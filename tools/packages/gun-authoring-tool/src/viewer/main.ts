@@ -9,7 +9,6 @@ import { worldBox } from '@skelly/construct/shapes/geometry.ts';
 import { DEFAULT_REVOLVE_FACETS, MAX_REVOLVE_FACETS, MIN_REVOLVE_FACETS } from '@skelly/construct/shapes/revolve.ts';
 import { type CameraState, parseCameraState, serializeCameraState } from '@skelly/tool-ui/camera-state';
 import { createOrbitControls } from '@skelly/tool-ui/orbit';
-import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import {
   buildPanelModel,
   clearParam,
@@ -41,6 +40,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { formatCartridgeParseError, parseCartridgeJson } from '../ammo/parseCartridge.ts';
 import { actionOpenOffsets, resolveGunAction } from '../gun/actionDescription.ts';
 import { previewFittedAttachments } from '../gun/attachmentPreview.ts';
@@ -91,13 +91,21 @@ const fixtures = Object.entries(
 
 const DESIGN_EXTENSION = /\.json$/;
 const designs = Object.entries(
-  import.meta.glob<string>('../../../../../models/guns/designs/*.json', { eager: true, import: 'default', query: '?raw' }),
+  import.meta.glob<string>('../../../../../models/guns/designs/*.json', {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  }),
 )
   .map(([path, text]) => ({ name: path.split('/').at(-1)!.replace(DESIGN_EXTENSION, ''), text }))
   .sort((a, b) => compareCodeUnits(a.name, b.name));
 
 const cartridges = Object.entries(
-  import.meta.glob<string>('../../../../../models/guns/cartridges/*.json', { eager: true, import: 'default', query: '?raw' }),
+  import.meta.glob<string>('../../../../../models/guns/cartridges/*.json', {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  }),
 ).flatMap(([path, text]) => {
   const parsed = parseCartridgeJson(text);
   if (!parsed.ok) {
@@ -235,7 +243,6 @@ const ammoMeshes: AmmoMeshes | undefined = ammoCartridge
       ammoCartridge,
       ammoFinishFromQuery(ammoCartridge, initialQuery.get('ammoCase')),
       ammoEnvironment(renderer),
-      revolveFacets,
     )
   : undefined;
 const showMagazine = initialQuery.has('mag');

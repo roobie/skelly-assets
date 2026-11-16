@@ -67,8 +67,8 @@ local cheek(id, slot, hx, hz, x, y0, y1) = h.prism(id, slot, 'y', [
     box('head', 'head', [0.07, 0.014, -0.032], [0.135, 0.078, 0.032]),
     disc('wheel', 'wheel', 0.0575, 0, 0.006, 0.10, 0),
     disc('nut', 'head', 0.012, 0.006, 0.014, 0.10, 0),
-  ] + h.crescent('guard', 'guard', 0.014, 0.062, 180, 360, 8, 0.008, 0.012, 0.10, 0)
-  + h.crescent('guard-lip', 'guard', 0.058, 0.062, 180, 360, 8, 0.0, 0.012, 0.10, 0)
+  ] + h.crescent('guard', 'guard', 0.014, 0.063, 180, 360, 8, 0.008, 0.012, 0.10, 0)
+  + h.crescent('guard-lip', 'guard', 0.058, 0.063, 180, 360, 8, 0.0, 0.012, 0.10, 0)
   + [
     zrod('side-handle', 'grip', 0.013, 0.032, 0.13, 0.105, 0.05),
   ], { body: 'plastic-charcoal', grip: 'plastic-matte-black', switch: 'plastic-red', head: 'alu-bare', wheel: 'ceramic-grey', guard: 'steel-bright' }) + { title: 'Angle grinder' }

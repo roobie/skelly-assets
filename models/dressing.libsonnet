@@ -10,9 +10,20 @@
     sides: ['right', 'left'],
     mirrored: 'left',
   },
+  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions that part is cut into,
+  // which the doll's export keeps as pieces (docs/decisions/0012-hidden-body.md). A part not listed is not cut.
+  regions: {
+    // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
+    torso: ['trunk', 'shoulders'],
+    // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it: heel, instep and toes.
+    foot: ['ankle', 'sole'],
+  },
   // The doll part a worn piece with no segment in its id, `<item>_worn`, is drawn in. A segment's part is in
   // models/worn-slots.libsonnet.
   piece: 'torso',
+  // The fits of pieces fitted over other clothing, `<item>_worn_<layer>`, which the doll leaves out. Each is drawn in
+  // the frame of its `<item>_worn` twin, since it is that piece shaped one layer out.
+  layers: ['over-jacket'],
   // The states whose models lie on their back with their head end at -z (docs/decisions/0002-model-frame.md), so a
   // wearable in one stands up, head end up and front forward, before it is placed.
   lying: ['folded'],

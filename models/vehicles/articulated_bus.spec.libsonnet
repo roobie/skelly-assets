@@ -6,7 +6,7 @@ local bus = import 'bus-body.libsonnet';
 local seat = bus.seat;
 local single = bus.single;
 local portalTop = 2.6;
-local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engineDeck', 'engineHatch', 'sign'], city) + {
+local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engineDeck', 'engineHatch', 'sign', 'batteryLocker'], city) + {
   paint: 'paint-white', band: 'paint-green', bumperFinish: 'paint-green',
   power: {
     engine: 'engine_i6_heavy_diesel', engineAt: [-8.15, 0.32, 0],
@@ -15,7 +15,6 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     radiator: 'radiator_truck', radiatorAt: [-8.8, 0.32, 0],
     tank: 'fuel_tank_truck', tankAt: [-6.75, 0.32, 0.86],
     exhaust: 'exhaust_long', exhaustAt: [-8.2, 0.36, -0.56],
-    batteryAt: [8.4, 0.42, -0.9],
   },
 };
 {
@@ -24,6 +23,8 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     rear: -0.4, front: 9,
     decks: [{ waist: 1.15, top: 2.55, bayFront: 8.6, pitch: 1.4, bays: 6 }],
     frontAxle: 6.3, rearAxle: 0.4,
+    // Between the legs of the far seats behind the front wheel.
+    batteryLocker: 4.825,
     doors: [{ bay: 0 }, { bay: 3 }],
     rearHoles: [{ y: [0.36, portalTop], z: 1.0, door: true }],
     sign: city.sign,
@@ -49,7 +50,7 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     rear: -9, front: -1.6,
     bonnet: { cowl: -1.6, cowlY: 1.7, noseY: 1.5, flankY: 0.7, halfWidth: 0.9 },
     lean: 0, screens: [[0.36, portalTop]],
-    floorRear: 0.82, floorStep: -4.72, engineDeck: { x: -7.25, y: 1.28 },
+    floorRear: 0.82, floorStep: -4.72, engineDeck: { x: -7.25, y: 1.36 },
     decks: [{ waist: 1.15, top: 2.55, bayFront: -1.85, pitch: 1.4, bays: 4 }],
     rearAxle: -5.6,
     doors: [{ bay: 1 }],
@@ -63,8 +64,8 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
       seat(-4.4, 0.36, 'far'),
       seat(-5.6, 1.18, 'both'),
       seat(-6.5, 0.82, 'both'),
-      seat(-7.65, 1.28, 'both'),
-      seat(-8.4, 1.28, 'both'),
+      seat(-7.65, self.engineDeck.y, 'both'),
+      seat(-8.4, self.engineDeck.y, 'both'),
     ],
   },
 }

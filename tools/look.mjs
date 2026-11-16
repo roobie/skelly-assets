@@ -11,7 +11,8 @@ import { join } from 'node:path';
 export const LOOK_DIR = 'look/sheet';
 
 const vehicleById = (manifest) => new Map(manifest.vehicles.map((vehicle) => [vehicle.id, vehicle]));
-const glbById = (manifest) => new Map(manifest.models.filter(({ path }) => path.endsWith('.glb')).map((model) => [model.id, model]));
+const glbById = (manifest) =>
+  new Map(manifest.models.filter(({ path }) => path.endsWith('.glb')).map((model) => [model.id, model]));
 const assemblyById = (manifest) => new Map((manifest.assemblies ?? []).map((assembly) => [assembly.id, assembly]));
 const wornById = (manifest) => new Map(Object.entries(manifest.worn ?? {}));
 
@@ -36,7 +37,10 @@ export function lookSources(built, manifest, id) {
   const assembly = assemblyById(manifest).get(id);
   if (assembly) return partFiles(assembly.sites.map(({ model }) => model));
   const vehicle = vehicleById(manifest).get(id);
-  if (!vehicle) return [...new Set([fileOf(models.get(id)), ...partFiles((wornById(manifest).get(id) ?? []).map(({ model }) => model))])];
+  if (!vehicle)
+    return [
+      ...new Set([fileOf(models.get(id)), ...partFiles((wornById(manifest).get(id) ?? []).map(({ model }) => model))]),
+    ];
   const placements = fileOf(vehicle);
   const { sites } = JSON.parse(readFileSync(join(built, placements), 'utf8'));
   return [placements, ...partFiles(sites.map(({ part }) => part))];
@@ -46,8 +50,9 @@ export function lookSources(built, manifest, id) {
 // such as a printed label, where an assembly sites its parts or where the doll wears a wearable. Undefined when the
 // tree no longer holds it or one of its files.
 export function lookDigest(built, manifest, id) {
-  const entries = [...glbById(manifest).values(), ...manifest.vehicles, ...assemblyById(manifest).values()]
-    .filter((entry) => entry.id === id);
+  const entries = [...glbById(manifest).values(), ...manifest.vehicles, ...assemblyById(manifest).values()].filter(
+    (entry) => entry.id === id,
+  );
   if (entries.length === 0) return undefined;
   let files;
   try {
@@ -61,18 +66,23 @@ export function lookDigest(built, manifest, id) {
   return hash.digest('hex');
 }
 
-// A look's options as the sheet prints and keys them: its view set and the sites it keeps (site/lookOptions.mjs).
-export const lookName = ({ views = 'review', sites = [] } = {}) => (sites.length > 0 ? `${views} views, sites ${sites.join(', ')}` : `${views} views`);
+// A look's options as the sheet prints and keys them: its view set, whether it draws what opens open, and the sites it
+// keeps (site/lookOptions.mjs).
+export const lookName = ({ views = 'review', sites = [], open = false } = {}) =>
+  [`${views} views`, ...(open ? ['open'] : []), ...(sites.length > 0 ? [`sites ${sites.join(', ')}`] : [])].join(', ');
 
 // The sheet's rows after a look named `look` (lookName): each row drawn now replaces its earlier one, so a few redrawn
 // entries still show beside the rest of a batch, and a row whose entry the tree no longer holds is dropped. A sheet
 // shows one look, so rows drawn with other options are dropped too.
 export function mergeRows(previous, drawn, known, look = lookName()) {
-  const byId = new Map(previous.filter((row) => known.has(row.id) && (row.look ?? lookName()) === look).map((row) => [row.id, row]));
+  const byId = new Map(
+    previous.filter((row) => known.has(row.id) && (row.look ?? lookName()) === look).map((row) => [row.id, row]),
+  );
   for (const row of drawn) byId.set(row.id, row);
   return [...byId.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
 // The ids whose picture no longer shows the built tree: a row drawn from files that have changed since, or that the
 // tree no longer holds. A row that failed to draw has no picture to be stale.
-export const staleIds = (rows, digestOf) => rows.filter((row) => !row.error && digestOf(row.id) !== row.digest).map(({ id }) => id);
+export const staleIds = (rows, digestOf) =>
+  rows.filter((row) => !row.error && digestOf(row.id) !== row.digest).map(({ id }) => id);

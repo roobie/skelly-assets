@@ -107,7 +107,7 @@ describe('shotshell cartridge export', () => {
   });
 
   it('keeps viewer loaded and fired geometry aligned with their corresponding GLBs', async () => {
-    const view = buildAmmoMeshes(shell, cartridgeFinish(shell), new Texture(), 96);
+    const view = buildAmmoMeshes(shell, cartridgeFinish(shell), new Texture());
     const models = exported();
     const pairs = [
       [view.loose, models.round, view.lengthUnits],

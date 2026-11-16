@@ -13,8 +13,9 @@
 //        node tools/model-history.mjs backfill --out <file> --work <dir>
 //          rebuild it by walking every release
 // The release commands read GitHub through `gh`.
-import { createHash } from 'node:crypto';
+
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -44,20 +45,24 @@ export function previousTag(tags, tag) {
   return earlier.at(-1);
 }
 
-const sha256 = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
+// One file's hash is its bytes' alone, so a model that has only that file keeps the hash an earlier release gave it. A
+// GLB states its own length, so files run end to end hash apart however their bytes are shared out.
+const sha256 = (files) =>
+  files.reduce((hash, file) => hash.update(readFileSync(file)), createHash('sha256')).digest('hex');
 
 /**
- * id -> sha256 of the file a built tree's manifest names: a model's GLB, or a vehicle's placements file, which is what
- * a vehicle is made of beside the models at its sites.
+ * id -> sha256 of the files a built tree's manifest names: a model's GLB and its smooth copy, so a change to either is
+ * an update, or a vehicle's placements file, which is what a vehicle is made of beside the models at its sites.
  */
 export function hashModels(built, manifest) {
   const hashes = {};
-  const add = (id, pack, path) => {
+  const add = (id, files) => {
     if (Object.hasOwn(hashes, id)) throw new Error(`${id} names more than one file to hash`);
-    hashes[id] = sha256(join(built, pack, path));
+    hashes[id] = sha256(files.map(({ pack, path }) => join(built, pack, path)));
   };
-  for (const { id, pack, path } of manifest.models) if (path.endsWith('.glb')) add(id, pack, path);
-  for (const { id, pack, path } of manifest.vehicles ?? []) add(id, pack, path);
+  for (const { id, pack, path, smooth } of manifest.models)
+    if (path.endsWith('.glb')) add(id, [{ pack, path }, ...(smooth ? [smooth] : [])]);
+  for (const { id, pack, path } of manifest.vehicles ?? []) add(id, [{ pack, path }]);
   return hashes;
 }
 
@@ -68,11 +73,14 @@ function carry(previous, hashes, renames) {
     const current = renames[id] ?? id;
     if (!Object.hasOwn(hashes, current)) continue;
     const kept = carried[current];
-    carried[current] = kept === undefined ? entry : {
-      introduced: [kept.introduced, entry.introduced].sort(compareVersions)[0],
-      updated: [kept.updated, entry.updated].sort(compareVersions).at(-1),
-      sha256: null,
-    };
+    carried[current] =
+      kept === undefined
+        ? entry
+        : {
+            introduced: [kept.introduced, entry.introduced].sort(compareVersions)[0],
+            updated: [kept.updated, entry.updated].sort(compareVersions).at(-1),
+            sha256: null,
+          };
   }
   return carried;
 }
@@ -99,11 +107,13 @@ export function mergeHistory({ previous, version, hashes, renames = {} }) {
  */
 export function standings(history, hashes, renames = {}) {
   const carried = carry(history, hashes, renames);
-  return Object.fromEntries(Object.keys(hashes).map((id) => {
-    const entry = carried[id];
-    if (entry === undefined) return [id, null];
-    return [id, { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
-  }));
+  return Object.fromEntries(
+    Object.keys(hashes).map((id) => {
+      const entry = carried[id];
+      if (entry === undefined) return [id, null];
+      return [id, { introduced: entry.introduced, updated: entry.updated, changed: entry.sha256 !== hashes[id] }];
+    }),
+  );
 }
 
 /**
@@ -124,8 +134,8 @@ export function vehicleStanding(own, parts) {
 const gh = (...args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 2 ** 28 });
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 
-const releaseTags = () => JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000'))
-  .map(({ tagName }) => tagName);
+const releaseTags = () =>
+  JSON.parse(gh('release', 'list', '--json', 'tagName', '--limit', '1000')).map(({ tagName }) => tagName);
 
 function download(tag, dir, ...patterns) {
   mkdirSync(dir, { recursive: true });

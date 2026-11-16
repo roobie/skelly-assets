@@ -6,19 +6,28 @@ import { test } from 'node:test';
 import { exportPool, exportRecipes, fillCacheShard } from '../build.mjs';
 import { treeMismatches } from '../check-built.mjs';
 import { compileJsonnetFile } from '../jsonnet/index.mjs';
-import { outputPath } from '../layout.mjs';
+import { outputPath, smoothPack } from '../layout.mjs';
 import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 await installJsonnetSources();
 const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
-const gunRows = JSON.parse(readFileSync(join(import.meta.dirname, '../packages/gun-authoring-tool/exports/deadvox.json'), 'utf8'));
+const gunRows = JSON.parse(
+  readFileSync(join(import.meta.dirname, '../packages/gun-authoring-tool/exports/deadvox.json'), 'utf8'),
+);
 
 // A gun row that reads no file, so it exports from any root, and an item row of the thing catalogue.
 const gunRow = () => ({ ...structuredClone(gunRows.find((row) => row.kind === 'part')), title: 'Fixture Gun Part' });
 const itemRow = () => {
   const item = catalogue.items.find((entry) => entry.exportMass === 'inventory-atom');
-  return { id: `${gunRow().id}_item`, kind: 'item', title: 'Fixture Item', source: item.id, voxel: { grain: 0.01 }, options: { mass: item.exportMass } };
+  return {
+    id: `${gunRow().id}_item`,
+    kind: 'item',
+    title: 'Fixture Item',
+    source: item.id,
+    voxel: { grain: 0.01 },
+    options: { mass: item.exportMass },
+  };
 };
 
 const withRoot = async (packId, rows, work) => {
@@ -26,7 +35,8 @@ const withRoot = async (packId, rows, work) => {
   const out = mkdtempSync(join(tmpdir(), 'build-output-'));
   try {
     mkdirSync(join(root, 'models/recipes'), { recursive: true });
-    for (const extension of ['jsonnet', 'json']) writeFileSync(join(root, 'models/recipes', `${packId}.${extension}`), JSON.stringify(rows));
+    for (const extension of ['jsonnet', 'json'])
+      writeFileSync(join(root, 'models/recipes', `${packId}.${extension}`), JSON.stringify(rows));
     await work(root, out);
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -43,19 +53,28 @@ test('one recipe file builds its gun and item rows into one pack, each in its to
     const base = join(out, outputPath(packId, '.keep'), '..');
     assert.equal(JSON.parse(readFileSync(join(base, 'gungen', `${gun.id}.model.json`), 'utf8')).id, gun.id);
     assert.ok(!existsSync(join(base, 'gungen/index.json')));
-    assert.deepEqual(JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8')).map(({ id }) => id), [item.id]);
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(base, 'things/index.json'), 'utf8')).map(({ id }) => id),
+      [item.id],
+    );
     for (const id of [gun.id, item.id]) assert.ok(existsSync(join(base, 'assets/models', `${id}.glb`)), id);
   });
 });
 
-const filesUnder = (directory) => readdirSync(directory, { recursive: true, withFileTypes: true })
-  .filter((entry) => entry.isFile()).map((entry) => relative(directory, join(entry.parentPath, entry.name))).sort();
+const filesUnder = (directory) =>
+  readdirSync(directory, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(directory, join(entry.parentPath, entry.name)))
+    .sort();
 
 // The names of a GLB's part nodes: the nodes that carry a part in their extras.
 const glbPartNodes = (bytes) => {
   const length = bytes.readUInt32LE(12);
   const { nodes } = JSON.parse(bytes.subarray(20, 20 + length).toString('utf8'));
-  return nodes.filter((node) => node.extras?.part !== undefined).map((node) => node.name).sort();
+  return nodes
+    .filter((node) => node.extras?.part !== undefined)
+    .map((node) => node.name)
+    .sort();
 };
 
 test('the driver reports every file it wrote, and each model with the part nodes its GLB carries', async () => {
@@ -66,7 +85,10 @@ test('the driver reports every file it wrote, and each model with the part nodes
     assert.ok(models.length > 0);
     for (const model of models) {
       assert.equal(model.pack, packId);
-      assert.ok(files.includes(outputPath(model.pack, model.path)), `${model.id} names a file the driver did not write`);
+      assert.ok(
+        files.includes(outputPath(model.pack, model.path)),
+        `${model.id} names a file the driver did not write`,
+      );
       assert.ok(model.nodes.length > 0, `${model.id} has no part node`);
       assert.deepEqual([...model.nodes].sort(), glbPartNodes(readFileSync(join(out, model.pack, model.path))));
     }
@@ -82,12 +104,15 @@ test('the tools left out of a run write nothing', async () => {
   });
 });
 
-test('an id build writes only the requested row, at its pack path, and no pack index', async () => {
+test('an id build writes only the requested row, at its pack path with its smooth copy, and no pack index', async () => {
   const packId = 'fixture.mixed';
   const item = itemRow();
   await withRoot(packId, [gunRow(), item], async (root, out) => {
     await exportRecipes({ root, out, tools: ['gun', 'thing'], ids: new Set([item.id]) });
-    const expected = [`things/${item.id}.model.json`, `assets/models/${item.id}.glb`].map((file) => outputPath(packId, file));
+    const expected = [
+      ...[`things/${item.id}.model.json`, `assets/models/${item.id}.glb`].map((file) => outputPath(packId, file)),
+      outputPath(smoothPack(packId), `assets/models/${item.id}.glb`),
+    ];
     assert.deepEqual(filesUnder(out), expected.sort());
   });
 });
@@ -114,7 +139,9 @@ test('every catalogue row is exported by its assigned pack', () => {
   try {
     const source = join(scratch, 'packs.jsonnet');
     writeFileSync(source, "(import 'models/catalogue/packs.libsonnet').packs\n");
-    const exported = new Set(readRecipes().flatMap(({ packId, value }) => value.map((row) => `${packId} ${row.source}`)));
+    const exported = new Set(
+      readRecipes().flatMap(({ packId, value }) => value.map((row) => `${packId} ${row.source}`)),
+    );
     for (const [id, packId] of Object.entries(JSON.parse(compileJsonnetFile(source)))) {
       assert.ok(exported.has(`${packId} ${id}`), `${packId} does not export catalogue row ${id}`);
     }
@@ -123,19 +150,30 @@ test('every catalogue row is exported by its assigned pack', () => {
   }
 });
 
+// A fleet with no vehicle, so a fixture root's shards sweep no swing: the fixture rows are not vehicles.
+const NO_VEHICLES = { motions: {}, vehicles: {} };
+
 const cacheEntries = (cache) => (existsSync(cache) ? filesUnder(cache).length : 0);
 
 // CI generates a clean build in shards and then builds the tree from their merged caches: a row no shard generated
-// would be generated by that last build instead, and the tree must be the one an uncached build writes.
-test('a tree built from its shards\' caches is generated by the shards and equals an uncached build', async () => {
+// would be generated by that last build instead, and the tree must be the one an uncached build writes. The fixture
+// holds a row of each production recipe tool, so a hit equals a fresh export for every tool's rows.
+test("a tree built from its shards' caches is generated by the shards and equals an uncached build", async () => {
   const items = catalogue.items.filter((entry) => entry.exportMass === 'inventory-atom').slice(0, 3);
-  const rows = items.map((item) => ({ id: `${item.id}_shard`, kind: 'item', title: 'Fixture Item', source: item.id, voxel: { grain: 0.01 }, options: { mass: item.exportMass } }));
-  await withRoot('fixture.shards', rows, async (root, out) => {
+  const rows = items.map((item) => ({
+    id: `${item.id}_shard`,
+    kind: 'item',
+    title: 'Fixture Item',
+    source: item.id,
+    voxel: { grain: 0.01 },
+    options: { mass: item.exportMass },
+  }));
+  await withRoot('fixture.shards', [gunRow(), ...rows], async (root, out) => {
     writeFileSync(join(root, 'models/export.json'), '{}');
     const cache = join(out, '.cache');
     const filled = [];
     for (const index of [1, 2]) {
-      await fillCacheShard({ root, shard: { index, count: 2 }, cache });
+      await fillCacheShard({ root, shard: { index, count: 2 }, cache, sitePieces: NO_VEHICLES });
       filled.push(cacheEntries(cache));
     }
     assert.ok(filled[0] > 0 && filled[1] > filled[0], `each shard generates a share: ${filled}`);
@@ -175,7 +213,14 @@ test('a gun row is reused from the cache until the file it names changes', async
 // The cache would otherwise keep an entry for every edit ever built.
 test('a complete build keeps exactly the cache entries it used, and a rebuild reuses every one', async () => {
   const items = catalogue.items.filter((entry) => entry.exportMass === 'inventory-atom').slice(0, 2);
-  const rowOf = (item) => ({ id: `${item.id}_kept`, kind: 'item', title: 'Fixture Item', source: item.id, voxel: { grain: 0.01 }, options: { mass: item.exportMass } });
+  const rowOf = (item) => ({
+    id: `${item.id}_kept`,
+    kind: 'item',
+    title: 'Fixture Item',
+    source: item.id,
+    voxel: { grain: 0.01 },
+    options: { mass: item.exportMass },
+  });
   const build = async (root, out, cache) => {
     const pool = exportPool(cache);
     try {
@@ -190,9 +235,14 @@ test('a complete build keeps exactly the cache entries it used, and a rebuild re
     const cache = join(out, '.cache');
     await build(root, join(out, 'first'), cache);
     const recipe = JSON.stringify([gunRow(), rowOf(items[0])]);
-    for (const extension of ['jsonnet', 'json']) writeFileSync(join(root, 'models/recipes', `fixture.kept.${extension}`), recipe);
+    for (const extension of ['jsonnet', 'json'])
+      writeFileSync(join(root, 'models/recipes', `fixture.kept.${extension}`), recipe);
     await build(root, join(out, 'second'), cache);
-    assert.equal(cacheEntries(cache), 4, 'the gun row and the one item row left, a GLB and a JSON file each');
+    assert.equal(
+      cacheEntries(cache),
+      6,
+      'the gun row and the one item row left, a GLB, its smooth copy and a JSON file each',
+    );
     assert.deepEqual(await build(root, join(out, 'third'), cache), { reused: 2, generated: 0 });
   });
 });

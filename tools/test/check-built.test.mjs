@@ -17,13 +17,28 @@ test('a further fresh tree must equal the first: a missing, an extra and a chang
   try {
     const first = join(root, 'first');
     const other = join(root, 'other');
-    writeTree(first, { 'manifest.json': '{}', 'fixture.a/kept.glb': 'same', 'fixture.a/lost.glb': 'x', 'fixture.b/drift.glb': 'abc' });
-    writeTree(other, { 'manifest.json': '{}', 'fixture.a/kept.glb': 'same', 'fixture.b/drift.glb': 'abd', 'fixture.b/extra.glb': 'y' });
+    writeTree(first, {
+      'manifest.json': '{}',
+      'fixture.a/kept.glb': 'same',
+      'fixture.a/lost.glb': 'x',
+      'fixture.b/drift.glb': 'abc',
+    });
+    writeTree(other, {
+      'manifest.json': '{}',
+      'fixture.a/kept.glb': 'same',
+      'fixture.b/drift.glb': 'abd',
+      'fixture.b/extra.glb': 'y',
+    });
     assert.deepEqual(treeMismatches(first, first), []);
     const mismatches = treeMismatches(first, other);
     assert.equal(mismatches.length, 3, mismatches.join('\n'));
     for (const file of ['fixture.a/lost.glb', 'fixture.b/extra.glb', 'fixture.b/drift.glb']) {
-      assert.ok(mismatches.some((line) => line.endsWith(`: ${file}`)), `${file} is not reported:\n${mismatches.join('\n')}`);
+      assert.ok(
+        mismatches.some((line) => line.endsWith(`: ${file}`)),
+        `${file} is not reported:\n${mismatches.join('\n')}`,
+      );
     }
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

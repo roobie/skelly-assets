@@ -20,7 +20,7 @@ local bootFinish = { upper: 'steel-gunmetal', toe: 'paint-graphite', sole: 'rubb
 
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
+  fit.refit(row, [p for p in pieces if !drop(p.id)] + add, grain);
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
 local round(piece) = piece + { sides: 12 };
@@ -115,15 +115,25 @@ local shinAdd = [
   oct('greave-rim', 'glow', -shinLength - leg.ankleOverlap, -shinLength + 0.01, sw + 0.05, sd + 0.05, leg.shinChamfer / 2 + 0.02),
 ] + piston('shin-piston', 0, -(sd + 0.04) / 2 - 0.02, -shinLength + 0.03, -0.09);
 
-// The helm: an angular shell with a swept crown, a glowing visor slit, vents, light strips on the cheeks and a rear fin.
-// Its brow anchor is the point of its shell that a seat with the visor slit over the eyes puts at the hairline.
-local visor = { min: [-0.1, 0.155, 0.135], max: [0.1, 0.185, 0.15] };
+// The helm: an angular shell sloping in to a swept crown chamfered along its sides, a skirt flared out over the nape, a
+// glowing visor slit under a peaked brow, vents, light strips on the cheeks and a rear fin. Its brow anchor is the point
+// of its shell that a seat with the visor slit over the eyes puts at the hairline.
+local visor = { min: [-0.08, 0.155, 0.135], max: [0.08, 0.185, 0.15] };
 local shell = { min: [-0.125, 0.03, -0.14], max: [0.125, 0.25, 0.14] };
+local taper = [0.015, 0.008, 0.015];
+local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
+local shellBlock = h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, taper, 0);
+// The crown carries on the shell's own faces, so it reads as one moulding with it: the shell's sloped sides and cut
+// corners, and its 45-degree cuts in from the top's outline at the sides and front. Its back rises sheer from the
+// shell's to carry the fin, so the shell's back chamfers (the 45-degree planes facing -z) stay off it.
+local backChamfer(plane) = plane.normal[1] == 1 && plane.normal[2] < 0;
+local crownCut = [plane for plane in shellBlock.clip if !backChamfer(plane)];
 local helmet = [
-  h.box('skirt', 'trim', [-0.135, 0, -0.15], [0.135, 0.035, 0.15]),
-  h.box('shell', 'plate', shell.min, shell.max),
-  h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115),
-  h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.13, 0.13),
+  h.taperedBlock('skirt', 'trim', [-0.135, 0, -0.165], [0.135, 0.035, 0.15], 0.04, [0.01, 0.01, 0.025], 0),
+  shellBlock,
+  h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115)
+  + { clip: crownCut },
+  h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.075, 0.075),
   h.box('visor', 'glow', visor.min, visor.max),
   h.prism('jaw', 'plate', 'x', [[0.035, 0.12], [0.15, 0.13], [0.15, 0.175], [0.05, 0.17]], -0.075, 0.075),
   h.prism('fin', 'trim', 'x', [[0.28, -0.12], [0.34, -0.1], [0.37, -0.14], [0.27, -0.14]], -0.012, 0.012),
@@ -131,21 +141,21 @@ local helmet = [
   h.box('vent-%d' % i, 'strap', [-0.04, 0.07 + i * 0.022, 0.17], [0.04, 0.081 + i * 0.022, 0.18])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'trim', [[-0.14, 0.125][i], 0.06, -0.06], [[-0.125, 0.14][i], 0.2, 0.12])
+  h.box('cheek-%d' % i, 'trim', [[-0.14, 0.11][i], 0.06, -0.06], [[-0.11, 0.14][i], 0.2, 0.12])
   for i in [0, 1]
 ] + [
   h.box('cheek-light-%d' % i, 'glow', [[-0.146, 0.14][i], 0.1, 0.0], [[-0.14, 0.146][i], 0.16, 0.1])
   for i in [0, 1]
 ];
 
-local body = fit.trooper('armor_power', livery, title='Power body armour').rows;
-local legs = fit.trooperLegs('legguard_power', livery, title='Power leg guards').rows;
+local body = fit.trooper('armor_power', livery, title='Power body armour');
+local legs = fit.trooperLegs('legguard_power', livery, title='Power leg guards');
 local gloves = fit.hands('gloves_power', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.05, hem: 0.018, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}, 'Power gauntlets').rows;
+}, 'Power gauntlets');
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots').rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, { covers: ['foot'] }, title='Power boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);
@@ -159,14 +169,15 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-armour.of('sci-fi', [
-  local seg = std.split(r.id, '_worn_')[1];
-  if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
-  for r in body + gloves + legs + boots
-] + [
-  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
-    title: 'Power helmet',
-    voxelGrain: 0.004,
-    anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(fit.eyesAt((visor.min[1] + visor.max[1]) / 2)).brow) },
+// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+local worn = { armor_power: body, legguard_power: legs, gloves_power: gloves, boots_power: boots };
+local powered(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
+{ [k]: worn[k] + { rows: armour.of('sci-fi', [powered(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
+  helmet_power: fit.head('helmet_power', helmetBase) + {
+    rows: armour.of('sci-fi', [h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
+      title: 'Power helmet',
+      voxelGrain: 0.004,
+      anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+    }]),
   },
-])
+}

@@ -23,7 +23,8 @@ export function turnPointArray(array) {
   return out;
 }
 
-const mapValues = (object, turn) => Object.fromEntries(Object.entries(object).map(([key, value]) => [key, turn(value)]));
+const mapValues = (object, turn) =>
+  Object.fromEntries(Object.entries(object).map(([key, value]) => [key, turn(value)]));
 
 function turnFields(object, turns, kept, what) {
   const out = {};
@@ -51,16 +52,19 @@ export const turnCellIndex = (dims) => {
 function turnCells({ size, origin, dims, filled }) {
   const index = turnCellIndex(dims);
   return {
-    size, dims,
+    size,
+    dims,
     origin: origin.map((o, a) => (S[a] < 0 ? -(o + dims[a] - 1) : o)),
     filled: filled.map(([cell, owner]) => [index(cell), owner]).sort((a, b) => a[0] - b[0]),
   };
 }
 
 const BONE_TURNS = {
-  head: turnPoint, tail: turnPoint,
+  head: turnPoint,
+  tail: turnPoint,
   frame: (frame) => mapValues(frame, turnPoint),
-  voxels: (points) => points.map(turnPoint), hull: (points) => points.map(turnPoint),
+  voxels: (points) => points.map(turnPoint),
+  hull: (points) => points.map(turnPoint),
 };
 // Joint limits and ids read in the bone's own joint frame, which turns with the bone.
 const BONE_KEPT = new Set(['id', 'parent', 'limits', 'disposition']);
@@ -72,7 +76,9 @@ const BODY_TURNS = {
   boxes: (boxes) => mapValues(boxes, (list) => list.map((box) => ({ ...box, center: turnPoint(box.center) }))),
   extents: (extents) => mapValues(extents, turnExtent),
   bounds: turnExtent,
-  originOffset: turnPoint, coreInteriorPoint: turnPoint, restStrikeOrigin: turnPoint,
+  originOffset: turnPoint,
+  coreInteriorPoint: turnPoint,
+  restStrikeOrigin: turnPoint,
   cells: turnCells,
   animation: ({ flinch, ...timing }) => ({
     ...timing,
@@ -80,14 +86,32 @@ const BODY_TURNS = {
   }),
 };
 const BODY_KEPT = new Set([
-  'type', 'model', 'seed', 'bodyPlan', 'legCut', 'scale', 'height', 'voxelSize', 'bodyMassKg', 'massFractions',
-  'regions', 'severableParts', 'burstBones', 'groundContactBones', 'lookAt', 'manifest',
+  'type',
+  'model',
+  'seed',
+  'bodyPlan',
+  'legCut',
+  'scale',
+  'height',
+  'voxelSize',
+  'bodyMassKg',
+  'massFractions',
+  'regions',
+  'severableParts',
+  'burstBones',
+  'groundContactBones',
+  'lookAt',
+  'manifest',
 ]);
 
 /** A baked body in the model frame. */
 export const fileBody = (body) => turnFields(body, BODY_TURNS, BODY_KEPT, 'body');
 
-const turnPose = (frame) => ({ ...frame, root: turnPoint(frame.root), rotations: mapValues(frame.rotations, turnQuat) });
+const turnPose = (frame) => ({
+  ...frame,
+  root: turnPoint(frame.root),
+  rotations: mapValues(frame.rotations, turnQuat),
+});
 
 const turnOscillator = (oscillator) => ({
   ...oscillator,
@@ -96,14 +120,23 @@ const turnOscillator = (oscillator) => ({
 
 function turnClip(clip) {
   switch (clip.kind) {
-    case 'pose': return { ...clip, frames: clip.frames.map(turnPose) };
-    case 'overlay': return { ...clip, frames: clip.frames.map((frame) => ({ ...frame, angles: mapValues(frame.angles, turnAngles) })) };
+    case 'pose':
+      return { ...clip, frames: clip.frames.map(turnPose) };
+    case 'overlay':
+      return {
+        ...clip,
+        frames: clip.frames.map((frame) => ({ ...frame, angles: mapValues(frame.angles, turnAngles) })),
+      };
     // Its angles are about each bone's joint frame, which the body turns.
-    case 'jointDelta': return clip;
+    case 'jointDelta':
+      return clip;
     case undefined:
       // An idle with live motion, or a set of clips keyed by stance, name, side or direction.
-      return 'motion' in clip ? { ...clip, base: turnPose(clip.base), motion: clip.motion.map(turnOscillator) } : mapValues(clip, turnClip);
-    default: throw new Error(`unknown clip kind ${clip.kind}`);
+      return 'motion' in clip
+        ? { ...clip, base: turnPose(clip.base), motion: clip.motion.map(turnOscillator) }
+        : mapValues(clip, turnClip);
+    default:
+      throw new Error(`unknown clip kind ${clip.kind}`);
   }
 }
 

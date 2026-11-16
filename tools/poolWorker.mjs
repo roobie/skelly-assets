@@ -9,7 +9,9 @@ const portable = (error) =>
         message: error.message,
         stack: error.stack,
         ...(Array.isArray(error.issues)
-          ? { issues: error.issues.map(({ message, path }) => ({ message, path: path?.map(({ key }) => String(key)) })) }
+          ? {
+              issues: error.issues.map(({ message, path }) => ({ message, path: path?.map(({ key }) => String(key)) })),
+            }
           : {}),
         ...(error.cause === undefined ? {} : { cause: portable(error.cause) }),
       }

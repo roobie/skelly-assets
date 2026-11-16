@@ -43,22 +43,14 @@ local grate(prefix, l, w, y, gap) = [
   for i in std.range(1, std.floor(l / gap) - 1)
   for x in [-l / 2 + i * gap]
 ];
-// An S-hook in the xy plane hanging from (x, y), 4 mm stock, `ht` tall, at depth z.
 // An S-hook of 4 mm wire hung over a bar along x at (y, z) of radius `r`: the top curl wraps the bar, the shank
 // drops in front of whatever lies below it and the bottom curl turns open towards +z, at height `foot`.
 local hangHook(id, x, y, z, r, foot) =
-  local top = r + 0.004;
+  local top = r + 0.002;
   local path = [[y + top * std.sin(a), z + top * std.cos(a)] for a in [std.pi * d / 180 for d in [160, 120, 90, 60, 30, 0, -30]]]
-    + [[foot + 0.03, z + 0.034], [foot + 0.012, z + 0.036]]
-    + [[foot + 0.012 - 0.012 * std.cos(a), z + 0.048 - 0.012 * std.sin(a)] for a in [std.pi * d / 180 for d in [30, 60, 90, 120, 150, 180, 210]]];
-  [
-    local a = path[i];
-    local b = path[i + 1];
-    local q = [a[0] + (b[0] - a[0]) * k / 4, a[1] + (b[1] - a[1]) * k / 4];
-    box('%s-%d-%d' % [id, i, k], 'hook', [x - 0.002, q[0] - 0.002, q[1] - 0.002], [x + 0.002, q[0] + 0.002, q[1] + 0.002])
-    for i in std.range(0, std.length(path) - 2)
-    for k in std.range(0, 3)
-  ];
+    + [[foot + 0.03, z + 0.034]]
+    + [[foot + 0.014 - 0.012 * std.cos(a), z + 0.048 - 0.012 * std.sin(a)] for a in [std.pi * d / 180 for d in [90, 60, 30, 0, -30, -60, -90]]];
+  h.bend(id, 'hook', path, 0.004, x - 0.002, x + 0.002, 'x');
 [
   // A bench-mounted lever shear for sheet metal: a cast frame on a 300 by 240 mm foot plate, a 200 mm blade pair and a
   // 0.9 m lever raised to cut, about 0.95 m along the lever.
@@ -245,7 +237,7 @@ local hangHook(id, x, y, z, r, foot) =
   ], { frame: 'paint-red', table: 'steel-grey', steel: 'steel-bright', grip: 'rubber-black', pump: 'paint-charcoal' }) + { title: 'Manual tyre changer' } + { taxonomy: { category: 'machinery', tags: { material: ['metal'], place: ['workshop'] } } },
 
   // A steel butchering rack folded for carrying: three 600 mm legs and a crossbar strapped together, with three
-  // open S-hooks hung over the bar and a short chain coiled on the ground in front.
+  // open S-hooks hung over the bar and a short chain coiled on the ground against the legs.
   h.compound('metal_butcher_rack', 2.8, [
     h.tube('leg-%d' % i, 'tube', 0.0, 0.011, -0.3, 0.3, p.y, p.z)
     for i in std.range(0, 2)
@@ -261,8 +253,8 @@ local hangHook(id, x, y, z, r, foot) =
   ] + hangHook('hook-a', -0.07, 0.062, -0.004, 0.011, 0.0) + hangHook('hook-b', 0.0, 0.062, -0.004, 0.011, 0.0)
   + hangHook('hook-c', 0.07, 0.062, -0.004, 0.011, 0.0) + [
     local a = 2 * std.pi * i / 9;
-    local x = -0.2 + 0.028 * std.cos(a);
-    local z = 0.075 + 0.028 * std.sin(a);
+    local x = -0.2 + 0.022 * std.cos(a);
+    local z = 0.045 + 0.022 * std.sin(a);
     if i % 2 == 0 then
       h.turned('chain-%d' % i, 'chain', 'y', [[0, 0.006], [0, 0.0095], [0.004, 0.0095], [0.004, 0.006], [0, 0.006]], [x, 0, z])
     else

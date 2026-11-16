@@ -14,8 +14,9 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
-import { installJsonnetSources } from './sources.mjs';
+import { readSeveredParts } from './severedParts.mjs';
 import { overlapReport, readSitePieces } from './siteOverlap.mjs';
+import { installJsonnetSources } from './sources.mjs';
 import { stowageReport } from './stowage.mjs';
 import { swingReport, swingResults } from './swingClearance.mjs';
 import { readVocabulary, taxonomyReport } from './taxonomy.mjs';
@@ -27,14 +28,24 @@ export const ROSTER_ROWS = 'tools/packages/thing-authoring-tool/exports/deadvox.
 
 // Every model the production build writes, from its source row: { pack, id, title, taxonomy }. A recipe or roster row
 // carries its title and its taxonomy already resolved by Jsonnet; a mob row's taxonomy is resolved over the sheet's
-// defaults (layout.mjs, readMobRows).
+// defaults (layout.mjs, readMobRows), and a severed part takes the sheet's severed taxonomy (severedParts.mjs).
 export async function modelSources(root = repo) {
   await installJsonnetSources();
   const rosterRows = new Map(JSON.parse(readFileSync(join(root, ROSTER_ROWS), 'utf8')).map((row) => [row.id, row]));
   return [
-    ...readRoster(root).map(({ packId, id }) => ({ pack: packId, id, title: rosterRows.get(id)?.title, taxonomy: rosterRows.get(id)?.taxonomy })),
-    ...readRecipes(root).flatMap(({ packId, value }) => value.map((row) => ({ pack: packId, id: row.id, title: row.title, taxonomy: row.taxonomy }))),
+    ...readRoster(root).map(({ packId, id }) => ({
+      pack: packId,
+      id,
+      title: rosterRows.get(id)?.title,
+      taxonomy: rosterRows.get(id)?.taxonomy,
+    })),
+    ...readRecipes(root).flatMap(({ packId, value }) =>
+      value.map((row) => ({ pack: packId, id: row.id, title: row.title, taxonomy: row.taxonomy })),
+    ),
     ...readMobRows(root).map(({ pack, id, title, taxonomy }) => ({ pack, id, title, taxonomy })),
+    ...(await readSeveredParts(root)).flatMap(({ pack, parts }) =>
+      parts.map(({ id, title, taxonomy }) => ({ pack, id, title, taxonomy })),
+    ),
   ];
 }
 
@@ -66,7 +77,8 @@ export const vehicleReport = async (root = repo, { cache, prune = false } = {}) 
 function printReport({ untagged, unlisted, unjudged, problems }) {
   const byPack = Map.groupBy(untagged, ({ pack }) => pack);
   console.log(`untagged: ${untagged.length} model(s) in ${byPack.size} pack(s)`);
-  for (const [pack, models] of byPack) console.log(`  ${pack} (${models.length}): ${models.map(({ id }) => id).join(' ')}`);
+  for (const [pack, models] of byPack)
+    console.log(`  ${pack} (${models.length}): ${models.map(({ id }) => id).join(' ')}`);
   console.log(`unlisted keywords: ${unlisted.length}`);
   for (const { message } of unlisted) console.log(`  ${message}`);
   console.log(`unjudged vehicle overlaps and swings: ${unjudged.length}`);
@@ -76,9 +88,13 @@ function printReport({ untagged, unlisted, unjudged, problems }) {
 }
 
 async function main() {
-  const { values } = parseArgs({ options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } } });
+  const { values } = parseArgs({
+    options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } },
+  });
   const report = sourceReport(await modelSources(repo), readVocabulary(repo));
-  const selected = Object.fromEntries(Object.entries(report).map(([key, entries]) => [key, entries.filter(inPacks(values.pack))]));
+  const selected = Object.fromEntries(
+    Object.entries(report).map(([key, entries]) => [key, entries.filter(inPacks(values.pack))]),
+  );
   const vehicles = await vehicleReport(repo);
   selected.problems.push(...vehicles.problems);
   selected.unjudged = vehicles.unjudged;
@@ -87,4 +103,5 @@ async function main() {
   return selected.problems.length > 0 ? 1 : 0;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) process.exitCode = await main();
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href)
+  process.exitCode = await main();

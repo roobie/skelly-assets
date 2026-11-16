@@ -43,8 +43,9 @@ local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9
     assert fold > 0 && fold <= 90 : 'a leaf folds more than 0 and at most 90 degrees, so its free panel turns at most 180';
     assert jambSign == 1 || jambSign == -1 : 'a leaf has its jamb at one end';
     assert whole(panel) && whole(thick / 2) : 'a leaf panel is a whole number of grains wide and half deep';
-    // The pins sit a tenth of the leaf's height in from each end.
-    local pins(name, z) = k.hingePins(name, 'y', [0, height * 0.1, z], [0, height * 0.9, z], slot);
+    // The pins sit a tenth of the leaf's height in from each end, sized to the panel's grain so they sink into a
+    // neighbour no deeper than it.
+    local pins(name, z) = k.hingePins(name, 'y', [0, height * 0.1, z], [0, height * 0.9, z], slot, grain, 2 * grain);
     {
       span: std.sort([0, -jambSign * panel]),
       jamb: {

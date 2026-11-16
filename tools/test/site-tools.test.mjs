@@ -14,7 +14,10 @@ test('a served tool page or viewer that no link names is reported, and a linked 
       writeFileSync(join(out, dir, 'index.html'), '');
     }
     mkdirSync(join(out, 'built'));
-    const linked = [{ label: 'Linked', page: 'linked.html' }, { label: 'Shown', viewer: 'shown' }];
+    const linked = [
+      { label: 'Linked', page: 'linked.html' },
+      { label: 'Shown', viewer: 'shown' },
+    ];
     assert.deepEqual(unlinkedTools(out, linked), ['hidden/', 'stray.html']);
   } finally {
     rmSync(out, { recursive: true, force: true });
@@ -24,8 +27,13 @@ test('a served tool page or viewer that no link names is reported, and a linked 
 test('every module a shipped site page imports from its own folder is shipped too', () => {
   const site = join(import.meta.dirname, '../../site');
   const scripts = SITE_FILES.filter((f) => /\.m?js$/.test(f));
-  const imported = new Set(scripts.flatMap((f) => [...readFileSync(join(site, f), 'utf8').matchAll(/from '\.\/([\w-]+\.mjs)'/g)].map(([, module]) => module)));
+  const imported = new Set(
+    scripts.flatMap((f) =>
+      [...readFileSync(join(site, f), 'utf8').matchAll(/from '\.\/([\w-]+\.mjs)'/g)].map(([, module]) => module),
+    ),
+  );
   assert.ok(imported.size > 0);
   const shipped = [...SITE_FILES, ...TOOLS_FILES];
-  for (const module of imported) assert.ok(shipped.includes(module), `${module} is imported by a shipped site page but not shipped`);
+  for (const module of imported)
+    assert.ok(shipped.includes(module), `${module} is imported by a shipped site page but not shipped`);
 });

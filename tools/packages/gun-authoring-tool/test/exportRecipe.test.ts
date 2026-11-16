@@ -2,11 +2,13 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
 import { SMOOTH } from '@skelly/thing-export/glb.ts';
+import type { ModelExport } from '@skelly/thing-export/recipe.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { REPO_ROOT } from '../src/cli/content.ts';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
 import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
+import type { DeadvoxModelEntry } from '../src/gun/exportGlb.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
 import { readGlb } from './glbReader.ts';
 
@@ -25,9 +27,9 @@ it.each([
   { kind: 'attachment' },
   { kind: 'magazine', options: { cartridge: 'fixture-cartridge.json', appearanceProfile: 'fixture' } },
 ])('refuses unresolved $kind sources at recipe load', (selection) => {
-  expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }])).toThrow(
-    SOURCE_CONTEXT,
-  );
+  expect(() =>
+    loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }]),
+  ).toThrow(SOURCE_CONTEXT);
 });
 
 it('rejects two rows owning the same output identity before resolving sources', () => {
@@ -47,6 +49,9 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
   ]);
   return exported!.generate();
 };
+
+// Exported once at file load: a voxelized rifle export costs seconds under load, and both lattice tests read it.
+const arExport = designExport(voxel);
 
 /** A node's transform when its rotation is a whole number of quarter turns, which keep the world lattice. */
 const quarterTurned = (node: { translation?: number[]; rotation?: number[] }): Matrix4 | undefined => {
@@ -99,7 +104,7 @@ const eyeOnSmoothSight = (source: string): boolean =>
   );
 
 it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
-  const { json, floats } = readGlb(designExport(voxel).glb);
+  const { json, floats } = readGlb(arExport.glb);
   const seen = new Set<number>();
   for (const node of json.nodes) {
     const transform = quarterTurned(node);
@@ -125,7 +130,7 @@ it('puts every part turned only by quarter turns, coarse or fine, on the fine la
 
 it('exports a voxelized sight whose up is perpendicular to its direction', () => {
   const { sight } = (
-    designExport(voxel) as unknown as {
+    arExport as unknown as {
       modelEntry: { gun: { sight: { direction: readonly number[]; up: readonly number[] } } };
     }
   ).modelEntry.gun;
@@ -164,6 +169,13 @@ describe('recipe iron sight lattice', () => {
 
 describe('recipe output grain', () => {
   const rows = loadExportRecipe();
+  // Each row is generated once for every check on it, since a gun takes seconds to write.
+  const generated = new Map<string, ModelExport<DeadvoxModelEntry>>();
+  const generatedOf = (row: (typeof rows)[number]) => {
+    const model = generated.get(row.id) ?? row.generate();
+    generated.set(row.id, model);
+    return model;
+  };
   it('has recipe rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });
@@ -174,7 +186,7 @@ describe('recipe output grain', () => {
       row.kind === 'cartridge'
         ? [undefined]
         : [row.voxel.voxelGrain, row.voxel.voxelDetailGrain].filter((grain) => grain !== undefined);
-    const { glb } = row.generate();
+    const { glb } = generatedOf(row);
     const { meshes } = readGlb(glb).json;
     expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
     // A loose part's node is named by the family its part builds, which need not be its catalogue family.
@@ -192,6 +204,15 @@ describe('recipe output grain', () => {
         );
       }
     });
+  });
+  it.for(rows)('ships a smooth copy of $id with the same part nodes and no voxel grain', (row) => {
+    const { glb, smoothGlb } = generatedOf(row);
+    expect(partNodes(smoothGlb).map(({ family }) => family)).toEqual(partNodes(glb).map(({ family }) => family));
+    const primitives = readGlb(smoothGlb).json.meshes.flatMap(({ primitives }) => primitives);
+    expect(primitives.length, `${row.id}: no smooth primitives`).toBeGreaterThan(0);
+    expect(
+      primitives.some(({ extras }) => (extras as { voxelGrain?: number } | undefined)?.voxelGrain !== undefined),
+    ).toBe(false);
   });
 });
 
@@ -217,7 +238,9 @@ describe('loose smooth attachment seat', () => {
               const { min, max } = json.accessors[attributes.POSITION!] as { min: number[]; max: number[] };
               const at = node.translation ?? [0, 0, 0];
               return Math.max(
-                ...[min, max].map((corner) => corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0)),
+                ...[min, max].map((corner) =>
+                  corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0),
+                ),
               );
             }),
       ),
@@ -233,7 +256,14 @@ it('refuses a detail grain the gun grain is not a whole multiple of', () => {
 it('rejects options not taken by the selected exporter', () => {
   expect(() =>
     loadExportRecipe([
-      { id: 'fixture', title: 'Fixture', kind: 'design', source: 'fixture-source', voxel, options: { component: 'round' } },
+      {
+        id: 'fixture',
+        title: 'Fixture',
+        kind: 'design',
+        source: 'fixture-source',
+        voxel,
+        options: { component: 'round' },
+      },
     ]),
   ).toThrow('Invalid key');
 });

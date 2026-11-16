@@ -3,13 +3,19 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { buildManifest } from '../manifest.mjs';
 import { compileJsonnetFile } from '../jsonnet/index.mjs';
+import { buildManifest } from '../manifest.mjs';
 import { MATERIALS } from '../packages/thing-core/src/materials.ts';
 import { exportPlacements, placementProblems } from '../placements.mjs';
 
 const terms = (...names) => ({ terms: new Map(names.map((name) => [name, name])) });
-const vocabulary = { categories: new Map(), facets: new Map([['vehicle-body', terms('van')], ['vehicle-role', terms('emergency', 'farm')]]) };
+const vocabulary = {
+  categories: new Map(),
+  facets: new Map([
+    ['vehicle-body', terms('van')],
+    ['vehicle-role', terms('emergency', 'farm')],
+  ]),
+};
 const van = { tags: { 'vehicle-body': ['van'] } };
 const models = [
   { id: 'fixture_van_body', pack: 'fixture.vans', taxonomy: van },
@@ -27,12 +33,29 @@ const vanSites = [
   { id: 'door_far', part: 'fixture_door', at: [0, 0, 0], mirror: true },
 ];
 // The ambulance borrows the van's body from another pack and adds its own light bar and role.
-const ambulance = { title: 'Fixture Ambulance', forward: '+z', sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }], tags: { 'vehicle-role': ['emergency'] } };
-const vehicleRows = { van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'], ambulance: ['fixture_light_bar'] };
+const ambulance = {
+  title: 'Fixture Ambulance',
+  forward: '+z',
+  sites: [...vanSites, { id: 'light_bar', part: 'fixture_light_bar', at: [0, 2, 0] }],
+  tags: { 'vehicle-role': ['emergency'] },
+};
+const vehicleRows = {
+  van: ['fixture_van_body', 'fixture_door', 'fixture_engine', 'fixture_motor'],
+  ambulance: ['fixture_light_bar'],
+};
 const dependsOn = { 'fixture.rescue': ['fixture.vans'] };
 // None of these vehicles stows kit or hides a site behind a closure.
 const stowage = { items: new Map(), moving: new Set() };
-const problems = (placements, deps = dependsOn) => placementProblems({ placements, models, vehicleRows, dependsOn: deps, vocabulary, finishes: MATERIALS, stowage }).join('\n');
+const problems = (placements, deps = dependsOn) =>
+  placementProblems({
+    placements,
+    models,
+    vehicleRows,
+    dependsOn: deps,
+    vocabulary,
+    finishes: MATERIALS,
+    stowage,
+  }).join('\n');
 
 test('sites that name built models, each once, at a point, in reachable packs, assemble without problems', () => {
   assert.equal(problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites }, ambulance }), '');
@@ -57,35 +80,61 @@ test('a site finish names a library material on a part that takes paint', () => 
   const paint = Object.keys(MATERIALS)[0];
   const sites = (site) => problems({ van: { title: 'Fixture Van', forward: '+z', sites: [body, site] } });
   assert.equal(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: paint }), '');
-  assert.match(sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: 'fixture-unknown' }), /not in the finish library/);
+  assert.match(
+    sites({ id: 'door', part: 'fixture_door', at: [0, 0, 0], finish: 'fixture-unknown' }),
+    /not in the finish library/,
+  );
   assert.match(sites({ id: 'engine', part: 'fixture_engine', at: [0, 0, 0], finish: paint }), /no paintable slot/);
 });
 
 // A copied part would drift from its source unseen; an undeclared reference would load without its pack.
-test('a part from another pack needs a declared dependency of the vehicle\'s pack', () => {
-  assert.match(problems({ ambulance }, {}), /ambulance\/body: fixture_van_body is in fixture.vans, which fixture.rescue does not declare/);
+test("a part from another pack needs a declared dependency of the vehicle's pack", () => {
+  assert.match(
+    problems({ ambulance }, {}),
+    /ambulance\/body: fixture_van_body is in fixture.vans, which fixture.rescue does not declare/,
+  );
 });
 
-test('a vehicle\'s extra tags are held to the vocabulary', () => {
-  assert.match(problems({ ambulance: { ...ambulance, tags: { 'vehicle-role': ['ambulance'] } } }), /vehicle-role ambulance is not in/);
+test("a vehicle's extra tags are held to the vocabulary", () => {
+  assert.match(
+    problems({ ambulance: { ...ambulance, tags: { 'vehicle-role': ['ambulance'] } } }),
+    /vehicle-role ambulance is not in/,
+  );
 });
 
-test('a vehicle ships in the pack of its own rows, with its body\'s tags and its own', () => {
+test("a vehicle ships in the pack of its own rows, with its body's tags and its own", () => {
   const out = mkdtempSync(join(tmpdir(), 'placements-'));
   try {
     const extra = { ...ambulance, tags: { ...ambulance.tags, 'vehicle-body': ['van'] } };
-    const placed = exportPlacements({ placements: { ambulance: extra }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, stowage, out });
-    assert.deepEqual(placed.vehicles, [{
-      id: 'ambulance',
-      title: 'Fixture Ambulance',
-      pack: 'fixture.rescue',
-      path: 'vehicles/ambulance.placements.json',
-      tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency'] },
-    }]);
+    const placed = exportPlacements({
+      placements: { ambulance: extra },
+      models,
+      vehicleRows,
+      dependsOn,
+      vocabulary,
+      finishes: MATERIALS,
+      stowage,
+      out,
+    });
+    assert.deepEqual(placed.vehicles, [
+      {
+        id: 'ambulance',
+        title: 'Fixture Ambulance',
+        pack: 'fixture.rescue',
+        path: 'vehicles/ambulance.placements.json',
+        tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency'] },
+      },
+    ]);
     assert.deepEqual(JSON.parse(readFileSync(join(out, placed.files[0]), 'utf8')), { sites: ambulance.sites });
     const manifest = buildManifest({ models: [], vehicles: placed.vehicles, files: placed.files, credit: () => ({}) });
-    assert.deepEqual(manifest.vehicles.map(({ id, title, pack, path, tags }) => ({ id, title, pack, path, tags })), placed.vehicles);
-    assert.throws(() => buildManifest({ models: [], vehicles: placed.vehicles, files: [], credit: () => ({}) }), /ambulance/);
+    assert.deepEqual(
+      manifest.vehicles.map(({ id, title, pack, path, tags }) => ({ id, title, pack, path, tags })),
+      placed.vehicles,
+    );
+    assert.throws(
+      () => buildManifest({ models: [], vehicles: placed.vehicles, files: [], credit: () => ({}) }),
+      /ambulance/,
+    );
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -93,29 +142,85 @@ test('a vehicle ships in the pack of its own rows, with its body\'s tags and its
 
 // A variant shares its parent's build: laid out from the parent's sites, it ships where the parent's rows do and carries
 // the parent's tags, and a parent that is missing would leave it nowhere to ship.
-test('a variant is laid out from its parent\'s sites, in its parent\'s pack, with its parent\'s tags and its own', () => {
-  const placements = JSON.parse(compileJsonnetFile(join(import.meta.dirname, 'fixtures/variants.jsonnet'), join(import.meta.dirname, '../..')));
+test("a variant is laid out from its parent's sites, in its parent's pack, with its parent's tags and its own", () => {
+  const placements = JSON.parse(
+    compileJsonnetFile(join(import.meta.dirname, 'fixtures/variants.jsonnet'), join(import.meta.dirname, '../..')),
+  );
   const van = { ...placements.van, tags: { 'vehicle-role': ['emergency'] } };
   const { electric_van: electricVan } = placements;
-  assert.deepEqual(electricVan.sites.map(({ id }) => id), ['body', 'motor']);
+  assert.deepEqual(
+    electricVan.sites.map(({ id }) => id),
+    ['body', 'motor'],
+  );
   assert.match(problems(placements), /^orphan_van: unknown parent gone_van$/);
-  assert.match(problems({ van, electric_van: { ...electricVan, parent: 'electric_van' } }), /parent electric_van is itself a variant/);
-  assert.match(problems({ van, ambulance: { ...ambulance, parent: 'van' } }), /a variant's rows belong in its parent's file/);
+  assert.match(
+    problems({ van, electric_van: { ...electricVan, parent: 'electric_van' } }),
+    /parent electric_van is itself a variant/,
+  );
+  assert.match(
+    problems({ van, ambulance: { ...ambulance, parent: 'van' } }),
+    /a variant's rows belong in its parent's file/,
+  );
   const out = mkdtempSync(join(tmpdir(), 'placements-'));
   try {
-    const placed = exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, stowage, out });
-    assert.deepEqual(placed.vehicles.find(({ id }) => id === 'electric_van'), {
-      id: 'electric_van',
-      title: 'Fixture Electric Van',
-      pack: 'fixture.vans',
-      path: 'vehicles/electric_van.placements.json',
-      tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency', 'farm'] },
+    const placed = exportPlacements({
+      placements: { van, electric_van: electricVan },
+      models,
+      vehicleRows,
+      dependsOn,
+      vocabulary,
+      finishes: MATERIALS,
+      stowage,
+      out,
     });
-    const shipped = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
-    assert.deepEqual(shipped.sites.find(({ id }) => id === 'motor').at, [0, 0, 1], 'a site laid out ahead along x ships ahead along +z');
-    assert.equal(shipped.sites.find(({ id }) => id === 'motor').swing, undefined, 'a site that does not move ships no swing');
-    exportPlacements({ placements: { van, electric_van: electricVan }, models, vehicleRows, dependsOn, vocabulary, finishes: MATERIALS, swings: { electric_van: { motor: { clear: 0.5, stop: 'body' } } }, out });
-    const swung = JSON.parse(readFileSync(join(out, placed.files.find((file) => file.endsWith('electric_van.placements.json'))), 'utf8'));
+    assert.deepEqual(
+      placed.vehicles.find(({ id }) => id === 'electric_van'),
+      {
+        id: 'electric_van',
+        title: 'Fixture Electric Van',
+        pack: 'fixture.vans',
+        path: 'vehicles/electric_van.placements.json',
+        tags: { 'vehicle-body': ['van'], 'vehicle-role': ['emergency', 'farm'] },
+      },
+    );
+    const shipped = JSON.parse(
+      readFileSync(
+        join(
+          out,
+          placed.files.find((file) => file.endsWith('electric_van.placements.json')),
+        ),
+        'utf8',
+      ),
+    );
+    assert.deepEqual(
+      shipped.sites.find(({ id }) => id === 'motor').at,
+      [0, 0, 1],
+      'a site laid out ahead along x ships ahead along +z',
+    );
+    assert.equal(
+      shipped.sites.find(({ id }) => id === 'motor').swing,
+      undefined,
+      'a site that does not move ships no swing',
+    );
+    exportPlacements({
+      placements: { van, electric_van: electricVan },
+      models,
+      vehicleRows,
+      dependsOn,
+      vocabulary,
+      finishes: MATERIALS,
+      swings: { electric_van: { motor: { clear: 0.5, stop: 'body' } } },
+      out,
+    });
+    const swung = JSON.parse(
+      readFileSync(
+        join(
+          out,
+          placed.files.find((file) => file.endsWith('electric_van.placements.json')),
+        ),
+        'utf8',
+      ),
+    );
     assert.deepEqual(swung.sites.find(({ id }) => id === 'motor').swing, { clear: 0.5, stop: 'body' });
   } finally {
     rmSync(out, { recursive: true, force: true });
@@ -125,14 +230,26 @@ test('a variant is laid out from its parent\'s sites, in its parent\'s pack, wit
 // A listed overlap that names a site the vehicle lacks, has no depth cap or gives no text would silence nothing or
 // hide why.
 test('a listed overlap names two different sites of the vehicle, its depth cap and its text', () => {
-  const entry = (textKey, extra = {}) =>
-    ({ sites: ['door_near', 'door_far'], depth: 0.05, [textKey]: 'the doors are seated in the body', ...extra });
-  for (const [listKey, textKey] of [['overlaps', 'why'], ['unjudged', 'note'], ['swingContacts', 'why'], ['swingUnjudged', 'note']]) {
+  const entry = (textKey, extra = {}) => ({
+    sites: ['door_near', 'door_far'],
+    depth: 0.05,
+    [textKey]: 'the doors are seated in the body',
+    ...extra,
+  });
+  for (const [listKey, textKey] of [
+    ['overlaps', 'why'],
+    ['unjudged', 'note'],
+    ['swingContacts', 'why'],
+    ['swingUnjudged', 'note'],
+  ]) {
     const listing = (entries) =>
       problems({ van: { title: 'Fixture Van', forward: '+z', sites: vanSites, [listKey]: entries } });
     assert.equal(listing([entry(textKey)]), '');
     assert.match(listing([entry(textKey, { sites: ['door_near', 'gone'] })]), /two different sites of the vehicle/);
-    assert.match(listing([entry(textKey, { sites: ['door_near', 'door_near'] })]), /two different sites of the vehicle/);
+    assert.match(
+      listing([entry(textKey, { sites: ['door_near', 'door_near'] })]),
+      /two different sites of the vehicle/,
+    );
     assert.match(listing([entry(textKey, { depth: 0 })]), /needs a depth above 0/);
     assert.match(listing([entry(textKey, { [textKey]: '' })]), new RegExp(`needs a ${textKey}`));
     assert.match(listing([entry(textKey, { extra: 1 })]), /unknown keys extra/);

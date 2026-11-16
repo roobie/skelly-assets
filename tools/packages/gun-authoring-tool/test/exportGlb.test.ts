@@ -188,7 +188,6 @@ const expectSightLineClear = (out: ExportedGun, label: string): void => {
     }
     const placed = out.resolved.placed.get(id)!;
     for (const solid of part.solids) {
-      // biome-ignore lint/suspicious/noMisplacedAssertion: called from the corpus sight-line test.
       expect(
         penetrationWorld(sightLine, worldSolid(placed, solid)),
         `${label}: ${id}.${solid.id} blocks the sight line`,
@@ -198,7 +197,6 @@ const expectSightLineClear = (out: ExportedGun, label: string): void => {
 };
 
 const near = (a: readonly number[], b: readonly number[], digits = 6): void => {
-  // biome-ignore lint/suspicious/noMisplacedAssertion: a small comparison helper called from tests
   expect(a).toEqual(b.map((x) => expect.closeTo(x, digits)));
 };
 
@@ -593,7 +591,6 @@ describe('glb export: meshes', () => {
     expect(checked).toBeGreaterThan(0);
   });
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: this contract walks exported primitives and compares full material metadata against each source solid.
   it('colours each solid with the palette converted from sRGB to linear', () => {
     const painted = withAttachmentInstanceAppearances(ar.resolved).assembly.parts;
     for (const [id, inst] of Object.entries(ar.resolved.assembly.parts)) {
@@ -672,16 +669,20 @@ describe('glb export: deadvox model entry', () => {
   });
 
   // Sight solids count too, so a gun that draws sights without a sight axis cannot pass as sightless.
-  it.each(loadCorpus())('exports sight metadata exactly when sight parts exist: $label', ({ label, assembly, items }) => {
-    const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' }, { items });
-    if (!result.ok) {
-      throw new Error(`${label}: export failed: ${JSON.stringify(result.error)}`);
-    }
-    const sighted = [...resolve(assembly, gunDomain).defs.values()].some(
-      ({ axes, solids }) => axes.some(({ kind }) => kind === 'sight') || solids.some(({ id }) => id.includes('sight')),
-    );
-    expect(result.modelEntry.gun.sight !== undefined).toBe(sighted);
-  });
+  it.each(loadCorpus())(
+    'exports sight metadata exactly when sight parts exist: $label',
+    ({ label, assembly, items }) => {
+      const result = exportGunGlb(assembly, ASSET, { appearanceProfile: 'ar' }, { items });
+      if (!result.ok) {
+        throw new Error(`${label}: export failed: ${JSON.stringify(result.error)}`);
+      }
+      const sighted = [...resolve(assembly, gunDomain).defs.values()].some(
+        ({ axes, solids }) =>
+          axes.some(({ kind }) => kind === 'sight') || solids.some(({ id }) => id.includes('sight')),
+      );
+      expect(result.modelEntry.gun.sight !== undefined).toBe(sighted);
+    },
+  );
 
   it('exports optic ocular diameter and eye relief with the sight line', () => {
     const optic = exported(design('archetype-battle-rifle'));

@@ -31,6 +31,7 @@ const countedRow = (inputs: unknown, declare = true) => {
       return {
         modelEntry: { id: 'thing', file: 'assets/models/thing.glb' } as unknown as NeutralModel,
         glb: new Uint8Array([row.runs, 1, 2, 3]),
+        smoothGlb: new Uint8Array([row.runs, 4, 5]),
         partNodes: ['part-1:block'],
       };
     },
@@ -45,7 +46,11 @@ describe('the export cache', () => {
     const first = exportCache(dir, 'code').export(countedRow({ size: 1, colour: 'red' }));
     const again = countedRow({ colour: 'red', size: 1 });
     const served = exportCache(dir, 'code').export(again);
-    expect(served.model).toEqual({ ...first.model, glb: Buffer.from(first.model.glb) });
+    expect(served.model).toEqual({
+      ...first.model,
+      glb: Buffer.from(first.model.glb),
+      smoothGlb: Buffer.from(first.model.smoothGlb),
+    });
     expect(served.entry).toEqual({ key: first.entry?.key, reused: true });
     expect(first.entry?.reused).toBe(false);
     expect(again.runs).toBe(0);
@@ -75,7 +80,7 @@ describe('the export cache', () => {
     const kept = exportCache(dir, 'code').export(countedRow({ size: 1 })).entry!.key;
     exportCache(dir, 'code').export(countedRow({ size: 2 }));
     pruneEntries(dir, new Set([kept]));
-    expect(readdirSync(dir).sort()).toEqual([`${kept}.glb`, `${kept}.json`]);
+    expect(readdirSync(dir).sort()).toEqual([`${kept}.glb`, `${kept}.json`, `${kept}.smooth.glb`]);
   });
 });
 
@@ -102,7 +107,12 @@ describe('the code fingerprint', () => {
     }
     return root;
   };
-  const base = { 'src/a.ts': 'code', 'src/a.json': 'data', 'src/a.test.ts': 'test', 'src/test/fixture.json': 'fixture' };
+  const base = {
+    'src/a.ts': 'code',
+    'src/a.json': 'data',
+    'src/a.test.ts': 'test',
+    'src/test/fixture.json': 'fixture',
+  };
   const fingerprints = (files: Record<string, string>) => {
     const root = tree(files);
     return { code: codeFingerprint(root, ['src']), data: codeFingerprint(root, ['src'], ['src']) };

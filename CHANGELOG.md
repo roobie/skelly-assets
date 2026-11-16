@@ -7,6 +7,112 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.10.0 - 2026-11-16
+
+### Breaking
+
+- The classic small car's doors and boot lid, the army 4x4's side rails and the school bus's rear exit now export a hinge
+  motion on drawn round pins in place of their hinge anchors, so the showcase's Open view swings them and a game plays
+  the swing the build proved clear. The army 4x4's side rails hang just outside the tub's side and swing out. The small car's boot lid is shorter, behind a
+  fixed deck under the rear screen, and its door mirrors sit a little further aft and ride the doors.
+- The tractor's and combine harvester's cab doors and the skid-steer loader's tail door now export a hinge motion on
+  drawn pins in place of their hinge anchors, so the showcase's Open view swings them and a game plays the same swing
+  the build proved clear. The tractor door's lower edge follows the rear fender, with a fixed skirt on the cab beneath
+  it; the skid-steer's tail lamps ride its tail door. The skid-steer's front door and the small tractor's footboard stay
+  shut and no longer carry hinge anchors.
+- The doors of the military trucks, the military ambulance, the light tactical vehicle, the cab-over 4x4 and the SWAT
+  truck's rear doors now export a hinge motion in place of their hinge anchors, so the showcase's Open view swings them
+  and a game plays the swing the build proved clear. Each door turns on round pins at the outer end of its hinge leaves.
+  The military trucks' A-posts reach back to the door, whose window frame no longer wraps forward past its hinge. The
+  cab-over 4x4's tail lamps are narrower and sit further outboard, clear of the rear door, and its spare wheel rides the
+  rear door.
+- Severed parts are baked from the mobs: `skelly.body` holds, per cut point of each zombie type, its whole part and one part for each set of cut points below it a cut there may find already gone, so an arm cut after its hand weighs only what is left. Each is listed with `kind: severed-part` and a `cut` naming the type, the bone and those gone cut points, and its `severed/index.json` holds every cut point's parts by type and bone. The drawn `shambler_*` parts are gone.
+- The skid-steer loader's front door now exports a hinge motion: it turns on drawn pins at its left front edge and
+  swings forward a right angle over the lowered bucket, which the build proves clear. It hangs above a toe board on the
+  cage, the lift arms' cross brace sits behind the cab, and the tilt rams run down the front of each arm to the bucket,
+  all out of the door's sweep.
+- The trailers' doors, ramps and tailgates now export a hinge motion on drawn round pins in place of their hinge anchors,
+  so the showcase's Open view swings them and a game plays the swing the build proved clear; the ramps lower onto the
+  ground, with their battens on the face the animals walk up.
+
+### Upgrading from 0.9.0
+
+- Open `classic_small_car_door`, `classic_small_car_boot_lid`, `army_jeep_side_rail` and `school_bus_rear_door` by
+  playing their `motion`, not by swinging them on `hinge_a` and `hinge_b`.
+- Have the classic small car's `door_mirror` ride `door` and place it where the placements export puts it.
+- Open `tractor_cab_door`, `combine_harvester_cab_door` and `skid_steer_tail_door` by playing their `motion`, not by
+  swinging them on `hinge_a` and `hinge_b`.
+- Treat `skid_steer_door` and `small_tractor_footboard` as fixed parts.
+- Have the skid-steer's tail lamps ride `tail_door`, as its placements do.
+- Open `military_truck_door`, `military_ambulance_rear_door`, `light_tactical_vehicle_front_door`,
+  `light_tactical_vehicle_rear_door`, `cab_over_field_car_cab_door`, `cab_over_field_car_side_door`,
+  `cab_over_field_car_rear_door` and `swat_truck_rear_door` by playing their `motion`, not by swinging them on
+  `hinge_a` and `hinge_b`.
+- Have the cab-over 4x4's `spare_wheel` ride `rear_door` and place its tail lamps where the placements export puts
+  them.
+- Take the item a cut leaves from `severed/index.json`, by the actor's type, the bone it severs and the top-most cut points below it already severed, instead of by hit region.
+- Drop `shambler_torso`, which has no successor; apply `renames.json` for the drawn arms and legs.
+- Open `skid_steer_door` by playing its `motion`; it is no longer a fixed part.
+- Open `horse_box_door`, `horse_box_ramp`, `horse_box_top_door`, `livestock_trailer_ramp`, `caravan_door`,
+  `semi_trailer_rear_door`, `utility_trailer_tailgate` and `checkpoint_barrier_trailer_tailgate` by playing their
+  `motion`, not by swinging them on `hinge_a` and `hinge_b`.
+
+### Added
+
+- A part of a compound model can declare the catalogue item it is, as `item` on the part in the model source, and the
+  showcase links it to that item's page. `mannequin_decoy` declares its `doll` part is `talking_doll`. The build refuses
+  a declared item no model has.
+- A worn piece's and a slot-placed wearable's manifest entry names the doll part it sits on, `wornOn`, the part a bone of `skelly.body`'s doll rig binds, with `side` for a wearable on one copy of a limb's part, named as the rig's `bind.side`, `both` for one across both copies and `anchor` for one seated by an anchor, such as a hat at the brow; a piece worn over a jacket (`*_worn_jacket`) names its `*_worn` twin's part. You can stop restating which part each worn segment or body slot means. `baseball_cap` loses its `fit: worn` tag: it is a loose head item, seated at the brow like other hats.
+- Two rat mobs in `skelly.bestiary`, `mutant_rat` and `rat_brute`: rigged actors that idle, scurry and bite, and
+  flinch when hit and fall dead onto their left or right side (`death.left`, `death.right`).
+
+### Changed
+
+- Cartridge models are flat-sided prisms, as optic bodies are, so every drawn level of detail and the collision hull agree
+  on the side count. The flats sit at the cartridge's diameter, so a round or case is a little wider across its corners
+  than before, and a dropped case comes to rest on a flat instead of rolling.
+- Folding bus doors' hinge pins are drawn as fine as their panels, so they no longer stand out of the door and pillar as
+  knobs the size of a vehicle voxel.
+- `helmet_trooper`, `helmet_heavy` and `helmet_power` lose their block shells: each shell slopes in to a chamfered crown,
+  its skirt flares out over the nape and its brow is a shaped peak; their `brow` anchors still meet the hairline.
+- Boots and the armour sets now declare `covers`: combat boots, rubber boots and the trooper's boots hide the doll's new `sole` region (the foot is cut into `ankle` and `sole`), the heavy and power boots and the plate sabatons the whole `foot`, the armour gloves the `palm`, the armour legguards the `shin`, and the armour bodies the `trunk`, so a consumer can drop its own list of what boots hide.
+  The trooper armour body now covers `trunk` rather than `torso`, since its pauldrons leave the shoulders open underneath; a consumer hiding by the declaration keeps drawing the trooper's shoulders.
+
+### Fixed
+
+- Truck front axles no longer pass through the engine's sump: the heavy and medium steered axles are drop-centre I-beams
+  whose middle runs under the sump, with goosenecks up to the spring seats and king pins, which keep their height.
+- Nineteen models no longer have loose or paper-thin parts: the chest pouches' harness lies round the pouch, the circular
+  saw's battery and front knob join the body, the butcher rack's hooks and chain touch it, and thin straps, lips, trims and
+  wires on tools, a whistle, earrings, collars, dresses, the four sheet metal and scrap plate suits and the riot leg guards
+  are at least a voxel thick.
+- Engine parts no longer pass through truck frames: the heavy I6's intake clears the rails, military trucks' crossmembers
+  clear the engine and gearbox and their battery tray stands between two of them, and the abandoned army truck's and
+  overturned delivery van's engine bays fit their frames.
+- Car shells have open rear wheel arches and a hollow transmission tunnel round the gearbox; the classic small car, convertible and hearse no longer run parts through each other; van noses, mirrors, bus bumpers and bus mirrors sit on their panels instead of in them, and the van and bus wrecks' damage is drawn as damage.
+  
+  The city, articulated, double-decker, open-top tour and shuttle buses carry their battery in a skirt locker behind the front wheel on the driver's side, behind a hinged flap with a part of its own (`city_bus_battery_flap` and the like), instead of inside the dash.
+
+## 0.9.0 - 2026-11-16
+
+### Added
+
+- Every mob ships `actors/<id>.genome.json` beside its body, named by its manifest entry's `genome`: every value the generator drew for it. Compare two releases' genomes to tell a re-rolled mob from one rebuilt from the same draws.
+- Every model in the `skelly.armour` and `skelly.bolt-guns` packs now ships its `things/<id>.model.json` sidecar and each
+  pack a `things/index.json`, as the other thing packs do. `helmet_trooper`, `helmet_heavy`, `helmet_power` and
+  `helmet_plate_armet` carry a `brow` anchor, the point that meets the hairline when the visor or slit is over the eyes.
+
+### Changed
+
+- Small catalogue items (keys, food, pill bottles and the like) draw at the 2 mm grain, so their shapes read; beans and soup draw a spilled serving rather than a thin disc. Pill bottles and opened tins weigh what they draw, and every non-vehicle catalogue row has facet tags.
+- `tower_shield` and `kite_shield` are shields rather than recut oven doors: a curved oak tower shield with an iron rim,
+  bands and boss, 11 kg, and a hide-faced kite shield bound in rawhide with a small boss, 2.9 kg. Both lie face up with
+  their top toward -z.
+
+### Fixed
+
+- Cars' struts stand inboard of the tyres and end under the bonnet, SUVs lose struts that doubled their beam front axle, exhausts hang under the floor pan and the saloon, coupe, estate and police car fuel tanks sit level under the rear bench.
+
 ## 0.8.0 - 2026-11-16
 
 ### Breaking

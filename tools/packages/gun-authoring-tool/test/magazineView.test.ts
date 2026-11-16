@@ -5,9 +5,9 @@ import { Group, InstancedMesh, Matrix4, Mesh, Texture, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { DESIGNS } from '../src/cli/content.ts';
+import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { magazineRoundColumn } from '../src/gun/magazineGeometry.ts';
 import { buildAmmoMeshes } from '../src/viewer/ammoLayer.ts';
 import { buildDetachedMagazine } from '../src/viewer/magazineView.ts';
@@ -25,7 +25,7 @@ describe('detached magazine viewer', () => {
     }
     const report = validate(loaded.design.assembly, gunDomain);
     const layers = buildLayers(report, report.issues, 'finish', { appearanceProfile: 'ak' }, 8);
-    const ammo = buildAmmoMeshes(cartridge, cartridgeFinish(cartridge), new Texture(), 8);
+    const ammo = buildAmmoMeshes(cartridge, cartridgeFinish(cartridge), new Texture());
     const detached = buildDetachedMagazine(report, layers.solids, cartridge, ammo);
     expect(detached).toBeDefined();
     expect(detached!.capacity).toBeGreaterThan(0);

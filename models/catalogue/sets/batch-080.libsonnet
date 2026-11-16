@@ -118,15 +118,16 @@ local chainsaw(engine) =
   }) + { title: 'Chainsaw' } + h.gripOn('chainsaw', 'rear-grip') + stow.stows(stow.resting('machine', [0.172, 0, -0.014])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless 165 mm circular saw 0.44 m long standing on its shoe: the blade on +z under its upper guard with the
-  // lower guard below the shoe, the motor on -z, a closed top handle and the battery at the back.
+  // lower guard below the shoe, the motor on -z, a top handle closed down onto the battery at the back, and a front
+  // knob on a post off the shoe.
   local r = 0.083, cx = 0.09, cy = 0.098, bz = 0.035;
   h.compound('cordless_circular_saw', 3, [
     box('shoe', 'shoe', [-0.12, 0.012, -0.075], [0.24, 0.018, 0.060]),
     ring('blade', 'blade', 'z', 0.010, r, 0.0024, [cx, cy, bz - 0.0012]),
     ring('arbor', 'guard', 'z', 0, 0.020, 0.024, [cx, cy, bz - 0.006]),
   ] + arc('upper-rim', 'guard', r + 0.004, r + 0.012, 0, 180, 10, cx, cy, bz - 0.012, bz + 0.012)
-    + arc('upper-face', 'guard', r * 0.35, r + 0.012, 0, 180, 10, cx, cy, bz + 0.008, bz + 0.012)
-    + arc('upper-back', 'guard', r * 0.35, r + 0.012, 0, 180, 10, cx, cy, bz - 0.012, bz - 0.008)
+    + arc('upper-face', 'guard', r * 0.35, r + 0.012, 0, 180, 10, cx, cy, bz + 0.007, bz + 0.012)
+    + arc('upper-back', 'guard', r * 0.35, r + 0.012, 0, 180, 10, cx, cy, bz - 0.012, bz - 0.007)
     + arc('lower-rim', 'lower', r + 0.003, r + 0.008, 205, 330, 6, cx, cy, bz - 0.009, bz + 0.009)
     + arc('lower-face', 'lower', r * 0.6, r + 0.008, 205, 330, 6, cx, cy, bz + 0.005, bz + 0.009)
     + [
@@ -136,8 +137,10 @@ local chainsaw(engine) =
       turned('handle-grip', 'grip', 'x', [[0, 0], [0, 0.017], [0.12, 0.017], [0.12, 0]], [-0.12, 0.215, -0.010]),
       box('handle-front', 'handle', [0.0, 0.17, -0.025], [0.03, 0.232, 0.005]),
       box('trigger', 'handle', [-0.06, 0.177, -0.017], [-0.03, 0.20, -0.003]),
-      box('battery', 'battery', [-0.20, 0.10, -0.040], [-0.09, 0.175, 0.020]),
-      box('battery-band', 'body', [-0.20, 0.148, -0.041], [-0.09, 0.158, 0.021]),
+      box('handle-rear', 'handle', [-0.12, 0.175, -0.025], [-0.09, 0.215, 0.005]),
+      box('battery', 'battery', [-0.17, 0.10, -0.040], [-0.06, 0.175, 0.020]),
+      box('battery-band', 'body', [-0.17, 0.148, -0.041], [-0.06, 0.158, 0.021]),
+      box('front-post', 'handle', [0.17, 0.018, -0.035], [0.195, 0.10, -0.010]),
       box('front-knob', 'grip', [0.165, 0.10, -0.040], [0.20, 0.14, -0.005]),
     ], {
     shoe: 'alu-bare', blade: 'steel-bright', guard: 'alu-bare', lower: 'plastic-red', body: 'plastic-yellow',

@@ -58,6 +58,21 @@ function(s) {
   // `band` across the centre line, `half` at the waist.
   across(id, slot, profile, half): outer.band(id, slot, profile, function(inset) [inset - half, half - inset]),
 
+  // The transmission tunnel is a hollow hump over the gearbox and shafts, so a car with an inline gearbox gives
+  // `s.tunnel` the space its driveline needs inside it: a half width, a top and how far back it runs. Its outer
+  // measures set the body's tunnel and the console that stands on it, where the gear lever sits.
+  tunnel:
+    local lift = std.get(s, 'lift', 0);
+    local space = std.get(s, 'tunnel', {});
+    local wall = 0.04;
+    {
+      wall: wall,
+      half: std.get(space, 'half', 0.08) + wall,
+      top: std.get(space, 'top', 0.41 + lift) + wall,
+      back: std.get(space, 'back', s.rearFloorFront + 0.35),
+      consoleTop: self.top + 0.1,
+    },
+
   chamfer: std.get(s, 'archChamfer', std.round(s.arch * 0.5 / grain) * grain),
   local c = outer.chamfer,
   aftCorner(id, slot, axle, z, top=s.archTop):

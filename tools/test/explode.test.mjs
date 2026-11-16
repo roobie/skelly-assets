@@ -5,14 +5,19 @@ import { EXPLODED_VIEWS, RIGHT, UP } from '../../site/modelFrame.mjs';
 
 const box = (min, max) => ({ min, max });
 const centre = ({ min, max }) => min.map((x, axis) => (x + max[axis]) / 2);
-const shifted = ({ min, max }, by) => box(min.map((x, a) => x + by[a]), max.map((x, a) => x + by[a]));
+const shifted = ({ min, max }, by) =>
+  box(
+    min.map((x, a) => x + by[a]),
+    max.map((x, a) => x + by[a]),
+  );
 const overlapping = (a, b) => [0, 1, 2].every((axis) => a.min[axis] < b.max[axis] && b.min[axis] < a.max[axis]);
 const dot = (a, b) => a.reduce((sum, x, axis) => sum + x * b[axis], 0);
 const cross = ([ax, ay, az], [bx, by, bz]) => [ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx];
-const whole = (boxes) => box(
-  [0, 1, 2].map((axis) => Math.min(...boxes.map((b) => b.min[axis]))),
-  [0, 1, 2].map((axis) => Math.max(...boxes.map((b) => b.max[axis]))),
-);
+const whole = (boxes) =>
+  box(
+    [0, 1, 2].map((axis) => Math.min(...boxes.map((b) => b.min[axis]))),
+    [0, 1, 2].map((axis) => Math.max(...boxes.map((b) => b.max[axis]))),
+  );
 
 // An engine-bay-like assembly: a hollow shell round everything, a core, accessories touching or cutting into the core,
 // a near and far twin, and a part sticking out of the shell.
@@ -46,7 +51,8 @@ test('no exploded part overlaps another, accessories and their core included', (
   const offsets = explode(assembly);
   const apart = assembly.map((b, i) => shifted(b, offsets[i]));
   for (let i = 0; i < apart.length; i++) {
-    for (let j = i + 1; j < apart.length; j++) assert.ok(!overlapping(apart[i], apart[j]), `parts ${i} and ${j} still overlap`);
+    for (let j = i + 1; j < apart.length; j++)
+      assert.ok(!overlapping(apart[i], apart[j]), `parts ${i} and ${j} still overlap`);
   }
 });
 

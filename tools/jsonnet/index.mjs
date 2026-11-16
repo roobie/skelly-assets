@@ -61,7 +61,11 @@ async function runJsonnetAsync(args, repositoryRoot, label) {
 
 const fileArgs = (sourcePath, repositoryRoot, overlay) => {
   const absoluteSource = resolve(repositoryRoot, sourcePath);
-  return [[...libraryArgs(repositoryRoot, overlay), absoluteSource], repositoryRoot, relative(repositoryRoot, absoluteSource)];
+  return [
+    [...libraryArgs(repositoryRoot, overlay), absoluteSource],
+    repositoryRoot,
+    relative(repositoryRoot, absoluteSource),
+  ];
 };
 
 // An `overlay` folder is searched before the repository for root-relative imports, so a caller can swap
@@ -87,8 +91,14 @@ export function evaluateJsonnetAsync(expression, repositoryRoot = REPOSITORY_ROO
 export function compileJsonnetFiles(sourcePaths, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
   const out = mkdtempSync(join(tmpdir(), 'jsonnet-'));
   try {
-    const fields = sourcePaths.map((source, at) => `"${at}": import ${JSON.stringify(resolve(repositoryRoot, source))}`);
-    runJsonnet([...libraryArgs(repositoryRoot, overlay), '-m', out, '-e', `{${fields.join(',')}}`], repositoryRoot, `${sourcePaths.length} sources`);
+    const fields = sourcePaths.map(
+      (source, at) => `"${at}": import ${JSON.stringify(resolve(repositoryRoot, source))}`,
+    );
+    runJsonnet(
+      [...libraryArgs(repositoryRoot, overlay), '-m', out, '-e', `{${fields.join(',')}}`],
+      repositoryRoot,
+      `${sourcePaths.length} sources`,
+    );
     return sourcePaths.map((_, at) => readFileSync(join(out, String(at)), 'utf8'));
   } finally {
     rmSync(out, { recursive: true, force: true });

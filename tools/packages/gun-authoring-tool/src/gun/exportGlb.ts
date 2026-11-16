@@ -1,6 +1,14 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { applyDir, applyPoint, eulerXyzDegrees, length, normalize, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  applyDir,
+  applyPoint,
+  eulerXyzDegrees,
+  length,
+  normalize,
+  sub,
+  type Vec3,
+} from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import type { ModelParts, NeutralModel } from '@skelly/thing-core/schema';
 import { type DrawnGeometry, drawnGeometry } from '@skelly/thing-export/drawn.ts';
@@ -8,11 +16,11 @@ import type {
   AppearanceContext,
   GlbAssetIdentity,
   GlbExportError,
-  GlbExportResult,
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
 import { partNodeName, partVoxelGrain } from '@skelly/thing-export/glb.ts';
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
+import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
@@ -35,14 +43,13 @@ import { boltCalibreIssue, isBoltAssembly, withBoltCalibre } from './boltCartrid
 import type { CycleMode, CycleTimeline } from './cycle.ts';
 import { gunDomain } from './domain.ts';
 import { FILE_AXES, fileVector, gripTurn, inFileFrame, toFileAxes, toFileRotation } from './exportFrame.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import { exportGunGeometry as exportGlb, exportGunModels } from './glbWriter.ts';
 import { internalMagazineCapacity } from './internalMagazine.ts';
 import { getOptic } from './optics.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
-import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
@@ -163,6 +170,7 @@ export type GunExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: GunDeadvoxModelEntry;
     }
@@ -375,7 +383,6 @@ interface GlbSightJson {
     mesh?: number;
     extras?: { part?: string };
   }[];
-  // biome-ignore lint/style/useNamingConvention: glTF attribute semantics are upper case
   readonly meshes: { primitives: { attributes: { POSITION: number }; indices: number }[] }[];
   readonly accessors: { bufferView: number; byteOffset?: number; count: number }[];
   readonly bufferViews: { byteOffset?: number }[];
@@ -749,8 +756,10 @@ const drawnAnchors = (
     : {};
 
 /** The sight an export describes: the lowest priority, then the first id. */
-export const compareSightCandidates = (a: { priority: number; id: string }, b: { priority: number; id: string }): number =>
-  a.priority - b.priority || compareCodeUnits(a.id, b.id);
+export const compareSightCandidates = (
+  a: { priority: number; id: string },
+  b: { priority: number; id: string },
+): number => a.priority - b.priority || compareCodeUnits(a.id, b.id);
 
 const sightMetadata = (resolved: Resolved, voxel?: VoxelFile): GunModelFields['sight'] => {
   const candidates = [...resolved.defs.entries()].flatMap(([id, part]) => {
@@ -940,12 +949,17 @@ export const exportGunGlb = (
   if ('code' in anchors) {
     return { ok: false, error: anchors };
   }
-  const result: GlbExportResult = exportGlb({
+  // Datums read off placements are written as the file draws them, so they read the file-frame assembly, and the
+  // file meshes the voxels they were read off.
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, grains);
+  const result = exportGunModels({
     resolved,
     palette: GUN_PALETTE,
     appearance,
     asset,
     ...grains,
+    drawnVoxels: drawn.voxels,
   });
   if (!result.ok) {
     return result;
@@ -958,9 +972,6 @@ export const exportGunGlb = (
   } = resolved.domain;
   const fittedAttachments = attachmentData(resolved);
   const magazine = magazineSlotData(resolved);
-  // Datums read off placements are written as the file draws them, so they read the file-frame assembly.
-  const fileResolved = inFileFrame(resolved);
-  const drawn = drawnGeometry(fileResolved, grains);
   const replaceableNodes = new Set([
     ...fittedAttachments.map(({ node }) => node),
     ...(magazine ? [magazine.node] : []),

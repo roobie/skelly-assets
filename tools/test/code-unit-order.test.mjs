@@ -36,10 +36,21 @@ test('no tracked tool or site source orders strings by the runtime locale', () =
 });
 
 test('code unit order puts capitals and punctuation by character code, not by collation', () => {
-  assert.deepEqual(['rear_b', 'rearB', 'rear-a', 'Rear', 'rear'].sort(compareCodeUnits), ['Rear', 'rear', 'rear-a', 'rearB', 'rear_b']);
+  assert.deepEqual(['rear_b', 'rearB', 'rear-a', 'Rear', 'rear'].sort(compareCodeUnits), [
+    'Rear',
+    'rear',
+    'rear-a',
+    'rearB',
+    'rear_b',
+  ]);
 });
 
 test('numbered order reads a digit run as a number and keeps the order total', () => {
-  assert.deepEqual(['press-10', 'press-9', 'press-2b', 'press-2a'].sort(compareNumbered), ['press-2a', 'press-2b', 'press-9', 'press-10']);
+  assert.deepEqual(['press-10', 'press-9', 'press-2b', 'press-2a'].sort(compareNumbered), [
+    'press-2a',
+    'press-2b',
+    'press-9',
+    'press-10',
+  ]);
   assert.notEqual(compareNumbered('x2', 'x02'), 0);
 });

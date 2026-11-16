@@ -27,7 +27,11 @@ export function vehicleApi({ root, cache = DEFAULT_CACHE }) {
     async verdicts() {
       const { pieces, report } = await load();
       return {
-        vehicles: Object.fromEntries(Object.keys(pieces.vehicles).sort().map((vehicle) => [vehicle, { sites: report.verdicts[vehicle] ?? {} }])),
+        vehicles: Object.fromEntries(
+          Object.keys(pieces.vehicles)
+            .sort()
+            .map((vehicle) => [vehicle, { sites: report.verdicts[vehicle] ?? {} }]),
+        ),
         notes: report.notes,
       };
     },
@@ -37,7 +41,11 @@ export function vehicleApi({ root, cache = DEFAULT_CACHE }) {
       if (!verdict) throw new Error(`${vehicle} has no moving site ${site}`);
       // Only what the search reads goes to the worker: this vehicle and the parent whose allowances it inherits.
       const family = [vehicle, pieces.vehicles[vehicle].parent].filter(Boolean);
-      const task = { pieces: { ...pieces, vehicles: Object.fromEntries(family.map((name) => [name, pieces.vehicles[name]])) }, vehicle, site };
+      const task = {
+        pieces: { ...pieces, vehicles: Object.fromEntries(family.map((name) => [name, pieces.vehicles[name]])) },
+        vehicle,
+        site,
+      };
       const pool = workerPool(new URL('../../../swingPropose.mjs', import.meta.url), 'proposeTask', 1);
       try {
         return { vehicle, site, part: verdict.part, ...(await pool.run(task)) };

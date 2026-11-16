@@ -16,7 +16,9 @@ export const ASSEMBLY_SUFFIX = '_assembly';
 // reflected, so only the near side is laid out. An exhaust has no core, so it is laid out about its front pipe, the
 // part that meets the engine.
 export function readAssemblies(root = repo) {
-  const { forward, assemblies } = JSON.parse(evaluateJsonnet(`
+  const { forward, assemblies } = JSON.parse(
+    evaluateJsonnet(
+      `
   local frame = import 'models/vehicles/frame.libsonnet';
   local site = import 'models/vehicles/site.libsonnet';
   local wheelKit = import 'models/vehicles/wheel-kit.libsonnet';
@@ -46,7 +48,10 @@ export function readAssemblies(root = repo) {
     { id: name + '${ASSEMBLY_SUFFIX}', sites: [placed { at: [placed.at[i] - first[i] for i in [0, 1, 2]] } for placed in sites] }
     for name in exhaustKit.names
   ];
-  { forward: frame.forward, assemblies: assemblies }`, root));
+  { forward: frame.forward, assemblies: assemblies }`,
+      root,
+    ),
+  );
   const turned = (sites) => sites.map((placed) => ({ ...placed, at: toModelFrame(forward, placed.at) }));
   return assemblies.map(({ id, sites }) => ({ id, sites: turned(sites) }));
 }

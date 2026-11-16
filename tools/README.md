@@ -107,9 +107,12 @@ are owned by `packages/thing-export/src/files.ts`, `writeRecipeExports`; pack co
 `packages/thing-authoring-tool/src/cli/export.ts`, `exportThingRecipes`.
 
 Generated actors are a separate source family, not another recipe partition. A mob row selects a registered
-template and body-plan pose mechanism; see `mobs.mjs`, `deriveTemplate` and `exportMob`. The GLB, body, pose
-clips and genome form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`. Use this
-same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
+template and body-plan pose mechanism; see `mobTemplates.mjs`, `templateFor`, and `mobs.mjs`, `exportMob`. The GLB,
+body, pose clips and genome form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`.
+Use this same representation for every reader so changing a rig does not require parallel consumer-specific encodings.
+The parts a cut leaves are baked from the same bodies rather than drawn, so a part always matches the stump it came
+from and every cut point has one; see `severedParts.mjs`, `severedPartPlan`, and `severedPartBake.mjs`,
+`bakeSeveredParts`.
 
 The taxonomy is checked before anything is built, from the source rows rather than from the export tools, so
 one report covers the roster, the recipes and the mob sheet alike, and the export tools only carry the field. See
@@ -122,8 +125,10 @@ Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildMan
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
-rather than assumed to. A build reuses every export whose code and inputs are unchanged, so its cost follows what
-changed rather than the size of the catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
+rather than assumed to. The smooth copies are held to the same fit checks only as a report, since those checks were
+tuned to the voxel lattice; see `smooth-fit.mjs` and `../docs/decisions/0020-smooth-copy.md`. A build reuses
+every export whose code and inputs are unchanged, so its cost follows what changed rather than the size of the
+catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
 content an export reads, not a dependency graph, so a kit or library edit rebuilds exactly the models whose compiled
 rows it changes, and nothing has to be kept in step with the imports. A key that leaves out something an export reads
 would serve stale bytes, so a tool caches only rows that name their inputs, data its code imports whatever the row

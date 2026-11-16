@@ -70,30 +70,28 @@ describe('a rear sight keeps its notch or aperture open in the voxelized file', 
   });
 
   // A smooth sight is drawn as authored, so no grain can close it; its line need only run through the opening.
-  it.each(rearSights)('is open on the sight line, at the gun grain if voxelized: $label, $partId', ({
-    assembly,
-    items,
-    partId,
-    smooth,
-  }) => {
-    const result = exportGunGlb(
-      assembly,
-      ASSET,
-      { appearanceProfile: 'ar' },
-      { ...recipeVoxel({ voxel: gunVoxel }), items },
-    );
-    if (!result.ok) {
-      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
-    }
-    const { eye } = result.modelEntry.gun.sight!;
-    const read = readGlb(result.glb);
-    // A quarter grain below the eye is inside the top row of an open notch and inside the hole of a closed aperture.
-    const row = eye[1] - gunVoxel.detailGrain / 4;
-    const width = openWidthAtLine(partTriangles(read.json, read, partId), eye, row);
-    if (smooth) {
-      expect(width).toBeGreaterThan(0);
-    } else {
-      expect(width).toBeGreaterThanOrEqual(gunVoxel.grain - 1e-6);
-    }
-  });
+  it.each(rearSights)(
+    'is open on the sight line, at the gun grain if voxelized: $label, $partId',
+    ({ assembly, items, partId, smooth }) => {
+      const result = exportGunGlb(
+        assembly,
+        ASSET,
+        { appearanceProfile: 'ar' },
+        { ...recipeVoxel({ voxel: gunVoxel }), items },
+      );
+      if (!result.ok) {
+        throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+      }
+      const { eye } = result.modelEntry.gun.sight!;
+      const read = readGlb(result.glb);
+      // A quarter grain below the eye is inside the top row of an open notch and inside the hole of a closed aperture.
+      const row = eye[1] - gunVoxel.detailGrain / 4;
+      const width = openWidthAtLine(partTriangles(read.json, read, partId), eye, row);
+      if (smooth) {
+        expect(width).toBeGreaterThan(0);
+      } else {
+        expect(width).toBeGreaterThanOrEqual(gunVoxel.grain - 1e-6);
+      }
+    },
+  );
 });

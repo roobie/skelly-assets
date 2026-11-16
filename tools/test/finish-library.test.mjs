@@ -11,8 +11,15 @@ const { finishLibrary, loadThingRecipe } = await import('../packages/thing-autho
 const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
 
 const repo = resolve(import.meta.dirname, '../..');
-const shipped = buildManifest({ models: [], files: [], credit: () => ({}), finishes: finishLibrary(catalogue) }).finishes;
-const named = [...new Set(Object.values(readPlacements(repo)).flatMap(({ sites }) => sites.flatMap(({ finish }) => finish ?? [])))];
+const shipped = buildManifest({
+  models: [],
+  files: [],
+  credit: () => ({}),
+  finishes: finishLibrary(catalogue),
+}).finishes;
+const named = [
+  ...new Set(Object.values(readPlacements(repo)).flatMap(({ sites }) => sites.flatMap(({ finish }) => finish ?? []))),
+];
 
 const glbJson = (bytes) => {
   const buffer = Buffer.from(bytes);
@@ -22,14 +29,20 @@ const glbJson = (bytes) => {
 // One fixture surface that takes paint, finished in the given finish, exported as a catalogue part is.
 const paintedMaterials = (finish) => {
   const fixture = JSON.parse(readFileSync(new URL('./fixtures/unknown-material.json', import.meta.url)));
-  const item = { ...fixture.item, parts: fixture.item.parts.map((part) => ({ ...part, finish: { surface: finish }, paintable: ['surface'] })) };
+  const item = {
+    ...fixture.item,
+    parts: fixture.item.parts.map((part) => ({ ...part, finish: { surface: finish }, paintable: ['surface'] })),
+  };
   const [row] = loadThingRecipe(fixture.recipe, { ...catalogue, items: [item] });
   return glbJson(row.generate().glb).materials.filter(({ extras }) => extras?.paintable);
 };
 
 test('every finish a vehicle site names is in the shipped finish library', () => {
   assert.ok(named.length > 0, 'no site names a finish');
-  assert.deepEqual(named.filter((finish) => !Object.hasOwn(shipped, finish)), []);
+  assert.deepEqual(
+    named.filter((finish) => !Object.hasOwn(shipped, finish)),
+    [],
+  );
 });
 
 // A consumer puts the shipped entry in place of a paintable material, so it must be what an export in that finish

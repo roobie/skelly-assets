@@ -53,6 +53,7 @@ export type ExportFileResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: GunDeadvoxModelEntry;
       readonly warnings: readonly string[];
@@ -172,6 +173,7 @@ export const exportFileText = (
   return {
     ok: true,
     glb: result.glb,
+    smoothGlb: result.smoothGlb,
     partNodes: result.partNodes,
     modelEntry: result.modelEntry,
     warnings: read.warnings,

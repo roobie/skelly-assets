@@ -5,16 +5,15 @@ import type {
   AppearanceContext,
   GlbAssetIdentity,
   GlbExportError,
-  GlbExportResult,
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
 import { modelCollision } from '@skelly/thing-export/physical.ts';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { MetallicCartridge } from '../ammo/cartridge.ts';
 import { gunDomain } from './domain.ts';
-import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { inFileFrame } from './exportFrame.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
+import { exportGunModels } from './glbWriter.ts';
 import { magazineRoundColumn, magazineRoundPoses } from './magazineGeometry.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { FAMILIES } from './parts.ts';
@@ -34,6 +33,7 @@ export type MagazineExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: DeadvoxModelEntry;
     }
@@ -60,12 +60,15 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
   if (def?.family !== 'magazine') {
     throw new Error(`family "${input.family}" does not build a magazine`);
   }
-  const output: GlbExportResult = exportGlb({
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, input.voxel);
+  const output = exportGunModels({
     resolved,
     palette: GUN_PALETTE,
     ...(input.appearance ? { appearance: input.appearance } : {}),
     asset: input.asset,
     ...input.voxel,
+    drawnVoxels: drawn.voxels,
   });
   if (!output.ok) {
     return output;
@@ -75,11 +78,10 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
     Object.entries(resolved.params.get('magazine') ?? {}).map(([key, param]) => [key, param.value]),
   );
   const { column } = magazineRoundColumn(def.displaySolids ?? def.solids, input.cartridge, params, def.solids);
-  const fileResolved = inFileFrame(resolved);
-  const drawn = drawnGeometry(fileResolved, input.voxel);
   return {
     ok: true,
     glb: output.glb,
+    smoothGlb: output.smoothGlb,
     partNodes: output.partNodes,
     modelEntry: {
       id: input.asset.id,

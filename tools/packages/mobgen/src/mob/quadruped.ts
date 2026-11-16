@@ -523,7 +523,7 @@ const smoothstep = (value: number): number => value * value * (3 - 2 * value);
  * planted paws are the lowest points keeps them exactly on the ground; a swing paw that lifts does not.
  * Severed bones are excluded, so the body rests or falls on its surviving geometry rather than hovering on
  * a hidden leg. */
-const groundDogPose = (realized: Realized, pose: Pose, severed?: ReadonlySet<string>): Pose => {
+export const groundDogPose = (realized: Realized, pose: Pose, severed?: ReadonlySet<string>): Pose => {
   const probe: Pose = { root: [pose.root[0], 0, pose.root[2]], rotations: pose.rotations };
   const surviving = realized.body.bones.map((bone) => bone.id).filter((id) => !(severed?.has(id) ?? false));
   const surfaces = posedVoxelSurfaceBoundsForBones(realized, probe, surviving);
@@ -668,7 +668,12 @@ export const quadrupedStrideLength = (realized: Realized, stance: QuadrupedStanc
  * has advanced, so a planted paw rides the moving ground and any speed just changes how fast distance
  * grows. The fore-left/hind-right pair reaches while fore-right/hind-left plants, then they swap; `limp`
  * shortens and droops the injured diagonal, so the walk lurches rather than trots. */
-export const quadrupedGaitPose = (realized: Realized, distance: number, speed: number, stance: QuadrupedStance = {}): Pose => {
+export const quadrupedGaitPose = (
+  realized: Realized,
+  distance: number,
+  speed: number,
+  stance: QuadrupedStance = {},
+): Pose => {
   const limp = stance.limp ?? 0;
   const limpScale = Math.max(0, Math.min(1, limp));
   const base = quadrupedPose(realized, stance);
@@ -738,14 +743,23 @@ export interface QuadrupedHitOptions {
   readonly severed?: ReadonlySet<string>;
 }
 
+/** The share of the flinch's duration at which its brace is deepest. */
+export const QUADRUPED_HIT_PEAK_FRACTION = 0.2;
+
 /** A short brace/recoil layered over the current pose and re-grounded against the surviving supports. */
-export const quadrupedHitPose = (realized: Realized, base: Pose, time: number, options: QuadrupedHitOptions = {}): Pose => {
+export const quadrupedHitPose = (
+  realized: Realized,
+  base: Pose,
+  time: number,
+  options: QuadrupedHitOptions = {},
+): Pose => {
   if (!(time > 0) || time >= HIT_FLINCH.duration) {
     return base;
   }
   const side = options.side ?? 0;
   const progress = time / HIT_FLINCH.duration;
-  const intensity = progress < 0.2 ? smoothstep(progress / 0.2) : 1 - smoothstep((progress - 0.2) / 0.8);
+  const peak = QUADRUPED_HIT_PEAK_FRACTION;
+  const intensity = progress < peak ? smoothstep(progress / peak) : 1 - smoothstep((progress - peak) / (1 - peak));
   const rotations: Record<string, Mat3> = { ...base.rotations };
   const addRotation = (bone: string, delta: Mat3): void => {
     rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, delta);
@@ -765,7 +779,8 @@ export const quadrupedPawBones: readonly string[] = PAW_BONES;
 // ---- Idle and attack ----
 
 /** The standing idle: the rest stance without the infected limp, so a row that is no cripple stands square. */
-export const dogIdlePose = (realized: Realized, stance: QuadrupedStance = {}): Pose => quadrupedPose(realized, { ...stance, limp: 0 });
+export const dogIdlePose = (realized: Realized, stance: QuadrupedStance = {}): Pose =>
+  quadrupedPose(realized, { ...stance, limp: 0 });
 
 /** One key of the pounce: time in seconds, bone rotations about X in degrees (positive swings a leg forward and lifts the nose), the body's
  * advance along its facing in metres (the dog faces -Z, so forward is negative Z there), and the key's name for readers. */
@@ -785,25 +800,68 @@ export const DOG_POUNCE = {
     { t: 0, rotations: {}, lunge: 0 },
     {
       t: 0.28,
-      rotations: { pelvis: -8, spine: 10, neck: 12, head: 10, jaw: -30, 'foreUpper.L': -22, 'foreUpper.R': -22, 'foreLower.L': 10, 'foreLower.R': 10, 'hindUpper.L': 14, 'hindUpper.R': 14 },
+      rotations: {
+        pelvis: -8,
+        spine: 10,
+        neck: 12,
+        head: 10,
+        jaw: -30,
+        'foreUpper.L': -22,
+        'foreUpper.R': -22,
+        'foreLower.L': 10,
+        'foreLower.R': 10,
+        'hindUpper.L': 14,
+        'hindUpper.R': 14,
+      },
       lunge: 0.08,
     },
     {
       t: 0.45,
-      rotations: { pelvis: 6, spine: -12, neck: -22, head: -20, jaw: -42, 'foreUpper.L': 38, 'foreUpper.R': 30, 'foreLower.L': -12, 'foreLower.R': -12, 'hindUpper.L': -16, 'hindUpper.R': -16 },
+      rotations: {
+        pelvis: 6,
+        spine: -12,
+        neck: -22,
+        head: -20,
+        jaw: -42,
+        'foreUpper.L': 38,
+        'foreUpper.R': 30,
+        'foreLower.L': -12,
+        'foreLower.R': -12,
+        'hindUpper.L': -16,
+        'hindUpper.R': -16,
+      },
       lunge: -0.26,
     },
     {
       t: 0.55,
-      rotations: { pelvis: 4, spine: -10, neck: -18, head: -14, jaw: 4, 'foreUpper.L': 30, 'foreUpper.R': 34, 'foreLower.L': -8, 'foreLower.R': -8, 'hindUpper.L': -10, 'hindUpper.R': -10 },
+      rotations: {
+        pelvis: 4,
+        spine: -10,
+        neck: -18,
+        head: -14,
+        jaw: 4,
+        'foreUpper.L': 30,
+        'foreUpper.R': 34,
+        'foreLower.L': -8,
+        'foreLower.R': -8,
+        'hindUpper.L': -10,
+        'hindUpper.R': -10,
+      },
       lunge: -0.22,
     },
     { t: 0.9, rotations: {}, lunge: 0 },
   ] as readonly PounceKey[],
 } as const;
 
+/** How a pounce lands: the cuts whose bones must not bear its regrounding, and `reach`, a factor on the keys' lunge, so a body far from a
+ * dog's size springs a distance in proportion to its own (1 is the dog's). */
+export interface DogAttackOptions {
+  readonly severed?: ReadonlySet<string>;
+  readonly reach?: number;
+}
+
 /** The pounce at `time` over `base` (the idle or walk pose), eased between its keys and re-grounded on the surviving paws. */
-export const dogAttackPose = (realized: Realized, base: Pose, time: number, options: { readonly severed?: ReadonlySet<string> } = {}): Pose => {
+export const dogAttackPose = (realized: Realized, base: Pose, time: number, options: DogAttackOptions = {}): Pose => {
   const { keys, duration } = DOG_POUNCE;
   const t = Math.max(0, Math.min(duration, time));
   let hi = keys.findIndex((key) => key.t >= t);
@@ -820,6 +878,10 @@ export const dogAttackPose = (realized: Realized, base: Pose, time: number, opti
     const b = keys[hi]!.rotations[bone] ?? 0;
     rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, rotX(a + (b - a) * u));
   }
-  const lunge = keys[lo]!.lunge + (keys[hi]!.lunge - keys[lo]!.lunge) * u;
-  return groundDogPose(realized, { root: [base.root[0], base.root[1], base.root[2] + lunge], rotations }, options.severed);
+  const lunge = (keys[lo]!.lunge + (keys[hi]!.lunge - keys[lo]!.lunge) * u) * (options.reach ?? 1);
+  return groundDogPose(
+    realized,
+    { root: [base.root[0], base.root[1], base.root[2] + lunge], rotations },
+    options.severed,
+  );
 };

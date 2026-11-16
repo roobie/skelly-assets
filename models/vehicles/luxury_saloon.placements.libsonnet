@@ -5,7 +5,7 @@ local s = import 'luxury_saloon.spec.libsonnet';
   sites: (import 'car-sites.libsonnet')('luxury_saloon', s, {
     engine: { name: 'v8_petrol' },
     over: {
-      gearbox: { part: 'gearbox_inline', at: [s.frontAxle - 0.7, 0.26, 0] },
+      gearbox: { part: 'gearbox_inline', at: s.gearboxAt },
       rear_bench: { at: [-0.75, s.floor, 0] },
     },
     add: [
@@ -17,7 +17,5 @@ local s = import 'luxury_saloon.spec.libsonnet';
   unjudged: [
     site.unjudged('air_box', 'bonnet', 0.042,
       'The air box stands through the bonnet\'s skin.'),
-    site.unjudged('gearbox', 'shell', 0.251,
-      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
   ],
 }

@@ -1,9 +1,10 @@
 // What tools/build.mjs and tools/mobs.mjs share about generating models: the export cache they reuse unchanged models
 // from, and how CI splits a complete build's generation over runners, each filling the cache with its share.
 import { join, resolve } from 'node:path';
+import { BUILD_ROOT } from './buildDir.mjs';
 
-// Ignored like the Jsonnet twin store beside it, so an author's builds are incremental without asking.
-export const DEFAULT_CACHE = join(import.meta.dirname, '.build', 'exports');
+// Under the build root like the Jsonnet twin store, so an author's builds are incremental without asking.
+export const DEFAULT_CACHE = join(BUILD_ROOT, 'exports');
 
 // The command line options that choose the cache, as node:util parseArgs takes them.
 export const CACHE_OPTIONS = {

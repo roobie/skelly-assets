@@ -120,7 +120,8 @@ const floaterLayout = (p: FloaterParams): FloaterLayout => {
   const tailPoints: Vec3[] = [];
   // the chain ends one tip radius above the ground, so the rounded end rests on it rather than dipping through
   const tipY = p.tailTipRadius * h;
-  for (let i = 0; i <= segments && p.tailLength > 0; i++) tailPoints.push([0, tipY + (coreBottomY - tipY) * (1 - i / segments), 0]);
+  for (let i = 0; i <= segments && p.tailLength > 0; i++)
+    tailPoints.push([0, tipY + (coreBottomY - tipY) * (1 - i / segments), 0]);
 
   const arms: Record<Side, readonly [Vec3, Vec3, Vec3] | null> = { L: null, R: null };
   if (p.armLength > 0) {
@@ -128,7 +129,11 @@ const floaterLayout = (p: FloaterParams): FloaterLayout => {
     const drop = (p.armDrop * Math.PI) / 180;
     const fore = ((p.armDrop + p.armBend) * Math.PI) / 180;
     for (const side of SIDES) {
-      const shoulder: Vec3 = [sideSign(side) * SHAPE.shoulderWidth * p.coreWidth * h, coreTop[1] - SHAPE.shoulderBelowTop * coreHalf, 0];
+      const shoulder: Vec3 = [
+        sideSign(side) * SHAPE.shoulderWidth * p.coreWidth * h,
+        coreTop[1] - SHAPE.shoulderBelowTop * coreHalf,
+        0,
+      ];
       const elbow = add(shoulder, [sideSign(side) * half * Math.cos(drop), -half * Math.sin(drop), 0]);
       const hand = add(elbow, [sideSign(side) * half * Math.cos(fore), -half * Math.sin(fore), 0]);
       arms[side] = [shoulder, elbow, hand];
@@ -159,7 +164,12 @@ const buildBones = (l: FloaterLayout): Body['bones'] => {
   const bones: Body['bones'][number][] = [{ id: 'core', parent: null, head: l.coreBottom, tail: l.coreTop }];
   if (l.headCenter && l.crown) bones.push({ id: 'head', parent: 'core', head: l.coreTop, tail: l.crown });
   for (let i = 0; i + 1 < l.tailPoints.length; i++) {
-    bones.push({ id: `tail.${i}`, parent: i === 0 ? 'core' : `tail.${i - 1}`, head: l.tailPoints[i]!, tail: l.tailPoints[i + 1]! });
+    bones.push({
+      id: `tail.${i}`,
+      parent: i === 0 ? 'core' : `tail.${i - 1}`,
+      head: l.tailPoints[i]!,
+      tail: l.tailPoints[i + 1]!,
+    });
   }
   for (const side of SIDES) {
     const arm = l.arms[side];
@@ -193,7 +203,13 @@ const buildFlesh = (l: FloaterLayout): Feature[] => {
   }
   if (l.headCenter) {
     const r = l.headRadius;
-    features.push({ bone: 'head', op: 'add', shape: { kind: 'ellipsoid', center: l.headCenter, radii: [r, r * 1.05, r] }, material: 'body', blend });
+    features.push({
+      bone: 'head',
+      op: 'add',
+      shape: { kind: 'ellipsoid', center: l.headCenter, radii: [r, r * 1.05, r] },
+      material: 'body',
+      blend,
+    });
     // two dark slits for eyes
     for (const side of SIDES) {
       features.push({
@@ -213,17 +229,49 @@ const buildFlesh = (l: FloaterLayout): Feature[] => {
     const u0 = i / segments;
     const u1 = (i + 1) / segments;
     const r = (u: number) => p.tailRadius * h + (p.tailTipRadius * h - p.tailRadius * h) * u;
-    features.push(capsule(`tail.${i}`, l.tailPoints[i]!, l.tailPoints[i + 1]!, r(u0), r(u1), bandMaterial(TAIL_BANDS, (u0 + u1) / 2), blend));
+    features.push(
+      capsule(
+        `tail.${i}`,
+        l.tailPoints[i]!,
+        l.tailPoints[i + 1]!,
+        r(u0),
+        r(u1),
+        bandMaterial(TAIL_BANDS, (u0 + u1) / 2),
+        blend,
+      ),
+    );
   }
   for (const side of SIDES) {
     const arm = l.arms[side];
     if (!arm) continue;
     const r = p.armRadius * h;
-    features.push(capsule(`arm.${side}`, arm[0], arm[1], r, r * (1 + SHAPE.armTipTaper) / 2, bandMaterial(ARM_BANDS, 0.25), blend));
-    features.push(capsule(`forearm.${side}`, arm[1], arm[2], r * (1 + SHAPE.armTipTaper) / 2, r * SHAPE.armTipTaper, bandMaterial(ARM_BANDS, 0.75), blend));
+    features.push(
+      capsule(
+        `arm.${side}`,
+        arm[0],
+        arm[1],
+        r,
+        (r * (1 + SHAPE.armTipTaper)) / 2,
+        bandMaterial(ARM_BANDS, 0.25),
+        blend,
+      ),
+    );
+    features.push(
+      capsule(
+        `forearm.${side}`,
+        arm[1],
+        arm[2],
+        (r * (1 + SHAPE.armTipTaper)) / 2,
+        r * SHAPE.armTipTaper,
+        bandMaterial(ARM_BANDS, 0.75),
+        blend,
+      ),
+    );
   }
   const rt = p.tongueRadius * h;
-  l.tongues.forEach((t, i) => features.push(capsule(`tongue.${i}`, t.from, t.to, rt, rt * SHAPE.tongueTipRadius, 'edge', blend * 0.5)));
+  l.tongues.forEach((t, i) =>
+    features.push(capsule(`tongue.${i}`, t.from, t.to, rt, rt * SHAPE.tongueTipRadius, 'edge', blend * 0.5)),
+  );
   return features;
 };
 
@@ -235,7 +283,15 @@ const buildHeat = (l: FloaterLayout): Feature[] => {
   features.push({
     bone: 'core',
     op: 'paint',
-    shape: { kind: 'ellipsoid', center: front, radii: [p.coreWidth * h * SHAPE.hotFrontShare * 0.6, p.coreHeight * h * SHAPE.hotFrontShare * 1.2, p.coreDepth * h * SHAPE.hotFrontShare] },
+    shape: {
+      kind: 'ellipsoid',
+      center: front,
+      radii: [
+        p.coreWidth * h * SHAPE.hotFrontShare * 0.6,
+        p.coreHeight * h * SHAPE.hotFrontShare * 1.2,
+        p.coreDepth * h * SHAPE.hotFrontShare,
+      ],
+    },
     material: 'hot',
     onto: ['body'],
   });
@@ -270,7 +326,10 @@ const buildFloater = (genome: Genome): Body => {
 };
 
 registerBodyPlan('floater', {
-  sample: (rng, template: Template) => ({ params: sampleParams(rng, template.params, FLOATER_PARAM_ORDER), wounds: [] }),
+  sample: (rng, template: Template) => ({
+    params: sampleParams(rng, template.params, FLOATER_PARAM_ORDER),
+    wounds: [],
+  }),
   build: (genome) => buildFloater(genome),
   paramOrder: FLOATER_PARAM_ORDER,
   woundBones: [],
@@ -334,7 +393,10 @@ export const floaterPose = (realized: Realized, p: FloaterParams, m: FloaterMoti
     } else if (kind === 'tongue' && flicker) {
       const i = Number(tag);
       const ph = flicker.phase + i * FLOATER_MOTION.flickerRatePerTongue;
-      rotations[id] = mulMM(rotX(flicker.amp * Math.sin(ph)), rotZ(flicker.amp * FLOATER_MOTION.flickerAxisShare * Math.cos(ph * 1.3)));
+      rotations[id] = mulMM(
+        rotX(flicker.amp * Math.sin(ph)),
+        rotZ(flicker.amp * FLOATER_MOTION.flickerAxisShare * Math.cos(ph * 1.3)),
+      );
     }
   }
   return { root: [0, p.hover + (m.rise ?? 0), m.lunge ?? 0], rotations };
@@ -346,7 +408,8 @@ export const floaterIdleMotion = (p: FloaterParams): FloaterMotion => ({
   flicker: { amp: p.flicker * FLOATER_MOTION.restFlickerShare, phase: 0 },
 });
 
-export const floaterIdlePose = (realized: Realized, p: FloaterParams): Pose => floaterPose(realized, p, floaterIdleMotion(p));
+export const floaterIdlePose = (realized: Realized, p: FloaterParams): Pose =>
+  floaterPose(realized, p, floaterIdleMotion(p));
 
 /** The drift at `progress` (0..1 of one cycle): the tail's sway travelling down, the body bobbing and leaning, the arms trailing, the tongues flickering. */
 export const floaterDriftPose = (realized: Realized, p: FloaterParams, progress: number): Pose => {
@@ -379,22 +442,48 @@ export const FLOATER_CAST = {
     { t: 0, motion: {} },
     {
       t: 0.3,
-      motion: { core: [14, 0, 0], head: [10, 0, 0], arm: [-20, -35, 40], forearm: [-30, -20, 20], tail: [12, 40], flicker: { amp: 22, phase: 0 }, rise: 0.06, lunge: 0.08 },
+      motion: {
+        core: [14, 0, 0],
+        head: [10, 0, 0],
+        arm: [-20, -35, 40],
+        forearm: [-30, -20, 20],
+        tail: [12, 40],
+        flicker: { amp: 22, phase: 0 },
+        rise: 0.06,
+        lunge: 0.08,
+      },
     },
     {
       t: 0.45,
-      motion: { core: [-24, 0, 0], head: [-16, 0, 0], arm: [-10, 70, -25], forearm: [0, 25, -10], tail: [-10, -55], flicker: { amp: 38, phase: 2 }, rise: 0.02, lunge: -0.22 },
+      motion: {
+        core: [-24, 0, 0],
+        head: [-16, 0, 0],
+        arm: [-10, 70, -25],
+        forearm: [0, 25, -10],
+        tail: [-10, -55],
+        flicker: { amp: 38, phase: 2 },
+        rise: 0.02,
+        lunge: -0.22,
+      },
     },
     {
       t: 0.6,
-      motion: { core: [-14, 0, 0], head: [-8, 0, 0], arm: [-6, 55, -15], forearm: [0, 15, -6], tail: [0, -20], flicker: { amp: 26, phase: 4 }, lunge: -0.16 },
+      motion: {
+        core: [-14, 0, 0],
+        head: [-8, 0, 0],
+        arm: [-6, 55, -15],
+        forearm: [0, 15, -6],
+        tail: [0, -20],
+        flicker: { amp: 26, phase: 4 },
+        lunge: -0.16,
+      },
     },
     { t: 0.9, motion: {} },
   ] as readonly CastKey[],
 } as const;
 
 const mixVec = (a: Vec3 | undefined, b: Vec3 | undefined, u: number): Vec3 | undefined =>
-  a || b ? [0, 1, 2].map((k) => (a?.[k] ?? 0) + ((b?.[k] ?? 0) - (a?.[k] ?? 0)) * u) as unknown as Vec3 : undefined;
+  a || b ? ([0, 1, 2].map((k) => (a?.[k] ?? 0) + ((b?.[k] ?? 0) - (a?.[k] ?? 0)) * u) as unknown as Vec3) : undefined;
 
 const smooth = (x: number): number => x * x * (3 - 2 * x);
 
@@ -411,7 +500,10 @@ export const floaterCastPose = (realized: Realized, p: FloaterParams, time: numb
   const b = keys[hi]!.motion;
   const num = (x: number | undefined, y: number | undefined): number => (x ?? 0) + ((y ?? 0) - (x ?? 0)) * u;
   const idle = floaterIdleMotion(p);
-  const tail = [num(a.tail?.[0], b.tail?.[0]) + (idle.tail?.[0] ?? 0), num(a.tail?.[1], b.tail?.[1]) + (idle.tail?.[1] ?? 0)] as const;
+  const tail = [
+    num(a.tail?.[0], b.tail?.[0]) + (idle.tail?.[0] ?? 0),
+    num(a.tail?.[1], b.tail?.[1]) + (idle.tail?.[1] ?? 0),
+  ] as const;
   const amp = num(a.flicker?.amp, b.flicker?.amp) + idle.flicker!.amp;
   const core = mixVec(a.core, b.core, u);
   const head = mixVec(a.head, b.head, u);

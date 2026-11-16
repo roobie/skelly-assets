@@ -4,6 +4,7 @@ import type { ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construc
 import { MATERIALS } from '@skelly/thing-core/materials';
 import appearance from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import type { Measure, Shotshell } from '../ammo/cartridge.ts';
+import { revolvedRound } from './revolvedRound.ts';
 
 type ShotshellSolid = RevolvedSolid | ExtrudedPolygonSolid;
 
@@ -24,13 +25,6 @@ const required = (measure: Measure, name: string): number => {
   }
   return measure.value;
 };
-const revolved = (id: string, profile: readonly Vec2[], slot: string): RevolvedSolid => ({
-  id,
-  kind: 'revolved',
-  axis: 'x',
-  profile,
-  slot,
-});
 
 export interface ShotshellGeometry {
   readonly round: readonly ShotshellSolid[];
@@ -47,7 +41,7 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
   const fired = required(shell.length.nominal, 'fired length');
   const inner = radius - SHOTSHELL_WALL_MM;
   const edge = SHOTSHELL_EDGE_MM;
-  const head = revolved(
+  const head = revolvedRound(
     'head',
     [
       [0, 0],
@@ -89,7 +83,7 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
       : tube(loaded);
   // A generic inset closure card, not pellets/wad geometry or a measured Federal component.
   const cardX = loaded - curl;
-  const card = revolved(
+  const card = revolvedRound(
     'closure-card',
     [
       [cardX - edge, 0],
@@ -121,8 +115,8 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
     }
   }
   return {
-    round: [head, revolved('hull', loadedHull, 'hull'), card, ...leaves],
-    case: [head, revolved('hull', tube(fired), 'hull')],
+    round: [head, revolvedRound('hull', loadedHull, 'hull'), card, ...leaves],
+    case: [head, revolvedRound('hull', tube(fired), 'hull')],
   };
 };
 

@@ -17,7 +17,7 @@ const pageCrc = (bytes) => bytes.reduce((crc, byte) => ((crc << 8) ^ CRC_TABLE[(
 // Sets every page's serial number and recomputes its checksum, which covers the serial.
 function fixSerial(file) {
   const view = new DataView(file.buffer, file.byteOffset, file.byteLength);
-  for (let at = 0; at < file.length;) {
+  for (let at = 0; at < file.length; ) {
     if (String.fromCharCode(...file.subarray(at, at + 4)) !== 'OggS') throw new Error(`no Ogg page at byte ${at}`);
     const segments = file[at + 26];
     const length = 27 + segments + file.subarray(at + 27, at + 27 + segments).reduce((sum, size) => sum + size, 0);

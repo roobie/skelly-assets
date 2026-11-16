@@ -1,4 +1,5 @@
 // A two-door V8 muscle car: 4.75 m long, 1.86 m wide, with a 2.75 m wheelbase, a long flat bonnet and a short rear deck. Metres in the vehicle frame.
+local gearbox = (import 'gearboxes.libsonnet').gearbox_inline;
 {
   rear: -2.35, front: 2.4, side: 0.93, skin: 0.865, sill: 0.2, floor: 0.26, waist: 0.92, roof: 1.3,
   rearAxle: -1.2, frontAxle: 1.55, arch: 0.41, archTop: 0.76,
@@ -10,4 +11,7 @@
   tumble: 0.21875, boot: true, twoDoor: true, archLiner: true, grilleHalf: 0.72, slamHalf: 0.72, railHalf: 0.5, legOuter: 0.57, towerOuter: 0.55,
   bumperLow: 0.36, bumperTop: 0.5, bumperPaint: 'steel-bright', scoop: true, stripe: 'paint-white',
   shellMass: 800, paint: 'paint-drum-blue',
+  gearboxAt: [self.cowl, 0.2, 0],
+  // The prop shaft runs forward from the rear axle under the rear bench, so the tunnel runs the floor's length.
+  tunnel: { half: gearbox.width / 2, top: $.gearboxAt[1] + gearbox.height, back: $.rearFloorFront },
 }

@@ -76,18 +76,24 @@ describe('walkPose', () => {
       for (let i = -2; i <= period + 1; i++) {
         const f = (i + 2) / (period + 3);
         cache.stepPlans.entries.set(i, {
-          style: 'normal', side: i % 2 === 0 ? 'L' : 'R',
-          lengthMul: 0.7 + f * 0.6, lateralX: f * 0.04,
-          liftMul: 0.7 + f, rollMul: 0.6 + f, hipDropMul: 0.8 + f,
-          leanExtraDeg: f * 10, armWideExtraDeg: f * 8,
-          armForwardExtraDeg: f * 12, armHangSide: null,
+          style: 'normal',
+          side: i % 2 === 0 ? 'L' : 'R',
+          lengthMul: 0.7 + f * 0.6,
+          lateralX: f * 0.04,
+          liftMul: 0.7 + f,
+          rollMul: 0.6 + f,
+          hipDropMul: 0.8 + f,
+          leanExtraDeg: f * 10,
+          armWideExtraDeg: f * 8,
+          armForwardExtraDeg: f * 12,
+          armHangSide: null,
         });
       }
-      return { bones: body.bones, extents, params, seed, cache,
-        ...(periodic ? { planPeriodSteps: period } : {}) };
+      return { bones: body.bones, extents, params, seed, cache, ...(periodic ? { planPeriodSteps: period } : {}) };
     };
     const components = (pose: ReturnType<typeof walkPose>) => [
-      ...(pose.root ?? [0, 0, 0]), ...Object.values(pose.rotations).flat(),
+      ...(pose.root ?? [0, 0, 0]),
+      ...Object.values(pose.rotations).flat(),
     ];
     const difference = (a: ReturnType<typeof walkPose>, b: ReturnType<typeof walkPose>) => {
       const right = components(b);
@@ -96,17 +102,21 @@ describe('walkPose', () => {
     const actor = makeActor(true);
     for (const stepIndex of [0, 1]) {
       for (const progress of [0, 0.37]) {
-        expect(difference(
-          walkPose(actor, { stepIndex, progress }, SPEEDS[0]!),
-          walkPose(actor, { stepIndex: stepIndex + period, progress }, SPEEDS[0]!),
-        )).toBeLessThan(1e-9);
+        expect(
+          difference(
+            walkPose(actor, { stepIndex, progress }, SPEEDS[0]!),
+            walkPose(actor, { stepIndex: stepIndex + period, progress }, SPEEDS[0]!),
+          ),
+        ).toBeLessThan(1e-9);
       }
     }
     const unbounded = makeActor(false);
-    expect(difference(
-      walkPose(unbounded, { stepIndex: 0, progress: 0 }, SPEEDS[0]!),
-      walkPose(unbounded, { stepIndex: period, progress: 0 }, SPEEDS[0]!),
-    )).toBeGreaterThan(1e-9);
+    expect(
+      difference(
+        walkPose(unbounded, { stepIndex: 0, progress: 0 }, SPEEDS[0]!),
+        walkPose(unbounded, { stepIndex: period, progress: 0 }, SPEEDS[0]!),
+      ),
+    ).toBeGreaterThan(1e-9);
   });
   it('speed 0 gives a still standing pose regardless of clock', () => {
     const { body, voxels, extents, params } = setup('humanoid');

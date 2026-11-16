@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { readRecipes } from '../recipes.mjs';
 import { outputPath } from '../layout.mjs';
+import { readRecipes } from '../recipes.mjs';
 
 test('recipe discovery uses source files and keeps pack ownership', () => {
   const root = mkdtempSync(join(tmpdir(), 'recipes-'));
@@ -16,12 +16,18 @@ test('recipe discovery uses source files and keeps pack ownership', () => {
       writeFileSync(join(directory, `${pack}.json`), JSON.stringify([{ id: pack }]));
     }
     writeFileSync(join(directory, 'stale.json'), '[]');
-    assert.deepEqual(readRecipes(root), ['fixture.a', 'fixture.z'].map(packId => ({ packId, value: [{ id: packId }] })));
-  } finally { rmSync(root, { recursive: true, force: true }); }
+    assert.deepEqual(
+      readRecipes(root),
+      ['fixture.a', 'fixture.z'].map((packId) => ({ packId, value: [{ id: packId }] })),
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('logical output paths remain within one pack', () => {
   assert.equal(outputPath('fixture.pack', 'assets/models/fixture.glb'), 'fixture.pack/assets/models/fixture.glb');
   for (const pack of ['../foreign', '', '/absolute']) assert.throws(() => outputPath(pack, 'things/index.json'));
-  for (const file of ['../foreign', '/absolute', 'things/../../foreign', 'things\\foreign']) assert.throws(() => outputPath('fixture.pack', file));
+  for (const file of ['../foreign', '/absolute', 'things/../../foreign', 'things\\foreign'])
+    assert.throws(() => outputPath('fixture.pack', file));
 });

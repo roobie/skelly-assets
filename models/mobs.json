@@ -13,6 +13,64 @@
     "crawl_stride": 1.2,
     "taxonomy": {"category": "creatures"}
   },
+  "severed": {
+    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): the parts a cut at each cut point, a bone a cut may start at, leaves from each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one set of parts, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. A cut point bakes its whole part and one part for each set of cut points below it a cut there may find already gone, since each of those left as a part of its own and its mass must not be counted twice; without titles each such cut point by bone id, after the title of the part it is missing from. pack is where the parts are placed, beside the other body parts, with taxonomy. materials names each mobgen material, and the cut face, by the catalogue material it is drawn as (tools/packages/thing-core/src/materials.json), so a game classes a part's wear as it does any drawn model's.",
+    "pack": "skelly.body",
+    "taxonomy": {"category": "body-parts", "tags": {"material": ["flesh"]}},
+    "mobs": {
+      "skelly.deadvox.actors": {
+        "shambler": "Shambler",
+        "military_shambler": "Military shambler",
+        "farmer_shambler": "Farmer shambler",
+        "worker_shambler": "Worker shambler",
+        "medic_shambler": "Medic shambler",
+        "brute_shambler": "Brute shambler",
+        "runner": "Runner",
+        "crawler": "Crawler",
+        "acid_zombie": "Acid zombie"
+      }
+    },
+    "cuts": {
+      "head": "head",
+      "skull": "head",
+      "maw": "jaw",
+      "upperArm.L": "left arm",
+      "upperArm.R": "right arm",
+      "arm.L": "left arm",
+      "arm.R": "right arm",
+      "forearm.L": "left forearm",
+      "forearm.R": "right forearm",
+      "fore.L": "left forearm",
+      "fore.R": "right forearm",
+      "hand.L": "left hand",
+      "hand.R": "right hand",
+      "thigh.L": "left leg",
+      "thigh.R": "right leg",
+      "shin.L": "left shin",
+      "shin.R": "right shin",
+      "foot.L": "left foot",
+      "foot.R": "right foot"
+    },
+    "without": {
+      "maw": "without jaw",
+      "forearm.L": "without forearm",
+      "forearm.R": "without forearm",
+      "fore.L": "without forearm",
+      "fore.R": "without forearm",
+      "hand.L": "without hand",
+      "hand.R": "without hand",
+      "shin.L": "without shin",
+      "shin.R": "without shin",
+      "foot.L": "without foot",
+      "foot.R": "without foot"
+    },
+    "materials": {
+      "cut": "body-gore", "gore": "body-gore", "acid": "body-gore",
+      "skin": "body-skin-sickly", "bruise": "body-skin-sickly", "mottle": "body-skin-sickly", "crust": "body-skin-sickly",
+      "hair": "body-hair", "eye": "body-eye", "mouth": "body-mouth", "claw": "body-bone",
+      "shirt": "cloth-shirt-faded", "pants": "cloth-pants-grey", "trousers": "cloth-pants-grey", "shoe": "rubber-black"
+    }
+  },
   "mobs": [
     {
       "id": "shambler",
@@ -2814,6 +2872,175 @@
       "template": "leaper",
       "lod_divisor": 0,
       "walk_speed": 0.58
+    },
+    {
+      "id": "mutant_rat",
+      "title": "Mutant rat",
+      "pack": "skelly.bestiary",
+      "template": "critter",
+      "lod_divisor": 0,
+      "brief": "Ahg3's farm-contract vermin (DESIGN.md beat 4): fast, weak, many, met in swarms. No sprite; the design reads: a hunched, mangy, dog-ugly rat a little bigger than a real one (about 0.2 m tall, 0.75 m with its tail), high-backed over a long body, head low and teeth bared. Silhouette for the tactics camera: the humped back with a tumour bulging off one shoulder, a long bare pink tail trailing, red eyes. Palette: dirty brown-grey fur #6b5a4a mottled darker #4a3e34, a dun belly, bare pink-grey mange patches on the flanks, a pale yellow-flesh tumour with a few sickly green glowing sores, pink tail, feet, ears and nose, yellow incisors. Motion: the critter plan's quick diagonal scurry with the tail swinging, a short spring and bite.",
+      "params": {
+        "height": 0.15,
+        "bodyLength": 1.7,
+        "girth": 1.4,
+        "arch": 0.3,
+        "legSplay": 0.15,
+        "headScale": 1.1,
+        "snoutLength": 1,
+        "earSize": 0.8,
+        "tailLength": 2.6,
+        "tailGirth": 0.3,
+        "headTilt": -6,
+        "jawOpen": 0.3,
+        "limp": 0.15
+      },
+      "materials": {
+        "skin": {
+          "color": "#6b5a4a"
+        },
+        "bruise": {
+          "color": "#4a3e34"
+        },
+        "belly": {
+          "color": "#8a7a62"
+        },
+        "ear": {
+          "color": "#a8787a"
+        },
+        "nose": {
+          "color": "#c47c7c"
+        },
+        "tail": {
+          "color": "#b48a84"
+        },
+        "paw": {
+          "color": "#b48a84"
+        },
+        "eye": {
+          "color": "#ff3020",
+          "emissive": 0.9
+        },
+        "mouth": {
+          "color": "#3a1010"
+        },
+        "mange": {
+          "color": "#a88078"
+        },
+        "tumour": {
+          "color": "#d8b07c"
+        },
+        "sore": {
+          "color": "#a8e040",
+          "emissive": 0.8
+        },
+        "tooth": {
+          "color": "#e8d080"
+        }
+      },
+      "parts": [
+        {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.035, 0.035, -0.03], "radii": [0.04, 0.036, 0.042]}},
+        {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.062, 0.005, 0], "radii": [0.022, 0.022, 0.022]}},
+        {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.018, 0.066, -0.06], "radii": [0.018, 0.018, 0.018]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [0.06, 0.06, -0.035], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [0.075, 0.02, 0.01], "radii": [0.014, 0.014, 0.014]}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [-0.055, 0, 0.02], "radii": [0.03, 0.035, 0.045]}},
+        {"bone": "spine", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [-0.05, 0.02, -0.01], "radii": [0.03, 0.025, 0.03]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.04, 0.03, 0], "radii": [0.025, 0.03, 0.03]}},
+        {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [0, -0.012, 0.008], "b": [0, -0.036, 0.004], "ra": 0.009, "rb": 0.007}}
+      ]
+    },
+    {
+      "id": "rat_brute",
+      "title": "Rat brute",
+      "pack": "skelly.bestiary",
+      "template": "critter",
+      "lod_divisor": 20,
+      "brief": "Ahg3's farm-contract big rat (DESIGN.md beat 4: a few among the swarm are 'big as dogs'). No sprite; the design reads: the mutant rat's family grown to a dog's size (about 0.55 m tall at the hump, over a metre with its tail), heavier in the shoulders and haunch, thick legs that a sniper's aimed leg shot can find, a big head with long yellow incisors and the jaw hanging open. Silhouette for the tactics camera: a hunched dog-sized rat with a raw red flank where the ribs show through, a cluster of tumours on the haunch and a shorter, thicker tail. Palette: darker brown fur #5a4a3c mottled #3c3028, a dun belly, raw red flesh #9a3a30 with pale bone ribs, pink-grey bald patches, pale tumours with green glowing sores, red glowing eyes, pink tail, feet and nose. Motion: the critter plan's heavy diagonal trot with the tail swinging, a spring and bite.",
+      "params": {
+        "height": 0.36,
+        "bodyLength": 1.55,
+        "girth": 1.6,
+        "arch": 0.3,
+        "legSplay": 0.2,
+        "headScale": 1.25,
+        "snoutLength": 0.95,
+        "earSize": 0.6,
+        "tailLength": 1.5,
+        "tailGirth": 0.4,
+        "headTilt": -4,
+        "jawOpen": 0.6,
+        "limp": 0.1
+      },
+      "materials": {
+        "skin": {
+          "color": "#5a4a3c"
+        },
+        "bruise": {
+          "color": "#3c3028"
+        },
+        "belly": {
+          "color": "#7a6a55"
+        },
+        "ear": {
+          "color": "#8a6060"
+        },
+        "nose": {
+          "color": "#b06a6a"
+        },
+        "tail": {
+          "color": "#a07a74"
+        },
+        "paw": {
+          "color": "#a07a74"
+        },
+        "eye": {
+          "color": "#ff4020",
+          "emissive": 0.9
+        },
+        "mouth": {
+          "color": "#3a1010"
+        },
+        "mange": {
+          "color": "#a07a70"
+        },
+        "raw": {
+          "color": "#9a3a30"
+        },
+        "rib": {
+          "color": "#e0d4b0"
+        },
+        "tumour": {
+          "color": "#d0a874"
+        },
+        "sore": {
+          "color": "#a8e040",
+          "emissive": 0.8
+        },
+        "tooth": {
+          "color": "#e8d080"
+        }
+      },
+      "parts": [
+        {"bone": "spine", "at": "mid", "op": "carve", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.21, 0, 0], "radii": [0.06, 0.08, 0.12]}},
+        {"bone": "spine", "at": "mid", "op": "paint", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.185, 0, 0], "radii": [0.07, 0.1, 0.14]}},
+        {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, -0.085], "b": [0.16, -0.075, -0.07300000000000001], "ra": 0.012, "rb": 0.011}},
+        {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, 0], "b": [0.16, -0.075, 0.012], "ra": 0.012, "rb": 0.011}},
+        {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, 0.085], "b": [0.16, -0.075, 0.097], "ra": 0.012, "rb": 0.011}},
+        {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.14, 0.08, 0.02], "radii": [0.07, 0.065, 0.075]}},
+        {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.09, 0.13, -0.05], "radii": [0.045, 0.045, 0.045]}},
+        {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.19, 0.02, 0.08], "radii": [0.04, 0.04, 0.04]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [-0.18, 0.12, 0], "radii": [0.04, 0.04, 0.04]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [-0.1, 0.17, -0.06], "radii": [0.025, 0.025, 0.025]}},
+        {"bone": "neck", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.09, 0.04, 0], "radii": [0.06, 0.06, 0.06]}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.15, -0.02, 0.06], "radii": [0.06, 0.07, 0.07]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0, 0.14, 0], "radii": [0.06, 0.04, 0.08]}},
+        {"bone": "hindUpper.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "ellipsoid", "center": [0, 0.02, 0], "radii": [0.07, 0.1, 0.08]}},
+        {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [-0.014, -0.02, 0.02], "b": [-0.014, -0.08, 0.01], "ra": 0.016, "rb": 0.012}},
+        {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [0.014, -0.02, 0.02], "b": [0.014, -0.08, 0.01], "ra": 0.016, "rb": 0.012}},
+        {"bone": "foreLower.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0.06, 0], "b": [0, -0.05, 0], "ra": 0.04, "rb": 0.032}},
+        {"bone": "hindLower.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0.06, 0], "b": [0, -0.05, 0], "ra": 0.045, "rb": 0.034}}
+      ]
     },
     {
       "id": "mech_walker_mob_1",

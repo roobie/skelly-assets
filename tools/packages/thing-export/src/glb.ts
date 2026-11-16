@@ -31,6 +31,7 @@ import type {
   GlbExportError,
   GlbExportInput,
   GlbExportResult,
+  ModelGlbsResult,
   Palette,
   PartPortId,
   SrgbColor,
@@ -39,7 +40,7 @@ import type {
 import { featureFitsGrain } from './featureFit.ts';
 import { partMounts } from './mounts.ts';
 import { matrixOf, prepareSkin, preserveSkinFace, SkinError, skinPoints } from './skin.ts';
-import { voxelize } from './voxelize.ts';
+import { fillVoxels, voxelize } from './voxelize.ts';
 
 const ASSET_FILE = /^assets\/models\/[a-z0-9_-]+\.glb$/;
 /** glTF node name of a part: its id and registry key (`PartInstance.family`), e.g. `part-1:family-a`. */
@@ -323,7 +324,9 @@ const SHEEN = 'KHR_materials_sheen';
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
   const extras = {
-    ...(material === undefined ? {} : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
+    ...(material === undefined
+      ? {}
+      : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
     ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
   };
   return {
@@ -379,7 +382,10 @@ interface PartExport {
 }
 
 const sameAppearance = (a: ReturnType<typeof resolveAppearance>, b: ReturnType<typeof resolveAppearance>): boolean =>
-  a.material === b.material && a.slot === b.slot && a.paintable === b.paintable && a.color.every((channel, index) => channel === b.color[index]);
+  a.material === b.material &&
+  a.slot === b.slot &&
+  a.paintable === b.paintable &&
+  a.color.every((channel, index) => channel === b.color[index]);
 
 /** Splits a merge group whose solids differ in finish or piece, because one primitive carries one of each. */
 const splitMixed = (
@@ -445,11 +451,47 @@ const refusal = (input: Parameters<ExportGlb>[0]): GlbExportError | undefined =>
 };
 
 /**
+ * How a part drawn smooth is cut into primitives: one per display item, which tools reading a solid's own primitive
+ * need, or one per finish and piece, as a voxel part is.
+ */
+type SmoothPrimitives = 'per-item' | 'per-finish';
+
+/** The meshes of one finish as one, in metres: their vertices end to end and their indices shifted to match. */
+const joinedMesh = (
+  meshes: readonly {
+    readonly positions: Float32Array;
+    readonly normals: Float32Array;
+    readonly indices: Uint32Array;
+  }[],
+  metresPerUnit: number,
+) => {
+  const positions = new Float32Array(meshes.reduce((sum, mesh) => sum + mesh.positions.length, 0));
+  const normals = new Float32Array(positions.length);
+  const indices = new Uint32Array(meshes.reduce((sum, mesh) => sum + mesh.indices.length, 0));
+  let vertex = 0;
+  let index = 0;
+  for (const mesh of meshes) {
+    positions.set(
+      mesh.positions.map((x) => x * metresPerUnit),
+      vertex * 3,
+    );
+    normals.set(mesh.normals, vertex * 3);
+    indices.set(
+      mesh.indices.map((i) => i + vertex),
+      index,
+    );
+    vertex += mesh.positions.length / 3;
+    index += mesh.indices.length;
+  }
+  return { positions, normals, indices };
+};
+
+/**
  * Writes a resolved assembly as a `.glb`. Refuses (as an error value, never an exception) an assembly with
  * structure issues or unplaced parts, ids that can't form a stable port id, a palette colour outside sRGB [0,1],
  * and an asset file outside `assets/models/<name>.glb`.
  */
-const writeGlb: ExportGlb = (input) => {
+const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'per-item'): GlbExportResult => {
   checkNesting(input);
   const error = refusal(input);
   if (error) {
@@ -642,8 +684,64 @@ const writeGlb: ExportGlb = (input) => {
         for (let v = 0; v < positions.length; v += 3) {
           positions.set(applyPoint(into, [mesh.positions[v]!, mesh.positions[v + 1]!, mesh.positions[v + 2]!]), v);
         }
-        return [{ positions, indices: mesh.indices, group: 0 }];
+        return [{ positions, indices: mesh.indices }];
       });
+    });
+  };
+  /**
+   * The part's display items grouped by finish and piece, in the order each group first draws: per item its group, none
+   * for an item that draws nothing, since a primitive carries one material and one piece.
+   */
+  const finishGroupsOf = (part: PartExport, items: DisplayItem[], draws: (index: number) => boolean) => {
+    const finishes: {
+      appearance: ReturnType<typeof resolveAppearance>;
+      piece: string | undefined;
+      solids: string[];
+    }[] = [];
+    const finishOf = new Map<string, number>();
+    const groups = items.map((item, index) => {
+      if (!draws(index)) {
+        return undefined;
+      }
+      const solid = item.solids[0]!;
+      const appearance = appearanceFor(part, solid);
+      const piece = solid.display?.piece;
+      const key = JSON.stringify([materialFor(appearance), appearance.material, appearance.slot, piece]);
+      let group = finishOf.get(key);
+      if (group === undefined) {
+        group = finishes.push({ appearance, piece, solids: [] }) - 1;
+        finishOf.set(key, group);
+      }
+      finishes[group]!.solids.push(...item.solids.map(({ id }) => id));
+      return group;
+    });
+    return { finishes, groups };
+  };
+  const finishExtras = (finish: ReturnType<typeof finishGroupsOf>['finishes'][number]): Json => ({
+    solids: finish.solids,
+    ...pieceExtras(finish.piece),
+    ...appearanceExtras(finish.appearance),
+  });
+  /**
+   * One primitive per finish and piece of the authored meshes, as a voxel part draws, so a consumer pays a draw call per
+   * finish rather than per solid.
+   */
+  const smoothFinishPrimitivesFor = (part: PartExport, items: DisplayItem[]): Json[] => {
+    const drawn = items.map((item) => {
+      const mesh = meshOf(item);
+      return mesh.triangleCount === 0 || mesh.indices.length === 0 ? undefined : mesh;
+    });
+    const { finishes, groups } = finishGroupsOf(part, items, (index) => drawn[index] !== undefined);
+    return finishes.map((finish, group) => {
+      const meshes = drawn.filter(
+        (mesh, index): mesh is NonNullable<typeof mesh> => mesh !== undefined && groups[index] === group,
+      );
+      return bufferPrimitive(
+        joinedMesh(meshes, metresPerUnit),
+        materialFor(finish.appearance),
+        finishExtras(finish),
+        part,
+      );
     });
   };
   /**
@@ -651,31 +749,21 @@ const writeGlb: ExportGlb = (input) => {
    * earlier ones. Each piece's primitives together form a closed surface.
    */
   const voxelPrimitivesFor = (part: PartExport, items: DisplayItem[], grain: number): Json[] => {
-    const finishes: {
-      appearance: ReturnType<typeof resolveAppearance>;
-      piece: string | undefined;
-      solids: string[];
-    }[] = [];
-    const groupOf = new Map<string, number>();
     const drawn = drawnOf(part);
-    const sources = items.flatMap((item, index) => {
-      const mesh = drawn[index];
-      if (mesh === undefined) {
-        return [];
-      }
-      const solid = item.solids[0]!;
-      const appearance = appearanceFor(part, solid);
-      const piece = solid.display?.piece;
-      const key = JSON.stringify([materialFor(appearance), appearance.material, appearance.slot, piece]);
-      let group = groupOf.get(key);
-      if (group === undefined) {
-        group = finishes.push({ appearance, piece, solids: [] }) - 1;
-        groupOf.set(key, group);
-      }
-      finishes[group]!.solids.push(...item.solids.map(({ id }) => id));
-      return [{ ...mesh, group }];
-    });
-    const { groups } = voxelize(sources, grain, latticeOrigin(part.placed, grain, metresPerUnit), {
+    const { finishes, groups } = finishGroupsOf(part, items, (index) => drawn[index] !== undefined);
+    const origin = latticeOrigin(part.placed, grain, metresPerUnit);
+    const fill =
+      input.drawnVoxels?.(part.id) ??
+      fillVoxels(
+        drawn.map((mesh) => mesh ?? { positions: [], indices: [] }),
+        grain,
+        origin,
+      );
+    if (fill.grain !== grain || fill.origin.some((value, axis) => value !== origin[axis])) {
+      throw new Error(`The drawn voxels of ${part.id} lie on another lattice than the file's`);
+    }
+    const { groups: meshes } = voxelize(fill, {
+      groupOf: (source) => groups[source]!,
       neighbours: neighboursOf(part, grain),
       // A face between pieces is kept on both sides, so a game hiding one piece leaves the rest closed.
       exposeInterface: (group, neighbour) =>
@@ -684,16 +772,11 @@ const writeGlb: ExportGlb = (input) => {
           surfaceOf(finishes[neighbour]!.appearance.finish).transparent),
       preserveFace: input.skin ? preserveSkinFace(input.skin, placedInMetres(part)) : undefined,
     });
-    return [...groups].map(([group, buffers]) =>
+    return [...meshes].map(([group, buffers]) =>
       bufferPrimitive(
         buffers,
         materialFor(finishes[group]!.appearance),
-        {
-          voxelGrain: grain,
-          solids: finishes[group]!.solids,
-          ...pieceExtras(finishes[group]!.piece),
-          ...appearanceExtras(finishes[group]!.appearance),
-        },
+        { voxelGrain: grain, ...finishExtras(finishes[group]!) },
         part,
       ),
     );
@@ -711,19 +794,22 @@ const writeGlb: ExportGlb = (input) => {
       : { ...part, def: seatedDef(part.def, port, input.voxelGrain / metresPerUnit) };
   };
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: existing glTF node construction; appearance metadata is conditional by contract.
   const addPart = (part: PartExport): void => {
     const drawn = part.def.displaySolids ?? part.def.solids;
     const grain =
       input.voxelGrain === undefined
         ? undefined
         : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
-    const primitives =
-      grain === undefined
-        ? itemsOf(seatedInHost(part)).flatMap((item) => {
+    const smoothPrimitivesFor = (items: DisplayItem[]): Json[] =>
+      smoothPrimitives === 'per-finish'
+        ? smoothFinishPrimitivesFor(part, items)
+        : items.flatMap((item) => {
             const primitive = primitiveFor(part, item);
             return primitive ? [primitive] : [];
-          })
+          });
+    const primitives =
+      grain === undefined
+        ? smoothPrimitivesFor(itemsOf(seatedInHost(part)))
         : voxelPrimitivesFor(part, itemsOf(part), grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
@@ -834,16 +920,37 @@ const writeGlb: ExportGlb = (input) => {
       : {}),
   };
 
-  return { ok: true, glb: glbFile(json, bin.bytes()), partNodes: parts.map(({ id, family }) => partNodeName(id, family)) };
+  return {
+    ok: true,
+    glb: glbFile(json, bin.bytes()),
+    partNodes: parts.map(({ id, family }) => partNodeName(id, family)),
+  };
 };
 
-export const exportGlb: ExportGlb = (input) => {
+const refusingBadSkin = (write: () => GlbExportResult): GlbExportResult => {
   try {
-    return writeGlb(input);
+    return write();
   } catch (error) {
     if (error instanceof SkinError) {
       return fail({ code: 'invalid-skin', message: error.message });
     }
     throw error;
   }
+};
+
+export const exportGlb: ExportGlb = (input) => refusingBadSkin(() => writeGlb(input));
+
+/**
+ * A shipped model's two files from one input: the file as asked, and its smooth copy, the same assembly as its authored
+ * meshes, so the copy can never drift from the build its datums are read off. The copy is drawn one primitive per
+ * finish and piece, as a voxel part is, since it ships to be drawn, not to be inspected solid by solid.
+ */
+export const exportModelGlbs = (input: GlbExportInput): ModelGlbsResult => {
+  const file = exportGlb(input);
+  if (!file.ok) {
+    return file;
+  }
+  const { voxelGrain, voxelDetailGrain, voxelDetailThinParts, drawnVoxels, ...authored } = input;
+  const smooth = refusingBadSkin(() => writeGlb(authored, 'per-finish'));
+  return smooth.ok ? { ...file, smoothGlb: smooth.glb } : smooth;
 };

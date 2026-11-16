@@ -15,7 +15,9 @@
     "packages/vehicle-authoring-tool"
   ],
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "lint": "biome ci",
+    "fix": "biome check --write"
   },
   "dependencies": {
     "three": "^0.186.0",

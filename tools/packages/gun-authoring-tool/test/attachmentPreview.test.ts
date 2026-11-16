@@ -81,9 +81,10 @@ const rotationMatrix = (rotation: Mat3): Matrix4 =>
   );
 
 const exportDesign = (assembly: Parameters<typeof exportGunGlb>[0]) => {
-  const design = JSON.parse(
-    readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8'),
-  ) as { template: string; finish?: Readonly<Record<string, string>> };
+  const design = JSON.parse(readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8')) as {
+    template: string;
+    finish?: Readonly<Record<string, string>>;
+  };
   const exported = exportGunGlb(
     assembly,
     { id: assembly.name, file: `assets/models/${assembly.name}.glb` },
@@ -195,9 +196,10 @@ describe('viewer attachment previews', () => {
     it(`exports ${assembly.name} attachment materials like their standalone item models`, () => {
       const exported = exportDesign(assembly);
       const { json } = readGlb(exported.glb);
-      const design = JSON.parse(
-        readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8'),
-      ) as { template: string; finish?: Readonly<Record<string, string>> };
+      const design = JSON.parse(readFileSync(join(DESIGNS, `${assembly.name}.json`), 'utf8')) as {
+        template: string;
+        finish?: Readonly<Record<string, string>>;
+      };
       const report = validate(assembly, gunDomain);
       const normalizedReport = { ...report, resolved: withAttachmentInstanceAppearances(report.resolved) };
       const layers = buildLayers(normalizedReport, [], 'finish', {

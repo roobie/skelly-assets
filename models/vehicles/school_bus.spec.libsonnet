@@ -1,8 +1,8 @@
 // A bonneted school bus of about 11 m: 2.44 m wide, 3.05 m high, 6.6 m wheelbase, about 11 t at the kerb, with a
 // high floor over the prop shaft and paired benches either side of a narrow aisle. Metres in the vehicle frame.
 local bench(x) = { part: 'bench_seat_2', x: x, y: 0.95, z: 0.65, sides: 'both' };
-// Over the rear wheel wells, sunk onto the well tops.
-local benchOverWell(x) = bench(x) { y: 1.15, riser: 0.38 };
+// Over the rear wheel wells, sunk onto the well tops, the riser's base standing inboard of the well's inner wall.
+local benchOverWell(x) = bench(x) { y: 1.15, riser: 0.32 };
 {
   rear: -5.5, front: 5.5, side: 1.22, skin: 1.15, sill: 0.5,
   floor: 0.95, floorFinish: 'rubber-black',
@@ -15,7 +15,7 @@ local benchOverWell(x) = bench(x) { y: 1.15, riser: 0.38 };
   bonnet: { cowl: 3.75, cowlY: 1.72, noseY: 1.5, flankY: 0.72, halfWidth: 0.88 },
   lean: 0.2, screens: [[1.72, 2.62]], screenPost: true, pillar: 0.1,
   doors: [{ bay: 0 }], doorLeaves: 1, doorSill: 0.5, doorKick: 0.42, doorSteps: 2, doorFinish: 'paint-signal-yellow',
-  rearHoles: [{ y: [1.0, 2.42], z: 0.5, door: true }],
+  rearHoles: [{ y: [1.0, 2.42], z: 0.5, door: true }], rearDoorOpens: 90,
   rearFlank: { y: [1.8, 2.36], z: [0.62, 1.06] },
   stripes: [
     { y: [1.08, 1.14], slot: 'rail' },

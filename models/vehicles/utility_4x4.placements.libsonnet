@@ -40,4 +40,8 @@ local wheel = 'utility_4x4_wheel';
     site.overlap('hull', 'gearbox', 0.18,
       'The gearbox sits in the floor tunnel, which the cab part draws as a solid block around it.'),
   ],
+  unjudged: [
+    site.unjudged('front_axle', 'engine', 0.081,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
+  ],
 }

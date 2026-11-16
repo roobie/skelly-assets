@@ -297,7 +297,9 @@ describe('optic catalog', () => {
     expect(new Raycaster(eye, inFile([1, 0, 0], 1)).intersectObjects(near, false)).toHaveLength(0);
     for (const solid of frame) {
       const [low, high] = localSolidBounds(solid);
-      const target = inFile(low).add(inFile(high)).multiplyScalar(1 / 2);
+      const target = inFile(low)
+        .add(inFile(high))
+        .multiplyScalar(1 / 2);
       expect(
         new Raycaster(eye, target.sub(eye).normalize()).intersectObjects(near, false).length,
         solid.id,
@@ -508,7 +510,11 @@ const fitOptic = (template: Template, seed: number, type: string, replacesRearIr
     throw new Error(`${template.name} seed ${seed} lacks the ${connection.from} mount for ${type}`);
   }
   // A template whose default leaves the optic off still offers it, so a fit adds the sight where none was drawn.
-  assembly.parts.sight = { family: 'sight', ...assembly.parts.sight, params: { ...assembly.parts.sight?.params, type } };
+  assembly.parts.sight = {
+    family: 'sight',
+    ...assembly.parts.sight,
+    params: { ...assembly.parts.sight?.params, type },
+  };
   assembly.connections = assembly.connections.filter(({ to }) => to !== 'sight.base');
   assembly.connections.push({ from, to: 'sight.base', slot: connection.slot });
   return assembly;
@@ -651,22 +657,19 @@ const FIT_CASES = [
 ] as const;
 
 describe('template optics can be attached, validated, and removed', () => {
-  it.each(FIT_CASES)(
-    '$template.name keeps one gun valid with every compatible optic type',
-    (fitCase) => {
-      const { template, seed, types } = fitCase;
-      for (const type of types) {
-        const assembly = fitOptic(template, seed, type, 'replacesRearIron' in fitCase && fitCase.replacesRearIron);
-        expectContactOnPhysicalRail(assembly, type);
-        expect(validate(assembly, gunDomain).issues, `${template.name} with ${type}`).toEqual([]);
-      }
-      const generated = structuredClone(generate(template, gunDomain, seed)) as MutableAssembly;
-      const { sight: _sight, ...remainingParts } = generated.parts;
-      const removed: MutableAssembly = { ...generated, parts: remainingParts };
-      removed.connections = removed.connections.filter(({ to }) => to !== 'sight.base');
-      expect(validate(removed, gunDomain).issues, `${template.name} without its optional optic`).toEqual([]);
-    },
-  );
+  it.each(FIT_CASES)('$template.name keeps one gun valid with every compatible optic type', (fitCase) => {
+    const { template, seed, types } = fitCase;
+    for (const type of types) {
+      const assembly = fitOptic(template, seed, type, 'replacesRearIron' in fitCase && fitCase.replacesRearIron);
+      expectContactOnPhysicalRail(assembly, type);
+      expect(validate(assembly, gunDomain).issues, `${template.name} with ${type}`).toEqual([]);
+    }
+    const generated = structuredClone(generate(template, gunDomain, seed)) as MutableAssembly;
+    const { sight: _sight, ...remainingParts } = generated.parts;
+    const removed: MutableAssembly = { ...generated, parts: remainingParts };
+    removed.connections = removed.connections.filter(({ to }) => to !== 'sight.base');
+    expect(validate(removed, gunDomain).issues, `${template.name} without its optional optic`).toEqual([]);
+  });
 });
 
 describe('authored front-bead contact', () => {

@@ -37,7 +37,8 @@ const loadRecipeTools = async () => {
     thing: {
       kinds: thing.THING_KINDS,
       // Only the parent loads the whole catalogue; a worker gets its row's slice.
-      tasks: async (rows) => thing.thingTasks(rows, (await import('./packages/thing-authoring-tool/src/content.ts')).catalogue),
+      tasks: async (rows) =>
+        thing.thingTasks(rows, (await import('./packages/thing-authoring-tool/src/content.ts')).catalogue),
       exportOf: ({ row, catalogue }) => thing.loadThingRecipe([row], catalogue)[0],
       directory: 'things',
       index: true,

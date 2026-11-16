@@ -10,7 +10,10 @@ const direction = new Vector3(1, 0.31, 0.17).normalize();
 const inset = 0.001;
 
 const shell = async (id: string) => {
-  const row = loadThingRecipe(recipes.filter((entry) => entry.id === id), catalogue)[0];
+  const row = loadThingRecipe(
+    recipes.filter((entry) => entry.id === id),
+    catalogue,
+  )[0];
   expect(row).toBeDefined();
   const { glb } = row!.generate();
   const { scene } = await new GLTFLoader().parseAsync(Uint8Array.from(glb).buffer, '');
@@ -20,7 +23,8 @@ const shell = async (id: string) => {
     if (!(node instanceof Mesh)) return;
     const position = node.geometry.getAttribute('position');
     const index = node.geometry.getIndex()!;
-    const vertex = (i: number) => new Vector3().fromBufferAttribute(position, index.getX(i)).applyMatrix4(node.matrixWorld);
+    const vertex = (i: number) =>
+      new Vector3().fromBufferAttribute(position, index.getX(i)).applyMatrix4(node.matrixWorld);
     for (let i = 0; i < index.count; i += 3) triangles.push([vertex(i), vertex(i + 1), vertex(i + 2)]);
   });
   expect(triangles.length).toBeGreaterThan(0);
@@ -50,9 +54,16 @@ const shell = async (id: string) => {
 };
 
 // Both torso garments take the over-jacket gear, so it must clear each of them.
-it.each(['jacket_worn_body', 'hoodie_worn_body'])('exports the over-jacket utility vest clear of %s', async (id) => {
-  const garment = await shell(id);
-  const vest = await shell('utility_vest_worn_jacket');
+const GARMENTS = ['jacket_worn_body', 'hoodie_worn_body'];
+// Each shell exports once, as the file loads: a garment's export fills its whole volume with voxels, which costs far
+// more than the check, and the time limit of a case belongs to its check, not to the models it reads.
+const shells = new Map(
+  await Promise.all([...GARMENTS, 'utility_vest_worn_jacket'].map(async (id) => [id, await shell(id)] as const)),
+);
+const vest = shells.get('utility_vest_worn_jacket')!;
+
+it.each(GARMENTS)('exports the over-jacket utility vest clear of %s', (id) => {
+  const garment = shells.get(id)!;
   expect(garment.points.filter(vest.contains)).toHaveLength(0);
   expect(vest.points.filter(garment.contains)).toHaveLength(0);
 });

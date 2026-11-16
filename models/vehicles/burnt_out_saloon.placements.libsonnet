@@ -18,16 +18,18 @@ local s = import 'burnt_out_saloon.spec.libsonnet';
   + pair('front_seat_frame', 'burnt_out_saloon_seat_frame', [0.2, s.floor, 0.37])
   + pair('front_rim', 'burnt_out_saloon_rim', [s.frontAxle, s.axleY, s.wheelZ])
   + pair('rear_rim', 'burnt_out_saloon_rim', [s.rearAxle, s.axleY, s.wheelZ]),
+  overlaps: [
+    site.overlap('front_rim_far', 'shell', 0.136,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+    site.overlap('front_rim_near', 'shell', 0.136,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+    site.overlap('rear_rim_far', 'shell', 0.136,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+    site.overlap('rear_rim_near', 'shell', 0.136,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+  ],
   unjudged: [
     site.unjudged('engine', 'shell', 0.166,
       'The engine\'s gearbox runs through the far front arch liner.'),
-    site.unjudged('front_rim_far', 'shell', 0.136,
-      'The bare front rims stand through the floor, deeper than a wheel in its arch: the wreck may be meant to have sunk onto them.'),
-    site.unjudged('front_rim_near', 'shell', 0.136,
-      'The bare front rims stand through the floor, deeper than a wheel in its arch: the wreck may be meant to have sunk onto them.'),
-    site.unjudged('rear_rim_far', 'shell', 0.136,
-      'The bare rear rims stand through the floor, deeper than a wheel in its arch: the wreck may be meant to have sunk onto them.'),
-    site.unjudged('rear_rim_near', 'shell', 0.136,
-      'The bare rear rims stand through the floor, deeper than a wheel in its arch: the wreck may be meant to have sunk onto them.'),
   ],
 }
