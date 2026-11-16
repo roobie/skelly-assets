@@ -98,6 +98,18 @@ test('the manifest carries what a worn shell covers, so a consumer reads it with
   assert.deepEqual(models[0].covers, ['trunk']);
 });
 
+test('the manifest carries the doll part a wearable sits on, and leaves it out of a model that is not worn', () => {
+  const { models } = buildManifest({
+    models: [
+      { id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', wornOn: { part: 'foot', both: true } },
+      { id: 'fixture_b', title: 'Fixture B', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_b.glb' },
+    ],
+    files: ['fixture.a/assets/models/fixture_a.glb', 'fixture.a/assets/models/fixture_b.glb'],
+    credit,
+  });
+  assert.deepEqual(models.map(({ wornOn }) => wornOn), [{ part: 'foot', both: true }, undefined]);
+});
+
 test('the manifest carries a model\'s mass and drawn volume, and leaves them out where its tool authors none', () => {
   const { models } = buildManifest({
     models: [

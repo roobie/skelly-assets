@@ -142,25 +142,79 @@ export function dollOf(dressing, figure) {
 // ---- dressing ----
 
 const tagsOf = (model, facet) => model.tags?.[facet] ?? [];
-const isPieceOf = (id, model) => model.id === `${id}_worn` || (model.id.startsWith(`${id}_worn_`) && !model.id.slice(`${id}_worn_`.length).includes('_'));
 
-// The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in: `<id>_worn` in the
-// dressing's `piece` part, `<id>_worn_<segment>` in the segment's part, and what it covers of that part, as its model
-// declares, with the sole lift a foot piece declares. Pieces fitted over other clothing are left out, so the doll wears
-// each item on its own.
+// A worn piece's garment and segment, read from its id, `<garment>_worn` or `<garment>_worn_<segment>`; nothing for a
+// model that is no worn piece. Pieces fitted over other clothing are not worn pieces here, so the doll wears each item
+// on its own.
+const PIECE_ID = /^(.+)_worn(?:_([^_]+))?$/;
+function pieceOf(model) {
+  if (!tagsOf(model, 'fit').includes('worn')) return undefined;
+  const match = PIECE_ID.exec(model.id);
+  return match ? { garment: match[1], segment: match[2] } : undefined;
+}
+
+// The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
+function piecePart(id, { segment }, dressing) {
+  if (segment === undefined) return dressing.piece;
+  const slot = dressing.slots[segment];
+  if (!slot) throw new Error(`${id}: worn segment ${segment} is not in the dressing's slots`);
+  return slot.part;
+}
+
+// The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in and what it covers of that
+// part, as its model declares, with the sole lift a foot piece declares.
 export function wornPieces(id, models, dressing) {
-  return models.filter((model) => tagsOf(model, 'fit').includes('worn') && isPieceOf(id, model)).map((model) => {
+  return models.flatMap((model) => {
+    const piece = pieceOf(model);
+    if (piece?.garment !== id) return [];
     const declared = { ...(model.covers ? { covers: model.covers } : {}), ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }) };
-    if (model.id === `${id}_worn`) return { model: model.id, part: dressing.piece, ...declared };
-    const segment = model.id.slice(`${id}_worn_`.length);
-    const slot = dressing.slots[segment];
-    if (!slot) throw new Error(`${model.id}: worn segment ${segment} is not in the dressing's slots`);
-    return { model: model.id, part: slot.part, ...declared };
+    return [{ model: model.id, part: piecePart(model.id, piece, dressing), ...declared }];
   });
 }
 
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
-export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => tagsOf(other, 'fit').includes('worn') && isPieceOf(model.id, other)));
+export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
+
+// The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
+function placeOf(model, dressing) {
+  const slots = tagsOf(model, 'slot');
+  const place = dressing.places.find(({ slot }) => slots.includes(slot));
+  if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
+  return place;
+}
+
+// Each model's `wornOn` by id, the doll part it sits on (tools/manifest.mjs, `buildManifest`): a worn piece's is the
+// part whose frame it is drawn in; a wearable with no pieces has its place's part, `both` when the place spans both
+// copies, or for an anchor place the `anchor` and the bust part it lies on, from `anchorParts` (readAnchorParts). A
+// wearable with pieces has none: its pieces are what sit on the doll.
+export function wornOnParts(models, dressing, anchorParts) {
+  const garments = new Set(models.map((model) => pieceOf(model)?.garment).filter(Boolean));
+  const placed = (model) => tagsOf(model, 'fit').length === 0 && tagsOf(model, 'slot').length > 0 && !garments.has(model.id);
+  const wornOn = new Map();
+  for (const model of models) {
+    const piece = pieceOf(model);
+    if (piece) wornOn.set(model.id, { part: piecePart(model.id, piece, dressing) });
+    else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, anchorParts));
+  }
+  return wornOn;
+}
+
+// The doll part each bust anchor lies on, from the bust's catalogue row, since the built sidecar keeps only the points.
+// Import only after installJsonnetSources, as the catalogue reads the compiled rows.
+export async function readAnchorParts(dressing) {
+  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
+  const bust = catalogue.items.find(({ id }) => id === dressing.doll.bust);
+  if (!bust) throw new Error(`doll: the catalogue has no ${dressing.doll.bust}`);
+  return Object.fromEntries(Object.entries(bust.anchors ?? {}).map(([name, { part }]) => [name, part]));
+}
+
+function placedOn(model, dressing, anchorParts) {
+  const place = placeOf(model, dressing);
+  if (place.anchor === undefined) return { part: place.part, ...(place.both ? { both: true } : {}) };
+  const part = anchorParts[place.anchor];
+  if (!part) throw new Error(`${model.id}: the doll's bust has no anchor ${place.anchor} on a part`);
+  return { part, anchor: place.anchor };
+}
 
 // The place in the dressing's `places` that a wearable with no pieces sits at: the first that one of its slots names.
 export function placeOf(model, dressing) {
