@@ -24,18 +24,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A wheel and its brake disc stand in the arch, which the body draws as boxes and a floor that are not cut away around them.',
-      [
-      ['front_rim', 'shell', 0.068],
-      ['front_wheel', 'crushed_nose', 0.068],
-      ['front_wheel', 'shell', 0.092],
-      ['rear_rim', 'shell', 0.068],
-      ['rear_wheel', 'shell', 0.201],
-      ['rear_wheel_brake_disc', 'shell', 0.066],
-      ['rim_rear', 'shell', 0.055],
-      ],
-    ),
-    fit(
       'A brake disc, or a drum brake\'s backing plate, is set on the hub of its axle.',
       [
       ['aft_rear_inner_wheel_brake_disc', 'aft_rear_axle', 0.055],

@@ -154,10 +154,6 @@ local site = import '../site.libsonnet';
       '`slam_panel` of classic_4x4_shell runs into `bowl_far` of headlamp_round; the others family is not judged under this measure.'),
     site.unjudged('shell', 'headlamp_near', 0.041,
       '`slam_panel` of classic_4x4_shell runs into `bowl` of headlamp_round; the others family is not judged under this measure.'),
-    site.unjudged('shell', 'rear_wheel_far', 0.205,
-      '`rear_floor` of classic_4x4_shell runs into `tyre_far` of wheel_265_75r16; the others family is not judged under this measure.'),
-    site.unjudged('shell', 'rear_wheel_near', 0.205,
-      '`rear_floor` of classic_4x4_shell runs into `tyre` of wheel_265_75r16; the others family is not judged under this measure.'),
   ],
   combine_harvester: [
     site.unjudged('body', 'battery_tray', 0.271,
