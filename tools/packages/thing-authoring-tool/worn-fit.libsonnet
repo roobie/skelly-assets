@@ -635,9 +635,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // laces). The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it, and
   // it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
-  // the foot piece declares the sole as the lift a consumer stands the shod figure on.
+  // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
+  // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
+  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee.
   feet(id, finish, b, spec={}, title=null)::
-    local s = { layer: 'normal', ease: 0 } + spec;
+    local s = { layer: 'normal', ease: 0, covers: [] } + spec;
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
@@ -672,8 +674,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, b.laces - 1)
     ]);
     local shafted = top > ankle;
-    // The ankle's cap rises above the vamp, inside the shaft, which rides the shin.
-    local shod = paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, [], ['foot'], title=named(title, 'foot'));
+    local shod = paired(id + '_worn_foot', 'boot', foot, { lining: 'paint-charcoal' } + finish, s.covers, ['foot'], title=named(title, 'foot'));
     fitted([shod { row+: { soleLift: b.s } }]
            + (if shafted then [paired(id + '_worn_shaft', 'hem', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
