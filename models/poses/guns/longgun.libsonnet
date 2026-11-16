@@ -28,11 +28,12 @@ function(model, sockets) {
     },
     // Shouldered, ready to fire, leaning into the gun: the chest tipped forward over the hips, the butt high in the
     // pocket ahead of the right shoulder joint, where the stock bears on the flat of the chest by its inner edge and the
-    // raised elbow opens the arm away from it, the bore level and straight ahead, the left elbow under the fore-end, and
-    // the head jutted forward, bowed and tilted onto the stock, the eyes down the sight.
+    // raised elbow opens the arm away from it, the bore level and straight ahead (raised back past the chest's lean),
+    // the left elbow under the fore-end, and the head jutted forward, bowed and tilted onto the stock, the eyes down the
+    // sight.
     guard: {
       body: bladed(40, 10),
-      weapon: { pocket: [0.0275, -0.04, 0.085], aim: { pitch: -5, yaw: 40, roll: 0 }, poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
+      weapon: { pocket: [0.0275, -0.03, 0.085], aim: { pitch: -7.7, yaw: 40, roll: 0 }, poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
       sight: { tilt: 30, jut: 15, lean: 10 },
     },
   },

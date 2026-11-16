@@ -643,7 +643,7 @@ test('at guard the bore points level and straight ahead', () => {
     const heading = Math.atan2(bore[0], bore[2]) * DEG,
       tip = -Math.asin(bore[1]) * DEG;
     assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
-    assert.ok(Math.abs(tip) <= 5, `${name}: the bore tips ${tip.toFixed(1)}°`);
+    assert.ok(Math.abs(tip) <= 0.5, `${name}: the bore tips ${tip.toFixed(2)}°`);
   }
 });
 
