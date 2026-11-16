@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { impactRows } from '../src/rows.ts';
-import { type ImpactRow, parseImpactRow } from '../src/schema.ts';
+import { impactPacks } from '../src/rows.ts';
+import { type ImpactRow, parseImpactRow, parseImpactRows } from '../src/schema.ts';
 import { peakOf, renderImpact } from '../src/synth.ts';
 
 const RATE = 22050;
+const impactRows: Record<string, ImpactRow> = Object.assign({}, ...Object.values(impactPacks));
 const row = (id: string): ImpactRow => {
   const found = impactRows[id];
   if (!found) throw new Error(`no row ${id}`);
@@ -50,6 +51,9 @@ describe('impact row validation', () => {
     ['body pitch shares that sum above 1', (d) => (d.strike.body.hardnessShare = 0.9)],
     ['an unknown setting', (d) => (d.drop.bounciness = 1)],
     ['a missing section', (d) => delete d.mix],
+    ['no seeds', (d) => (d.seeds = [])],
+    ['a seed given twice', (d) => (d.seeds = [3, 3])],
+    ['a surface id that is no file name', (d) => (d.surface.id = 'Wet Mud')],
   ];
 
   it('accepts every shipped row', () => {
@@ -60,5 +64,9 @@ describe('impact row validation', () => {
     const draft = base();
     mutate(draft);
     expect(() => parseImpactRow(draft)).toThrow();
+  });
+
+  it('rejects two rows for one object on one surface, since the landing surface picks the row', () => {
+    expect(() => parseImpactRows({ first: base(), second: base() })).toThrow();
   });
 });

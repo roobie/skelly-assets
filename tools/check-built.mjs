@@ -65,7 +65,7 @@ function main() {
       return 1;
     }
     console.log(`check-built: ${trees.length} fresh tree(s) agree byte for byte and hold exactly the files the manifest `
-      + 'names; every directory is a declared pack and every declared pack has a model');
+      + 'names; every directory is a declared pack and every declared pack has a model or sound');
     return 0;
   } finally {
     if (temporary) rmSync(temporary, { recursive: true, force: true });

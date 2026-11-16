@@ -144,7 +144,7 @@ change; see `site/app.js`, `showMeta`. Whether a model is an assembly or an atom
 components, never tagged, so no curated term can disagree with the model; see `tools/components.mjs`, `formOf`.
 
 Use `manifest.json` as the consumer-facing file authority, not a parallel list in documentation; see
-`tools/manifest.mjs`, `buildManifest` and `mobManifest`. Credits come from `REUSE.toml` through
+`tools/manifest.mjs`, `buildManifest`, `mobManifest` and `soundManifest`. Credits come from `REUSE.toml` through
 `tools/manifest.mjs`, `readCredits`. Nothing sits flat beside the manifest, so every file belongs to a pack a
 consumer can choose to bundle. CI holds every build to its manifest and to the declared packs before it is
 shown or released; see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDifferences`.
@@ -191,8 +191,16 @@ For pipeline ownership and authoring entry points, see `tools/README.md`.
 
 ## Sounds
 
-Sounds are rows too: `models/sounds/` holds Jsonnet rows that `tools/packages/impact-synth` renders to samples,
-so a consumer ships a few numbers per sound instead of recorded audio. Only sounds the project owns live here, the
+Sounds are rows too: `models/sounds/` holds Jsonnet rows, one per object and the surface it lands on, that
+`tools/packages/impact-synth` renders to samples. The surface picks the row, because the ground changes the ring, the
+bounce and the roll, not only the level. The build bakes each row's takes to Ogg Vorbis files and ships the row
+beside them as data; see `tools/sounds.mjs`, `bakeSounds`, and `tools/manifest.mjs`, `soundManifest`. Games play
+the baked files and never synthesise, so a sound costs one decoded buffer in any engine and sounds the same in every
+game. Ogg Vorbis is open, compact and decoded by browsers and game engines alike. The row as data lets a tool
+re-render or retune a take without this repository's sources. The encoded bytes depend only on the row and seed
+(`tools/ogg.mjs`, `encodeOgg`), so two builds agree on sounds as they do on models.
+
+Only sounds the project owns live here, the
 way only models it owns do: a sound that is synthesised or recorded by us carries the same licence as the models,
 and a sampled or downloaded one would bring its own terms and make the licence page as complicated as the
 sound's origin.
@@ -305,7 +313,7 @@ agents select skills by that field.
 
 The licence depends on the path; [`REUSE.toml`](REUSE.toml) states it for each one.
 
-- **Models, their sources and the built output** (`models/`, `built/`):
+- **Models and sounds, their sources and the built output** (`models/`, `built/`):
   [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You may use, share and adapt them for
   non-commercial purposes, with attribution to Björn Roberg, and you must share adaptations under the same licence.
   For a commercial licence, contact the author.
