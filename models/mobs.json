@@ -13,6 +13,45 @@
     "crawl_stride": 1.2,
     "taxonomy": {"category": "creatures"}
   },
+  "severed": {
+    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): one model per cut point, a bone a cut may start at, of each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one item per cut point, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. pack is where the parts are placed, beside the other body parts, with taxonomy.",
+    "pack": "skelly.body",
+    "taxonomy": {"category": "body-parts", "tags": {"material": ["flesh"]}},
+    "mobs": {
+      "skelly.deadvox.actors": {
+        "shambler": "Shambler",
+        "military_shambler": "Military shambler",
+        "farmer_shambler": "Farmer shambler",
+        "worker_shambler": "Worker shambler",
+        "medic_shambler": "Medic shambler",
+        "brute_shambler": "Brute shambler",
+        "runner": "Runner",
+        "crawler": "Crawler",
+        "acid_zombie": "Acid zombie"
+      }
+    },
+    "cuts": {
+      "head": "head",
+      "skull": "head",
+      "maw": "jaw",
+      "upperArm.L": "left arm",
+      "upperArm.R": "right arm",
+      "arm.L": "left arm",
+      "arm.R": "right arm",
+      "forearm.L": "left forearm",
+      "forearm.R": "right forearm",
+      "fore.L": "left forearm",
+      "fore.R": "right forearm",
+      "hand.L": "left hand",
+      "hand.R": "right hand",
+      "thigh.L": "left leg",
+      "thigh.R": "right leg",
+      "shin.L": "left shin",
+      "shin.R": "right shin",
+      "foot.L": "left foot",
+      "foot.R": "right foot"
+    }
+  },
   "mobs": [
     {
       "id": "shambler",
