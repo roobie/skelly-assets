@@ -122,16 +122,15 @@ local visor = { min: [-0.08, 0.155, 0.135], max: [0.08, 0.185, 0.15] };
 local shell = { min: [-0.125, 0.03, -0.14], max: [0.125, 0.25, 0.14] };
 local taper = [0.015, 0.008, 0.015];
 local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
-// The crown stands on the shell's sloped-in top, and its sides are cut at 45 degrees from there up to its ridge.
-local crownCut = [
-  { normal: [1, 1, 0], offset: shell.max[0] - taper[0] + shell.max[1] },
-  { normal: [-1, 1, 0], offset: shell.max[0] - taper[0] + shell.max[1] },
-  { normal: [0, 0, 1], offset: shell.max[2] - taper[1] },
-  { normal: [0, 0, -1], offset: -shell.min[2] - taper[2] },
-];
+local shellBlock = h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, taper, 0);
+// The crown carries on the shell's own faces, so it reads as one moulding with it: the shell's sloped sides and cut
+// corners, and its 45-degree cuts in from the top's outline at the sides and front. Its back rises sheer from the
+// shell's to carry the fin, so the shell's back chamfers (the 45-degree planes facing -z) stay off it.
+local backChamfer(plane) = plane.normal[1] == 1 && plane.normal[2] < 0;
+local crownCut = [plane for plane in shellBlock.clip if !backChamfer(plane)];
 local helmet = [
   h.taperedBlock('skirt', 'trim', [-0.135, 0, -0.165], [0.135, 0.035, 0.15], 0.04, [0.01, 0.01, 0.025], 0),
-  h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, taper, 0),
+  shellBlock,
   h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115)
   + { clip: crownCut },
   h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.075, 0.075),
