@@ -530,10 +530,13 @@ test("every baked strike's hit falls within a frame of where its striking end re
       : Object.keys(wields.classes[kind].free).map((hand) =>
           posed.map((p) => applyPoint(p.get(hand), rig.bones.find((b) => b.id === hand).tail)),
         );
-    const ahead = tracks.map((track) => track.map(([, , z]) => z));
-    const track = ahead.reduce((a, b) => (Math.max(...b) > Math.max(...a) ? b : a));
+    // Each track's farthest reach ahead and the frame it comes in; the striking track is the one reaching farthest.
+    const reaches = tracks.map((track) =>
+      track.reduce((best, [, , z], k) => (z > best.z ? { z, k } : best), { z: -Infinity, k: 0 }),
+    );
+    const { k } = reaches.reduce((best, reach) => (reach.z > best.z ? reach : best));
     const step = clip.durationSimSeconds / (clip.frames.length - 1);
-    const contact = track.indexOf(Math.max(...track)) * step;
+    const contact = k * step;
     assert.ok(
       Math.abs(contact - clip.hitAtSimSeconds) <= step + 1e-9,
       `${name}: the striking end reaches farthest ahead at ${contact.toFixed(3)} s, the hit lands at ${clip.hitAtSimSeconds} s`,
