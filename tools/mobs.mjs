@@ -16,9 +16,18 @@ const here = import.meta.dirname;
 const repo = resolve(here, '..');
 const { templateFor } = await import('./mobTemplates.mjs');
 const { codeFingerprint, entryStore, pruneEntries } = await import('./packages/thing-export/src/cache.ts');
-const { generate, generateValid, realize, realizeLod } = await import('./packages/mobgen/src/core/generate.ts');
+const { generate, generateValid, realize, realizeLod, strayParams } = await import('./packages/mobgen/src/core/generate.ts');
 const { bakeActor } = await import('./actorBake.mjs');
 const { bakeSeveredParts } = await import('./severedPartBake.mjs');
+
+// A consumer reads the genome as a draw from the row's ranges, the row's own where it narrows one and its template's
+// otherwise, so a genome outside them would misstate the figure.
+const refuseStrayParams = (row, template, genome) => {
+  const strays = strayParams(template, genome);
+  if (strays.length === 0) return;
+  const range = (spec) => (spec === undefined ? 'no declared range' : `range ${JSON.stringify(spec)}`);
+  throw new Error(`${row.id} draws ${strays.map(({ name, value, spec }) => `${name} = ${value} outside ${range(spec)}`).join('; ')}`);
+};
 
 // The row's files by role; a row that is its type's severed-part source (tools/severedParts.mjs) also bakes the parts.
 const bakeMob = (row, severed) => {
@@ -30,6 +39,7 @@ const bakeMob = (row, severed) => {
   }
   // A coarser row bakes the genome it realized, so its recorded genome names the voxel size its figure was built at.
   const { genome, realized } = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor) : found;
+  refuseStrayParams(row, template, genome);
   const actor = bakeActor(row, template, { ...found, genome, realized });
   if (severed === undefined) return actor;
   const { cuts, ...parts } = bakeSeveredParts(severed, template, realized);
