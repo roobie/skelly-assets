@@ -8,7 +8,6 @@ import type {
   AppearanceContext,
   GlbAssetIdentity,
   GlbExportError,
-  GlbExportResult,
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
 import { partNodeName, partVoxelGrain } from '@skelly/thing-export/glb.ts';
@@ -35,7 +34,7 @@ import { boltCalibreIssue, isBoltAssembly, withBoltCalibre } from './boltCartrid
 import type { CycleMode, CycleTimeline } from './cycle.ts';
 import { gunDomain } from './domain.ts';
 import { FILE_AXES, fileVector, gripTurn, inFileFrame, toFileAxes, toFileRotation } from './exportFrame.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import { exportGunGeometry as exportGlb, exportGunModels } from './glbWriter.ts';
 import { internalMagazineCapacity } from './internalMagazine.ts';
 import { getOptic } from './optics.ts';
 import { GUN_PALETTE } from './palette.ts';
@@ -163,6 +162,7 @@ export type GunExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: GunDeadvoxModelEntry;
     }
@@ -940,7 +940,7 @@ export const exportGunGlb = (
   if ('code' in anchors) {
     return { ok: false, error: anchors };
   }
-  const result: GlbExportResult = exportGlb({
+  const result = exportGunModels({
     resolved,
     palette: GUN_PALETTE,
     appearance,

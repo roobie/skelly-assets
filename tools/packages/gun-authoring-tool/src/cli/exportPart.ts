@@ -7,13 +7,14 @@ import { PART_CATALOGUE, type PartCatalogue } from '../gun/catalogue.ts';
 import { gunDomain } from '../gun/domain.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from '../gun/exportGlb.ts';
 import { inFileFrame } from '../gun/exportFrame.ts';
-import { exportGunGeometry } from '../gun/glbWriter.ts';
+import { exportGunModels } from '../gun/glbWriter.ts';
 import { GUN_PALETTE } from '../gun/palette.ts';
 
 export type PartExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: DeadvoxModelEntry;
     }
@@ -46,7 +47,7 @@ export const exportPartItem = (
   const part = { ...built, ports: built.ports.map((port) => ({ ...port, required: false })) };
   const single = singlePart({ id: item.id, part, massKg: item.massKg, units: gunDomain.units });
   const resolved = resolve(single.assembly, single.domain);
-  const result = exportGunGeometry({
+  const result = exportGunModels({
     resolved,
     palette: GUN_PALETTE,
     appearance: { finish: item.finish },
@@ -63,6 +64,7 @@ export const exportPartItem = (
   return {
     ok: true,
     glb: result.glb,
+    smoothGlb: result.smoothGlb,
     partNodes: result.partNodes,
     modelEntry: { id: asset.id, file: asset.file as DeadvoxModelFile, gun: {}, parts },
   };
