@@ -7,7 +7,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     back: 0.4, reach: 0.231, kickBack: 0.438, kickRise: 0.113, clawAt: 0.105, clawDrop: 0.129, thickness: 0.03, depth: 0.03,
   }, { body: 'steel-grey' }) + { title: 'Crowbar' } + held('crowbar', 'shaft-0', [0.174825174825, 0.5, 0.5]) + stow.stows(stow.seat('hung-tool', [0.244, -0.144, 0], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['metal'], setting: ['modern'] } },
     anchors: {
       strike: datum('crowbar', 'shaft-1', [0.876315789474, 0.842105263158, 0.5]),
       claw: datum('crowbar', 'shaft-3', [0.046296296296, 0.25, 0.5]),
@@ -17,7 +17,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     handleBack: 0.273, handleRadius: 0.017, headBottom: 0.024, headTop: 0.094, faceReach: 0.1, clawReach: 0.1, headDepth: 0.044,
   }, { handle: 'wood-walnut', head: 'steel-grey' }) + { title: 'Hammer' } + held('hammer', 'handle', [0.258928571429, 0.5, 0.5]) + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], place: ['workshop'], setting: ['modern'] } },
     anchors: {
       strike: datum('hammer', 'eye', [1, 0.533333333333, 0.5]),
       face: datum('hammer', 'face', [0.338235294118, 0, 0.545454545455]),
@@ -28,7 +28,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     handleBack: 0.84, handleRadius: 0.016, headBottom: 0.005, headTop: 0.062, faceReach: 0.095, headDepth: 0.057,
   }, { handle: 'wood-walnut', head: 'steel-grey' }) + { title: 'Sledgehammer' } + held('sledgehammer', 'handle', [0.441176470588, 0.5, 0.5]) + stow.stows(stow.seat('hung-tool', [0.064, -0.096, 0], [0, -1, 0], [1, 0, 0])) + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['metal', 'wood'], setting: ['modern'] } },
     anchors: {
       strike: datum('sledgehammer', 'head', [1, 0.5, 0.5]),
       face: datum('sledgehammer', 'head', [0.535714285714, 0.005208333333, 0.5]),
@@ -68,7 +68,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     back: 0.245, handleHalf: 0.0125, headAt: 0.02, jawAt: 0.055, reach: 0.105, headUp: 0.055, headDown: 0.035, gap: 0.022, depth: 0.014,
   }, { body: 'steel-grey' }) + { title: 'Wrench' } + held('wrench', 'handle', [0.640151515152, 0.5, 0.5]) + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['metal'], place: ['workshop'], setting: ['modern'] } },
     anchors: { strike: datum('wrench', 'fixed-jaw', [1, 0, 0.5]) },
   },
   melee('steel_pipe', 'steelPipe', 1.8, { length: 0.927, radius: 0.0165, bendDrop: 0.1 }, { body: 'steel-grey' }) + { title: 'Steel pipe' } + held('steel_pipe', 'tube', [0, 0.5, 0.5], roll=0) + {
@@ -78,24 +78,24 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
   },
   melee('flashlight', 'flashlight', 0.25, {
     length: 0.2, bodyRadius: 0.022, headRadius: 0.033, headLength: 0.05, lensDepth: 0.006,
-  }, { body: 'polymer-black', lens: 'plastic-white' }) + { title: 'Flashlight' } + { voxelGrain: 0.004, taxonomy: { category: 'lighting' } },
+  }, { body: 'polymer-black', lens: 'plastic-white' }) + { title: 'Flashlight' } + { voxelGrain: 0.004, taxonomy: { category: 'lighting', tags: { material: ['plastic'], setting: ['modern'] } } },
   atom('compass', 'compass', 0.120, { radius: 0.03, height: 0.009, bezelHeight: 0.004, dialHeight: 0.001 }, { body: 'plastic-black', bezel: 'steel-grey', dial: 'paint-cream', lubber: 'plastic-white' }, 'body') + { title: 'Compass' } + {
     display: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5], normal: [0, 1, 0], up: [0, 0, -1] },
     anchors: { needle_mount: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5] } },
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['plastic', 'metal'], setting: ['modern'] } },
   },
   local carrier = atom('lighter', 'lighter', 0.019, { width: 0.024, height: 0.055, depth: 0.012, capHeight: 0.009 }, { body: 'plastic-clear-red', cap: 'steel-grey', wheel: 'steel-grey' }) + { title: 'Lighter' };
   local port(id, gender, pos, normal) = { id: id, mount: 'fuel-fill', gender: gender, pos: pos, normal: normal, up: [1, 0, 0], required: true };
   carrier + {
     voxelGrain: 0.002,
-    taxonomy: { category: 'lighting', keywords: ['fire-starting'] },
+    taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['plastic'], setting: ['modern'] } },
     parts: [
       carrier.parts[0] + { ports: [port('fill', 'female', [0, 0.005, 0], [0, 1, 0])] },
       { id: 'fuel_fill', family: 'block', massKg: 0.001, params: params({ width: 0.014, height: 0.04, depth: 0.008 }), finish: { body: 'fuel-amber' }, ports: [port('base', 'male', [0, 0, 0], [0, -1, 0])] },
     ],
     connections: [{ from: 'lighter.fill', to: 'fuel_fill.base' }],
   },
-  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { title: 'Matches' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'] } },
+  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { title: 'Matches' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['paper'], setting: ['modern'] } } },
   key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey') + { title: 'Dad\'s cabin key' } + metalKey,
   key('pharmacy_key', 0.010, 0.011, 0.039, 'brass') + { title: 'Pharmacy key' } + metalKey,
   key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized') + { title: 'Camp armoury key' } + metalKey,

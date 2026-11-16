@@ -5,7 +5,7 @@ local atom = m.atom;
     radius: 0.007, height: 0.046, shoulderHeight: 0.0005, neckRadius: 0.003,
     neckHeight: 0.001, capRadius: 0.003, capHeight: 0.002,
     rimHeight: 0.001, bandHeight: 0.034, bandInset: 0.00015,
-  }, { body: 'steel-grey', label: 'paint-charcoal', cap: 'steel-stainless' }, turn=[0, -90, -90]) + { title: 'AA battery' } + { taxonomy: { category: 'electrical' } },
+  }, { body: 'steel-grey', label: 'paint-charcoal', cap: 'steel-stainless' }, turn=[0, -90, -90]) + { title: 'AA battery' } + { taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
   atom('rag', 'foldedSheet', 'parts', 0.050, {
     thickness: 0.002,
     vertices: [
@@ -20,7 +20,7 @@ local atom = m.atom;
       { indices: [4, 7, 8], slot: 'fold' }, { indices: [4, 8, 5], slot: 'body' },
     ],
   }, { body: 'cloth-rag', fold: 'cloth-rag-shadow' }, 'fold-4', turn=[0, -90, 0]) + { title: 'Rag' } + { taxonomy: { category: 'materials', tags: { material: ['fabric'] } } },
-  atom('duct_tape', 'ring', 'parts', 0.150, { outerRadius: 0.05, innerRadius: 0.018, coreRadius: 0.020, height: 0.048 }, { body: 'tape-grey', core: 'paperboard-tan' }, fraction=[0.87, 0.5, 0.5], turn=[0, -90, 0]) + { title: 'Duct tape' } + { taxonomy: { category: 'materials' } },
+  atom('duct_tape', 'ring', 'parts', 0.150, { outerRadius: 0.05, innerRadius: 0.018, coreRadius: 0.020, height: 0.048 }, { body: 'tape-grey', core: 'paperboard-tan' }, fraction=[0.87, 0.5, 0.5], turn=[0, -90, 0]) + { title: 'Duct tape' } + { taxonomy: { category: 'materials', tags: { material: ['plastic'], place: ['workshop'], setting: ['modern'] } } },
   atom('nails', 'turnedStock', 'parts', 0.005, {
     axis: 'x', profile: [[0, 0], [0.008, 0.0017], [0.067, 0.0017], [0.067, 0.0042], [0.070, 0.0042], [0.070, 0], [0, 0]],
   }, { body: 'steel-grey' }) + { title: 'Nails' } + {
@@ -48,7 +48,7 @@ local atom = m.atom;
   }, { body: 'wood-walnut' }) + { title: 'Stick' } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   atom('wax', 'turnedStock', 'parts', 0.050, {
     axis: 'y', profile: [[0, 0], [0, 0.021], [0.007, 0.030], [0.020, 0.027], [0.029, 0.015], [0.031, 0], [0, 0]],
-  }, { body: 'wax-cream' }) + { title: 'Wax' } + { taxonomy: { category: 'materials' } },
+  }, { body: 'wax-cream' }) + { title: 'Wax' } + { taxonomy: { category: 'materials', tags: { material: ['wax'] } } },
   atom('wooden_plank', 'cutStock', 'parts', 0.500, {
     axis: 'y', start: 0, end: 0.022,
     profile: [[-0.045, -0.40], [0.045, -0.395], [0.045, 0.395], [-0.04, 0.40]],
