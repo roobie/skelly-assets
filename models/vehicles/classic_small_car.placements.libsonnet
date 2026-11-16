@@ -31,4 +31,14 @@ local s = import 'classic_small_car.spec.libsonnet';
   + site.pair('tail_lamp', 'tail_lamp_small', [s.rear + 0.06, 0.58, 0.44])
   + site.pair('door_mirror', 'door_mirror_bright', [0.76, s.waist, s.body - 0.02])
   + site.batteryBay('battery_tray', [1.3, 0.56, 0.28]),
+  unjudged: [
+    site.unjudged('front_wing_far', 'shell', 0.042,
+      'The front wings\' arcs run into the running boards.'),
+    site.unjudged('front_wing_near', 'shell', 0.042,
+      'The front wings\' arcs run into the running boards.'),
+    site.unjudged('fuel_tank', 'shell', 0.269,
+      'The fuel tank stands through the shell\'s tail.'),
+    site.unjudged('gearbox', 'radiator', 0.046,
+      'The radiator\'s lower hose runs through the gearbox case.'),
+  ],
 }

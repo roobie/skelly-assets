@@ -18,4 +18,8 @@ local s = import 'minivan.spec.libsonnet';
       site.one('door_track', 'minivan_door_track'),
     ],
   }),
+  unjudged: [
+    site.unjudged('gearbox', 'radiator', 0.096,
+      'The radiator\'s lower hose runs through the gearbox case.'),
+  ],
 }

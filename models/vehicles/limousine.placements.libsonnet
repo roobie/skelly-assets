@@ -19,4 +19,10 @@ local s = import 'limousine.spec.libsonnet';
     + site.pair('front_door_brightwork', 'limousine_front_door_brightwork', rides='front_door')
     + site.pair('rear_door_brightwork', 'limousine_rear_door_brightwork', rides='rear_door'),
   }),
+  unjudged: [
+    site.unjudged('dashboard', 'gearbox', 0.241,
+      'The inline gearbox\'s case rises above the tunnel into the dashboard\'s console.'),
+    site.unjudged('gearbox', 'shell', 0.191,
+      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
+  ],
 }

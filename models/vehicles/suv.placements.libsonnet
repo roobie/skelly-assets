@@ -40,4 +40,18 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
+  unjudged: [
+    site.unjudged('dashboard', 'gearbox', 0.221,
+      'The inline gearbox\'s case rises above the tunnel into the dashboard\'s console.'),
+    site.unjudged('drive_belt', 'front_axle', 0.051,
+      'The engine\'s lowest belt run passes through the front axle\'s diff.'),
+    site.unjudged('front_axle', 'front_prop_shaft', 0.153,
+      'The front prop shaft\'s tube runs through the front axle\'s diff instead of ending at it.'),
+    site.unjudged('front_prop_shaft', 'shell', 0.061,
+      'The front prop shaft\'s tube runs through the floor pan, which has no tunnel over it.'),
+    site.unjudged('gearbox', 'shell', 0.221,
+      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
+    site.unjudged('prop_shaft', 'shell', 0.061,
+      'The prop shaft\'s tube runs through the floor pan outside the tunnel drawn for it.'),
+  ],
 }
