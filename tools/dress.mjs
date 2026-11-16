@@ -183,18 +183,34 @@ function placeOf(model, dressing) {
   return place;
 }
 
+// The `<item>_worn` twin of a piece fitted over other clothing, a fit among the dressing's `layers`, read from its id
+// `<item>_worn_<layer>`; nothing for any other model.
+function layerTwinOf(model, dressing) {
+  if (!tagsOf(model, 'fit').some((fit) => dressing.layers.includes(fit))) return undefined;
+  const match = PIECE_ID.exec(model.id);
+  if (match?.[2] === undefined) throw new Error(`${model.id}: a piece fitted over other clothing is named <item>_worn_<layer>`);
+  return `${match[1]}_worn`;
+}
+
 // Each model's `wornOn` by id, the doll part it sits on (tools/manifest.mjs, `buildManifest`): a worn piece's is the
-// part whose frame it is drawn in; a wearable with no pieces has its place's part, `both` when the place spans both
-// copies, or for an anchor place the `anchor` and the bust part it lies on, from `anchorParts` (readAnchorParts). A
-// wearable with pieces has none: its pieces are what sit on the doll.
+// part whose frame it is drawn in, and a piece fitted over other clothing has its worn twin's; a wearable with no
+// pieces has its place's part, `both` when the place spans both copies, or for an anchor place the `anchor` and the
+// bust part it lies on, from `anchorParts` (readAnchorParts). A wearable with pieces has none: its pieces are what sit
+// on the doll.
 export function wornOnParts(models, dressing, anchorParts) {
+  const byId = new Map(models.map((model) => [model.id, model]));
   const garments = new Set(models.map((model) => pieceOf(model)?.garment).filter(Boolean));
   const placed = (model) => tagsOf(model, 'fit').length === 0 && tagsOf(model, 'slot').length > 0 && !garments.has(model.id);
+  const pieceOn = (piece) => ({ part: piecePart(piece.id, pieceOf(piece), dressing) });
   const wornOn = new Map();
   for (const model of models) {
-    const piece = pieceOf(model);
-    if (piece) wornOn.set(model.id, { part: piecePart(model.id, piece, dressing) });
-    else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, anchorParts));
+    const twinId = layerTwinOf(model, dressing);
+    if (pieceOf(model)) wornOn.set(model.id, pieceOn(model));
+    else if (twinId !== undefined) {
+      const twin = byId.get(twinId);
+      if (!twin || !pieceOf(twin)) throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
+      wornOn.set(model.id, pieceOn(twin));
+    } else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, anchorParts));
   }
   return wornOn;
 }
