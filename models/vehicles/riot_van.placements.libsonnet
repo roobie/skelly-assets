@@ -3,6 +3,7 @@ local van = import 'van-body.libsonnet';
 local s = import 'riot_van.spec.libsonnet';
 {
   title: 'Riot van',
+  overlaps: van.engineSeat,
   sites: van.fittings(site.kit, 'riot_van', s) + [
     site.one('windscreen_grille', 'riot_van_windscreen_grille'),
     site.one('side_door_grille', 'riot_van_side_door_grille', rides='side_door'),

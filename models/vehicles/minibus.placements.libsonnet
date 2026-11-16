@@ -5,6 +5,7 @@ local farColumn = -0.46;
 local rearRow = s.seatRows[std.length(s.seatRows) - 1];
 {
   title: 'Minibus',
+  overlaps: van.engineSeat,
   // Pairs line the far side so the aisle runs back from the sliding door; the last row spans the body.
   sites: van.fittings(site.kit, 'minibus', s) + [
     site.one('seats_' + i, 'bus_seat_pair', [s.seatRows[i], s.floor, farColumn])

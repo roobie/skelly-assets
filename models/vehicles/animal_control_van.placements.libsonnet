@@ -8,6 +8,7 @@ local cages(tag, y) = std.flattenArrays([
 ]);
 {
   title: 'Animal control van',
+  overlaps: van.engineSeat,
   sites: van.fittings(site.kit, 'animal_control_van', s) + [
     site.one('roof_vent', 'roof_vent', [-1.4, b.roof, 0]),
     site.one('beacon', 'beacon_amber', [-0.3, b.roof, 0]),

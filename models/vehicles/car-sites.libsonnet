@@ -30,7 +30,7 @@ function(id, s, o={})
     one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.36]),
     one('radiator', 'radiator_car', [s.front - 0.3, 0.32, 0]),
     one('fuel_tank', 'fuel_tank_car', [s.rearAxle + 0.65, s.sill, 0]),
-    one('exhaust', 'exhaust_car', [s.rear + 0.46, 0.2, 0.42]),
+    one('exhaust', 'exhaust_car', [s.rear + 0.46, 0.12 + std.get(s, 'lift', 0), 0.42]),
     one('rear_axle', 'twist_beam', [s.rearAxle, hub - 0.316, 0]),
     one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
     one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.55, 0]),

@@ -413,6 +413,9 @@ local pressings(id, title, s0) = {
 local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s0));
 {
   cab: cab,
+  // The engine-in-shell allowance of every van this body draws, whose engine sits ahead of the cab.
+  engineSeat: [(import 'site.libsonnet').overlap('engine', 'shell', 0.107,
+    'The sump\'s rear end runs under the cab floor pan, which the shell draws as a flat slab not stepped over it.')],
   // Mixed into a spec to floor its body: for loading, or for standing and fitting seats on.
   loadFloor: { floorPart: { suffix: '_load_floor', fitting: 'load_floor', label: 'load floor', capabilities: ['structure', 'load_floor'] } },
   saloonFloor: { floorPart: { suffix: '_floor', fitting: 'floor', label: 'floor', capabilities: ['structure'] } },

@@ -3,9 +3,9 @@
 // `depth` metres, in either direction and for every vehicle, because of the fit's reason `why`. A role is a site id
 // without its `_near` / `_far` side and its number, so `wheel_front_near` and `wheel_front_far` are both
 // `wheel_front`, and a role is named exactly, not by a pattern. Two parts at different sites overlap only when they
-// share more than one voxel grain of depth (`tools/siteOverlap.mjs`), and a pair covers an overlap no deeper than its
-// depth. A pair that no vehicle overlaps on, that is far deeper than any vehicle's overlap, that names a role no
-// drawn site has, or that two fits list is reported. The reasons for the rule are in
+// sink more than one voxel grain into each other (`tools/siteOverlap.mjs`), and a pair covers an overlap no deeper
+// than its depth. A pair that no vehicle overlaps on, that is far deeper than any vehicle's overlap, that names a role
+// no drawn site has, or that two fits list is reported. The reasons for the rule are in
 // `docs/decisions/0014-site-overlap.md`.
 local fit(why, pairs) = { why: why, pairs: pairs };
 {
@@ -24,37 +24,39 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A wheel stands in its arch, which the body draws as boxes that are not cut away around the tyre.',
+      'A wheel and its brake disc stand in the arch, which the body draws as boxes and a floor that are not cut away around them.',
       [
       ['front_rim', 'shell', 0.068],
       ['front_wheel', 'crushed_nose', 0.068],
       ['front_wheel', 'shell', 0.092],
       ['rear_rim', 'shell', 0.068],
-      ['rear_wheel', 'shell', 0.12],
+      ['rear_wheel', 'shell', 0.201],
+      ['rear_wheel_brake_disc', 'shell', 0.066],
       ['rim_rear', 'shell', 0.055],
       ],
     ),
     fit(
-      'A brake disc is set on the hub of its axle.',
+      'A brake disc, or a drum brake\'s backing plate, is set on the hub of its axle.',
       [
       ['aft_rear_inner_wheel_brake_disc', 'aft_rear_axle', 0.055],
       ['front_wheel_brake_disc', 'front_axle', 0.055],
       ['rear_inner_wheel_brake_disc', 'rear_axle', 0.055],
       ['rear_wheel_brake_disc', 'rear_axle', 0.055],
+      ['rear_wheel_brake_shoes', 'rear_axle', 0.034],
       ],
     ),
     fit(
-      'A beam axle\'s diff housing and spring seats run into the rails or floor above it.',
+      'A beam axle\'s diff housing and spring seats run into the rails or floor above it, and its beam through the arch liners, which are not cut for it.',
       [
       ['aft_rear_axle', 'aft_shell', 0.055],
       ['axle', 'belly', 0.092],
       ['axle', 'chassis', 0.065],
       ['front_axle', 'frame', 0.085],
       ['front_axle', 'front_pivot', 0.065],
-      ['front_axle', 'shell', 0.055],
+      ['front_axle', 'shell', 0.065],
       ['rear_axle', 'frame', 0.095],
       ['rear_axle', 'rear_body', 0.065],
-      ['rear_axle', 'shell', 0.128],
+      ['rear_axle', 'shell', 0.147],
       ],
     ),
     fit(
@@ -63,7 +65,7 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['aft_prop_shaft', 'aft_gearbox', 0.037],
       ['aft_prop_shaft', 'aft_rear_axle', 0.04],
       ['front_prop_shaft', 'front_axle', 0.04],
-      ['front_prop_shaft', 'gearbox', 0.037],
+      ['front_prop_shaft', 'gearbox', 0.041],
       ['front_prop_shaft', 'shell', 0.037],
       ['inter_axle_shaft', 'rear_axle', 0.04],
       ['prop_shaft', 'gearbox', 0.04],
@@ -95,7 +97,12 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['engine', 'front_bumper', 0.068],
       ['engine', 'fuselage', 0.055],
       ['engine', 'gearbox', 0.115],
-      ['engine', 'shell', 0.092],
+      ],
+    ),
+    fit(
+      'A car\'s engine stands in its bay with its sump in the nose pan under it, which the shell draws as a solid slab.',
+      [
+      ['engine', 'shell', 0.041],
       ],
     ),
     fit(
@@ -143,8 +150,9 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'The front bumper is a block let into the nose of the shell, with the radiator and the push bar behind it.',
+      'The front bumper is a block let into the nose of the shell and the wings\' noses, with the radiator and the push bar behind it.',
       [
+      ['front_bumper', 'front_wing', 0.038],
       ['front_bumper', 'push_bar', 0.065],
       ['front_bumper', 'radiator', 0.065],
       ['front_bumper', 'shell', 0.185],
@@ -155,13 +163,13 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['rear_bumper', 'box', 0.065],
       ['rear_bumper', 'exhaust', 0.055],
-      ['rear_bumper', 'shell', 0.092],
+      ['rear_bumper', 'shell', 0.101],
       ],
     ),
     fit(
-      'A door closes into the edge of the shell, whose frame is drawn to the same line.',
+      'A door closes into the edge of the shell, whose frame is drawn to the same line, and its glass stands in the pillar\'s channel.',
       [
-      ['front_door', 'shell', 0.068],
+      ['front_door', 'shell', 0.078],
       ],
     ),
     fit(
@@ -178,9 +186,9 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       'A seat or bench base is let into the floor, tunnel, tub, tank or frame it stands on.',
       [
       ['bench', 'cab', 0.13],
-      ['facing_seat', 'shell', 0.13],
+      ['facing_seat', 'shell', 0.141],
       ['front_seat', 'tub', 0.055],
-      ['rear_bench', 'shell', 0.13],
+      ['rear_bench', 'shell', 0.141],
       ['saddle', 'frame', 0.054],
       ['seat', 'shell', 0.055],
       ['seat', 'tank', 0.05],
@@ -211,7 +219,7 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['bonnet', 'cooling_fan', 0.053],
       ['bonnet', 'grille', 0.055],
       ['bonnet', 'radiator_hose_upper', 0.04],
-      ['bonnet', 'shell', 0.067],
+      ['bonnet', 'shell', 0.071],
       ['front_panel', 'shell', 0.054],
       ],
     ),
@@ -396,10 +404,10 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A strut\'s knuckle or arm is pinned into the axle or body it hangs from.',
+      'A strut\'s knuckle or arm is pinned into the axle or body it hangs from, and its damper rises through the arch liner to its top mount.',
       [
       ['front_strut', 'front_axle', 0.055],
-      ['front_strut', 'shell', 0.055],
+      ['front_strut', 'shell', 0.086],
       ],
     ),
     fit(
@@ -437,12 +445,15 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A battery pack, engine, gearbox, radiator, fuel tank or motor is slung under the floor pan above it, which the shell draws as a solid slab.',
+      'A battery pack, engine, gearbox, radiator, motor, or fuel tank with its straps and filler neck is slung under the floor pan above it, which the shell draws as a solid slab.',
       [
       ['aft_engine', 'aft_shell', 0.08],
       ['aft_fuel_tank', 'aft_shell', 0.08],
       ['aft_gearbox', 'aft_shell', 0.08],
       ['aft_radiator', 'aft_shell', 0.06],
+      ['fuel_tank_filler_neck', 'shell', 0.106],
+      ['fuel_tank_strap_front', 'shell', 0.131],
+      ['fuel_tank_strap_rear', 'shell', 0.131],
       ['motor', 'shell', 0.06],
       ['pack', 'shell', 0.09],
       ],

@@ -13,4 +13,8 @@ local s = import 'microcar.spec.libsonnet';
     pack: { part: 'traction_pack_small', at: [(s.rearFloorFront + s.cowl) / 2, s.sill, 0] },
     port: { part: 'charge_port', at: [s.rearAxle, s.archTop + 0.05, s.side] },
   }),
+  unjudged: [
+    site.unjudged('inverter', 'rear_bumper', 0.044,
+      'The inverter\'s case runs into the rear bumper\'s bar.'),
+  ],
 }
