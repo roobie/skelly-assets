@@ -49,7 +49,8 @@ const isClosed = (glb: Glb, primitives: readonly GlbPrimitive[]): boolean => {
   for (const primitive of primitives) {
     const positions = accessorArray(glb, primitive.attributes.POSITION, Float32Array, 3);
     const indices = accessorArray(glb, primitive.indices, Uint32Array, 1);
-    const at = (i: number) => [...positions.subarray(indices[i]! * 3, indices[i]! * 3 + 3)].map((c) => c.toFixed(5)).join();
+    const at = (i: number) =>
+      [...positions.subarray(indices[i]! * 3, indices[i]! * 3 + 3)].map((c) => c.toFixed(5)).join();
     for (let t = 0; t < indices.length; t += 3) {
       for (let k = 0; k < 3; k += 1) {
         const from = at(t + k);

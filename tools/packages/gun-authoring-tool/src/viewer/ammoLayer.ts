@@ -1,6 +1,6 @@
-import { MATERIALS } from '@skelly/thing-core/materials';
 import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
+import { MATERIALS } from '@skelly/thing-core/materials';
 import {
   BufferAttribute,
   BufferGeometry,
@@ -16,7 +16,7 @@ import {
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { roundProfiles } from '../ammo/roundProfile.ts';
-import { cartridgeFinish, type CartridgeFinish } from '../gun/cartridgeFinish.ts';
+import { type CartridgeFinish, cartridgeFinish } from '../gun/cartridgeFinish.ts';
 import { type CartridgeSolids, cartridgeSolids } from '../gun/cartridgeSolids.ts';
 import { mmToU } from '../gun/units.ts';
 

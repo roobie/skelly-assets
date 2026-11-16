@@ -13,7 +13,12 @@ const { turnPoint } = await import('../actorFrame.mjs');
 const swapFrame = ({ root, rotations, ...rest }) => ({
   ...rest,
   root: turnPoint(root),
-  rotations: Object.fromEntries(Object.entries(rotations).map(([id, m]) => [id, m.map((v, i) => v * TO_MODEL_FRAME[Math.floor(i / 3)] * TO_MODEL_FRAME[i % 3])])),
+  rotations: Object.fromEntries(
+    Object.entries(rotations).map(([id, m]) => [
+      id,
+      m.map((v, i) => v * TO_MODEL_FRAME[Math.floor(i / 3)] * TO_MODEL_FRAME[i % 3]),
+    ]),
+  ),
 });
 
 // Exercise the on-disk row boundary while sharing the existing live-pose assertions.
@@ -24,19 +29,41 @@ async function bakeFixture(model, options = {}) {
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
-  const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
-    pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
-    glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', genome: 'fixture/actor.genome.json', ...options };
+  const row = {
+    id: `fixture.${model}`,
+    type: `fixture.${model}`,
+    template: model,
+    model,
+    seed: 1,
+    scale: 1,
+    pack: 'fixture.pack',
+    lod_divisor: 0,
+    walkCycles: 1,
+    walk_speed: 0.8,
+    walk_frames: 8,
+    attack_frames: 9,
+    crawls: true,
+    crawl_stride: 1.2,
+    glb: 'fixture/actor.glb',
+    body: 'fixture/actor.body.json',
+    clips: 'fixture/actor.clips.json',
+    genome: 'fixture/actor.genome.json',
+    ...options,
+  };
   try {
     exportMob(row, out);
     const bytes = (file) => readFileSync(join(out, outputPath(row.pack, file)));
     const read = (file) => JSON.parse(bytes(file));
     return { body: read(row.body), clips: read(row.clips), genome: read(row.genome), glb: bytes(row.glb) };
-  } finally { rmSync(out, { recursive: true, force: true }); }
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
 }
 
 const cellFixture = () => ({
-  size: 0.25, origin: [-1, 0, 2], dims: [3, 2, 1],
+  size: 0.25,
+  origin: [-1, 0, 2],
+  dims: [3, 2, 1],
   owner: new Uint8Array([1, 1, 2, 1, 0, 2]),
   color: new Uint8Array(6).fill(3),
   materials: [],
@@ -48,7 +75,9 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
   const area = (mesh) => {
     let result = 0;
     for (let t = 0; t < mesh.indices.length; t += 3) {
-      const points = Array.from(mesh.indices.slice(t, t + 3), (v) => Array.from(mesh.positions.slice(v * 3, v * 3 + 3)));
+      const points = Array.from(mesh.indices.slice(t, t + 3), (v) =>
+        Array.from(mesh.positions.slice(v * 3, v * 3 + 3)),
+      );
       const a = points[1].map((x, i) => x - points[0][i]);
       const b = points[2].map((x, i) => x - points[0][i]);
       result += Math.hypot(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]) / 2;
@@ -76,7 +105,7 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
         for (let c = 0; c < 3; c++) {
           const delta = mesh.positions[vertex * 3 + c] - center[c];
           assert.equal(Math.abs(delta), voxels.size / 2);
-          if (c === axis) assert.equal(delta, normal[c] * voxels.size / 2);
+          if (c === axis) assert.equal(delta, (normal[c] * voxels.size) / 2);
         }
       }
       const neighbour = mesh.neighbourBone[vertices[0]];
@@ -84,7 +113,9 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
       const adjacent = [i, j, k];
       adjacent[axis] += normal[axis];
       const inside = adjacent.every((x, c) => x >= 0 && x < voxels.dims[c]);
-      const expected = inside ? voxels.owner[adjacent[0] + adjacent[1] * voxels.dims[0] + adjacent[2] * voxels.dims[0] * voxels.dims[1]] - 1 : -1;
+      const expected = inside
+        ? voxels.owner[adjacent[0] + adjacent[1] * voxels.dims[0] + adjacent[2] * voxels.dims[0] * voxels.dims[1]] - 1
+        : -1;
       assert.equal(neighbour, expected);
       assert.notEqual(neighbour, bone);
       if (neighbour >= 0) sawBoundary = true;
@@ -92,15 +123,23 @@ test('per-cell faces retain their owning cell, including bone boundaries, withou
     }
     for (let cell = 0; cell < voxels.owner.length; cell++) {
       if (voxels.owner[cell] !== bone + 1) continue;
-      const coordinates = [cell % voxels.dims[0], Math.floor(cell / voxels.dims[0]) % voxels.dims[1], Math.floor(cell / (voxels.dims[0] * voxels.dims[1]))];
-      for (let axis = 0; axis < 3; axis++) for (const sign of [-1, 1]) {
-        const adjacent = [...coordinates];
-        adjacent[axis] += sign;
-        const inside = adjacent.every((x, c) => x >= 0 && x < voxels.dims[c]);
-        const owner = inside ? voxels.owner[adjacent[0] + adjacent[1] * voxels.dims[0] + adjacent[2] * voxels.dims[0] * voxels.dims[1]] : 0;
-        const normal = [0, 0, 0]; normal[axis] = sign;
-        assert.equal(exposed.has(`${cell}:${normal.join(',')}`), owner !== bone + 1);
-      }
+      const coordinates = [
+        cell % voxels.dims[0],
+        Math.floor(cell / voxels.dims[0]) % voxels.dims[1],
+        Math.floor(cell / (voxels.dims[0] * voxels.dims[1])),
+      ];
+      for (let axis = 0; axis < 3; axis++)
+        for (const sign of [-1, 1]) {
+          const adjacent = [...coordinates];
+          adjacent[axis] += sign;
+          const inside = adjacent.every((x, c) => x >= 0 && x < voxels.dims[c]);
+          const owner = inside
+            ? voxels.owner[adjacent[0] + adjacent[1] * voxels.dims[0] + adjacent[2] * voxels.dims[0] * voxels.dims[1]]
+            : 0;
+          const normal = [0, 0, 0];
+          normal[axis] = sign;
+          assert.equal(exposed.has(`${cell}:${normal.join(',')}`), owner !== bone + 1);
+        }
     }
   }
   assert(sawBoundary);
@@ -113,7 +152,8 @@ test('baked figures face +z with their left at +x', async () => {
     assert(bone('head').tail[2] > bone('pelvis').head[2], `${model} head lies forward of its pelvis`);
     const sides = body.bones.filter((b) => /\.[LR]$/.test(b.id));
     assert(sides.length > 0);
-    for (const { id, head } of sides) assert(id.endsWith('.L') ? head[0] > 0 : head[0] < 0, `${model} ${id} lies on its own side`);
+    for (const { id, head } of sides)
+      assert(id.endsWith('.L') ? head[0] > 0 : head[0] < 0, `${model} ${id} lies on its own side`);
   }
   const { body } = await bakeFixture('humanoid');
   const foot = body.bones.find((b) => b.id === 'foot.L');
@@ -123,8 +163,14 @@ test('baked figures face +z with their left at +x', async () => {
 test('turned cells keep each owner at the turned centre of its source cell', async () => {
   const { fileBody, turnCellIndex } = await import('../actorFrame.mjs');
   const voxels = cellFixture();
-  const at = (grid, cell) => worldPosition(grid, cell % grid.dims[0], Math.floor(cell / grid.dims[0]) % grid.dims[1], Math.floor(cell / (grid.dims[0] * grid.dims[1])));
-  const filled = Array.from(voxels.owner).flatMap((owner, i) => owner ? [[i, owner]] : []);
+  const at = (grid, cell) =>
+    worldPosition(
+      grid,
+      cell % grid.dims[0],
+      Math.floor(cell / grid.dims[0]) % grid.dims[1],
+      Math.floor(cell / (grid.dims[0] * grid.dims[1])),
+    );
+  const filled = Array.from(voxels.owner).flatMap((owner, i) => (owner ? [[i, owner]] : []));
   const { cells } = fileBody({ cells: { size: voxels.size, origin: voxels.origin, dims: voxels.dims, filled } });
   const turned = new Map(cells.filled);
   assert.equal(turned.size, filled.length);
@@ -138,7 +184,9 @@ test('turned cells keep each owner at the turned centre of its source cell', asy
 
 test('the emitted hull reproduces the generator ground fit after a JSON round trip', async () => {
   const { groundFit } = await import('../actorCompose.mjs');
-  const { hullCentersByBone, posedVoxelSurfaceBounds, posedVoxelSurfaceBoundsForBones } = await import('../packages/mobgen/src/core/voxelBounds.ts');
+  const { hullCentersByBone, posedVoxelSurfaceBounds, posedVoxelSurfaceBoundsForBones } = await import(
+    '../packages/mobgen/src/core/voxelBounds.ts'
+  );
   const { rotX, rotZ, mulMM } = await import('../packages/mobgen/src/core/math.ts');
   const voxels = cellFixture();
   const bones = [
@@ -148,13 +196,25 @@ test('the emitted hull reproduces the generator ground fit after a JSON round tr
   ];
   const realized = { body: { bones }, voxels };
   const hull = hullCentersByBone(realized);
-  const body = JSON.parse(JSON.stringify({ voxelSize: voxels.size, bones: bones.map((b) => ({ ...b, hull: hull.get(b.id) })) }));
+  const body = JSON.parse(
+    JSON.stringify({ voxelSize: voxels.size, bones: bones.map((b) => ({ ...b, hull: hull.get(b.id) })) }),
+  );
   assert(hull.size > 0);
   for (const rotations of [{}, { root: rotZ(29), chest: mulMM(rotX(47), rotZ(-31)) }]) {
     const pose = { root: [0.3, -0.7, 0.2], rotations };
     const expected = posedVoxelSurfaceBounds(realized, pose);
-    assert.deepEqual(groundFit(body, pose, bones.map((b) => b.id)), expected);
-    assert.deepEqual(groundFit(body, pose, ['chest']).byBone, posedVoxelSurfaceBoundsForBones(realized, pose, ['chest']));
+    assert.deepEqual(
+      groundFit(
+        body,
+        pose,
+        bones.map((b) => b.id),
+      ),
+      expected,
+    );
+    assert.deepEqual(
+      groundFit(body, pose, ['chest']).byBone,
+      posedVoxelSurfaceBoundsForBones(realized, pose, ['chest']),
+    );
     // Independent all-cell sweep protects the projected half-height, not just the mapping.
     const { boneTransforms } = await import('../packages/mobgen/src/core/pose.ts');
     const { applyPoint } = await import('../packages/mobgen/src/core/math.ts');
@@ -164,10 +224,12 @@ test('the emitted hull reproduces the generator ground fit after a JSON round tr
       if (!voxels.owner[cell]) continue;
       const center = worldPosition(voxels, cell % 3, Math.floor(cell / 3), 0);
       const transform = transforms.get(bones[voxels.owner[cell] - 1].id);
-      for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) {
-        const corner = center.map((v, a) => v + [x, y, z][a] * voxels.size / 2);
-        lowest = Math.min(lowest, applyPoint(transform, corner)[1]);
-      }
+      for (const x of [-1, 1])
+        for (const y of [-1, 1])
+          for (const z of [-1, 1]) {
+            const corner = center.map((v, a) => v + ([x, y, z][a] * voxels.size) / 2);
+            lowest = Math.min(lowest, applyPoint(transform, corner)[1]);
+          }
     }
     assert(Math.abs(expected.lowest - lowest) < 1e-12);
   }
@@ -184,7 +246,7 @@ const massAgreement = (actual, reference) => {
   }
 };
 
-test('the emitted body reproduces the generator\'s mass laws', async () => {
+test("the emitted body reproduces the generator's mass laws", async () => {
   const { bodyGeometry } = await import('../actorBody.mjs');
   const { voxelMassProperties, voxelBounds, partMassProperties } = await import('../actorMass.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
@@ -217,7 +279,8 @@ test('the emitted body reproduces the generator\'s mass laws', async () => {
   }
   assert(sawHullReduction, 'fixture must distinguish hull candidates from owned voxels');
   assert.equal(body.voxelSize, realized.voxels.size);
-  const pointsFor = (selection) => body.bones.filter((b) => selection.some((s) => s.id === b.id)).flatMap((b) => b.voxels ?? []);
+  const pointsFor = (selection) =>
+    body.bones.filter((b) => selection.some((s) => s.id === b.id)).flatMap((b) => b.voxels ?? []);
   for (const selected of selections) {
     const indices = selected.map((b) => bones.indexOf(b));
     const points = pointsFor(selected);
@@ -234,8 +297,22 @@ test('the emitted body reproduces the generator\'s mass laws', async () => {
   let fallback = 0;
   for (const [i, part] of parts.entries()) {
     const points = pointsFor(subtrees[i]);
-    const actual = partMassProperties({ points, voxelSize: body.voxelSize, bodyVoxelCount, bodyMassKg: body.bodyMassKg, massFractions: body.massFractions, part });
-    const expected = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: subtrees[i].map((b) => bones.indexOf(b)), bodyBoneIndices: bones.map((_, b) => b), voxelSize: body.voxelSize, template, part });
+    const actual = partMassProperties({
+      points,
+      voxelSize: body.voxelSize,
+      bodyVoxelCount,
+      bodyMassKg: body.bodyMassKg,
+      massFractions: body.massFractions,
+      part,
+    });
+    const expected = templatePartMassProperties({
+      voxels: realized.voxels,
+      partBoneIndices: subtrees[i].map((b) => bones.indexOf(b)),
+      bodyBoneIndices: bones.map((_, b) => b),
+      voxelSize: body.voxelSize,
+      template,
+      part,
+    });
     if (template.massFractions?.[part] !== undefined) {
       authored++;
       assert.equal(actual.mass, expected.mass);
@@ -247,24 +324,39 @@ test('the emitted body reproduces the generator\'s mass laws', async () => {
     }
     massAgreement(actual.center, expected.center);
     massAgreement(actual.inertia, expected.inertia);
-    massAgreement(voxelBounds(points, body.voxelSize, actual.center).corners, liveBounds(realized.voxels, subtrees[i].map((b) => bones.indexOf(b)), expected.center).corners);
+    massAgreement(
+      voxelBounds(points, body.voxelSize, actual.center).corners,
+      liveBounds(
+        realized.voxels,
+        subtrees[i].map((b) => bones.indexOf(b)),
+        expected.center,
+      ).corners,
+    );
   }
   assert(authored > 0 && fallback > 0);
 });
 
 test('point-list mass keeps the assigned product and rejects empty or invalid inputs', async () => {
   const { voxelMassProperties, voxelBounds, partMassProperties } = await import('../actorMass.mjs');
-  const points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]];
+  const points = [
+    [-1, 0, 0],
+    [0, 0, 0],
+    [1, 0, 0],
+  ];
   const input = { points, voxelSize: 0.5, bodyVoxelCount: 3, bodyMassKg: 1, massFractions: { arm: 0.42 }, part: 'arm' };
   assert.equal(partMassProperties(input).mass, 0.42);
   assert.equal(partMassProperties(input).fraction, 0.42);
   assert.equal(partMassProperties({ ...input, massFractions: undefined }).fraction, 1);
   assert.throws(() => voxelMassProperties([], 1, 1), RangeError);
   assert.throws(() => voxelBounds([], 1), RangeError);
-  for (const voxelSize of [0, -1, Infinity, NaN]) assert.throws(() => voxelMassProperties(points, voxelSize, 1), RangeError);
-  for (const voxelMass of [0, -1, Infinity, NaN]) assert.throws(() => voxelMassProperties(points, 1, voxelMass), RangeError);
-  for (const fraction of [0, -1, 1.1, Infinity, NaN]) assert.throws(() => partMassProperties({ ...input, massFractions: { arm: fraction } }), RangeError);
-  for (const bodyMassKg of [0, -1, Infinity, NaN]) assert.throws(() => partMassProperties({ ...input, bodyMassKg }), RangeError);
+  for (const voxelSize of [0, -1, Infinity, NaN])
+    assert.throws(() => voxelMassProperties(points, voxelSize, 1), RangeError);
+  for (const voxelMass of [0, -1, Infinity, NaN])
+    assert.throws(() => voxelMassProperties(points, 1, voxelMass), RangeError);
+  for (const fraction of [0, -1, 1.1, Infinity, NaN])
+    assert.throws(() => partMassProperties({ ...input, massFractions: { arm: fraction } }), RangeError);
+  for (const bodyMassKg of [0, -1, Infinity, NaN])
+    assert.throws(() => partMassProperties({ ...input, bodyMassKg }), RangeError);
 });
 
 test('actor body metadata preserves figure regions, support geometry and template action timing', async () => {
@@ -281,21 +373,32 @@ test('actor body metadata preserves figure regions, support geometry and templat
   const fixture = { type: 'fixture.actor', model: 'humanoid', seed: 1, scale: 1 };
   const figure = templateFigure(fixture.model, fixture.seed);
   const template = consumableTemplate(fixture.model);
-  const body = JSON.parse(JSON.stringify(actorBody(figure, template, { ...fixture, lookAt: LOOK_AT_PROFILES[fixture.model] })));
+  const body = JSON.parse(
+    JSON.stringify(actorBody(figure, template, { ...fixture, lookAt: LOOK_AT_PROFILES[fixture.model] })),
+  );
   for (const [key, value] of Object.entries(fixture)) assert.equal(body[key], value);
   assert.equal(body.bodyPlan, template.bodyPlan);
   assert.deepEqual(body.regions, planOf(template.bodyPlan).regionBones);
   assert.deepEqual(body.boxes, figure.boxes);
   assert.deepEqual(body.severableParts, figure.severableParts);
   assert.deepEqual(body.burstBones, burstBones(figure.realized.body.bones));
-  assert.deepEqual(body.extents, Object.fromEntries(footRestExtents(figure.realized.body.bones, figure.realized.voxels)));
+  assert.deepEqual(
+    body.extents,
+    Object.fromEntries(footRestExtents(figure.realized.body.bones, figure.realized.voxels)),
+  );
   assert(GROUND_CONTACT_BONES.length > 0);
   assert.deepEqual(body.groundContactBones, GROUND_CONTACT_BONES);
   assert.deepEqual(body.anchors, figure.realized.body.anchors ?? {});
   assert.deepEqual(body.lookAt, LOOK_AT_PROFILES[fixture.model]);
   const attack = attackClipFor(template);
-  assert.deepEqual(body.animation, { attackPeakAtSimSeconds: attack.hitTime, attackDurationSimSeconds: attack.duration, hitDurationSimSeconds: flinchClipFor(template).duration });
-  const heights = [...figure.realized.meshes.values()].flatMap((mesh) => Array.from(mesh.positions).filter((_, i) => i % 3 === 1));
+  assert.deepEqual(body.animation, {
+    attackPeakAtSimSeconds: attack.hitTime,
+    attackDurationSimSeconds: attack.duration,
+    hitDurationSimSeconds: flinchClipFor(template).duration,
+  });
+  const heights = [...figure.realized.meshes.values()].flatMap((mesh) =>
+    Array.from(mesh.positions).filter((_, i) => i % 3 === 1),
+  );
   assert(heights.length > 0);
   assert.equal(body.height, Math.max(...heights) - Math.min(...heights));
   assert.equal(body.bodyMassKg, template.bodyMassKg);
@@ -314,27 +417,54 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   const { humanoidPoseClips } = await import('../actorClips.mjs');
   const { decodeFrame } = await import('../actorCompose.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
-  const { createGaitCache, footRestExtents, legGeometryFor, stepLengthMeters, walkPose } = await import('../packages/mobgen/src/mob/gait.ts');
+  const { createGaitCache, footRestExtents, legGeometryFor, stepLengthMeters, walkPose } = await import(
+    '../packages/mobgen/src/mob/gait.ts'
+  );
   const { idleBasePose } = await import('../packages/mobgen/src/mob/idle.ts');
   const { crawlGaitPose } = await import('../packages/mobgen/src/mob/crawl.ts');
   const figure = templateFigure('humanoid', 1);
   const row = { walkCycles: 3, walk_frames: 8, walk_speed: 0.8 };
   const { clips } = await bakeFixture('humanoid', row);
-  const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles };
-  const close = (a, b) => {
-    if (Array.isArray(a)) { assert.equal(a.length, b.length); a.forEach((x, i) => close(x, b[i])); }
-    else if (typeof a === 'object') { assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort()); for (const key of Object.keys(a)) close(a[key], b[key]); }
-    else assert(Math.abs(a - b) <= 1e-9, `${a} != ${b}`);
+  const actor = {
+    bones: figure.realized.body.bones,
+    extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
+    params: figure.genome.params,
+    seed: figure.seed,
+    cache: createGaitCache(),
+    planPeriodSteps: 2 * row.walkCycles,
   };
-  for (const stance of ['slack', 'aggravated']) close(decodeFrame(clips.standing.idle[stance].base), swapFrame(idleBasePose(actor, stance)));
+  const close = (a, b) => {
+    if (Array.isArray(a)) {
+      assert.equal(a.length, b.length);
+      a.forEach((x, i) => close(x, b[i]));
+    } else if (typeof a === 'object') {
+      assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort());
+      for (const key of Object.keys(a)) close(a[key], b[key]);
+    } else assert(Math.abs(a - b) <= 1e-9, `${a} != ${b}`);
+  };
+  for (const stance of ['slack', 'aggravated'])
+    close(decodeFrame(clips.standing.idle[stance].base), swapFrame(idleBasePose(actor, stance)));
   assert.equal(clips.standing.walk.cycles, row.walkCycles);
   assert.equal(clips.standing.walk.loop, true);
-  const basis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
-  const loopMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce((sum, length) => sum + length, 0);
+  const basis = {
+    params: actor.params,
+    geomL: legGeometryFor(actor.bones, actor.extents, 'L'),
+    speed: row.walk_speed,
+    seed: actor.seed,
+    cache: actor.cache,
+    planPeriodSteps: actor.planPeriodSteps,
+  };
+  const loopMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(basis, step)).reduce(
+    (sum, length) => sum + length,
+    0,
+  );
   assert.equal(clips.standing.walk.periodSimSeconds, undefined);
-  assert(Math.abs(clips.standing.walk.strideMetres * row.walkCycles - loopMetres) <= 1e-12, 'the walk loop spans its plan period in strides');
+  assert(
+    Math.abs(clips.standing.walk.strideMetres * row.walkCycles - loopMetres) <= 1e-12,
+    'the walk loop spans its plan period in strides',
+  );
   for (const [i, frame] of clips.standing.walk.frames.entries()) {
-    const steps = 2 * row.walkCycles * i / clips.standing.walk.frames.length;
+    const steps = (2 * row.walkCycles * i) / clips.standing.walk.frames.length;
     const pose = walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
     close(decodeFrame(frame), swapFrame({ root: pose.root, rotations: pose.rotations }));
   }
@@ -342,13 +472,25 @@ test('humanoid pose clips reproduce live standing and crawling poses over a clos
   close(decodeFrame(clips.standing.walk.frames[0]), swapFrame({ root: end.root, rotations: end.rotations }));
   close(decodeFrame(clips.crawling.idle.frames[0]), swapFrame(crawlGaitPose(figure.realized, 0, 0)));
   assert.equal(clips.crawling.walk.cycles, 1);
-  assert.equal(clips.crawling.walk.strideMetres, 1.2, 'the crawl walk states the row\'s authored crawl stride');
-  for (const [i, frame] of clips.crawling.walk.frames.entries()) close(decodeFrame(frame), swapFrame(crawlGaitPose(figure.realized, 2 * Math.PI * i / clips.crawling.walk.frames.length, row.walk_speed)));
-  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: true, crawl_stride: 0.9, legCut: 0.55 });
+  assert.equal(clips.crawling.walk.strideMetres, 1.2, "the crawl walk states the row's authored crawl stride");
+  for (const [i, frame] of clips.crawling.walk.frames.entries())
+    close(
+      decodeFrame(frame),
+      swapFrame(crawlGaitPose(figure.realized, (2 * Math.PI * i) / clips.crawling.walk.frames.length, row.walk_speed)),
+    );
+  const legless = humanoidPoseClips(templateFigure('legless-humanoid', 1), {
+    ...row,
+    crawls: true,
+    crawl_stride: 0.9,
+    legCut: 0.55,
+  });
   assert(!('standing' in legless));
   assert(legless.crawling.walk.frames.length > 1);
   assert.equal(legless.crawling.walk.strideMetres, 0.9);
-  assert.throws(() => humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: false, legCut: 0.55 }), RangeError);
+  assert.throws(
+    () => humanoidPoseClips(templateFigure('legless-humanoid', 1), { ...row, crawls: false, legCut: 0.55 }),
+    RangeError,
+  );
 });
 
 test('a humanoid row that does not crawl bakes no crawling set', async () => {
@@ -360,7 +502,10 @@ test('a humanoid row that does not crawl bakes no crawling set', async () => {
 test('content rows that crawl carry a valid crawl stride; the player row bakes no crawling set', async () => {
   const { readMobRows } = await import('../layout.mjs');
   for (const row of readMobRows().filter((r) => /humanoid$/.test(r.template) && r.crawls)) {
-    assert(Number.isFinite(row.crawl_stride) && row.crawl_stride > 0, `${row.id} crawl stride must be positive and finite`);
+    assert(
+      Number.isFinite(row.crawl_stride) && row.crawl_stride > 0,
+      `${row.id} crawl stride must be positive and finite`,
+    );
   }
   const player = readMobRows().find((r) => r.type === 'player');
   assert.equal(player.crawls, false);
@@ -374,13 +519,16 @@ test('serialized idle oscillators reproduce the live ordered rotation product at
     assert(idle.motion.length > 0);
     assert(idle.motion.every((motion) => motion.bones.length > 0));
   }
-  for (const [stance, idle] of Object.entries(clips.standing.idle)) for (const time of [0, 0.37, 3.2]) for (const seed of [2, 17]) {
-    const base = decodeFrame(idle.base);
-    const actual = applyMotion(base, idle.motion, time, seed);
-    const expected = swapFrame(applyIdleMotion(swapFrame(base), stance, time, seed));
-    assert.deepEqual(actual.root, expected.root);
-    for (const id of Object.keys(expected.rotations)) expected.rotations[id].forEach((x, i) => assert(Math.abs(x - actual.rotations[id][i]) <= 1e-9));
-  }
+  for (const [stance, idle] of Object.entries(clips.standing.idle))
+    for (const time of [0, 0.37, 3.2])
+      for (const seed of [2, 17]) {
+        const base = decodeFrame(idle.base);
+        const actual = applyMotion(base, idle.motion, time, seed);
+        const expected = swapFrame(applyIdleMotion(swapFrame(base), stance, time, seed));
+        assert.deepEqual(actual.root, expected.root);
+        for (const id of Object.keys(expected.rotations))
+          expected.rotations[id].forEach((x, i) => assert(Math.abs(x - actual.rotations[id][i]) <= 1e-9));
+      }
 });
 
 test('humanoid overlays reproduce action poses over live idle and walk bases at both sides', async () => {
@@ -394,9 +542,24 @@ test('humanoid overlays reproduce action poses over live idle and walk bases at 
   const { flinchClipFor, flinchPoseWithClip } = await import('../packages/mobgen/src/mob/reactions.ts');
   const figure = templateFigure('humanoid', 1);
   const template = consumableTemplate('humanoid');
-  const row = { type: 'fixture.actor', model: 'humanoid', seed: 1, scale: 1, walkCycles: 1, walk_frames: 8, walk_speed: 0.8, attack_frames: 9 };
+  const row = {
+    type: 'fixture.actor',
+    model: 'humanoid',
+    seed: 1,
+    scale: 1,
+    walkCycles: 1,
+    walk_frames: 8,
+    walk_speed: 0.8,
+    attack_frames: 9,
+  };
   const { body, clips } = await bakeFixture('humanoid', row);
-  const actor = { bones: figure.realized.body.bones, extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels), params: figure.genome.params, seed: figure.seed, cache: createGaitCache() };
+  const actor = {
+    bones: figure.realized.body.bones,
+    extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
+    params: figure.genome.params,
+    seed: figure.seed,
+    cache: createGaitCache(),
+  };
   const attack = attackClipFor(template);
   const flinch = flinchClipFor(template);
   const crawlAttack = attackClipFor(consumableTemplate('legless-humanoid'));
@@ -404,37 +567,50 @@ test('humanoid overlays reproduce action poses over live idle and walk bases at 
     a.root.forEach((x, i) => assert(Math.abs(x - b.root[i]) <= 1e-9));
     const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
     for (const id of new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)])) {
-      (b.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (a.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+      (b.rotations[id] ?? identity).forEach((x, i) =>
+        assert(Math.abs(x - (a.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`),
+      );
     }
   };
   let changedBySide = false;
   for (const [stance, bases] of Object.entries({
     standing: [idleBasePose(actor, 'slack'), walkPose(actor, { stepIndex: 1, progress: 0.4 }, 0.8)],
     crawling: [crawlGaitPose(figure.realized, 0, 0), crawlGaitPose(figure.realized, 1.7, 0.8)],
-  })) for (const base of bases) for (const kind of ['attack', 'flinch']) {
-    const clip = clips[stance][kind];
-    assert.equal(clip.kind, 'overlay');
-    // The span and strike keys name their clock, and no clock-less twin survives.
-    assert(clip.durationSimSeconds > 0);
-    assert(!('duration' in clip) && !('hitTime' in clip) && !('peak' in clip));
-    assert(typeof (kind === 'attack' ? clip.hitAtSimSeconds : clip.peakAtSimSeconds) === 'number');
-    assert(clip.frames.length > 2);
-    for (let i = 0; i < clip.frames.length; i++) {
-      const time = clip.durationSimSeconds * i / (clip.frames.length - 1);
-      for (const side of [-1, 1]) {
-        const actual = applyOverlay(body, swapFrame(base), clip, time, side, stance);
-        const expected = swapFrame(stance === 'standing'
-          ? kind === 'attack' ? attackPose(actor, attack, time, base) : flinchPoseWithClip(actor, time, base, { clip: flinch, side })
-          : kind === 'attack' ? groundCrawlPose(figure.realized, { ...base, rotations: attackRotations(actor, crawlAttack, time, base).rotations }) : crawlHitPose(figure.realized, base, time, side));
-        close(actual, expected);
+  }))
+    for (const base of bases)
+      for (const kind of ['attack', 'flinch']) {
+        const clip = clips[stance][kind];
+        assert.equal(clip.kind, 'overlay');
+        // The span and strike keys name their clock, and no clock-less twin survives.
+        assert(clip.durationSimSeconds > 0);
+        assert(!('duration' in clip) && !('hitTime' in clip) && !('peak' in clip));
+        assert(typeof (kind === 'attack' ? clip.hitAtSimSeconds : clip.peakAtSimSeconds) === 'number');
+        assert(clip.frames.length > 2);
+        for (let i = 0; i < clip.frames.length; i++) {
+          const time = (clip.durationSimSeconds * i) / (clip.frames.length - 1);
+          for (const side of [-1, 1]) {
+            const actual = applyOverlay(body, swapFrame(base), clip, time, side, stance);
+            const expected = swapFrame(
+              stance === 'standing'
+                ? kind === 'attack'
+                  ? attackPose(actor, attack, time, base)
+                  : flinchPoseWithClip(actor, time, base, { clip: flinch, side })
+                : kind === 'attack'
+                  ? groundCrawlPose(figure.realized, {
+                      ...base,
+                      rotations: attackRotations(actor, crawlAttack, time, base).rotations,
+                    })
+                  : crawlHitPose(figure.realized, base, time, side),
+            );
+            close(actual, expected);
+          }
+          if (kind === 'flinch' && i > 0 && i < clip.frames.length - 1) {
+            const left = applyOverlay(body, swapFrame(base), clip, time, -1, stance);
+            const right = applyOverlay(body, swapFrame(base), clip, time, 1, stance);
+            changedBySide ||= JSON.stringify(left.rotations) !== JSON.stringify(right.rotations);
+          }
+        }
       }
-      if (kind === 'flinch' && i > 0 && i < clip.frames.length - 1) {
-        const left = applyOverlay(body, swapFrame(base), clip, time, -1, stance);
-        const right = applyOverlay(body, swapFrame(base), clip, time, 1, stance);
-        changedBySide ||= JSON.stringify(left.rotations) !== JSON.stringify(right.rotations);
-      }
-    }
-  }
   assert(changedBySide);
 });
 
@@ -442,48 +618,86 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const { applyJointDelta, decodeFrame } = await import('../actorCompose.mjs');
   const { templateFigure } = await import('../packages/mobgen/src/mob/humanoidFigure.ts');
   const { acidTemplate } = await import('../packages/mobgen/src/mob/acidTemplate.ts');
-  const { acidIdlePose, acidWalkPose, acidStrideLength, acidAttackPose, acidWindupPose, acidHitPose } = await import('../packages/mobgen/src/mob/acidPoses.ts');
+  const { acidIdlePose, acidWalkPose, acidStrideLength, acidAttackPose, acidWindupPose, acidHitPose } = await import(
+    '../packages/mobgen/src/mob/acidPoses.ts'
+  );
   const figure = templateFigure('acid', 1);
-  const row = { type: 'fixture.acid', model: 'acid', seed: 1, scale: 1, walkCycles: 1, walk_frames: 8, attack_frames: 9 };
+  const row = {
+    type: 'fixture.acid',
+    model: 'acid',
+    seed: 1,
+    scale: 1,
+    walkCycles: 1,
+    walk_frames: 8,
+    attack_frames: 9,
+  };
   const baked = await bakeFixture('acid', row);
   const clips = baked.clips.standing;
   const body = baked.body;
   const tuning = acidTemplate.animation;
-  assert.deepEqual(body.animation, { attackPeakAtSimSeconds: tuning.attackPeak, attackDurationSimSeconds: tuning.attackDuration, hitDurationSimSeconds: tuning.hitDuration, deathDurationRealSeconds: tuning.deathDuration });
+  assert.deepEqual(body.animation, {
+    attackPeakAtSimSeconds: tuning.attackPeak,
+    attackDurationSimSeconds: tuning.attackDuration,
+    hitDurationSimSeconds: tuning.hitDuration,
+    deathDurationRealSeconds: tuning.deathDuration,
+  });
   assert.equal(clips.idle.periodSimSeconds, tuning.idlePeriod);
   assert.equal(clips.idle.loop, true);
   const close = (actual, expected) => {
     actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
     const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
     for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) {
-      (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+      (expected.rotations[id] ?? identity).forEach((x, i) =>
+        assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`),
+      );
     }
   };
-  for (const [i, frame] of clips.idle.frames.entries()) close(decodeFrame(frame), swapFrame(acidIdlePose(figure.realized, tuning.idlePeriod * i / clips.idle.frames.length)));
+  for (const [i, frame] of clips.idle.frames.entries())
+    close(
+      decodeFrame(frame),
+      swapFrame(acidIdlePose(figure.realized, (tuning.idlePeriod * i) / clips.idle.frames.length)),
+    );
   close(decodeFrame(clips.idle.frames[0]), swapFrame(acidIdlePose(figure.realized, tuning.idlePeriod)));
-  for (const speed of [-0.2, 0, 0.4, 1.4]) for (let i = 0; i < clips.walk.frames.length; i++) {
-    const phase = 2 * Math.PI * i / clips.walk.frames.length;
-    const base = acidIdlePose(figure.realized, 0.37);
-    close(applyJointDelta(body, swapFrame(base), clips.walk, phase, { speed }), swapFrame(acidWalkPose(figure.realized, acidStrideLength(figure.realized) * phase / (2 * Math.PI), speed, 0.37)));
-  }
+  for (const speed of [-0.2, 0, 0.4, 1.4])
+    for (let i = 0; i < clips.walk.frames.length; i++) {
+      const phase = (2 * Math.PI * i) / clips.walk.frames.length;
+      const base = acidIdlePose(figure.realized, 0.37);
+      close(
+        applyJointDelta(body, swapFrame(base), clips.walk, phase, { speed }),
+        swapFrame(
+          acidWalkPose(figure.realized, (acidStrideLength(figure.realized) * phase) / (2 * Math.PI), speed, 0.37),
+        ),
+      );
+    }
   const bases = [acidIdlePose(figure.realized, 0.37), acidWalkPose(figure.realized, 0.23, 0.7, 0.37)];
   let sideVaries = false;
-  for (const base of bases) for (const name of ['attack', 'spitDraw', 'hit']) {
-    const clip = clips[name];
-    assert.equal(clip.kind, 'jointDelta');
-    if (name === 'spitDraw') assert(!('durationSimSeconds' in clip) && !('durationRealSeconds' in clip));
-    else {
-      assert.equal(clip.durationSimSeconds, name === 'attack' ? tuning.attackDuration : tuning.hitDuration);
-      assert(!('duration' in clip) && !('durationRealSeconds' in clip));
+  for (const base of bases)
+    for (const name of ['attack', 'spitDraw', 'hit']) {
+      const clip = clips[name];
+      assert.equal(clip.kind, 'jointDelta');
+      if (name === 'spitDraw') assert(!('durationSimSeconds' in clip) && !('durationRealSeconds' in clip));
+      else {
+        assert.equal(clip.durationSimSeconds, name === 'attack' ? tuning.attackDuration : tuning.hitDuration);
+        assert(!('duration' in clip) && !('durationRealSeconds' in clip));
+      }
+      for (let i = 0; i < clip.frames.length; i++)
+        for (const side of [-1, 1]) {
+          const cursor = ((clip.durationSimSeconds ?? 1) * i) / (clip.frames.length - 1);
+          const actual = applyJointDelta(body, swapFrame(base), clip, cursor, { side });
+          const expected = swapFrame(
+            name === 'attack'
+              ? acidAttackPose(figure.realized, base, cursor)
+              : name === 'spitDraw'
+                ? acidWindupPose(figure.realized, base, cursor)
+                : acidHitPose(figure.realized, base, cursor, side),
+          );
+          close(actual, expected);
+          if (name === 'hit')
+            sideVaries ||=
+              JSON.stringify(actual) !==
+              JSON.stringify(applyJointDelta(body, swapFrame(base), clip, cursor, { side: -side }));
+        }
     }
-    for (let i = 0; i < clip.frames.length; i++) for (const side of [-1, 1]) {
-      const cursor = (clip.durationSimSeconds ?? 1) * i / (clip.frames.length - 1);
-      const actual = applyJointDelta(body, swapFrame(base), clip, cursor, { side });
-      const expected = swapFrame(name === 'attack' ? acidAttackPose(figure.realized, base, cursor) : name === 'spitDraw' ? acidWindupPose(figure.realized, base, cursor) : acidHitPose(figure.realized, base, cursor, side));
-      close(actual, expected);
-      if (name === 'hit') sideVaries ||= JSON.stringify(actual) !== JSON.stringify(applyJointDelta(body, swapFrame(base), clip, cursor, { side: -side }));
-    }
-  }
   assert(sideVaries);
   const { jointRotation, jointAngles, clampJointAngles } = await import('../packages/mobgen/src/core/joints.ts');
   // A deliberately excessive delta must clamp, rather than relying on authored curves staying in range.
@@ -491,7 +705,10 @@ test('acid clips preserve idle timing and compose joint deltas over live bases w
   const angles = [1000, -1000, 1000];
   const excessive = { kind: 'jointDelta', cursor: 'progress', frames: [{ angles: { chest: angles } }] };
   const actual = applyJointDelta(body, { root: [0.3, 0, -0.2], rotations: {} }, excessive, 1);
-  close({ ...actual, root: [0, 0, 0] }, { root: [0, 0, 0], rotations: { chest: jointRotation(bone, clampJointAngles(bone, angles)) } });
+  close(
+    { ...actual, root: [0, 0, 0] },
+    { root: [0, 0, 0], rotations: { chest: jointRotation(bone, clampJointAngles(bone, angles)) } },
+  );
   assert.deepEqual([actual.root[0], actual.root[2]], [0.3, -0.2]);
   assert(jointAngles(bone, actual.rotations.chest).every(Number.isFinite));
 });
@@ -510,12 +727,17 @@ test('acid death clips reproduce the generator fall over the rest frame at every
     actual.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `root[${i}]`));
     const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
     for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) {
-      (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`));
+      (expected.rotations[id] ?? identity).forEach((x, i) =>
+        assert(Math.abs(x - (actual.rotations[id] ?? identity)[i]) <= 1e-9, `${id}[${i}]`),
+      );
     }
   };
   assert(!('death' in body.animation));
   const clip = (direction) => clips.standing.death[direction];
-  for (const [name, direction] of [['forward', 1], ['backward', -1]]) {
+  for (const [name, direction] of [
+    ['forward', 1],
+    ['backward', -1],
+  ]) {
     const death = clip(name);
     assert.equal(death.kind, 'pose');
     assert.equal(death.loop, false);
@@ -523,7 +745,12 @@ test('acid death clips reproduce the generator fall over the rest frame at every
     assert(!('durationSimSeconds' in death));
     assert.equal(death.frames.length, row.attack_frames);
     for (const [i, frame] of death.frames.entries()) {
-      close(decodeFrame(frame), swapFrame(acidDeathPose(figure.realized, rest, death.durationRealSeconds * i / (death.frames.length - 1), direction)));
+      close(
+        decodeFrame(frame),
+        swapFrame(
+          acidDeathPose(figure.realized, rest, (death.durationRealSeconds * i) / (death.frames.length - 1), direction),
+        ),
+      );
     }
     // Frame zero is the rest frame itself: the fall starts from idle frame zero.
     close(decodeFrame(death.frames[0]), swapFrame(rest));
@@ -541,18 +768,25 @@ test('the death clips settle', async () => {
   const { clips } = await bakeFixture('acid');
   const { deathDuration } = acidTemplate.animation;
   const rest = acidIdlePose(figure.realized, 0);
-  for (const [name, direction] of [['forward', 1], ['backward', -1]]) {
+  for (const [name, direction] of [
+    ['forward', 1],
+    ['backward', -1],
+  ]) {
     const death = clips.standing.death[name];
     assert.equal(death.durationRealSeconds, deathDuration);
     assert(death.frames.length >= 2);
     const settled = acidDeathPose(figure.realized, rest, deathDuration, direction);
     // The settled fold is what the generator holds from deathDuration on.
     const last = decodeFrame(death.frames.at(-1));
-    for (const expected of [settled, acidDeathPose(figure.realized, rest, 2 * deathDuration, direction)].map(swapFrame)) {
+    for (const expected of [settled, acidDeathPose(figure.realized, rest, 2 * deathDuration, direction)].map(
+      swapFrame,
+    )) {
       last.root.forEach((x, i) => assert(Math.abs(x - expected.root[i]) <= 1e-9, `${name} root[${i}]`));
       const identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
       for (const id of new Set([...Object.keys(last.rotations), ...Object.keys(expected.rotations)])) {
-        (expected.rotations[id] ?? identity).forEach((x, i) => assert(Math.abs(x - (last.rotations[id] ?? identity)[i]) <= 1e-9, `${name} ${id}[${i}]`));
+        (expected.rotations[id] ?? identity).forEach((x, i) =>
+          assert(Math.abs(x - (last.rotations[id] ?? identity)[i]) <= 1e-9, `${name} ${id}[${i}]`),
+        );
       }
     }
     // Finite sampling returns the stored settled frame at and after duration.
@@ -574,12 +808,30 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   assert(generated);
   const scale = 1.7;
   const figure = figureFor(generated, fusedMassTemplate, scale);
-  const body = JSON.parse(JSON.stringify(actorBody(figure, fusedMassTemplate, { type: 'fixture.fused', model: 'fused-mass', seed: 1, scale, lookAt: LOOK_AT_PROFILES['fused-mass'] })));
+  const body = JSON.parse(
+    JSON.stringify(
+      actorBody(figure, fusedMassTemplate, {
+        type: 'fixture.fused',
+        model: 'fused-mass',
+        seed: 1,
+        scale,
+        lookAt: LOOK_AT_PROFILES['fused-mass'],
+      }),
+    ),
+  );
   const voxels = generated.realized.voxels;
   assert.deepEqual(body.manifest, fusedMassManifest(generated.realized.body, voxels));
-  assert.deepEqual(body.regions, Object.fromEntries(body.manifest.regions.map((region) => [region.id, region.boneIds])));
+  assert.deepEqual(
+    body.regions,
+    Object.fromEntries(body.manifest.regions.map((region) => [region.id, region.boneIds])),
+  );
   assert.deepEqual(Object.keys(body.boxes), Object.keys(body.regions));
-  assert.deepEqual(body.cells, { size: voxels.size, origin: voxels.origin, dims: voxels.dims, filled: Array.from(voxels.owner).flatMap((owner, i) => owner ? [[i, owner]] : []) });
+  assert.deepEqual(body.cells, {
+    size: voxels.size,
+    origin: voxels.origin,
+    dims: voxels.dims,
+    filled: Array.from(voxels.owner).flatMap((owner, i) => (owner ? [[i, owner]] : [])),
+  });
   assert(body.cells.filled.length > 0);
   for (let axis = 0; axis < 3; axis++) {
     const values = body.bones.flatMap((bone) => bone.voxels ?? []).map((p) => p[axis]);
@@ -588,19 +840,29 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
     assert.equal(body.bounds.min[axis], lo * scale);
     assert.equal(body.bounds.max[axis], hi * scale);
     assert(Math.abs(body.originOffset[axis] + (axis === 1 ? lo : (lo + hi) / 2) * scale) <= 1e-9);
-    assert(Math.abs(body.restStrikeOrigin[axis] - (body.coreInteriorPoint[axis] * scale + body.originOffset[axis])) <= 1e-9);
+    assert(
+      Math.abs(body.restStrikeOrigin[axis] - (body.coreInteriorPoint[axis] * scale + body.originOffset[axis])) <= 1e-9,
+    );
   }
-  for (const [region, ids] of Object.entries(body.regions)) for (const id of ids) {
-    const points = body.bones.find((bone) => bone.id === id).voxels;
-    if (!points) continue;
-    const box = body.boxes[region].find((box) => box.bone === id);
-    assert(box);
-    points.forEach((p) => p.forEach((v, a) => assert(Math.abs(v - box.center[a]) <= box.halfSize[a])));
-  }
+  for (const [region, ids] of Object.entries(body.regions))
+    for (const id of ids) {
+      const points = body.bones.find((bone) => bone.id === id).voxels;
+      if (!points) continue;
+      const box = body.boxes[region].find((box) => box.bone === id);
+      assert(box);
+      points.forEach((p) => p.forEach((v, a) => assert(Math.abs(v - box.center[a]) <= box.halfSize[a])));
+    }
   const core = body.bones.find((bone) => bone.id === 'core');
   assert(core.voxels.some((p) => p.every((v, a) => Math.abs(v - body.coreInteriorPoint[a]) < body.voxelSize / 2)));
   const peak = HIT_FLINCH.keys[1];
-  assert.deepEqual(body.animation, { flinch: { peakAtSimSeconds: peak.t, durationSimSeconds: HIT_FLINCH.duration, pitch: peak.rotations.chest[0], roll: peak.rotations.chest[2] } });
+  assert.deepEqual(body.animation, {
+    flinch: {
+      peakAtSimSeconds: peak.t,
+      durationSimSeconds: HIT_FLINCH.duration,
+      pitch: peak.rotations.chest[0],
+      roll: peak.rotations.chest[2],
+    },
+  });
   assert.equal(body.bodyMassKg, fusedMassTemplate.bodyMassKg);
   assert(!('massFractions' in body));
   const clips = JSON.parse(JSON.stringify(fusedClips(figure)));
@@ -612,7 +874,7 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
 // The genome is what a consumer compares to tell a re-rolled figure from a rebuilt one, so it must hold every draw, each
 // from the row's narrowed range rather than the base template's. The acid plan rounds its mottle count, so a range no
 // whole count fits is one its draw cannot keep.
-test('a row writes its declared actor files, with a genome drawing every plan param in its row\'s range', async () => {
+test("a row writes its declared actor files, with a genome drawing every plan param in its row's range", async () => {
   const { planOf } = await import('../packages/mobgen/src/core/generate.ts');
   const { specAllows, templateByName } = await import('../packages/mobgen/src/core/template.ts');
   const params = { mottleCount: { min: 4, max: 6 } };
@@ -621,10 +883,15 @@ test('a row writes its declared actor files, with a genome drawing every plan pa
   assert.equal(genome.seed, 1);
   const base = templateByName('acid');
   for (const name of planOf(base.bodyPlan).paramOrder) {
-    assert(specAllows(params[name] ?? base.params[name], genome.params[name]), `records ${name} = ${genome.params[name]} outside its row's range`);
+    assert(
+      specAllows(params[name] ?? base.params[name], genome.params[name]),
+      `records ${name} = ${genome.params[name]} outside its row's range`,
+    );
   }
-  await assert.rejects(bakeFixture('acid', { params: { mottleCount: { min: 4.2, max: 4.4 } } }),
-    /fixture\.acid draws mottleCount = 4 outside range \{"min":4\.2,"max":4\.4\}/);
+  await assert.rejects(
+    bakeFixture('acid', { params: { mottleCount: { min: 4.2, max: 4.4 } } }),
+    /fixture\.acid draws mottleCount = 4 outside range \{"min":4\.2,"max":4\.4\}/,
+  );
 });
 
 test('every baked body names only bones it realizes in its regions and ground contacts', async () => {
@@ -647,7 +914,8 @@ test('every baked body names only bones it realizes in its regions and ground co
       }
       if (body.groundContactBones !== undefined) {
         sawGroundContacts = true;
-        for (const bone of body.groundContactBones) assert(bones.has(bone), `${row.id} ground contact names absent bone ${bone}`);
+        for (const bone of body.groundContactBones)
+          assert(bones.has(bone), `${row.id} ground contact names absent bone ${bone}`);
       }
     }
     assert(sawRegions, 'content must exercise bodies with hit regions');
@@ -678,16 +946,35 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
   let sawEmission = false;
   try {
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
-      const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
-        pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
-        glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json`,
-        genome: `fixture/actors/${model}.genome.json` };
+      const row = {
+        id: `fixture.${model}`,
+        type: `fixture.${model}`,
+        model,
+        template: model,
+        seed: 1,
+        scale: 1.3,
+        pack: 'fixture.pack',
+        lod_divisor: 0,
+        walkCycles: 1,
+        walk_speed: 0.8,
+        walk_frames: 8,
+        attack_frames: 9,
+        crawls: true,
+        crawl_stride: 1.2,
+        glb: `fixture/assets/${model}.glb`,
+        body: `fixture/actors/${model}.body.json`,
+        clips: `fixture/actors/${model}.clips.json`,
+        genome: `fixture/actors/${model}.genome.json`,
+      };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
       const body = JSON.parse(readFileSync(at(row.body)));
       const clips = JSON.parse(readFileSync(at(row.clips)));
       const bytes = readFileSync(at(row.glb));
-      const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+      const gltf = await new GLTFLoader().parseAsync(
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+        '',
+      );
       const node = gltf.scene.children[0];
       const geometry = node.geometry;
       const pos = geometry.getAttribute('position');
@@ -696,7 +983,10 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
       const bone = geometry.getAttribute('uv1');
       const emission = geometry.getAttribute('uv2');
       const cell = geometry.getAttribute('uv3');
-      assert.deepEqual(node.userData.bones, body.bones.map((bone) => bone.id));
+      assert.deepEqual(
+        node.userData.bones,
+        body.bones.map((bone) => bone.id),
+      );
       assert(pos.count > 0);
       assert.equal(nor.count, pos.count);
       assert.equal(color.count, pos.count);
@@ -704,44 +994,80 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
       assert.equal(emission.count, pos.count);
       for (const index of geometry.index.array) assert(index < pos.count);
       const template = consumableTemplate(model);
-      const figure = model === 'fused-mass' ? figureFor(generateValid(template, row.seed, { maxAttempts: 1 }), template, row.scale) : templateFigure(model, row.seed);
+      const figure =
+        model === 'fused-mass'
+          ? figureFor(generateValid(template, row.seed, { maxAttempts: 1 }), template, row.scale)
+          : templateFigure(model, row.seed);
       // As written to JSON, which spells a turned -0 as 0.
-      const written = (value) => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
-      assert.deepEqual(body.boxes, written(figure.boxes && Object.fromEntries(Object.entries(figure.boxes).map(([region, boxes]) => [region, boxes.map((box) => ({ ...box, center: turnPoint(box.center) }))]))));
+      const written = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
+      assert.deepEqual(
+        body.boxes,
+        written(
+          figure.boxes &&
+            Object.fromEntries(
+              Object.entries(figure.boxes).map(([region, boxes]) => [
+                region,
+                boxes.map((box) => ({ ...box, center: turnPoint(box.center) })),
+              ]),
+            ),
+        ),
+      );
       assert.deepEqual(body.severableParts, figure.severableParts);
       for (const bone of body.bones) {
         assert.deepEqual(bone.voxels, written(figure.voxelCentersByBone.get(bone.id)?.map(turnPoint)));
-        if (bone.voxels) assert(bone.hull.length > 0 && bone.hull.every((p) => bone.voxels.some((v) => v.every((x, a) => x === p[a]))));
+        if (bone.voxels)
+          assert(
+            bone.hull.length > 0 && bone.hull.every((p) => bone.voxels.some((v) => v.every((x, a) => x === p[a]))),
+          );
       }
-      const meshes = model === 'fused-mass' ? meshBones(figure.realized.voxels, body.bones.length, { perCell: true }) : figure.realized.meshes;
+      const meshes =
+        model === 'fused-mass'
+          ? meshBones(figure.realized.voxels, body.bones.length, { perCell: true })
+          : figure.realized.meshes;
       let vertex = 0;
-      for (const [owner, mesh] of meshes) for (let v = 0; v < mesh.colors.length; v++, vertex++) {
-        assert.equal(bone.getX(vertex), owner);
-        assert.equal(bone.getY(vertex), mesh.neighbourBone[v]);
-        assert(owner >= 0 && owner < body.bones.length);
-        for (let a = 0; a < 3; a++) {
-          assert.equal(pos.array[vertex * 3 + a], mesh.positions[v * 3 + a] * TO_MODEL_FRAME[a]);
-          assert.equal(nor.array[vertex * 3 + a], mesh.normals[v * 3 + a] * TO_MODEL_FRAME[a]);
+      for (const [owner, mesh] of meshes)
+        for (let v = 0; v < mesh.colors.length; v++, vertex++) {
+          assert.equal(bone.getX(vertex), owner);
+          assert.equal(bone.getY(vertex), mesh.neighbourBone[v]);
+          assert(owner >= 0 && owner < body.bones.length);
+          for (let a = 0; a < 3; a++) {
+            assert.equal(pos.array[vertex * 3 + a], mesh.positions[v * 3 + a] * TO_MODEL_FRAME[a]);
+            assert.equal(nor.array[vertex * 3 + a], mesh.normals[v * 3 + a] * TO_MODEL_FRAME[a]);
+          }
+          const expectedEmission = crowdEmission(
+            figure.realized.body.materials[materialOf(figure.realized.voxels, mesh.colors[v])],
+          );
+          expectedEmission.forEach((x, a) => assert.equal(emission.array[vertex * 2 + a], Math.fround(x)));
+          sawCharged ||= emission.getY(vertex) > 0;
+          sawEmission ||= emission.getX(vertex) > 0;
         }
-        const expectedEmission = crowdEmission(figure.realized.body.materials[materialOf(figure.realized.voxels, mesh.colors[v])]);
-        expectedEmission.forEach((x, a) => assert.equal(emission.array[vertex * 2 + a], Math.fround(x)));
-        sawCharged ||= emission.getY(vertex) > 0;
-        sawEmission ||= emission.getX(vertex) > 0;
-      }
       assert.equal(vertex, pos.count);
       const heights = Array.from({ length: pos.count }, (_, i) => pos.getY(i));
       assert(Math.abs(body.height - (Math.max(...heights) - Math.min(...heights))) <= body.voxelSize);
-      const idle = clips.standing?.idle.slack?.base ?? clips.standing?.idle.frames?.[0] ?? clips.crawling.idle.frames[0];
+      const idle =
+        clips.standing?.idle.slack?.base ?? clips.standing?.idle.frames?.[0] ?? clips.crawling.idle.frames[0];
       const base = decodeFrame(idle);
       // A non-axis-aligned pose catches missing projected half-voxel extents and reversed bone transforms.
-      for (const pose of [base, { root: [0.2, -0.1, 0.3], rotations: { [body.bones[0].id]: rotZ(27), [body.bones[1].id]: rotX(-19) } }]) {
+      for (const pose of [
+        base,
+        { root: [0.2, -0.1, 0.3], rotations: { [body.bones[0].id]: rotZ(27), [body.bones[1].id]: rotX(-19) } },
+      ]) {
         const transforms = boneTransforms(body.bones, pose);
         let lowest = Infinity;
         for (let v = 0; v < pos.count; v++) {
           const point = [pos.getX(v), pos.getY(v), pos.getZ(v)];
           lowest = Math.min(lowest, applyPoint(transforms.get(body.bones[bone.getX(v)].id), point)[1]);
         }
-        assert(Math.abs(lowest - groundFit(body, pose, body.bones.map((b) => b.id)).lowest) <= 1e-6);
+        assert(
+          Math.abs(
+            lowest -
+              groundFit(
+                body,
+                pose,
+                body.bones.map((b) => b.id),
+              ).lowest,
+          ) <= 1e-6,
+        );
         if (pose === base) assert(Math.abs(lowest) <= body.voxelSize);
       }
       if (template.bodyPlan === 'humanoid') {
@@ -780,45 +1106,112 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
   const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
   const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
   const { figureFor } = await import('../actorFigure.mjs');
-  const { dogIdlePose, dogAttackPose, quadrupedGaitPose, quadrupedStrideLength, DOG_POUNCE } = await import('../packages/mobgen/src/mob/quadruped.ts');
-  const { insectIdlePose, insectAttackPose, insectGaitPose, insectStrideLength, INSECT_LUNGE } = await import('../packages/mobgen/src/mob/insect.ts');
-  const { floaterIdlePose, floaterCastPose, floaterDriftPose, FLOATER_CAST } = await import('../packages/mobgen/src/mob/floater.ts');
-  const { dragonIdlePose, dragonAttackPose, dragonStompPose, DRAGON_LUNGE } = await import('../packages/mobgen/src/mob/dragon.ts');
+  const { dogIdlePose, dogAttackPose, quadrupedGaitPose, quadrupedStrideLength, DOG_POUNCE } = await import(
+    '../packages/mobgen/src/mob/quadruped.ts'
+  );
+  const { insectIdlePose, insectAttackPose, insectGaitPose, insectStrideLength, INSECT_LUNGE } = await import(
+    '../packages/mobgen/src/mob/insect.ts'
+  );
+  const { floaterIdlePose, floaterCastPose, floaterDriftPose, FLOATER_CAST } = await import(
+    '../packages/mobgen/src/mob/floater.ts'
+  );
+  const { dragonIdlePose, dragonAttackPose, dragonStompPose, DRAGON_LUNGE } = await import(
+    '../packages/mobgen/src/mob/dragon.ts'
+  );
   const critter = await import('../packages/mobgen/src/mob/critter.ts');
-  await Promise.all(['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts', 'critterTemplate.ts'].map((file) => import(`../packages/mobgen/src/mob/${file}`)));
+  await Promise.all(
+    ['quadrupedTemplate.ts', 'insectTemplate.ts', 'floaterTemplate.ts', 'dragonTemplate.ts', 'critterTemplate.ts'].map(
+      (file) => import(`../packages/mobgen/src/mob/${file}`),
+    ),
+  );
   const close = (actual, expected) => {
     actual.root.forEach((value, axis) => assert(Math.abs(value - expected.root[axis]) < 1e-12));
-    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)])) (actual.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]).forEach((value, axis) => assert(Math.abs(value - (expected.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1])[axis]) < 1e-12));
+    for (const id of new Set([...Object.keys(actual.rotations), ...Object.keys(expected.rotations)]))
+      (actual.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]).forEach((value, axis) =>
+        assert(Math.abs(value - (expected.rotations[id] ?? [1, 0, 0, 0, 1, 0, 0, 0, 1])[axis]) < 1e-12),
+      );
   };
   const plans = {
-    dog: (figure, row) => { const s = { limp: figure.genome.params.limp, headTilt: figure.genome.params.headTilt, jawOpen: figure.genome.params.jawOpen }; const stride = quadrupedStrideLength(figure.realized, s); return { idle: () => dogIdlePose(figure.realized, s), walk: (u) => quadrupedGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => dogAttackPose(figure.realized, dogIdlePose(figure.realized, s), t), duration: DOG_POUNCE.duration }; },
-    insect: (figure, row) => { const s = { mandibleOpen: figure.genome.params.mandibleOpen }; const stride = insectStrideLength(figure.realized); return { idle: () => insectIdlePose(figure.realized, 0.9), walk: (u) => insectGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => insectAttackPose(figure.realized, insectIdlePose(figure.realized, 0), t), duration: INSECT_LUNGE.duration }; },
-    floater: (figure) => ({ idle: () => floaterIdlePose(figure.realized, figure.genome.params), walk: (u) => floaterDriftPose(figure.realized, figure.genome.params, u), attack: (t) => floaterCastPose(figure.realized, figure.genome.params, t), duration: FLOATER_CAST.duration }),
-    dragon: (figure) => ({ idle: () => dragonIdlePose(figure.realized, figure.genome.params), walk: (u) => dragonStompPose(figure.realized, figure.genome.params, u), attack: (t) => dragonAttackPose(figure.realized, figure.genome.params, t), duration: DRAGON_LUNGE.duration }),
-    critter: (figure, row) => {
-      const s = critter.critterStance(figure.genome.params), rest = critter.critterIdlePose(figure.realized, s), stride = critter.critterStrideLength(figure.realized, s);
-      const fall = (side) => [(t) => critter.critterDeathPose(figure.realized, rest, t, side), critter.CRITTER_DEATH_SECONDS];
+    dog: (figure, row) => {
+      const s = {
+        limp: figure.genome.params.limp,
+        headTilt: figure.genome.params.headTilt,
+        jawOpen: figure.genome.params.jawOpen,
+      };
+      const stride = quadrupedStrideLength(figure.realized, s);
       return {
-        idle: () => rest, walk: (u) => critter.critterGaitPose(figure.realized, u * stride, row.walk_speed, s), attack: (t) => critter.critterAttackPose(figure.realized, rest, t), duration: critter.CRITTER_POUNCE.duration,
-        reactions: { flinch: [(t) => critter.critterHitPose(figure.realized, rest, t), critter.CRITTER_FLINCH.duration], 'death.left': fall('L'), 'death.right': fall('R') },
+        idle: () => dogIdlePose(figure.realized, s),
+        walk: (u) => quadrupedGaitPose(figure.realized, u * stride, row.walk_speed, s),
+        attack: (t) => dogAttackPose(figure.realized, dogIdlePose(figure.realized, s), t),
+        duration: DOG_POUNCE.duration,
+      };
+    },
+    insect: (figure, row) => {
+      const s = { mandibleOpen: figure.genome.params.mandibleOpen };
+      const stride = insectStrideLength(figure.realized);
+      return {
+        idle: () => insectIdlePose(figure.realized, 0.9),
+        walk: (u) => insectGaitPose(figure.realized, u * stride, row.walk_speed, s),
+        attack: (t) => insectAttackPose(figure.realized, insectIdlePose(figure.realized, 0), t),
+        duration: INSECT_LUNGE.duration,
+      };
+    },
+    floater: (figure) => ({
+      idle: () => floaterIdlePose(figure.realized, figure.genome.params),
+      walk: (u) => floaterDriftPose(figure.realized, figure.genome.params, u),
+      attack: (t) => floaterCastPose(figure.realized, figure.genome.params, t),
+      duration: FLOATER_CAST.duration,
+    }),
+    dragon: (figure) => ({
+      idle: () => dragonIdlePose(figure.realized, figure.genome.params),
+      walk: (u) => dragonStompPose(figure.realized, figure.genome.params, u),
+      attack: (t) => dragonAttackPose(figure.realized, figure.genome.params, t),
+      duration: DRAGON_LUNGE.duration,
+    }),
+    critter: (figure, row) => {
+      const s = critter.critterStance(figure.genome.params),
+        rest = critter.critterIdlePose(figure.realized, s),
+        stride = critter.critterStrideLength(figure.realized, s);
+      const fall = (side) => [
+        (t) => critter.critterDeathPose(figure.realized, rest, t, side),
+        critter.CRITTER_DEATH_SECONDS,
+      ];
+      return {
+        idle: () => rest,
+        walk: (u) => critter.critterGaitPose(figure.realized, u * stride, row.walk_speed, s),
+        attack: (t) => critter.critterAttackPose(figure.realized, rest, t),
+        duration: critter.CRITTER_POUNCE.duration,
+        reactions: {
+          flinch: [(t) => critter.critterHitPose(figure.realized, rest, t), critter.CRITTER_FLINCH.duration],
+          'death.left': fall('L'),
+          'death.right': fall('R'),
+        },
       };
     },
   };
   for (const model of Object.keys(plans)) {
     const row = { walk_speed: 0.8, walk_frames: 8, attack_frames: 9 };
-    const template = consumableTemplate(model), generated = generateValid(template, 1, { maxAttempts: 1 });
-    const figure = figureFor(generated, template, 1), live = plans[model](figure, row), { body, clips } = await bakeFixture(model, row);
+    const template = consumableTemplate(model),
+      generated = generateValid(template, 1, { maxAttempts: 1 });
+    const figure = figureFor(generated, template, 1),
+      live = plans[model](figure, row),
+      { body, clips } = await bakeFixture(model, row);
     assert(!('regions' in body) && !('boxes' in body) && !('severableParts' in body));
     if (model !== 'dog') assert(!('lookAt' in body));
     const standing = clips.standing;
-    for (const [name, at] of Object.entries({ idle: live.idle, walk: live.walk, attack: live.attack })) for (const [i, frame] of standing[name].frames.entries()) {
-      const cursor = name === 'attack' ? live.duration * i / (standing[name].frames.length - 1) : i / standing[name].frames.length;
-      close(decodeFrame(frame), swapFrame(at(cursor)));
-    }
+    for (const [name, at] of Object.entries({ idle: live.idle, walk: live.walk, attack: live.attack }))
+      for (const [i, frame] of standing[name].frames.entries()) {
+        const cursor =
+          name === 'attack'
+            ? (live.duration * i) / (standing[name].frames.length - 1)
+            : i / standing[name].frames.length;
+        close(decodeFrame(frame), swapFrame(at(cursor)));
+      }
     // Reactions are finite clips sampled endpoint to endpoint over their own span.
     for (const [path, [at, duration]] of Object.entries(live.reactions ?? {})) {
       const clip = path.split('.').reduce((set, key) => set[key], standing);
-      for (const [i, frame] of clip.frames.entries()) close(decodeFrame(frame), swapFrame(at(duration * i / (clip.frames.length - 1))));
+      for (const [i, frame] of clip.frames.entries())
+        close(decodeFrame(frame), swapFrame(at((duration * i) / (clip.frames.length - 1))));
     }
     if (model === 'critter') assert.deepEqual(Object.keys(standing.death).sort(), ['left', 'right']);
   }
@@ -828,13 +1221,19 @@ test('creature pose clips reproduce their live posers at every stored cursor', a
 // travel. Each case is [baked clip, name for messages, live frame at a cursor].
 async function assertTrackClipsMatchLive(cases) {
   const { decodeFrame } = await import('../actorCompose.mjs');
-  for (const [clip, name, frameOf] of cases) for (const [i, frame] of clip.frames.entries()) {
-    const live = frameOf(clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1));
-    const decoded = decodeFrame(frame);
-    const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
-    decoded.root.forEach((value, axis) => assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`));
-    for (const [id, rotation] of Object.entries(pose.rotations)) rotation.forEach((value, k) => assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`));
-  }
+  for (const [clip, name, frameOf] of cases)
+    for (const [i, frame] of clip.frames.entries()) {
+      const live = frameOf(clip.loop ? i / clip.frames.length : i / (clip.frames.length - 1));
+      const decoded = decodeFrame(frame);
+      const pose = swapFrame(clip.loop ? { ...live.pose, root: [live.pose.root[0], live.pose.root[1], 0] } : live.pose);
+      decoded.root.forEach((value, axis) =>
+        assert(Math.abs(value - pose.root[axis]) < 1e-12, `${name} root at frame ${i}`),
+      );
+      for (const [id, rotation] of Object.entries(pose.rotations))
+        rotation.forEach((value, k) =>
+          assert(Math.abs(decoded.rotations[id][k] - value) < 1e-12, `${name} ${id} at frame ${i}`),
+        );
+    }
 }
 
 test('leaper pose clips reproduce its live frames at every stored cursor, whole and maimed', async () => {
@@ -847,12 +1246,19 @@ test('leaper pose clips reproduce its live frames at every stored cursor, whole 
   const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
   const { clips } = await bakeFixture('leaper', row);
   const cases = [
-    [clips.standing.walk, 'stalk', {}], [clips.standing.attack, 'rake', {}], [clips.standing.pounce, 'pounce', {}],
-    [clips.limping.walk.right, 'limp', { cuts: ['thigh.R'], mirrored: true }], [clips.dragging.walk, 'drag', { cuts: ['thigh.L', 'thigh.R'] }],
+    [clips.standing.walk, 'stalk', {}],
+    [clips.standing.attack, 'rake', {}],
+    [clips.standing.pounce, 'pounce', {}],
+    [clips.limping.walk.right, 'limp', { cuts: ['thigh.R'], mirrored: true }],
+    [clips.dragging.walk, 'drag', { cuts: ['thigh.L', 'thigh.R'] }],
   ];
-  await assertTrackClipsMatchLive(cases.map(([clip, name, cut]) => [clip, name, (u) => leaperFrame(realized, name, u, cut)]));
+  await assertTrackClipsMatchLive(
+    cases.map(([clip, name, cut]) => [clip, name, (u) => leaperFrame(realized, name, u, cut)]),
+  );
   const pounce = clips.standing.pounce;
-  pounce.frames.forEach((frame, i) => assert.equal(frame.charge, leaperFrame(realized, 'pounce', i / (pounce.frames.length - 1)).charge));
+  pounce.frames.forEach((frame, i) =>
+    assert.equal(frame.charge, leaperFrame(realized, 'pounce', i / (pounce.frames.length - 1)).charge),
+  );
   assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);
 });
 
@@ -864,10 +1270,17 @@ test('walker pose clips reproduce its live frames and state the stride and hit i
   const template = consumableTemplate('security-walker');
   const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
   const { clips } = await bakeFixture('security-walker');
-  await assertTrackClipsMatchLive([[clips.standing.idle, 'idle'], [clips.standing.walk, 'stomp'], [clips.standing.attack, 'fire']]
-    .map(([clip, name]) => [clip, name, (u) => walkerFrame(realized, name, u)]));
+  await assertTrackClipsMatchLive(
+    [
+      [clips.standing.idle, 'idle'],
+      [clips.standing.walk, 'stomp'],
+      [clips.standing.attack, 'fire'],
+    ].map(([clip, name]) => [clip, name, (u) => walkerFrame(realized, name, u)]),
+  );
   const fire = clips.standing.attack;
-  fire.frames.forEach((frame, i) => assert.equal(frame.charge, walkerFrame(realized, 'fire', i / (fire.frames.length - 1)).charge));
+  fire.frames.forEach((frame, i) =>
+    assert.equal(frame.charge, walkerFrame(realized, 'fire', i / (fire.frames.length - 1)).charge),
+  );
   assert.equal(clips.standing.walk.strideMetres, walkerClip('stomp').travel.at(-1)[1]);
   assert.equal(clips.standing.attack.hitAtSimSeconds, walkerClip('fire').hit * walkerClip('fire').seconds);
 });
@@ -877,7 +1290,10 @@ test('a keyed-rig mob row paces its walk at the speed its walk clip travels', as
   const { leaperClip } = await import('../packages/mobgen/src/mob/leaper/motion.ts');
   const { walkerClip } = await import('../packages/mobgen/src/mob/walker/motion.ts');
   const root = new URL('../..', import.meta.url).pathname;
-  for (const [id, clip] of [['leaper', leaperClip('stalk')], ['mech_walker_mob_1', walkerClip('stomp')]]) {
+  for (const [id, clip] of [
+    ['leaper', leaperClip('stalk')],
+    ['mech_walker_mob_1', walkerClip('stomp')],
+  ]) {
     const row = readMobRows(root).find((candidate) => candidate.id === id);
     assert(Math.abs(row.walk_speed - clip.travel.at(-1)[1] / clip.seconds) < 0.01, `${id} walk_speed matches its clip`);
   }
@@ -895,7 +1311,10 @@ test('finite pose sampling stores both endpoints and holds the last frame', asyn
   const clip = poseClip(motionFixture, { loop: false, durationSimSeconds: 2, frames: 3 });
   assert.equal(clip.kind, 'pose');
   assert.equal(clip.loop, false);
-  assert.deepEqual(clip.frames.map((f) => f.root), [0, 1, 2].map((t) => motionFixture(t).root));
+  assert.deepEqual(
+    clip.frames.map((f) => f.root),
+    [0, 1, 2].map((t) => motionFixture(t).root),
+  );
   assert.strictEqual(sampleClip(clip, 2), clip.frames.at(-1));
   assert.strictEqual(sampleClip(clip, 4), clip.frames.at(-1));
   assert.strictEqual(sampleClip(clip, -1), clip.frames[0]);
@@ -906,8 +1325,14 @@ test('finite pose sampling stores both endpoints and holds the last frame', asyn
 test('a finite clip without exactly one span key is rejected, not sampled as NaN', async () => {
   const { sampleClip } = await import('../actorCompose.mjs');
   const { poseClip } = await import('../actorClips.mjs');
-  const frames = [{ root: [0, 0, 0], rotations: {} }, { root: [1, 0, 0], rotations: {} }];
-  for (const clip of [{ kind: 'pose', loop: false, frames }, { kind: 'pose', loop: false, durationSimSeconds: 1, durationRealSeconds: 1, frames }]) {
+  const frames = [
+    { root: [0, 0, 0], rotations: {} },
+    { root: [1, 0, 0], rotations: {} },
+  ];
+  for (const clip of [
+    { kind: 'pose', loop: false, frames },
+    { kind: 'pose', loop: false, durationSimSeconds: 1, durationRealSeconds: 1, frames },
+  ]) {
     assert.throws(() => sampleClip(clip, 0.5), RangeError);
   }
   // The writer leaves no way to bake such a clip by accident: a finite span must name its clock.
@@ -918,7 +1343,10 @@ test('loop sampling returns stored frames and interpolates the last interval tow
   const { poseClip } = await import('../actorClips.mjs');
   const { sampleClip } = await import('../actorCompose.mjs');
   const clip = poseClip(motionFixture, { loop: true, periodSimSeconds: 2, frames: 4 });
-  assert.deepEqual(clip.frames.map((f) => f.root), [0, 0.5, 1, 1.5].map((t) => motionFixture(t).root));
+  assert.deepEqual(
+    clip.frames.map((f) => f.root),
+    [0, 0.5, 1, 1.5].map((t) => motionFixture(t).root),
+  );
   assert.strictEqual(sampleClip(clip, 1), clip.frames[0]);
   assert.strictEqual(sampleClip(clip, -0.25), clip.frames[3]);
   assert.strictEqual(sampleClip(clip, 0.5), clip.frames[2]);
@@ -932,16 +1360,23 @@ test('pose interpolation uses shortest-arc spherical quaternion interpolation an
   const { slerpQuat, quatToMat3 } = await import('../packages/mobgen/src/core/math.ts');
   const a = [0, 0, 0, 1];
   const b = [0, 0, -Math.sin(1.2), -Math.cos(1.2)];
-  const clip = { kind: 'pose', loop: false, durationSimSeconds: 1, frames: [
-    { root: [0, 0, 0], rotations: { chest: a } },
-    { root: [2, 4, -2], rotations: { chest: b } },
-  ] };
+  const clip = {
+    kind: 'pose',
+    loop: false,
+    durationSimSeconds: 1,
+    frames: [
+      { root: [0, 0, 0], rotations: { chest: a } },
+      { root: [2, 4, -2], rotations: { chest: b } },
+    ],
+  };
   const sample = sampleClip(clip, 0.3);
   assert.deepEqual(sample.rotations.chest, slerpQuat(a, b, 0.3));
   const decoded = decodeFrame(sample);
   assert.deepEqual(decoded.root, sample.root);
   // The shared decode divides by the quaternion's squared length, so it agrees with mobgen's to rounding, not bit for bit.
-  quatToMat3(sample.rotations.chest).forEach((v, i) => assert.ok(Math.abs(decoded.rotations.chest[i] - v) < 1e-12, `entry ${i}`));
+  quatToMat3(sample.rotations.chest).forEach((v, i) =>
+    assert.ok(Math.abs(decoded.rotations.chest[i] - v) < 1e-12, `entry ${i}`),
+  );
   const { boneTransforms } = await import('../packages/mobgen/src/core/pose.ts');
   const bones = [{ id: 'chest', parent: null, head: [0, 0, 0], tail: [0, 1, 0] }];
   const posed = boneTransforms(bones, decodeFrame(sample)).get('chest');

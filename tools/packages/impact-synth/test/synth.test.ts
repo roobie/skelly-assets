@@ -33,9 +33,12 @@ describe('renderImpact', () => {
   });
 });
 
+// biome-ignore lint/suspicious/noExplicitAny: drafts break the schema on purpose, so they are untyped.
+type Draft = Record<string, any>;
+
 describe('impact row validation', () => {
-  const base = (): Record<string, any> => structuredClone(row(rowIds[0] ?? ''));
-  const mutations: [string, (draft: Record<string, any>) => void][] = [
+  const base = (): Draft => structuredClone(row(rowIds[0] ?? ''));
+  const mutations: [string, (draft: Draft) => void][] = [
     ['a mode with no decay time', (d) => (d.object.modes[0].ms = 0)],
     ['no modes', (d) => (d.object.modes = [])],
     ['a negative mode level', (d) => (d.object.modes[0].gain = -1)],

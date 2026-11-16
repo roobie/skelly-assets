@@ -31,7 +31,13 @@ function garmentTask(garment, { models, dressing, rig, doll }, files) {
   const tags = new Map(models.map(({ id, tags: own }) => [id, own]));
   const pieces = wornPieces(garment, models, dressing).map(({ model: id }) => {
     const { glb, entry } = files.get(id);
-    return { id, tags: tags.get(id), glb, ...(entry.covers ? { covers: entry.covers } : {}), ...(entry.soleLift === undefined ? {} : { soleLift: entry.soleLift }) };
+    return {
+      id,
+      tags: tags.get(id),
+      glb,
+      ...(entry.covers ? { covers: entry.covers } : {}),
+      ...(entry.soleLift === undefined ? {} : { soleLift: entry.soleLift }),
+    };
   });
   return { garment, dressing, rig, doll, pieces };
 }
@@ -40,9 +46,18 @@ function garmentTask(garment, { models, dressing, rig, doll }, files) {
 // worker runs.
 export function probeGarment({ garment, dressing, rig: content, doll: figure, pieces }) {
   // A Buffer crosses to a worker thread as a plain Uint8Array, and the GLB readers take a Buffer.
-  const glbs = new Map([...Object.entries(figure), ...pieces.map((piece) => [piece.id, piece])]
-    .map(([id, { glb }]) => [id, Buffer.from(glb.buffer, glb.byteOffset, glb.byteLength)]));
-  const doll = dollOf(dressing, Object.fromEntries(Object.entries(figure).map(([id, { anchors }]) => [id, { parts: modelParts(glbs.get(id)), anchors }])));
+  const glbs = new Map(
+    [...Object.entries(figure), ...pieces.map((piece) => [piece.id, piece])].map(([id, { glb }]) => [
+      id,
+      Buffer.from(glb.buffer, glb.byteOffset, glb.byteLength),
+    ]),
+  );
+  const doll = dollOf(
+    dressing,
+    Object.fromEntries(
+      Object.entries(figure).map(([id, { anchors }]) => [id, { parts: modelParts(glbs.get(id)), anchors }]),
+    ),
+  );
   const rig = dollRig(content, doll, dressing);
   const meshes = new Map();
   const meshesOf = (id) => {
@@ -50,7 +65,9 @@ export function probeGarment({ garment, dressing, rig: content, doll: figure, pi
     return meshes.get(id);
   };
   // A garment with pieces is placed by them alone, so it has no loose box or anchors to read.
-  const loose = (id) => { throw new Error(`${garment}: ${id} is placed loose, not by its worn pieces`); };
+  const loose = (id) => {
+    throw new Error(`${garment}: ${id} is placed loose, not by its worn pieces`);
+  };
   const sites = wornSites({ id: garment }, { dressing, doll, models: pieces, boxOf: loose, anchorsOf: loose });
   const deepest = new Map();
   for (const { bone, piece, depth } of restClearance(rig, restMeshes(rig, sites, meshesOf)).pokes) {
@@ -62,22 +79,40 @@ export function probeGarment({ garment, dressing, rig: content, doll: figure, pi
 
 const HERE = import.meta.dirname;
 // The code a probe runs. A cached probe is only as good as the code and the runtime that made it.
-const CHECKER_CODE = ['restPoke.mjs', 'dress.mjs', 'dollRig.mjs', 'glb.mjs', '../site/clearance.mjs', '../site/hiding.mjs', '../site/kinematics.mjs'];
+const CHECKER_CODE = [
+  'restPoke.mjs',
+  'dress.mjs',
+  'dollRig.mjs',
+  'glb.mjs',
+  '../site/clearance.mjs',
+  '../site/hiding.mjs',
+  '../site/kinematics.mjs',
+];
 const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
 const CACHE_FOLDER = 'rest-poke';
 
 // A GLB stands in the key by its digest: the key is what made the result, and the bytes are only how it was carried.
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
-const taskHash = (task, checker) => createHash('sha256').update(checker)
-  .update(JSON.stringify(task, function bytesByDigest(name, value) { return this[name] instanceof Uint8Array ? digest(this[name]) : value; }))
-  .digest('hex').slice(0, 32);
+const taskHash = (task, checker) =>
+  createHash('sha256')
+    .update(checker)
+    .update(
+      JSON.stringify(task, function bytesByDigest(name, value) {
+        return this[name] instanceof Uint8Array ? digest(this[name]) : value;
+      }),
+    )
+    .digest('hex')
+    .slice(0, 32);
 
 // The pokes of every fitted garment among `models` ({ id, tags }), by garment: from the cache folder when a garment's
 // inputs and the checker are as they were, else probed on worker threads, one garment each, and kept. `modelOf(id)`
 // gives a model's { glb, entry }, its GLB and model entry, from a built tree or as generated. With `shard`, only that
 // shard of the garments is probed, so CI can spread a clean build's probes over runners like its models (tools/build.mjs,
 // fillCacheShard). With `prune`, entries no garment uses any more go, as a full build is the only run that knows them all.
-export async function restPokeResults({ models, modelOf }, { root = repo, cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {}) {
+export async function restPokeResults(
+  { models, modelOf },
+  { root = repo, cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
+) {
   const garments = fittedGarments(models).sort();
   const mine = shard === undefined ? garments : shardUnits(garments, shard);
   const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
@@ -86,7 +121,9 @@ export async function restPokeResults({ models, modelOf }, { root = repo, cache,
   const dollIds = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
   const pieceIds = mine.flatMap((garment) => wornPieces(garment, models, dressing).map(({ model }) => model));
   const files = new Map(await Promise.all([...dollIds, ...pieceIds].map(async (id) => [id, await modelOf(id)])));
-  const doll = Object.fromEntries(dollIds.map((id) => [id, { glb: files.get(id).glb, anchors: files.get(id).entry.anchors }]));
+  const doll = Object.fromEntries(
+    dollIds.map((id) => [id, { glb: files.get(id).glb, anchors: files.get(id).entry.anchors }]),
+  );
   const shared = { models, dressing, rig: readRigContent(root), doll };
   const tasks = mine.map((garment) => {
     const task = garmentTask(garment, shared, files);
@@ -97,16 +134,19 @@ export async function restPokeResults({ models, modelOf }, { root = repo, cache,
   const results = {};
   const missing = [];
   for (const entry of tasks) {
-    if (folder && existsSync(fileOf(entry.hash))) results[entry.garment] = JSON.parse(readFileSync(fileOf(entry.hash), 'utf8'));
+    if (folder && existsSync(fileOf(entry.hash)))
+      results[entry.garment] = JSON.parse(readFileSync(fileOf(entry.hash), 'utf8'));
     else missing.push(entry);
   }
   if (missing.length > 0) {
     const pool = workerPool(import.meta.url, 'probeGarment', Math.min(workers, missing.length));
     try {
-      await Promise.all(missing.map(async ({ garment, task, hash }) => {
-        results[garment] = await pool.run(task);
-        if (folder) writeFileSync(fileOf(hash), JSON.stringify(results[garment]));
-      }));
+      await Promise.all(
+        missing.map(async ({ garment, task, hash }) => {
+          results[garment] = await pool.run(task);
+          if (folder) writeFileSync(fileOf(hash), JSON.stringify(results[garment]));
+        }),
+      );
     } finally {
       await pool.close();
     }
@@ -134,7 +174,9 @@ export function restPokeReport(results, { pokes: judged, unjudged }) {
       const cap = allowed.get(pairOf({ garment, ...poke }))?.depth ?? 0;
       if (poke.depth <= cap + EPSILON) continue;
       const limit = cap > 0 ? `, more than the ${millimetres(cap)} mm allowed` : '';
-      problems.push(`${garment}: the doll's ${poke.bone} pokes out of ${poke.piece} at rest by ${millimetres(poke.depth)} mm${limit}`);
+      problems.push(
+        `${garment}: the doll's ${poke.bone} pokes out of ${poke.piece} at rest by ${millimetres(poke.depth)} mm${limit}`,
+      );
     }
   }
   const seen = new Set();
@@ -144,9 +186,15 @@ export function restPokeReport(results, { pokes: judged, unjudged }) {
     const poke = found.get(pair);
     if (seen.has(pair)) problems.push(`${where} is listed twice`);
     else if (!poke) problems.push(`${where} is stale: nothing pokes there any more`);
-    else if (entry.depth - poke.depth > LOOSE + EPSILON) problems.push(`${where} is capped at ${millimetres(entry.depth)} mm, far above the ${millimetres(poke.depth)} mm it measures`);
+    else if (entry.depth - poke.depth > LOOSE + EPSILON)
+      problems.push(
+        `${where} is capped at ${millimetres(entry.depth)} mm, far above the ${millimetres(poke.depth)} mm it measures`,
+      );
     seen.add(pair);
-    if (poke && unjudged.includes(entry)) notes.push(`${entry.garment}: the doll's ${entry.bone} pokes out of ${entry.piece} at rest by ${millimetres(poke.depth)} mm and is not judged: ${entry.note}`);
+    if (poke && unjudged.includes(entry))
+      notes.push(
+        `${entry.garment}: the doll's ${entry.bone} pokes out of ${entry.piece} at rest by ${millimetres(poke.depth)} mm and is not judged: ${entry.note}`,
+      );
   }
   return { problems, notes };
 }
@@ -159,7 +207,10 @@ export const treeModels = (out, models) => {
     models: models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })),
     modelOf: async (id) => {
       const { pack, path } = byId.get(id);
-      return { glb: readFileSync(join(out, pack, path)), entry: JSON.parse(readFileSync(join(out, pack, 'things', `${id}.model.json`), 'utf8')) };
+      return {
+        glb: readFileSync(join(out, pack, path)),
+        entry: JSON.parse(readFileSync(join(out, pack, 'things', `${id}.model.json`), 'utf8')),
+      };
     },
   };
 };

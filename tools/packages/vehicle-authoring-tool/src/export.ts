@@ -34,7 +34,9 @@ export interface VehicleBlueprintInput {
 
 /** Writes the Deadvox content shape; Deadvox remains the validator of parts and fitting relationships. */
 export const blueprintRow = ({ id, name, fittings }: VehicleBlueprintInput): VehicleBlueprintInput => ({
-  id, name, fittings,
+  id,
+  name,
+  fittings,
 });
 
 export const exportVehicleBlueprint = (blueprint: VehicleBlueprintInput): VehicleBlueprintExport => ({

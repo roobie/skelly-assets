@@ -448,7 +448,6 @@ const recordLongFrame = (timings: FrameTimings): void => {
   if (longFrames.length > LONG_FRAME_LOG_MAX) {
     longFrames.shift();
   }
-  // biome-ignore lint/suspicious/noConsole: a stall is exactly what a console watcher wants immediately.
   console.warn(formatLongFrame(longFrame));
 };
 
@@ -746,7 +745,6 @@ const runSweep = async (): Promise<void> => {
       for (const n of SWEEP_NS) {
         sweepStatus.textContent = `sweep: mode=${m} n=${n} — warming up`;
         setActorCount(n);
-        // biome-ignore lint/performance/noAwaitInLoops: a measurement protocol, not parallelizable work.
         await sleep(SWEEP_SKIP_MS);
         sweepStatus.textContent = `sweep: mode=${m} n=${n} — measuring`;
         const from = performance.now();
@@ -776,7 +774,6 @@ const runSweep = async (): Promise<void> => {
         : 'No long frames recorded during measurement.',
     ].join('\n');
     sweepOutput.textContent = table;
-    // biome-ignore lint/suspicious/noConsole: the sweep's whole point is a copy-pasteable result.
     console.log(table);
     sweepStatus.textContent = 'sweep complete';
   } finally {

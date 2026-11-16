@@ -12,8 +12,8 @@ import { modelCollision } from '@skelly/thing-export/physical.ts';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { MetallicCartridge } from '../ammo/cartridge.ts';
 import { gunDomain } from './domain.ts';
-import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { inFileFrame } from './exportFrame.ts';
+import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { magazineRoundColumn, magazineRoundPoses } from './magazineGeometry.ts';
 import { GUN_PALETTE } from './palette.ts';
@@ -60,12 +60,15 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
   if (def?.family !== 'magazine') {
     throw new Error(`family "${input.family}" does not build a magazine`);
   }
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, input.voxel);
   const output: GlbExportResult = exportGlb({
     resolved,
     palette: GUN_PALETTE,
     ...(input.appearance ? { appearance: input.appearance } : {}),
     asset: input.asset,
     ...input.voxel,
+    drawnVoxels: drawn.voxels,
   });
   if (!output.ok) {
     return output;
@@ -75,8 +78,6 @@ export const exportMagazineGlb = (input: MagazineExportInput): MagazineExportRes
     Object.entries(resolved.params.get('magazine') ?? {}).map(([key, param]) => [key, param.value]),
   );
   const { column } = magazineRoundColumn(def.displaySolids ?? def.solids, input.cartridge, params, def.solids);
-  const fileResolved = inFileFrame(resolved);
-  const drawn = drawnGeometry(fileResolved, input.voxel);
   return {
     ok: true,
     glb: output.glb,

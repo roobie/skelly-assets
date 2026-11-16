@@ -12,5 +12,7 @@ export function titleProblems({ pack, id, title }) {
 }
 
 // The title problems of every model, ordered by pack and id.
-export const titleReport = (models) => models.flatMap(titleProblems)
-  .sort((a, b) => (a.pack < b.pack ? -1 : a.pack > b.pack ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+export const titleReport = (models) =>
+  models
+    .flatMap(titleProblems)
+    .sort((a, b) => (a.pack < b.pack ? -1 : a.pack > b.pack ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

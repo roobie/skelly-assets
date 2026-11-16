@@ -25,7 +25,8 @@ const sheetDir = resolve(values.sheet);
 const out = resolve(values.out ?? join(sheetDir, 'gallery.html'));
 const manifest = JSON.parse(readFileSync(join(built, MANIFEST), 'utf8'));
 const sheetPath = join(sheetDir, 'sheet.json');
-if (!existsSync(sheetPath)) throw new Error(`${sheetPath}: no sheet; draw the vehicles with tools/model-sheet.mjs --vehicles`);
+if (!existsSync(sheetPath))
+  throw new Error(`${sheetPath}: no sheet; draw the vehicles with tools/model-sheet.mjs --vehicles`);
 const vehicleTags = new Map(manifest.vehicles.map(({ id, tags }) => [id, tags ?? {}]));
 const vehicleTitles = new Map(manifest.vehicles.map(({ id, title }) => [id, title]));
 const rows = JSON.parse(readFileSync(sheetPath, 'utf8')).filter(({ id }) => vehicleTags.has(id));
@@ -46,7 +47,13 @@ function readReview(id) {
 
 const vehicles = rows.map((row) => {
   try {
-    return { ...row, title: vehicleTitles.get(row.id), tags: vehicleTags.get(row.id), stale: stale.has(row.id), ...readReview(row.id) };
+    return {
+      ...row,
+      title: vehicleTitles.get(row.id),
+      tags: vehicleTags.get(row.id),
+      stale: stale.has(row.id),
+      ...readReview(row.id),
+    };
   } catch (error) {
     return { ...row, title: vehicleTitles.get(row.id), tags: vehicleTags.get(row.id), broken: String(error) };
   }
@@ -67,17 +74,23 @@ function verdict({ broken, review, reviewStale }) {
 
 function card(vehicle) {
   const faults = vehicle.review?.faults ?? [];
-  const tags = Object.entries(vehicle.tags).map(([facet, terms]) => `<div><dt>${escapeHtml(facet)}</dt><dd>${escapeHtml(terms.join(', '))}</dd></div>`);
+  const tags = Object.entries(vehicle.tags).map(
+    ([facet, terms]) => `<div><dt>${escapeHtml(facet)}</dt><dd>${escapeHtml(terms.join(', '))}</dd></div>`,
+  );
   return `<article class="card" id="${escapeHtml(vehicle.id)}">
   <header><h3>${escapeHtml(vehicle.title)}</h3>${vehicle.stale ? '<span class="pill fault">Render predates model</span>' : ''}${verdict(vehicle)}</header>
   ${vehicle.broken ? `<p class="note">${escapeHtml(vehicle.broken)}</p>` : ''}
-  ${vehicle.error ? `<p class="note">No render: ${escapeHtml(vehicle.error)}</p>` : `<dl>
+  ${
+    vehicle.error
+      ? `<p class="note">No render: ${escapeHtml(vehicle.error)}</p>`
+      : `<dl>
     <div><dt>L × W × H</dt><dd>${metres(vehicle.sizeM)}</dd></div>
     <div><dt>Parts</dt><dd>${vehicle.parts}</dd></div>
     <div><dt>Triangles</dt><dd>${vehicle.triangles.toLocaleString('en-GB')}</dd></div>
     ${tags.join('\n    ')}
   </dl>
-  <figure><img src="${escapeHtml(relative(resolve(out, '..'), tileOf(vehicle.id)))}" alt="${escapeHtml(vehicle.title)}: front and rear three-quarter, side and top views" loading="lazy"></figure>`}
+  <figure><img src="${escapeHtml(relative(resolve(out, '..'), tileOf(vehicle.id)))}" alt="${escapeHtml(vehicle.title)}: front and rear three-quarter, side and top views" loading="lazy"></figure>`
+  }
   ${faults.length > 0 ? `<ul class="faults${vehicle.reviewStale ? ' old' : ''}">${faults.map((fault) => `<li>${escapeHtml(fault)}</li>`).join('')}</ul>` : ''}
 </article>`;
 }
@@ -85,12 +98,17 @@ function card(vehicle) {
 const families = Map.groupBy(vehicles, (vehicle) => vehicle.review?.family ?? 'Awaiting review');
 const sections = [...families]
   .sort(([a], [b]) => compareCodeUnits(a, b))
-  .map(([family, members]) => `<section>
+  .map(
+    ([family, members]) => `<section>
   <h2>${escapeHtml(family)} <span>${members.length}</span></h2>
   <div class="grid">${members.map(card).join('\n')}</div>
-</section>`)
+</section>`,
+  )
   .join('\n');
-const faultCount = vehicles.reduce((sum, { review, reviewStale }) => sum + (reviewStale ? 0 : (review?.faults.length ?? 0)), 0);
+const faultCount = vehicles.reduce(
+  (sum, { review, reviewStale }) => sum + (reviewStale ? 0 : (review?.faults.length ?? 0)),
+  0,
+);
 const brokenCount = vehicles.filter(({ broken }) => broken).length;
 const tallyExtra = [
   [brokenCount, 'could not be read'],

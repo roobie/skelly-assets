@@ -10,8 +10,14 @@ const check = (parts) => {
   try {
     mkdirSync(join(out, 'fixture.a/things'), { recursive: true });
     writeFileSync(join(out, 'fixture.a/things/holder.model.json'), JSON.stringify({ id: 'holder', parts }));
-    return danglingPartItems({ files: ['fixture.a/things/holder.model.json', 'fixture.a/things/holder.glb'], out, models: [{ id: 'holder' }, { id: 'held' }] });
-  } finally { rmSync(out, { recursive: true, force: true }); }
+    return danglingPartItems({
+      files: ['fixture.a/things/holder.model.json', 'fixture.a/things/holder.glb'],
+      out,
+      models: [{ id: 'holder' }, { id: 'held' }],
+    });
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
 };
 
 test('a part that declares a model of the tree is an item and a part that declares none is not', () => {

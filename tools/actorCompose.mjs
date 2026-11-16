@@ -1,11 +1,20 @@
 // Assets-side twin of the generator-free actor clip reader.
 import { sampleClip as sampleFrames } from '../site/clipFrames.mjs';
-import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, slerpQuat } from './packages/mobgen/src/core/math.ts';
 import { clampJointAngles, jointAngles, jointRotation } from './packages/mobgen/src/core/joints.ts';
-import { clamp, transpose } from './packages/mobgen/src/core/math.ts';
+import {
+  applyPoint,
+  clamp,
+  IDENTITY_M,
+  mulMM,
+  rotX,
+  rotY,
+  rotZ,
+  slerpQuat,
+  transpose,
+} from './packages/mobgen/src/core/math.ts';
 import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
 import { blendArmBase, eulerToMat3 } from './packages/mobgen/src/mob/attack.ts';
-import { groundOffset, GROUND_SMOOTHING } from './packages/mobgen/src/mob/gait.ts';
+import { GROUND_SMOOTHING, groundOffset } from './packages/mobgen/src/mob/gait.ts';
 
 /** Simulation ground geometry comes only from the serialized body, never the GLB. */
 export function groundFit(body, pose, boneIds) {
@@ -35,10 +44,15 @@ export function sampleOverlay(clip, time) {
   const b = clip.frames[i + 1];
   const ids = new Set([...Object.keys(a.angles), ...Object.keys(b.angles)]);
   return {
-    angles: Object.fromEntries([...ids].map((id) => [id, [0, 1, 2].map((axis) => {
-      const x = a.angles[id]?.[axis] ?? 0;
-      return x + ((b.angles[id]?.[axis] ?? 0) - x) * w;
-    })])),
+    angles: Object.fromEntries(
+      [...ids].map((id) => [
+        id,
+        [0, 1, 2].map((axis) => {
+          const x = a.angles[id]?.[axis] ?? 0;
+          return x + ((b.angles[id]?.[axis] ?? 0) - x) * w;
+        }),
+      ]),
+    ),
     walkBlendWeight: a.walkBlendWeight + (b.walkBlendWeight - a.walkBlendWeight) * w,
     dropMetres: a.dropMetres + (b.dropMetres - a.dropMetres) * w,
   };
@@ -50,13 +64,16 @@ export function applyOverlay(body, base, clip, time, side, stance) {
   const blendBones = new Set(clip.walkBlendBones);
   for (const [id, [x, y, z]] of Object.entries(frame.angles)) {
     const baseR = base.rotations[id] ?? IDENTITY_M;
-    rotations[id] = mulMM(blendBones.has(id) ? blendArmBase(baseR, frame.walkBlendWeight) : baseR,
-      eulerToMat3([x, y, z * (clip.sideScalesZ ? side : 1)]));
+    rotations[id] = mulMM(
+      blendBones.has(id) ? blendArmBase(baseR, frame.walkBlendWeight) : baseR,
+      eulerToMat3([x, y, z * (clip.sideScalesZ ? side : 1)]),
+    );
   }
   const probe = { root: [base.root[0], 0, base.root[2]], rotations };
-  const offset = stance === 'crawling'
-    ? -groundFit(body, probe, body.groundContactBones).lowest
-    : groundOffset(body.bones, new Map(Object.entries(body.extents)), rotations, GROUND_SMOOTHING);
+  const offset =
+    stance === 'crawling'
+      ? -groundFit(body, probe, body.groundContactBones).lowest
+      : groundOffset(body.bones, new Map(Object.entries(body.extents)), rotations, GROUND_SMOOTHING);
   return { root: [base.root[0], offset - frame.dropMetres, base.root[2]], rotations };
 }
 
@@ -64,9 +81,10 @@ export function applyOverlay(body, base, clip, time, side, stance) {
 export function applyJointDelta(body, base, clip, cursor, { speed = 0, side = 0 } = {}) {
   if (clip.speedWeight && speed <= 0) return base;
   const count = clip.frames.length;
-  const u = clip.cursor === 'gaitPhase'
-    ? (((cursor / (2 * Math.PI) % 1) + 1) % 1) * count
-    : clamp(cursor / (clip.durationSimSeconds ?? 1), 0, 1) * (count - 1);
+  const u =
+    clip.cursor === 'gaitPhase'
+      ? ((((cursor / (2 * Math.PI)) % 1) + 1) % 1) * count
+      : clamp(cursor / (clip.durationSimSeconds ?? 1), 0, 1) * (count - 1);
   const i = Math.floor(u);
   const w = u - i;
   const a = clip.frames[i].angles;
@@ -94,7 +112,11 @@ export function applyJointDelta(body, base, clip, cursor, { speed = 0, side = 0 
     }
   }
   const pose = { root: [...base.root], rotations };
-  pose.root[1] -= groundFit(body, pose, body.bones.map((bone) => bone.id)).lowest;
+  pose.root[1] -= groundFit(
+    body,
+    pose,
+    body.bones.map((bone) => bone.id),
+  ).lowest;
   return pose;
 }
 
@@ -108,8 +130,11 @@ export function applyMotion(base, motion, time, seed) {
   const rotations = { ...base.rotations };
   const axes = { x: rotX, y: rotY, z: rotZ };
   for (const oscillator of motion) {
-    const angle = Math.sin(2 * Math.PI * time / oscillator.periodSimSeconds + phaseFor(seed, oscillator.salt)) * oscillator.amplitudeDeg;
-    for (const { bone, axis, scale } of oscillator.bones) rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, axes[axis](angle * scale));
+    const angle =
+      Math.sin((2 * Math.PI * time) / oscillator.periodSimSeconds + phaseFor(seed, oscillator.salt)) *
+      oscillator.amplitudeDeg;
+    for (const { bone, axis, scale } of oscillator.bones)
+      rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, axes[axis](angle * scale));
   }
   return { root: [...base.root], rotations };
 }

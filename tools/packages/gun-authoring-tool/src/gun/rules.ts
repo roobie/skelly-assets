@@ -18,6 +18,7 @@ import {
   boxFromMinMax,
   distanceWorld,
   localSolidBounds,
+  lowerBoundDistanceWorld,
   obbPolyhedron,
   penetrationWorld,
   worldSolid,
@@ -722,7 +723,11 @@ const opticSupportError = (
       return 'mount foot extends beyond the receiver body or is not on its top';
     }
     const point = worldSolid(IDENTITY, { id: 'contact-probe', kind: 'box', box: { center: local, half: [0, 0, 0] } });
-    if (!surfaces.some((surface) => distanceWorld(point, surface) <= 1e-6)) {
+    // The bounds' gap never exceeds the exact distance, so it skips the surfaces a foot is far from.
+    const supported = surfaces.some(
+      (surface) => lowerBoundDistanceWorld(point, surface) <= 1e-6 && distanceWorld(point, surface) <= 1e-6,
+    );
+    if (!supported) {
       return 'mount foot is not supported by a physical receiver top solid';
     }
   }

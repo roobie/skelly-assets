@@ -91,7 +91,6 @@ export interface SuggestionResult {
 export type EffectiveSuggestionLocks = DesignLocks;
 
 /** Signature only; the suggester is introduced in 3.3. */
-// biome-ignore lint/complexity/useMaxParams: the frozen 3.3 API plus effective prefab locks is explicit by contract.
 export type Suggest = (
   design: Design,
   template: Template,

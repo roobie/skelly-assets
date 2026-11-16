@@ -102,7 +102,12 @@ describe('the code fingerprint', () => {
     }
     return root;
   };
-  const base = { 'src/a.ts': 'code', 'src/a.json': 'data', 'src/a.test.ts': 'test', 'src/test/fixture.json': 'fixture' };
+  const base = {
+    'src/a.ts': 'code',
+    'src/a.json': 'data',
+    'src/a.test.ts': 'test',
+    'src/test/fixture.json': 'fixture',
+  };
   const fingerprints = (files: Record<string, string>) => {
     const root = tree(files);
     return { code: codeFingerprint(root, ['src']), data: codeFingerprint(root, ['src'], ['src']) };

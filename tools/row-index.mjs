@@ -17,15 +17,23 @@ export const INDEX = 'index.libsonnet';
 export const PLACEMENTS = 'placements.libsonnet';
 const PLACEMENTS_SUFFIX = '.placements.libsonnet';
 
-const sources = (dir) => readdirSync(dir).filter((file) => file.endsWith('.libsonnet') && file !== INDEX && file !== PLACEMENTS).sort();
+const sources = (dir) =>
+  readdirSync(dir)
+    .filter((file) => file.endsWith('.libsonnet') && file !== INDEX && file !== PLACEMENTS)
+    .sort();
 
 // Spec files are measures and placement files place rows, not rows; a kit is a function or an object of functions, so
 // only a row file is an array.
 function rowFiles(dir) {
-  const candidates = sources(dir).filter((file) => !file.endsWith('.spec.libsonnet') && !file.endsWith(PLACEMENTS_SUFFIX));
+  const candidates = sources(dir).filter(
+    (file) => !file.endsWith('.spec.libsonnet') && !file.endsWith(PLACEMENTS_SUFFIX),
+  );
   const scratch = mkdtempSync(join(tmpdir(), 'row-index-'));
   const source = join(scratch, 'rows.jsonnet');
-  writeFileSync(source, `[${candidates.map((file) => `std.isArray(import ${JSON.stringify(join(dir, file))})`).join(', ')}]\n`);
+  writeFileSync(
+    source,
+    `[${candidates.map((file) => `std.isArray(import ${JSON.stringify(join(dir, file))})`).join(', ')}]\n`,
+  );
   try {
     const isRows = JSON.parse(compileJsonnetFile(source));
     return candidates.filter((_, i) => isRows[i]);
@@ -43,13 +51,18 @@ const generated = (entries) => `${HEADER}{\n${entries.join('\n')}\n}\n`;
 // file must therefore be plain data: its fragment is its manifested JSON, so a hidden field, a function or a late-bound
 // `self` an importer extends would differ from the source. Anything that is not plain data belongs in a kit or library.
 export function rowIndex(dir) {
-  return generated(rowFiles(dir).map((file) => `  '${file.slice(0, -'.libsonnet'.length)}': import '${relative(repository, join(dir, file))}',`));
+  return generated(
+    rowFiles(dir).map(
+      (file) => `  '${file.slice(0, -'.libsonnet'.length)}': import '${relative(repository, join(dir, file))}',`,
+    ),
+  );
 }
 
 // The placements index text: each vehicle's placements under its name, with variants laid out from their parents'
 // sites (models/vehicles/site.libsonnet, `variants`), for tools/placements.mjs.
 export function placementsIndex(dir = VEHICLES_DIR) {
-  const entries = sources(dir).filter((file) => file.endsWith(PLACEMENTS_SUFFIX))
+  const entries = sources(dir)
+    .filter((file) => file.endsWith(PLACEMENTS_SUFFIX))
     .map((file) => `  '${file.slice(0, -PLACEMENTS_SUFFIX.length)}': import '${file}',`);
   return `${HEADER}(import 'site.libsonnet').variants({\n${entries.join('\n')}\n})\n`;
 }

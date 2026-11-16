@@ -16,18 +16,22 @@ export const SMOOTH_GRAIN = 0.002;
 
 // The finest voxel grain the model's primitives name, or SMOOTH_GRAIN when none is voxelized.
 export function modelGrain(gltf) {
-  const grains = gltf.meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.voxelGrain)).filter((g) => g > 0);
+  const grains = gltf.meshes
+    .flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.voxelGrain))
+    .filter((g) => g > 0);
   return grains.length > 0 ? Math.min(...grains) : SMOOTH_GRAIN;
 }
 
 // A box of lattice cells, each holding 0 for empty or one plus the index of the slot drawn there in `slots`. The box
 // has a ring of empty cells round what is drawn, so a step to any neighbour of a drawn cell stays inside it.
 export function cellGrid(drawn, slots) {
-  const low = [Infinity, Infinity, Infinity], high = [-Infinity, -Infinity, -Infinity];
-  for (const { cell } of drawn) for (let a = 0; a < 3; a++) {
-    low[a] = Math.min(low[a], cell[a] - 1);
-    high[a] = Math.max(high[a], cell[a] + 1);
-  }
+  const low = [Infinity, Infinity, Infinity],
+    high = [-Infinity, -Infinity, -Infinity];
+  for (const { cell } of drawn)
+    for (let a = 0; a < 3; a++) {
+      low[a] = Math.min(low[a], cell[a] - 1);
+      high[a] = Math.max(high[a], cell[a] + 1);
+    }
   const size = drawn.length > 0 ? high.map((h, a) => h - low[a] + 1) : [0, 0, 0];
   const grid = { low, size, slots, slot: new Uint8Array(size[0] * size[1] * size[2]) };
   for (const { cell, slot } of drawn) grid.slot[indexOf(grid, cell)] = slot + 1;
@@ -44,7 +48,11 @@ const cellAt = ({ low, size }, index) => [
   (Math.floor(index / size[2]) % size[1]) + low[1],
   (index % size[2]) + low[2],
 ];
-const drawnCells = (grid) => grid.slot.reduce((found, slot, index) => (slot > 0 ? (found.push(index), found) : found), []);
+const drawnCells = (grid) => {
+  const found = [];
+  for (const [index, slot] of grid.slot.entries()) if (slot > 0) found.push(index);
+  return found;
+};
 
 // The most cells a model is read across along its longest side. A model larger than this at its own grain is read
 // coarser, so a model's cost stays bounded at the price of missing one-cell defects on the largest models.
@@ -52,11 +60,13 @@ export const MOST_CELLS = 256;
 
 // The grain a model is read at: its own, or coarser when MOST_CELLS of it would not span the model's longest side.
 export function readGrain(meshes, grain) {
-  const low = [Infinity, Infinity, Infinity], high = [-Infinity, -Infinity, -Infinity];
-  for (const { positions } of meshes) for (let i = 0; i < positions.length; i++) {
-    low[i % 3] = Math.min(low[i % 3], positions[i]);
-    high[i % 3] = Math.max(high[i % 3], positions[i]);
-  }
+  const low = [Infinity, Infinity, Infinity],
+    high = [-Infinity, -Infinity, -Infinity];
+  for (const { positions } of meshes)
+    for (let i = 0; i < positions.length; i++) {
+      low[i % 3] = Math.min(low[i % 3], positions[i]);
+      high[i % 3] = Math.max(high[i % 3], positions[i]);
+    }
   return Math.max(grain, Math.max(...high.map((h, a) => h - low[a])) / MOST_CELLS);
 }
 
@@ -65,16 +75,19 @@ export function readGrain(meshes, grain) {
 // voxel face, which lies on a cell boundary, counts for the cell it closes.
 export function surfaceCells(buffer) {
   const gltf = glbJson(buffer);
-  const slots = [...new Set(gltf.meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.slot ?? '')))];
+  const slots = [
+    ...new Set(gltf.meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.slot ?? ''))),
+  ];
   const bySlot = slots.map((name) => modelMeshes(buffer, (_part, _piece, own) => (own ?? '') === name));
   const grain = readGrain(bySlot.flat(), modelGrain(gltf));
   // Samples run to millions on a large fine model, so each mesh's are binned and let go before the next is sampled.
   const drawn = new Map();
   bySlot.forEach((meshes, slot) => {
-    for (const mesh of meshes) for (const { point, normal } of sampledSurface(mesh, grain)) {
-      const cell = point.map((x, a) => Math.floor((x - (normal[a] * grain) / 4) / grain));
-      drawn.set(`${cell} ${slot}`, { cell, slot });
-    }
+    for (const mesh of meshes)
+      for (const { point, normal } of sampledSurface(mesh, grain)) {
+        const cell = point.map((x, a) => Math.floor((x - (normal[a] * grain) / 4) / grain));
+        drawn.set(`${cell} ${slot}`, { cell, slot });
+      }
   });
   return cellGrid([...drawn.values()], slots);
 }
@@ -91,13 +104,15 @@ export function pieces(grid, reach = 4) {
     owner[start] = groups.length;
     for (let n = 0; n < group.length; n++) {
       const [i, j, k] = cellAt(grid, group[n]);
-      for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) for (let dk = -1; dk <= 1; dk++) {
-        const next = indexOf(grid, [i + di, j + dj, k + dk]);
-        if (grid.slot[next] > 0 && owner[next] < 0) {
-          owner[next] = groups.length;
-          group.push(next);
-        }
-      }
+      for (let di = -1; di <= 1; di++)
+        for (let dj = -1; dj <= 1; dj++)
+          for (let dk = -1; dk <= 1; dk++) {
+            const next = indexOf(grid, [i + di, j + dj, k + dk]);
+            if (grid.slot[next] > 0 && owner[next] < 0) {
+              owner[next] = groups.length;
+              group.push(next);
+            }
+          }
     }
     groups.push(group);
   }
@@ -105,10 +120,13 @@ export function pieces(grid, reach = 4) {
     let best = Infinity;
     for (const cell of groups[own]) {
       const [i, j, k] = cellAt(grid, cell);
-      for (let di = -reach; di <= reach; di++) for (let dj = -reach; dj <= reach; dj++) for (let dk = -reach; dk <= reach; dk++) {
-        const other = owner[indexOf(grid, [i + di, j + dj, k + dk])];
-        if (other !== undefined && other >= 0 && other !== own) best = Math.min(best, Math.max(Math.abs(di), Math.abs(dj), Math.abs(dk)) - 1);
-      }
+      for (let di = -reach; di <= reach; di++)
+        for (let dj = -reach; dj <= reach; dj++)
+          for (let dk = -reach; dk <= reach; dk++) {
+            const other = owner[indexOf(grid, [i + di, j + dj, k + dk])];
+            if (other !== undefined && other >= 0 && other !== own)
+              best = Math.min(best, Math.max(Math.abs(di), Math.abs(dj), Math.abs(dk)) - 1);
+          }
       if (best === 0) break;
     }
     return best;
@@ -157,26 +175,29 @@ export function mirrorMiss(grid, axis, drift = 2) {
 export function quarterMiss(grid, axis, drift = 1) {
   const [u, v] = [0, 1, 2].filter((a) => a !== axis);
   let best;
-  for (const twiceU of planesAlong(grid, u, drift)) for (const twiceV of planesAlong(grid, v, drift)) {
-    // A quarter turn takes cell centres to cell centres only about a line through cell corners or cell centres.
-    if ((twiceU - twiceV) % 2 !== 0) continue;
-    const [pu, pv] = [twiceU / 2, twiceV / 2];
-    // About (pu, pv) the centre c + 1/2 turns as (du, dv) -> (-dv, du).
-    const found = missUnder(grid, (cell) => {
-      const turned = [...cell];
-      turned[u] = pu + pv - cell[v] - 1;
-      turned[v] = pv - pu + cell[u];
-      return turned;
-    });
-    if (!best || found.missed < best.missed) best = { line: [twiceU / 2, twiceV / 2], ...found };
-  }
+  for (const twiceU of planesAlong(grid, u, drift))
+    for (const twiceV of planesAlong(grid, v, drift)) {
+      // A quarter turn takes cell centres to cell centres only about a line through cell corners or cell centres.
+      if ((twiceU - twiceV) % 2 !== 0) continue;
+      const [pu, pv] = [twiceU / 2, twiceV / 2];
+      // About (pu, pv) the centre c + 1/2 turns as (du, dv) -> (-dv, du).
+      const found = missUnder(grid, (cell) => {
+        const turned = [...cell];
+        turned[u] = pu + pv - cell[v] - 1;
+        turned[v] = pv - pu + cell[u];
+        return turned;
+      });
+      if (!best || found.missed < best.missed) best = { line: [twiceU / 2, twiceV / 2], ...found };
+    }
   return best;
 }
 
 // The cells of one slot, as a grid of their own, so a part is judged about its own middle.
 export function slotGrid(grid, name) {
   const slot = grid.slots.indexOf(name);
-  const drawn = drawnCells(grid).filter((index) => grid.slot[index] === slot + 1).map((index) => ({ cell: cellAt(grid, index), slot: 0 }));
+  const drawn = drawnCells(grid)
+    .filter((index) => grid.slot[index] === slot + 1)
+    .map((index) => ({ cell: cellAt(grid, index), slot: 0 }));
   return cellGrid(drawn, [name]);
 }
 
@@ -210,7 +231,8 @@ export function shapeFindings(grid) {
       ...(gap < Infinity ? { gap } : {}),
     });
   }
-  const near = ({ cells, missed }) => missed >= NEAR_MISS.cells && missed > NEAR_MISS.least * cells && missed <= NEAR_MISS.most * cells;
+  const near = ({ cells, missed }) =>
+    missed >= NEAR_MISS.cells && missed > NEAR_MISS.least * cells && missed <= NEAR_MISS.most * cells;
   for (const name of grid.slots) {
     const slot = slotGrid(grid, name);
     for (const axis of LEVEL_AXES) {
@@ -222,7 +244,8 @@ export function shapeFindings(grid) {
       const [u, v] = [0, 1, 2].filter((a) => a !== axis);
       if (Math.abs(slot.size[u] - slot.size[v]) > 2) continue;
       const quarter = quarterMiss(slot, axis).bySlot[name];
-      if (near(quarter)) findings.push({ probe: 'quarter', slot: name, axis, cells: quarter.missed, of: quarter.cells });
+      if (near(quarter))
+        findings.push({ probe: 'quarter', slot: name, axis, cells: quarter.missed, of: quarter.cells });
     }
   }
   return findings;

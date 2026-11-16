@@ -1,5 +1,19 @@
 import type { Bone } from './body.ts';
-import { clamp, cross, dot, type Mat3, mulMM, normalize, rotX, rotY, rotZ, scale, sub, transpose, type Vec3 } from './math.ts';
+import {
+  clamp,
+  cross,
+  dot,
+  type Mat3,
+  mulMM,
+  normalize,
+  rotX,
+  rotY,
+  rotZ,
+  scale,
+  sub,
+  transpose,
+  type Vec3,
+} from './math.ts';
 import type { EulerDeg } from './pose.ts';
 
 const jointFrame = (bone: Bone): Mat3 => {

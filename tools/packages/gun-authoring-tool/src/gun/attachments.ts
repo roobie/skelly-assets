@@ -102,8 +102,7 @@ export const ATTACHMENT_IDS = [
 
 const looks: Readonly<
   Record<string, { readonly appearance?: PartAppearance; readonly voxelGrain?: number; readonly voxelClass?: string }>
-> =
-  appearanceContent.attachments;
+> = appearanceContent.attachments;
 
 /** Finish slots no gun or role finish fills, so the attachment's look must select them: an optic's lens coating. */
 const requiredSlots = (id: string): readonly string[] => (id.startsWith('optic-') ? [LENS_SLOT] : []);
@@ -419,7 +418,14 @@ export const attachmentMetadata = (
   return {
     ...metadata,
     ...(sight
-      ? { sight: { ...sight, eye: toFileAxes(sight.eye), direction: toFileAxes(sight.direction), up: toFileAxes(sight.up) } }
+      ? {
+          sight: {
+            ...sight,
+            eye: toFileAxes(sight.eye),
+            direction: toFileAxes(sight.direction),
+            up: toFileAxes(sight.up),
+          },
+        }
       : {}),
     mountFrame: { normal: toFileAxes(port.normal), up: toFileAxes(port.up) },
   };

@@ -1,0 +1,28 @@
+// Lint and format config for the authoring tools. Formatting follows the skelly repository's house style, so code
+// moves between the two repositories unchanged. Lint is Biome's recommended set: the house's every-rule-on set would
+// fail thousands of sites written without it, and a lint nobody can pass is one nobody runs.
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["**", "!**/dist", "!.build", "!**/package-lock.json"] },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "arrowParentheses": "always" }
+  },
+  // JSON here is content, and the tools that write it (the gun designer's save among them) own its layout.
+  "json": { "formatter": { "enabled": false } },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "linter": {
+    "rules": {
+      "style": {
+        // tsconfig's noUncheckedIndexedAccess makes every index read `T | undefined`;
+        // `!` is the explicit, reviewed acknowledgement on hot typed-array reads.
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        // Expression-bodied forEach callbacks are the house idiom for one-line checks; forEach ignores the value.
+        "useIterableCallbackReturn": "off"
+      }
+    }
+  }
+}

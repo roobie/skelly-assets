@@ -169,8 +169,6 @@ const highlights = (issues: readonly Issue[]) => ({
   keepOuts: new Set(issues.flatMap((i) => (i.keepOut ? [`${i.keepOut.part}.${i.keepOut.id}`] : []))),
 });
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
-// biome-ignore lint/complexity/useMaxParams: the existing positional signature plus the revolve level of detail; callers pass the first two or four.
 export function buildLayers(
   report: Report,
   focus: readonly Issue[],
@@ -232,12 +230,17 @@ export function buildLayers(
       const smooth = s.kind === 'revolved';
       const mesh = new three.Mesh(
         geometry,
-        surfaceMaterial(three, finishInUnits(appearance.finish, resolved.domain.units), colorMode === 'finish' && !failing, {
-          color,
-          flatShading: !smooth,
-          roughness: appearance.finish.roughness,
-          metalness: appearance.finish.metallic,
-        }),
+        surfaceMaterial(
+          three,
+          finishInUnits(appearance.finish, resolved.domain.units),
+          colorMode === 'finish' && !failing,
+          {
+            color,
+            flatShading: !smooth,
+            roughness: appearance.finish.roughness,
+            metalness: appearance.finish.metallic,
+          },
+        ),
       );
       // The solid's own box.center/profile is already baked into its mesh's positions.
       mesh.matrixAutoUpdate = false;

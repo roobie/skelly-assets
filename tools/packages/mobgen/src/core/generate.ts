@@ -11,7 +11,15 @@ import type { BoneMesh } from './mesh.ts';
 import { meshBones } from './mesh.ts';
 import { pick, type Rng, range, seededRng } from './random.ts';
 import { type Budgets, type RuleBudgets, silhouetteSize, type ValidationProfile } from './rules.ts';
-import { type BodyPlan, type Genome, type ParamSpec, specAllows, type Template, templateByName, type Wound } from './template.ts';
+import {
+  type BodyPlan,
+  type Genome,
+  type ParamSpec,
+  specAllows,
+  type Template,
+  templateByName,
+  type Wound,
+} from './template.ts';
 import { type Report, validate } from './validate.ts';
 import { type Voxels, voxelize } from './voxelize.ts';
 

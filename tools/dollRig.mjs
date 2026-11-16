@@ -16,7 +16,8 @@ export const readRigContent = (root = repo) => JSON.parse(evaluateJsonnet("impor
 
 const SUFFIX = { right: 'R', left: 'L' };
 const AXES = ['flex', 'twist', 'abduct'];
-const corners = ({ min, max }) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a])));
+const corners = ({ min, max }) =>
+  [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a])));
 const mirrorRange = ([min, max]) => [-max, -min];
 
 // Parents before children, in the content's order otherwise; a missing parent or a cycle is refused.
@@ -57,7 +58,9 @@ const inMirrorPlane = (axis, name) => {
   const [x, y, z] = axis;
   if (Math.abs(x) < 1e-9) return true;
   if (Math.hypot(y, z) < 1e-9) return false;
-  throw new Error(`rig: bone ${name} has a joint axis ${axis.map((a) => a.toFixed(3)).join(',')} neither along x nor square to it, so its mirrored copy cannot share its limits`);
+  throw new Error(
+    `rig: bone ${name} has a joint axis ${axis.map((a) => a.toFixed(3)).join(',')} neither along x nor square to it, so its mirrored copy cannot share its limits`,
+  );
 };
 
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A sided bone off the
@@ -65,7 +68,8 @@ const inMirrorPlane = (axis, name) => {
 // each angle takes there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying.
 export function dollRig(content, doll, dressing) {
   const { sides } = dressing.doll;
-  if (!sides.includes(content.reference)) throw new Error(`rig: limits are written for the ${content.reference}, which the doll has no side of`);
+  if (!sides.includes(content.reference))
+    throw new Error(`rig: limits are written for the ${content.reference}, which the doll has no side of`);
   const sided = (id, side) => (content.bones[id]?.sided ? `${id}.${SUFFIX[side]}` : id);
   const bones = [];
   for (const [name, spec] of Object.entries(content.bones)) {
@@ -79,7 +83,9 @@ export function dollRig(content, doll, dressing) {
       const flexAxis = spec.flexAxis ?? [1, 0, 0];
       const axes = frameAbout([0, 0, 0], spec.along, flexAxis);
       const sense = ['x', 'y', 'z'].map((axis) => (mirrored && inMirrorPlane(axes[axis], name) ? -1 : 1));
-      const limits = Object.fromEntries(AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]));
+      const limits = Object.fromEntries(
+        AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]),
+      );
       bones.push({
         id: sided(name, side),
         parent: spec.parent === null ? null : sided(spec.parent, side),
@@ -88,8 +94,17 @@ export function dollRig(content, doll, dressing) {
         flexAxis,
         limits,
         sense,
-        bind: { model: spec.model, part: spec.part, side, site: copy.site, box: copy.box, mirror: Boolean(copy.mirror) },
-        ...(spec.reach ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole } : {}),
+        bind: {
+          model: spec.model,
+          part: spec.part,
+          side,
+          site: copy.site,
+          box: copy.box,
+          mirror: Boolean(copy.mirror),
+        },
+        ...(spec.reach
+          ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole }
+          : {}),
         ...(spec.digit ? { digit: spec.digit } : {}),
         ...(spec.spread !== undefined ? { spread: spec.spread } : {}),
         ...(spec.absorbs ? { absorbs: spec.absorbs } : {}),
@@ -116,7 +131,8 @@ export function dollRig(content, doll, dressing) {
       const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
       const tail = own.length === 1 ? own[0].head : add(bone.head, scale(along, reach));
       const reaching = pole && { reach: { chain: [byId.get(bone.parent)?.parent, bone.parent], pole } };
-      if (reaching && !reaching.reach.chain.every(Boolean)) throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
+      if (reaching && !reaching.reach.chain.every(Boolean))
+        throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
       return { ...bone, tail, frame: frameAbout(bone.head, tail, flexAxis), ...reaching };
     }),
   };
@@ -131,7 +147,8 @@ const placed = (mesh, { at, mirror }) => {
   return { positions: flipped.map((x, i) => x + at[i % 3]), indices: mesh.indices, pieces: mesh.pieces };
 };
 const wholeModel = (meshes) => {
-  const positions = [], indices = [];
+  const positions = [],
+    indices = [];
   for (const mesh of meshes) {
     const base = positions.length / 3;
     positions.push(...mesh.positions);
@@ -153,8 +170,14 @@ export function restMeshes(rig, sites, meshesOf) {
     if (!mesh) throw new Error(`rig: ${site.model} has no part ${bone.bind.part} for ${bone.id}`);
     return { bone: bone.id, part: bone.bind.part, mesh: placed(mesh, site) };
   });
-  const pieces = sites.filter((site) => site.part !== undefined)
-    .map((site) => ({ piece: site.model, bone: boneOf(rig, site).id, covers: site.covers, mesh: placed(wholeModel(meshesOf(site.model)), site) }));
+  const pieces = sites
+    .filter((site) => site.part !== undefined)
+    .map((site) => ({
+      piece: site.model,
+      bone: boneOf(rig, site).id,
+      covers: site.covers,
+      mesh: placed(wholeModel(meshesOf(site.model)), site),
+    }));
   return { body, pieces };
 }
 
@@ -193,12 +216,25 @@ export function coverGaps(rig, sites, meshesOf) {
  */
 export function coverMargins(rig, sites, meshesOf) {
   return declaredSurfaces(rig, sites, meshesOf).map(({ declaration, samples, pieces, bone }) => {
-    if (!samples) return { ...declaration, samples: 0, open: 0, beneath: 0, margin: -Infinity, at: null, end: -Infinity, endAt: null };
+    if (!samples)
+      return {
+        ...declaration,
+        samples: 0,
+        open: 0,
+        beneath: 0,
+        margin: -Infinity,
+        at: null,
+        end: -Infinity,
+        endAt: null,
+      };
     const solids = pieces.map(({ mesh }) => posedSolid(mesh, STILL));
-    const depth = (point, normal) => Math.max(...solids.map((solid) => {
-      const inside = -signedDepth(solid, point);
-      return inside > COINCIDENT ? runAlong(solid, point, normal) : inside;
-    }));
+    const depth = (point, normal) =>
+      Math.max(
+        ...solids.map((solid) => {
+          const inside = -signedDepth(solid, point);
+          return inside > COINCIDENT ? runAlong(solid, point, normal) : inside;
+        }),
+      );
     const axis = sub(bone.tail, bone.head);
     const least = { across: { depth: Infinity, at: null }, along: { depth: Infinity, at: null } };
     let beneath = 0;
@@ -210,8 +246,14 @@ export function coverMargins(rig, sites, meshesOf) {
       if (d < facing.depth) Object.assign(facing, { depth: d, at: point });
     }
     return {
-      ...declaration, samples: samples.length, open: samples.filter(({ whole }) => !whole).length, beneath,
-      margin: least.across.depth, at: least.across.at, end: least.along.depth, endAt: least.along.at,
+      ...declaration,
+      samples: samples.length,
+      open: samples.filter(({ whole }) => !whole).length,
+      beneath,
+      margin: least.across.depth,
+      at: least.across.at,
+      end: least.along.depth,
+      endAt: least.along.at,
     };
   });
 }
@@ -222,18 +264,29 @@ export function coverMargins(rig, sites, meshesOf) {
 // with it in every pose, and the bone that moves the copy.
 function declaredSurfaces(rig, sites, meshesOf) {
   const riding = (site) => sites.filter((other) => other.part === site.part && other.side === site.side);
-  return sites.filter(({ covers }) => covers).flatMap((site) => {
-    const bone = boneOf(rig, site);
-    const doll = sites[site.bodySite];
-    const pieces = riding(site).map((other) => ({ piece: other.model, bone: bone.id, covers: other.covers, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
-    return site.covers.map((name) => {
-      const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
-      const declaration = { piece: site.model, side: site.side, name };
-      if (!hidden) return { declaration, samples: null, pieces, bone };
-      const [{ samples }] = coveredSurface(rig, { body: [{ bone: bone.id, part: site.part, mesh: placed(hidden, doll) }], pieces }, { whole: true });
-      return { declaration, samples, pieces, bone };
+  return sites
+    .filter(({ covers }) => covers)
+    .flatMap((site) => {
+      const bone = boneOf(rig, site);
+      const doll = sites[site.bodySite];
+      const pieces = riding(site).map((other) => ({
+        piece: other.model,
+        bone: bone.id,
+        covers: other.covers,
+        mesh: placed(wholeModel(meshesOf(other.model)), other),
+      }));
+      return site.covers.map((name) => {
+        const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
+        const declaration = { piece: site.model, side: site.side, name };
+        if (!hidden) return { declaration, samples: null, pieces, bone };
+        const [{ samples }] = coveredSurface(
+          rig,
+          { body: [{ bone: bone.id, part: site.part, mesh: placed(hidden, doll) }], pieces },
+          { whole: true },
+        );
+        return { declaration, samples, pieces, bone };
+      });
     });
-  });
 }
 
 // A built tree's part meshes by model id, read once each.

@@ -77,11 +77,31 @@ it('applies the catalogue turned count to non-compound families', () => {
 
 it('keeps compound round opt-outs through catalogue assembly building', () => {
   const input = fixture();
-  const piece = { id: 'fixture', slot: 'body', kind: 'turned', axis: 'y', profile: [[0, 0], [0, 0.03], [0.02, 0.03], [0.02, 0]] };
-  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: {
-    pieces: JSON.stringify([piece, { ...piece, id: 'round', sides: null }]),
-  } };
-  const loaded = loadCatalogue({ ...input, turnedSides: TURNED_SIDES, items: [{ ...input.items[0], parts: [part], connections: [] }] });
+  const piece = {
+    id: 'fixture',
+    slot: 'body',
+    kind: 'turned',
+    axis: 'y',
+    profile: [
+      [0, 0],
+      [0, 0.03],
+      [0.02, 0.03],
+      [0.02, 0],
+    ],
+  };
+  const part = {
+    ...input.items[0]!.parts[0]!,
+    family: 'compound',
+    ports: [],
+    params: {
+      pieces: JSON.stringify([piece, { ...piece, id: 'round', sides: null }]),
+    },
+  };
+  const loaded = loadCatalogue({
+    ...input,
+    turnedSides: TURNED_SIDES,
+    items: [{ ...input.items[0], parts: [part], connections: [] }],
+  });
   const solids = buildItem(loaded.items[0]!, loaded).report.resolved.defs.get(part.id)!.solids;
   expect(solids.find(({ id }) => id === piece.id)).toMatchObject({ sides: TURNED_SIDES });
   expect(solids.find(({ id }) => id === 'round')).not.toHaveProperty('sides');
@@ -90,8 +110,19 @@ it('keeps compound round opt-outs through catalogue assembly building', () => {
 it('exports a label on its face, its text defaulting to the authored title', () => {
   const input = fixture();
   const carton = { id: 'carton', slot: 'body', kind: 'box', min: [-0.05, 0, -0.02], max: [0.05, 0.2, 0.02] };
-  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify([carton]) } };
-  const item = { ...input.items[0], title: 'Oat flakes', parts: [part], connections: [], label: { solid: 'carton', face: '+z' } };
+  const part = {
+    ...input.items[0]!.parts[0]!,
+    family: 'compound',
+    ports: [],
+    params: { pieces: JSON.stringify([carton]) },
+  };
+  const item = {
+    ...input.items[0],
+    title: 'Oat flakes',
+    parts: [part],
+    connections: [],
+    label: { solid: 'carton', face: '+z' },
+  };
   const loaded = loadCatalogue({ ...input, items: [item] });
   const { label } = exportItem(
     loaded.items[0]!,
@@ -125,12 +156,7 @@ it('exports a grip following the held solid through resizing and assembly placem
   };
   const exportFixture = () => {
     const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], handling: datum }] });
-    return exportItem(
-      loaded.items[0]!,
-      loaded,
-      { id: 'fixture', file: 'assets/models/fixture.glb' },
-      VOXEL,
-    ).modelEntry;
+    return exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL).modelEntry;
   };
   const before = exportFixture();
   expect(before.grip?.at[1]).toBeCloseTo(0.03);
@@ -158,14 +184,21 @@ it('turns a tool laid out along its named axis so its working end faces +z, and 
       { id: 'shaft', slot: 'body', kind: 'box', ...span(0, 0.25, 0.01) },
       { id: 'head', slot: 'body', kind: 'box', ...span(0.25, 0.3, 0.03) },
     ];
-    const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: { pieces: JSON.stringify(pieces) } };
+    const part = {
+      ...input.items[0]!.parts[0]!,
+      family: 'compound',
+      ports: [],
+      params: { pieces: JSON.stringify(pieces) },
+    };
     const item = {
       ...input.items[0],
       ...(forward ? { forward } : {}),
       parts: [part],
       connections: [],
       handling: { part: part.id, solid: 'shaft', fraction: [0.5, 0.5, 0.5], turn: twist, hold: 'upright', roll: 0 },
-      anchors: { tip: { part: part.id, solid: 'head', fraction: [1, 0.5, 0.5].map((_, axis) => (axis === along ? 1 : 0.5)) } },
+      anchors: {
+        tip: { part: part.id, solid: 'head', fraction: [1, 0.5, 0.5].map((_, axis) => (axis === along ? 1 : 0.5)) },
+      },
     };
     const loaded = loadCatalogue({ ...input, items: [item] });
     return buildItem(loaded.items[0]!, loaded).handling;
@@ -199,13 +232,9 @@ it('exports datums and baked collision that follow the resized solid', () => {
       ...input,
       items: [{ ...input.items[0], anchors: { top: { part: 'upper', solid: 'body', fraction: [0.5, 1, 0.5] } } }],
     });
-    return exportItem(
-      loaded.items[0]!,
-      loaded,
-      { id: 'fixture', file: 'assets/models/fixture.glb' },
-      VOXEL,
-      { collision: true },
-    ).modelEntry;
+    return exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL, {
+      collision: true,
+    }).modelEntry;
   };
   const topOf = (entry: ReturnType<typeof exportFixture>) => ({
     datum: entry.anchors?.top?.[1],
@@ -223,7 +252,9 @@ it('refuses baked collision on an inventory atom, whose export carries no parts'
   input.items[0]!.exportMass = 'inventory-atom';
   const loaded = loadCatalogue(input);
   expect(() =>
-    exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL, { collision: true }),
+    exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL, {
+      collision: true,
+    }),
   ).toThrow('baked collision travels with exported parts');
 });
 it('omits runtime part masses only when inventory-atom export is authored', () => {
@@ -244,37 +275,58 @@ it('omits runtime part masses only when inventory-atom export is authored', () =
 it('reports the authored mass and a positive drawn volume, which the showcase turns into a density', () => {
   const input = fixture();
   const loaded = loadCatalogue(input);
-  const { physical } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  const { physical } = exportItem(
+    loaded.items[0]!,
+    loaded,
+    { id: 'fixture', file: 'assets/models/fixture.glb' },
+    VOXEL,
+  );
   expect(physical.massKg).toBe(loaded.items[0]!.parts.reduce((sum, part) => sum + part.massKg, 0));
   expect(physical.volumeM3).toBeGreaterThan(0);
 });
 it('refuses recipe mass ownership that differs from the authored item', () => {
   const item = catalogue.items[0]!;
   expect(() =>
-    loadThingRecipe([
-      {
-        id: 'fixture',
-        title: 'Fixture',
-        kind: 'item',
-        source: item.id,
-        voxel: ROW_VOXEL,
-        options: { mass: item.exportMass === 'parts' ? 'inventory-atom' : 'parts' },
-      },
-    ], catalogue),
+    loadThingRecipe(
+      [
+        {
+          id: 'fixture',
+          title: 'Fixture',
+          kind: 'item',
+          source: item.id,
+          voxel: ROW_VOXEL,
+          options: { mass: item.exportMass === 'parts' ? 'inventory-atom' : 'parts' },
+        },
+      ],
+      catalogue,
+    ),
   ).toThrow('Recipe mass ownership differs');
 });
 it('refuses a recipe row without a voxel class, so no model exports smooth', () => {
   const item = catalogue.items[0]!;
   expect(() =>
-    loadThingRecipe([{ id: 'fixture', title: 'Fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }], catalogue),
+    loadThingRecipe(
+      [{ id: 'fixture', title: 'Fixture', kind: 'item', source: item.id, options: { mass: item.exportMass } }],
+      catalogue,
+    ),
   ).toThrow('Expected "voxel"');
 });
 it.each([0, -1])('refuses a voxel class grain of %s', (grain) => {
   const item = catalogue.items[0]!;
   expect(() =>
-    loadThingRecipe([
-      { id: 'fixture', title: 'Fixture', kind: 'item', source: item.id, voxel: { grain }, options: { mass: item.exportMass } },
-    ], catalogue),
+    loadThingRecipe(
+      [
+        {
+          id: 'fixture',
+          title: 'Fixture',
+          kind: 'item',
+          source: item.id,
+          voxel: { grain },
+          options: { mass: item.exportMass },
+        },
+      ],
+      catalogue,
+    ),
   ).toThrow('Invalid');
 });
 it('refuses unknown geometry families during catalogue loading', () => {
@@ -284,9 +336,19 @@ it('refuses unknown geometry families during catalogue loading', () => {
 });
 it('refuses recipe references outside the authored item set', () => {
   expect(() =>
-    loadThingRecipe([
-      { id: 'fixture', title: 'Fixture', kind: 'item', source: 'fixture-unknown', voxel: ROW_VOXEL, options: { mass: 'parts' } },
-    ], catalogue),
+    loadThingRecipe(
+      [
+        {
+          id: 'fixture',
+          title: 'Fixture',
+          kind: 'item',
+          source: 'fixture-unknown',
+          voxel: ROW_VOXEL,
+          options: { mass: 'parts' },
+        },
+      ],
+      catalogue,
+    ),
   ).toThrow('Unknown tool item');
 });
 // The material names a GLB's JSON chunk declares, read independently of the writer.
@@ -297,7 +359,10 @@ const glbMaterialNames = (glb: Uint8Array): string[] => {
 };
 const thingRows = () =>
   readRecipes().flatMap(({ value }) =>
-    loadThingRecipe((value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind)), catalogue),
+    loadThingRecipe(
+      (value as { kind: string }[]).filter(({ kind }) => THING_KINDS.includes(kind)),
+      catalogue,
+    ),
   );
 it('exports every authored glow as an emissive material its own GLB names exactly once', () => {
   const glowing = new Set(catalogue.items.filter(({ glow }) => glow !== undefined).map(({ id }) => id));
@@ -307,42 +372,78 @@ it('exports every authored glow as an emissive material its own GLB names exactl
   for (const row of rows) {
     const { glb, modelEntry } = row.generate();
     expect(modelEntry.emissiveMaterial, row.id).toBeDefined();
-    expect(glbMaterialNames(glb).filter((name) => name === modelEntry.emissiveMaterial), row.id).toHaveLength(1);
+    expect(
+      glbMaterialNames(glb).filter((name) => name === modelEntry.emissiveMaterial),
+      row.id,
+    ).toHaveLength(1);
   }
 });
 it('refuses a glow whose material the built GLB does not draw', () => {
   const input = fixture();
   const lit = Object.keys(MATERIALS).find((id) => id !== material)!;
   const body = { id: 'body', slot: 'body', kind: 'box', min: [0, 0, 0], max: [0.02, 0.02, 0.02] };
-  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], finish: { body: material, lit }, params: {
-    pieces: JSON.stringify([body]),
-  } };
-  const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }] });
-  expect(() => exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL)).toThrow(
-    'fixture: emissive material',
-  );
+  const part = {
+    ...input.items[0]!.parts[0]!,
+    family: 'compound',
+    ports: [],
+    finish: { body: material, lit },
+    params: {
+      pieces: JSON.stringify([body]),
+    },
+  };
+  const loaded = loadCatalogue({
+    ...input,
+    items: [{ ...input.items[0], parts: [part], connections: [], glow: 'lit' }],
+  });
+  expect(() =>
+    exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL),
+  ).toThrow('fixture: emissive material');
 });
 type GltfMaterial = { extras: { paintable?: true } };
-type GltfJson = { meshes: { primitives: { material: number; extras: { slot?: string } }[] }[]; materials: GltfMaterial[] };
+type GltfJson = {
+  meshes: { primitives: { material: number; extras: { slot?: string } }[] }[];
+  materials: GltfMaterial[];
+};
 const glbJson = (glb: Uint8Array): GltfJson => {
   const view = new DataView(glb.buffer, glb.byteOffset, glb.byteLength);
   return JSON.parse(new TextDecoder().decode(glb.subarray(20, 20 + view.getUint32(12, true))));
 };
 const paintFixture = () => {
   const input = fixture();
-  const box = (slot: string, x: number) => ({ id: slot, slot, kind: 'box', min: [x, 0, 0], max: [x + 0.02, 0.02, 0.02] });
-  const part = { ...input.items[0]!.parts[0]!, family: 'compound', ports: [], params: {
-    pieces: JSON.stringify([box('paint', 0), box('trim', 0.02)]),
-  }, finish: { paint: material, trim: material }, paintable: ['paint'] };
+  const box = (slot: string, x: number) => ({
+    id: slot,
+    slot,
+    kind: 'box',
+    min: [x, 0, 0],
+    max: [x + 0.02, 0.02, 0.02],
+  });
+  const part = {
+    ...input.items[0]!.parts[0]!,
+    family: 'compound',
+    ports: [],
+    params: {
+      pieces: JSON.stringify([box('paint', 0), box('trim', 0.02)]),
+    },
+    finish: { paint: material, trim: material },
+    paintable: ['paint'],
+  };
   return { ...input, items: [{ ...input.items[0], parts: [part], connections: [] }] };
 };
-it('marks only the paintable slot\'s material, even when an unmarked slot shares its look', () => {
+it("marks only the paintable slot's material, even when an unmarked slot shares its look", () => {
   const loaded = loadCatalogue(paintFixture());
-  const { glb, modelEntry } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  const { glb, modelEntry } = exportItem(
+    loaded.items[0]!,
+    loaded,
+    { id: 'fixture', file: 'assets/models/fixture.glb' },
+    VOXEL,
+  );
   const json = glbJson(glb);
   const slotMaterials = (slot: string) =>
-    new Set(json.meshes.flatMap(({ primitives }) =>
-      primitives.filter(({ extras }) => extras.slot === slot).map((primitive) => json.materials[primitive.material]!)));
+    new Set(
+      json.meshes.flatMap(({ primitives }) =>
+        primitives.filter(({ extras }) => extras.slot === slot).map((primitive) => json.materials[primitive.material]!),
+      ),
+    );
   const paint = [...slotMaterials('paint')];
   const trim = [...slotMaterials('trim')];
   expect(paint.length).toBeGreaterThan(0);
@@ -353,13 +454,24 @@ it('marks only the paintable slot\'s material, even when an unmarked slot shares
 });
 it('refuses a paintable slot that colours no solid', () => {
   const input = paintFixture();
-  const part = { ...input.items[0]!.parts[0]!, paintable: ['glass'], finish: { paint: material, trim: material, glass: material } };
-  expect(() => loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part] }] })).toThrow('paintable slot glass');
+  const part = {
+    ...input.items[0]!.parts[0]!,
+    paintable: ['glass'],
+    finish: { paint: material, trim: material, glass: material },
+  };
+  expect(() => loadCatalogue({ ...input, items: [{ ...input.items[0], parts: [part] }] })).toThrow(
+    'paintable slot glass',
+  );
 });
 it('carries what a worn shell covers into its model entry', () => {
   const input = fixture();
   const loaded = loadCatalogue({ ...input, items: [{ ...input.items[0], covers: ['trunk', 'upper_arm_left'] }] });
-  const { modelEntry } = exportItem(loaded.items[0]!, loaded, { id: 'fixture', file: 'assets/models/fixture.glb' }, VOXEL);
+  const { modelEntry } = exportItem(
+    loaded.items[0]!,
+    loaded,
+    { id: 'fixture', file: 'assets/models/fixture.glb' },
+    VOXEL,
+  );
   expect(parse(NeutralModelSchema, modelEntry).covers).toEqual(['trunk', 'upper_arm_left']);
 });
 it.each([
@@ -387,5 +499,7 @@ it('refuses a row that carries both a motion and hinge anchors', () => {
   const motion = { part: 'lower', stages: [{ kind: 'hinge', pins: ['pin'], toward: 'up', open: 30 }] };
   const item = { ...input.items[0], motion };
   expect(() => loadCatalogue({ ...input, items: [item] })).not.toThrow();
-  expect(() => loadCatalogue({ ...input, items: [{ ...item, anchors: { hinge_a: hinge } }] })).toThrow(/hinge_a or hinge_b/);
+  expect(() => loadCatalogue({ ...input, items: [{ ...item, anchors: { hinge_a: hinge } }] })).toThrow(
+    /hinge_a or hinge_b/,
+  );
 });

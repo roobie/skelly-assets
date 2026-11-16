@@ -4,7 +4,9 @@ import { solid } from '../pieceSolid.mjs';
 // A piece's shape and material, ignoring the id and slot names, which a fused row may prefix with a part's site.
 const shape = (piece, finish) => {
   const { id, slot, ...geometry } = piece;
-  return JSON.stringify({ geometry, material: finish[slot] }, (_key, value) => (typeof value === 'number' ? Math.round(value * 1e9) / 1e9 : value));
+  return JSON.stringify({ geometry, material: finish[slot] }, (_key, value) =>
+    typeof value === 'number' ? Math.round(value * 1e9) / 1e9 : value,
+  );
 };
 // Every shape that drawn parts draw, as a sorted list, so two fittings drawing the same things compare equal.
 export const shapes = (drawn) => drawn.flatMap((d) => d.pieces.map((p) => shape(p, d.finish))).sort();

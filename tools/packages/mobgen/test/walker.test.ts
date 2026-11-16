@@ -45,7 +45,9 @@ const restFailures = (realized: Realized): string[] =>
 /** Where each foot's ball is in the world, frame by frame, through the stomp with its travel applied. */
 const ballTrack = (realized: Realized, foot: string) => {
   const bone = realized.body.bones.find((candidate) => candidate.id === foot)!;
-  return frames(realized, 'stomp').map(({ pose }) => applyPoint(boneTransforms(realized.body.bones, pose).get(foot)!, bone.head));
+  return frames(realized, 'stomp').map(({ pose }) =>
+    applyPoint(boneTransforms(realized.body.bones, pose).get(foot)!, bone.head),
+  );
 };
 
 describe('walker body', () => {
@@ -102,7 +104,10 @@ describe('walker motion', () => {
       const ground = Math.min(...track.map(([, y]) => y));
       const planted = track.map(([, y]) => y - ground < PLANTED);
       const slides = track.flatMap((at, i) =>
-        i > 0 && planted[i] && planted[i - 1] && Math.hypot(at[0] - track[i - 1]![0], at[2] - track[i - 1]![2]) > PLANTED
+        i > 0 &&
+        planted[i] &&
+        planted[i - 1] &&
+        Math.hypot(at[0] - track[i - 1]![0], at[2] - track[i - 1]![2]) > PLANTED
           ? [`${foot} slides at frame ${i}`]
           : [],
       );

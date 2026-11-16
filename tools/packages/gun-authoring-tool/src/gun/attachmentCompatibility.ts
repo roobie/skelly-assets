@@ -1,5 +1,7 @@
 import { mateTransform, resolve } from '@skelly/construct/assembly/resolve.ts';
 import {
+  connectionContact,
+  connectionContactForPart,
   keepOut,
   keepOutBetweenParts,
   keepOutForPart,
@@ -158,6 +160,7 @@ const withCandidate = ({
 // with a per-part variant check only the candidate's interactions, which is all a fit can change.
 const PER_PART_RULES = new Map<Rule, (r: Resolved, part: string) => Issue[]>([
   [solidOverlap, solidOverlapForPart],
+  [connectionContact, connectionContactForPart],
   [keepOut, keepOutForPart],
   [opticMountFit, opticMountFitForPart],
   [opticLoadingClearance, opticLoadingClearanceForPart],

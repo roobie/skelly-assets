@@ -30,12 +30,18 @@ test('a slot whose envelope reaches into another or into the fit-out at all is a
 
 // Its slots are checked against one part's fit-out, which a row of several parts has not.
 test('a row of several parts with stowage slots is a problem', () => {
-  assert.match(slotRowProblems({ id: 'fixture_locker', partCount: 2, ports: [], pieces: [] }, GRAIN).join('\n'), /built of 2 parts, not one/);
+  assert.match(
+    slotRowProblems({ id: 'fixture_locker', partCount: 2, ports: [], pieces: [] }, GRAIN).join('\n'),
+    /built of 2 parts, not one/,
+  );
 });
 
 // The far twin's kit stands turned, not reflected, so only an envelope centred along the vehicle comes out reflected.
 test('a slot whose envelope is not centred on it along the vehicle is a problem', () => {
-  assert.match(locker([shelfSlot('left', 0, { min: [0, -0.1, -0.15], max: [0.4, 0.3, 0.15] })]), /not centred on it along the vehicle/);
+  assert.match(
+    locker([shelfSlot('left', 0, { min: [0, -0.1, -0.15], max: [0.4, 0.3, 0.15] })]),
+    /not centred on it along the vehicle/,
+  );
 });
 
 // The item model is rigid; posing it must put each corner where the fit check measured it.
@@ -49,8 +55,18 @@ test('an item posed by its seat fills the box the fit check measures', () => {
     return [0, 1, 2].map((row) => at[row] + [0, 1, 2].reduce((sum, col) => sum + rotation[row * 3 + col] * p[col], 0));
   });
   const filled = seatedBounds(seat, bounds);
-  const axes = [slot.normal, slot.up, [slot.normal[1] * slot.up[2] - slot.normal[2] * slot.up[1], slot.normal[2] * slot.up[0] - slot.normal[0] * slot.up[2], slot.normal[0] * slot.up[1] - slot.normal[1] * slot.up[0]]];
-  const inSlot = posed.map((p) => axes.map((axis) => axis.reduce((sum, v, a) => sum + v * (p[a] - slot.position[a]), 0)));
+  const axes = [
+    slot.normal,
+    slot.up,
+    [
+      slot.normal[1] * slot.up[2] - slot.normal[2] * slot.up[1],
+      slot.normal[2] * slot.up[0] - slot.normal[0] * slot.up[2],
+      slot.normal[0] * slot.up[1] - slot.normal[1] * slot.up[0],
+    ],
+  ];
+  const inSlot = posed.map((p) =>
+    axes.map((axis) => axis.reduce((sum, v, a) => sum + v * (p[a] - slot.position[a]), 0)),
+  );
   for (const a of [0, 1, 2]) {
     assert.ok(Math.abs(Math.min(...inSlot.map((p) => p[a])) - filled.min[a]) < 1e-9);
     assert.ok(Math.abs(Math.max(...inSlot.map((p) => p[a])) - filled.max[a]) < 1e-9);
@@ -74,7 +90,11 @@ const vehicleRows = { van: ['fixture_body', 'fixture_locker', 'fixture_shutter']
 const dependsOn = { 'fixture.vans': ['fixture.kit'] };
 // Items stand on their base, the seat's normal down out of it.
 const seat = (standard) => ({ standard, frame: { position: [0, 0, 0], normal: [0, -1, 0], up: [1, 0, 0] } });
-const item = (standard, height) => ({ slots: [], seats: [seat(standard)], bounds: { min: [-0.1, 0, -0.1], max: [0.1, height, 0.1] } });
+const item = (standard, height) => ({
+  slots: [],
+  seats: [seat(standard)],
+  bounds: { min: [-0.1, 0, -0.1], max: [0.1, height, 0.1] },
+});
 const stowage = {
   items: new Map([
     ['fixture_locker', { slots: [shelfSlot('left', 0)], seats: [], bounds: { min: [-1, 0, 0], max: [1, 2, 1] } }],
@@ -87,9 +107,18 @@ const stowage = {
   moving: new Set(['fixture_shutter']),
 };
 const van = (site) => ({
-  van: { title: 'Fixture Van', forward: '+z', sites: [{ id: 'body', part: 'fixture_body', at: [0, 0, 0] }, { id: 'door', part: 'fixture_shutter', at: [0, 0, 0] }, { id: 'locker', part: 'fixture_locker', at: [0, 0, 0], ...site }] },
+  van: {
+    title: 'Fixture Van',
+    forward: '+z',
+    sites: [
+      { id: 'body', part: 'fixture_body', at: [0, 0, 0] },
+      { id: 'door', part: 'fixture_shutter', at: [0, 0, 0] },
+      { id: 'locker', part: 'fixture_locker', at: [0, 0, 0], ...site },
+    ],
+  },
 });
-const loaded = (site) => placementProblems({ placements: van(site), models, vehicleRows, dependsOn, vocabulary, stowage }).join('\n');
+const loaded = (site) =>
+  placementProblems({ placements: van(site), models, vehicleRows, dependsOn, vocabulary, stowage }).join('\n');
 
 test('a load-out of built items that a slot accepts and holds stows without problems, flush included', () => {
   assert.equal(loaded({ stowed: { left: 'fixture_can' }, behind: 'door' }), '');
@@ -108,8 +137,28 @@ test('a load-out that cannot be stowed is a problem', () => {
 
 // A slot read from a model without its fields would leave nothing to check the item against.
 test('a load-out into a slot without accepts or envelope is a problem', () => {
-  const bare = { ...stowage, items: new Map([...stowage.items, ['fixture_locker', { slots: [{ id: 'left', frame: shelfSlot('left', 0).frame }], seats: [], bounds: { min: [-1, 0, 0], max: [1, 2, 1] } }]]) };
-  const problems = placementProblems({ placements: van({ stowed: { left: 'fixture_can' } }), models, vehicleRows, dependsOn, vocabulary, stowage: bare }).join('\n');
+  const bare = {
+    ...stowage,
+    items: new Map([
+      ...stowage.items,
+      [
+        'fixture_locker',
+        {
+          slots: [{ id: 'left', frame: shelfSlot('left', 0).frame }],
+          seats: [],
+          bounds: { min: [-1, 0, 0], max: [1, 2, 1] },
+        },
+      ],
+    ]),
+  };
+  const problems = placementProblems({
+    placements: van({ stowed: { left: 'fixture_can' } }),
+    models,
+    vehicleRows,
+    dependsOn,
+    vocabulary,
+    stowage: bare,
+  }).join('\n');
   assert.match(problems, /the slot has no accepts or envelope/);
 });
 
@@ -131,12 +180,16 @@ test('the closures that open are those whose built model has a motion', () => {
     };
     sidecar('fixture_shutter', [{ kind: 'slide', direction: [0, 1, 0], travel: 1, stow: 0, share: 1 }]);
     sidecar('fixture_body', []);
-    const placements = { van: { sites: [
-      { id: 'body', part: 'fixture_body' },
-      { id: 'door', part: 'fixture_shutter' },
-      { id: 'locker', part: 'fixture_locker', behind: 'door' },
-      { id: 'boot', part: 'fixture_locker', behind: 'body' },
-    ] } };
+    const placements = {
+      van: {
+        sites: [
+          { id: 'body', part: 'fixture_body' },
+          { id: 'door', part: 'fixture_shutter' },
+          { id: 'locker', part: 'fixture_locker', behind: 'door' },
+          { id: 'boot', part: 'fixture_locker', behind: 'body' },
+        ],
+      },
+    };
     assert.deepEqual([...loadOutStowage(out, models, placements).moving], ['fixture_shutter']);
   } finally {
     rmSync(out, { recursive: true, force: true });

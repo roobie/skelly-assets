@@ -4,7 +4,17 @@ import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/c
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
-import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, shareStages, type StageMove, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
+import {
+  centreOf,
+  cornersOf,
+  hingeSense,
+  piecesBounds,
+  pinAxis,
+  type StageMove,
+  shareStages,
+  TOWARD,
+  TOWARDS,
+} from '@skelly/thing-core/motion';
 import {
   ModelPartSchema,
   ModelPointSchema,
@@ -72,7 +82,14 @@ const faceAxis = (face: Face): Vec3 => {
   const axis = 'xyz'.indexOf(face[1]!);
   return [0, 1, 2].map((at) => (at === axis ? (face[0] === '+' ? 1 : -1) : 0)) as unknown as Vec3;
 };
-const defaultUp: Readonly<Record<Face, Face>> = { '+x': '+y', '-x': '+y', '+z': '+y', '-z': '+y', '+y': '-z', '-y': '+z' };
+const defaultUp: Readonly<Record<Face, Face>> = {
+  '+x': '+y',
+  '-x': '+y',
+  '+z': '+y',
+  '-z': '+y',
+  '+y': '-z',
+  '-y': '+z',
+};
 const positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
 const name = pipe(string(), nonEmpty());
 const material = pipe(
@@ -177,7 +194,12 @@ const ItemSchema = pipe(
                 toward: picklist(TOWARDS),
                 open: OpenAngleSchema,
               }),
-              strictObject({ kind: literal('slide'), toward: picklist(TOWARDS), travel: positive, stow: optional(literal(true)) }),
+              strictObject({
+                kind: literal('slide'),
+                toward: picklist(TOWARDS),
+                travel: positive,
+                stow: optional(literal(true)),
+              }),
             ]),
           ),
           nonEmpty(),
@@ -320,13 +342,15 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
     throw new Error(`Unknown thing family ${part.family}`);
   }
   // Compound consumes per-piece null opt-outs itself; other families emit ordinary revolved solids.
-  const solids = part.family === 'compound'
-    ? compound(params, turnedSides)
-    : builders[part.family as keyof typeof builders](params, turnedSides).map((solid): Solid =>
-      solid.kind === 'revolved' && solid.sides === undefined && turnedSides !== undefined
-        ? { ...solid, sides: turnedSides }
-        : solid,
-    );
+  const solids =
+    part.family === 'compound'
+      ? compound(params, turnedSides)
+      : builders[part.family as keyof typeof builders](params, turnedSides).map(
+          (solid): Solid =>
+            solid.kind === 'revolved' && solid.sides === undefined && turnedSides !== undefined
+              ? { ...solid, sides: turnedSides }
+              : solid,
+        );
   for (const solid of solids) {
     if (!(solid.slot && Object.hasOwn(part.finish, solid.slot))) {
       throw new Error(`Missing finish for ${part.id}/${solid.id}`);
@@ -373,7 +397,9 @@ const glowMaterial = (item: ToolItem, slot: string): string => {
 const partAppearance = ({ finish, paintable }: ToolPart) => ({ finish, ...(paintable ? { paintable } : {}) });
 
 /** The finish slots any part of the item lets a host repaint, in authored order. */
-const paintableSlots = (item: ToolItem): readonly string[] => [...new Set(item.parts.flatMap(({ paintable = [] }) => paintable))];
+const paintableSlots = (item: ToolItem): readonly string[] => [
+  ...new Set(item.parts.flatMap(({ paintable = [] }) => paintable)),
+];
 
 /**
  * The item's motion in the model frame, from the authored shapes of the pins and pieces of its part rather than their
@@ -448,7 +474,12 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
   let domain: Domain;
   let masses: Readonly<Record<string, number>>;
   if (item.parts.length === 1) {
-    const wrapped = singlePart({ id: first.id, part: buildPart(first, first.params, settings.turnedSides), massKg: first.massKg, units: settings.units });
+    const wrapped = singlePart({
+      id: first.id,
+      part: buildPart(first, first.params, settings.turnedSides),
+      massKg: first.massKg,
+      units: settings.units,
+    });
     assembly = {
       ...wrapped.assembly,
       rootPlacement,
@@ -466,7 +497,10 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
           params: Object.fromEntries(
             Object.entries(part.params).map(([key, value]) => [key, { values: [value], default: value }]),
           ),
-          build: (params: Readonly<Record<string, string>>) => ({ ...buildPart(part, params, settings.turnedSides), family: part.id }),
+          build: (params: Readonly<Record<string, string>>) => ({
+            ...buildPart(part, params, settings.turnedSides),
+            family: part.id,
+          }),
         },
       ]),
     );
@@ -475,10 +509,7 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
       root: first.id,
       rootPlacement,
       parts: Object.fromEntries(
-        item.parts.map((part) => [
-          part.id,
-          { family: part.id, params: part.params, appearance: partAppearance(part) },
-        ]),
+        item.parts.map((part) => [part.id, { family: part.id, params: part.params, appearance: partAppearance(part) }]),
       ),
       connections: item.connections,
     };
