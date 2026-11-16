@@ -121,6 +121,10 @@ test('a sheet shows one look, so a look with other options drops the rows drawn 
   assert.deepEqual(mergeRows(previous, [{ id: 'c', look: underside }], new Set(['a', 'b', 'c']), underside).map(({ id }) => id), ['b', 'c']);
 });
 
+test('an open look is a look of its own, so its rows never mix with the closed ones', () => {
+  assert.notEqual(lookName({ open: true }), lookName());
+});
+
 test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {
   const van = { id: 'fixture_van', sites: [{ site: 'body' }, { site: 'exhaust_front_pipe' }, { site: 'muffler' }, { site: 'door_far' }] };
   const kept = keepSites(van, ['exhaust_', 'muffler']);

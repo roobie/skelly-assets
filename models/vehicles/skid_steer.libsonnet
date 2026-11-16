@@ -5,6 +5,14 @@ local s = import 'skid_steer.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+// The front door swings forward over the lowered bucket, so it hangs above a toe board as tall as the bucket's mount,
+// and the arms' cross brace and the tilt rams keep out of its sweep: the brace crosses behind the cab, and each ram
+// runs down the front of its arm to the bucket.
+local doorHeight(share) = s.doorSill + share * (s.roof - 0.02 - s.doorSill);
+local doorPins = k.hingePins('hinge', 'y', [s.cageFront + 0.04 + k.grain, doorHeight(0.1), -s.cageSide + 0.04],
+                             [s.cageFront + 0.04 + k.grain, doorHeight(0.9), -s.cageSide + 0.04], slot='bar');
+local sponsonInner = 0.35;
+local sponsonTop = 0.8;
 local tailPins = k.hingePins('hinge', 'y', [s.tailDoor - k.grain, 0.58, 0.5], [s.tailDoor - k.grain, 1.06, 0.5], slot='trim');
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('skid_steer_frame', s.shellMass, [
@@ -13,7 +21,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('foot_board', 'mat', [0.3, s.floor, -0.36], [s.cageFront, s.floor + 0.03, 0.36]),
     box('seat_box', 'steel', [-0.32, s.floor, -0.28], [0.14, s.floor + 0.2, 0.28]),
   ] + bothSides([
-    box('sponson', 'steel', [-1.05, 0.28, 0.35], [0.95, 0.8, 0.56]),
+    box('sponson', 'steel', [-1.05, 0.28, sponsonInner], [0.95, sponsonTop, 0.56]),
     box('tower', 'paint', [-1.08, 0.78, 0.48], [-0.62, 1.82, 0.62]),
     box('tower_top', 'paint', [-1.0, 1.6, 0.48], [-0.6, 1.92, 0.62]),
   ]), { steel: 'paint-charcoal', mat: 'rubber-black', paint: s.paint }) + { title: 'Skid-steer loader frame' },
@@ -27,6 +35,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('rear_wall', 'bar', [s.cageRear, s.floor, -s.cageSide], [s.cageRear + 0.05, 1.42, s.cageSide]),
     box('rear_top', 'bar', [s.cageRear, 1.9, -s.cageSide], [s.cageRear + 0.05, s.roof, s.cageSide]),
     box('rear_glass', 'glass', [s.cageRear + 0.01, 1.42, -s.cageSide + 0.05], [s.cageRear + 0.04, 1.9, s.cageSide - 0.05]),
+    box('toe_board', 'paint', [s.cageFront, s.floor, -sponsonInner], [s.cageFront + 0.04, sponsonTop, sponsonInner]),
+    box('toe_board_top', 'paint', [s.cageFront, sponsonTop, -s.cageSide + 0.04], [s.cageFront + 0.04, s.doorSill, s.cageSide - 0.04]),
   ] + bothSides([
     box('post_front', 'bar', [s.cageFront - 0.06, s.floor, s.cageSide - 0.05], [s.cageFront, s.roof, s.cageSide]),
     box('post_rear', 'bar', [s.cageRear, s.floor, s.cageSide - 0.05], [s.cageRear + 0.06, s.roof, s.cageSide]),
@@ -36,12 +46,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('mesh_c', 'bar', [s.cageRear, 1.7, s.cageSide - 0.04], [s.cageFront, 1.74, s.cageSide]),
   ]), { paint: s.paint, bar: 'paint-charcoal', glass: 'glass-clear' }) + { title: 'Skid-steer loader cage' },
   k.compound('skid_steer_door', 28, [
-    box('sill', 'bar', [s.cageFront, s.floor + 0.03, -s.cageSide + 0.04], [s.cageFront + 0.04, s.floor + 0.09, s.cageSide - 0.04]),
+    box('sill', 'bar', [s.cageFront, s.doorSill, -s.cageSide + 0.04], [s.cageFront + 0.04, s.doorSill + 0.06, s.cageSide - 0.04]),
     box('head', 'bar', [s.cageFront, s.roof - 0.08, -s.cageSide + 0.04], [s.cageFront + 0.04, s.roof - 0.02, s.cageSide - 0.04]),
-    box('stile_near', 'bar', [s.cageFront, s.floor + 0.03, s.cageSide - 0.1], [s.cageFront + 0.04, s.roof - 0.02, s.cageSide - 0.04]),
-    box('stile_far', 'bar', [s.cageFront, s.floor + 0.03, -s.cageSide + 0.04], [s.cageFront + 0.04, s.roof - 0.02, -s.cageSide + 0.1]),
-    box('glass', 'glass', [s.cageFront + 0.01, s.floor + 0.09, -s.cageSide + 0.1], [s.cageFront + 0.03, s.roof - 0.08, s.cageSide - 0.1]),
-  ], { bar: 'paint-charcoal', glass: 'glass-clear' }) + { title: 'Skid-steer loader door' },
+    box('stile_near', 'bar', [s.cageFront, s.doorSill, s.cageSide - 0.1], [s.cageFront + 0.04, s.roof - 0.02, s.cageSide - 0.04]),
+    box('stile_far', 'bar', [s.cageFront, s.doorSill, -s.cageSide + 0.04], [s.cageFront + 0.04, s.roof - 0.02, -s.cageSide + 0.1]),
+    box('glass', 'glass', [s.cageFront + 0.01, s.doorSill + 0.06, -s.cageSide + 0.1], [s.cageFront + 0.03, s.roof - 0.08, s.cageSide - 0.1]),
+  ] + doorPins, { bar: 'paint-charcoal', glass: 'glass-clear' }, motion=k.motion.hinge(doorPins, 'fore', s.doorOpens))
+  + { title: 'Skid-steer loader door' },
   // The cover rests on the frame's sponsons, dropping between them and behind them to the frame's floor.
   k.compound('skid_steer_engine_cover', 90, [
     prism('hood', 'paint', [[-1.24, 0.8], [s.cageRear, 0.8], [s.cageRear, 1.42], [-1.1, 1.42], [-1.24, 1.24]], [-0.47, 0.47]),
@@ -58,7 +69,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   ] + tailPins, { trim: 'paint-charcoal', bar: 'plastic-black' }, motion=k.motion.hinge(tailPins, 'rear', s.tailDoorOpens))
   + { title: 'Skid-steer loader tail door' },
   k.compound('skid_steer_lift_arms', 260, [
-    k.bar('brace', 'paint', [0.7, 1.22], [0.78, 1.32], 0.12, [-0.62, 0.62]),
+    k.bar('brace', 'paint', [-0.58, 1.71], [-0.46, 1.69], 0.14, [-0.62, 0.62]),
   ] + bothSides([
     k.bar('beam_rear', 'paint', [-0.82, 1.74], [0.45, 1.58], 0.2, [0.5, 0.645], 0.17),
     k.bar('beam_drop', 'paint', [0.45, 1.58], [1.1, 0.8], 0.17, [0.5, 0.645], 0.13),
@@ -81,8 +92,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('lug', 'dark', [-0.02, 1.5, 0.6], [0.1, 1.62, 0.7]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Skid-steer loader lift ram' },
   k.compound('skid_steer_tilt_ram', 22, [
-    k.bar('barrel', 'dark', [0.74, 1.28], [1.0, 1.0], 0.1, [0.14, 0.24]),
-    k.bar('rod', 'bright', [0.98, 1.02], [1.12, 0.82], 0.05, [0.165, 0.215]),
+    k.bar('barrel', 'dark', [0.7, 1.483], [1.04, 1.117], 0.1, [0.525, 0.62]),
+    k.bar('rod', 'bright', [1.02, 1.14], [1.3, 0.81], 0.05, [0.55, 0.595]),
   ], { dark: 'paint-charcoal', bright: 'steel-stainless' }) + { title: 'Skid-steer loader tilt ram' },
   k.compound('skid_steer_exhaust', 4, [
     k.turned('pipe', 'steel', 'y', k.disc(0.035, 0, 0.3)) + { sides: 12 },
