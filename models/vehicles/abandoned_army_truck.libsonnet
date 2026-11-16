@@ -8,6 +8,8 @@ local fin = s.finish;
 local c = s.cab;
 local b = s.bonnet;
 local between(x, a, e) = x > a && x < e;
+// Where the bumper's horns, let into the rails' front ends, stop.
+local hornBack = s.nose - 0.1;
 local age(x, y, seed, lowFrom) =
   0.34 + 0.26 * w.clamp((lowFrom - y) / 0.6, 0, 1) + (w.patchNoise(x, y, seed) - 0.5) * 0.8
   + (w.hash(std.floor(x * 8), std.floor(y * 8), seed + 5) - 0.5) * 0.12;
@@ -157,7 +159,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
                box('bogie_near', 'rust', [s.rearAxles[1] - 0.4, s.hubY + 0.09, 0.42], [s.rearAxles[0] + 0.4, s.rail[0], 0.54]),
                box('bogie_far', 'rust', [s.rearAxles[1] - 0.4, s.hubY + 0.09, -0.54], [s.rearAxles[0] + 0.4, s.rail[0], -0.42]),
              ] + [
-               box('cross_' + i, 'frame', [-3.2 + i * 1.2, s.rail[0] + 0.04, -s.railZ], [-3.1 + i * 1.2, s.rail[1] - 0.04, s.railZ])
+               // The front crossmember closes the rails just behind the bumper's horns, clear of the engine.
+               local x = if i < 5 then -3.15 + i * 1.2 else hornBack - 0.05;
+               box('cross_' + i, 'frame', [x - 0.05, s.rail[0] + 0.04, -s.railZ], [x + 0.05, s.rail[1] - 0.04, s.railZ])
                for i in std.range(0, 5)
              ] + w.field('floor', 'y', [c.back, c.front], [-c.side, c.side], 0.125, 0.125, floorPlate),
              fin) + { title: 'Abandoned army truck chassis' },
@@ -165,10 +169,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
     box('block', 'iron', [1.78, b.low, -0.3], [2.86, 1.42, 0.3]),
     box('head', 'rust', [1.82, 1.42, -0.24], [2.8, 1.54, 0.24]),
     box('rocker', 'rustRed', [1.9, 1.54, -0.14], [2.7, 1.6, 0.14]),
-    box('manifold', 'rust', [1.86, 1.24, 0.3], [2.76, 1.36, 0.4]),
-    box('down_pipe', 'dark', [1.9, 0.78, 0.3], [2.02, 1.24, 0.4]),
+    // The manifold reaches out over the near rail, so its down pipe drops outboard of the rail.
+    box('manifold', 'rust', [1.86, 1.24, 0.3], [2.76, 1.36, s.railZ + 0.1]),
+    box('down_pipe', 'dark', [1.9, 0.78, s.railZ], [2.02, 1.24, s.railZ + 0.1]),
     box('sump', 'dark', [1.9, 0.72, -0.26], [2.8, b.low, 0.26]),
-    box('radiator', 'rust', [2.96, b.low, -0.46], [3.1, 1.58, 0.46]),
+    // Wider than the frame, so it stands on the rails.
+    box('radiator', 'rust', [2.96, s.rail[1], -0.46], [3.1, 1.58, 0.46]),
     k.turned('fan_hub', 'dark', 'x', k.disc(0.3, 2.86, 2.96), [0, 1.26, 0]) + { sides: 12 },
     box('coil', 'iron', [2.2, 1.0, -0.42], [2.5, 1.2, -0.3]),
   ], fin) + { title: 'Abandoned army truck engine' },
@@ -199,8 +205,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, 
   k.compound('abandoned_army_truck_bumper', 70,
              w.field('bar', 'x', [-1.14, 1.14], [s.wing.board, 1.04], 0.125, 0.03125, bumper)
              + [
-               box('horn_near', 'rust', [s.nose - 0.1, 0.84, 0.3], [s.front - 0.12, 0.96, 0.42]),
-               box('horn_far', 'rust', [s.nose - 0.1, 0.84, -0.42], [s.front - 0.12, 0.96, -0.3]),
+               box('horn_near', 'rust', [hornBack, 0.84, 0.3], [s.front - 0.12, 0.96, 0.42]),
+               box('horn_far', 'rust', [hornBack, 0.84, -0.42], [s.front - 0.12, 0.96, -0.3]),
              ], fin) + { title: 'Abandoned army truck bumper' },
   k.compound('abandoned_army_truck_near_side', 110,
              w.field('wall', 'z', [c.back, c.front], [c.floor - 0.1, c.roof], 0.0625, 0.0625, cabWall(1, 137, true)), fin) + { title: 'Abandoned army truck near side' },

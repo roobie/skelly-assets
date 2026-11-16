@@ -50,7 +50,7 @@ local set = {
     slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
   }, 'Trooper gauntlets')),
   boots_trooper: suit('boots_trooper', 'Trooper boots', 2.6, fit.feet('boots_trooper', trooperBoot,
-                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, title='Trooper boots')),
+                                                    { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, { covers: ['sole'] }, title='Trooper boots')),
   legguard_trooper: suit('legguard_trooper', 'Trooper leg guards', 6.5, fit.trooperLegs('legguard_trooper', livery, title='Trooper leg guards')),
 };
 { [k]: set[k] + { rows: armour.of(null, set[k].rows) } for k in std.objectFields(set) }

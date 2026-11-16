@@ -1,13 +1,10 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { array, integer, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
-import { block, dome, oval, ovalCut } from './body.ts';
+import { block, dome, oval, ovalCut, region } from './body.ts';
 import { positive, spheroid } from './shapes.ts';
 
 /** The bust's segments: the head is its own part so a stance can lift it about the neck while the torso leans. */
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
-
-const region = <T extends ExtrudedPolygonSolid | BoxSolid | RevolvedSolid>(piece: string, solids: T[]): T[] =>
-  solids.map((solid) => ({ ...solid, display: { ...solid.display, piece } }));
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the

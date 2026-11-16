@@ -20,7 +20,7 @@ local bootFinish = { upper: 'steel-gunmetal', toe: 'paint-graphite', sole: 'rubb
 
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
+  fit.refit(row, [p for p in pieces if !drop(p.id)] + add, grain);
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
 local round(piece) = piece + { sides: 12 };
@@ -145,7 +145,7 @@ local gloves = fit.hands('gloves_power', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
 }, 'Power gauntlets').rows;
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots').rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, { covers: ['foot'] }, title='Power boots').rows;
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);

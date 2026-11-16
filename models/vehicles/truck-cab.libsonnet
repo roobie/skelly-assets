@@ -110,14 +110,9 @@ local defaults = {
 local spec(s) = defaults + s;
 // Where a cab door from `rear` to `front` starts, clear of the post behind it as it swings.
 local doorTail(s, rear, front) = rear + k.doorTailGap(front - rear, s.side + k.grain - s.skin);
-// The crossmembers' middles along x, back to front. The front one closes the rails' ends ahead of the radiator and
-// engine, which stand between them; the rest spread from the rails' back ends to the gearbox's back, so none passes
-// through the engine or gearbox.
+// The crossmembers' middles along x, back to front; the front one stands ahead of the radiator as well as the engine.
 local crossmembers(s) =
-  local rear = s.rear + 0.12;
-  local last = s.gearboxX - s.gearboxLength / 2 - crossmemberHalf;
-  assert (last - rear) / (crossmemberCount - 2) >= 2 * crossmemberHalf : 'the crossmembers behind the gearbox must not meet';
-  [rear + i * (last - rear) / (crossmemberCount - 2) for i in std.range(0, crossmemberCount - 2)] + [s.railFront - crossmemberHalf];
+  k.crossmemberXs(s.rear + 0.12, s.gearboxX - s.gearboxLength / 2, s.railFront, crossmemberCount, crossmemberHalf);
 // The near leaf spring under the rail, from the seat of the axle at `x`, whose frame stands at `axleY`, up to the rail.
 // `front` and `back` stop its hangers short of whatever stands ahead and behind.
 local springZ(s) = [s.railZ - springWidth, s.railZ];
