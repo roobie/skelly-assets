@@ -194,6 +194,7 @@ local pressings(id, title, s) = {
       ],
   // Never under the sill, or the floor's edge shows as a strip below the skirt.
   local floorUnder = std.max(s.floor - 0.08, s.sill),
+  // The engine bay under an engine deck is open below, so a raised rear floor stops at the deck's riser.
   local floorPieces = (
     if stepCount == 0 then slab('floor', floorRearEnd, floorFront, floorUnder, s.floor)
     else
@@ -205,7 +206,7 @@ local pressings(id, title, s) = {
         box('floor_door_' + d, 'floor', [g.doorways[d][0], floorUnder, -s.skin], [g.doorways[d][1], s.floor, wellInner])
         for d in std.range(0, std.length(g.doorways) - 1)
       ]
-  ) + (if raised then slab('floor_rear', s.rear, s.floorStep, s.floorRear - 0.08, s.floorRear) + [
+  ) + (if raised then slab('floor_rear', if has(s, 'engineDeck') then s.engineDeck.x else s.rear, s.floorStep, s.floorRear - 0.08, s.floorRear) + [
          box('floor_riser', 'floor', [s.floorStep - 0.04, floorUnder, -s.skin], [s.floorStep, s.floorRear, s.skin]),
        ] else []) + (if has(s, 'engineDeck') then [
                        box('engine_deck', 'floor', [s.rear, s.engineDeck.y - 0.08, -s.skin], [s.engineDeck.x, s.engineDeck.y, s.skin]),

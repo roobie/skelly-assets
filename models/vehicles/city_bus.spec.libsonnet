@@ -5,7 +5,7 @@ local seat = bus.seat;
 local single = bus.single;
 {
   rear: -6, front: 6, side: 1.275, skin: 1.2, sill: 0.3,
-  floor: 0.36, floorRear: 0.82, floorStep: -1.4, engineDeck: { x: -4.25, y: 1.28 },
+  floor: 0.36, floorRear: 0.82, floorStep: -1.4, engineDeck: { x: -4.25, y: 1.36 },
   roofBase: 2.82, roof: 3.0,
   decks: [{ waist: 1.15, top: 2.55, bayFront: 5.6, pitch: 1.35, bays: 8 }],
   frontAxle: 3.3, frontAxlePart: 'steered_axle_drop', rearAxle: -2.6, arch: 0.62, archTop: 1.12, frontWell: 0.86, rearWell: 0.6,
@@ -36,8 +36,8 @@ local single = bus.single;
     seat(-1.7, 0.82, 'both'),
     seat(-2.6, 1.18, 'both'),
     seat(-3.5, 0.82, 'both'),
-    seat(-4.65, 1.28, 'both'),
-    seat(-5.4, 1.28, 'both'),
+    seat(-4.65, self.engineDeck.y, 'both'),
+    seat(-5.4, self.engineDeck.y, 'both'),
   ],
   power: {
     engine: 'engine_i6_heavy_diesel', engineAt: [-5.15, 0.32, 0],
