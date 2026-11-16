@@ -2,7 +2,7 @@
 // walk loops and still poses, each frame a pose file compiled as the posing page compiles one. The walks are a gait
 // rather than key frames, because a planted foot keeps pace with the ground only for the legs it was worked out on, and
 // the doll's legs are measured off its built parts. The gait is arpg1's avatar gait as ahg3's FigureGait carries it,
-// whose look its owner judged there.
+// whose look its owner judged there; see docs/decisions/0021-doll-locomotion.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { clampJointAngles, sub } from '../site/kinematics.mjs';
