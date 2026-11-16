@@ -106,14 +106,8 @@ local blank(id, slot, r0, r1, x0, x1, y, z=0) = turned(id, slot, 'x', [[0, 0], [
                blank('wind-%d' % i, 'line', 0.024, 0.024, -0.34 + i * 0.008, -0.335 + i * 0.008, 0.0225)
                for i in std.range(0, 7)
              ]
-             + [
-               box('run-%d' % i, 'line', [x, top(x + 0.073) - 0.001, -0.001], [x + 0.073, top(x + 0.073) + 0.001, 0.001])
-               for i in std.range(0, 9)
-               for x in [-0.28 + i * 0.073]
-             ]
-             + [shift(p, -0.29, 0.0465, -0.008) for p in hook('hook', 0.006, 0.002, 0.002, 0.022, 0.009, 0.002)]
-             + [
-             ],
+             + h.bend('run', 'line', [[-0.28, top(-0.28)], [0.45, top(0.45)]], 0.003, -0.0015, 0.0015)
+             + [shift(p, -0.29, 0.0465, -0.008) for p in hook('hook', 0.006, 0.003, 0.003, 0.022, 0.009, 0.0025)],
              { bark: 'bark', cut: 'wood-pine', line: 'cloth-cream', hook: 'steel-grey' }) + { title: 'Stick fishing rod' }
   + gripOn('stick_fishing_rod', 'stick') + { voxelGrain: 0.002 } + { taxonomy: { category: 'recreation', tags: { material: ['wood', 'fabric'], setting: ['prehistoric'] } } },
 

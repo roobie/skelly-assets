@@ -22,10 +22,11 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
     local area = std.sum([profile[i][0] * profile[(i + 1) % n][1] - profile[(i + 1) % n][0] * profile[i][1] for i in std.range(0, n - 1)]);
     { id: id, slot: slot, kind: 'prism', axis: axis, profile: if area > 0 then profile else std.reverse(profile), start: start, end: end },
   rod: rod,
-  // A bar bent along a polyline of [x, y] points, lying from z0 to z1, `w` wide or one width per point for a taper.
+  // A bar bent along a polyline of points across `axis`, lying from z0 to z1 along it, `w` wide or one width per point
+  // for a taper. The points are [x, y] across z, [y, z] across x and [z, x] across y.
   // Prisms must be convex, so each straight run is its own prism; the runs are mitred at every bend so neighbours
   // share their joint face and the bar reads as one piece, not a chain of offset blocks.
-  bend(prefix, slot, pts, w, z0, z1):
+  bend(prefix, slot, pts, w, z0, z1, axis='z'):
     local n = std.length(pts);
     local half(i) = (if std.isArray(w) then w[i] else w) / 2;
     local normal(i) =
@@ -38,7 +39,7 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
       [mx * k, my * k];
     local side(i, s) = local o = offset(i); [pts[i][0] + s * o[0], pts[i][1] + s * o[1]];
     [
-      $.prism('%s-%d' % [prefix, i], slot, 'z', [side(i, 1), side(i, -1), side(i + 1, -1), side(i + 1, 1)], z0, z1)
+      $.prism('%s-%d' % [prefix, i], slot, axis, [side(i, 1), side(i, -1), side(i + 1, -1), side(i + 1, 1)], z0, z1)
       for i in std.range(0, n - 2)
     ],
   // A round pipe or wire of radius `r` (or one radius per point) bent along a polyline of [x, y] points at depth z:
