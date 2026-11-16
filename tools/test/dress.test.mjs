@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { dollOf, isWearable, modelBox, modelParts, readDressing, wornPieces, wornSites } from '../dress.mjs';
+import { coveringItems, dollOf, isWearable, modelBox, modelParts, readDressing, wornPieces, wornSites } from '../dress.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 const box = (min, max) => ({ min, max });
@@ -65,6 +65,18 @@ test('a piece that covers some of its part names, in every copy, the doll site t
     [['sleeve'], doll.parts.get('sleeve')[1].site],
     [undefined, undefined],
   ]);
+});
+
+test('an item is dressed to check its pieces\' covers whether or not the tree holds the item itself', () => {
+  const models = [
+    { ...model('coat_worn_cuff', { fit: ['worn'] }), covers: ['sleeve'] },
+    { ...model('coat_worn', { fit: ['worn'] }), covers: ['chest'] },
+    { ...model('vest_worn', { fit: ['worn'] }), covers: ['chest'] },
+    model('scarf_worn', { fit: ['worn'] }),
+    { ...model('coat_hood_worn_body', { fit: ['worn'] }), covers: ['chest'] },
+    { ...model('coat_worn_jacket_cuff', { fit: ['over-jacket'] }), covers: ['sleeve'] },
+  ];
+  assert.deepEqual(coveringItems(models), ['coat', 'vest', 'coat_hood']);
 });
 
 test('pieces fitted over other clothing and other items\' pieces are not worn with an item', () => {
