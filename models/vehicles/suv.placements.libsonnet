@@ -34,7 +34,6 @@ local s = import 'suv.spec.libsonnet';
   + site.pair('arch_flare', 'suv_arch_flare')
   + site.pair('rear_door_flare', 'suv_rear_door_flare', rides='rear_door')
   + site.pair('side_step', 'suv_side_step')
-  + site.pair('front_strut', 'front_strut', [s.frontAxle, 0.366, s.side - 0.1325 - 0.05])
   + site.pair('front_wheel', 'wheel_265_75r16', [s.frontAxle, 0.402, s.side - 0.1325])
   + site.pair('rear_wheel', 'wheel_265_75r16', [s.rearAxle, 0.402, s.side - 0.1325])
   + site.pair('front_seat', 'front_seat', [0.05, s.floor, 0.37])
