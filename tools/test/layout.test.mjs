@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
+import process from 'node:process';
 import { test } from 'node:test';
 import { sampleClip } from '../../site/clipFrames.mjs';
 import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
