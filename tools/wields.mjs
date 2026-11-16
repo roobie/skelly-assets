@@ -3,7 +3,7 @@
 // (`wieldClips`). A key frame states where the weapon's grip is and how it is turned against the chest, so its pose file
 // states world points that would drift from the frame if written by hand, as the press check's do.
 // Usage: node tools/wields.mjs [--built built]
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { posedSolid, signedDepth } from '../site/clearance.mjs';
@@ -31,12 +31,17 @@ import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
+import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
 
-export const readWields = (root = repo) =>
-  JSON.parse(evaluateJsonnet(`import '${POSES}/wields/wields.libsonnet'`, root));
+/**
+ * A set of wields: `{ classes, framesPerSecond, easing }` from its content file under models/poses, each class's stances
+ * and, for a set that swings, its strikes.
+ */
+export const readWields = (root = repo, file = 'wields/wields.libsonnet') =>
+  JSON.parse(evaluateJsonnet(`import '${POSES}/${file}'`, root));
 
 /** A strike's phases in the order it passes through them; the hit lands where `strike` ends. */
 export const PHASES = ['windup', 'strike', 'follow', 'recovery'];
@@ -82,7 +87,7 @@ export function strikeTiming(strike) {
 const fromEulerXyz = ([x, y, z]) => [rotX(x), rotY(y), rotZ(z)].reduce(mulMM);
 
 /**
- * What the wields need of a held model, from its things sidecar (`grip`, `roll`) and its mesh: the turn `held` that
+ * What the wields need of a held model, from its sidecar (`grip`, `roll`) and its mesh: the turn `held` that
  * carries its file's axes onto the held axes (working end +z, up +y), the grip point `at` in its file, and its solid.
  */
 export function heldWeapon(entry, mesh) {
@@ -177,7 +182,7 @@ export function wieldPoses(rig, wields, weapons) {
     const { weapon, sockets } = weapons[name];
     for (const [stance, key] of Object.entries(cls.stances))
       poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       for (const key of Object.values(ENDS))
         poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
     }
@@ -192,7 +197,7 @@ const easings = (wields, strike) => PHASES.map((phase) => strike.easing?.[phase]
 export function wieldSequences(wields) {
   const sequences = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const guard = clipName(name, 'stance', 'guard');
       const phases = strikePhases(spec);
@@ -343,7 +348,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
       clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
       reports[clipName(name, 'stance', stance)] = [report];
     }
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
       const phases = strikePhases(spec);
@@ -386,7 +391,7 @@ export function wieldTree(built, manifest, root = repo) {
 
 /**
  * What a hand needs of the models a built tree holds: `meshOf(id)`, the model's parts at rest as one mesh, and
- * `entryOf(id)`, its things sidecar.
+ * `entryOf(id)`, its sidecar, from whichever tool's folder under its pack holds it.
  */
 export function heldItems(built, manifest) {
   const meshes = treeMeshes(built, manifest);
@@ -403,7 +408,10 @@ export function heldItems(built, manifest) {
     );
   const entryOf = (id) => {
     const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    return JSON.parse(readFileSync(join(built, pack, 'things', `${id}.model.json`), 'utf8'));
+    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, pack, folder, `${id}.model.json`));
+    const sidecar = sidecars.find((path) => existsSync(path));
+    if (!sidecar) throw new Error(`${id}: no sidecar under ${pack}`);
+    return JSON.parse(readFileSync(sidecar, 'utf8'));
   };
   return { meshOf, entryOf };
 }
