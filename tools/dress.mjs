@@ -159,6 +159,13 @@ export function wornPieces(id, models, dressing) {
   });
 }
 
+// The items any of whose worn pieces declares what it covers, by the pieces' ids, whether or not the tree holds the item
+// itself: a set of worn shells with no ground model is still dressed to check what it declares.
+export const coveringItems = (models) => [...new Set(models.flatMap((model) => {
+  const item = model.covers && tagsOf(model, 'fit').includes('worn') ? /^(.+)_worn(?:_[^_]+)?$/.exec(model.id)?.[1] : undefined;
+  return item ? [item] : [];
+}))];
+
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
 export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => tagsOf(other, 'fit').includes('worn') && isPieceOf(model.id, other)));
 
