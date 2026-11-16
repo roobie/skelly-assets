@@ -223,7 +223,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['dash', 'shell', 0.068],
       ['floor', 'near_side', 0.065],
       ['floor', 'side', 0.055],
-      ['partition', 'shell', 0.055],
       ['tub_floor', 'tub_side', 0.058],
       ],
     ),
