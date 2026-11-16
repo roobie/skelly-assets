@@ -27,7 +27,7 @@ local shellZ(id, slot, r, t, a, z0, z1, cx, n=8, y0=0) =
 // Height of a shellZ's top at its crown.
 local shellTop(r, t, a, y0=0) = y0 - r * std.cos(a * std.pi / 180) + t + r;
 // A band `w` long along z lying round the outside of a shellZ at z, `lift` proud of it: straps, rivet rows, roped edges.
-local bandZ(id, slot, r, t, a, z, w, cx, lift=0.003, n=8, y0=0) =
+local bandZ(id, slot, r, a, z, w, cx, lift=0.003, n=8, y0=0) =
   shellZ(id, slot, r + lift, lift + 0.002, a, z - w / 2, z + w / 2, cx, n, y0 + lift);
 
 // The body plate lying front up, centred on [0, cz]: a breastplate `w` across and `l` from neck to waist, curved
@@ -98,8 +98,8 @@ local plateSuit(o) =
       flat('couter-fan-' + side, 'plate', [[x + s * 0.03, z0 + 0.2], [x + s * 0.09, z0 + 0.19], [x + s * 0.09, z0 + 0.27], [x + s * 0.03, z0 + 0.26]], 0, 0.006),
     ]
     + shellZ('vambrace-' + side, 'plate', 0.05, 0.006, 75, z0 + 0.27, z0 + 0.5, x)
-    + bandZ('arm-strap-a-' + side, 'strap', 0.06, 0.006, 70, z0 + 0.1, 0.02, x)
-    + bandZ('arm-strap-b-' + side, 'strap', 0.05, 0.006, 75, z0 + 0.4, 0.02, x);
+    + bandZ('arm-strap-a-' + side, 'strap', 0.06, 70, z0 + 0.1, 0.02, x)
+    + bandZ('arm-strap-b-' + side, 'strap', 0.05, 75, z0 + 0.4, 0.02, x);
   // Leg harness below: cuisse, a knee cop with its wing, mail at the back of the knee, and a greave.
   local leg(side, s) =
     local x = s * 0.11, z0 = skirtZ + 0.05;
@@ -110,9 +110,9 @@ local plateSuit(o) =
       flat('poleyn-wing-' + side, 'plate', [[x + s * 0.04, z0 + 0.24], [x + s * 0.095, z0 + 0.25], [x + s * 0.095, z0 + 0.29], [x + s * 0.04, z0 + 0.3]], 0, 0.006),
     ]
     + shellZ('greave-' + side, 'plate', 0.065, 0.007, 80, z0 + 0.31, z0 + 0.53, x)
-    + bandZ('thigh-strap-a-' + side, 'strap', 0.085, 0.007, 70, z0 + 0.06, 0.022, x)
-    + bandZ('thigh-strap-b-' + side, 'strap', 0.085, 0.007, 70, z0 + 0.18, 0.022, x)
-    + bandZ('shin-strap-' + side, 'strap', 0.065, 0.007, 80, z0 + 0.45, 0.022, x);
+    + bandZ('thigh-strap-a-' + side, 'strap', 0.085, 70, z0 + 0.06, 0.022, x)
+    + bandZ('thigh-strap-b-' + side, 'strap', 0.085, 70, z0 + 0.18, 0.022, x)
+    + bandZ('shin-strap-' + side, 'strap', 0.065, 80, z0 + 0.45, 0.022, x);
   // Shoulder straps joining breast to back, buckled on the chest.
   local straps = [
     sbox('shoulder-strap-' + side, 'strap', [s * 0.09, 0, cz - l / 2 - 0.05], [s * 0.13, h.curvedTopAt(out, 0, t, r, s * 0.11) + 0.003, cz - l / 2 + 0.04])
@@ -173,7 +173,7 @@ local sheetSuit(o) =
     + [box('skirt-row-%d' % i, 'mail', [-0.21, 0.006, skirtZ + 0.035 + i * 0.016], [0.21, 0.009, skirtZ + 0.04 + i * 0.016]) for i in std.range(0, 2)]
   else [];
   // Straps stand 4.5 mm proud so their three facets, each thinner than the strap across its corners, keep a full voxel.
-  local strapAt(id, rr, a, z, x) = bandZ(id, 'strap', rr, t, a, z, 0.025, x, 0.0045, 3);
+  local strapAt(id, rr, a, z, x) = bandZ(id, 'strap', rr, a, z, 0.025, x, 0.0045, 3);
   local limb(p, x, z0, segs, rr) = std.flattenArrays([
     shellZ('%s-%d' % [p, k], 'sheet', rr[k], t, 55, segs[k][0], segs[k][1], x, 3)
     + strapAt('%s-strap-%d' % [p, k], rr[k], 55, (segs[k][0] + segs[k][1]) / 2, x)
@@ -233,8 +233,8 @@ local leatherSuit() =
   ]);
   local laced(p, x, z0, z1, rr) =
     shellZ(p, 'leather', rr, 0.008, 70, z0, z1, x)
-    + bandZ(p + '-rim-a', 'edge', rr, 0.008, 70, z0 + 0.008, 0.014, x, 0.002)
-    + bandZ(p + '-rim-b', 'edge', rr, 0.008, 70, z1 - 0.008, 0.014, x, 0.002)
+    + bandZ(p + '-rim-a', 'edge', rr, 70, z0 + 0.008, 0.014, x, 0.002)
+    + bandZ(p + '-rim-b', 'edge', rr, 70, z1 - 0.008, 0.014, x, 0.002)
     + [
       local za = z0 + 0.03 + i * 0.03, top = shellTop(rr, 0.008, 70);
       flat('%s-lace-%d' % [p, i], 'lace', [[x - 0.025, za], [x - 0.019, za], [x + 0.025, za + 0.03], [x + 0.019, za + 0.03]], top - 0.002, top + 0.002)
@@ -279,7 +279,7 @@ local chitinSuit() =
     std.flattenArrays([
       local rr = 0.085 - k * 0.0055, za = z0 + k * 0.075;
       shellZ('leg-%s-%d' % [side, k], 'shell', rr, 0.008, 72, za, za + 0.085, x, 8, k % 2 * 0.002)
-      + bandZ('leg-lace-%s-%d' % [side, k], 'lace', rr, 0.008, 72, za + 0.075, 0.008, x, 0.002, 8, k % 2 * 0.002)
+      + bandZ('leg-lace-%s-%d' % [side, k], 'lace', rr, 72, za + 0.075, 0.008, x, 0.002, 8, k % 2 * 0.002)
       for k in std.range(0, 7)
     ]);
   body + laces + horns + leg('l', -1) + leg('r', 1);

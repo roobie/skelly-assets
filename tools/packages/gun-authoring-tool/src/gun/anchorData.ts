@@ -173,7 +173,6 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
         ...ejectionAnchor(params, part),
         ...(mouth
           ? {
-              // biome-ignore lint/style/useNamingConvention: exported Deadvox anchor is a snake_case content Id.
               loading_port: frameAt([
                 mouth.box.center[0],
                 mouth.box.center[1] + mouth.box.half[1],

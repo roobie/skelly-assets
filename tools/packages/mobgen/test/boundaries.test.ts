@@ -61,21 +61,24 @@ describe('import boundaries', () => {
     }
   });
 
-  it.each(STANDALONE_MOBS)('keeps the %s standalone: core, shared mob plumbing and its own files and content only', (mob) => {
-    const home = join(ROOT, 'src/mob', mob);
-    const mobFiles = srcFiles.filter((file) => file.startsWith(`${home}/`));
-    expect(mobFiles.length).toBeGreaterThan(0);
-    for (const file of mobFiles) {
-      for (const spec of specifiers(file)) {
-        const target = resolve(file, '..', spec);
-        const allowed =
-          spec.startsWith('.') &&
-          (target.startsWith(join(ROOT, 'src/core/')) ||
-            target.startsWith(`${home}/`) ||
-            target.startsWith(`${CONTENT}/${mob}/`) ||
-            SHARED_PLUMBING.includes(target));
-        expect(allowed, `${relative(REPO, file)} -> ${spec}`).toBe(true);
+  it.each(STANDALONE_MOBS)(
+    'keeps the %s standalone: core, shared mob plumbing and its own files and content only',
+    (mob) => {
+      const home = join(ROOT, 'src/mob', mob);
+      const mobFiles = srcFiles.filter((file) => file.startsWith(`${home}/`));
+      expect(mobFiles.length).toBeGreaterThan(0);
+      for (const file of mobFiles) {
+        for (const spec of specifiers(file)) {
+          const target = resolve(file, '..', spec);
+          const allowed =
+            spec.startsWith('.') &&
+            (target.startsWith(join(ROOT, 'src/core/')) ||
+              target.startsWith(`${home}/`) ||
+              target.startsWith(`${CONTENT}/${mob}/`) ||
+              SHARED_PLUMBING.includes(target));
+          expect(allowed, `${relative(REPO, file)} -> ${spec}`).toBe(true);
+        }
       }
-    }
-  });
+    },
+  );
 });

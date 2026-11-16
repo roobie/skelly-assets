@@ -221,7 +221,13 @@ const buildWalker = (genome: Genome, template: Template): Body => {
 
   // The sensor head: a charcoal block set into the front of the box carrying the slit window and its
   // lenses. It severs, as the one shot that blinds the walker.
-  rig.bones.push({ id: 'head', parent: 'hull', head: at(0, 2.74, -0.92), tail: at(0, 2.74, -1.3), disposition: 'sever' });
+  rig.bones.push({
+    id: 'head',
+    parent: 'hull',
+    head: at(0, 2.74, -0.92),
+    tail: at(0, 2.74, -1.3),
+    disposition: 'sever',
+  });
   part(rig, 'head', box(at(0, 2.74, -1.06), [r(0.66), r(0.22), r(0.16)]), 'frame');
   part(rig, 'head', box(at(0, 2.95, -1.1), [r(0.7), r(0.05), r(0.14)]), 'armor');
   paint(rig, 'head', box(at(0, 2.76, -1.2), [r(0.56), r(0.075), r(0.06)]), 'window', ['frame']);
@@ -252,7 +258,13 @@ const buildPod = (rig: Rig, side: string, x: number, { at, r, p }: Limb): void =
   const bone = `pod.${side}`;
   const k = p.pods;
   const out = 0.86 + 0.26 * k;
-  rig.bones.push({ id: bone, parent: 'hull', head: at(0.86 * x, 2.66, -0.14), tail: at(out * x, 2.62, -1.1), disposition: 'sever' });
+  rig.bones.push({
+    id: bone,
+    parent: 'hull',
+    head: at(0.86 * x, 2.66, -0.14),
+    tail: at(out * x, 2.62, -1.1),
+    disposition: 'sever',
+  });
   part(rig, bone, box(at(0.92 * x, 2.66, -0.14), [r(0.1), r(0.17), r(0.2)]), 'frame');
   part(rig, bone, box(at(out * x, 2.64, -0.36), [r(0.23 * k), r(0.26 * k), r(0.6)]), 'armor');
   const front = -0.96;
@@ -263,9 +275,22 @@ const buildPod = (rig: Rig, side: string, x: number, { at, r, p }: Limb): void =
     [1, -1],
     [1, 1],
   ] as const) {
-    paint(rig, bone, box(at(out * x + 0.1 * k * dx, 2.64 + 0.11 * k * dy, front), [r(0.065), r(0.065), r(0.05)]), 'bore', ['frame']);
+    paint(
+      rig,
+      bone,
+      box(at(out * x + 0.1 * k * dx, 2.64 + 0.11 * k * dy, front), [r(0.065), r(0.065), r(0.05)]),
+      'bore',
+      ['frame'],
+    );
   }
-  hazardBand(rig, bone, box(at((out + 0.23 * k) * x, 2.64, -0.72), [r(0.04), r(0.2 * k), r(0.18)]), 'armor', r(0.26), 'x');
+  hazardBand(
+    rig,
+    bone,
+    box(at((out + 0.23 * k) * x, 2.64, -0.72), [r(0.04), r(0.2 * k), r(0.18)]),
+    'armor',
+    r(0.26),
+    'x',
+  );
   hazardBand(rig, bone, box(at(out * x, 2.64 + 0.26 * k, -0.82), [r(0.2 * k), r(0.04), r(0.1)]), 'armor', r(0.26), 'y');
   const gunY = 2.64 - 0.26 * k - 0.1;
   part(rig, bone, box(at(out * x, gunY, -0.5), [r(0.13), r(0.12), r(0.42)]), 'frame');
@@ -297,7 +322,12 @@ const buildLeg = (rig: Rig, side: string, x: number, { at, r, p }: Limb): void =
   // face makes it read as the muscle of the machine.
   part(rig, thigh, drum(hip, r(0.3 * g), r(0.3 * g)), 'frame');
   part(rig, thigh, slab(hip, knee, [r(0.26 * g), r(0.3 * g)], r(0.06)), 'armor');
-  part(rig, thigh, slab(add(hip, at(0.3 * x * g, -0.05, 0.02)), add(knee, at(0.3 * x * g, 0.16, 0.12)), [r(0.07), r(0.27 * g)], 0), 'armor');
+  part(
+    rig,
+    thigh,
+    slab(add(hip, at(0.3 * x * g, -0.05, 0.02)), add(knee, at(0.3 * x * g, 0.16, 0.12)), [r(0.07), r(0.27 * g)], 0),
+    'armor',
+  );
   ram(rig, thigh, hip, knee, at(0, 0.2, -0.2), r(0.12 * g));
 
   part(rig, shin, drum(knee, r(0.29 * g), r(0.29 * g)), 'frame');

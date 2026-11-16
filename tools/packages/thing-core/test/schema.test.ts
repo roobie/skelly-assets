@@ -76,7 +76,9 @@ describe('material table', () => {
     const cloth = { colour: [0.2, 0.3, 0.4], finish: { metallic: 0, roughness: 0.9, sheen, fabric } };
     expect(safeParse(MaterialSchema, cloth).success).toBe(true);
     expect(safeParse(MaterialSchema, { ...cloth, finish: { ...cloth.finish, metallic: 1 } }).success).toBe(false);
-    expect(safeParse(MaterialSchema, { ...cloth, finish: { metallic: 0, roughness: 0.9, fabric } }).success).toBe(false);
+    expect(safeParse(MaterialSchema, { ...cloth, finish: { metallic: 0, roughness: 0.9, fabric } }).success).toBe(
+      false,
+    );
     expect(
       safeParse(MaterialSchema, { ...cloth, finish: { ...cloth.finish, fabric: { ...fabric, kind: 'chainmail' } } })
         .success,

@@ -130,7 +130,10 @@ const namedFiles = {
   magazine: (row: Row) => [String((optionsFor(row) as { cartridge?: unknown }).cartridge)],
 } satisfies Record<keyof typeof exporters, (row: Row) => readonly string[]>;
 
-export const loadExportRecipe = (value: unknown = content, root = REPO_ROOT): readonly RecipeExport<DeadvoxModelEntry>[] =>
+export const loadExportRecipe = (
+  value: unknown = content,
+  root = REPO_ROOT,
+): readonly RecipeExport<DeadvoxModelEntry>[] =>
   loadRecipe(
     value,
     Object.fromEntries(Object.entries(exporters).map(([kind, load]) => [kind, (row: Row) => load(row, root)])),

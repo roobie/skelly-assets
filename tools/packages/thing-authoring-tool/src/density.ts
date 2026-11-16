@@ -1,7 +1,18 @@
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { DrawnGeometry } from '@skelly/thing-export/drawn.ts';
-import { check, finite, type InferOutput, minValue, number, optional, pipe, record, strictObject, string } from 'valibot';
+import {
+  check,
+  finite,
+  type InferOutput,
+  minValue,
+  number,
+  optional,
+  pipe,
+  record,
+  strictObject,
+  string,
+} from 'valibot';
 import type { ToolItem } from './catalogue.ts';
 
 const density = pipe(number(), finite(), minValue(0));

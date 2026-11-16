@@ -35,7 +35,6 @@ const partOf = (ref: string): string => ref.slice(0, ref.indexOf('.'));
  * Makes one assembly from a template. Deterministic: the same template,
  * domain and seed always give the same assembly.
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
 export const generate = (template: Template, domain: Domain, seed: number): Assembly => {
   const rng = seededRng(seed);
 

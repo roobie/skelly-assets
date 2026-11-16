@@ -47,8 +47,16 @@ test('a breaking note must say what a consumer does, and only a breaking note ha
 
 test('reading the notes names every invalid note, not only the first, and skips the guide', () => {
   withRoot((root) => {
-    writeNotes(root, { 'README.md': '# not a note\n', 'one.md': note('nope', 'x'), 'two.md': note('added', ''), 'ok.md': note('added', 'x') });
-    assert.throws(() => readNotes(join(root, NOTES_DIR)), (error) => /one\.md/.test(error.message) && /two\.md/.test(error.message));
+    writeNotes(root, {
+      'README.md': '# not a note\n',
+      'one.md': note('nope', 'x'),
+      'two.md': note('added', ''),
+      'ok.md': note('added', 'x'),
+    });
+    assert.throws(
+      () => readNotes(join(root, NOTES_DIR)),
+      (error) => /one\.md/.test(error.message) && /two\.md/.test(error.message),
+    );
   });
 });
 
@@ -69,7 +77,10 @@ test('a release groups its notes by type, breaking first, above the newest secti
     const groups = versionSection(changelog, '0.2.0');
     assert.deepEqual(groups.match(/^### .+/gm), ['### Breaking', '### Upgrading from 0.1.0', '### Added', '### Fixed']);
     assert.match(groups, /### Breaking\n\n- Renamed a thing\.\n {2}It reads better\.\n- Moved a thing\.\n/);
-    assert.match(groups, /### Upgrading from 0\.1\.0\n\n- Rename your references\.\n- Rebuild\.\n- Read it from its new path\.\n/);
+    assert.match(
+      groups,
+      /### Upgrading from 0\.1\.0\n\n- Rename your references\.\n- Rebuild\.\n- Read it from its new path\.\n/,
+    );
     assert.doesNotMatch(groups, /Old\./);
     assert.equal(versionSection(changelog, 'v0.1.0'), '### Added\n\n- Old.\n');
     assert.ok(!existsSync(join(root, NOTES_DIR, 'a.md')) && existsSync(join(root, NOTES_DIR, 'README.md')));
@@ -78,14 +89,18 @@ test('a release groups its notes by type, breaking first, above the newest secti
 });
 
 test('a tag without its changelog section is refused rather than released with empty notes', () => {
-  assert.throws(() => versionSection('# Changelog\n\n## 0.1.0 - 2000-01-01\n\n- x\n', 'v0.1.1'), /no section for 0\.1\.1/);
+  assert.throws(
+    () => versionSection('# Changelog\n\n## 0.1.0 - 2000-01-01\n\n- x\n', 'v0.1.1'),
+    /no section for 0\.1\.1/,
+  );
 });
 
 test('only notes a range adds count for a PR, not edits to pending notes or to the guide', () => {
   withRoot((root) => {
     // Inherited GIT_* bindings would point the fixture's git at the repository running the test.
     const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
-    const git = (...args) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd: root, env });
+    const git = (...args) =>
+      execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd: root, env });
     git('init', '-q');
     writeNotes(root, { 'README.md': '# guide\n', 'old.md': note('added', 'x') });
     git('add', '.');

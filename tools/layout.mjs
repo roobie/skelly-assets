@@ -15,7 +15,12 @@ function assertPackId(packId) {
 
 export function outputPath(packId, file) {
   assertPackId(packId);
-  if (!file || file.includes('\\') || posix.isAbsolute(file) || file.split('/').some(segment => segment === '..' || segment === '.' || segment === '')) {
+  if (
+    !file ||
+    file.includes('\\') ||
+    posix.isAbsolute(file) ||
+    file.split('/').some((segment) => segment === '..' || segment === '.' || segment === '')
+  ) {
     throw new Error(`Invalid logical output path: ${file}`);
   }
   return posix.join(packId, file);
@@ -52,35 +57,56 @@ export function readMobRows(root = repo) {
 // models/sounds/<packId>.jsonnet: each file holds one pack's sound rows, so its name declares the pack, as a recipe
 // file's does, and the packs are known without compiling the rows.
 export const SOUNDS = 'models/sounds';
-export const soundPackIds = (root = repo) => readdirSync(join(root, SOUNDS)).filter((name) => name.endsWith('.jsonnet')).sort()
-  .map((name) => name.slice(0, -'.jsonnet'.length));
+export const soundPackIds = (root = repo) =>
+  readdirSync(join(root, SOUNDS))
+    .filter((name) => name.endsWith('.jsonnet'))
+    .sort()
+    .map((name) => name.slice(0, -'.jsonnet'.length));
 
 // Pack id -> its compiled rows by id, as written; tools/packages/impact-synth/src/schema.ts validates them.
-export const readSoundPacks = (root = repo) => Object.fromEntries(soundPackIds(root)
-  .map((pack) => [pack, JSON.parse(readFileSync(join(root, SOUNDS, `${pack}.json`), 'utf8'))]));
+export const readSoundPacks = (root = repo) =>
+  Object.fromEntries(
+    soundPackIds(root).map((pack) => [pack, JSON.parse(readFileSync(join(root, SOUNDS, `${pack}.json`), 'utf8'))]),
+  );
 
 // Every sound row with the files it is baked to under its pack: the row itself as data, so a tool can render it again,
 // and one audio file per seed.
-export const readSoundRows = (root = repo) => Object.entries(readSoundPacks(root)).flatMap(([pack, rows]) => Object.entries(rows)
-  .map(([id, row]) => ({
-    id,
-    pack,
-    row,
-    data: `sounds/${id}.json`,
-    variants: row.seeds.map((seed) => ({ seed, path: `sounds/${id}/${seed}.ogg` })),
-  })));
+export const readSoundRows = (root = repo) =>
+  Object.entries(readSoundPacks(root)).flatMap(([pack, rows]) =>
+    Object.entries(rows).map(([id, row]) => ({
+      id,
+      pack,
+      row,
+      data: `sounds/${id}.json`,
+      variants: row.seeds.map((seed) => ({ seed, path: `sounds/${id}/${seed}.ogg` })),
+    })),
+  );
+
+// A model pack's smooth copy ships as a pack of its own beside it, so a consumer that draws only voxels never loads it;
+// the why is in docs/decisions/0020-smooth-copy.md.
+const SMOOTH = '.smooth';
+export const smoothPack = (packId) => `${packId}${SMOOTH}`;
+// The pack a smooth pack is the copy of, or undefined for a pack that is not one.
+export const smoothedPack = (packId) => (packId.endsWith(SMOOTH) ? packId.slice(0, -SMOOTH.length) : undefined);
 
 export function declaredPacks(root = repo) {
-  return new Set([
-    ...recipePackIds(root),
-    ...readRoster(root).map((row) => row.packId),
-    ...readMobRows(root).map((row) => row.pack),
-    ...soundPackIds(root),
-  ]);
+  const models = new Set([...recipePackIds(root), ...readRoster(root).map((row) => row.packId)]);
+  const declared = new Set([...models, ...readMobRows(root).map((row) => row.pack), ...soundPackIds(root)]);
+  const named = [...declared].filter((pack) => smoothedPack(pack) !== undefined);
+  if (named.length > 0) throw new Error(`a source declares a smooth pack's name: ${named.sort().join(' ')}`);
+  return new Set([...declared, ...[...models].map(smoothPack)]);
 }
 
 // Every directory directly under built/ must be a declared pack; flat files are not directories.
 export function undeclaredDirectories(paths, declared) {
-  const directories = new Set(paths.map((path) => path.split('/')).filter((parts) => parts[0] === 'built' && parts.length > 2).map((parts) => parts[1]));
-  return [...directories].filter((directory) => !declared.has(directory)).sort().map((directory) => `built/${directory}`);
+  const directories = new Set(
+    paths
+      .map((path) => path.split('/'))
+      .filter((parts) => parts[0] === 'built' && parts.length > 2)
+      .map((parts) => parts[1]),
+  );
+  return [...directories]
+    .filter((directory) => !declared.has(directory))
+    .sort()
+    .map((directory) => `built/${directory}`);
 }

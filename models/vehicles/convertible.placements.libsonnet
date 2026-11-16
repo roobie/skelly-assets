@@ -8,6 +8,9 @@ local s = import 'convertible.spec.libsonnet';
       rear_bench: { part: 'bench_seat_3', at: [-0.6, s.floor, 0] },
       // The cat can runs under the floor pan beneath the rear bench, its top at the pan's underside.
       exhaust: { at: [s.rear + 0.46, s.floor - 0.18, 0.42] },
+      // The tank hangs under the floor pan beneath the rear bench, mirrored so that its filler neck leaves on the far
+      // side, clear of the cat can.
+      fuel_tank: { at: [s.rearAxle + 0.65, s.floor - 0.16, 0], mirror: true },
       steering_wheel: { at: [s.cowl - 0.4, s.waist - 0.16, -0.37] },
       front_seat_near: { part: 'sports_car_bucket_seat', at: [-0.02, s.floor, 0.37] },
       front_seat_far: { part: 'sports_car_bucket_seat', at: [-0.02, s.floor, -0.37] },
@@ -21,7 +24,5 @@ local s = import 'convertible.spec.libsonnet';
       'The folded hood\'s tonneau runs into the rear bench\'s back.'),
     site.unjudged('folded_hood', 'shell', 0.041,
       'The folded hood\'s tonneau runs into the boot\'s side.'),
-    site.unjudged('fuel_tank', 'rear_bench', 0.081,
-      'The tank\'s filler cap stands through the floor into the rear bench\'s base; set lower, its neck meets the cat can, so the tank or the exhaust wants rerouting.'),
   ],
 }

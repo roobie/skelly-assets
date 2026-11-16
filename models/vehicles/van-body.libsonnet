@@ -41,11 +41,16 @@ local bonnetDepth = 0.03;
 // The headlamps' top, and their housing's height (`headlamp_large`).
 local headlampTop = 0.96;
 local headlampHeight = 0.22;
+// The headlamps' span across the nose, inboard edge to outboard, which their bezels frame and the slam panel is cut round.
+local headlampSpan = [0.5, 0.86];
 // Half the width of `tail_lamp_tall`, which a van stands beside its rear doors.
 local tailLampHalfWidth = 0.07;
 // The inner face of a body's side wall, the deeper of the lower panel's and the glass line's: what a jamb lies behind.
 local wallInOf(b) = std.min(b.skin, b.glassIn);
 local noseOf(s) = s.front - 0.08;
+// The front bumper is a moulding: a bar across the nose's front with returns along its sides, open behind, so the frame
+// rails end at its back face and the radiator stands behind it.
+local barBackOf(s) = noseOf(s) - 0.12;
 // The lowest the bonnet's underside comes: it is thinned where the headlamps would reach into it, so it shuts and lifts
 // a swing gap clear of them. Lowering the lamps instead would open a see-through slit under the bonnet at the voxel grain.
 local bonnetFloor = headlampTop + k.swingGap;
@@ -106,6 +111,7 @@ local pressings(id, title, s0) = {
   local b = s + (if isBox then s.box else {}),
   local tail = tailOf(s),
   local nose = noseOf(s),
+  local barBack = barBackOf(s),
   local bodyFront = if isBox then s.box.front else s.bRear,
   local slideFront = if isBox then s.box.slideFront else s.bRear,
   local slideTravel = slideFront - s.slideRear,
@@ -157,7 +163,7 @@ local pressings(id, title, s0) = {
   ] + bands('lower_rear', [tail, s.rearAxle - s.arch], b.side) + bands('lower_mid', [s.rearAxle + s.arch, s.slideRear], b.side) + archPieces('rear_arch', s.rearAxle, b.waist),
   local section(low) = [[low, -b.glassOut], [b.canton, -b.glassOut], [b.roof, -b.roofSide], [b.roof, b.roofSide], [b.canton, b.glassOut], [low, b.glassOut]],
   local chassis = k.bothSides([
-    box('frame_rail', 'pan', [tail + 0.1, 0.38, 0.42], [nose - 0.1, 0.52, 0.5]),
+    box('frame_rail', 'pan', [tail + 0.1, 0.38, 0.42], [barBack, 0.52, 0.5]),
   ]),
   // A floor's 2 cm rounds to one vertex grain, so a pan closer than two grains would meet its top face and z-fight.
   local panTop = b.floor - 0.04,
@@ -219,19 +225,25 @@ local pressings(id, title, s0) = {
   local cabEnd = [[s.floor, -s.skin], [s.canton, -s.skin], [s.roof - 0.05, -s.roofSide], [s.roof - 0.05, s.roofSide], [s.canton, s.skin], [s.floor, s.skin]],
   // The cab: floor, firewall, pillars, roof over the seats, and the front arches' tubs.
   local cabPieces = [
-    // Narrowed to the tubs ahead of the door, because the front tyres stand outside them.
-    box('cab_pan', 'pan', [bodyFront, s.sill, -s.skin], [s.frontAxle - s.arch, s.floor - 0.04, s.skin]),
+    // Narrowed to the front wings' inner face ahead of the door and to the tubs over the arch, since the wings stand
+    // down to the sill outside it and the front tyres outside the tubs.
+    box('cab_pan', 'pan', [bodyFront, s.sill, -s.skin], [s.cowl, s.floor - 0.04, s.skin]),
+    box('cab_pan_wings', 'pan', [s.cowl, s.sill, -(s.side - 0.1)], [s.frontAxle - s.arch, s.floor - 0.04, s.side - 0.1]),
     box('cab_pan_tubs', 'pan', [s.frontAxle - s.arch, s.sill, -s.tubIn], [s.aPost, s.floor - 0.04, s.tubIn]),
     box('cab_floor', 'carpet', [bodyFront, s.floor - 0.02, -s.skin + 0.02], [s.frontAxle - s.arch, s.floor, s.skin - 0.02]),
     box('cab_floor_tubs', 'carpet', [s.frontAxle - s.arch, s.floor - 0.02, -s.tubIn], [s.aPost, s.floor, s.tubIn]),
     box('tunnel', 'carpet', [s.bFront, s.floor, -0.2], [s.fire - 0.05, 0.78, 0.2]),
     box('firewall_low', 'paint', [s.fire - 0.05, s.floor, -s.tubIn], [s.fire, s.archTop, s.tubIn]),
-    box('firewall', 'paint', [s.fire - 0.05, s.archTop, -s.skin], [s.fire, s.waist, s.skin]),
-    box('scuttle', 'paint', [s.fire, s.waist - 0.03, -s.skin], [s.aPost, s.waist, s.skin]),
-    box('slam_panel', 'paint', [nose - 0.04, 0.58, -(s.side - 0.1)], [nose, bonnetNoseUnderOf(s) - k.swingGap, s.side - 0.1]),
+    // Over the arches the firewall and scuttle end at the front wings' inner face, which stands outside them.
+    box('firewall', 'paint', [s.fire - 0.05, s.archTop, -(s.side - 0.1)], [s.fire, s.waist, s.side - 0.1]),
+    box('scuttle', 'paint', [s.fire, s.waist - 0.03, -(s.side - 0.1)], [s.aPost, s.waist, s.side - 0.1]),
+    box('slam_panel', 'paint', [nose - 0.04, 0.58, -headlampSpan[0]], [nose, bonnetNoseUnderOf(s) - k.swingGap, headlampSpan[0]]),
     box('front_tub_floor', 'pan', [s.frontAxle - s.arch, s.sill, -s.tubIn], [s.frontAxle + s.arch, 0.5, s.tubIn]),
-    box('front_apron', 'pan', [s.frontAxle + s.arch, s.sill, -s.side + 0.1], [nose - 0.04, 0.6, s.side - 0.1]),
-  ] + (if s.bulkhead then [k.xPrism('bulkhead', 'lining', cabEnd, [s.bRear - 0.04, s.bRear])] else [])
+    // The nose's undertray, under the radiator and behind the bumper.
+    box('front_apron', 'pan', [s.frontAxle + s.arch, 0.34, -s.side + 0.1], [barBack, 0.38, s.side - 0.1]),
+  ]
+  // The bulkhead closes the cab ahead of the B pillars' rear face, so the body or box behind it starts clear of it.
+  + (if s.bulkhead then [k.xPrism('bulkhead', 'lining', cabEnd, [s.bRear, s.bRear + 0.04])] else [])
   + (if isBox then [
     box('cab_roof', 'paint', [s.bRear, s.roof - 0.04, -s.roofSide], [roofFront, s.roof, s.roofSide]),
     k.xPrism('cab_back', 'paint', cabEnd, [s.bRear, s.bRear + 0.04]),
@@ -246,6 +258,8 @@ local pressings(id, title, s0) = {
   + chassis
   + k.bothSides([
     box('cab_skirt', 'pan', [s.bRear, 0.3, s.side - 0.06], [s.frontAxle - s.arch, s.sill, s.side - 0.04]),
+    box('slam_panel_under_lamp', 'paint', [nose - 0.04, 0.58, headlampSpan[0]], [nose, headlampTop - headlampHeight, s.side - 0.1]),
+    box('slam_panel_outer', 'paint', [nose - 0.04, headlampTop - headlampHeight, headlampSpan[1]], [nose, bonnetNoseUnderOf(s) - k.swingGap, s.side - 0.1]),
     prism('a_pillar', 'paint', [[s.aPost - 0.1, s.waist], [s.aPost, s.waist], [pillarAt(pillarTop) + 0.1, pillarTop], [pillarAt(pillarTop), pillarTop]], [s.glassIn, s.glassOut]),
     box('b_pillar_lower', 'paint', [s.bRear, s.sill, s.skin], [s.bFront, s.waist, s.side]),
     box('b_pillar_upper', 'paint', [s.bRear, s.waist, s.glassIn], [s.bFront, s.windowTop, s.glassOut]),
@@ -289,16 +303,21 @@ local pressings(id, title, s0) = {
     + bands('over_arch', [s.frontAxle - s.arch, s.frontAxle + s.arch], s.side, true)
     + bands('nose', [s.frontAxle + s.arch, nose - 0.2], s.side, true), finish) + { title: title + ' front wing' },
     k.compound(id + '_front_bumper', 14, [
-      k.yPrism('bar', 'bumper', [[-(s.side - 0.02), s.frontAxle + s.arch], [s.side - 0.02, s.frontAxle + s.arch], [s.side - 0.02, nose - 0.12], [s.side - 0.2, s.front], [-(s.side - 0.2), s.front], [-(s.side - 0.02), nose - 0.12]], [0.3, bumperTop]),
+      k.yPrism('bar', 'bumper', [[-(s.side - 0.02), barBack], [s.side - 0.02, barBack], [s.side - 0.2, s.front], [-(s.side - 0.2), s.front]], [0.3, bumperTop]),
+    ] + k.bothSides([
+      box('bar_return', 'bumper', [s.frontAxle + s.arch, 0.3, s.side - 0.08], [barBack, bumperTop, s.side - 0.02]),
+    ]) + [
       box('grille', 'trim', [nose, 0.66, -0.48], [nose + 0.03, 0.92, 0.48]),
       box('grille_bar', 'bumper', [nose + 0.03, 0.78, -0.48], [nose + 0.04, 0.82, 0.48]),
     ] + k.bothSides([
-      box('lamp_bezel', 'trim', [nose, headlampTop - headlampHeight, 0.5], [nose + 0.015, headlampTop - 0.01, 0.86]),
+      box('lamp_bezel', 'trim', [nose, headlampTop - headlampHeight, headlampSpan[0]], [nose + 0.015, headlampTop - 0.01, headlampSpan[1]]),
     ]) + [
       box('intake', 'trim', [s.front, 0.34, -0.5], [s.front + 0.01, 0.46, 0.5]),
     ], finish + { bumper: s.bumper }) + { title: title + ' front bumper' },
     k.compound(id + '_rear_bumper', 10, [
-      box('bar', 'bumper', [s.rear, 0.42, -(b.side - 0.03)], [tail + 0.08, 0.6, b.side - 0.03]),
+      // It wraps under the body's end, but stands on the rear sill's face where a low box floor brings the sill down
+      // behind it.
+      box('bar', 'bumper', [s.rear, 0.42, -(b.side - 0.03)], [if b.sill < 0.6 then tail else tail + 0.08, 0.6, b.side - 0.03]),
     ], { bumper: s.bumper }) + { title: title + ' rear bumper' },
     dashboard(id, title, s),
     // Side doors hinge on their leading edge, with the handle near the trailing one. The pins stand on the door's outer
@@ -416,6 +435,12 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
   // The engine-in-shell allowance of every van this body draws, whose engine sits ahead of the cab.
   engineSeat: [(import 'site.libsonnet').overlap('engine', 'shell', 0.107,
     'The sump\'s rear end runs under the cab floor pan, which the shell draws as a flat slab not stepped over it.')],
+  // For a van on twin rear wheels, whose inner wheel's rim the beam runs on through to the outer hub.
+  twinWheelSeat: [
+    (import 'site.libsonnet').overlap('rear_axle', 'rear_wheel_' + side, 0.175,
+      'The beam runs on through the twin wheel\'s inner rim to the outer hub.')
+    for side in ['far', 'near']
+  ],
   // Mixed into a spec to floor its body: for loading, or for standing and fitting seats on.
   loadFloor: { floorPart: { suffix: '_load_floor', fitting: 'load_floor', label: 'load floor', capabilities: ['structure', 'load_floor'] } },
   saloonFloor: { floorPart: { suffix: '_floor', fitting: 'floor', label: 'floor', capabilities: ['structure'] } },
@@ -517,8 +542,8 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
       fitting('engine', s.engine, [s.frontAxle + 0.13, 0.42, 0], ['shell']),
       fitting('gearbox', 'gearbox_inline', [s.frontAxle - 0.44, 0.4, 0], ['engine']),
       fitting('prop_shaft', 'prop_shaft_long', [(s.frontAxle - 0.76 + s.rearAxle) / 2, 0.34, 0], ['gearbox', 'rear_axle']),
-      fitting('radiator', 'radiator_van', [nose - 0.12, 0.38, 0], ['shell']),
-      fitting('fuel_tank', 'fuel_tank_van', [s.rearAxle + 1.0, if isBox then 0.3 else 0.2, -0.58], ['shell']),
+      fitting('radiator', 'radiator_van', [barBackOf(s) - 0.05, 0.38, 0], ['shell']),
+      fitting('fuel_tank', 'fuel_tank_van', [s.rearAxle + 1.0, 0.2, -0.58], ['shell']),
       fitting('exhaust', 'exhaust_long', [s.frontAxle - 3.47, 0.19, 0.3], ['engine', 'shell']),
       fitting('rear_axle', 'beam_axle_van', [s.rearAxle, lift, 0], ['shell']),
       fitting('steering_wheel', 'steering_wheel', [s.dash - 0.3, s.waist - 0.05, s.driverZ], ['dashboard']),
@@ -535,7 +560,8 @@ local rows(id, title, s0) = k.unborrowed(id, withCab(s0), pressings(id, title, s
     + pair('rear_wheel', std.get(s, 'rearWheel', s.wheel), [s.rearAxle, hub, std.get(s, 'rearWheelZ', s.wheelZ)], on(['rear_axle']))
     + pair('seat_riser', 'seat_riser', [seatX, s.floor, 0.5], on(['shell']))
     + pair('front_seat', 'front_seat', [seatX, s.floor + 0.2, 0.5], on(paired=['seat_riser']))
-    + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, std.min((if isBox then s.box.side else s.side) - 0.13, s.glassOut - 0.02)], on(['shell']))
+    // A van's mirror arm stands off the A pillar's outer face; a box's cab mirror reaches out past the box's side.
+    + pair('door_mirror', if isBox then 'door_mirror_box' else 'door_mirror_large', [s.aPost - 0.27, s.waist + 0.04, if isBox then s.box.side - 0.13 else s.glassOut], on(['shell']))
     + pair('indicator', 'marker_lamp', [nose + 0.02, 0.6, 0.72], on(['front_bumper']))
     + pair('headlamp', 'headlamp_large', [nose, headlampTop - headlampHeight, 0.68], on(['front_bumper']))
     + kit.batteryBay('battery_tray', [s.aPost + 0.12, 0.8, -0.62], ['shell'])

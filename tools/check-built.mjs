@@ -3,14 +3,14 @@
 // seat the rigid head shells clear of it (tools/head-fit.mjs);
 // every further fresh tree must equal the first byte for byte, which shows the build is deterministic across
 // independent runs.
-// Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a temporary folder.
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+// Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a folder under tools/.build.
+import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { buildAll } from './build-all.mjs';
+import { makeBuildDir } from './buildDir.mjs';
 import { treeSeatFindings } from './head-fit.mjs';
 import { declaredPacks } from './layout.mjs';
 import { MANIFEST, treeDifferences } from './manifest.mjs';
@@ -54,18 +54,21 @@ function freshDifferences([reference, ...others]) {
 
 function main() {
   const { values } = parseArgs({ options: { fresh: { type: 'string', multiple: true, default: [] } } });
-  const temporary = values.fresh.length === 0 ? mkdtempSync(join(tmpdir(), 'skelly-assets-built-')) : undefined;
+  const temporary = values.fresh.length === 0 ? makeBuildDir('check-built') : undefined;
   try {
     if (temporary) buildAll(temporary, { cache: undefined });
     const trees = temporary ? [temporary] : values.fresh.map((tree) => resolve(tree));
-    for (const tree of trees) if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
+    for (const tree of trees)
+      if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
     const differences = freshDifferences(trees);
     if (differences.length) {
       console.error(differences.join('\n'));
       return 1;
     }
-    console.log(`check-built: ${trees.length} fresh tree(s) agree byte for byte and hold exactly the files the manifest `
-      + 'names; every directory is a declared pack and every declared pack has a model or sound');
+    console.log(
+      `check-built: ${trees.length} fresh tree(s) agree byte for byte and hold exactly the files the manifest ` +
+        'names; every directory is a declared pack and every declared pack has a model or sound',
+    );
     return 0;
   } finally {
     if (temporary) rmSync(temporary, { recursive: true, force: true });

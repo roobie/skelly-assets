@@ -43,8 +43,10 @@ export function parseNote(text, file) {
   else if (!TYPES.includes(fields.type)) problems.push(`unknown type "${fields.type}", one of: ${TYPES.join(', ')}`);
   const [change, upgrade] = splitUpgrade(match[2]);
   if (!change) problems.push('empty body');
-  if (fields.type === 'breaking' && !upgrade) problems.push('a breaking note needs an "Upgrade:" line followed by what a consumer must do');
-  if (fields.type !== 'breaking' && upgrade !== undefined) problems.push('only a breaking note has an "Upgrade:" block');
+  if (fields.type === 'breaking' && !upgrade)
+    problems.push('a breaking note needs an "Upgrade:" line followed by what a consumer must do');
+  if (fields.type !== 'breaking' && upgrade !== undefined)
+    problems.push('only a breaking note has an "Upgrade:" block');
   if (problems.length) throw new Error(`${file}: ${problems.join('; ')}`);
   return upgrade === undefined ? { file, type: fields.type, change } : { file, type: fields.type, change, upgrade };
 }
@@ -84,9 +86,19 @@ export function renderGroups(notes, previous) {
   const groups = [];
   for (const type of TYPES) {
     if (!ofType(type).length) continue;
-    groups.push(group(HEADINGS[type], ofType(type).map((note) => listItems(note.change))));
+    groups.push(
+      group(
+        HEADINGS[type],
+        ofType(type).map((note) => listItems(note.change)),
+      ),
+    );
     if (type === 'breaking') {
-      groups.push(group(previous ? `Upgrading from ${plainVersion(previous)}` : 'Upgrading', ofType(type).map((note) => listItems(note.upgrade))));
+      groups.push(
+        group(
+          previous ? `Upgrading from ${plainVersion(previous)}` : 'Upgrading',
+          ofType(type).map((note) => listItems(note.upgrade)),
+        ),
+      );
     }
   }
   return groups.join('\n');
@@ -101,16 +113,20 @@ const sectionStart = (version) => new RegExp(`^## ${plainVersion(version).replac
 
 /** Inserts the version's section above the newest one, keeping the file's front matter and preamble. */
 export function addSection(changelog, version, date, notes) {
-  if (sectionStart(version).test(changelog)) throw new Error(`${CHANGELOG} already has a section for ${plainVersion(version)}`);
+  if (sectionStart(version).test(changelog))
+    throw new Error(`${CHANGELOG} already has a section for ${plainVersion(version)}`);
   const section = `## ${plainVersion(version)} - ${date}\n\n${renderGroups(notes, newestVersion(changelog))}\n`;
   const newest = changelog.search(/^## /m);
-  return newest < 0 ? `${changelog.trimEnd()}\n\n${section.trimEnd()}\n` : changelog.slice(0, newest) + section + changelog.slice(newest);
+  return newest < 0
+    ? `${changelog.trimEnd()}\n\n${section.trimEnd()}\n`
+    : changelog.slice(0, newest) + section + changelog.slice(newest);
 }
 
 /** The groups of the version's section, without its heading, for a release body. */
 export function versionSection(changelog, version) {
   const start = changelog.search(sectionStart(version));
-  if (start < 0) throw new Error(`${CHANGELOG} has no section for ${plainVersion(version)}; run the release step before tagging`);
+  if (start < 0)
+    throw new Error(`${CHANGELOG} has no section for ${plainVersion(version)}; run the release step before tagging`);
   const body = changelog.slice(changelog.indexOf('\n', start) + 1);
   const next = body.search(/^## /m);
   return `${(next < 0 ? body : body.slice(0, next)).trim()}\n`;
@@ -130,7 +146,11 @@ export function release(root, version, date) {
 /** The notes a commit range adds, so a PR's own note is told apart from those already pending. */
 export function addedNotes(root, base, env = process.env) {
   const prefix = `${NOTES_DIR}/`;
-  const out = execFileSync('git', ['diff', '--name-only', '--diff-filter=A', base, 'HEAD', '--', prefix], { cwd: root, env, encoding: 'utf8' });
+  const out = execFileSync('git', ['diff', '--name-only', '--diff-filter=A', base, 'HEAD', '--', prefix], {
+    cwd: root,
+    env,
+    encoding: 'utf8',
+  });
   return out
     .split('\n')
     .filter((path) => path.startsWith(prefix))
@@ -150,13 +170,17 @@ function main([command, arg]) {
       if (!arg) throw new Error('usage: require-note <base>');
       const added = addedNotes(ROOT, arg);
       if (!added.length) {
-        throw new Error(`add a change note under ${NOTES_DIR}/ (see ${NOTES_DIR}/${GUIDE}), or label the PR no-changelog if consumers notice nothing`);
+        throw new Error(
+          `add a change note under ${NOTES_DIR}/ (see ${NOTES_DIR}/${GUIDE}), or label the PR no-changelog if consumers notice nothing`,
+        );
       }
       console.log(`adds ${added.join(' ')}`);
       return;
     }
     case 'unreleased':
-      process.stdout.write(renderGroups(readNotes(notesDir), newestVersion(readFileSync(join(ROOT, CHANGELOG), 'utf8'))));
+      process.stdout.write(
+        renderGroups(readNotes(notesDir), newestVersion(readFileSync(join(ROOT, CHANGELOG), 'utf8'))),
+      );
       return;
     case 'release': {
       if (!arg) throw new Error('usage: release <version>');
@@ -169,7 +193,9 @@ function main([command, arg]) {
       process.stdout.write(versionSection(readFileSync(join(ROOT, CHANGELOG), 'utf8'), arg));
       return;
     default:
-      throw new Error('usage: node tools/changelog.mjs check | require-note <base> | unreleased | release <version> | notes <version>');
+      throw new Error(
+        'usage: node tools/changelog.mjs check | require-note <base> | unreleased | release <version> | notes <version>',
+      );
   }
 }
 

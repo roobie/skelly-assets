@@ -21,26 +21,34 @@ const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a
 const plus = (a, b) => a.map((x, i) => x + b[i]);
 const minus = (a, b) => a.map((x, i) => x - b[i]);
 const times = (a, k) => a.map((x) => x * k);
-const corners = ({ min, max }) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => AXES.map((a) => ((i >> a) & 1 ? max[a] : min[a])));
+const corners = ({ min, max }) =>
+  [0, 1, 2, 3, 4, 5, 6, 7].map((i) => AXES.map((a) => ((i >> a) & 1 ? max[a] : min[a])));
 const boxOf = (points) => ({
   min: AXES.map((a) => Math.min(...points.map((p) => p[a]))),
   max: AXES.map((a) => Math.max(...points.map((p) => p[a]))),
 });
-const isAxis = (v) => Array.isArray(v) && v.length === 3 && v.filter((x) => Math.abs(x) > EPSILON).length === 1 && v.some((x) => Math.abs(Math.abs(x) - 1) < EPSILON);
+const isAxis = (v) =>
+  Array.isArray(v) &&
+  v.length === 3 &&
+  v.filter((x) => Math.abs(x) > EPSILON).length === 1 &&
+  v.some((x) => Math.abs(Math.abs(x) - 1) < EPSILON);
 
 // A port's frame: its origin, x along its normal, y along its up and z = normal × up.
 const frameOf = ({ position, normal, up }) => ({ position, x: normal, y: up, z: cross(normal, up) });
 // A point given in a frame, in the frame that holds it.
-const outOf = (frame, [x, y, z]) => plus(frame.position, plus(times(frame.x, x), plus(times(frame.y, y), times(frame.z, z))));
+const outOf = (frame, [x, y, z]) =>
+  plus(frame.position, plus(times(frame.x, x), plus(times(frame.y, y), times(frame.z, z))));
 
 // The box an item's bounds fill in the frame of the slot it is seated in: the seat meets the slot as ports mate, its
 // normal against the slot's and its up along the slot's, so the seat's x and z come out reversed.
 export function seatedBounds(seat, bounds) {
   const frame = frameOf(seat);
-  return boxOf(corners(bounds).map((p) => {
-    const d = minus(p, frame.position);
-    return [-dot(d, frame.x), dot(d, frame.y), -dot(d, frame.z)];
-  }));
+  return boxOf(
+    corners(bounds).map((p) => {
+      const d = minus(p, frame.position);
+      return [-dot(d, frame.x), dot(d, frame.y), -dot(d, frame.z)];
+    }),
+  );
 }
 
 // The item's pose in the frame its slot is given in: a row-major rotation and the translation that seats it.
@@ -49,7 +57,9 @@ export function stowedPose(slot, seat) {
   const i = frameOf(seat);
   const into = [times(s.x, -1), s.y, times(s.z, -1)];
   // rotation = into · [i.x i.y i.z]ᵀ, taking each seat axis onto its partner in the slot.
-  const rotation = AXES.flatMap((row) => AXES.map((col) => AXES.reduce((sum, k) => sum + into[k][row] * [i.x, i.y, i.z][k][col], 0)));
+  const rotation = AXES.flatMap((row) =>
+    AXES.map((col) => AXES.reduce((sum, k) => sum + into[k][row] * [i.x, i.y, i.z][k][col], 0)),
+  );
   const turned = AXES.map((row) => AXES.reduce((sum, col) => sum + rotation[row * 3 + col] * seat.position[col], 0));
   return { rotation, at: minus(s.position, turned) };
 }
@@ -67,7 +77,9 @@ export function farSlot(slot, lateral) {
 // Every vehicle row with stowage slots: { id, partCount, ports, pieces }, its first part's slots and pieces in the vehicle
 // frame (models/vehicles/frame.libsonnet). Only rows with slots are manifested, which keeps the evaluation cheap.
 export function readSlotParts(root = repo) {
-  return JSON.parse(evaluateJsonnet(`
+  return JSON.parse(
+    evaluateJsonnet(
+      `
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   {
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
@@ -81,11 +93,19 @@ export function readSlotParts(root = repo) {
       for row in rows
       if std.length([port for part in row.parts for port in part.ports if port.mount == '${STOWAGE}']) > 0
     ],
-  }`, root));
+  }`,
+      root,
+    ),
+  );
 }
 
 // A slot port as authored, in the shape the export writes it.
-export const slotOf = ({ id, accepts, envelope, pos, normal, up }) => ({ id, accepts, envelope, frame: { position: pos, normal, up } });
+export const slotOf = ({ id, accepts, envelope, pos, normal, up }) => ({
+  id,
+  accepts,
+  envelope,
+  frame: { position: pos, normal, up },
+});
 
 // The envelope as a box in the frame the slot is given in; the slot's axes are the frame's, so it stays a box.
 const envelopeBox = (slot) => boxOf(corners(slot.envelope).map((p) => outOf(frameOf(slot.frame), p)));
@@ -114,7 +134,9 @@ export function slotProblems({ id, slots, pieces }, grain, length = 0) {
     const box = envelopeBox(slot);
     const origin = slot.frame.position[length];
     if (Math.abs(box.max[length] - origin - (origin - box.min[length])) > EPSILON) {
-      problems.push(`${where}: its envelope is not centred on it along the vehicle, so its far twin's would not be its reflection`);
+      problems.push(
+        `${where}: its envelope is not centred on it along the vehicle, so its far twin's would not be its reflection`,
+      );
     }
     sound.push({ id: slot.id, box });
   }
@@ -130,7 +152,8 @@ export function slotProblems({ id, slots, pieces }, grain, length = 0) {
     const envelope = solid({ kind: 'box', ...box });
     for (const piece of pieces) {
       const depth = 2 * sharedDepth(envelope, solid(piece), EPSILON, grain / 2);
-      if (depth > 2 * EPSILON) problems.push(`${id}.${slot}: its envelope reaches ${Math.round(depth * 1e3)} mm into ${piece.id}`);
+      if (depth > 2 * EPSILON)
+        problems.push(`${id}.${slot}: its envelope reaches ${Math.round(depth * 1e3)} mm into ${piece.id}`);
     }
   }
   return problems;
@@ -155,16 +178,32 @@ export function stowageReport(root = repo) {
 // the model frame as the GLB's port nodes give them, bounds the model's box.
 export function readStowage(out, models, ids) {
   const byId = new Map(models.map((model) => [model.id, model]));
-  return new Map([...new Set(ids)].filter((id) => byId.has(id)).map((id) => {
-    const { pack, path } = byId.get(id);
-    const buffer = readFileSync(join(out, outputPath(pack, path)));
-    const ports = glbJson(buffer).nodes.map((node) => node.extras?.port).filter((port) => port?.mount === STOWAGE);
-    return [id, {
-      slots: ports.filter(({ gender }) => gender === 'female').map(({ id: portId, accepts, envelope, frame }) => ({ id: portId.split('.').at(-1), accepts, envelope, frame })),
-      seats: ports.filter(({ gender }) => gender === 'male').map(({ standard, frame }) => ({ standard, frame })),
-      bounds: modelBox(buffer),
-    }];
-  }));
+  return new Map(
+    [...new Set(ids)]
+      .filter((id) => byId.has(id))
+      .map((id) => {
+        const { pack, path } = byId.get(id);
+        const buffer = readFileSync(join(out, outputPath(pack, path)));
+        const ports = glbJson(buffer)
+          .nodes.map((node) => node.extras?.port)
+          .filter((port) => port?.mount === STOWAGE);
+        return [
+          id,
+          {
+            slots: ports
+              .filter(({ gender }) => gender === 'female')
+              .map(({ id: portId, accepts, envelope, frame }) => ({
+                id: portId.split('.').at(-1),
+                accepts,
+                envelope,
+                frame,
+              })),
+            seats: ports.filter(({ gender }) => gender === 'male').map(({ standard, frame }) => ({ standard, frame })),
+            bounds: modelBox(buffer),
+          },
+        ];
+      }),
+  );
 }
 
 // The stowage the placements need, for tools/placements.mjs, placementProblems, read from the built tree: `items`, the
@@ -172,14 +211,23 @@ export function readStowage(out, models, ids) {
 // open to show what they hide.
 export function loadOutStowage(out, models, placements) {
   const vehicles = Object.values(placements).map(({ sites }) => sites ?? []);
-  const ids = vehicles.flat().filter((site) => site?.stowed !== undefined).flatMap((site) => [site.part, ...Object.values(site.stowed ?? {})]);
-  const closures = vehicles.flatMap((sites) => sites.filter((site) => site?.behind !== undefined)
-    .map((site) => sites.find((other) => other?.id === site.behind)?.part).filter((part) => part !== undefined));
+  const ids = vehicles
+    .flat()
+    .filter((site) => site?.stowed !== undefined)
+    .flatMap((site) => [site.part, ...Object.values(site.stowed ?? {})]);
+  const closures = vehicles.flatMap((sites) =>
+    sites
+      .filter((site) => site?.behind !== undefined)
+      .map((site) => sites.find((other) => other?.id === site.behind)?.part)
+      .filter((part) => part !== undefined),
+  );
   const packOf = new Map(models.map((model) => [model.id, model.pack]));
-  const moving = new Set([...new Set(closures)].filter((id) => {
-    const sidecar = join(out, packOf.get(id) ?? '', 'things', `${id}.model.json`);
-    return packOf.has(id) && existsSync(sidecar) && JSON.parse(readFileSync(sidecar, 'utf8')).motion?.length > 0;
-  }));
+  const moving = new Set(
+    [...new Set(closures)].filter((id) => {
+      const sidecar = join(out, packOf.get(id) ?? '', 'things', `${id}.model.json`);
+      return packOf.has(id) && existsSync(sidecar) && JSON.parse(readFileSync(sidecar, 'utf8')).motion?.length > 0;
+    }),
+  );
   return { items: readStowage(out, models, ids), moving };
 }
 
@@ -188,7 +236,8 @@ export function loadOutStowage(out, models, placements) {
 // checked with the site's other models (tools/placements.mjs, siteProblems).
 export function loadOutProblems(where, site, stowage) {
   const { stowed } = site;
-  if (stowed === null || typeof stowed !== 'object' || Array.isArray(stowed)) return [`${where}: stowed is not slot -> item`];
+  if (stowed === null || typeof stowed !== 'object' || Array.isArray(stowed))
+    return [`${where}: stowed is not slot -> item`];
   const slots = new Map((stowage.get(site.part)?.slots ?? []).map((slot) => [slot.id, slot]));
   return Object.entries(stowed).flatMap(([slotId, item]) => {
     const at = `${where}.${slotId}`;
@@ -197,12 +246,18 @@ export function loadOutProblems(where, site, stowage) {
     const stowable = stowage.get(item);
     // An item that is not built is reported with the site's other models.
     if (!stowable) return [];
-    if (!Array.isArray(slot.accepts) || !slot.envelope?.min || !slot.envelope?.max) return [`${at}: the slot has no accepts or envelope`];
+    if (!Array.isArray(slot.accepts) || !slot.envelope?.min || !slot.envelope?.max)
+      return [`${at}: the slot has no accepts or envelope`];
     if (stowable.seats.length !== 1) return [`${at}: ${item} has ${stowable.seats.length} stowage seats, not one`];
     const [seat] = stowable.seats;
-    if (!slot.accepts.includes(seat.standard)) return [`${at}: ${item} stows as ${seat.standard}, which the slot does not accept (${slot.accepts.join(' ')})`];
+    if (!slot.accepts.includes(seat.standard))
+      return [`${at}: ${item} stows as ${seat.standard}, which the slot does not accept (${slot.accepts.join(' ')})`];
     const filled = seatedBounds(seat.frame, stowable.bounds);
-    const over = AXES.filter((a) => filled.min[a] < slot.envelope.min[a] - EPSILON || filled.max[a] > slot.envelope.max[a] + EPSILON);
-    return over.length === 0 ? [] : [`${at}: ${item} does not fit the slot's envelope along its ${over.map((a) => 'xyz'[a]).join(', ')}`];
+    const over = AXES.filter(
+      (a) => filled.min[a] < slot.envelope.min[a] - EPSILON || filled.max[a] > slot.envelope.max[a] + EPSILON,
+    );
+    return over.length === 0
+      ? []
+      : [`${at}: ${item} does not fit the slot's envelope along its ${over.map((a) => 'xyz'[a]).join(', ')}`];
   });
 }

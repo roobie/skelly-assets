@@ -1,10 +1,17 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
-import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
+import { exportModelGlbs, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
 import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
-import { buildItem, type Catalogue, type CatalogueSettings, itemMotion, itemPalette, type ToolItem } from './catalogue.ts';
+import {
+  buildItem,
+  type Catalogue,
+  type CatalogueSettings,
+  itemMotion,
+  itemPalette,
+  type ToolItem,
+} from './catalogue.ts';
 import { checkDrawnDensity, type DensityBounds, DensityBoundsSchema } from './density.ts';
 import { authoredSkin } from './skin.ts';
 
@@ -32,30 +39,29 @@ const checkGlow = (id: string, glow: string, glb: Uint8Array) => {
  * The finish library a vehicle site names its paint from, as the glTF material each finish gives a paintable surface
  * of a catalogue part, so a consumer repaints a copy with what an export in that finish would carry.
  */
-export const finishLibrary = (settings: Pick<CatalogueSettings, 'defaultMaterial'>) => paintMaterials(itemPalette(settings));
+export const finishLibrary = (settings: Pick<CatalogueSettings, 'defaultMaterial'>) =>
+  paintMaterials(itemPalette(settings));
 
 export const exportItem = (
   item: ToolItem,
   settings: CatalogueSettings,
   asset: ReturnType<typeof recipeAsset>,
   voxel: VoxelGrains,
-  {
-    collision = false,
-    density,
-  }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
+  { collision = false, density }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
   const built = buildItem(item, settings, voxel);
   const { report, masses, handling, label, drawn, glow, paintable } = built;
   if (density) {
     checkDrawnDensity(item, report.resolved, drawn, masses, density);
   }
-  const out = exportGlb({
+  const out = exportModelGlbs({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
     asset,
     palette: itemPalette(settings),
     revolveFacets: settings.facets,
     ...voxel,
+    drawnVoxels: drawn.voxels,
     generator: '@skelly/thing-authoring-tool',
     metadataNamespace: 'thing',
   });
@@ -64,6 +70,7 @@ export const exportItem = (
   }
   if (glow) {
     checkGlow(item.id, glow, out.glb);
+    checkGlow(item.id, glow, out.smoothGlb);
   }
   const parts = modelParts(
     report.resolved,
@@ -83,6 +90,7 @@ export const exportItem = (
   const motion = itemMotion(item, settings, built, voxel.voxelGrain);
   return {
     glb: out.glb,
+    smoothGlb: out.smoothGlb,
     partNodes: out.partNodes,
     modelEntry: {
       ...asset,

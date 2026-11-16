@@ -5,6 +5,8 @@ local seat(x, y, sides) = bus.seat(x, y, sides, z=0.68);
 local single(x, sides) = bus.single(x, sides, z=0.58);
 {
   rear: -3.95, front: 3.9, side: 1.2, skin: 1.13, sill: 0.3,
+  // Between the legs of the far seats behind the front wheel.
+  batteryLocker: 0.35,
   floor: 0.36, floorRear: 0.8, floorStep: -1.3, engineDeck: { x: -2.75, y: 1.1 },
   roofBase: 2.62, roof: 2.8,
   decks: [{ waist: 1.1, top: 2.32, bayFront: 3.6, pitch: 1.35, bays: 5 }],
@@ -39,6 +41,5 @@ local single(x, sides) = bus.single(x, sides, z=0.58);
     radiator: 'radiator_van', radiatorAt: [-3.72, 0.32, 0],
     tank: 'fuel_tank_van', tankAt: [-3.0, 0.32, 0.72],
     exhaust: 'exhaust_car', exhaustAt: [-3.55, 0.32, -0.62],
-    batteryAt: [3.25, 0.42, -0.85],
   },
 }

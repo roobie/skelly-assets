@@ -1,5 +1,5 @@
 import { Id, Name, vehicleBlueprintSchema } from '@skelly/thing-core/schema';
-import { finite, integer, maxValue, minValue, number, pipe, safeParse, check } from 'valibot';
+import { check, finite, integer, maxValue, minValue, number, pipe, safeParse } from 'valibot';
 import {
   blueprintRow,
   exportVehicleBlueprint,
@@ -160,7 +160,6 @@ export const createMirroredPair = (
       ...rest,
       id: which === 'near' ? nearId : farId,
       // `0 - z`, not `-z`: a centred twin stays 0, because -0 doesn't survive a JSON round trip.
-      // biome-ignore lint/complexity/noImplicitCoercions: `-z` would give -0 for a centred twin.
       at: which === 'near' ? original.at : [original.at[0], original.at[1], 0 - original.at[2]],
       supportedBy: original.supportedBy.map((support) => {
         const choice = supports[support]!;
@@ -231,7 +230,11 @@ export const loadSavedBlueprint = (text: string): VehicleBlueprintInput => JSON.
 const schema = vehicleBlueprintSchema({
   id: Id,
   name: Name,
-  positiveSimSeconds: pipe(number(), finite(), check((value) => value > 0, 'must be more than 0')),
+  positiveSimSeconds: pipe(
+    number(),
+    finite(),
+    check((value) => value > 0, 'must be more than 0'),
+  ),
   qualityLevel: pipe(number(), integer(), minValue(1), maxValue(5)),
   cells: pipe(number(), integer(), minValue(1, 'must be at least 1')),
 });
@@ -239,9 +242,10 @@ const schema = vehicleBlueprintSchema({
 /** Schema issues only; part metadata and placement belong to consumer admission. */
 export const blueprintIssues = (blueprint: VehicleBlueprintInput): string[] => {
   const result = safeParse(schema, blueprintRow(blueprint));
-  return result.issues?.map(({ path, message }) =>
-    `${path?.map(({ key }) => String(key)).join('.') ?? ''}: ${message}`,
-  ) ?? [];
+  return (
+    result.issues?.map(({ path, message }) => `${path?.map(({ key }) => String(key)).join('.') ?? ''}: ${message}`) ??
+    []
+  );
 };
 
 /** Export is refused while the blueprint has schema issues. */

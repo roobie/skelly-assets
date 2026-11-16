@@ -17,7 +17,9 @@ interface Site {
 
 // Every vehicle's folding door panels, the sites that place them, the jamb panel sites of each doorway whose two leaves
 // close against each other, and the vehicle grain a row without its own is drawn at.
-const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
+const { grain, vehicles, doorPairs, rows } = JSON.parse(
+  evaluateJsonnet(
+    `
   local placements = import 'models/vehicles/placements.libsonnet';
   local frame = import 'models/vehicles/frame.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
@@ -34,14 +36,22 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
     doorPairs: { [v]: pairsOf(v) for v in std.objectFields(placements) if pairsOf(v) != null },
     rows: frame.rows([row for row in rows if std.member(parts, row.id)]),
   }
-`, resolve(import.meta.dirname, '../../../..'))) as {
+`,
+    resolve(import.meta.dirname, '../../../..'),
+  ),
+) as {
   grain: number;
   vehicles: Record<string, Site[]>;
   doorPairs: Record<string, [string, string][]>;
   rows: unknown[];
 };
 
-const loaded = loadCatalogue({ units: { metresPerUnit: 1, grid: 0.001, bevel: 0 }, facets: 12, defaultMaterial: 'paint-silver', items: rows });
+const loaded = loadCatalogue({
+  units: { metresPerUnit: 1, grid: 0.001, bevel: 0 },
+  facets: 12,
+  defaultMaterial: 'paint-silver',
+  items: rows,
+});
 
 // Each panel's motion and the box each of its solids' voxels fill, both in the model frame about the panel's origin.
 const panels = new Map(
@@ -75,14 +85,28 @@ const poser = (sites: readonly Site[]) => {
   };
 };
 
-// Every hinge turns about y, so a solid stays an upright box: its outline across y (x and z) and its rise along it.
-type Outline = { readonly corners: readonly (readonly [number, number])[]; readonly low: number; readonly high: number };
+// Every hinge turns about y, so a solid stays an upright box: its outline across y (x and z), the x and z ranges that
+// outline spans, and its rise along y.
+type Outline = {
+  readonly corners: readonly (readonly [number, number])[];
+  readonly x: readonly [number, number];
+  readonly z: readonly [number, number];
+  readonly low: number;
+  readonly high: number;
+};
+
+// Two outlines whose spans part on x, z or y cannot interpenetrate, so only the rest need the full separation test.
+const spansMeet = (a: Outline, b: Outline): boolean =>
+  a.x[0] < b.x[1] && b.x[0] < a.x[1] && a.z[0] < b.z[1] && b.z[0] < a.z[1] && a.low < b.high && b.low < a.high;
 
 // How far apart two convex outlines are along the axis that parts them best: negative by how deep they interpenetrate.
 const separation = (a: Outline, b: Outline): number => {
   if (a.high <= b.low || b.high <= a.low) return Number.POSITIVE_INFINITY;
   let best = Number.NEGATIVE_INFINITY;
-  for (const [from, to] of [[a, b], [b, a]] as const) {
+  for (const [from, to] of [
+    [a, b],
+    [b, a],
+  ] as const) {
     from.corners.forEach(([x0, z0], i) => {
       const [x1, z1] = from.corners[(i + 1) % from.corners.length]!;
       const length = Math.hypot(x1 - x0, z1 - z0);
@@ -98,7 +122,8 @@ const separation = (a: Outline, b: Outline): number => {
 // A vehicle's folding leaves, each a panel that rides no other folding panel with every panel that rides it, keyed by
 // that panel's site, and how far apart two of them are at `clock`.
 const leavesOf = (vehicle: string, sites: readonly Site[]) => {
-  for (const site of sites) if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
+  for (const site of sites)
+    if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
   const pose = poser(sites);
   const carrier = (site: Site) => sites.find(({ id }) => id === site.rides);
   const leafOf = (site: Site): string => {
@@ -109,14 +134,24 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
   for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
   const drawOutlines = (leaf: string, clock: number): Outline[] =>
     leaves.get(leaf)!.flatMap((site) =>
-      panels.get(site.part)!.boxes.map(({ min, max }) => ({
-        corners: ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
+      panels.get(site.part)!.boxes.map(({ min, max }) => {
+        const corners = (
+          [
+            [min[0], min[2]],
+            [max[0], min[2]],
+            [max[0], max[2]],
+            [min[0], max[2]],
+          ] as const
+        ).map(([x, z]) => {
           const [px, , pz] = pose(site, [x, min[1], z], clock);
           return [px, pz] as const;
-        }),
-        low: pose(site, min, clock)[1],
-        high: pose(site, max, clock)[1],
-      })),
+        });
+        const span = (axis: 0 | 1) => {
+          const along = corners.map((corner) => corner[axis]);
+          return [Math.min(...along), Math.max(...along)] as const;
+        };
+        return { corners, x: span(0), z: span(1), low: pose(site, min, clock)[1], high: pose(site, max, clock)[1] };
+      }),
     );
   const posed = new Map<string, Outline[]>();
   const outlines = (leaf: string, clock: number): Outline[] => {
@@ -128,7 +163,16 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
     const theirs = outlines(b, clock);
     return Math.min(...outlines(a, clock).flatMap((one) => theirs.map((other) => separation(one, other))));
   };
-  return { ids: [...leaves.keys()], gap };
+  // How deep two leaves interpenetrate at `clock`, 0 when they are clear.
+  const depth = (a: string, b: string, clock: number) => {
+    const theirs = outlines(b, clock);
+    let deepest = 0;
+    for (const one of outlines(a, clock)) {
+      for (const other of theirs) if (spansMeet(one, other)) deepest = Math.max(deepest, -separation(one, other));
+    }
+    return deepest;
+  };
+  return { ids: [...leaves.keys()], gap, depth };
 };
 
 const CLOCKS = 100;
@@ -136,13 +180,16 @@ const CLOCKS = 100;
 it('keeps every folding leaf clear of every other leaf of its vehicle at every step of the fold, as the voxels draw them', () => {
   let compared = 0;
   for (const [vehicle, sites] of Object.entries(vehicles)) {
-    const { ids, gap } = leavesOf(vehicle, sites);
+    const { ids, depth } = leavesOf(vehicle, sites);
     ids.forEach((a, i) =>
       ids.slice(i + 1).forEach((b) => {
         compared += 1;
-        const gaps = Array.from({ length: CLOCKS + 1 }, (_, step) => ({ clock: step / CLOCKS, gap: gap(a, b, step / CLOCKS) }));
-        const closest = gaps.reduce((low, next) => (next.gap < low.gap ? next : low));
-        expect(closest.gap, `${vehicle}: ${a} and ${b} at clock ${closest.clock}`).toBeGreaterThanOrEqual(-1e-9);
+        const depths = Array.from({ length: CLOCKS + 1 }, (_, step) => ({
+          clock: step / CLOCKS,
+          depth: depth(a, b, step / CLOCKS),
+        }));
+        const deepest = depths.reduce((high, next) => (next.depth > high.depth ? next : high));
+        expect(deepest.depth, `${vehicle}: ${a} and ${b} at clock ${deepest.clock}`).toBeLessThanOrEqual(1e-9);
       }),
     );
   }

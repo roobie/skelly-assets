@@ -6,9 +6,9 @@ import { modelCollision } from '@skelly/thing-export/physical.ts';
 import { ATTACHMENT_FAMILIES } from './attachmentParts.ts';
 import { attachmentInstanceForId, attachmentMetadata, attachmentMountPort } from './attachments.ts';
 import { gunDomain } from './domain.ts';
-import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { inFileFrame } from './exportFrame.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
+import { exportGunModels } from './glbWriter.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { FAMILIES } from './parts.ts';
 
@@ -16,6 +16,7 @@ export type AttachmentExportResult =
   | {
       readonly ok: true;
       readonly glb: Uint8Array;
+      readonly smoothGlb: Uint8Array;
       readonly partNodes: readonly string[];
       readonly modelEntry: DeadvoxModelEntry;
     }
@@ -60,18 +61,28 @@ export const exportAttachmentGlb = (
     throw new Error(`Attachment ${id} has no game metadata`);
   }
   const rootMount = attachmentMountPort(part, metadata.mount)!.id;
-  const result = exportGlb({ resolved, palette: GUN_PALETTE, asset, rootMount, ...voxel });
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, voxel);
+  const result = exportGunModels({
+    resolved,
+    palette: GUN_PALETTE,
+    asset,
+    rootMount,
+    ...voxel,
+    drawnVoxels: drawn.voxels,
+  });
   if (!result.ok) {
     return result;
   }
   return {
     ok: true,
     glb: result.glb,
+    smoothGlb: result.smoothGlb,
     partNodes: result.partNodes,
     modelEntry: {
       id: asset.id,
       file: asset.file as DeadvoxModelFile,
-      collision: modelCollision(inFileFrame(resolved), drawnGeometry(inFileFrame(resolved), voxel)),
+      collision: modelCollision(fileResolved, drawn),
       gun: { attachment: metadata },
     },
   };

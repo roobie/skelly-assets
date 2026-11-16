@@ -11,36 +11,27 @@ local fit(why, pairs) = { why: why, pairs: pairs };
 {
   fits: [
     fit(
-      'A wheel is set over the hub of its axle, strut or gear leg, so the solids share the hub.',
+      'A wheel is set over the hub of its axle, strut or gear leg, so the solids share the hub, and an inner twin wheel over the beam that runs on through it to the outer hub.',
       [
       ['front_wheel', 'front_axle', 0.124],
       ['front_wheel', 'front_strut', 0.037],
       ['main_wheel', 'gear_strut', 0.06],
       ['middle_wheel', 'rear_axle', 0.091],
-      ['rear_inner_wheel', 'rear_axle', 0.095],
+      ['rear_inner_wheel', 'rear_axle', 0.141],
       ['rear_wheel', 'rear_axle', 0.125],
       ['rear_wheel', 'shock', 0.055],
       ['wheel', 'axle', 0.065],
       ],
     ),
     fit(
-      'A wheel and its brake disc stand in the arch, which the body draws as boxes and a floor that are not cut away around them.',
+      'A brake disc, or a drum brake\'s drum and backing plate, is set on the hub of its axle, and a twin wheel\'s inner brake is threaded onto the beam that runs on through it to the outer hub.',
       [
-      ['front_rim', 'shell', 0.068],
-      ['front_wheel', 'crushed_nose', 0.068],
-      ['front_wheel', 'shell', 0.092],
-      ['rear_rim', 'shell', 0.068],
-      ['rear_wheel', 'shell', 0.201],
-      ['rear_wheel_brake_disc', 'shell', 0.066],
-      ['rim_rear', 'shell', 0.055],
-      ],
-    ),
-    fit(
-      'A brake disc, or a drum brake\'s backing plate, is set on the hub of its axle.',
-      [
-      ['aft_rear_inner_wheel_brake_disc', 'aft_rear_axle', 0.055],
+      ['aft_rear_inner_wheel_brake_disc', 'aft_rear_axle', 0.141],
       ['front_wheel_brake_disc', 'front_axle', 0.055],
-      ['rear_inner_wheel_brake_disc', 'rear_axle', 0.055],
+      ['front_wheel_brake_shoes', 'front_axle', 0.078],
+      ['rear_inner_wheel_brake_disc', 'rear_axle', 0.141],
+      ['rear_inner_wheel_brake_drum', 'rear_axle', 0.161],
+      ['rear_inner_wheel_brake_shoes', 'rear_axle', 0.313],
       ['rear_wheel_brake_disc', 'rear_axle', 0.055],
       ['rear_wheel_brake_shoes', 'rear_axle', 0.034],
       ],
@@ -48,7 +39,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
     fit(
       'A beam axle\'s diff housing and spring seats run into the rails or floor above it, and its beam through the arch liners, which are not cut for it.',
       [
-      ['aft_rear_axle', 'aft_shell', 0.055],
       ['axle', 'belly', 0.092],
       ['axle', 'chassis', 0.065],
       ['front_axle', 'frame', 0.085],
@@ -65,15 +55,12 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['aft_prop_shaft', 'aft_gearbox', 0.037],
       ['aft_prop_shaft', 'aft_rear_axle', 0.04],
       ['front_prop_shaft', 'front_axle', 0.04],
-      ['front_prop_shaft', 'gearbox', 0.041],
-      ['front_prop_shaft', 'shell', 0.037],
       ['inter_axle_shaft', 'rear_axle', 0.04],
       ['prop_shaft', 'gearbox', 0.04],
       ['prop_shaft', 'motor', 0.04],
       ['prop_shaft', 'prop_shaft', 0.04],
       ['prop_shaft', 'rear_axle', 0.04],
       ['prop_shaft', 'rear_prop_shaft', 0.04],
-      ['prop_shaft', 'shell', 0.037],
       ['prop_shaft', 'transfer_case', 0.04],
       ['rear_prop_shaft', 'rear_axle', 0.04],
       ],
@@ -142,7 +129,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['radiator', 'bonnet', 0.065],
       ['radiator', 'cab', 0.055],
       ['radiator', 'chassis', 0.065],
-      ['radiator', 'engine_cover', 0.065],
       ['radiator', 'hood', 0.065],
       ['radiator', 'house', 0.065],
       ['radiator', 'shell', 0.065],
@@ -153,14 +139,12 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       [
       ['front_bumper', 'front_wing', 0.038],
       ['front_bumper', 'push_bar', 0.065],
-      ['front_bumper', 'radiator', 0.065],
-      ['front_bumper', 'shell', 0.185],
+      ['front_bumper', 'shell', 0.059],
       ],
     ),
     fit(
       'The rear bumper wraps the end of the body and the exhaust tip.',
       [
-      ['rear_bumper', 'box', 0.065],
       ['rear_bumper', 'exhaust', 0.055],
       ['rear_bumper', 'shell', 0.101],
       ],
@@ -172,10 +156,11 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ],
     ),
     fit(
-      'A windscreen and its frame are let into the shell\'s pillars.',
+      'A windscreen or window pane and its frame are let into the shell\'s pillars.',
       [
+      ['pane', 'shell', 0.032],
       ['screen_frame', 'near_side', 0.058],
-      ['windscreen', 'shell', 0.063],
+      ['windscreen', 'shell', 0.069],
       ['windscreen_frame', 'far_side', 0.051],
       ['windscreen_frame', 'near_side', 0.051],
       ['windscreen_frame', 'roof', 0.051],
@@ -234,7 +219,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['dash', 'shell', 0.068],
       ['floor', 'near_side', 0.065],
       ['floor', 'side', 0.055],
-      ['partition', 'shell', 0.055],
       ['tub_floor', 'tub_side', 0.058],
       ],
     ),
@@ -367,8 +351,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['bucket_ram', 'arm', 0.125],
       ['bucket_ram', 'bucket', 0.071],
       ['lift_ram', 'digging_boom', 0.085],
-      ['tilt_ram', 'bucket', 0.041],
-      ['tilt_ram', 'lift_arms', 0.068],
       ],
     ),
     fit(
@@ -420,7 +402,7 @@ local fit(why, pairs) = { why: why, pairs: pairs };
     fit(
       'A frame or chassis rail runs into the floor pan, tub, panel or fitting that it carries.',
       [
-      ['chassis', 'cab', 0.085],
+      ['chassis', 'cab', 0.101],
       ['chassis', 'floor', 0.055],
       ['chassis', 'nose_cap', 0.087],
       ['chassis', 'side', 0.058],
@@ -446,7 +428,6 @@ local fit(why, pairs) = { why: why, pairs: pairs };
     fit(
       'A battery pack, engine, gearbox, radiator, motor, or fuel tank with its straps and filler neck is slung under the floor pan above it, which the shell draws as a solid slab.',
       [
-      ['aft_engine', 'aft_shell', 0.08],
       ['aft_fuel_tank', 'aft_shell', 0.08],
       ['aft_gearbox', 'aft_shell', 0.08],
       ['aft_radiator', 'aft_shell', 0.06],

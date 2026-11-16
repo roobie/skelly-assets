@@ -12,13 +12,13 @@ local s = import 'muscle_car.spec.libsonnet';
     site.one('rear_bumper', 'muscle_car_rear_bumper'),
     site.one('dashboard', 'muscle_car_dashboard'),
   ] + engine.sites('v8_petrol', [s.frontAxle - 0.3, 0.22, 0], 'assembly') + [
-    site.one('gearbox', 'gearbox_inline', [s.cowl + 0.0, 0.2, 0]),
+    site.one('gearbox', 'gearbox_inline', s.gearboxAt),
     site.one('rear_axle', 'beam_axle_light', [s.rearAxle, -0.003, 0]),
     site.one('prop_shaft', 'prop_shaft_short', [-0.38, 0.24, 0]),
     site.one('radiator', 'radiator_car', [s.front - 0.3, 0.32, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [s.rearAxle - 0.5, 0.22, 0]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
-    site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.55, 0]),
+    site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, (import 'car-shape.libsonnet')(s).tunnel.consoleTop, 0]),
     site.one('rear_bench', 'bench_seat_2', [-0.6, s.floor, 0]),
   ]
   + site.pair('front_wing', 'muscle_car_front_wing')
@@ -33,10 +33,4 @@ local s = import 'muscle_car.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.68, 0.7)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
-  unjudged: [
-    site.unjudged('gearbox', 'shell', 0.241,
-      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
-    site.unjudged('prop_shaft', 'shell', 0.061,
-      'The prop shaft\'s tube runs through the floor pan outside the tunnel drawn for it.'),
-  ],
 }

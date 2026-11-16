@@ -11,7 +11,9 @@ const withReuse = (text, work) => {
   try {
     writeFileSync(join(root, 'REUSE.toml'), text);
     work(root);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 };
 
 const REUSE = [
@@ -32,8 +34,14 @@ const REUSE = [
 test('credits come from REUSE.toml: the last annotation whose path matches names the author and licence', () => {
   withReuse(REUSE, (root) => {
     const credit = readCredits(root);
-    assert.deepEqual(credit('built/fixture.a/assets/models/x.glb'), { author: 'Fixture Author', licence: 'fixture-licence-a' });
-    assert.deepEqual(credit('built/fixture.b/assets/models/x.glb'), { author: 'Other Author', licence: 'fixture-licence-b' });
+    assert.deepEqual(credit('built/fixture.a/assets/models/x.glb'), {
+      author: 'Fixture Author',
+      licence: 'fixture-licence-a',
+    });
+    assert.deepEqual(credit('built/fixture.b/assets/models/x.glb'), {
+      author: 'Other Author',
+      licence: 'fixture-licence-b',
+    });
     assert.deepEqual(credit('other/x.txt'), { author: 'Other Author', licence: 'fixture-licence-b' });
     assert.throws(() => credit('other/deeper/x.txt'), /no REUSE.toml annotation/);
     assert.throws(() => credit('elsewhere/x.glb'), /no REUSE.toml annotation/);
@@ -42,27 +50,50 @@ test('credits come from REUSE.toml: the last annotation whose path matches names
 
 test('a REUSE.toml line the reader does not know is refused, not skipped', () => {
   withReuse(`${REUSE}\nunknown line\n`, (root) => assert.throws(() => readCredits(root), /REUSE.toml/));
-  withReuse(REUSE.replace('SPDX-FileCopyrightText = "Other Author"\n', ''), (root) => assert.throws(() => readCredits(root), /REUSE.toml/));
+  withReuse(REUSE.replace('SPDX-FileCopyrightText = "Other Author"\n', ''), (root) =>
+    assert.throws(() => readCredits(root), /REUSE.toml/),
+  );
 });
 
 const credit = () => ({ author: 'Fixture Author', licence: 'fixture-licence' });
-const fixtureManifest = () => buildManifest({
-  models: [
-    { id: 'fixture_b', title: 'Fixture B', kind: 'item', pack: 'fixture.b', path: 'assets/models/fixture_b.glb', nodes: ['b:part'] },
-    { id: 'fixture_a', title: 'Fixture A', kind: 'design', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: ['a:part'] },
-  ],
-  files: [
-    'fixture.b/assets/models/fixture_b.glb', 'fixture.b/things/fixture_b.model.json', 'fixture.b/things/index.json',
-    'fixture.a/assets/models/fixture_a.glb', 'fixture.a/gungen/fixture_a.model.json',
-  ],
-  credit,
-});
+const fixtureManifest = () =>
+  buildManifest({
+    models: [
+      {
+        id: 'fixture_b',
+        title: 'Fixture B',
+        kind: 'item',
+        pack: 'fixture.b',
+        path: 'assets/models/fixture_b.glb',
+        nodes: ['b:part'],
+      },
+      {
+        id: 'fixture_a',
+        title: 'Fixture A',
+        kind: 'design',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_a.glb',
+        nodes: ['a:part'],
+      },
+    ],
+    files: [
+      'fixture.b/assets/models/fixture_b.glb',
+      'fixture.b/things/fixture_b.model.json',
+      'fixture.b/things/index.json',
+      'fixture.a/assets/models/fixture_a.glb',
+      'fixture.a/gungen/fixture_a.model.json',
+    ],
+    credit,
+  });
 
 test('the manifest names every produced file under its pack and every model with its pack, path, nodes and credits', () => {
   const manifest = fixtureManifest();
   const files = manifestFiles(manifest);
   for (const model of manifest.models) {
-    assert.ok(files.has(`built/${outputPath(model.pack, model.path)}`), `${model.id}'s path is not among its pack's files`);
+    assert.ok(
+      files.has(`built/${outputPath(model.pack, model.path)}`),
+      `${model.id}'s path is not among its pack's files`,
+    );
     assert.deepEqual(model.credits, credit());
     assert.ok(Array.isArray(model.nodes));
   }
@@ -73,36 +104,108 @@ test('the manifest names every produced file under its pack and every model with
 });
 
 test('a model whose path is not among the produced files is refused', () => {
-  assert.throws(() => buildManifest({
-    models: [{ id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [] }],
-    files: [],
-    credit,
-  }), /fixture_a/);
+  assert.throws(
+    () =>
+      buildManifest({
+        models: [
+          {
+            id: 'fixture_a',
+            title: 'Fixture A',
+            kind: 'item',
+            pack: 'fixture.a',
+            path: 'assets/models/fixture_a.glb',
+            nodes: [],
+          },
+        ],
+        files: [],
+        credit,
+      }),
+    /fixture_a/,
+  );
 });
 
 test('motions whose rig file the tree does not hold are refused, so a consumer never loads clips it cannot pose', () => {
-  assert.throws(() => buildManifest({
-    models: [],
-    motions: [{ id: 'fixture_moves', pack: 'fixture.a', path: 'motions/fixture.moves.json', rig: 'motions/fixture.rig.json' }],
-    files: ['fixture.a/motions/fixture.moves.json'],
-    credit,
-  }), /fixture_moves/);
+  assert.throws(
+    () =>
+      buildManifest({
+        models: [],
+        motions: [
+          {
+            id: 'fixture_moves',
+            pack: 'fixture.a',
+            path: 'motions/fixture.moves.json',
+            rig: 'motions/fixture.rig.json',
+          },
+        ],
+        files: ['fixture.a/motions/fixture.moves.json'],
+        credit,
+      }),
+    /fixture_moves/,
+  );
 });
 
 test('the manifest carries what a worn shell covers, so a consumer reads it without opening the model entry', () => {
   const { models } = buildManifest({
-    models: [{ id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [], covers: ['trunk'] }],
+    models: [
+      {
+        id: 'fixture_a',
+        title: 'Fixture A',
+        kind: 'item',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_a.glb',
+        nodes: [],
+        covers: ['trunk'],
+      },
+    ],
     files: ['fixture.a/assets/models/fixture_a.glb'],
     credit,
   });
   assert.deepEqual(models[0].covers, ['trunk']);
 });
 
-test('the manifest carries a model\'s mass and drawn volume, and leaves them out where its tool authors none', () => {
+test('the manifest carries the doll part a wearable sits on, and leaves it out of a model that is not worn', () => {
   const { models } = buildManifest({
     models: [
-      { id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [], massKg: 2, volumeM3: 0.004 },
-      { id: 'fixture_b', title: 'Fixture B', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_b.glb', nodes: [] },
+      {
+        id: 'fixture_a',
+        title: 'Fixture A',
+        kind: 'item',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_a.glb',
+        wornOn: { part: 'foot', both: true },
+      },
+      { id: 'fixture_b', title: 'Fixture B', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_b.glb' },
+    ],
+    files: ['fixture.a/assets/models/fixture_a.glb', 'fixture.a/assets/models/fixture_b.glb'],
+    credit,
+  });
+  assert.deepEqual(
+    models.map(({ wornOn }) => wornOn),
+    [{ part: 'foot', both: true }, undefined],
+  );
+});
+
+test("the manifest carries a model's mass and drawn volume, and leaves them out where its tool authors none", () => {
+  const { models } = buildManifest({
+    models: [
+      {
+        id: 'fixture_a',
+        title: 'Fixture A',
+        kind: 'item',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_a.glb',
+        nodes: [],
+        massKg: 2,
+        volumeM3: 0.004,
+      },
+      {
+        id: 'fixture_b',
+        title: 'Fixture B',
+        kind: 'item',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_b.glb',
+        nodes: [],
+      },
     ],
     files: ['fixture.a/assets/models/fixture_a.glb', 'fixture.a/assets/models/fixture_b.glb'],
     credit,
@@ -111,12 +214,22 @@ test('the manifest carries a model\'s mass and drawn volume, and leaves them out
   assert.ok(!Object.hasOwn(models[1], 'massKg') && !Object.hasOwn(models[1], 'volumeM3'));
 });
 
-const withRenames = (renames) => buildManifest({
-  models: [{ id: 'fixture_a', title: 'Fixture A', kind: 'item', pack: 'fixture.a', path: 'assets/models/fixture_a.glb', nodes: [] }],
-  files: ['fixture.a/assets/models/fixture_a.glb'],
-  credit,
-  renames,
-});
+const withRenames = (renames) =>
+  buildManifest({
+    models: [
+      {
+        id: 'fixture_a',
+        title: 'Fixture A',
+        kind: 'item',
+        pack: 'fixture.a',
+        path: 'assets/models/fixture_a.glb',
+        nodes: [],
+      },
+    ],
+    files: ['fixture.a/assets/models/fixture_a.glb'],
+    credit,
+    renames,
+  });
 
 test('the manifest carries each retired id with the current id that replaces it', () => {
   assert.deepEqual(withRenames({ fixture_old: 'fixture_a' }).renames, { fixture_old: 'fixture_a' });
@@ -131,10 +244,30 @@ test('a rename to an id the build does not hold is refused, so one lookup always
 });
 
 test('a mob row joins the manifest with its actor files and no part nodes', () => {
-  const actorFiles = { clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json', genome: 'fixture_mob.genome.json' };
-  const { models, files } = mobManifest([{ id: 'fixture_mob', title: 'Fixture mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', ...actorFiles }]);
-  assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob.body.json', 'fixture.mobs/fixture_mob.clips.json', 'fixture.mobs/fixture_mob.genome.json']);
-  assert.deepEqual(models, [{ id: 'fixture_mob', title: 'Fixture mob', kind: 'mob', pack: 'fixture.mobs', path: 'fixture_mob.glb', ...actorFiles }]);
+  const actorFiles = {
+    clips: 'fixture_mob.clips.json',
+    body: 'fixture_mob.body.json',
+    genome: 'fixture_mob.genome.json',
+  };
+  const { models, files } = mobManifest([
+    { id: 'fixture_mob', title: 'Fixture mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', ...actorFiles },
+  ]);
+  assert.deepEqual(files, [
+    'fixture.mobs/fixture_mob.glb',
+    'fixture.mobs/fixture_mob.body.json',
+    'fixture.mobs/fixture_mob.clips.json',
+    'fixture.mobs/fixture_mob.genome.json',
+  ]);
+  assert.deepEqual(models, [
+    {
+      id: 'fixture_mob',
+      title: 'Fixture mob',
+      kind: 'mob',
+      pack: 'fixture.mobs',
+      path: 'fixture_mob.glb',
+      ...actorFiles,
+    },
+  ]);
   assert.ok(!Object.hasOwn(models[0], 'nodes'));
 });
 
@@ -144,10 +277,35 @@ test('the tree check holds a fresh tree to its manifest and the declared packs',
   const declared = new Set(Object.keys(manifest.packs));
   const differences = (tree, packs = declared) => treeDifferences({ files: tree, manifest, declared: packs });
   assert.deepEqual(differences(files), []);
-  const reports = (lines, needle) => assert.ok(lines.some((line) => line.includes(needle)), `${needle} is not reported:\n${lines.join('\n')}`);
+  const reports = (lines, needle) =>
+    assert.ok(
+      lines.some((line) => line.includes(needle)),
+      `${needle} is not reported:\n${lines.join('\n')}`,
+    );
   reports(differences([...files, 'built/flat.glb']), 'built/flat.glb');
   reports(differences([...files, 'built/fixture.a/new.glb']), 'built/fixture.a/new.glb');
   reports(differences(files.filter((file) => !file.endsWith('fixture_a.glb'))), 'fixture_a.glb');
   reports(differences(files, new Set(['fixture.a'])), 'fixture.b');
   reports(differences(files, new Set([...declared, 'fixture.unbuilt'])), 'fixture.unbuilt');
+});
+
+test("a model's smooth copy is named beside it, must be produced, and makes its pack a modelled one", () => {
+  const smooth = { pack: 'fixture.a.smooth', path: 'assets/models/fixture_a.glb' };
+  const model = {
+    id: 'fixture_a',
+    title: 'Fixture A',
+    kind: 'item',
+    pack: 'fixture.a',
+    path: 'assets/models/fixture_a.glb',
+    smooth,
+  };
+  const files = ['fixture.a/assets/models/fixture_a.glb', 'fixture.a.smooth/assets/models/fixture_a.glb'];
+  const manifest = buildManifest({ models: [model], files, credit });
+  assert.deepEqual(manifest.models[0].smooth, smooth);
+  const tree = [...files.map((file) => `built/${file}`), 'built/manifest.json'];
+  assert.deepEqual(
+    treeDifferences({ files: tree, manifest, declared: new Set(['fixture.a', 'fixture.a.smooth']) }),
+    [],
+  );
+  assert.throws(() => buildManifest({ models: [model], files: files.slice(0, 1), credit }), /smooth copy/);
 });

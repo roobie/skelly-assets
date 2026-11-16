@@ -11,7 +11,15 @@ import type { BoneMesh } from './mesh.ts';
 import { meshBones } from './mesh.ts';
 import { pick, type Rng, range, seededRng } from './random.ts';
 import { type Budgets, type RuleBudgets, silhouetteSize, type ValidationProfile } from './rules.ts';
-import { type BodyPlan, type Genome, type ParamSpec, type Template, templateByName, type Wound } from './template.ts';
+import {
+  type BodyPlan,
+  type Genome,
+  type ParamSpec,
+  specAllows,
+  type Template,
+  templateByName,
+  type Wound,
+} from './template.ts';
 import { type Report, validate } from './validate.ts';
 import { type Voxels, voxelize } from './voxelize.ts';
 
@@ -107,6 +115,22 @@ const checkGenome = (template: Template, genome: Genome): void => {
     }
   });
 };
+
+export interface StrayParam {
+  readonly name: string;
+  readonly value: number;
+  readonly spec: ParamSpec | undefined;
+}
+
+/** The plan params a genome holds outside its template's declared ranges. A plan may round or derive what it
+ * samples, so a genome can stray from the ranges its template promises; a param the template declares no range
+ * for strays too, since nothing then bounds it. */
+export const strayParams = (template: Template, genome: Genome): StrayParam[] =>
+  planOf(template.bodyPlan).paramOrder.flatMap((name) => {
+    const spec = template.params[name];
+    const value = genome.params[name]!;
+    return spec !== undefined && specAllows(spec, value) ? [] : [{ name, value, spec }];
+  });
 
 export const build = (genome: Genome): Body => {
   const template = templateByName(genome.template);

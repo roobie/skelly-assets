@@ -1,8 +1,30 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FORM, KEYWORD, dailySeed, emptyFilter, emptyState, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from '../../site/filter.mjs';
+import {
+  dailySeed,
+  emptyFilter,
+  emptyState,
+  FORM,
+  isBrowsing,
+  KEYWORD,
+  knownOnly,
+  landingModels,
+  landingSeed,
+  matches,
+  parseState,
+  sameGrid,
+  shelfOf,
+  stateHash,
+  suggestions,
+} from '../../site/filter.mjs';
 
-const model = (id, category, tags = {}, keywords = []) => ({ id, title: `Fixture ${category}`, category, tags, keywords });
+const model = (id, category, tags = {}, keywords = []) => ({
+  id,
+  title: `Fixture ${category}`,
+  category,
+  tags,
+  keywords,
+});
 const entries = [
   model('oak_door', 'building', { material: ['wood'], place: ['urban'] }, ['entrance']),
   model('steel_door', 'building', { material: ['steel'], place: ['urban'] }, ['entrance']),
@@ -26,10 +48,16 @@ test('the search text matches a model by its title, not only its id', () => {
 
 test('terms picked in one tag facet widen the match, where two keywords narrow it', () => {
   assert.deepEqual(ids(filterOf({ picks: { material: ['wood', 'steel'] } })), ['oak_door', 'steel_door', 'oak_log']);
-  assert.deepEqual(ids(filterOf({ picks: { material: ['wood', 'steel'], place: ['urban'] } })), ['oak_door', 'steel_door']);
+  assert.deepEqual(ids(filterOf({ picks: { material: ['wood', 'steel'], place: ['urban'] } })), [
+    'oak_door',
+    'steel_door',
+  ]);
   const keyed = [model('a', null, {}, ['x', 'y']), model('b', null, {}, ['x'])];
   const both = { ...emptyFilter(), picks: { [KEYWORD]: ['x', 'y'] } };
-  assert.deepEqual(keyed.filter((e) => matches(e, both)).map((e) => e.id), ['a']);
+  assert.deepEqual(
+    keyed.filter((e) => matches(e, both)).map((e) => e.id),
+    ['a'],
+  );
 });
 
 test('the shelf names vehicles and models without a category', () => {
@@ -44,7 +72,11 @@ test('only an empty filter is browsing', () => {
 });
 
 test('the whole page state survives the round trip through the URL hash', () => {
-  const filter = filterOf({ q: 'oak door', shelf: 'building', picks: { [KEYWORD]: ['entrance'], material: ['wood', 'steel'], place: ['urban'] } });
+  const filter = filterOf({
+    q: 'oak door',
+    shelf: 'building',
+    picks: { [KEYWORD]: ['entrance'], material: ['wood', 'steel'], place: ['urban'] },
+  });
   for (const view of ['exploded', 'open']) {
     const state = { filter, reshuffle: 3, model: 'oak_door', view, info: true };
     assert.deepEqual(parseState(`#${stateHash(state)}`), state);
@@ -58,7 +90,9 @@ test('a view and the details belong to an open model only', () => {
 });
 
 test('a pick the catalogue lacks is dropped from a linked filter', () => {
-  const linked = parseState('#cat=gone&kw=entrance&kw=nonsense&tag=material:wood&tag=material:unobtainium&tag=malformed&r=-2').filter;
+  const linked = parseState(
+    '#cat=gone&kw=entrance&kw=nonsense&tag=material:wood&tag=material:unobtainium&tag=malformed&r=-2',
+  ).filter;
   assert.deepEqual(knownOnly(linked, entries), filterOf({ picks: { [KEYWORD]: ['entrance'], material: ['wood'] } }));
   assert.equal(parseState('#r=junk').reshuffle, 0);
 });
@@ -69,7 +103,10 @@ test('suggestions list only the terms that leave models, without those already p
   assert.deepEqual(suggestions(entries, filter, 'material'), [{ term: 'steel', count: 1 }]);
   const keyword = filterOf({ picks: { [KEYWORD]: ['entrance'], material: ['wood'] } });
   assert.deepEqual(suggestions(entries, keyword, KEYWORD), []);
-  assert.deepEqual(suggestions(entries, emptyFilter(), 'material').map(({ term }) => term), ['wood', 'steel']);
+  assert.deepEqual(
+    suggestions(entries, emptyFilter(), 'material').map(({ term }) => term),
+    ['wood', 'steel'],
+  );
 });
 
 test('the landing page is the same models for the same seed and stays within its count', () => {
@@ -105,12 +142,23 @@ test('the order in which dimensions were picked does not make a state a differen
 });
 
 test('the form dimension filters like a tag facet and round-trips through its own hash token', () => {
-  const formed = [{ ...model('a', null), form: 'atom' }, { ...model('b', null), form: 'assembly' }, { ...model('c', null, { form: ['atom'] }), form: 'assembly' }];
-  const picked = (terms, more = {}) => formed.filter((e) => matches(e, filterOf({ picks: { [FORM]: terms, ...more } }))).map((e) => e.id);
+  const formed = [
+    { ...model('a', null), form: 'atom' },
+    { ...model('b', null), form: 'assembly' },
+    { ...model('c', null, { form: ['atom'] }), form: 'assembly' },
+  ];
+  const picked = (terms, more = {}) =>
+    formed.filter((e) => matches(e, filterOf({ picks: { [FORM]: terms, ...more } }))).map((e) => e.id);
   assert.deepEqual(picked(['atom']), ['a']);
   assert.deepEqual(picked(['atom', 'assembly']), ['a', 'b', 'c']);
-  assert.deepEqual(picked(['assembly'], { form: ['atom'] }), ['c'], 'a taxonomy facet of the same name is not the derived form');
-  assert.deepEqual(suggestions(formed, filterOf({ picks: { [FORM]: ['atom'] } }), FORM), [{ term: 'assembly', count: 2 }]);
+  assert.deepEqual(
+    picked(['assembly'], { form: ['atom'] }),
+    ['c'],
+    'a taxonomy facet of the same name is not the derived form',
+  );
+  assert.deepEqual(suggestions(formed, filterOf({ picks: { [FORM]: ['atom'] } }), FORM), [
+    { term: 'assembly', count: 2 },
+  ]);
   const state = { ...emptyState(), filter: filterOf({ picks: { [FORM]: ['assembly'], material: ['wood'] } }) };
   assert.equal(stateHash(state), 'form=assembly&tag=material:wood');
   assert.deepEqual(parseState(stateHash(state)).filter.picks, state.filter.picks);

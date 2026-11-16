@@ -40,6 +40,8 @@ export type RecipeRow = InferOutput<typeof RowSchema>;
 export interface ModelExport<Model extends NeutralModel = NeutralModel> {
   readonly modelEntry: Model;
   readonly glb: Uint8Array;
+  /** The same model as its authored meshes; see `glb.ts`, `exportModelGlbs`. */
+  readonly smoothGlb: Uint8Array;
   /** The GLB's part node names from the resolved assembly; see `glb.ts`, `partNodeName`. */
   readonly partNodes: readonly string[];
   /** The model's total mass and drawn volume, for tools that author the mass; see `physical.ts`, `drawnVolumeM3`. */

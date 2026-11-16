@@ -1,13 +1,13 @@
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { expect, it } from 'vitest';
-import { catalogue } from '../src/content.ts';
-import { exportThingRecipes } from '../src/cli/export.ts';
 import { exportRecipes } from '../../../build.mjs';
 import { generateRow } from '../../../recipeTools.mjs';
-import { loadThingRecipe, loadThingRecipeFiles } from '../src/exports.ts';
 import { installJsonnetSources } from '../../../sources.mjs';
+import { exportThingRecipes } from '../src/cli/export.ts';
+import { catalogue } from '../src/content.ts';
+import { loadThingRecipe, loadThingRecipeFiles } from '../src/exports.ts';
 import { sweepGroup } from './sweeps.ts';
 
 await installJsonnetSources();
@@ -16,13 +16,20 @@ it('exports one recipe file into its pack output without changing its source roo
   const root = mkdtempSync(join(tmpdir(), 'thing-recipes-'));
   const out = mkdtempSync(join(tmpdir(), 'thing-output-'));
   try {
-    const item = catalogue.items.find(({ exportMass, parts }) =>
-      exportMass === 'parts' && parts.length === 1 && parts[0]!.family === 'fuse')!;
+    const item = catalogue.items.find(
+      ({ exportMass, parts }) => exportMass === 'parts' && parts.length === 1 && parts[0]!.family === 'fuse',
+    )!;
     const packId = 'fixture.pack';
-    const value = [{
-      id: `${item.id}_fixture_model`, title: 'Fixture Model', kind: 'item', source: item.id,
-      voxel: { grain: 0.01 }, options: { mass: item.exportMass },
-    }];
+    const value = [
+      {
+        id: `${item.id}_fixture_model`,
+        title: 'Fixture Model',
+        kind: 'item',
+        source: item.id,
+        voxel: { grain: 0.01 },
+        options: { mass: item.exportMass },
+      },
+    ];
     mkdirSync(join(root, 'models/recipes'), { recursive: true });
     writeFileSync(join(root, 'models/recipes', `${packId}.jsonnet`), JSON.stringify(value));
     writeFileSync(join(root, 'models/recipes', `${packId}.json`), JSON.stringify(value));
@@ -44,7 +51,14 @@ it('exports one recipe file into its pack output without changing its source roo
 
 it('loads only the thing rows of recipe files that also hold another tool’s rows', () => {
   const item = catalogue.items.find(({ exportMass }) => exportMass === 'parts')!;
-  const thingRow = { id: 'fixture_thing', title: 'Fixture thing', kind: 'item', source: item.id, voxel: { grain: 0.01 }, options: { mass: 'parts' } };
+  const thingRow = {
+    id: 'fixture_thing',
+    title: 'Fixture thing',
+    kind: 'item',
+    source: item.id,
+    voxel: { grain: 0.01 },
+    options: { mass: 'parts' },
+  };
   const gunRow = (id: string) => ({ id, kind: 'design', source: 'fixture.gun.json', voxel: { grain: 0.01 } });
   const files = [[gunRow('fixture_gun')], [gunRow('fixture_other_gun'), thingRow]];
   expect(loadThingRecipeFiles(files, catalogue).map(({ id }) => id)).toEqual(['fixture_thing']);

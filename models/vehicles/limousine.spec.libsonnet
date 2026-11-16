@@ -1,5 +1,6 @@
 // A saloon stretched by 1.9 m between its doors: 6.6 m long, 1.8 m wide, with a 4.7 m wheelbase and tinted side
 // glass. Metres in the vehicle frame.
+local gearbox = (import 'gearboxes.libsonnet').gearbox_inline;
 (import 'saloon.spec.libsonnet') + {
   rear: -3.3, front: 3.3,
   rearAxle: -2.3, frontAxle: 2.4, arch: 0.4, archTop: 0.74, tyre: 'wheel_225_60r17',
@@ -9,4 +10,6 @@
   cWaist: -2.09, tailWaist: -2.05, deckFront: -2.45, rearFloorFront: -1.93,
   grilleHalf: 0.34, bumperPaint: 'steel-bright', bumperLow: 0.36, bumperTop: 0.5, sideGlass: 'lens-smoke',
   shellMass: 2150, paint: 'paint-white',
+  gearboxAt: [self.frontAxle - 0.7, 0.26, 0],
+  tunnel: { half: gearbox.width / 2, top: $.gearboxAt[1] + gearbox.height },
 }

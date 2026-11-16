@@ -11,18 +11,14 @@ const requireOctagon = (solid: Solid) => {
   if (solid.kind !== 'extruded-polygon') {
     throw new Error(`Expected an X-axis octagonal extrusion, got ${solid.kind}.`);
   }
-  // biome-ignore lint/suspicious/noMisplacedAssertion: helper is called only by tests
   expect(solid.axis).toBe('x');
-  // biome-ignore lint/suspicious/noMisplacedAssertion: helper is called only by tests
   expect(solid.profile).toHaveLength(8);
-  // biome-ignore lint/suspicious/noMisplacedAssertion: helper is called only by tests
   expect(validateExtrudedPolygon(solid.profile, solid.z)).toBeUndefined();
   const edgeLengths = solid.profile.map((point, index) => {
     const next = solid.profile[(index + 1) % solid.profile.length]!;
     return Math.hypot(next[0] - point[0], next[1] - point[1]);
   });
   for (const length of edgeLengths) {
-    // biome-ignore lint/suspicious/noMisplacedAssertion: helper is called only by tests
     expect(length).toBeCloseTo(edgeLengths[0]!);
   }
   return solid;

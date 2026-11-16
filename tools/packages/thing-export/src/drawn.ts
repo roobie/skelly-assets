@@ -1,7 +1,7 @@
 // Where each solid is drawn, so the datums an export writes (grips, anchors, round poses, collision boxes, centres of
 // mass) read off the voxels the player sees rather than off the authored solids those voxels approximate.
 
-import type { Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
 import {
   add,
   applyPoint,
@@ -19,7 +19,7 @@ import { displayBevel, meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { VoxelGrains } from './exportTypes.ts';
 import { latticeOrigin, partVoxelGrain } from './glb.ts';
-import { measureVoxels } from './voxelize.ts';
+import { fillVoxels, type VoxelFill } from './voxelize.ts';
 
 /** A solid's bounds, centre and volume in its part's local frame and domain units. */
 export interface SolidMeasure {
@@ -82,6 +82,11 @@ export interface DrawnGeometry {
    * without a voxel grain, or when the part is turned off the axes and its boxes stand off every lattice plane.
    */
   readonly grain: (part: string) => number | undefined;
+  /**
+   * The fill of `part`'s drawn solids, one source per solid, that its datums read off, for the file to mesh: none
+   * without a grain for the part, or for a part that merges solids, which the file samples as one mesh.
+   */
+  readonly voxels: (part: string) => VoxelFill | undefined;
 }
 
 const onAxes = ({ r }: Transform): boolean => r.every((x) => [-1, 0, 1].some((q) => Math.abs(x - q) < 1e-9));
@@ -116,23 +121,40 @@ export const drawnGeometry = (
   const { voxelGrain } = options;
   const unit = resolved.domain.units.metresPerUnit;
   const authoredMeasures = new Map<Solid, SolidMeasure>();
-  /** Per list of solids sampled together, each solid's drawn measure, undefined where it draws no voxels. */
-  const measured = new Map<readonly Solid[], Map<Solid, SolidMeasure | undefined>>();
-  const drawnMeasures = (
-    siblings: readonly Solid[],
-    grain: number,
-    placed: Transform,
-  ): Map<Solid, SolidMeasure | undefined> => {
+  // Judging a part's grain bounds all its solids, and every solid of the part is measured, so it is judged once.
+  const grains = new Map<PartDef, number | undefined>();
+  const grainOf = (def: PartDef): number | undefined => {
+    if (voxelGrain === undefined) {
+      return undefined;
+    }
+    if (!grains.has(def)) {
+      grains.set(def, partVoxelGrain(def, { ...options, voxelGrain }, unit));
+    }
+    return grains.get(def);
+  };
+  /** Per list of solids sampled together, their fill and each solid's drawn measure, undefined where it draws none. */
+  const sampled = new Map<
+    readonly Solid[],
+    { readonly fill: VoxelFill; readonly measures: Map<Solid, SolidMeasure | undefined> }
+  >();
+  const sampledOf = (siblings: readonly Solid[], grain: number, placed: Transform) => {
+    const known = sampled.get(siblings);
+    if (known) {
+      return known;
+    }
     const sources = siblings.map((solid) => {
       const bevel = solid.display?.mergeGroup === undefined ? displayBevel(solid, resolved.domain.units) : 0;
       const mesh = meshForSolid(solid, bevel, options.revolveFacets);
-      return { positions: mesh.positions.map((x) => x * unit), indices: mesh.indices, group: 0 };
+      // A solid without triangles draws nothing, and the file leaves it out of its sampling.
+      return mesh.triangleCount === 0 || mesh.indices.length === 0
+        ? { positions: [], indices: [] }
+        : { positions: mesh.positions.map((x) => x * unit), indices: mesh.indices };
     });
     const inUnits = (v: readonly number[]): Vec3 => [v[0]! / unit, v[1]! / unit, v[2]! / unit];
-    const voxels = measureVoxels(sources, grain, latticeOrigin(placed, grain, unit));
-    return new Map(
+    const fill = fillVoxels(sources, grain, latticeOrigin(placed, grain, unit));
+    const measures = new Map(
       siblings.map((solid, index) => {
-        const own = voxels[index];
+        const own = fill.measures[index];
         return [
           solid,
           own && {
@@ -144,14 +166,21 @@ export const drawnGeometry = (
         ];
       }),
     );
+    const entry = { fill, measures };
+    sampled.set(siblings, entry);
+    return entry;
   };
-  const measure = (partId: string, solid: Solid): SolidMeasure => {
+  const placedPart = (partId: string) => {
     const def = resolved.defs.get(partId);
     const placed = resolved.placed.get(partId);
     if (!(def && placed)) {
       throw new Error(`No placed part ${partId} to read a datum from`);
     }
-    const grain = voxelGrain === undefined ? undefined : partVoxelGrain(def, { ...options, voxelGrain }, unit);
+    return { def, placed };
+  };
+  const measure = (partId: string, solid: Solid): SolidMeasure => {
+    const { def, placed } = placedPart(partId);
+    const grain = grainOf(def);
     if (grain === undefined) {
       const authored = authoredMeasures.get(solid) ?? authoredMeasure(solid);
       authoredMeasures.set(solid, authored);
@@ -160,16 +189,19 @@ export const drawnGeometry = (
     // A solid is sampled with the solids it is drawn among, as the file samples them; a collision solid the file does
     // not draw, with the part's other collision solids.
     const siblings = [def.displaySolids ?? def.solids, def.solids].find((list) => list.includes(solid)) ?? [solid];
-    let measures = measured.get(siblings);
-    if (!measures) {
-      measures = drawnMeasures(siblings, grain, placed);
-      measured.set(siblings, measures);
-    }
-    const found = measures.get(solid);
+    const found = sampledOf(siblings, grain, placed).measures.get(solid);
     if (!found) {
       throw new Error(`Solid ${solid.id} of ${partId} draws no voxels to read its datums from`);
     }
     return found;
+  };
+  const voxels = (partId: string): VoxelFill | undefined => {
+    const { def, placed } = placedPart(partId);
+    const grain = grainOf(def);
+    const drawn = def.displaySolids ?? def.solids;
+    return grain === undefined || drawn.some((solid) => solid.display?.mergeGroup !== undefined)
+      ? undefined
+      : sampledOf(drawn, grain, placed).fill;
   };
   let regions: Region[] | undefined;
   const regionsOf = (): Region[] => {
@@ -221,9 +253,7 @@ export const drawnGeometry = (
   const grain = (part: string): number | undefined => {
     const def = resolved.defs.get(part);
     const placed = resolved.placed.get(part);
-    return voxelGrain !== undefined && def && placed && onAxes(placed)
-      ? partVoxelGrain(def, { ...options, voxelGrain }, unit)
-      : undefined;
+    return def && placed && onAxes(placed) ? grainOf(def) : undefined;
   };
-  return { measure, point, grain };
+  return { measure, point, grain, voxels };
 };

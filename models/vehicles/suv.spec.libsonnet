@@ -1,4 +1,7 @@
 // A tall four-door 4x4: 4.66 m long, 1.86 m wide, with a 2.9 m wheelbase and a raised floor. Metres in the vehicle frame.
+local gearbox = (import 'gearboxes.libsonnet').gearbox_inline;
+// The engine and gearbox ride high enough for the front beam axle's diff to pass under the engine's pulleys.
+local gearboxAt = [0.79, 0.46, 0];
 {
   rear: -2.33, front: 2.33, side: 0.93, skin: 0.865, sill: 0.37, floor: 0.5, waist: 1.22, roof: 1.75,
   rearAxle: -1.35, frontAxle: 1.55, arch: 0.43, archTop: 0.85,
@@ -9,4 +12,7 @@
   hoodBack: 1.22, hoodFall: 0.06, lampTop: 1.15,
   tumble: 0.125, lift: 0.2, grilleHalf: 0.55, archLiner: true, bumperPaint: 'plastic-black',
   shellMass: 1110, paint: 'paint-green',
+  engineAt: [1.35, gearboxAt[1] + 0.03, 0], gearboxAt: gearboxAt,
+  // The prop shafts run under the floor from the rear axle to the front, so the tunnel runs the floor's length.
+  tunnel: { half: gearbox.width / 2, top: gearboxAt[1] + gearbox.height, back: $.rearFloorFront },
 }
