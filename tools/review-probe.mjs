@@ -12,6 +12,7 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
+import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { compileJsonnetFile } from './jsonnet/index.mjs';
 import { MANIFEST } from './manifest.mjs';
 import { INDEX } from './row-index.mjs';
@@ -51,7 +52,7 @@ export function rankedQueue(found) {
       sure: Math.max(...findings.map(weight)),
       findings,
     }));
-  return ranked.sort((a, b) => b.defects.length - a.defects.length || b.sure - a.sure || a.id.localeCompare(b.id));
+  return ranked.sort((a, b) => b.defects.length - a.defects.length || b.sure - a.sure || compareCodeUnits(a.id, b.id));
 }
 
 // The row ids a verdicts file marks reviewed, under their current ids: a review of a row since renamed counts for it.
