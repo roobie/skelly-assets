@@ -3,7 +3,7 @@ import { sampleClip as sampleFrames } from '../site/clipFrames.mjs';
 import { applyPoint, IDENTITY_M, mulMM, rotX, rotY, rotZ, slerpQuat } from './packages/mobgen/src/core/math.ts';
 import { clampJointAngles, jointAngles, jointRotation } from './packages/mobgen/src/core/joints.ts';
 import { clamp, transpose } from './packages/mobgen/src/core/math.ts';
-import { boneTransforms } from './packages/mobgen/src/core/pose.ts';
+import { blendPose, boneTransforms } from './packages/mobgen/src/core/pose.ts';
 import { blendArmBase, eulerToMat3 } from './packages/mobgen/src/mob/attack.ts';
 import { groundOffset, GROUND_SMOOTHING } from './packages/mobgen/src/mob/gait.ts';
 
@@ -112,6 +112,20 @@ export function applyMotion(base, motion, time, seed) {
     for (const { bone, axis, scale } of oscillator.bones) rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, axes[axis](angle * scale));
   }
   return { root: [...base.root], rotations };
+}
+
+/** The walk cross-faded into the idle: fully the idle standing still, fully the walk at and above `idleBlendSpeed`. */
+export const walkToIdle = (walk, idle, speed, idleBlendSpeed) => blendPose(walk, idle, clamp(1 - speed / idleBlendSpeed, 0, 1));
+
+/** `headYaw` radians about the look-at head bone's own y, innermost, held to its limits where it is a framed joint. */
+export function applyHeadYaw(body, pose, headYaw) {
+  if (headYaw === 0) return pose;
+  const id = body.lookAt?.headBone ?? 'head';
+  const head = body.bones.find((bone) => bone.id === id);
+  if (!head) throw new Error(`missing head bone ${id}`);
+  const turned = mulMM(pose.rotations[id] ?? IDENTITY_M, rotY(headYaw * 180 / Math.PI));
+  const held = head.frame && head.limits ? jointRotation(head, clampJointAngles(head, jointAngles(head, turned))) : turned;
+  return { ...pose, rotations: { ...pose.rotations, [id]: held } };
 }
 
 export { clipSpanSeconds, decodeFrame } from '../site/clipFrames.mjs';
