@@ -15,7 +15,7 @@ local band = import 'models/head-band.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
-local plate = import 'models/plate.libsonnet';
+local plate = std.flattenArrays([item.rows for item in std.objectValues(import 'models/plate.libsonnet')]);
 
 // How much larger than life the figure is cut.
 local k = 1.25;

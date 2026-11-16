@@ -75,8 +75,19 @@ const poser = (sites: readonly Site[]) => {
   };
 };
 
-// Every hinge turns about y, so a solid stays an upright box: its outline across y (x and z) and its rise along it.
-type Outline = { readonly corners: readonly (readonly [number, number])[]; readonly low: number; readonly high: number };
+// Every hinge turns about y, so a solid stays an upright box: its outline across y (x and z), the x and z ranges that
+// outline spans, and its rise along y.
+type Outline = {
+  readonly corners: readonly (readonly [number, number])[];
+  readonly x: readonly [number, number];
+  readonly z: readonly [number, number];
+  readonly low: number;
+  readonly high: number;
+};
+
+// Two outlines whose spans part on x, z or y cannot interpenetrate, so only the rest need the full separation test.
+const spansMeet = (a: Outline, b: Outline): boolean =>
+  a.x[0] < b.x[1] && b.x[0] < a.x[1] && a.z[0] < b.z[1] && b.z[0] < a.z[1] && a.low < b.high && b.low < a.high;
 
 // How far apart two convex outlines are along the axis that parts them best: negative by how deep they interpenetrate.
 const separation = (a: Outline, b: Outline): number => {
@@ -109,14 +120,17 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
   for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
   const drawOutlines = (leaf: string, clock: number): Outline[] =>
     leaves.get(leaf)!.flatMap((site) =>
-      panels.get(site.part)!.boxes.map(({ min, max }) => ({
-        corners: ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
+      panels.get(site.part)!.boxes.map(({ min, max }) => {
+        const corners = ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
           const [px, , pz] = pose(site, [x, min[1], z], clock);
           return [px, pz] as const;
-        }),
-        low: pose(site, min, clock)[1],
-        high: pose(site, max, clock)[1],
-      })),
+        });
+        const span = (axis: 0 | 1) => {
+          const along = corners.map((corner) => corner[axis]);
+          return [Math.min(...along), Math.max(...along)] as const;
+        };
+        return { corners, x: span(0), z: span(1), low: pose(site, min, clock)[1], high: pose(site, max, clock)[1] };
+      }),
     );
   const posed = new Map<string, Outline[]>();
   const outlines = (leaf: string, clock: number): Outline[] => {
@@ -128,7 +142,16 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
     const theirs = outlines(b, clock);
     return Math.min(...outlines(a, clock).flatMap((one) => theirs.map((other) => separation(one, other))));
   };
-  return { ids: [...leaves.keys()], gap };
+  // How deep two leaves interpenetrate at `clock`, 0 when they are clear.
+  const depth = (a: string, b: string, clock: number) => {
+    const theirs = outlines(b, clock);
+    let deepest = 0;
+    for (const one of outlines(a, clock)) {
+      for (const other of theirs) if (spansMeet(one, other)) deepest = Math.max(deepest, -separation(one, other));
+    }
+    return deepest;
+  };
+  return { ids: [...leaves.keys()], gap, depth };
 };
 
 const CLOCKS = 100;
@@ -136,13 +159,13 @@ const CLOCKS = 100;
 it('keeps every folding leaf clear of every other leaf of its vehicle at every step of the fold, as the voxels draw them', () => {
   let compared = 0;
   for (const [vehicle, sites] of Object.entries(vehicles)) {
-    const { ids, gap } = leavesOf(vehicle, sites);
+    const { ids, depth } = leavesOf(vehicle, sites);
     ids.forEach((a, i) =>
       ids.slice(i + 1).forEach((b) => {
         compared += 1;
-        const gaps = Array.from({ length: CLOCKS + 1 }, (_, step) => ({ clock: step / CLOCKS, gap: gap(a, b, step / CLOCKS) }));
-        const closest = gaps.reduce((low, next) => (next.gap < low.gap ? next : low));
-        expect(closest.gap, `${vehicle}: ${a} and ${b} at clock ${closest.clock}`).toBeGreaterThanOrEqual(-1e-9);
+        const depths = Array.from({ length: CLOCKS + 1 }, (_, step) => ({ clock: step / CLOCKS, depth: depth(a, b, step / CLOCKS) }));
+        const deepest = depths.reduce((high, next) => (next.depth > high.depth ? next : high));
+        expect(deepest.depth, `${vehicle}: ${a} and ${b} at clock ${deepest.clock}`).toBeLessThanOrEqual(1e-9);
       }),
     );
   }

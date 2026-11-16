@@ -33,7 +33,7 @@ function(id, s, o={})
     one('exhaust', 'exhaust_car', [s.rear + 0.46, 0.12 + std.get(s, 'lift', 0), 0.42]),
     one('rear_axle', 'twist_beam', [s.rearAxle, hub - 0.316, 0]),
     one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
-    one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.55, 0]),
+    one('gear_lever', 'gear_lever', [s.cowl - 0.4, (import 'car-shape.libsonnet')(s).tunnel.consoleTop, 0]),
     one('rear_bench', 'bench_seat_3', [-0.55, s.floor, 0]),
   ]
   + pair('front_wing', part('_front_wing'))

@@ -76,12 +76,47 @@ local pressings(id, title, s) = {
   local bootFloorFront = std.get(s, 'engineBayBack', s.rearFloorFront),
   // `s.towerFront` stops the strut towers short of a nose too short for them.
   local towerFront = std.get(s, 'towerFront', s.frontAxle + 0.45),
+  // The wheel well's inner side: the floors stop at it over each arch, so the wheel turns in an opening, not in them.
+  local well = s.skin - 0.26,
+  local linerTop = s.archTop - shape.chamfer + 0.0625,
   // Closes the arch fore and aft, because a look down past the wheel otherwise leaves through the open underside of the wing.
   local archEnds(name, axle) = [
-    box(name + '_liner_fore', 'trim', [axle + s.arch, 0.2 + lift, s.skin - 0.26], [axle + s.arch + 0.04, s.archTop - shape.chamfer + 0.0625, s.skin]),
-    box(name + '_liner_aft', 'trim', [axle - s.arch - 0.04, 0.2 + lift, s.skin - 0.26], [axle - s.arch, s.archTop - shape.chamfer + 0.0625, s.skin]),
+    box(name + '_liner_fore', 'trim', [axle + s.arch, 0.2 + lift, well], [axle + s.arch + 0.04, linerTop, s.skin]),
+    box(name + '_liner_aft', 'trim', [axle - s.arch - 0.04, 0.2 + lift, well], [axle - s.arch, linerTop, s.skin]),
   ],
-  local archLiner(name, axle) = shape.liner(name + '_liner', 'trim', axle, 0.2 + lift, [s.skin - 0.26, s.skin], [s.skin - 0.26, s.skin - 0.22]) + archEnds(name, axle),
+  local archLiner(name, axle) = shape.liner(name + '_liner', 'trim', axle, 0.2 + lift, [well, s.skin], [well, well + 0.04]) + archEnds(name, axle),
+  // Open under the tunnel (`car-shape.libsonnet`, `tunnel`), the floor pan and bulkhead stand either side of it.
+  local tunnel =
+    local t = shape.tunnel;
+    local inner = t.half - t.wall;
+    (if t.back > s.rearFloorFront then [
+      box('floor_pan', 'pan', [s.rearFloorFront, 0.2 + lift, -s.skin], [t.back, s.floor, s.skin]),
+      box('carpet', 'carpet', [s.rearFloorFront, s.floor, -s.skin + 0.04], [t.back, s.floor + 0.01, s.skin - 0.04]),
+    ] else []) + [
+      box('tunnel', 'carpet', [t.back, t.top - t.wall, -t.half], [s.cowl, t.top, t.half]),
+      box('bulkhead_over_tunnel', 'paint', [s.cowl, t.top - t.wall, -t.half], [s.aPost, s.waist - 0.04, t.half]),
+    ] + bothSides([
+      box('floor_pan', 'pan', [t.back, 0.2 + lift, inner], [s.cowl, s.floor, s.skin]),
+      box('carpet', 'carpet', [t.back, s.floor, t.half], [s.cowl, s.floor + 0.01, s.skin - 0.04]),
+      box('tunnel_side', 'carpet', [t.back, s.floor, inner], [s.cowl, t.top - t.wall, t.half]),
+      box('bulkhead', 'paint', [s.cowl, s.floor, t.half], [s.aPost, s.waist - 0.04, s.skin - 0.02]),
+    ]),
+  // A box of the body at the rear arch's side, from `from` to `to` along x, kept clear of the wheel: fore and aft of the
+  // arch it stands whole, and over it only above the liner's crown.
+  local aroundArch(id, slot, from, to, low, high, z) =
+    local aft = s.rearAxle - s.arch;
+    local fore = s.rearAxle + s.arch;
+    local over = std.max(low, s.archTop + 0.0625);
+    // An arch's edge can meet the box's end to within rounding, which would leave a sliver with no width.
+    local beyond(a, b) = a - b > 1e-6;
+    if !beyond(to, aft) || !beyond(fore, from) then [box(id, slot, [from, low, z[0]], [to, high, z[1]])]
+    else (if beyond(aft, from) then [box(id + '_aft', slot, [from, low, z[0]], [aft, high, z[1]])] else [])
+      + (if beyond(to, fore) then [box(id + '_fore', slot, [fore, low, z[0]], [to, high, z[1]])] else [])
+      + (if high > over then [box(id + '_over', slot, [std.max(aft, from), over, z[0]], [std.min(fore, to), high, z[1]])] else []),
+  // The floor behind the seats, whole between the wells and cut round the rear arch outside them.
+  local rearFloor(low, high) =
+    [box('rear_floor', 'pan', [floorBack, low, -well], [bootFloorFront, high, well])]
+    + bothSides(aroundArch('rear_floor', 'pan', floorBack, bootFloorFront, low, high, [well, s.skin])),
   // Door and quarter glass stand two voxels thick: a thinner pane falls between cells where its bands step in.
   local paneZ = [s.skin + 0.01 - 2 * grain, s.skin + 0.01],
   // The rear arch's forward corner rides on the rear door wherever the door reaches over the arch.
@@ -96,14 +131,7 @@ local pressings(id, title, s) = {
     local headDepth = s.side - (bHeadOut - shape.tumble);
     s.bFront + std.max(0, std.sqrt(std.max(0, reach * reach + glassDepth * glassDepth - headDepth * headDepth)) - reach),
   local rows = [
-    part('_shell', 'shell', s.shellMass, [
-      box('floor_pan', 'pan', [s.rearFloorFront, 0.2 + lift, -s.skin], [s.cowl, s.floor, s.skin]),
-      box('carpet', 'carpet', [s.rearFloorFront, s.floor, -s.skin + 0.04], [s.cowl, s.floor + 0.01, s.skin - 0.04]),
-      box('tunnel', 'carpet', [s.rearFloorFront + 0.35, s.floor, -0.12], [s.cowl, 0.45 + lift, 0.12]),
-    ] + (if cab then [] else [
-      box('rear_floor', 'pan', [floorBack, bootFloor - 0.1, -s.skin], [bootFloorFront, bootFloor, s.skin]),
-    ]) + [
-      box('bulkhead', 'paint', [s.cowl, s.floor, -s.skin + 0.02], [s.aPost, s.waist - 0.04, s.skin - 0.02]),
+    part('_shell', 'shell', s.shellMass, tunnel + (if cab then [] else rearFloor(bootFloor - 0.1, bootFloor)) + [
       box('slam_panel', 'paint', [nose - 0.05, 0.35 + lift, -slam], [nose, slamTop, slam]),
     ] + (if noseShut > slamTop then [
       box('slam_header', 'paint', [nose - 0.05, slamTop, -s.skin], [nose, noseShut, s.skin]),
@@ -146,8 +174,7 @@ local pressings(id, title, s) = {
       box('tail_under', 'paint', [s.rear + 0.04, bumperTop, s.hatchSide], [s.rear + 0.1, 0.62 + lift, s.side]),
       box('quarter_arch', 'paint', [s.rearAxle - s.arch, s.archTop, s.skin], [s.rearDoor, s.waist, s.side]),
       shape.aftCorner('quarter_corner_aft', 'paint', s.rearAxle, [s.skin, s.side]),
-      box('boot_side', 'trim', [floorBack, bootFloor, loadSide], [s.rearFloorFront, s.waist, s.skin]),
-    ]) + (if !cab && !hasDoorCorner then [
+    ] + aroundArch('boot_side', 'trim', floorBack, s.rearFloorFront, bootFloor, s.waist, [loadSide, s.skin])) + (if !cab && !hasDoorCorner then [
       shape.foreCorner('quarter_corner_fore', 'paint', s.rearAxle, [s.skin, s.side]),
     ] else []) + (if std.get(s, 'archLiner', false) then archLiner('front', s.frontAxle) + (if cab then [] else archLiner('rear', s.rearAxle)) else []) + (if twoDoor then [
       box('quarter_door', 'paint', [s.rearDoorArch, s.floor, s.skin], [s.bRear, s.waist, s.side]),
@@ -220,9 +247,9 @@ local pressings(id, title, s) = {
     ], { lens: 'plastic-red' }),
   ]) + [
     part('_dashboard', 'dashboard', 15, [
-      box('lower', 'trim', [s.cowl - 0.15, 0.45 + lift, -s.skin + 0.06], [s.cowl, s.waist - 0.17, s.skin - 0.06]),
+      box('lower', 'trim', [s.cowl - 0.15, shape.tunnel.top, -s.skin + 0.06], [s.cowl, s.waist - 0.17, s.skin - 0.06]),
       box('top', 'trim', [s.cowl - 0.32, s.waist - 0.17, -s.skin + 0.06], [s.cowl, s.waist - 0.05, s.skin - 0.06]),
-      box('console', 'trim', [s.cowl - 0.6, s.floor, -0.1], [s.cowl - 0.15, 0.55 + lift, 0.1]),
+      box('console', 'trim', [s.cowl - 0.6, shape.tunnel.top, -0.1], [s.cowl - 0.15, shape.tunnel.consoleTop, 0.1]),
       box('column', 'trim', [s.cowl - 0.37, s.waist - 0.23, -0.41], [s.cowl - 0.15, s.waist - 0.15, -0.33]),
     ], { trim: 'plastic-black' }),
   ] + (if twoDoor then [] else [

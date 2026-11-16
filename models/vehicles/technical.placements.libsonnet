@@ -42,4 +42,8 @@ local wheel = 'wheel_235_75r15';
   + pair('headlamp', 'car_headlamp', [s.nose + 0.05, 0.78, 0.62])
   + site.batteryBay('battery_tray', [2.0, 0.76, 0.42]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('front_axle', 'engine', 0.118,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
+  ],
 }

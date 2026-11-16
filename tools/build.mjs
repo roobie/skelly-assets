@@ -20,7 +20,9 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
+import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
+import { danglingPartItems } from './partItems.mjs';
 import { readDependencies } from './packs.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
@@ -173,6 +175,12 @@ export function withSources(models, sources) {
   return models.map((model) => ({ ...model, title: byModel.get(key(model)).title, taxonomy: byModel.get(key(model)).taxonomy }));
 }
 
+// Each model with the doll part it sits on, if it is worn (tools/dress.mjs, `wornOnParts`), read from its taxonomy.
+export function withWornOn(models, dressing, dollParts) {
+  const wornOn = wornOnParts(models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })), dressing, dollParts);
+  return models.map((model) => (wornOn.has(model.id) ? { ...model, wornOn: wornOn.get(model.id) } : model));
+}
+
 // The catalogue's finish library, which vehicle sites name their paint from (tools/placements.mjs, siteProblems). Loaded
 // only after installJsonnetSources: the library reads the compiled finishes, which a module graph imported earlier would
 // have read before they were regenerated.
@@ -271,7 +279,10 @@ async function main() {
     const problems = [...report.problems, ...vehicles.problems];
     for (const { message } of [...unlisted, ...vehicles.unjudged]) console.log(`SOURCE note: ${message}`);
     for (const { message } of problems) console.log(`SOURCE ${message}`);
-    if (problems.length > 0) process.exit(1);
+    if (problems.length > 0) {
+      process.exitCode = 1;
+      return;
+    }
   }
   let failed = false;
   const pool = exportPool(cache);
@@ -292,7 +303,8 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
-      const models = withSources([...built.models, ...recipes.models, ...mobs.models], sources);
+      const dressing = readDressing(repo);
+      const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({
@@ -309,13 +321,16 @@ async function main() {
       for (const file of placed.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models });
       for (const file of wields.files) console.log(`built ${file}`);
+      const files = [...built.files, ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files];
+      const dangling = danglingPartItems({ files, out, models });
+      if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
         vehicles: placed.vehicles,
         motions: wields.motions,
         sounds: sounds.sounds,
         dependsOn,
-        files: [...built.files, ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files],
+        files,
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes,
@@ -337,7 +352,8 @@ async function main() {
   } finally {
     await pool.close();
   }
-  process.exit(failed ? 1 : 0);
+  // Not process.exit: on a pipe stdout writes asynchronously, and exiting drops the report lines still queued.
+  process.exitCode = failed ? 1 : 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

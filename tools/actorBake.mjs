@@ -13,6 +13,7 @@ const clipEmitters = {
   acid: (figure, _template, row) => acidClips(figure, row),
   'fused-mass': fusedClips,
   quadruped: creatureClips,
+  critter: creatureClips,
   insect: creatureClips,
   floater: creatureClips,
   dragon: creatureClips,

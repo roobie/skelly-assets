@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { dollOf, isWearable, modelBox, modelParts, readDressing, wornPieces, wornSites } from '../dress.mjs';
+import { withWornOn } from '../build.mjs';
+import { modelSources } from '../check-sources.mjs';
+import { readRigContent } from '../dollRig.mjs';
+import { coveringItems, dollOf, isWearable, modelBox, modelParts, readDollParts, readDressing, wornOnParts, wornPieces, wornSites } from '../dress.mjs';
+import { evaluateJsonnet } from '../jsonnet/index.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 const box = (min, max) => ({ min, max });
@@ -12,6 +16,7 @@ const close = (actual, expected) => actual.forEach((x, i) => assert.ok(Math.abs(
 const dressing = {
   doll: { bust: 'bust', limbs: [{ model: 'limb', anchor: 'shoulder' }], sides: ['right', 'left'], mirrored: 'left' },
   piece: 'chest',
+  layers: ['over-jacket'],
   lying: ['folded'],
   places: [
     { slot: 'torso', part: 'chest', against: [0, 0, 1], sink: 0.5 },
@@ -67,6 +72,18 @@ test('a piece that covers some of its part names, in every copy, the doll site t
   ]);
 });
 
+test('an item is dressed to check its pieces\' covers whether or not the tree holds the item itself', () => {
+  const models = [
+    { ...model('coat_worn_cuff', { fit: ['worn'] }), covers: ['sleeve'] },
+    { ...model('coat_worn', { fit: ['worn'] }), covers: ['chest'] },
+    { ...model('vest_worn', { fit: ['worn'] }), covers: ['chest'] },
+    model('scarf_worn', { fit: ['worn'] }),
+    { ...model('coat_hood_worn_body', { fit: ['worn'] }), covers: ['chest'] },
+    { ...model('coat_worn_jacket_cuff', { fit: ['over-jacket'] }), covers: ['sleeve'] },
+  ];
+  assert.deepEqual(coveringItems(models), ['coat', 'vest', 'coat_hood']);
+});
+
 test('pieces fitted over other clothing and other items\' pieces are not worn with an item', () => {
   const models = [model('coat_worn_cuff', { fit: ['worn'] }), model('coat_worn_jacket', { fit: ['over-jacket'] }), model('coat_hood_worn_body', { fit: ['worn'] })];
   assert.deepEqual(wornPieces('coat', models, dressing), [{ model: 'coat_worn_cuff', part: 'sleeve' }]);
@@ -76,6 +93,61 @@ test('pieces fitted over other clothing and other items\' pieces are not worn wi
 test('a wearable is a loose model that names a slot or has worn pieces, never a piece itself', () => {
   const models = [model('cap', { slot: ['head'] }), model('sling'), model('sling_worn', { fit: ['worn'] }), model('rock')];
   assert.deepEqual(models.filter((m) => isWearable(m, models)).map(({ id }) => id), ['cap', 'sling']);
+});
+
+test('a worn piece sits on the part its frame is, one over other clothing on its worn twin\'s, and a wearable with no pieces on its place\'s part, on the first side\'s copy of a limb\'s', () => {
+  const models = [
+    model('coat', { slot: ['torso'] }), model('coat_worn_cuff', { fit: ['worn'] }), model('coat_worn', { fit: ['worn'] }),
+    model('coat_worn_jacket', { fit: ['over-jacket'] }), model('plate_worn_body', { fit: ['worn'] }),
+    model('vest', { slot: ['hands', 'torso'] }), model('boots', { slot: ['feet'] }), model('hat', { slot: ['head'] }),
+    model('gloves', { slot: ['hands'] }), model('cap', { slot: ['head'], fit: ['worn'] }), model('rock'),
+  ];
+  const dollParts = { anchors: { brow: 'chest' }, sided: ['sleeve'] };
+  assert.deepEqual(Object.fromEntries(wornOnParts(models, dressing, dollParts)), {
+    coat_worn_cuff: { part: 'sleeve' },
+    coat_worn: { part: 'chest' },
+    coat_worn_jacket: { part: 'chest' },
+    plate_worn_body: { part: 'chest' },
+    vest: { part: 'chest' },
+    boots: { part: 'sleeve', both: true },
+    gloves: { part: 'sleeve', side: 'right' },
+    hat: { part: 'chest', anchor: 'brow' },
+  });
+  assert.throws(() => wornOnParts([model('mask', { slot: ['face'] })], dressing, dollParts), /nose/);
+  assert.throws(() => wornOnParts([model('sling_worn_jacket', { fit: ['over-jacket'] })], dressing, dollParts), /sling_worn/);
+});
+
+test('every worn piece, over other clothing too, and every wearable with no pieces sits on the part worn-slots or its place names, which the rig binds, on the side of the rig\'s copy', async () => {
+  const dressing = readDressing(repo);
+  const wornSlots = JSON.parse(evaluateJsonnet("import 'models/worn-slots.libsonnet'", repo));
+  const dollParts = await readDollParts(dressing);
+  const bones = Object.values(readRigContent(repo).bones);
+  const bound = new Set(bones.map(({ part }) => part));
+  assert.deepEqual(new Set(dollParts.sided), new Set(bones.filter(({ sided }) => sided).map(({ part }) => part)));
+  const sources = await modelSources(repo);
+  const tags = (entry, facet) => entry.taxonomy?.tags?.[facet] ?? [];
+  const pieces = sources.filter((entry) => tags(entry, 'fit').includes('worn') && /_worn(_[^_]+)?$/.test(entry.id));
+  const garments = new Set(pieces.map(({ id }) => id.replace(/_worn(_[^_]+)?$/, '')));
+  const placed = sources.filter((entry) => tags(entry, 'fit').length === 0 && tags(entry, 'slot').length > 0 && !garments.has(entry.id));
+  const pieceParts = new Map(pieces.map(({ id }) => {
+    const segment = /_worn_([^_]+)$/.exec(id)?.[1];
+    return [id, { part: segment === undefined ? dressing.piece : wornSlots[segment].part }];
+  }));
+  const layered = sources.filter((entry) => tags(entry, 'fit').some((fit) => dressing.layers.includes(fit)));
+  assert.ok(layered.length > 0);
+  const expected = new Map([
+    ...pieceParts,
+    ...layered.map(({ id }) => [id, pieceParts.get(id.replace(/_[^_]+$/, ''))]),
+    ...placed.map((entry) => {
+      const { part: placePart, both, anchor } = dressing.places.find(({ slot }) => tags(entry, 'slot').includes(slot));
+      const part = anchor === undefined ? placePart : dollParts.anchors[anchor];
+      const copy = both ? { both } : dollParts.sided.includes(part) ? { side: dressing.doll.sides[0] } : {};
+      return [entry.id, { part, ...copy, ...(anchor === undefined ? {} : { anchor }) }];
+    }),
+  ]);
+  const worn = withWornOn(sources, dressing, dollParts).filter(({ wornOn }) => wornOn !== undefined);
+  assert.deepEqual(new Map(worn.map(({ id, wornOn }) => [id, wornOn])), expected);
+  assert.deepEqual(worn.filter(({ wornOn }) => !bound.has(wornOn.part)).map(({ id }) => id), []);
 });
 
 test('a wearable with no pieces rests against its place\'s part, sunk by its share of its own depth and centred across', () => {

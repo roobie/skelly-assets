@@ -9,6 +9,7 @@ await import(src('mob/templates.ts'));
 await import(src('mob/acidTemplate.ts'));
 await import(src('mob/fusedMassTemplate.ts'));
 await import(src('mob/quadrupedTemplate.ts'));
+await import(src('mob/critterTemplate.ts'));
 await import(src('mob/insectTemplate.ts'));
 await import(src('mob/floaterTemplate.ts'));
 await import(src('mob/dragonTemplate.ts'));

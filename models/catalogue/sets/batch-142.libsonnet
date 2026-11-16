@@ -151,9 +151,9 @@ local medal(id, mass) =
   // wooden beads strung below it, the middle one larger.
   h.compound('bead_ear', 0.0014,
              std.flattenArrays([
-               h.crescent('hook-%d' % k, 'wire', 0.0055, 0.0068, -10, 200, 6, 0, 0.0014, x, 0.011)
+               h.crescent('hook-%d' % k, 'wire', 0.0052, 0.0076, -10, 200, 6, 0, 0.0025, x, 0.011)
                + [
-                 h.box('pin-%d' % k, 'wire', [x - 0.0006, 0, -0.012], [x + 0.0006, 0.0014, 0.005]),
+                 h.box('pin-%d' % k, 'wire', [x - 0.0006, 0, -0.012], [x + 0.0006, 0.0025, 0.005]),
                  ball('bead-%d-a' % k, 'bead', 0.0025, x, 0.002),
                  ball('bead-%d-b' % k, 'bead', 0.0032, x, -0.0037),
                  ball('bead-%d-c' % k, 'bead', 0.0025, x, -0.0095),

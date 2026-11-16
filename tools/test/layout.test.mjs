@@ -125,8 +125,7 @@ test('the showcase lists every model of the manifest at its pack path, ships the
           assert.ok(sampleClip(clip, time, (a) => a), `${model.file} has an unsampleable ${name} clip`);
         }
         // Death falls run on the render clock, so its span key differs from every other finite clip's.
-        for (const direction of ['forward', 'backward']) if (set.death?.[direction]) for (const time of [0, 1.234]) {
-          const clip = set.death[direction];
+        for (const [direction, clip] of Object.entries(set.death ?? {})) for (const time of [0, 1.234]) {
           assert.equal(clip.kind, 'pose');
           assert.ok(sampleClip(clip, time, (a) => a), `${model.file} has an unsampleable death ${direction} clip`);
           sampledDeaths++;

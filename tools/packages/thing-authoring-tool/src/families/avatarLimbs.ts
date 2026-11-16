@@ -1,6 +1,6 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
-import { block, oval, taper } from './body.ts';
+import { block, oval, region, taper } from './body.ts';
 import { positive, requireConvex, scalar, spheroid } from './shapes.ts';
 
 // The player's limbs hang from their joint: origin on the joint at the limb's top, y up, the limb down -y, front
@@ -263,12 +263,16 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
         edge -= width + toeGap;
         return toe;
       });
+      // Regions a worn shell's `covers` names, so footwear hides the skin it encloses: the ankle's cap, which rises
+      // above a shoe's vamp into the shaft that rides the shin, and the sole below it, heel, instep and toes.
       return [
-        oval('heel', 'skin', ys(sole, ankle - 0.015), { halfX: halfShoe * 0.95, halfZ: 0.05, power: 2.6, cz: heelBack + 0.05 }),
-        spheroid('ankle', [0, 0, 0], [shinHalfZ * 0.8, shinHalfX * 0.8], ['x', 'skin']),
-        { id: 'instep', kind: 'extruded-polygon', axis: 'x', profile: instep, z: [-halfShoe, halfShoe], slot: 'skin' },
-        // The model is the right foot, so the big toe is on its inner side, +x; the left foot is its mirror.
-        ...toes,
+        ...region('sole', [oval('heel', 'skin', ys(sole, ankle - 0.015), { halfX: halfShoe * 0.95, halfZ: 0.05, power: 2.6, cz: heelBack + 0.05 })]),
+        ...region('ankle', [spheroid('ankle', [0, 0, 0], [shinHalfZ * 0.8, shinHalfX * 0.8], ['x', 'skin'])]),
+        ...region('sole', [
+          { id: 'instep', kind: 'extruded-polygon', axis: 'x', profile: instep, z: [-halfShoe, halfShoe], slot: 'skin' } satisfies ExtrudedPolygonSolid,
+          // The model is the right foot, so the big toe is on its inner side, +x; the left foot is its mirror.
+          ...toes,
+        ]),
       ];
     }
     default:

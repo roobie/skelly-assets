@@ -103,9 +103,9 @@ local guardBottom(a) = if std.abs(a) < 50 then 0.045 * std.abs(a) / 50 else 0.04
              wall('collar', 'cover', 0.072, 0.086, -145, 145, 29, function(a) if std.abs(a) < 55 then 0.052 * std.abs(a) / 55 else 0.052, 0.1)
              + wall('inner', 'inner', 0.064, 0.072, -150, 150, 30, function(a) 0.05, 0.112)
              + wall('seam-top', 'seam', 0.071, 0.087, -145, 145, 29, function(a) 0.096, 0.1)
-             + wall('flap-patch', 'hook', 0.086, 0.088, -22, 22, 6, function(a) 0.022, 0.07)
-             + wall('hook', 'hook', 0.086, 0.089, 118, 143, 4, function(a) 0.062, 0.09)
-             + wall('loop', 'hook', 0.061, 0.064, -148, -122, 4, function(a) 0.058, 0.1),
+             + wall('flap-patch', 'hook', 0.086, 0.091, -22, 22, 6, function(a) 0.022, 0.07)
+             + wall('hook', 'hook', 0.086, 0.091, 118, 143, 4, function(a) 0.062, 0.09)
+             + wall('loop', 'hook', 0.059, 0.064, -148, -122, 4, function(a) 0.058, 0.1),
              { cover: 'nylon-coyote', inner: 'nylon-black', seam: 'webbing-olive-dark', hook: 'hook-loop-grey' }) + { title: 'Ballistic throat guard' }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['fabric'], setting: ['modern'], slot: ['neck'] } } },
 

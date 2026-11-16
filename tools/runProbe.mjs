@@ -56,6 +56,10 @@ function polygonWidth(points) {
   return least;
 }
 
+// The share of the grain a prism may fall short of it and still count one grain thick: a curve drawn one grain thick
+// comes out a few percent thinner across each flat facet than at its corners, and the lattice still draws it whole.
+const ONE_GRAIN_SLACK = 0.05;
+
 // Runs of slanted prisms thinner than the grain, across their section or along their extrusion, each touching the
 // next: a wire bent through short straight runs, which the voxel sampling turns into a jagged line of single cells rather than the curve it
 // follows. A prism whose section keeps the model's axes is a plain bar and is not reported.
@@ -66,7 +70,7 @@ export function thinRuns(pieces, grain) {
         const [bx, by] = profile[(i + 1) % profile.length];
         return ax !== bx && ay !== by;
       });
-      return slanted && Math.min(polygonWidth(profile), end - start) < grain;
+      return slanted && Math.min(polygonWidth(profile), end - start) < grain * (1 - ONE_GRAIN_SLACK);
     });
     return thin.length >= 3 && joined(list.map(solid), grain / 2) ? [{ prefix, slot, pieces: list.length, thin: thin.length }] : [];
   });

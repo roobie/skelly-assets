@@ -190,12 +190,12 @@ local trousers(w, d, ht) = h.foldedGarment(w, d, ht, 3) + [
       box(p + 'edge-b', 'pad', [-0.09, 0, z - 0.068], [0.13, 0.016, z - 0.056]),
     ]
     + arc(p + 'shin', 'shell', 0.055, 0.005, 80, -0.09, 0.13, z)
-    + arc(p + 'instep', 'trim', 0.05, 0.004, 65, 0.14, 0.215, z)
+    + arc(p + 'instep', 'trim', 0.05, 0.005, 65, 0.14, 0.215, z)
     + std.flattenArrays([
       local yc = -0.055 * std.cos(80 * std.pi / 180), side = z + 0.06 * std.sin(80 * std.pi / 180);
-      arc(p + 'strap-%d' % i, 'strap', 0.06, 0.002, 80, x, x + 0.03, z, 8, yc) + [
-        box(p + 'tail-%d' % i, 'strap', [x, 0, side], [x + 0.03, 0.003, side + 0.08]),
-        box(p + 'loop-%d' % i, 'hook', [x, 0.003, side + 0.02], [x + 0.03, 0.005, side + 0.075]),
+      arc(p + 'strap-%d' % i, 'strap', 0.06, 0.005, 80, x, x + 0.03, z, 8, yc) + [
+        box(p + 'tail-%d' % i, 'strap', [x, 0, side], [x + 0.03, 0.005, side + 0.08]),
+        box(p + 'loop-%d' % i, 'hook', [x, 0.005, side + 0.02], [x + 0.03, 0.007, side + 0.075]),
       ]
       for i in [0, 1]
       for x in [if i == 0 then -0.06 else 0.07]

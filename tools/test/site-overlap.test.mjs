@@ -28,6 +28,14 @@ test('faces that touch, or sink less than a grain into each other, are contact a
   }
 });
 
+test('a part drawn on a finer grain is contact only within the finer of the two grains', () => {
+  const fine = GRAIN / 8;
+  const panel = (by) => ({ ...site('door', 'van_door', shifted(by)), grain: fine });
+  assert.deepEqual(siteOverlaps([site('body', 'van_body', unit), panel(1 - fine / 2)], GRAIN), []);
+  const [overlap] = siteOverlaps([site('body', 'van_body', unit), panel(1 - GRAIN / 2)], GRAIN);
+  assert.ok(Math.abs(overlap?.depth - GRAIN / 2) < fine / 8, `depth ${overlap?.depth}`);
+});
+
 test('a piece passing right through a thin panel reads as deep as it passes, not as thin as the panel', () => {
   const floor = box('floor', [-1, -1, 0.4], [2, 2, 0.4 + 2 * GRAIN]);
   const rod = { id: 'rod', kind: 'turned', axis: 'z', origin: [0.5, 0.5, 0], profile: [[0, 0], [0, 0.1], [1, 0.1], [1, 0]] };

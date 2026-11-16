@@ -11,19 +11,20 @@ local s = import 'suv.spec.libsonnet';
     site.one('front_bumper', 'suv_front_bumper'),
     site.one('rear_bumper', 'suv_rear_bumper'),
     site.one('dashboard', 'suv_dashboard'),
-  ] + engine.sites('v6_petrol', [1.35, 0.45, 0], 'assembly') + [
-    site.one('gearbox', 'gearbox_inline', [0.79, 0.42, 0]),
+  ] + engine.sites('v6_petrol', s.engineAt, 'assembly') + [
+    site.one('gearbox', 'gearbox_inline', s.gearboxAt),
     site.one('rear_axle', 'beam_axle_light', [s.rearAxle, 0.032, 0]),
     site.one('prop_shaft', 'prop_shaft_short', [-0.48, 0.42, 0]),
     site.one('radiator', 'radiator_van', [s.front - 0.3, 0.48, 0]),
     site.one('fuel_tank', 'fuel_tank_van', [s.rearAxle - 0.55, 0.34, -0.06]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
-    site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, 0.75, 0]),
+    site.one('gear_lever', 'gear_lever', [s.cowl - 0.4, (import 'car-shape.libsonnet')(s).tunnel.consoleTop, 0]),
     site.one('rear_bench', 'bench_seat_3', [-0.72, s.floor, 0]),
     site.one('roof_rails', 'suv_roof_rails'),
     site.one('spare_wheel', 'spare_wheel_carrier', [s.rear + 0.05, 1.15, 0], 'tailgate'),
     site.one('front_axle', 'beam_axle_light', [s.frontAxle, 0.032, 0]),
-    site.one('front_prop_shaft', 'prop_shaft_short', [1.05, 0.42, 0]),
+    // The front shaft runs under the gearbox and the engine's sump to the front diff.
+    site.one('front_prop_shaft', 'prop_shaft_short', [0.85, s.gearboxAt[1] - 0.04, 0]),
     site.one('exhaust', 'exhaust_long', [s.rear + 0.58, 0.24, 0.5]),
     site.one('tow_hitch', 'tow_hitch', [s.rear + 0.02, 0.35, 0]),
   ]
@@ -41,17 +42,7 @@ local s = import 'suv.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
   unjudged: [
-    site.unjudged('dashboard', 'gearbox', 0.221,
-      'The inline gearbox\'s case rises above the tunnel into the dashboard\'s console.'),
-    site.unjudged('drive_belt', 'front_axle', 0.051,
-      'The engine\'s lowest belt run passes through the front axle\'s diff.'),
-    site.unjudged('front_axle', 'front_prop_shaft', 0.153,
-      'The front prop shaft\'s tube runs through the front axle\'s diff instead of ending at it.'),
-    site.unjudged('front_prop_shaft', 'shell', 0.061,
-      'The front prop shaft\'s tube runs through the floor pan, which has no tunnel over it.'),
-    site.unjudged('gearbox', 'shell', 0.221,
-      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
-    site.unjudged('prop_shaft', 'shell', 0.061,
-      'The prop shaft\'s tube runs through the floor pan outside the tunnel drawn for it.'),
+    site.unjudged('engine', 'front_axle', 0.043,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
   ],
 }

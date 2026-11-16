@@ -22,10 +22,36 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
     local area = std.sum([profile[i][0] * profile[(i + 1) % n][1] - profile[(i + 1) % n][0] * profile[i][1] for i in std.range(0, n - 1)]);
     { id: id, slot: slot, kind: 'prism', axis: axis, profile: if area > 0 then profile else std.reverse(profile), start: start, end: end },
   rod: rod,
-  // A bar bent along a polyline of [x, y] points, lying from z0 to z1, `w` wide or one width per point for a taper.
+  // A moulded block from `min` to `max` that reads shaped rather than cut, for helmet shells and housings: its plan's
+  // corners cut by `corner`, its sides sloping in from its foot to its top by `taper`, [either side, front (+z), back
+  // (-z)], and its top edges chamfered at 45 degrees by `crown`. It keeps its whole plan at its foot and a flat top, so
+  // its bounds stay `min`..`max` and an anchor given as a share of them stays where it was on a plain box.
+  taperedBlock(id, slot, min, max, corner, taper, crown):
+    local c = [(min[0] + max[0]) / 2, (min[2] + max[2]) / 2], half = [(max[0] - min[0]) / 2, (max[2] - min[2]) / 2];
+    local height = max[1] - min[1];
+    // Each plan direction [x, z], with how far the foot's outline reaches along it and how far that face slopes in.
+    local faces = [
+      { u: [1, 0], reach: half[0], inset: taper[0] },
+      { u: [-1, 0], reach: half[0], inset: taper[0] },
+      { u: [0, 1], reach: half[1], inset: taper[1] },
+      { u: [0, -1], reach: half[1], inset: taper[2] },
+    ] + [
+      { u: [sx / std.sqrt(2), sz / std.sqrt(2)], reach: (half[0] + half[1] - corner) / std.sqrt(2), inset: (taper[0] + taper[if sz > 0 then 1 else 2]) / std.sqrt(2) }
+      for sx in [1, -1]
+      for sz in [1, -1]
+    ];
+    local along(f) = f.u[0] * c[0] + f.u[1] * c[1];
+    // Keeps dot(normal, p) <= offset: a face meeting the foot at its reach and the top `inset` further in, and a chamfer
+    // meeting the top `crown` in from that.
+    local slope(f) = { normal: [f.u[0] * height, f.inset, f.u[1] * height], offset: (f.reach + along(f)) * height + f.inset * min[1] };
+    local chamfer(f) = { normal: [f.u[0], 1, f.u[1]], offset: f.reach + along(f) - f.inset - crown + max[1] };
+    self.prism(id, slot, 'y', [[min[2], min[0]], [min[2], max[0]], [max[2], max[0]], [max[2], min[0]]], min[1], max[1])
+    + { clip: [slope(f) for f in faces] + [chamfer(f) for f in faces] },
+  // A bar bent along a polyline of points across `axis`, lying from z0 to z1 along it, `w` wide or one width per point
+  // for a taper. The points are [x, y] across z, [y, z] across x and [z, x] across y.
   // Prisms must be convex, so each straight run is its own prism; the runs are mitred at every bend so neighbours
   // share their joint face and the bar reads as one piece, not a chain of offset blocks.
-  bend(prefix, slot, pts, w, z0, z1):
+  bend(prefix, slot, pts, w, z0, z1, axis='z'):
     local n = std.length(pts);
     local half(i) = (if std.isArray(w) then w[i] else w) / 2;
     local normal(i) =
@@ -38,7 +64,7 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
       [mx * k, my * k];
     local side(i, s) = local o = offset(i); [pts[i][0] + s * o[0], pts[i][1] + s * o[1]];
     [
-      $.prism('%s-%d' % [prefix, i], slot, 'z', [side(i, 1), side(i, -1), side(i + 1, -1), side(i + 1, 1)], z0, z1)
+      $.prism('%s-%d' % [prefix, i], slot, axis, [side(i, 1), side(i, -1), side(i + 1, -1), side(i + 1, 1)], z0, z1)
       for i in std.range(0, n - 2)
     ],
   // A round pipe or wire of radius `r` (or one radius per point) bent along a polyline of [x, y] points at depth z:

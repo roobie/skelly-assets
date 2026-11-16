@@ -1,8 +1,8 @@
 // Finds parts placed at different sites of one vehicle that occupy the same space. A part is authored as pieces in its
 // vehicle's frame; a site moves them by its position, and a far-side twin first reflects them across the centre plane
 // (models/vehicles/kit.libsonnet, `far` and `moved`), exactly as the showcase and the game place the part. Two pieces
-// overlap when they sink more than one voxel grain into each other, so faces that touch or sink a grain into each other
-// are contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other
+// overlap when they sink into each other more than the finer of their parts' voxel grains, so faces that touch or sink
+// that grain into each other are contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other
 // freely. An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which
 // holds for every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
 // correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run. A family's
@@ -16,9 +16,10 @@ import { solid } from './pieceSolid.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
-// Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
-// the overlaps it allows and has not judged, the fits by role and every drawn site's id: { grain, fits, roles, motions,
-// vehicles: { vehicle: { parent?, forward, sites: [{ id, part, pieces, mirror?, at, rides? }], overlaps, unjudged,
+// Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame and the
+// grain the part is drawn on, and the overlaps it allows and has not judged, the fits by role and every drawn site's id:
+// { grain, fits, roles, motions, vehicles: { vehicle: { parent?, forward, sites: [{ id, part, grain, pieces, mirror?,
+// at, rides? }], overlaps, unjudged,
 // ledger, swingContacts, swingUnjudged } } }, where `ledger` is the vehicle's rows of its family's unjudged list. A
 // site whose part is a roster model has no pieces to compare, so it is left out.
 // `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
@@ -26,17 +27,19 @@ const repo = resolve(import.meta.dirname, '..');
 export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
   local k = import 'models/vehicles/kit.libsonnet';
+  local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
   local placements = import 'models/vehicles/placements.libsonnet';
   local ledger = import 'models/vehicles/unjudged-overlaps.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   local drawn = { [row.id]: std.parseJson(row.parts[0].params.pieces) for row in rows };
+  local grains = { [row.id]: voxel.of(voxel.vehicle, row).grain for row in rows };
   local placed(site) = [
     k.moved(if std.objectHas(site, 'mirror') then k.far(piece) else piece, site.at)
     for piece in drawn[site.part]
   ];
   local moving = [row for row in rows if std.objectHas(row, 'motion')];
   {
-    grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
+    grain: voxel.vehicle.grain,
     motions: { [row.id]: { stages: row.motion.stages, pieces: drawn[row.id] } for row in moving },
     fits: (import 'models/vehicles/seating.libsonnet').fits,
     roles: std.set(std.flattenArrays([
@@ -48,7 +51,7 @@ export function readSitePieces(root = repo) {
       [vehicle]: {
         parent: std.get(placements[vehicle], 'parent'),
         forward: placements[vehicle].forward,
-        sites: [site { pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
+        sites: [site { grain: grains[site.part], pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
         overlaps: std.get(placements[vehicle], 'overlaps', []),
         unjudged: std.get(placements[vehicle], 'unjudged', []),
         ledger: std.get(ledger, vehicle, []),
@@ -172,18 +175,20 @@ export function penetration(p, q, grain, step) {
   return sharing ? depth : 0;
 }
 
-// Every pair of sites of one vehicle whose pieces overlap by more than `grain`, as { sites: [a, b], parts: [a, b],
-// pieces: [a, b], depth }, depth being the penetration (m) of the deepest piece pair found. Pieces are swept along x
-// so only those whose boxes meet are compared.
+// Every pair of sites of one vehicle whose pieces overlap by more than the finer of their parts' grains, as
+// { sites: [a, b], parts: [a, b], pieces: [a, b], depth }, depth being the penetration (m) of the deepest piece pair
+// found. A site's part is drawn on its `grain`, or on the vehicle's `grain` when it names none, and moves are sampled
+// every vehicle grain. Pieces are swept along x so only those whose boxes meet are compared.
 export function siteOverlaps(sites, grain) {
-  const pieces = sites.flatMap((site, owner) => site.pieces.map((piece) => ({ owner, id: piece.id, ...solid(piece) })))
+  const pieces = sites.flatMap((site, owner) =>
+    site.pieces.map((piece) => ({ owner, id: piece.id, grain: site.grain ?? grain, ...solid(piece) })))
     .sort((a, b) => a.min[0] - b.min[0]);
   const found = new Map();
   for (let i = 0; i < pieces.length; i++) {
-    for (let j = i + 1; j < pieces.length && pieces[j].min[0] < pieces[i].max[0] - grain; j++) {
+    for (let j = i + 1; j < pieces.length && pieces[j].min[0] < pieces[i].max[0]; j++) {
       if (pieces[i].owner === pieces[j].owner) continue;
       const [p, q] = pieces[i].owner < pieces[j].owner ? [pieces[i], pieces[j]] : [pieces[j], pieces[i]];
-      const depth = penetration(p, q, grain, grain);
+      const depth = penetration(p, q, Math.min(p.grain, q.grain), grain);
       const pair = key(p.owner, q.owner);
       if (depth > (found.get(pair)?.depth ?? 0)) {
         found.set(pair, { owners: [p.owner, q.owner], pieces: [p.id, q.id], depth });

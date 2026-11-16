@@ -20,4 +20,14 @@ local s = import 'burnt_out_van.spec.libsonnet';
   + pair('seat_frame', 'burnt_out_van_seat_frame', [0.75, s.floor, 0.5])
   + pair('rim_front', 'burnt_out_van_rim', [s.frontAxle, s.rimRadius, s.wheelZ])
   + pair('rim_rear', 'burnt_out_van_rim', [s.rearAxle, s.rimRadius, s.wheelZ]),
+  overlaps: [
+    site.overlap('chassis', 'shell', 0.041,
+      'The burnt shell has settled onto the chassis, its floor onto the rear axle\'s diff.'),
+    site.overlap('shell', 'rear_door_near', 0.05,
+      'The rear door hangs from one hinge and has swung down against the rear bumper.'),
+    site.overlap('shell', 'rim_rear_far', 0.161,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+    site.overlap('shell', 'rim_rear_near', 0.161,
+      'The tyres have burnt away and the shell has settled onto its bare rims, which stand up through its sagging floor.'),
+  ],
 }

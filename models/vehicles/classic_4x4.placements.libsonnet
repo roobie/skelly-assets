@@ -37,4 +37,8 @@ local s = import 'classic_4x4.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.pair('headlamp', 'headlamp_round', [s.front - 0.035, 0.76, 0.6])
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.72, -0.44]),
+  unjudged: [
+    site.unjudged('engine', 'front_axle', 0.043,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
+  ],
 }

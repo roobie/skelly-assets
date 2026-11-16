@@ -3,6 +3,8 @@
   frontAxle: 0.9, rearAxle: -2.8, frontHub: 0.78, rearHub: 0.522, frontZ: 1.36, rearZ: 1.2,
   bodyRear: -4.05, bodyFront: 0.95, side: 1.02, sill: 0.82, shoulder: 2.8125,
   cabRear: 0.92, cabFront: 2.3, cabSide: 0.82, cabFloor: 2.3, cabRoof: 3.9, shoulderCab: 2.78,
+  // The cab door swings over the platform only as far as the platform's rail lets it.
+  doorOpens: 30,
   tankRear: -1.6, tankFront: 0.9, tankTop: 3.53, tankSide: 1.0, tankFloorTop: 2.84375,
   headerRear: 3.0, headerFront: 4.2, headerHalf: 2.7, wallTop: 1.42,
   // The reel turns over the cutter bar, ahead of the auger, so its bats sweep clear of the auger's flights.

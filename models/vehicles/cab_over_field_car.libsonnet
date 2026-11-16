@@ -7,7 +7,7 @@ local bothSides = k.bothSides;
 local id = 'cab_over_field_car';
 local vehicle = import 'cab_over_field_car.placements.libsonnet';
 // A compound row of this vehicle, titled with its title and the part's `label`.
-local part(suffix, label, massKg, pieces, finish, anchors={}) = k.compound(id + suffix, massKg, pieces, finish, anchors) + { title: vehicle.title + ' ' + label };
+local part(suffix, label, massKg, pieces, finish, anchors={}, motion=null) = k.compound(id + suffix, massKg, pieces, finish, anchors, motion) + { title: vehicle.title + ' ' + label };
 local finish = { paint: 'paint-olive', frame: 'steel-spall-black', dark: 'steel-spall-black', trim: 'paint-charcoal', liner: 'steel-spall-black', glass: 'glass-clear', seal: 'rubber-black', seam: 'steel-spall-black' };
 
 // Edges are functions of height, so a raked or diagonal edge draws as one piece.
@@ -50,7 +50,14 @@ local windowed(name, aft, fore, windowAft, windowFore, seal=s.seal) =
   + leaning(name + '_fore', 'paint', windowFore, fore, s.windowLow, s.windowHigh)
   + glazing(name, windowAft, windowFore, s.windowLow, s.windowHigh, seal);
 
-local strap(name, fore, y) = box(name, 'dark', [fore - 0.2, y, s.side], [fore, y + 0.05, s.side + s.voxel]);
+local strapHigh = 0.05;
+// Each strap turns on the knuckle at its tip, so no part of the door reaches past the axis to swing into the body.
+local knuckles(x, ys, z) = k.hingePins('knuckle', 'y', [x, ys[0] + strapHigh / 2, z], [x, ys[1] + strapHigh / 2, z], 'dark');
+// A side door's two straps, reaching just past its fore edge.
+local sideStraps(fore, ys) =
+  local tip = fore + 0.02;
+  [box('hinge_' + end[0], 'dark', [tip - 0.2, end[1], s.side], [tip, end[1] + strapHigh, s.side + s.voxel]) for end in [['low', ys[0]], ['high', ys[1]]]]
+  + knuckles(tip, ys, s.side + s.voxel / 2);
 local handle(name, x) = box(name, 'dark', [x - 0.2, s.belt - 0.08, s.side], [x, s.belt - 0.04, s.side + s.voxel]);
 
 local d = s.cabDoor;
@@ -60,31 +67,34 @@ local cabDoor = part('_cab_door', 'cab door', s.mass.cabDoor, [
   flat('fore', [[d.foot, d.low], [d.fore, d.low], [d.fore, d.step], [d.stepFore, d.step]]),
   flat('aft', [[d.rear, d.stepAftTop], [d.stepAft, d.step], [d.stepAft, s.belt], [d.rear, s.belt]]),
   box('split', 'seal', [d.split - s.seal / 2, s.windowLow, s.side - 0.07], [d.split + s.seal / 2, s.windowHigh, s.side - 0.03]),
-  strap('hinge_low', d.fore + 0.02, s.hinges.cab[0]),
-  strap('hinge_high', d.fore + 0.02, s.hinges.cab[1]),
   handle('handle', d.rear + 0.3),
-] + windowed('upper', at(d.rear), doorFront, at(d.rear + 0.05), plus(doorFront, -0.08))
+] + sideStraps(d.fore, s.hinges.cab)
+  + windowed('upper', at(d.rear), doorFront, at(d.rear + 0.05), plus(doorFront, -0.08))
   + cords('edge', [[d.fore, s.belt], [d.fore, d.low], [d.foot, d.low], [d.stepFore, d.step], [d.stepAft, d.step], [d.rear, d.stepAftTop], [d.rear, s.belt]])
   + leaningCord('rear_edge', at(d.rear), s.belt, s.drip),
-  finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] });
+  finish, motion=k.motion.hinge(['knuckle_a', 'knuckle_b'], 'near', s.opens.door));
 
 local e = s.sideDoor;
 local sideDoor = part('_side_door', 'side door', s.mass.sideDoor, [
   rect('skin', e.rear, e.fore, e.low, s.belt),
-  strap('hinge_low', e.fore + 0.02, s.hinges.side[0]),
-  strap('hinge_high', e.fore + 0.02, s.hinges.side[1]),
   handle('handle', e.rear + 0.3),
   box('rubbing_strip', 'trim', [e.strip[0], s.stripY - 0.02, s.side], [e.strip[1], s.stripY + 0.02, s.side + s.voxel]),
-] + windowed('upper', at(e.rear), at(e.fore), at(e.window[0]), at(e.window[1]))
+] + sideStraps(e.fore, s.hinges.side)
+  + windowed('upper', at(e.rear), at(e.fore), at(e.window[0]), at(e.window[1]))
   + cords('edge', [[e.fore, s.belt], [e.fore, e.low], [e.rear, e.low], [e.rear, s.belt]])
   + leaningCord('fore_edge', at(e.fore - s.voxel), s.belt, s.drip)
   + leaningCord('rear_edge', at(e.rear), s.belt, s.drip),
-  finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] });
+  finish, motion=k.motion.hinge(['knuckle_a', 'knuckle_b'], 'near', s.opens.door));
 
 local rd = s.rearDoor;
 local skinBack(edge) = plus(edge, s.skin);
 local backAt(y) = if y <= s.belt then s.rear else rearLine(y);
 local rearSection(name, slot, low, high, z) = section(name, slot, backAt, skinBack(backAt), low, high, z);
+// The rear door's straps reach just past its far edge.
+local rearStraps =
+  local tip = -rd.half - 0.1;
+  [box('hinge_' + end[0], 'dark', [s.rear - s.voxel, end[1], tip], [s.rear, end[1] + strapHigh, -rd.half + 0.1]) for end in [['low', s.hinges.rear[0]], ['high', s.hinges.rear[1]]]]
+  + knuckles(s.rear - s.voxel / 2, s.hinges.rear, tip);
 local rearDoor = part('_rear_door', 'rear door', s.mass.rearDoor, [
   rearSection('skin', 'paint', rd.low, s.belt, [-rd.half, rd.half]),
   rearSection('under_window', 'paint', s.belt, rd.windowLow, [-rd.half, rd.half]),
@@ -94,14 +104,12 @@ local rearDoor = part('_rear_door', 'rear door', s.mass.rearDoor, [
   rearSection('seal_high', 'seal', rd.windowHigh - s.seal, rd.windowHigh, [-rd.half + rd.stile, rd.half - rd.stile]),
   rearSection('seam_low', 'seam', rd.low, rd.low + s.voxel, [-rd.half, rd.half]),
   rearSection('seam_high', 'seam', rd.top - s.voxel, rd.top, [-rd.half, rd.half]),
-  box('hinge_low', 'dark', [s.rear - s.voxel, s.hinges.rear[0], -rd.half - 0.1], [s.rear, s.hinges.rear[0] + 0.05, -rd.half + 0.1]),
-  box('hinge_high', 'dark', [s.rear - s.voxel, s.hinges.rear[1], -rd.half - 0.1], [s.rear, s.hinges.rear[1] + 0.05, -rd.half + 0.1]),
   box('handle', 'dark', [s.rear - s.voxel, 1.22, rd.half - 0.12], [s.rear, 1.42, rd.half - 0.07]),
-] + bothSides([
+] + rearStraps + bothSides([
   rearSection('stile', 'paint', rd.windowLow, rd.windowHigh, [rd.half - rd.stile, rd.half]),
   rearSection('seal_side', 'seal', rd.windowLow + s.seal, rd.windowHigh - s.seal, [rd.half - rd.stile - s.seal, rd.half - rd.stile]),
   rearSection('seam_side', 'seam', rd.low, rd.top, [rd.half - s.voxel, rd.half]),
-]), finish, { hinge_a: ['skin', [0, 0.2, 0]], hinge_b: ['skin', [0, 0.8, 0]] });
+]), finish, motion=k.motion.hinge(['knuckle_a', 'knuckle_b'], 'rear', s.opens.rearDoor));
 
 // The trapezoid wall and roof inboard of the tyre, so an arch shows a liner rather than the cabin.
 local wheelBox(name, a) = [
@@ -286,9 +294,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     k.turned('bowl', 'dark', 'x', k.disc(0.075, 0, 0.0625)) + { sides: 16 },
   ], { dark: 'steel-spall-black' }),
   part('_tail_lamp', 'tail lamp', s.mass.tailLamp, [
-    box('bracket', 'dark', [-0.03125, 0, -0.17], [0.06, 0.03125, 0.17]),
-    k.turned('red', 'red', 'x', k.disc(0.08, -0.03125, 0.03125), [0, 0.1, 0.09]) + { sides: 16 },
-    k.turned('clear', 'clear', 'x', k.disc(0.08, -0.03125, 0.03125), [0, 0.1, -0.09]) + { sides: 16 },
+    box('bracket', 'dark', [-0.03125, 0, -0.125], [0.06, 0.03125, 0.125]),
+    k.turned('red', 'red', 'x', k.disc(0.06, -0.03125, 0.03125), [0, 0.08, 0.065]) + { sides: 16 },
+    k.turned('clear', 'clear', 'x', k.disc(0.06, -0.03125, 0.03125), [0, 0.08, -0.065]) + { sides: 16 },
   ], { dark: 'steel-spall-black', red: 'plastic-red', clear: 'plastic-frosted' }),
   part('_wiper', 'wiper', s.mass.wiper, [
     box('blade', 'dark', [frontLine(windscreenLow + 0.04), windscreenLow + 0.03, 0.12], [frontLine(windscreenLow + 0.04) + s.voxel, windscreenLow + 0.03 + s.voxel, 0.68]),

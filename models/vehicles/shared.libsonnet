@@ -37,14 +37,18 @@ local spareCarrier = k.compound('spare_wheel_carrier', 38, [
   k.turned('rim', 'steel', 'x', k.disc(0.19, -0.24, -0.04)) + { sides: roundSides },
   k.turned('hub', 'cap', 'x', k.disc(0.08, -0.26, -0.24)) + { sides: 12 },
 ], { tyre: 'rubber-black', steel: 'steel-grey', cap: 'paint-charcoal' }) + { title: 'Spare wheel carrier' };
-// An engine with its crank along x; `length` is along the crank.
-local inline(id, massKg, length, width, height) = k.compound(id, massKg, [
-  box('sump', 'casting', [-length / 2, 0, -width * 0.42], [length / 2, height * 0.2, width * 0.42]),
-  box('block', 'casting', [-length / 2, height * 0.2, -width / 2], [length / 2, height * 0.72, width / 2]),
-  box('head', 'casting', [-length * 0.47, height * 0.72, -width * 0.44], [length * 0.47, height * 0.92, width * 0.44]),
-  box('cover', 'cover', [-length * 0.43, height * 0.92, -width * 0.36], [length * 0.43, height, width * 0.36]),
-  box('intake', 'casting', [-length * 0.38, height * 0.45, width / 2], [length * 0.38, height * 0.82, width * 0.68]),
-], { casting: 'steel-grey', cover: 'paint-charcoal' });
+// An engine with its crank along x; `length` is along the crank. The intake manifold bolts to the head's ports, so it
+// stands on the block's deck against the head's side rather than down the block, where a truck's frame rails run.
+local inline(id, massKg, length, width, height) =
+  local deck = height * 0.72;
+  local headHalf = width * 0.44;
+  k.compound(id, massKg, [
+    box('sump', 'casting', [-length / 2, 0, -width * 0.42], [length / 2, height * 0.2, width * 0.42]),
+    box('block', 'casting', [-length / 2, height * 0.2, -width / 2], [length / 2, deck, width / 2]),
+    box('head', 'casting', [-length * 0.47, deck, -headHalf], [length * 0.47, height * 0.92, headHalf]),
+    box('cover', 'cover', [-length * 0.43, height * 0.92, -width * 0.36], [length * 0.43, height, width * 0.36]),
+    box('intake', 'casting', [-length * 0.38, deck, headHalf], [length * 0.38, height * 0.82, width * 0.68]),
+  ], { casting: 'steel-grey', cover: 'paint-charcoal' });
 // A vee has two rows of cylinders, so it reads wider and lower than an inline of the same mass.
 local vee(id, massKg, length, width, height) = k.compound(id, massKg, [
   box('sump', 'casting', [-length / 2, 0, -width * 0.3], [length / 2, height * 0.22, width * 0.3]),
@@ -102,10 +106,23 @@ local trailerAxle(id, massKg, track, radius, height, drums=true) = k.compound(id
 ] + (if drums then [
   k.turned('drum', 'steel', 'z', k.disc(radius * 2.2, -0.05, 0.05), [0, height, track / 2 - 0.1]),
 ] else [])), { steel: 'steel-grey' });
+// A steered I-beam of square section `half` either side of its line, at `height` from king pin to king pin, whose middle
+// drops to `seats`' `drop` (`driveline.libsonnet`, `axles`) through a gooseneck under each spring seat, so the engine's
+// sump clears it while the seats keep their height. The middle runs out to just inboard of the seats, so a sump narrow
+// enough to stand between the rails over them clears the goosenecks too.
+local neck = 0.01;
+local steeredBeam(seats, halfTrack, height, half) =
+  local seat = driveline.axles[seats].seat;
+  local drop = driveline.axles[seats].drop;
+  local middle = seat.z[0] - neck;
+  [
+    box('beam', 'steel', [-half, drop.y[0], -middle], [half, drop.y[1], middle]),
+  ] + k.bothSides([
+    k.xPrism('gooseneck', 'steel', [[drop.y[1], middle], [height + half, seat.z[0]], [height + half, seat.z[1]], [height - half, seat.z[1]], [drop.y[0], middle]], [-half, half]),
+    box('arm', 'steel', [-half, height - half, seat.z[1]], [half, height + half, halfTrack]),
+  ]);
 // A steered I-beam for 295 wheels, in `beamAxle`'s frame: the king pins stand at the beam's ends.
-local steeredAxle(id, massKg, halfTrack, height, seats, drums=true) = k.compound(id, massKg, [
-  box('beam', 'steel', [-0.06, height - 0.06, -halfTrack], [0.06, height + 0.06, halfTrack]),
-] + k.bothSides([
+local steeredAxle(id, massKg, halfTrack, height, seats, drums=true) = k.compound(id, massKg, steeredBeam(seats, halfTrack, height, 0.06) + k.bothSides([
   springSeat(seats, height + 0.06, 0.09),
   box('king_pin', 'steel', [-0.08, height - 0.12, halfTrack - 0.1], [0.08, height + 0.12, halfTrack + 0.05]),
 ] + (if drums then [
@@ -121,9 +138,7 @@ local withBare(draw, id, title, bareTitle, massKg, class) = [
 local truckDriveAxle = 430;
 local truckSteeredAxle = 350;
 // For 8 R19.5 wheels: lighter section, its spring seats under a medium truck's rails.
-local steeredAxleMedium = k.compound('steered_axle_medium', 200, [
-  box('beam', 'steel', [-0.045, 0.385, -0.95], [0.045, 0.475, 0.95]),
-] + k.bothSides([
+local steeredAxleMedium = k.compound('steered_axle_medium', 200, steeredBeam('steered_axle_medium', 0.95, 0.43, 0.045) + k.bothSides([
   springSeat('steered_axle_medium', 0.475, 0.07),
   box('king_pin', 'steel', [-0.06, 0.33, 0.87], [0.06, 0.53, 1.0]),
   k.turned('drum', 'steel', 'z', k.disc(0.17, 1.0, 1.12), [0, 0.43, 0]) + { sides: 12 },
@@ -261,7 +276,8 @@ local doorMirrorBus =
     box('foot', 'arm', [-0.07, -0.07, 0], [0.07, 0.07, 0.03125]),
   ] + [
     local c = hornAt(i);
-    box('horn_' + i, 'arm', [c[0] - 0.035, c[1] - 0.035, c[2] - 0.035], [c[0] + 0.035, c[1] + 0.035, c[2] + 0.035])
+    // The horn rises off the foot's face, not out of the body behind it.
+    box('horn_' + i, 'arm', [c[0] - 0.035, c[1] - 0.035, std.max(c[2] - 0.035, 0)], [c[0] + 0.035, c[1] + 0.035, c[2] + 0.035])
     for i in std.range(0, count)
   ] + [
     box('drop', 'arm', [sweep - 0.035, top - 0.04, reach - 0.035], [sweep + 0.035, 0.035, reach + 0.035]),

@@ -45,11 +45,11 @@ local satchel(id, massKg, cloth, fastener) = h.compound(id, massKg, pouch(0.2, 0
   box('strap-over', 'strap', [-0.107, 0.153, -0.015], [0.107, 0.157, 0.015]),
   box('fastener', 'fastener', [-0.012, 0.09, 0.033], [0.012, 0.11, 0.037]),
 ], { body: cloth, flap: cloth, strap: cloth, fastener: fastener });
-// A tall single-magazine pouch standing up, its neck harness laid flat on the floor beside it in a closed loop.
+// A tall single-magazine pouch standing up, its neck harness laid flat on the floor round its foot in a closed loop.
 // Slots: body, flap, strap, fastener.
 local chestPouch(id, massKg, cloth, strap, fastener) = h.compound(id, massKg, pouch(0.09, 0.2, 0.045, 0.06, 1) + [
   stud('fastener', 'fastener', 0, 0.165, 0.0255),
-] + h.strapLoop('harness', 'strap', 0.08, 0.045, 0.02, 0.003, 0, 0.155, 0), { body: cloth, flap: cloth, strap: strap, fastener: fastener });
+] + h.strapLoop('harness', 'strap', 0.09, 0.0325, 0.02, 0.005), { body: cloth, flap: cloth, strap: strap, fastener: fastener });
 // Rows of PALS webbing on a flat panel from x0 to x1 and down from z0, `rows` rows 25 mm wide every 38 mm, cut into
 // 38 mm channels, standing on height y.
 local molle(id, x0, x1, z0, rows, y) = [
