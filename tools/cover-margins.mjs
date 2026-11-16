@@ -22,17 +22,20 @@ const rig = dollRig(readRigContent(repo), doll, dressing);
 const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, byId.get(id).pack, byId.get(id).path)), keep);
 const unplaced = () => { throw new Error('a covering item is dressed by its worn pieces, never placed whole'); };
 
+// Worst first: the lesser of the margins across and along the bone, then the other.
+const order = (a, b) => Math.min(a.margin, a.end) - Math.min(b.margin, b.end) || Math.max(a.margin, a.end) - Math.max(b.margin, b.end);
 // The worse side of each declaration, since a consumer hides it on both.
 const worst = new Map();
 for (const id of positionals.length > 0 ? positionals : coveringItems(models)) {
   for (const row of coverMargins(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf)) {
     const key = `${row.piece} ${row.name}`;
-    if (!worst.has(key) || row.margin < worst.get(key).margin) worst.set(key, row);
+    if (!worst.has(key) || order(row, worst.get(key)) < 0) worst.set(key, row);
   }
 }
 const mm = (metres) => (Number.isFinite(metres) ? (metres * 1000).toFixed(1) : String(metres));
-console.log('| piece | covers | margin (mm) | beneath | open | samples | side | at (m) |');
-console.log('|---|---|--:|--:|--:|--:|---|---|');
-for (const { piece, name, margin, beneath, open, samples, side, at } of [...worst.values()].sort((a, b) => a.margin - b.margin)) {
-  console.log(`| ${piece} | ${name} | ${mm(margin)} | ${beneath} | ${open} | ${samples} | ${side} | ${at ? at.map((x) => x.toFixed(3)).join(', ') : ''} |`);
+const point = (at) => (at ? at.map((x) => x.toFixed(3)).join(', ') : '');
+console.log('| piece | covers | margin (mm) | at (m) | end (mm) | end at (m) | beneath | open | samples | side |');
+console.log('|---|---|--:|---|--:|---|--:|--:|--:|---|');
+for (const { piece, name, margin, at, end, endAt, beneath, open, samples, side } of [...worst.values()].sort(order)) {
+  console.log(`| ${piece} | ${name} | ${mm(margin)} | ${point(at)} | ${mm(end)} | ${point(endAt)} | ${beneath} | ${open} | ${samples} | ${side} |`);
 }
