@@ -11,6 +11,7 @@ const generated = (parts: Record<string, { massKg?: number }>, physical?: Genera
     kind: 'item',
     modelEntry: { id: 'fixture', file: 'assets/models/fixture.glb', parts } as unknown as NeutralModel,
     glb: new Uint8Array(),
+    smoothGlb: new Uint8Array(),
     partNodes: [],
     ...(physical === undefined ? {} : { physical }),
   }) satisfies GeneratedModel;

@@ -34,12 +34,13 @@ export interface GeneratedModel extends ModelExport {
 }
 export const generateModel = (row: RecipeExport, cache?: ExportCache): GeneratedModel => {
   const { model, entry } = cache ? cache.export(row) : { model: row.generate() };
-  const { modelEntry, glb, partNodes, physical } = model;
+  const { modelEntry, glb, smoothGlb, partNodes, physical } = model;
   return {
     id: row.id,
     kind: row.kind,
     modelEntry,
     glb,
+    smoothGlb,
     partNodes,
     ...(physical === undefined ? {} : { physical }),
     ...(entry === undefined ? {} : { entry }),
