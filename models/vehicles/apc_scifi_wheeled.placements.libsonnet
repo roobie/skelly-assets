@@ -28,4 +28,10 @@ local bench(id, x, z) = site.pair(id, 'apc_scifi_wheeled_bench', [x, floorTop, z
     + site.pair('headlamp', 'headlamp_large', [b.fender, l.y, l.z])
     + site.pair('tail_lamp', 'tail_lamp_small', [b.rear, l.tailY, l.tailZ]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('hull', 'tail_lamp_near', 0.030,
+      'The tail lamp\'s lens is set into the rear quarter deeper than the hull\'s grain; nobody has said whether the lamp stands proud or is recessed.'),
+    site.unjudged('hull', 'tail_lamp_far', 0.030,
+      'The tail lamp\'s lens is set into the rear quarter deeper than the hull\'s grain; nobody has said whether the lamp stands proud or is recessed.'),
+  ],
 }

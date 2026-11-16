@@ -72,7 +72,8 @@ export const exportItem = (
       if (massKg === undefined) {
         throw new Error(`Missing authored mass for ${id}`);
       }
-      return { part, massKg };
+      const declared = item.parts.find((authored) => authored.id === id)?.item;
+      return { part, massKg, ...(declared === undefined ? {} : { item: declared }) };
     },
     { collision, drawn },
   );

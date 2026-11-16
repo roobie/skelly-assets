@@ -19,7 +19,7 @@ import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
-import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
+import { coveringItems, isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { farSlot, readStowage, stowedPose } from '../tools/stowage.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
@@ -222,8 +222,10 @@ if (doll) {
   // names the clip actor's plain clips and its walk speed, which paces its walk.
   const rig = dollRig(readRigContent(root), doll, dressing);
   // A worn piece hides what it declares it covers, so a declaration it does not enclose would open the body to view.
-  const gaps = shown.filter(({ worn }) => worn?.some(({ covers }) => covers))
-    .flatMap(({ worn }) => coverGaps(rig, worn, (id, keep) => modelMeshes(readFileSync(join(built, modelsById.get(id).file)), keep)));
+  // Every declaring item is dressed, shown or not, since a consumer hides by the declaration wherever it wears it.
+  const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, modelsById.get(id).file)), keep);
+  const gaps = coveringItems(models)
+    .flatMap((id) => coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf, anchorsOf }), meshesOf));
   if (gaps.length > 0) {
     const where = ({ piece, side, name, open, at }) => `${piece} (${side}) covers ${name}, but ${open === 'nothing' ? 'it names nothing there' : `${open} samples show, one at [${at.map((x) => x.toFixed(3))}]`}`;
     throw new Error(`worn pieces would hide body they do not enclose:\n${gaps.map(where).join('\n')}`);

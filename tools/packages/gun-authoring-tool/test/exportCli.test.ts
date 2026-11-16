@@ -1,8 +1,9 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { generate } from '@skelly/construct/assembly/generate.ts';
+import { generateValid } from '@skelly/construct/assembly/generate.ts';
 import { parseAssemblyJson } from '@skelly/construct/assembly/parseAssembly.ts';
+import type { Template } from '@skelly/construct/assembly/template.ts';
 import { srgbToHex } from '@skelly/thing-export/appearance.ts';
 import { describe, expect, it } from 'vitest';
 import { DESIGNS } from '../src/cli/content.ts';
@@ -81,8 +82,12 @@ describe('export CLI core', () => {
 
   // The appearance field exists only in the generate CLI's output, so its serializer is the unit under test.
   it('preserves the generated template finish through a bare assembly file export', () => {
-    const template = TEMPLATES.find((t) => t.name === 'pump-shotgun')!;
-    const generated = generatedAssemblyJson(generate(template, gunDomain, 0), template);
+    const template: Template = TEMPLATES.find((t) => t.name === 'pump-shotgun')!;
+    const found = generateValid(template, gunDomain, 0);
+    if (!found) {
+      throw new Error('the pump-shotgun template must generate a valid assembly');
+    }
+    const generated = generatedAssemblyJson(found.assembly, template);
     const output = JSON.parse(generated) as { appearance?: unknown };
     expect(output.appearance).toEqual({ appearanceProfile: template.name });
 

@@ -4,6 +4,7 @@ read_if:
   - changing what a GLB records on its part or port nodes
   - adding a mount type, a size class or a standard to the parts a component meets its neighbour by
   - wondering why a component hangs from one neighbour and not another
+  - linking a part of a model to the catalogue item it is
 ---
 
 # 9. Components meet at named mount sites
@@ -34,6 +35,11 @@ comes apart when any of its parts declares a mount; the showcase and the review 
 as a vehicle (`site/explode.mjs`, `explode`), so a review judges the components the showcase shows; see
 `tools/components.mjs`, `modelComponents`. A skinned model and a wearable are not taken apart: a skin binds its parts
 to bones, and a wearable is shown worn (`docs/decisions/0008-dressing.md`).
+
+A part id is a local name, so which catalogue item a part is cannot be read off its id: a revolver's hammer part is
+not the Hammer tool. A part that is an item in its own right says so with `item` on the part in the model source,
+which the sidecar carries and the showcase links to that item's page; the build refuses an item no model has
+(`tools/partItems.mjs`, `danglingPartItems`).
 
 ## Consequences
 

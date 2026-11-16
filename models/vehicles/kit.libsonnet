@@ -223,10 +223,11 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   },
   grain: vehicleGrain,
   // A pair of round pins along `axis`, centred on `a` and `b`, which must lie on a line along that axis: round so a pin
-  // turning in its socket keeps the same depth all through the swing. A pin one grain in radius whose centre lies on a
-  // neighbour's face sinks at most a grain into it, which the overlap check of docs/decisions/0014-site-overlap.md
-  // counts as contact. Pins take the part's `paint` slot unless `slot` names another, so by default they read as part of
-  // the panel they carry rather than as fittings of their own.
+  // turning in its socket keeps the same depth all through the swing. A pin one grain of its part in radius whose centre
+  // lies on a neighbour's face sinks at most that grain into it, which the overlap check of
+  // docs/decisions/0014-site-overlap.md counts as contact; a part drawn finer than the vehicle passes its own grain. Pins
+  // take the part's `paint` slot unless `slot` names another, so by default they read as part of the panel they carry
+  // rather than as fittings of their own.
   hingePins(name, axis, a, b, slot='paint', radius=vehicleGrain, length=2 * vehicleGrain):
     local along = { x: 0, y: 1, z: 2 }[axis];
     assert std.all([i == along || a[i] == b[i] for i in [0, 1, 2]]) : name + ' pins must lie on one line along ' + axis;
@@ -353,6 +354,13 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   doorJamb(name, rear, y, face): box(name, 'paint', [rear - 0.02, y[0], face - self.jambDepth], [rear + 0.02, y[1], face - self.swingGap]),
   // How far a `doorJamb` reaches in from the face, so whatever stands inside the opening can stop short of it.
   jambDepth: 0.03,
+  // The middles along x, back to front, of a ladder frame's `count` crossmembers, each `half` long either side: all
+  // but the front one spread from the middle `rear` to the back of the gearbox, `gearboxBack`, so none passes through
+  // the gearbox or the engine ahead of it, and the front one closes the rails' ends at `front`, ahead of the engine.
+  crossmemberXs(rear, gearboxBack, front, count, half):
+    local last = gearboxBack - half;
+    assert (last - rear) / (count - 2) >= 2 * half : 'the crossmembers behind the gearbox must not meet';
+    [rear + i * (last - rear) / (count - 2) for i in std.range(0, count - 2)] + [front - half],
   // A piece moved by `by`, an [x, y, z] offset, so one part's pieces can be drawn inside another.
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];

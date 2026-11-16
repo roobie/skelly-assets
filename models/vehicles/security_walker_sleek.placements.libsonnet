@@ -33,4 +33,16 @@ local lowered(id, y) = local at = baseSite(id).at; [at[0], y, at[2]];
       + [site.one('floodlight', 'security_walker_sleek_floodlight', s.lights.floodlight)]
   ),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('carrier', 'radiator', 0.030,
+      'The radiator\'s near tank rises into the carrier\'s deck deeper than the carrier\'s grain.'),
+    site.unjudged('ammo_cassette_near', 'ammo_feed_near', 0.030,
+      'The ammo feed\'s coupler sinks into the cassette\'s case deeper than their grain; a coupler may plug into the case or meet its face.'),
+    site.unjudged('ammo_cassette_far', 'ammo_feed_far', 0.030,
+      'The ammo feed\'s coupler sinks into the cassette\'s case deeper than their grain; a coupler may plug into the case or meet its face.'),
+    site.unjudged('hull', 'work_lamp_near', 0.030,
+      'The work lamp\'s bracket stands into the hull\'s armour plate deeper than the hull\'s grain; a bracket bolts onto a plate rather than through it.'),
+    site.unjudged('hull', 'work_lamp_far', 0.030,
+      'The work lamp\'s bracket stands into the hull\'s armour plate deeper than the hull\'s grain; a bracket bolts onto a plate rather than through it.'),
+  ],
 }

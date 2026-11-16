@@ -77,7 +77,7 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       segment('shin-' + s[0], 'avatarLeg', leg, 'shin', 0.6, ['skin'], [pin('knee'), socket('ankle', [0, leg.shoeHeight - leg.length + leg.thighLength, 0])]),
       segment('foot-' + s[0], 'avatarLeg', leg, 'foot', 0.2, ['skin'], [pin('ankle')]),
     ] for s in sides]) + (if doll == null then [] else [
-      h.compound('doll', dollMassKg, doll, {}).parts[0] + { id: 'doll', finish: dollFinish, ports: [pin('back', [0, 0, -1], [0, 1, 0], [0, 0, -0.06])] },
+      h.compound('doll', dollMassKg, doll, {}).parts[0] + { id: 'doll', item: 'talking_doll', finish: dollFinish, ports: [pin('back', [0, 0, -1], [0, 1, 0], [0, 0, -0.06])] },
     ]),
     connections: [
       { from: 'stand.pelvis', to: 'pelvis.stand' },
