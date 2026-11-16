@@ -26,6 +26,8 @@ local chequer(id, x) =
   ]);
 local keel(id, x) = skin(id, 'paint', x, [s.bandLow, 360 - s.bandLow], 16);
 local proudCowl = h.proud(s.cowl, 0.035);
+// The rear bow stands ahead of the rear fairing it closes.
+local rearBow = s.doorRear + 0.035;
 taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('police_helicopter_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.doorRear, s.noseCap], arc=[90, 270])
@@ -55,10 +57,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              h.shell('roof', 'paint', s.body, x=[s.doorRear, s.doorFront + 0.035], arc=[-s.roofArc, s.roofArc])
              + h.bow('front_bow', s.body, s.doorFront)
              + h.bow('mid_bow', s.body, s.doorMid)
-             + h.bow('rear_bow', s.body, s.doorRear + 0.035),
+             + h.bow('rear_bow', s.body, rearBow)
+             + h.doorPost('mid_lip', s.body, s.doorMid, s.doorFront, s.roofArc)
+             + h.doorPost('rear_lip', s.body, rearBow, s.doorMid, s.roofArc),
              { paint: s.paint }) + { title: 'Police helicopter roof' },
-  h.door('police_helicopter_front_door', 18, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint) + { title: 'Police helicopter front door' },
-  h.door('police_helicopter_rear_door', 18, s.body, s.doorRear, s.doorMid, s.roofArc, s.paint) + { title: 'Police helicopter rear door' },
+  h.door('police_helicopter_front_door', 18, s.body, s.doorMid, s.doorFront, s.roofArc, s.paint, s.doorOpens) + { title: 'Police helicopter front door' },
+  h.door('police_helicopter_rear_door', 18, s.body, rearBow, s.doorMid, s.roofArc, s.paint, s.doorOpens) + { title: 'Police helicopter rear door' },
   k.compound('police_helicopter_engine_cowl', 30,
              h.loft('cowl', 'paint', s.cowl)
              + h.shell('intake_near', 'dark', proudCowl, thick=0.05, x=[-1.0, -0.6], arc=[45, 100], sides=24)
@@ -103,7 +107,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('police_helicopter_rear_bench', 14, [
     box('pan', 'dark', [-0.24, 0, -0.66], [0.22, 0.08, 0.66]),
     box('cushion', 'seat', [-0.24, 0.08, -0.66], [0.22, 0.18, 0.66]),
-    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.8], [-0.33, 0.8]], [-0.66, 0.66]),
+    // Narrower than the cushion: the back stands up where the cabin curves in, inboard of the rear doors' trailing edges.
+    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.8], [-0.33, 0.8]], [-0.63, 0.63]),
   ], { dark: trim, seat: 'cloth-seat' }) + { title: 'Police helicopter rear bench' },
   k.compound('police_helicopter_console', 10, [
     box('pedestal', 'dark', [-0.12, 0, -0.16], [0.12, 0.34, 0.16]),

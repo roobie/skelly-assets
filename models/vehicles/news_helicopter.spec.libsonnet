@@ -2,6 +2,7 @@
 // about 750 kg empty. The mast stands at x = 0 and the skids rest on y = 0. Metres in the vehicle frame.
 {
   nose: 2.35, noseCap: 2.27, doorFront: 1.5, doorMid: 0.55, doorRear: -0.4, tail: -2.3, roofArc: 32, bandArc: 118,
+  doorOpens: 90,
   rotorRadius: 5.1, hub: 3.1, mastFoot: 2.3,
   tailRotor: { x: -5.4, y: 1.76, z: 0.16, radius: 0.8 },
   floor: 0.98,
@@ -12,6 +13,8 @@
     { x: 1.6, top: 2.04, bottom: 0.52, half: 0.66, waist: 0.98 },
     { x: 1.0, top: 2.15, bottom: 0.5, half: 0.7, waist: 0.98 },
     { x: 0.0, top: 2.16, bottom: 0.5, half: 0.7, waist: 0.98 },
+    // The waist runs level the length of the doors, so their sills and the belly below are sliced to one waist.
+    { x: -0.4, top: 2.1333, bottom: 0.54, half: 0.6733, waist: 0.98 },
     { x: -0.6, top: 2.12, bottom: 0.56, half: 0.66, waist: 1.02 },
     { x: -1.1, top: 2.06, bottom: 0.78, half: 0.52, waist: 1.3 },
     { x: -1.7, top: 1.92, bottom: 1.16, half: 0.3, waist: 1.52 },

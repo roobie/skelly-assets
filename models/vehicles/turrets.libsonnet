@@ -7,7 +7,7 @@
 // or a plan of corners as (z, x) at the base and the roof, listed from the front face's far corner round the near side,
 // so the first face looks forward. The shell's front face is open where the guns pass, for the gun mask. Each fitting is
 // its site, its class entry and where its origin sits; the guns' origins stand on the mask's back, where their
-// receivers abut it. Roof hatches stand side by side across the roof, which is cut open under each. Each smoke rack
+// receivers abut it. The roof is cut open under each roof hatch. Each smoke rack
 // stands its launchers in a row `along` x or z through `at`, and reaches into the shell to `reach` across that row.
 {
   // A one-man turret of 7 mm welded armour as on an eight-wheeled carrier, coned from the ring to a flat roof.

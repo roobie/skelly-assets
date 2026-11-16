@@ -12,6 +12,7 @@ local g = fit.layers.cloak;
 
 // Cobalt paint over navy fittings and belt, pale blue edging and dark gunmetal rivets.
 local livery = { plate: 'paint-armour-blue', trim: 'paint-armour-navy', strap: 'paint-armour-navy', rivet: 'steel-parkerized', insignia: 'paint-armour-sky' };
+// The gauntlet's palm and fingers are a black leather glove under its cuff and plate, as the trooper's are.
 local gauntlet = livery + { hand: 'leather-black' };
 local bootFinish = { upper: 'paint-armour-navy', toe: 'paint-armour-blue', sole: 'rubber-tread', collar: 'paint-armour-sky', laces: 'webbing-olive-dark' };
 

@@ -8,7 +8,8 @@
 // `docs/decisions/0016-swing-check.md`, "A failing site gets a proposal, never an edit".
 import { dot, normalize, sub } from './packages/construct/src/foundation/math.ts';
 import { centreOf, piecesBounds } from './packages/thing-core/src/motion.ts';
-import { adjustedMotion, motionAtSite, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
+import { AUTHORED_LATERAL, motionAtSite } from '../site/motionPose.mjs';
+import { adjustedMotion, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
 
 const WINDOW = 4; // grains the hinge line may move each way
 const DOWN = [0, -1, 0];
@@ -79,7 +80,7 @@ export function proposeFix(pieces, vehicle, siteId) {
     const report = reportOf(adjust, false);
     return failing(report) ? null : { entries: wornBy(report).filter((message) => !known.has(message)) };
   };
-  const [stage, ...rest] = motionAtSite(adjustedMotion(task.motions[part], {}, task.forward, grain), site);
+  const [stage, ...rest] = motionAtSite(adjustedMotion(task.motions[part], {}, task.forward, grain), site, AUTHORED_LATERAL);
   let reachable = start.clear;
   if (rest.length > 0) return { status: 'none', clear: start.clear, reachable };
   if (stage.kind === 'hinge') {

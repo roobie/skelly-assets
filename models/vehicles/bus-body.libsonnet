@@ -23,6 +23,8 @@ local voxel = 0.03125;
 local binnacle = import 'instrument-binnacle.libsonnet';
 // How far the dash stands back from the windscreen raked over it.
 local glassGap = 0.14;
+// How far a door's rubber strip laps what lies past the leaf it rides.
+local sealLap = 0.012;
 local rearGlass(s) = [hole for hole in std.get(s, 'rearHoles', []) if !std.get(hole, 'door', false)];
 local dashTop(s) = std.get(s, 'dashTop', s.driver.y + 0.55);
 // A low-floor driver sits on a plinth, raised to see over the dash.
@@ -54,10 +56,23 @@ local layout(s) = {
   // forward end. Folding in, a leaf would sweep through the floor above its foot or the steps inside a high floor's
   // doorway. Each leaf names its pressing's `suffix`, its `site` and its `jamb` end of the doorway.
   leaves: if std.get(s, 'doorLeaves', 2) == 2 then [
-    { suffix: '_door_fwd', site: 'door_fwd', label: 'front door', item: 'door, forward leaf', jamb: 1 },
-    { suffix: '_door_aft', site: 'door_aft', label: 'rear door', item: 'door, rear leaf', jamb: -1 },
-  ] else [{ suffix: '_door', site: 'door', label: 'door', item: 'door', jamb: 1 }],
-  fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door'),
+    { suffix: '_door_fwd', site: 'door_fwd', label: 'front door', item: 'door, forward leaf', jamb: 1, sealed: true },
+    { suffix: '_door_aft', site: 'door_aft', label: 'rear door', item: 'door, rear leaf', jamb: -1, sealed: false },
+  ] else [{ suffix: '_door', site: 'door', label: 'door', item: 'door', jamb: 1, sealed: true }],
+  // A leaf's mid-plane, inside the depth of the skin.
+  doorZ: s.side - 0.035,
+  // A doorway's rubber strip hides the gap the fold leaves at rest. One leaf of a pair carries it, lapping the other
+  // leaf's inner face; a single leaf's laps the pillar past its free end, behind the skin's inner face. It stops above
+  // the doorway's first tread, the floor or a high floor's lowest step, which stands right inside the leaf.
+  local door = self,
+  local seal = {
+    gap: spans[0] - std.length(door.leaves) * door.leafWidth,
+    face: if std.length(door.leaves) == 2 then -door.doorThick / 2 else s.skin - door.doorZ,
+    lap: sealLap,
+    from: (s.floor - s.doorSill) / std.max(1, std.get(s, 'doorSteps', 0)),
+    to: door.doorHeight,
+  },
+  fold(leaf): foldDoor.leaf(self.leafWidth, self.doorHeight, self.doorThick, leaf.jamb, slot='door', seal=if leaf.sealed then seal),
   // Where a leaf's centre lies along doorway `way`.
   leafX(way, leaf): (if leaf.jamb > 0 then way[1] else way[0]) - leaf.jamb * self.leafWidth / 2,
   // The id of one of a leaf's panels, `panel` being 'jamb' or 'free', in doorway `d`, and where its origin sits along `way`.
@@ -293,7 +308,7 @@ local pressings(id, title, s) = {
       box('stile_aft', 'door', [aft, 0, -t], [aft + 0.03, h, t]),
       box('stile_fwd', 'door', [fwd - 0.03, 0, -t], [fwd, h, t]),
       box('head', 'door', [aft, h - 0.06, -t], [fwd, h, t]),
-    ] + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear' }, motion=panel.motion) + { voxelGrain: foldDoor.grain },
+    ] + std.get(panel, 'seal', []) + panel.pins, { door: std.get(s, 'doorFinish', s.paint), glass: 'glass-clear', seal: 'rubber-black' }, motion=panel.motion) + { voxelGrain: foldDoor.grain },
   local leaves = std.flattenArrays([
     local fold = g.fold(leaf);
     [
@@ -451,13 +466,12 @@ local laid(kit, id, s) =
     ])
     for i in std.range(0, std.length(s.decks) - 1)
   ]);
-  local doorZ = s.side - 0.035;
   // The free panel rides its jamb panel, so it folds back as the jamb panel turns out.
   local doors = std.flattenArrays([
     local jamb = g.panelSite(leaf, 'jamb', d);
     [
-      fitting(jamb, part(leaf.suffix + '_jamb'), [g.panelX(g.doorways[d], leaf, 'jamb'), s.doorSill, doorZ], ['shell']),
-      fitting(g.panelSite(leaf, 'free', d), part(leaf.suffix + '_free'), [g.panelX(g.doorways[d], leaf, 'free'), s.doorSill, doorZ], [jamb], rides=jamb),
+      fitting(jamb, part(leaf.suffix + '_jamb'), [g.panelX(g.doorways[d], leaf, 'jamb'), s.doorSill, g.doorZ], ['shell']),
+      fitting(g.panelSite(leaf, 'free', d), part(leaf.suffix + '_free'), [g.panelX(g.doorways[d], leaf, 'free'), s.doorSill, g.doorZ], [jamb], rides=jamb),
     ]
     for d in std.range(0, std.length(g.doorways) - 1)
     for leaf in g.leaves
