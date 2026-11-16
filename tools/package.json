@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "@skelly/thing-core": "*",
     "knip": "6.34.0",
     "playwright": "1.64.0",
     "valibot": "^1.5.0"
