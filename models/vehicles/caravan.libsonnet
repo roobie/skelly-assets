@@ -21,6 +21,10 @@ local wallPieces(z, stripeZ, openings, stripeSpans) =
   ];
 local finish = { paint: s.paint, stripe: s.stripe };
 local capZ = [-s.side - 0.02, s.side + 0.02];
+local grain = k.grain;
+local doorHeight = s.doorTop - s.floor;
+// Below the stripe and high on the door, so no pin pokes into the wall's stripe ahead of it.
+local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.floor + 0.1 * doorHeight, s.side + grain], [s.doorFront - 0.02, s.floor + 0.9 * doorHeight, s.side + grain], 'frame');
 local window(id, massKg, width) = k.compound(id, massKg, [
   box('glass', 'glass', [-width / 2, 0, s.side - 0.03], [width / 2, s.windowHigh - s.windowLow, s.side - 0.01]),
   box('frame_low', 'frame', [-width / 2, 0, s.side - 0.04], [width / 2, 0.04, s.side + 0.02]),
@@ -58,8 +62,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('stripe', 'stripe', [s.doorRear + 0.02, s.stripeLow, s.side], [s.doorFront - 0.02, s.stripeHigh, s.side + 0.02]),
     box('window', 'glass', [s.doorRear + 0.12, 1.45, s.side - 0.03], [s.doorFront - 0.12, 1.95, s.side - 0.01]),
     box('handle', 'frame', [s.doorRear + 0.06, 1.2, s.side], [s.doorRear + 0.18, 1.24, s.side + 0.03]),
-  ] + h.wall('skin', 'paint', [s.doorRear + 0.02, s.doorFront - 0.02], [s.floor + 0.08, s.doorTop - 0.02], [s.skin + 0.01, s.side], [[s.doorRear + 0.12, s.doorFront - 0.12, 1.45, 1.95]]),
-  finish + { frame: 'plastic-charcoal', glass: 'glass-clear' }, { hinge_a: ['skin_pier_1', [1, 0.2, 1]], hinge_b: ['skin_pier_1', [1, 0.8, 1]] }) + { title: 'Caravan door' },
+  ] + h.wall('skin', 'paint', [s.doorRear + 0.02, s.doorFront - 0.02], [s.floor + 0.08, s.doorTop - 0.02], [s.skin + 0.01, s.side], [[s.doorRear + 0.12, s.doorFront - 0.12, 1.45, 1.95]])
+  + doorPins,
+  finish + { frame: 'plastic-charcoal', glass: 'glass-clear' }, motion=k.motion.hinge(doorPins, 'near', s.doorOpen)) + { title: 'Caravan door' },
   window('caravan_window_small', 4, s.smallWindow) + { title: 'Caravan window small' },
   window('caravan_window_large', 8, s.largeWindow) + { title: 'Caravan window large' },
   // The eaves round in over the walls, so the roof reads as a moulded shell.
