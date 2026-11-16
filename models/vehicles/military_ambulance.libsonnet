@@ -6,6 +6,9 @@ local box = k.box;
 local bothSides = k.bothSides;
 local finish = { white: 'paint-white', cross: 'paint-green', paint: 'paint-olive', frame: 'steel-parkerized', floor: 'steel-grey', dark: 'steel-spall-black', frost: 'plastic-frosted', mattress: 'canvas-grey', trim: 'paint-charcoal' };
 local back = s.bedRear;
+// The rear door turns on pins at its leaves' outer ends, on its outer edge, so none of it swings into the rear post.
+local rearDoorHinge = s.boxSide - 0.2;
+local rearDoorPins = k.hingePins('hinge', 'y', [back - 0.04, 2.65, rearDoorHinge], [back - 0.04, 1.71, rearDoorHinge], 'dark');
 taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   // Stops inside the walls, which run down past it.
   k.compound('military_ambulance_box_floor', s.boxFloorMass, [
@@ -37,11 +40,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
   ]), finish) + { title: 'Military ambulance box' },
   k.compound('military_ambulance_rear_door', s.doorMass, [
     box('skin', 'paint', [back - 0.03, s.deckTop + 0.04, 0.005], [back + 0.03, s.boxTop - 0.14, s.boxSide - 0.2]),
-    box('hinge_top', 'dark', [back - 0.05, 2.62, s.boxSide - 0.24], [back - 0.03, 2.68, s.boxSide - 0.16]),
-    box('hinge_low', 'dark', [back - 0.05, 1.68, s.boxSide - 0.24], [back - 0.03, 1.74, s.boxSide - 0.16]),
+    box('hinge_top', 'dark', [back - 0.05, 2.62, rearDoorHinge - 0.08], [back - 0.03, 2.68, rearDoorHinge]),
+    box('hinge_low', 'dark', [back - 0.05, 1.68, rearDoorHinge - 0.08], [back - 0.03, 1.74, rearDoorHinge]),
     box('handle', 'dark', [back - 0.08, 2.0, 0.07], [back - 0.04, 2.32, 0.11]),
     box('handle_foot_top', 'dark', [back - 0.08, 2.28, 0.03], [back - 0.04, 2.32, 0.07]),
-  ], finish, { hinge_a: ['skin', [0.5, 0.2, 1]], hinge_b: ['skin', [0.5, 0.8, 1]] }) + { title: 'Military ambulance rear door' },
+  ] + rearDoorPins, finish, motion=k.motion.hinge(rearDoorPins, 'rear', s.rearDoorOpens)) + { title: 'Military ambulance rear door' },
   k.compound('military_ambulance_rear_step', 24, [
     box('tread_top', 'frame', [back - 0.3, s.deckBottom - 0.2, -0.6], [back - 0.04, s.deckBottom - 0.16, 0.6]),
     box('tread_low', 'frame', [back - 0.42, 0.72, -0.6], [back - 0.16, 0.76, 0.6]),

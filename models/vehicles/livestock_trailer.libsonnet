@@ -7,6 +7,9 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 local finish = { paint: s.paint, slat: s.slat, frame: s.frame };
 local posts = [-1.9, -1.0, -0.1, 0.8, 1.64];
+local grain = k.grain;
+// At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
+local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('livestock_trailer_chassis', 300, [
     box('rear_rail', 'frame', [s.rear - 0.04, s.frameLow, -s.side], [s.rear + 0.06, s.frameHigh, s.side]),
@@ -50,9 +53,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('livestock_trailer_ramp', 70, [
     box('skin', 'paint', [s.rear - 0.05, s.frameHigh, -s.side], [s.rear, s.rampTop, s.side]),
     box('catch', 'frame', [s.rear - 0.08, s.rampTop - 0.14, -0.3], [s.rear - 0.05, s.rampTop - 0.08, 0.3]),
-  ] + [box('batten_' + i, 'frame', [s.rear - 0.07, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear - 0.05, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 3)]
-  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])]),
-  finish, { hinge_a: ['skin', [0.5, 0, 0.1]], hinge_b: ['skin', [0.5, 0, 0.9]] }) + { title: 'Livestock trailer ramp' },
+  ] + [box('batten_' + i, 'frame', [s.rear, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear + 0.02, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 3)]
+  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])])
+  + rampPins,
+  finish, motion=k.motion.hinge(rampPins, 'rear', s.rampOpen)) + { title: 'Livestock trailer ramp' },
   k.compound('livestock_trailer_top_gate', 15, [
     box('slat', 'slat', [s.rear - 0.04, s.slats[4][0], -s.side], [s.rear, s.slats[4][1], s.side]),
     box('rail', 'paint', [s.rear - 0.04, s.railLow, -s.side], [s.rear, s.eave, s.side]),

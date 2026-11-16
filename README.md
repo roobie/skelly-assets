@@ -4,6 +4,7 @@ read_if:
   - renaming or merging a model id, or moving a pin past renamed ids
   - which way a model faces, or whether a consumer converts its axes
   - understanding asset ownership, turned-piece appearance or actor clip contracts
+  - telling a re-rolled mob from a rebuilt one across releases
   - labelling a packaged model's print, or drawing labels in a consumer
   - naming a model, or showing its name in a consumer
   - adding or applying the catalogue's item drafts
@@ -128,6 +129,14 @@ files in the one shared representation, in the model frame: roots and quaternion
 facing conventions must not become a second baked rig. Mobgen authors figures facing -z and the export turns every
 baked value once, so its authored signs stay as they read; see `tools/actorFrame.mjs`, `fileBody` and `fileClips`.
 Consumers compose with `tools/actorCompose.mjs`, `decodeFrame` and `sampleClip`.
+
+Each actor also ships its genome: every value the generator drew for it, after its row narrowed the template. A
+seed does not fix a figure, because a change to the order the generator draws in, or to a builder such as the
+voxelizer, changes the figure under the same seed. A consumer moving its pin compares two releases' genomes to
+tell a figure that was re-rolled from one that the same draws built differently, so neither passes unseen. The
+genome is its own file rather than a body field, because consumers parse the body strictly and the genome is
+evidence for a reviewer, not data a game plays; see `tools/actorBake.mjs`, `bakeActor`, and `tools/mobs.mjs`,
+`bakeMob`.
 
 A consumer reads pack paths from the manifest and bundles the packs it needs, with the packs each of them depends
 on, so a pack that refers to another's models never loads without them; see `models/packs.json`. Which packs a product bundles is

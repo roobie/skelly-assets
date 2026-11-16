@@ -26,7 +26,7 @@ async function bakeFixture(model, options = {}) {
   const out = mkdtempSync(join(tmpdir(), 'actor-clips-'));
   const row = { id: `fixture.${model}`, type: `fixture.${model}`, template: model, model, seed: 1, scale: 1,
     pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
-    glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', ...options };
+    glb: 'fixture/actor.glb', body: 'fixture/actor.body.json', clips: 'fixture/actor.clips.json', genome: 'fixture/actor.genome.json', ...options };
   try {
     exportMob(row, out);
     const read = (file) => JSON.parse(readFileSync(join(out, outputPath(row.pack, file))));
@@ -608,20 +608,36 @@ test('fused body preserves manifest, sparse owners, scaled bounds and ground-ori
   assert.deepEqual(clips.standing.idle.frames[0], { root: body.originOffset.map((v) => v / scale), rotations: {} });
 });
 
-test('every content row writes its declared actor files', async () => {
-  const { mkdtempSync, existsSync, rmSync } = await import('node:fs');
+// The genome is what a consumer compares to tell a re-rolled figure from a rebuilt one, so it must hold every draw, each
+// from the row's narrowed range rather than the base template's.
+test('every content row writes its declared actor files, with a genome drawing every plan param in its row\'s range', async () => {
+  const { mkdtempSync, existsSync, readFileSync, rmSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
   const { exportMob } = await import('../mobs.mjs');
   const { outputPath, readMobRows } = await import('../layout.mjs');
+  const { planOf } = await import('../packages/mobgen/src/core/generate.ts');
+  const { templateByName } = await import('../packages/mobgen/src/core/template.ts');
+  const allows = (spec, value) => (typeof spec === 'number' ? value === spec
+    : 'choices' in spec ? spec.choices.includes(value) : value >= spec.min && value <= spec.max);
   const root = mkdtempSync(join(tmpdir(), 'actor-content-'));
   try {
     const rows = readMobRows();
     assert(rows.some(() => true), 'content must declare actor rows');
+    let narrowed = 0;
     for (const row of rows) {
       exportMob(row, root);
-      for (const file of [row.glb, row.body, row.clips]) assert(existsSync(join(root, outputPath(row.pack, file))));
+      for (const file of [row.glb, row.body, row.clips, row.genome]) assert(existsSync(join(root, outputPath(row.pack, file))));
+      const genome = JSON.parse(readFileSync(join(root, outputPath(row.pack, row.genome))));
+      assert.equal(genome.seed, row.seed);
+      const template = templateByName(genome.template);
+      for (const name of planOf(template.bodyPlan).paramOrder) {
+        const spec = row.params?.[name] ?? template.params[name];
+        assert(allows(spec, genome.params[name]), `${row.id} records ${name} = ${genome.params[name]} outside its row's range`);
+        if (row.params?.[name] !== undefined) narrowed += 1;
+      }
     }
+    assert(narrowed > 0, 'content must exercise rows that narrow a drawn param');
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -680,7 +696,8 @@ test('pose fixture rows bake nested GLBs and JSON with matching bone, emission, 
     for (const model of ['humanoid', 'legless-humanoid', 'acid', 'fused-mass']) {
       const row = { id: `fixture.${model}`, type: `fixture.${model}`, model, template: model, seed: 1, scale: 1.3,
         pack: 'fixture.pack', lod_divisor: 0, walkCycles: 1, walk_speed: 0.8, walk_frames: 8, attack_frames: 9, crawls: true, crawl_stride: 1.2,
-        glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json` };
+        glb: `fixture/assets/${model}.glb`, body: `fixture/actors/${model}.body.json`, clips: `fixture/actors/${model}.clips.json`,
+        genome: `fixture/actors/${model}.genome.json` };
       exportMob(row, root);
       const at = (file) => join(root, outputPath(row.pack, file));
       const body = JSON.parse(readFileSync(at(row.body)));
