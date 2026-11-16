@@ -1,5 +1,6 @@
 // Samples closed triangle meshes onto a voxel grid and greedy-meshes the result. It knows nothing of assemblies or
-// glTF: `glb.ts` feeds it one part's solids (metres, part-local) and writes what comes back.
+// glTF: `glb.ts` feeds it one part's solids (metres, part-local) and writes what comes back. Filling and meshing are
+// two steps, so the datums `drawn.ts` reads off one fill come from the voxels the file draws without sampling twice.
 //
 // A solid is sampled by casting rays along each axis through the columns of voxel centres, nudged off the centres by a
 // fixed fraction of a voxel so a ray never runs along a mesh edge. The nudge points toward the origin and a centre on a
@@ -16,8 +17,6 @@ export interface VoxelSource {
   /** Part-local metres, three numbers per vertex. */
   readonly positions: ArrayLike<number>;
   readonly indices: ArrayLike<number>;
-  /** Voxels take the group of the last source that covers them; each group meshes on its own. */
-  readonly group: number;
 }
 
 export interface VoxelBuffers {
@@ -148,6 +147,9 @@ class Grid {
     this.#keys.length = 0;
   }
 }
+
+/** Where a fill writes its cells: a grid, or more than one at once. */
+type CellSink = Pick<Grid, 'box' | 'set'>;
 
 interface Lattice {
   readonly grain: number;
@@ -298,11 +300,11 @@ const cellOf = (at: number, grain: number): number => Math.floor(at / grain + SE
  * of the shape as a one-voxel sliver.
  */
 const fillAlong = (
-  target: { readonly grid: Grid; readonly group: number; readonly grain: number },
+  target: { readonly grid: CellSink; readonly source: number; readonly grain: number },
   axes: Axes,
   sampled: { readonly own: Spans; readonly joined: Spans },
 ): boolean => {
-  const { grid, group, grain } = target;
+  const { grid, source, grain } = target;
   let filled = false;
   for (const [column, spans] of sampled.own) {
     const lattice = [Math.floor(column / RANGE) - HALF_RANGE, (column % RANGE) - HALF_RANGE];
@@ -311,7 +313,7 @@ const fillAlong = (
       voxel[axes.across[0]] = lattice[0]!;
       voxel[axes.across[1]] = lattice[1]!;
       voxel[axes.ray] = checkedIndex((ray + 0.5) * grain, grain);
-      grid.set(keyIn(grid.box, voxel[0]!, voxel[1]!, voxel[2]!), group);
+      grid.set(keyIn(grid.box, voxel[0]!, voxel[1]!, voxel[2]!), source);
       filled = true;
     };
     for (const span of spans) {
@@ -344,14 +346,14 @@ const THIN_AXES: readonly Axes[] = [
  * so it stays where it touches its neighbours.
  */
 const fillSource = (
-  target: { readonly grid: Grid; readonly group: number; readonly grain: number },
+  target: { readonly grid: CellSink; readonly source: number; readonly grain: number },
   sampled: readonly { readonly own: Spans; readonly joined: Spans }[],
   surface: () => readonly number[],
 ): void => {
   const crossed = THIN_AXES.map((axes, index) => fillAlong(target, axes, sampled[index]!));
   if (!crossed.includes(true)) {
     for (const key of surface()) {
-      target.grid.set(key, target.group);
+      target.grid.set(key, target.source);
     }
   }
 };
@@ -821,7 +823,7 @@ const checkedGrain = (grain: number): void => {
 
 /**
  * Samples the sources together, so thinness is judged on the shape they make: `fill(index, grid)` fills source `index`'s
- * voxels into `grid`, and `surface(index)` lists the cells its surface meets.
+ * voxels into `grid`, valued by that index, and `surface(index)` lists the cells its surface meets.
  */
 const sample = (solids: readonly VoxelSource[], { grain, origin }: Lattice, box: Box) => {
   const locals = solids.map((source) => ({ ...source, positions: shifted(source.positions, origin, -1) }));
@@ -838,9 +840,9 @@ const sample = (solids: readonly VoxelSource[], { grain, origin }: Lattice, box:
     return surfaces[index];
   };
   return {
-    fill: (index: number, grid: Grid): void =>
+    fill: (index: number, grid: CellSink): void =>
       fillSource(
-        { grid, group: locals[index]!.group, grain },
+        { grid, source: index, grain },
         spans[index]!.map((own, axis) => ({ own, joined: joined[axis]! })),
         () => surface(index),
       ),
@@ -858,78 +860,99 @@ export interface VoxelMeasure {
 }
 
 /**
- * Measures, source by source, the voxels `voxelize` fills when it samples these sources together on the same lattice,
- * before bridging joins them to anything, so a datum read off one solid follows the voxels that solid draws beside its
- * siblings. A source that fills no voxels measures undefined.
+ * Sources sampled together on one lattice, before bridging or meshing. A cell holds the index of the last source that
+ * fills it; `measures` holds, source by source, the voxels that source fills, so a datum read off one solid follows the
+ * voxels that solid draws beside its siblings. A source that fills no voxels measures undefined.
  */
-export const measureVoxels = (
+export interface VoxelFill {
+  readonly grain: number;
+  readonly origin: readonly number[];
+  readonly measures: readonly (VoxelMeasure | undefined)[];
+  readonly box: Box;
+  readonly cells: Grid;
+  readonly surface: (index: number) => readonly number[];
+}
+
+const measureOf = (grid: Grid, { grain, origin }: Lattice): VoxelMeasure => {
+  const at = (axis: number, cells: number): number => cells * grain + origin[axis]!;
+  const [low, high] = boundsOf(grid);
+  const sum = [0, 0, 0];
+  for (const key of grid.keys()) {
+    grid.voxelOf(key).forEach((index, axis) => {
+      sum[axis] = sum[axis]! + index;
+    });
+  }
+  return {
+    min: [at(0, low[0]!), at(1, low[1]!), at(2, low[2]!)],
+    max: [at(0, high[0]! + 1), at(1, high[1]! + 1), at(2, high[2]! + 1)],
+    centroid: [at(0, sum[0]! / grid.size + 0.5), at(1, sum[1]! / grid.size + 0.5), at(2, sum[2]! / grid.size + 0.5)],
+    voxels: grid.size,
+  };
+};
+
+/**
+ * Fills the sources at `grain` metres, on a lattice anchored at `origin` (part-local metres, the part origin by default)
+ * so a caller can put the voxels of parts placed at fractions of a voxel on one shared lattice.
+ */
+export const fillVoxels = (
   sources: readonly VoxelSource[],
   grain: number,
   origin: readonly number[] = [0, 0, 0],
-): (VoxelMeasure | undefined)[] => {
+): VoxelFill => {
   checkedGrain(grain);
   const lattice = { grain, origin };
   const box = boxOf(sources, lattice);
   const sampled = sample(sources, lattice, box);
-  const grid = new Grid(box);
-  const at = (axis: number, cells: number): number => cells * grain + origin[axis]!;
-  const measureOf = (grid: Grid): VoxelMeasure => {
-    const [low, high] = boundsOf(grid);
-    const sum = [0, 0, 0];
-    for (const key of grid.keys()) {
-      grid.voxelOf(key).forEach((index, axis) => {
-        sum[axis] = sum[axis]! + index;
-      });
-    }
-    return {
-      min: [at(0, low[0]!), at(1, low[1]!), at(2, low[2]!)],
-      max: [at(0, high[0]! + 1), at(1, high[1]! + 1), at(2, high[2]! + 1)],
-      centroid: [at(0, sum[0]! / grid.size + 0.5), at(1, sum[1]! / grid.size + 0.5), at(2, sum[2]! / grid.size + 0.5)],
-      voxels: grid.size,
-    };
+  const cells = new Grid(box);
+  const own = new Grid(box);
+  const both: CellSink = {
+    box,
+    set: (key, index) => {
+      cells.set(key, index);
+      own.set(key, index);
+    },
   };
-  return sources.map((_, index) => {
-    grid.clear();
-    sampled.fill(index, grid);
-    return grid.size === 0 ? undefined : measureOf(grid);
+  const measures = sources.map((_, index) => {
+    own.clear();
+    sampled.fill(index, both);
+    return own.size === 0 ? undefined : measureOf(own, lattice);
   });
+  return { grain, origin, measures, box, cells, surface: sampled.surface };
 };
 
 /**
- * Voxelizes the sources at `grain` metres, on a lattice anchored at `origin` (part-local metres, the part origin by
- * default) so a caller can put the voxels of parts placed at fractions of a voxel on one shared lattice. `neighbours`
- * are the solids of other parts that may touch these (part-local metres): they are not drawn, but a piece of these
- * sources that meets one is joined to its voxels, so a part that holds on through its neighbour stays on. Empty input
- * gives no groups.
+ * Meshes a fill, each cell in the group `groupOf` gives the source that fills it; each group meshes on its own.
+ * `neighbours` are the solids of other parts that may touch the fill's sources (part-local metres): they are not drawn,
+ * but a piece of the sources that meets one is joined to its voxels, so a part that holds on through its neighbour
+ * stays on. An empty fill gives no groups.
  */
 export const voxelize = (
-  sources: readonly VoxelSource[],
-  grain: number,
-  origin: readonly number[] = [0, 0, 0],
+  fill: VoxelFill,
   {
+    groupOf = () => 0,
     neighbours = [],
     preserveFace,
     exposeInterface,
   }: {
+    readonly groupOf?: (source: number) => number;
     readonly neighbours?: readonly VoxelSource[];
     readonly preserveFace?: PreserveVoxelFace | undefined;
     readonly exposeInterface?: ExposeInterface;
   } = {},
 ): Voxelized => {
-  checkedGrain(grain);
-  const lattice = { grain, origin };
-  const box = boxOf(sources, lattice);
+  const { grain, origin, box } = fill;
   const grid = new Grid(box);
+  for (const key of fill.cells.keys()) {
+    grid.set(key, groupOf(fill.cells.get(key)!));
+  }
   const reach = new Grid(box);
-  const drawn = sample(sources, lattice, box);
-  for (const [index, { group }] of sources.entries()) {
-    drawn.fill(index, grid);
-    for (const key of drawn.surface(index)) {
-      reach.set(key, group);
+  for (const index of fill.measures.keys()) {
+    for (const key of fill.surface(index)) {
+      reach.set(key, groupOf(index));
     }
   }
   const anchor = new Grid(box, { clips: true });
-  const neighbouring = sample(neighbours, lattice, box);
+  const neighbouring = sample(neighbours, { grain, origin }, box);
   for (const index of neighbours.keys()) {
     neighbouring.fill(index, anchor);
   }

@@ -39,7 +39,7 @@ import type {
 import { featureFitsGrain } from './featureFit.ts';
 import { partMounts } from './mounts.ts';
 import { matrixOf, prepareSkin, preserveSkinFace, SkinError, skinPoints } from './skin.ts';
-import { voxelize } from './voxelize.ts';
+import { fillVoxels, voxelize } from './voxelize.ts';
 
 const ASSET_FILE = /^assets\/models\/[a-z0-9_-]+\.glb$/;
 /** glTF node name of a part: its id and registry key (`PartInstance.family`), e.g. `part-1:family-a`. */
@@ -642,7 +642,7 @@ const writeGlb: ExportGlb = (input) => {
         for (let v = 0; v < positions.length; v += 3) {
           positions.set(applyPoint(into, [mesh.positions[v]!, mesh.positions[v + 1]!, mesh.positions[v + 2]!]), v);
         }
-        return [{ positions, indices: mesh.indices, group: 0 }];
+        return [{ positions, indices: mesh.indices }];
       });
     });
   };
@@ -656,26 +656,38 @@ const writeGlb: ExportGlb = (input) => {
       piece: string | undefined;
       solids: string[];
     }[] = [];
-    const groupOf = new Map<string, number>();
+    const finishOf = new Map<string, number>();
     const drawn = drawnOf(part);
-    const sources = items.flatMap((item, index) => {
-      const mesh = drawn[index];
-      if (mesh === undefined) {
-        return [];
+    /** Per display item, its finish; none for an item that draws nothing. */
+    const groups = items.map((item, index) => {
+      if (drawn[index] === undefined) {
+        return undefined;
       }
       const solid = item.solids[0]!;
       const appearance = appearanceFor(part, solid);
       const piece = solid.display?.piece;
       const key = JSON.stringify([materialFor(appearance), appearance.material, appearance.slot, piece]);
-      let group = groupOf.get(key);
+      let group = finishOf.get(key);
       if (group === undefined) {
         group = finishes.push({ appearance, piece, solids: [] }) - 1;
-        groupOf.set(key, group);
+        finishOf.set(key, group);
       }
       finishes[group]!.solids.push(...item.solids.map(({ id }) => id));
-      return [{ ...mesh, group }];
+      return group;
     });
-    const { groups } = voxelize(sources, grain, latticeOrigin(part.placed, grain, metresPerUnit), {
+    const origin = latticeOrigin(part.placed, grain, metresPerUnit);
+    const fill =
+      input.drawnVoxels?.(part.id) ??
+      fillVoxels(
+        drawn.map((mesh) => mesh ?? { positions: [], indices: [] }),
+        grain,
+        origin,
+      );
+    if (fill.grain !== grain || fill.origin.some((value, axis) => value !== origin[axis])) {
+      throw new Error(`The drawn voxels of ${part.id} lie on another lattice than the file's`);
+    }
+    const { groups: meshes } = voxelize(fill, {
+      groupOf: (source) => groups[source]!,
       neighbours: neighboursOf(part, grain),
       // A face between pieces is kept on both sides, so a game hiding one piece leaves the rest closed.
       exposeInterface: (group, neighbour) =>
@@ -684,7 +696,7 @@ const writeGlb: ExportGlb = (input) => {
           surfaceOf(finishes[neighbour]!.appearance.finish).transparent),
       preserveFace: input.skin ? preserveSkinFace(input.skin, placedInMetres(part)) : undefined,
     });
-    return [...groups].map(([group, buffers]) =>
+    return [...meshes].map(([group, buffers]) =>
       bufferPrimitive(
         buffers,
         materialFor(finishes[group]!.appearance),
