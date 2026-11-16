@@ -1,5 +1,5 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
+// their category, tags, keywords, printed label, sidecar, mass and smooth copy, and the components a model comes apart into
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
 // labels (models/taxonomy.json), and a sounds.json of the tree's sound rows with each take's file. It serves the tool pages site/tools.json lists and links them from the index.
@@ -58,9 +58,10 @@ const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files 
   })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
+  .map(({ id, title, pack, path, smooth, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
+    smooth: smooth && outputPath(smooth.pack, smooth.path),
     category: category ?? null,
     label: label ?? null,
     tags: tags ?? {},
@@ -74,11 +75,12 @@ const models = manifest.models
     volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, title, file, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
+  .map(({ id, title, file, smooth, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
     file,
     bytes: statSync(join(built, file)).size,
+    ...(smooth ? { smooth: { file: smooth, bytes: statSync(join(built, smooth)).size } } : {}),
     category,
     tags,
     keywords,
