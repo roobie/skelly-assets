@@ -92,6 +92,25 @@ test('thin slanted prisms that do not touch, such as strings side by side, are n
   assert.deepEqual(thinRuns(strings, GRAIN), []);
 });
 
+// A half shell of radius `r` round the z axis, `t` thick, in `n` flat facets, each a prism extruded 20 mm along z.
+const shell = (id, n, r, t) => Array.from({ length: n }, (_, k) => {
+  const a = (Math.PI * k) / n, b = (Math.PI * (k + 1)) / n;
+  return {
+    id: `${id}-${k}`,
+    kind: 'prism',
+    slot: id,
+    axis: 'z',
+    profile: [[r * Math.cos(a), r * Math.sin(a)], [(r + t) * Math.cos(a), (r + t) * Math.sin(a)], [(r + t) * Math.cos(b), (r + t) * Math.sin(b)], [r * Math.cos(b), r * Math.sin(b)]],
+    start: 0,
+    end: 0.02,
+  };
+});
+
+test('a faceted shell drawn one grain thick is not a thin run, and a thinner layer flush on it still is', () => {
+  assert.deepEqual(thinRuns(shell('plate', 8, 0.05, GRAIN), GRAIN), []);
+  assert.deepEqual(thinRuns(shell('strap', 8, 0.05 + GRAIN, GRAIN * 0.75), GRAIN).map(({ slot }) => slot), ['strap']);
+});
+
 test('the queue puts rows with more kinds of defect first, then the surest finding, and leaves out rows with none', () => {
   const queue = rankedQueue({
     clean: [],
