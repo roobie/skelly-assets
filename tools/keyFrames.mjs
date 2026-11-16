@@ -19,6 +19,17 @@ export const standing = (rig) => ({
 export const posedAt = (rig, angles) =>
   boneTransforms(rig.bones, decodeFrame(compilePose(rig, { ...standing(rig), angles }).frame));
 
+/**
+ * Where a point a key frame gives from the shoulder of `hand`, in the chest's frame, stands in the world as `angles`
+ * stand the figure: `(hand, p) => point`. Key frames give points so, as a twisting or leaning chest carries the hands
+ * and a shouldered stock round with it.
+ */
+export function shoulderPoints(rig, angles) {
+  const bone = (id) => rig.bones.find((b) => b.id === id);
+  const chest = posedAt(rig, angles).get('spine');
+  return (hand, p) => applyPoint(chest, add(bone(bone(hand).reach.chain[0]).head, p));
+}
+
 // One axis of a look shared between two joints in proportion to how far each turns that way.
 const share = (angle, [lowA, highA], [lowB, highB]) => {
   const a = angle >= 0 ? highA : -lowA,

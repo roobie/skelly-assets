@@ -5,13 +5,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { add, applyPoint, mat3ToQuat, mulMM, mulMV, quatToMat3, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
+import { add, mat3ToQuat, mulMM, mulMV, quatToMat3, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
 import { compareNumbered } from './codeUnitOrder.mjs';
 import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
+import { lookAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
 import { graspOf, handSocket, heldItems, heldWeapon } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -73,8 +73,7 @@ export const pressCheckSockets = (check, rifle) =>
  * sockets (`pressCheckSockets`); a frame's hold naming a socket takes that one.
  */
 export function pressCheckPoses(rig, check, strokes, sockets) {
-  const bone = (id) => rig.bones.find((b) => b.id === id);
-  const pocket = applyPoint(posedAt(rig, check.stance).get('spine'), add(bone('upperArm.R').head, check.pocket));
+  const pocket = shoulderPoints(rig, check.stance)('hand.R', check.pocket);
 
   // The rifle turned by its carry, yaw then pitch then roll about its own bore, its butt pad in the pocket.
   const placed = ({ pitch, yaw, roll }) => {
