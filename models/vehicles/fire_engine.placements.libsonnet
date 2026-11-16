@@ -18,7 +18,6 @@ local loadOut = {
   sites: t.fittings(site.kit, 'fire_engine', s) + [
     site.one('body', 'fire_engine_body'),
     site.one('rear_wall', 'fire_engine_rear_wall'),
-    site.one('cab_stripe', 'fire_engine_cab_stripe'),
     site.one('water_tank', 'fire_engine_water_tank'),
     site.one('gantry', 'fire_engine_gantry'),
     site.one('roof_ladder', 'fire_engine_roof_ladder'),
@@ -27,6 +26,7 @@ local loadOut = {
     site.one('rear_step', 'fire_engine_rear_step'),
     site.one('crew_bench', 'bench_seat_3', [1.32, s.floor, 0]),
   ]
+  + t.stripeSites(site, 'fire_engine', s)
   + std.flattenArrays([site.pair('locker_shutter_' + name, 'fire_engine_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
   + std.flattenArrays([
     site.pair('locker_stowage_' + name, 'fire_engine_locker_stowage_' + name, stowed=loadOut[name], behind='locker_shutter_' + name)

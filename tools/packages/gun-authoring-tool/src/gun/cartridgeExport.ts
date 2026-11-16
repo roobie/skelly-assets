@@ -1,7 +1,12 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
-import type { AppearanceContext, GlbAssetIdentity, GlbExportError } from '@skelly/thing-export/exportTypes.ts';
+import type {
+  AppearanceContext,
+  GlbAssetIdentity,
+  GlbExportError,
+  VoxelGrains,
+} from '@skelly/thing-export/exportTypes.ts';
 import { type CartridgeModelKind, cartridgeModelAsset } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type RoundProfiles, roundProfiles } from '../ammo/roundProfile.ts';
@@ -10,6 +15,7 @@ import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
 import { exportGunGeometry as exportGlb } from './glbWriter.ts';
 import { AMMO_PALETTE, GUN_APPEARANCE } from './palette.ts';
 import { shotshellGeometry } from './shotshellGeometry.ts';
+import { TOO_SMALL_TO_VOXELIZE } from './tooSmallToVoxelize.ts';
 
 interface CartridgeModel {
   readonly glb: Uint8Array;
@@ -44,6 +50,7 @@ const makeModelExport = (
   asset: GlbAssetIdentity,
   solids: readonly Solid[],
   { appearance }: CartridgeLook,
+  voxel: Partial<VoxelGrains>,
 ): SingleCartridgeExportResult => {
   const family: PartFamily = {
     name: 'cartridge-model',
@@ -54,6 +61,7 @@ const makeModelExport = (
       ports: EMPTY_PORTS,
       keepOuts: EMPTY_KEEPOUTS,
       axes: EMPTY_AXES,
+      tags: TOO_SMALL_TO_VOXELIZE,
     }),
   };
   const domain: Domain = {
@@ -73,13 +81,13 @@ const makeModelExport = (
     ...appearance,
     finish: { ...cartridgeFinish(cartridge), ...appearance?.finish },
   };
-  // No voxel grain: a cartridge's rim and taper land unevenly on any grain, so it is drawn as a faceted lathe.
   const result = exportGlb({
     resolved,
     palette: AMMO_PALETTE,
     revolveFacets: GUN_APPEARANCE.roundSides,
     asset,
     appearance: effectiveAppearance,
+    ...voxel,
   });
   if (!result.ok) {
     return result;
@@ -123,9 +131,10 @@ export const exportCartridgeModel = (
   component: CartridgeModelKind,
   asset: GlbAssetIdentity,
   look: CartridgeLook = {},
+  voxel: Partial<VoxelGrains> = {},
 ): SingleCartridgeExportResult => {
   const solids = cartridge.kind === 'shotshell' ? shotshellGeometry(cartridge) : metallicSolids(cartridge);
-  return makeModelExport(cartridge, asset, solids[component], look);
+  return makeModelExport(cartridge, asset, solids[component], look, voxel);
 };
 
 /** Export loaded-round/shell and fired-case/hull GLBs at real millimetre-derived dimensions. */

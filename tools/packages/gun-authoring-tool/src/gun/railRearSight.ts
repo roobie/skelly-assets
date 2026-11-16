@@ -24,27 +24,38 @@ export const RAIL_REAR_SIGHT_EYE_RELIEF_U = P.eyeReliefU;
 const box = (id: string, min: Vec3, max: Vec3): Solid => ({ id, kind: 'box', box: boxFromMinMax(min, max) });
 
 /**
- * The sight's solids with the aperture centred `apertureU` over the rail. The leaf closes over the hole, so its top is
- * solid and the exported sight line drops into the hole rather than resting on the top (see `exportGlb.ts`,
- * `openSightGapOrThrow`).
+ * The sight's solids with the square hole centred `apertureU` over the rail, where the exported sight line runs through
+ * it. The tower ends inside the frame's bottom wall, and is narrower than the frame so no tower face lies in a frame
+ * face.
  */
 export const railRearSightSolids = (apertureU: number): Solid[] => {
   const { base, tower, aperture } = P;
   const hole = aperture.holeHalfU;
   const outer = hole + aperture.ringU;
-  const leafX = aperture.halfThicknessU;
+  if (tower.halfWidthU >= outer) {
+    throw new Error("A rail rear sight's tower must be narrower than its frame");
+  }
   if (apertureU - outer <= base.heightU) {
     throw new Error(`A rail rear sight's aperture at ${apertureU}u leaves no room for its tower`);
   }
+  const towerTop = apertureU - (hole + outer) / 2;
+  const [back, front] = [-aperture.halfThicknessU, aperture.halfThicknessU];
   return [
     box('base', [-base.halfLengthU, 0, -base.halfWidthU], [base.halfLengthU, base.heightU, base.halfWidthU]),
-    box(
-      'tower',
-      [-tower.halfLengthU, base.heightU, -tower.halfWidthU],
-      [tower.halfLengthU, apertureU - hole, tower.halfWidthU],
-    ),
-    box('ring-left', [-leafX, apertureU - hole, -outer], [leafX, apertureU + hole, -hole]),
-    box('ring-right', [-leafX, apertureU - hole, hole], [leafX, apertureU + hole, outer]),
-    box('ring-top', [-leafX, apertureU + hole, -outer], [leafX, apertureU + outer, outer]),
+    box('tower', [-tower.halfLengthU, base.heightU, -tower.halfWidthU], [tower.halfLengthU, towerTop, tower.halfWidthU]),
+    {
+      id: 'frame',
+      kind: 'revolved',
+      axis: 'x',
+      origin: [0, apertureU, 0],
+      profile: [
+        [back, outer],
+        [front, outer],
+        [front, hole],
+        [back, hole],
+        [back, outer],
+      ],
+      sides: 4,
+    },
   ];
 };

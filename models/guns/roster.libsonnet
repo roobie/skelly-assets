@@ -43,6 +43,7 @@
     { source: 'optic-tube-dot', title: 'Tube dot sight' },
     { source: 'rail-front-sight', title: 'Front sight rail' },
     { source: 'rail-rear-sight', title: 'Rear sight rail' },
+    { source: 'rail-peep-rear-sight', title: 'Peep rear sight rail' },
     { source: 'real-suppressor', title: 'Suppressor', keywords: ['silencer'] },
     { source: 'tactical-flashlight-mount', title: 'Tactical flashlight mount' },
   ],

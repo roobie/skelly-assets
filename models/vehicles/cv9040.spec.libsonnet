@@ -20,12 +20,18 @@
   // The Perkins X-300-5 at the front sprockets.
   transmission: { massKg: 700, offset: -0.27, length: 0.4, width: 0.56, above: 0.31, shaft: 0.08 },
   driverX: 2.15, driverZ: -0.54, hatchX: 1.36,
+  // The troop compartment's one wide roof hatch, hinged at its rear: its lid's centre, its length along x and its width.
+  // Its front edge stays outside the circle the turret's bustle sweeps as it traverses, and its hole stays between the
+  // lower walls, over the troop compartment rather than the sponsons.
+  troopHatch: { massKg: 90, x: -2.565, length: 1.03, width: 1.6, thickness: 0.05, open: 105 },
   // The 40 mm ready rounds below the turret, in clips.
   ammoRack: { massKg: 350, x: [-0.3, 0.2], z: [-0.75, -0.2], top: 1.4 },
   fuelTank: { massKg: 90, x: [-2.9, -1.9] },
   towEye: { length: 0.08, height: 0.12, width: 0.1, z: 0.5 },
   headlamp: { x: 2.5, z: 1.25 },
   tailLamp: { y: 1.45, z: 1.3 },
+  // Degrees, so the troop door stands well clear of the doorway.
+  rearDoorOpen: 110,
   battery: { x: -0.75, z: 0.5 },
   paint: 'paint-olive',
 }

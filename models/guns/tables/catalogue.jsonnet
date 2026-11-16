@@ -286,6 +286,7 @@ local item(id, family, selector, params, massKg, profile) =
     row('heavy-magazine', 'heavy-magazine', {}, 0.3),
     row('recoil-stock', 'recoil-stock', {}, 1),
     row('barrel-shroud', 'barrel-shroud', {}, 0.6),
+    row('shroud-front-sight', 'shroud-front-sight', {}, 0.08),
     row('muzzle-brake', 'muzzle-brake', {}, 0.4),
     row('carry-trunnion', 'handle-trunnion', {}, 0.15),
     row('carry-strut', 'handle-strut', {}, 0.1),

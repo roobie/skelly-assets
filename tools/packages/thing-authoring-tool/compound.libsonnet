@@ -288,6 +288,36 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
     $.box('%s-%d' % [prefix, i], slot, [cx + xa, top - 0.004, cz + z - w / 2], [cx + xb, top + 0.002, cz + z + w / 2])
     for i in std.range(0, n - 1)
   ],
+  // A rim `w` wide round the edge of a smoothPlate or curvedPlate shell with the same convex [x, z] outline, wrapping
+  // its edge from underneath and standing `proud` above its face: shield and lid edging, binding and trim. Each edge is
+  // cut into runs no more than `step` across x, so the rim follows the curve, and each run reaches from the lowest to
+  // the highest height its shell takes under it, so the shell never shows through.
+  plateRim(prefix, slot, outline, y0, t, r, w, proud, cx=0, cz=0, step=0.03):
+    local n = std.length(outline), half = halfWidth(outline);
+    local lift(x) = (half * half - x * x) / (2 * r);
+    local area = std.sum([outline[i][0] * outline[(i + 1) % n][1] - outline[(i + 1) % n][0] * outline[i][1] for i in std.range(0, n - 1)]);
+    local inward(i) =
+      local p = outline[i], q = outline[(i + 1) % n];
+      local dx = q[0] - p[0], dz = q[1] - p[1], len = std.sqrt(dx * dx + dz * dz), s = std.sign(area);
+      [-s * dz / len, s * dx / len];
+    // The outline inset by w: each corner mitred where its two inset edges meet.
+    local inner(i) =
+      local a = inward((i + n - 1) % n), b = inward(i), k = w / (1 + a[0] * b[0] + a[1] * b[1]);
+      [outline[i][0] + k * (a[0] + b[0]), outline[i][1] + k * (a[1] + b[1])];
+    local at(p, q, f) = [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f];
+    std.flattenArrays([
+      local p = outline[i], q = outline[(i + 1) % n], pi = inner(i), qi = inner((i + 1) % n);
+      local runs = std.max(1, std.ceil(std.abs(q[0] - p[0]) / step));
+      [
+        local quad = [at(p, q, j / runs), at(p, q, (j + 1) / runs), at(pi, qi, (j + 1) / runs), at(pi, qi, j / runs)];
+        local xs = [c[0] for c in quad];
+        local far = std.foldl(std.max, [std.abs(x) for x in xs], 0);
+        local near = if std.foldl(std.min, xs, 1e9) < 0 && std.foldl(std.max, xs, -1e9) > 0 then 0 else std.foldl(std.min, [std.abs(x) for x in xs], 1e9);
+        $.prism('%s-%d-%d' % [prefix, i, j], slot, 'y', [[c[1] + cz, c[0] + cx] for c in quad], y0 + lift(far), y0 + t + lift(near) + proud)
+        for j in std.range(0, runs - 1)
+      ]
+      for i in std.range(0, n - 1)
+    ]),
   // A chestplate or cuirass laid front up on its backplate, neck towards -z: a breastplate `w` across and `l` from
   // the neck edge to the hem, curved across x with radius `r`, its neck edge `neck` either side of the middle and its
   // armholes cut `arm` down the sides. Options, each off by default unless noted: ridge (on) down the middle; rim (on)

@@ -13,6 +13,7 @@ local g = fit.layers.over;
 
 // Hardened steel plate, bright rims and bosses, black leather straps, brass rivets.
 local livery = { plate: 'steel-plate', trim: 'steel-bright', strap: 'leather-black', rivet: 'brass-polished', insignia: 'steel-bright' };
+// The gauntlet's fingers are steel: a piece on each phalanx is the lame a fingered gauntlet rivets over each joint.
 local gauntlet = livery + { hand: 'steel-plate' };
 local sabaton = { upper: 'steel-plate', toe: 'steel-bright', sole: 'leather-black', collar: 'steel-bright', laces: 'leather-black' };
 

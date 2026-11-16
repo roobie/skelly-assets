@@ -107,25 +107,32 @@ export const loadDesignAssembly = (name: string): MutableAssembly => {
   return structuredClone(result.design.assembly) as MutableAssembly;
 };
 
+/** Takes the rear iron off, as a player does to free the rail it sits on for an optic. */
+export const removeRearSight = (assembly: MutableAssembly): void => {
+  delete assembly.parts['rear-sight'];
+  assembly.connections = assembly.connections.filter(({ to }) => to !== 'rear-sight.base');
+};
+
 /**
  * The published AR with an optic on its upper's rail in place of its rear iron, as a player swaps one for the other:
  * the default AR ships with irons, so a test that needs a scoped AR builds it.
  */
 export const scopedArDesign = (type = 'lpvo-1-6x'): MutableAssembly => {
   const assembly = loadDesignAssembly('archetype-ar');
-  delete assembly.parts['rear-sight'];
+  removeRearSight(assembly);
   assembly.parts.sight = { family: 'sight', params: { type } };
-  assembly.connections = [
-    ...assembly.connections.filter(({ to }) => to !== 'rear-sight.base'),
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
-  ];
+  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 3 });
   return assembly;
 };
 
-/** Fits a scope to an anti-materiel rifle's receiver rail: it ships without one, as a player fits one. */
+/**
+ * Fits a scope to an anti-materiel rifle's receiver rail in place of its rear iron: it ships with irons only, as a
+ * player fits one.
+ */
 export const fitAntiMaterielScope = (assembly: MutableAssembly, type = 'high-mag-5-25x'): void => {
+  removeRearSight(assembly);
   assembly.parts.sight = { family: 'sight', params: { type } };
-  assembly.connections = [...assembly.connections, { from: 'receiver.rail', to: 'sight.base', slot: 5 }];
+  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 5 });
 };
 
 /** The published anti-materiel rifle with a scope on its receiver rail. */

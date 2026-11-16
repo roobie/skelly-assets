@@ -13,6 +13,7 @@ local claimed = {
     'military_transport_helicopter',
     'news_helicopter',
     'police_helicopter',
+    'short_military_transport_helicopter',
   ],
   'skelly.vehicle-wrecks': [
     'abandoned_ambulance',

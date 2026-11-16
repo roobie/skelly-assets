@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local stow = import 'models/stowage.libsonnet';
 local box = h.box;
 local turned = h.turned;
 local prism = h.prism;
@@ -114,7 +115,7 @@ local chainsaw(engine) =
   h.compound('chainsaw', 7.6, chainsaw(true), {
     body: 'plastic-orange', cover: 'plastic-orange', handle: 'plastic-black', grip: 'rubber-black', guard: 'plastic-black',
     bar: 'steel-bright', chain: 'steel-parkerized', sprocket: 'plastic-charcoal', starter: 'plastic-black', battery: 'plastic-black',
-  }) + { title: 'Chainsaw' } + h.gripOn('chainsaw', 'rear-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
+  }) + { title: 'Chainsaw' } + h.gripOn('chainsaw', 'rear-grip') + stow.stows(stow.resting('machine', [0.172, 0, -0.014])) + { voxelGrain: 0.004 } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
 
   // A cordless 165 mm circular saw 0.44 m long standing on its shoe: the blade on +z under its upper guard with the
   // lower guard below the shoe, the motor on -z, a closed top handle and the battery at the back.

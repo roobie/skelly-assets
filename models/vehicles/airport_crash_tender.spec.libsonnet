@@ -46,12 +46,12 @@
   turretMountMass: 140, turretMass: 210, bumperTurretMass: 70, roofRailMass: 90, ladderMass: 30,
   // The lockers' back wall stands just outboard of the water and foam tanks, which fill the middle.
   lockerBack: 0.94,
-  // What each locker stows, a part on each side: its title and mass.
+  // Each locker's fit-out, a part on each side: its title and mass. The kit it holds is its site's load-out.
   stowage: {
-    fore: { title: 'Airport crash tender breathing apparatus stowage', mass: 150 },
-    mid: { title: 'Airport crash tender hose stowage', mass: 160 },
-    wheel_fore: { title: 'Airport crash tender rescue tool stowage', mass: 70 },
-    wheel_aft: { title: 'Airport crash tender extinguisher stowage', mass: 140 },
-    aft: { title: 'Airport crash tender pump panel', mass: 60 },
+    fore: { title: 'Airport crash tender breathing apparatus stowage', mass: 30 },
+    mid: { title: 'Airport crash tender hose stowage', mass: 25 },
+    wheel_fore: { title: 'Airport crash tender rescue tool stowage', mass: 12 },
+    wheel_aft: { title: 'Airport crash tender extinguisher stowage', mass: 25 },
+    aft: { title: 'Airport crash tender pump panel', mass: 40 },
   },
 }

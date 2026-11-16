@@ -12,7 +12,7 @@ local s = import 'swat_truck.spec.libsonnet';
     site.one('ram', 'swat_truck_ram'),
     site.one('windscreen_guard', 'swat_truck_windscreen_guard'),
   ]
-  + site.pair('door_guard', 'swat_truck_door_guard')
+  + site.pair('door_guard', 'swat_truck_door_guard', rides='door')
   + site.pair('body_side', 'swat_truck_body_side')
   + site.pair('rear_door', 'swat_truck_rear_door')
   + site.pair('roof_beacon', 'beacon_blue', [-0.55, s.body.top + 0.05, 0.85])

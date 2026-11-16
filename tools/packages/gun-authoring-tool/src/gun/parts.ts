@@ -38,6 +38,7 @@ import pistolAction from '../../../../../models/guns/tables/pistolAction.json' w
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
+import { SHROUD_HALF_HEIGHT } from './antiMateriel/barrelShroud.ts';
 import { ANTI_MATERIEL_FAMILIES } from './antiMateriel/index.ts';
 import { arChargingHandle, arChargingHandleSolidsFor, arHandleChannel } from './arChargingHandle.ts';
 import {
@@ -77,8 +78,10 @@ import {
   subtractAxialPockets,
   subtractConvexSection,
 } from './receiverSection.ts';
+import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import { revolverFamilySet } from './revolver.ts';
+import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import {
   curvedTriggerBlade,
   openTriggerGuard,
@@ -99,6 +102,7 @@ import {
 } from './sporter.ts';
 import { SPORTER_PROPORTIONS } from './sporterProportions.ts';
 import { taperedStockSolids } from './taperedStock.ts';
+import { TOO_SMALL_TO_VOXELIZE } from './tooSmallToVoxelize.ts';
 import {
   CLOSED_TRIGGER_GUARDS,
   CURVED_TRIGGER_BLADES,
@@ -109,6 +113,7 @@ import {
 import { inchesToMm, mmToU } from './units.ts';
 
 const SIGHT_GRAIN = GRID / 4;
+const AK_POST_HALF_WIDTH = SIGHT_GRAIN;
 const sportingStockParams = SPORTER_PROPORTIONS.stock;
 const sportingFrontSightParams = SPORTER_PROPORTIONS.frontSight;
 
@@ -3859,7 +3864,7 @@ const frontSight: PartFamily = {
     const radius = BARREL_RADIUS[cls(params, 'bore')];
     const ak = params.style === 'ak';
     const postHalf = GRID;
-    const postHalfZ = ak ? SIGHT_GRAIN : GRID / 2;
+    const postHalfZ = ak ? AK_POST_HALF_WIDTH : GRID / 2;
     let conventionalPostTop = params.style === 'sporting' ? RECEIVER_FRONT_HALF_HEIGHT + 1 : IRON_SIGHT_LINE_U;
     if (params.section === 'sporter') {
       conventionalPostTop = SPORTER_PROPORTIONS.frontSight.sightLineU;
@@ -3907,7 +3912,7 @@ const frontSight: PartFamily = {
       ports: [{ id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: X, up: Y, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -3933,14 +3938,19 @@ const muzzleBead: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, 1.25, 0], dir: X }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
 
+const OPEN_NOTCH_LEAF_HALF_WIDTH = 1.125;
+// Three AK post widths: the post's share of the notch only shrinks as the eye nears, so this leaves a bar of light at
+// least as wide as the post either side of it from any eye distance, whatever the sight radius.
+const OPEN_NOTCH_HALF_WIDTH = 3 * AK_POST_HALF_WIDTH;
+
 const openNotchLeafSolids = (topU: number): Solid[] => [
-  solid('leaf-left', [-SIGHT_GRAIN, 0, -1.125], [SIGHT_GRAIN, topU, -0.125]),
-  solid('leaf-right', [-SIGHT_GRAIN, 0, 0.125], [SIGHT_GRAIN, topU, 1.125]),
+  solid('leaf-left', [-SIGHT_GRAIN, 0, -OPEN_NOTCH_LEAF_HALF_WIDTH], [SIGHT_GRAIN, topU, -OPEN_NOTCH_HALF_WIDTH]),
+  solid('leaf-right', [-SIGHT_GRAIN, 0, OPEN_NOTCH_HALF_WIDTH], [SIGHT_GRAIN, topU, OPEN_NOTCH_LEAF_HALF_WIDTH]),
 ];
 
 const sportingRearSight: PartFamily = {
@@ -3977,7 +3987,7 @@ const sportingRearSight: PartFamily = {
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       axes: [{ kind: 'sight', origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
       keepOuts: [],
     };
   },
@@ -4006,7 +4016,7 @@ const railFrontSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -4023,7 +4033,45 @@ const railRearSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
+    };
+  },
+};
+
+/** A fixed peep rear sight on a top rail: one disc with a round hole on the conventional front post's sight line. */
+const railPeepRearSight: PartFamily = {
+  name: 'rail-peep-rear-sight',
+  params: {},
+  build(): PartDef {
+    const apertureU = IRON_SIGHT_LINE_U - RECEIVER_SECTION.ar.faces.top.y;
+    return {
+      family: 'rail-peep-rear-sight',
+      solids: railPeepRearSightSolids(apertureU),
+      ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
+      keepOuts: [],
+      axes: [
+        { kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U },
+      ],
+      tags: TOO_SMALL_TO_VOXELIZE,
+    };
+  },
+};
+
+/** A fixed front post on an anti-materiel barrel shroud, its top on the conventional iron sight line. */
+const shroudFrontSight: PartFamily = {
+  name: 'shroud-front-sight',
+  params: {},
+  build(): PartDef {
+    const postTopU = IRON_SIGHT_LINE_U - SHROUD_HALF_HEIGHT;
+    return {
+      family: 'shroud-front-sight',
+      solids: shroudFrontSightSolids(postTopU),
+      ports: [
+        { id: 'base', mount: 'shroud-sight', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
+      ],
+      keepOuts: [],
+      axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -4131,7 +4179,7 @@ const akRearSight: PartFamily = {
       ],
       keepOuts: [],
       axes: [{ kind: 'sight', origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 }],
-      tags: [VOXEL_DETAIL],
+      tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
 };
@@ -5694,6 +5742,8 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   'front-sight-bead': muzzleBead,
   'rail-front-sight': railFrontSight,
   'rail-rear-sight': railRearSight,
+  'rail-peep-rear-sight': railPeepRearSight,
+  'shroud-front-sight': shroudFrontSight,
   'sporting-rear-sight': sportingRearSight,
   'gas-cylinder': gasCylinder,
   'gas-block': gasBlock,

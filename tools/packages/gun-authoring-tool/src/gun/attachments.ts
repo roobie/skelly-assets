@@ -91,6 +91,7 @@ export const ATTACHMENT_IDS = [
   ...OPTIC_TYPE_IDS.map((id) => `optic-${id}`),
   'rail-front-sight',
   'rail-rear-sight',
+  'rail-peep-rear-sight',
   'real-suppressor',
   'improvised-suppressor',
   'ak-slant-compensator',
@@ -99,7 +100,9 @@ export const ATTACHMENT_IDS = [
   'foregrip',
 ] as const;
 
-const looks: Readonly<Record<string, { readonly appearance?: PartAppearance; readonly voxelGrain?: number }>> =
+const looks: Readonly<
+  Record<string, { readonly appearance?: PartAppearance; readonly voxelGrain?: number; readonly voxelClass?: string }>
+> =
   appearanceContent.attachments;
 
 /** Finish slots no gun or role finish fills, so the attachment's look must select them: an optic's lens coating. */
@@ -173,12 +176,16 @@ export const attachmentMountSlot = (resolved: Resolved, partId: string, mount: M
   return undefined;
 };
 
+/** The connector by which an attachment mounts on its host. */
+export const attachmentMountPort = (part: PartDef | undefined, mount: MountKind): PortDef | undefined =>
+  part?.ports.find(({ gender, mount: portMount }) => gender === 'male' && portMount === mount);
+
 const railSpanNotches = (part: PartDef | undefined, mount: MountKind, solids = part?.solids) => {
   const pitch = MOUNT_STANDARDS[mount].slotPitchU;
   if (pitch === undefined || !part || !solids) {
     return;
   }
-  const port = part.ports.find(({ gender, mount: portMount }) => gender === 'male' && portMount === mount);
+  const port = attachmentMountPort(part, mount);
   if (!port) {
     return;
   }
@@ -286,7 +293,7 @@ const opticMetadata = (
 };
 
 const railIronSightMetadata = (
-  id: 'rail-front-sight' | 'rail-rear-sight',
+  id: 'rail-front-sight' | 'rail-rear-sight' | 'rail-peep-rear-sight',
   metresPerUnit: number,
   part?: PartDef,
 ): AttachmentCoreMetadata => {
@@ -387,6 +394,7 @@ export const attachmentMetadata = (
         return opticMetadata(params, metresPerUnit, part);
       case 'rail-front-sight':
       case 'rail-rear-sight':
+      case 'rail-peep-rear-sight':
         return railIronSightMetadata(family, metresPerUnit, part);
       case 'suppressor':
         return suppressorMetadata(params, part);
@@ -403,7 +411,7 @@ export const attachmentMetadata = (
   if (!metadata) {
     return undefined;
   }
-  const port = part?.ports.find(({ gender, mount }) => gender === 'male' && mount === metadata.mount);
+  const port = attachmentMountPort(part, metadata.mount);
   if (!port) {
     throw new Error(`Attachment ${metadata.id} has no male ${metadata.mount} connector`);
   }
