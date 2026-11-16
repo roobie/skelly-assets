@@ -1,15 +1,14 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { WavEncoder } from '@grame/faustwasm/dist/esm/index.js';
+import { encodeOgg } from '../../../ogg.mjs';
 import { drawValues, planBatch } from './explore.ts';
 import { compilePatch, loadCompiler, type Patch, renderPatch } from './faust.ts';
 import { type Levels, levelsOf, type ShapeSettings, shapeSound } from './shape.ts';
 
-export type ExploreSettings = ShapeSettings & { sampleRate: number; count: number };
+export type ExploreSettings = ShapeSettings & { sampleRate: number; count: number; oggQuality: number };
 export type Sound = { file: string; patch: string; seed: number; seconds: number; values: Record<string, number> };
 
 const SETTINGS_FILE = 'explore.json';
-const BIT_DEPTH = 16;
 
 /** Every `.dsp` in the folder is a patch, and every `.lib` a library they may import, so a new family is a file. */
 export async function readPatches(folder: string): Promise<Map<string, Patch>> {
@@ -33,7 +32,7 @@ export async function renderSound(patch: Patch, seed: number, settings: ExploreS
   return { values, rawLevels: levelsOf(raw), samples: shapeSound(raw, settings.sampleRate, settings) };
 }
 
-/** Renders the batch to `out` as WAV files, a manifest that can reproduce each one, and a level log. */
+/** Renders the batch to `out` as Ogg Vorbis files, a manifest that can reproduce each one, and a level log. */
 export async function exploreBatch(
   patches: Map<string, Patch>,
   settings: ExploreSettings,
@@ -48,9 +47,8 @@ export async function exploreBatch(
   for (const { patch: name, seed } of planBatch(names, options.firstSeed, options.count)) {
     const patch = patches.get(name) as Patch;
     const { values, rawLevels, samples } = await renderSound(patch, seed, settings);
-    const file = `${name}-${seed}.wav`;
-    const wav = WavEncoder.encode([samples], { bitDepth: BIT_DEPTH, sampleRate: settings.sampleRate });
-    writeFileSync(join(options.out, file), new Uint8Array(wav));
+    const file = `${name}-${seed}.ogg`;
+    writeFileSync(join(options.out, file), await encodeOgg(samples, { sampleRate: settings.sampleRate, quality: settings.oggQuality }));
     sounds.push({ file, patch: name, seed, seconds: samples.length / settings.sampleRate, values });
     log.push({ file, rawPeakDbfs: rawLevels.peakDbfs, ...levelsOf(samples) });
   }
