@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { exportPool, exportRecipes, fillCacheShard } from '../build.mjs';
 import { treeMismatches } from '../check-built.mjs';
 import { compileJsonnetFile } from '../jsonnet/index.mjs';
-import { outputPath } from '../layout.mjs';
+import { outputPath, smoothPack } from '../layout.mjs';
 import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
@@ -82,12 +82,15 @@ test('the tools left out of a run write nothing', async () => {
   });
 });
 
-test('an id build writes only the requested row, at its pack path, and no pack index', async () => {
+test('an id build writes only the requested row, at its pack path with its smooth copy, and no pack index', async () => {
   const packId = 'fixture.mixed';
   const item = itemRow();
   await withRoot(packId, [gunRow(), item], async (root, out) => {
     await exportRecipes({ root, out, tools: ['gun', 'thing'], ids: new Set([item.id]) });
-    const expected = [`things/${item.id}.model.json`, `assets/models/${item.id}.glb`].map((file) => outputPath(packId, file));
+    const expected = [
+      ...[`things/${item.id}.model.json`, `assets/models/${item.id}.glb`].map((file) => outputPath(packId, file)),
+      outputPath(smoothPack(packId), `assets/models/${item.id}.glb`),
+    ];
     assert.deepEqual(filesUnder(out), expected.sort());
   });
 });
@@ -192,7 +195,7 @@ test('a complete build keeps exactly the cache entries it used, and a rebuild re
     const recipe = JSON.stringify([gunRow(), rowOf(items[0])]);
     for (const extension of ['jsonnet', 'json']) writeFileSync(join(root, 'models/recipes', `fixture.kept.${extension}`), recipe);
     await build(root, join(out, 'second'), cache);
-    assert.equal(cacheEntries(cache), 4, 'the gun row and the one item row left, a GLB and a JSON file each');
+    assert.equal(cacheEntries(cache), 6, 'the gun row and the one item row left, a GLB, its smooth copy and a JSON file each');
     assert.deepEqual(await build(root, join(out, 'third'), cache), { reused: 2, generated: 0 });
   });
 });
