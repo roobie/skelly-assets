@@ -1,5 +1,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local part = h.part, port = h.port;
+// Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
+local fine = { voxelGrain: 0.002 };
 [
   {
     id: 'frag_grenade',
@@ -12,12 +14,12 @@ local part = h.part, port = h.port;
     connections: [],
     handling: { part: 'grenade', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     taxonomy: { category: 'weapons', tags: { weapon: ['explosive'], material: ['metal'], setting: ['modern'] } },
-  },
+  } + fine,
   // Burn-down mass belongs to the inventory row, so these export no part masses.
   {
     id: 'torch',
     title: 'Torch',
-    taxonomy: { category: 'lighting' },
+    taxonomy: { category: 'lighting', tags: { material: ['wood', 'fabric'] } },
     exportMass: 'inventory-atom',
     parts: [part('torch', 'torch', 0.350, { length: 0.42, shaftRadius: 0.014, headLength: 0.10, headRadius: 0.03 }, { shaft: 'wood-birch', head: 'cloth-charred' })],
     connections: [],
@@ -28,7 +30,7 @@ local part = h.part, port = h.port;
   {
     id: 'candle',
     title: 'Candle',
-    taxonomy: { category: 'lighting' },
+    taxonomy: { category: 'lighting', tags: { material: ['wax'] } },
     exportMass: 'inventory-atom',
     parts: [part('candle', 'candle', 0.150, { radius: 0.023, height: 0.10, wickRadius: 0.0012, wickHeight: 0.012 }, { body: 'wax-ivory', wick: 'cloth-charred' })],
     connections: [],
@@ -40,7 +42,7 @@ local part = h.part, port = h.port;
   {
     id: 'oil_lamp',
     title: 'Oil lamp',
-    taxonomy: { category: 'lighting' },
+    taxonomy: { category: 'lighting', tags: { material: ['glass', 'metal'] } },
     exportMass: 'parts',
     parts: [
       part('base', 'cylinder', 0.400, { radius: 0.052, height: 0.012 }, { body: 'steel-grey' }, [port('reservoir', 'female', [0, 0.012, 0], [0, 1, 0])]),

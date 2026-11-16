@@ -7,6 +7,241 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.8.0 - 2026-11-16
+
+### Breaking
+
+- The animal control van's cage hatches open: each is a part of its own, hung on drawn round pins at its leading edge as
+  the cab doors are, so the wind shuts one left unlatched, and its vent grille and latch swing with it. An open hatch
+  shows its cage's barred gate, which now faces the hatch. Its side door is hung rather than sliding, because an open
+  hatch stands in the sliding door's path. Every van's hung side door, the food truck's and the ice cream van's too, now
+  stands its leading edge off the frame, so it no longer rubs the wall ahead as it swings.
+- The armoured vehicles' ramps, doors and hatches now export a hinge motion on drawn round pins in place of their hinge
+  anchors, so the showcase's Open view swings them and a game plays the swing the build proved clear; the ramps lower
+  until their lips rest on the ground. The APC hatch and the turret hatches, which had no hinge before, open too. The
+  CV9040's and the main battle tank's driver's hatches are rows of their own that swing aside level, as a tank's does,
+  since the gun and the turret's front leave a raised lid no room, their lids a little thinner than the turret ring is
+  high so the turret clears them, and their hinge pins stand in the post behind the periscopes. The APC's tow hitch sits
+  lower, under the sill, so the lowered ramp clears it. The frames facing a door's free edge stand a few millimetres off
+  it, so the door's inner corner clears them as it starts to swing: the half-track's bay sides at the cab doors and its
+  rear jamb, the CV9040's rear post and sponson end, and the sci-fi APC's rear lintel, tail bevel and side jamb. The
+  sci-fi APC's side doorway is 1 cm longer.
+- The airport crash tender drives its front axle, `drive_axle_wide` in place of `steered_axle_wide`, through new parts
+  `airport_crash_tender_transfer_case`, `airport_crash_tender_front_shaft` and `airport_crash_tender_rear_shaft`. It rides
+  higher on lugged tyres, its engine's manifolds sit between its frame rails, and its engine is fitted as an assembly
+  whose air box hangs under the near rail at its own `low_air_box` site.
+- Every bus door leaf now folds in two: a jamb panel that turns out of the doorway and a free panel that rides it,
+  each exporting a hinge motion in place of the leaf's hinge anchors. A panel's origin lies on its hinge pins, not at its
+  centre, it is drawn on a finer grain than its vehicle, and its leaf stops clear of the other leaf of its doorway at
+  every step of the fold. The prison bus's door bars ride the panels.
+- The helicopters' hinged doors now export a hinge motion on drawn round pins in place of their hinge anchors, so the
+  showcase's Open view swings them and a game plays the same swing the build proved clear. A side door's free edge rakes
+  toward its hinge as the wall curves in, so that edge is cut to swing off the post it shuts against, and the post draws a lip that closes on it.
+  The heavy cargo helicopter's crew door hangs just ahead of the cockpit bulkhead; its rear ramp is
+  narrower, so it swings inside the tail, and is drawn raised shut, lowering onto the ground as it opens; and its load
+  floor stops short of the ramp's knuckle. The air ambulance's clamshell doors stand just aft of the cabin's rear end.
+  Seats give the doors room: the backs of `helicopter_seat` and the police helicopter's rear bench are narrower, and the
+  news helicopter's front seats sit further inboard.
+- The airport crash tender's and rescue truck's locker kit, and the rescue truck's rear compartment kit, are catalogue
+  items in stowage slots, as on the fire engine; new fire, rescue and generic items fill them, and the chainsaw,
+  cut-off saw and pike pole can be stowed. Only kit that only fire and rescue crews carry has the `firefighting` keyword.
+- Roller shutters open onto stowed kit: each fire engine, rescue truck and airport crash tender locker holds its own
+  stowage part, the rescue truck's rear shutter opens onto shelved kit, the cube van carries removal kit on its walls
+  and the step van parcel shelves. The fire engine's lockers are deeper, and its body's rear wall is a part of its own.
+- The bulldozer's and excavator's cab doors, the technical's doors and the utility 4x4's front and rear doors now export
+  a hinge motion on drawn pins in place of their hinge anchors, so the showcase's Open view swings them and a game plays
+  the same swing the build proved clear. Each door's free edge, the one away from its pins, stands off the body by the gap
+  its swing needs, closed by a jamb on the body. The excavator's door now closes above the cab floor rather than over its
+  edge. The technical's quarter light straddles its door's pin line, so the part ahead of the pins would swing into the
+  windscreen; it is fixed glass on its windows. The utility 4x4's front doors hang on leaves out to the wing's face. The
+  machine steps and the quad bike's footboard stay put and no longer carry hinge anchors.
+- Vehicle roller shutters open by rolling up into their heads: the cube and step van rear doors, the rescue truck's
+  rear shutter, and each fire engine and airport crash tender locker shutter, now a part of its own.
+- The boss mob is exported as `mech_walker_mob_1` in the new pack `skelly.bestiary.mech`, with `standing.idle`, `standing.walk` (its stomp) and `standing.attack` (its twin-pod fire), and no far-LOD or limping sets. The security walker vehicle's id changes from `security_walker` to `mech_walker_vehicle_1`.
+- Boots and shoes stand the wearer on their soles: each worn foot piece's sole lies under the bare foot instead of round
+  it, so the piece reaches a sole's depth below the bare sole, and the model declares that depth as `soleLift`, in
+  metres, in its model entry and the manifest. The fitted boots' uppers keep their fit, so their ground models stand a
+  sole taller. The wheeled skates and heel-wheel sneakers declare the lift of their wheels and soles too.
+- A fire engine's locker kit is catalogue items in stowage slots, so a game can loot it or stow more: a placements
+  site's new `stowed` names the item in each slot of its part, and its new `behind` names the closure that hides it.
+- The opening parts of the cars built from the shared car body now swing clear: their bonnets, tailgates and boot lids
+  hinge on their top edges, boot lids are narrower to fit inside their opening, the front door glass ends short of the
+  B-pillar, and parts on a door, lid or tailgate ride it: the SUV and classic 4x4 spare wheel, the hybrid badges, the
+  sports car spoiler, the SUV and electric crossover rear arch flares, now split at the door, and the limousine, luxury
+  saloon and taxi trims, now one model per door.
+- The pickups', trucks' and hearse's tailgates and the light truck's dropsides now export a hinge motion on drawn round
+  pins in place of their hinge anchors, so the showcase's Open view swings them and a game plays the swing the build
+  proved clear; the bed gates drop level with the deck, and the technical's tail lamps ride its tailgate.
+- The cab doors of the vans built on the shared van body now export a hinge motion in place of their hinge anchors, as
+  the car doors do, so the showcase's Open view swings them and a game plays the same swing the build proved clear of the
+  wing. The security van's quarter-light plate is a part of its own, `security_van_quarter_plate`, since it stays shut
+  when the door opens; the riot and security vans' door grilles, door markings and cab plates ride the door.
+- The vans' rear doors and hinged side doors, and the trucks' cab doors, crew doors and box rear doors, export a hinge
+  motion on drawn round pins in place of their hinge anchors, and the vans' bonnets open, so the showcase's Open view
+  swings them as a game will. None touches the body as it opens: each edge stands a swing gap off the sill and roof it
+  slides across, and each trailing edge stands off the post behind it by a tail gap wide enough for its inner corner to
+  circle the pins clear. A lip inside the post behind each hinged cab door and van side door keeps that
+  gap from showing through the body. The rear doors open square to the body, and kit on an opening part rides it.
+
+### Upgrading from 0.7.0
+
+- Place `animal_control_van_hatch` at each `hatch<n>_near` and `hatch<n>_far` site in place of
+  `animal_control_van_hatches`, and open it by playing its `motion`. `renames.json` maps the retired id to it.
+- Open `animal_control_van_side_door` by playing its hinge `motion`, which no longer slides.
+- Open `apc_ramp`, `apc_hatch`, `apc_scifi_wheeled_ramp`, `apc_scifi_wheeled_side_door`, `cv9040_rear_door`,
+  `half_track_windscreen_armour`, `half_track_cab_door` and `half_track_rear_door` by playing their `motion`, not by
+  swinging them on `hinge_a` and `hinge_b`.
+- Open `turret_hatch`, `ifv_turret_hatch`, `mbt_turret_hatch`, `cv9040_driver_hatch` and `mbt_driver_hatch` by
+  playing their `motion`.
+- Fit `cv9040_driver_hatch` and `mbt_driver_hatch` at those vehicles' `driver_hatch` sites in place of `apc_hatch`,
+  as the vehicles' placements do.
+- Apply `renames.json`; `steered_axle_wide` maps to `drive_axle_wide`.
+- In place of each `<bus>_door`, `<bus>_door_fwd` and `<bus>_door_aft`, place its `_jamb` and `_free` panels, the free
+  panel riding the jamb panel, as the vehicles' placements do; `models/renames.json` maps each old id to its jamb panel.
+- Place `prison_bus_door_bars` once on each prison bus door panel, riding it.
+- Open each of these by playing its `motion`, not by swinging it on `hinge_a` and `hinge_b`: `light_helicopter_door`,
+  `air_ambulance_front_door`, `air_ambulance_clamshell_door`, `heavy_cargo_helicopter_crew_door`,
+  `heavy_cargo_helicopter_ramp`, `military_transport_helicopter_cockpit_door`, and the front and rear doors of the
+  news and police helicopters.
+- Expect `heavy_cargo_helicopter_ramp` shut at rest; play its motion to lower it.
+- Load `skelly.melee` with `skelly.ground-vehicles`, which now depends on it for the crash tender's pike pole.
+- For each crash tender and rescue truck site with `stowed`, place each named item in its slot as for the fire engine;
+  their stowage parts no longer draw the kit.
+- Place `fire_engine_rear_wall` wherever you place `fire_engine_body` on a fire engine, but not on a rescue truck,
+  whose rear shutter opens where it stood.
+- Place the new stowage parts as the vehicles' placements do: `<vehicle>_locker_stowage_<locker>` on both sides of
+  the fire engine, rescue truck and crash tender, and `step_van_parcel_shelves` on both sides of the step van; place
+  `rescue_truck_rear_stowage` and `cube_van_removal_stowage` once each.
+- Open `bulldozer_cab_door`, `excavator_cab_door`, `technical_door`, `utility_4x4_front_door` and
+  `utility_4x4_rear_door` by playing their `motion`, not by swinging them on `hinge_a` and `hinge_b`.
+- Treat `beach_buggy_step`, `forklift_step`, `golf_cart_step`, `quad_bike_footboard`, `road_roller_step` and
+  `trencher_step` as fixed parts.
+- Have the technical's mirrors ride `door`, as its placements do.
+- Draw the technical's quarter light from `technical_windows`, not `technical_door`.
+- Open `cube_van_rear_door` and `step_van_rear_door` by playing their `motion`, not by swinging them on `hinge_a` and
+  `hinge_b`, which they no longer carry. Hide whatever a stowing slide carries past its `stow` offset.
+- Place `fire_engine_locker_shutter_<fore|mid|wheel|aft>` on both sides in place of `fire_engine_lockers`, and
+  `airport_crash_tender_locker_shutter_<fore|mid|wheel_fore|wheel_aft|aft>` in place of
+  `airport_crash_tender_lockers`, as the vehicles' placements do. `renames.json` maps each retired id to its fore
+  shutter, so a saved reference still resolves to one of its parts.
+- Place `rescue_truck_rear_shutter_frame` wherever you place `rescue_truck_rear_shutter`.
+- Place `mech_walker_vehicle_1` wherever you placed the vehicle `security_walker`, and update any reference to it, such as an item-materials entry. Its parts keep their ids.
+- Name the mob `mech_walker_mob_1`.
+- Stand a figure higher by the largest `soleLift` among the models it wears, and raise its eyes with it; a barefoot
+  figure, or one wearing nothing that declares a lift, stands as before.
+- Load the packs `skelly.ground-vehicles` now depends on with it.
+- For each fire engine site with `stowed`, place each named item in its slot, its seat mated to the slot as ports
+  mate, and never mirror an item on a mirrored site; see `docs/decisions/0017-stowage-slots.md`.
+- Read `behind` on a site, or ignore it to draw stowed kit whatever the shutter.
+- Place the new rider models where the placements export puts them: `suv_rear_door_flare`,
+  `electric_crossover_rear_door_cladding`, `limousine_rear_door_brightwork`, `luxury_saloon_rear_door_brightwork`
+  and `taxi_rear_door_band`, and give the rear door models the same materials as their front door ones.
+- Open `crew_pickup_bed_tailgate`, `light_4x4_truck_tailgate`, `light_4x4_truck_dropside`,
+  `military_cargo_truck_tailgate`, `technical_tailgate` and `hearse_tailgate` by playing their `motion`, not by swinging
+  them on `hinge_a` and `hinge_b`.
+- The technical's panel below its tailgate now belongs to `technical_bed`, so the gate is shorter and lighter.
+- The hearse's tailgate lifts on pins under a brow on `hearse_coach`, behind the shell roof, and carries the arms that
+  reach back to them.
+- Open each `<van>_front_door` by playing its `motion`, not by swinging it on `hinge_a` and `hinge_b`.
+- Place `security_van_quarter_plate` once on each side, beside `security_van_cab_plate`, and have the door grilles,
+  door markings and cab plates ride `front_door`, as the vehicles' placements do.
+- Open each of these by playing its `motion`, not by swinging it on `hinge_a` and `hinge_b`: `<van>_rear_door`,
+  `food_truck_side_door`, `ice_cream_van_side_door`, `<truck>_door`, `<truck>_crew_door` and `box_truck_rear_door`.
+- Open `panel_van_bonnet` and `step_van_bonnet` by playing their `motion`.
+- Have `animal_control_van_rear_hatches`, `ambulance_rear_markings`, `prisoner_van_rear_bars`, `riot_van_rear_grille`,
+  `riot_van_rear_markings` and `security_van_rear_door_bars` ride `rear_door`, and `swat_truck_door_guard` ride `door`,
+  as the vehicles' placements do.
+- `fire_engine_cab_stripe` and `airport_crash_tender_cab_stripe` hold only the stripe between and ahead of the doors;
+  place `<truck>_door_stripe` riding `door` and `<truck>_crew_door_stripe` riding `crew_door` for the rest, as the
+  vehicles' placements do.
+
+### Added
+
+- The bulldozer's blade has a tilt cylinder, `bulldozer_tilt_cylinder`, on its near push arm and a pitch brace,
+  `bulldozer_tilt_brace`, on its far one. It now carries its own engine, `engine_i6_off_highway_diesel`, in place of
+  `engine_i6_heavy_diesel`, fitted as a core with salvageable plant accessories (`alternator_plant`,
+  `starter_motor_plant`, `air_box_plant`, `fuel_pump_plant`, `drive_belt_plant`), and its truck radiator is fitted with
+  its fan and hoses.
+- The doll wields melee: unarmed, one-hand and two-hand stances and strikes, baked as clips in
+  `skelly.body/motions/doll.melee.json` with the rig their frames turn, which the manifest's new `motions` lists. Each
+  strike names its phases and the moment it hits, and a weapon class's clips name where the weapon sits in the hand.
+- Impact sounds: `skelly.audio.impact` carries a 9 mm brass case landing on concrete, metal, wood and dirt, each as
+  a few Ogg Vorbis takes with its synth row as data. The manifest's new `sounds` lists each with the object and
+  surface it is the sound of, so a game picks the takes by the surface an object lands on.
+- A short military transport helicopter, `short_military_transport_helicopter`, in the aircraft pack: no cockpit doors, so
+  the crew board through the cabin, and a 1.7 m shorter cabin and hull on a longer tail boom.
+- The showcase's model page has an Open view for every vehicle with parts that move. It puts each door, lid and shutter
+  at its open stop, riders following their carriers, and hides what a stowing slide has taken in, as the swing check
+  does. The view is kept in the page's link.
+- A part's motion can stow: a slide stage may carry `stow`, an offset along its direction past which what the part
+  shows is hidden, so a shutter can rise into its head. A placement site may name the site it `rides`, the carrier
+  that poses it before its own motion.
+- The build checks that every vehicle part that opens swings clear of the other parts and the ground, and each moving
+  site's placements export gains `swing`, how much of its way it opens before it first touches something and what that is.
+  A roller shutter is checked only where it shows, not where it rolls into its head.
+- The vehicle authoring tool has a Vehicles view that shows each moving part's swing verdict from the build's check, and a
+  Solve button that proposes a hinge-line move or a shorter stop for a part that swings into something. It needs the tool's
+  dev server and writes nothing.
+
+### Changed
+
+- `rifle_anti_materiel` now ships with iron sights: a fixed post on its barrel shroud and a removable one-piece peep
+  rear sight, attachment `rail-peep-rear-sight`, on its receiver rail. A scope fits that rail once the rear sight
+  comes off.
+- The armoured vehicles' roof hatches have round lids over round holes, so an open hatch shows a way into the hull or
+  turret, and the hull roof is open inside the turret ring.
+- Every folding bus door hides the gap its leaves leave at rest behind a black rubber edge strip on one free panel,
+  lapping the other leaf of a pair or the pillar of a single leaf, and the strip folds clear with the door.
+- The vehicle gallery, the gun viewer lists and the press check clip order their names by character code, so they no longer vary with the host locale. A new test refuses locale ordering in the tools and site.
+- The tracked infantry fighting vehicle's rear roof has one wide rectangular troop hatch, `cv9040_troop_hatch` at site
+  `troop_hatch`, over a matching hole, in place of the pair of round APC hatches at `troop_hatch_near` and `troop_hatch_far`.
+- Every petrol car now fits its four, V6 or V8 as a core with salvageable light accessories (`alternator_light`,
+  `starter_motor_light`, `air_box_light`, `fuel_pump_light`, `drive_belt_light`) in place of the bare fused engine. The
+  V6 and V8 are drawn as vees, with the air box standing in the valley between the banks. The armed pickup carries a new
+  light truck's four, `engine_i4_petrol_medium`, with medium accessories, in place of `engine_i4_petrol`. The fused
+  `engine_v6_petrol` and `engine_v8_petrol` models look different too: the engine kit draws them, with the light
+  accessories and the kit's finishes. `air_box_light` is smaller and lighter and stands lower beside the block, so it
+  fits under a narrow bonnet; every fused light engine that draws it changes with it. The sports car's floor behind its
+  seats is open over its engine and gearbox, which now stand lower in that bay.
+- The military transport helicopter's doors open as they do on medium utility helicopters: each cabin door slides aft
+  along its sill rail, clear of the engines above it, and leaves the cockpit door free to swing out on pins at its front
+  edge. The cabin runs on at full section behind the cabin door for the door to slide its whole length clear of the
+  doorway, so the fuselage and its tail are 1.7 m longer.
+- Every separate iron sight part keeps a smooth mesh in the voxel model, as cartridges already did, so posts, notches
+  and holes read cleanly at the eye. That covers the loose parts `front_sight_ak`, `front_sight_ar`,
+  `front_sight_sporter`, `rear_sight_sporter`, `front_bead` and `rear_sight_ak`, the attachments `rail_front_sight`,
+  `rail_rear_sight` and `rail_peep_rear_sight`, and the same sights fitted to a gun. Each sits slightly into the part it
+  mounts on, a loose attachment too once fitted, and the attachments now take the gun grain. Sights built into another
+  part, such as a pistol slide or a revolver frame, stay voxelized. The eyes and directions of guns sighted by a
+  separate sight part move to the authored sight line; built-in sights keep theirs.
+  
+  `rail_rear_sight` is now one solid frame round its square hole, so the smooth mesh shows no joins at its corners. The
+  AK rear notch is wider, so light shows either side of the front post however far the eye sits behind it.
+- Van sliding side doors, the air ambulance's sliding doors and the military transport helicopter's cabin doors now
+  export a staged motion, a slide out and then a slide along, in place of their hinge anchors. What a van carries on its
+  side door rides it, and the security van's side door keeps only its lock bar, `security_van_side_door_lock_bar`, in
+  place of the bars with hinge straps. The air ambulance's door rolls back to the cabin's rear end. The ice cream van and
+  the food truck keep a side door that does not slide, because their serving counters stand in its path.
+
+### Fixed
+
+- The trucks' leaf springs are now drawn on both sides and sit on their axles' seats clear of the crossmembers and the
+  rear underrun. On the trucks built on the shared truck chassis, no crossmember passes through an engine or gearbox. The
+  conventional box truck's and SWAT truck's radiators stand as far forward as their front crossmembers let them. The
+  hybrid refuse truck's motor stands behind the crossmember behind its gearbox, which leaves room for the smaller
+  `traction_pack_car` in place of `traction_pack_van`.
+- Fabric grain's slow mottle no longer stripes a stepped garment, such as the wizard robe's skirt, at mid distance, and
+  the thing and gun authoring tools draw a fabric finish's grain beside its sheen. The shader moved to
+  `tools/fabric.mjs`; a game that ported it ports the mottle's change too (`tools/fabric.mjs`, `wearFabric`).
+- A build after a change to `models/finishes.jsonnet` writes the new colours into the manifest's `finishes` on the first
+  run, where it used to write the previous build's until a second build.
+- `riot_helmet` and `baseball_cap` are sized from the player bust's head instead of by hand, so they no longer stand
+  loose round it; `riot_helmet` is about 26 mm lower at the crown, clears the hair and carries a `brow` anchor.
+  `tank_crew_helmet` covers the hair and its headset lead hangs at the nape instead of jutting out back.
+- The road roller's radiator stands ahead of its engine inside the hood, so its hoses run to the engine instead of
+  out through the hood's rear panel.
+- The vans' cab doors, bonnet and rear doors no longer touch their frames, lamps or neighbouring panels when shut or swinging.
+
 ## 0.7.0 - 2026-11-14
 
 ### Breaking

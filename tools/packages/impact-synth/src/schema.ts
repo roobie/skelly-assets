@@ -12,6 +12,7 @@ import {
   parse,
   pipe,
   record,
+  regex,
   strictObject,
   string,
   array,
@@ -26,6 +27,10 @@ const Seconds = pipe(Positive, maxValue(10));
 
 const Rate = pipe(Positive, maxValue(200));
 const Scale = pipe(Positive, maxValue(10));
+
+/** Lower-case words joined by underscores, so an id is also a file name in every pack. */
+const Id = pipe(string(), regex(/^[a-z0-9]+(?:_[a-z0-9]+)*$/, 'must be lower-case words joined by underscores'));
+const Seed = pipe(number(), integer(), minValue(0), maxValue(0xffffffff));
 
 const ordered = <T extends Record<string, number>>(low: keyof T & string, high: keyof T & string) =>
   check<T, string>((range) => range[low]! <= range[high]!, `${low} must not exceed ${high}`);
@@ -64,6 +69,7 @@ const TickSchema = pipe(
 );
 
 const ObjectSchema = strictObject({
+  id: Id,
   contactGain: NonNegative,
   ringGain: NonNegative,
   hardness: Fraction,
@@ -75,6 +81,7 @@ const ObjectSchema = strictObject({
 });
 
 const SurfaceSchema = strictObject({
+  id: Id,
   decayScale: Scale,
   contactGain: NonNegative,
   hardness: Fraction,
@@ -158,8 +165,17 @@ const MixSchema = strictObject({
   endFadeSeconds: pipe(Positive, maxValue(1)),
 });
 
-/** One dropped object on one surface: every setting `renderImpact` reads. */
+/**
+ * One dropped object on one surface: every setting `renderImpact` reads, and the seeds that are the row's variants,
+ * which a build bakes and a live render picks among, so both play the same takes.
+ */
 export const ImpactRowSchema = strictObject({
+  seeds: pipe(
+    array(Seed),
+    minLength(1),
+    maxLength(16),
+    check((seeds) => new Set(seeds).size === seeds.length, 'must not repeat a seed'),
+  ),
   object: ObjectSchema,
   surface: SurfaceSchema,
   strike: StrikeSchema,
@@ -169,10 +185,16 @@ export const ImpactRowSchema = strictObject({
 });
 export type ImpactRow = InferOutput<typeof ImpactRowSchema>;
 
-/** The impact rows by id. */
+const pairOf = ({ object, surface }: ImpactRow) => `${object.id} on ${surface.id}`;
+
+/** The impact rows of one pack by id; the landing surface picks the row, so one object has one row per surface. */
 export const ImpactRowsSchema = pipe(
-  record(pipe(string(), minLength(1)), ImpactRowSchema),
+  record(Id, ImpactRowSchema),
   check((rows) => Object.keys(rows).length > 0, 'needs at least one row'),
+  check((rows) => {
+    const pairs = Object.values(rows).map(pairOf);
+    return new Set(pairs).size === pairs.length;
+  }, 'must not give one object on one surface two rows'),
 );
 
 /** Throws, naming the field, when a row's settings are out of range. */

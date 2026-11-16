@@ -1,6 +1,7 @@
 // manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names, label, what a worn
 // shell covers and how far footwear lifts the foot, the authored mass and drawn volume of a model whose tool authors them, and credits, every vehicle's
-// placements file and tags (tools/placements.mjs), and every pack's dependencies (tools/packs.mjs) and produced files,
+// placements file and tags (tools/placements.mjs), every sound row's data and baked files (tools/sounds.mjs), and every
+// pack's dependencies (tools/packs.mjs) and produced files,
 // every retired model id mapped to its current one (models/renames.json), and the finish library a vehicle site names
 // its paint from. tools/build.mjs writes it; tools/check-built.mjs holds every fresh build to it.
 // Credits come from REUSE.toml: the last annotation whose path matches the file names its author and licence.
@@ -99,14 +100,21 @@ export function mobManifest(rows) {
   return { models, files };
 }
 
+// Every sound row is its row as data and one audio file per seed, all baked at the one sample rate.
+export function soundManifest(rows, sampleRate) {
+  const sounds = rows.map(({ id, pack, row, data, variants }) => ({ id, pack, object: row.object.id, surface: row.surface.id, sampleRate, row: data, variants }));
+  const files = rows.flatMap(({ pack, data, variants }) => [outputPath(pack, data), ...variants.map(({ path }) => outputPath(pack, path))]);
+  return { sounds, files };
+}
+
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 // models: { id, kind, pack, path, title, taxonomy?, nodes?, label?, covers?, soleLift?, clips?, massKg?, volumeM3? },
 // paths logical under the pack; vehicles: { id, title, pack, path, tags } of each vehicle's placements; motions: { id,
 // pack, path, rig } of each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as
 // <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id; finishes:
-// finish id -> its glTF material.
-export function buildManifest({ models, vehicles = [], motions = [], dependsOn = {}, files, credit, renames = {}, finishes = {} }) {
+// finish id -> its glTF material; sounds: as soundManifest gives them.
+export function buildManifest({ models, vehicles = [], motions = [], sounds = [], dependsOn = {}, files, credit, renames = {}, finishes = {} }) {
   const packs = {};
   for (const file of [...new Set(files)].sort(byText)) {
     const [pack, ...rest] = file.split('/');
@@ -155,14 +163,23 @@ export function buildManifest({ models, vehicles = [], motions = [], dependsOn =
     for (const file of [path, rig]) if (!known.has(outputPath(pack, file))) throw new Error(`motions ${id}: ${outputPath(pack, file)} is not a produced file`);
     return { id, pack, path, rig };
   });
+  const soundIds = new Set();
+  const soundEntries = [...sounds].sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id)).map((sound) => {
+    const paths = [sound.row, ...sound.variants.map(({ path }) => path)];
+    for (const path of paths) if (!known.has(outputPath(sound.pack, path))) throw new Error(`sound ${sound.id}: ${outputPath(sound.pack, path)} is not a produced file`);
+    if (soundIds.has(`${sound.pack}/${sound.id}`)) throw new Error(`sound ${sound.id}: two sounds of one id in ${sound.pack}`);
+    soundIds.add(`${sound.pack}/${sound.id}`);
+    return { ...sound, credits: credit(`built/${outputPath(sound.pack, sound.row)}`) };
+  });
   const stale = renameProblems(renames, models);
   if (stale.length) throw new Error(`${RENAMES}: ${stale.join('; ')}`);
   return {
-    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model\'s authored mass, the sum of its parts\'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. covers: on a worn shell, the doll parts, or pieces of the part it is drawn on (a GLB primitive\'s extras.piece), that a consumer stops drawing while it is worn, so skin under the shell never shows through. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle\'s title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body\'s tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips\' frames turn and the site of each model on them. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.',
+    _doc: 'Every model the built tree holds, every vehicle\'s placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model\'s shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model\'s authored mass, the sum of its parts\'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. covers: on a worn shell, the doll parts, or pieces of the part it is drawn on (a GLB primitive\'s extras.piece), that a consumer stops drawing while it is worn, so skin under the shell never shows through. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle\'s title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body\'s tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips\' frames turn and the site of each model on them. sounds: each sound row, the object and surface it is the sound of, so a consumer picks it by the surface an object lands on, its row as data, which the impact synth renders to the same samples at the same sample rate, and one Ogg Vorbis file per seed, a take of it baked at that rate. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.',
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
     vehicles: vehicleEntries,
     motions: motionEntries,
+    sounds: soundEntries,
     renames: Object.fromEntries(Object.entries(renames).sort(([a], [b]) => byText(a, b))),
     finishes: Object.fromEntries(Object.entries(finishes).sort(([a], [b]) => byText(a, b))),
   };
@@ -180,16 +197,16 @@ export function manifestFiles(manifest) {
 
 // How a fresh tree departs from its manifest and the declared packs (layout.mjs, declaredPacks): nothing flat but the
 // manifest, the manifest names exactly the produced files, every directory is a declared pack, and every declared pack
-// has a model, so a pack whose rows the production build skips is caught. files: the tree's files under built/.
+// has a model or a sound, so a pack whose rows the production build skips is caught. files: the tree's files under built/.
 export function treeDifferences({ files, manifest, declared }) {
   const produced = new Set(files);
   const named = manifestFiles(manifest);
-  const modelled = new Set(manifest.models.map((model) => model.pack));
+  const modelled = new Set([...manifest.models, ...manifest.sounds].map((entry) => entry.pack));
   return [
     ...files.filter((file) => file.split('/').length === 2 && file !== `built/${MANIFEST}`).map((file) => `flat under built/: ${file}`),
     ...files.filter((file) => !named.has(file)).map((file) => `produced, not in the manifest: ${file}`),
     ...[...named].filter((file) => !produced.has(file)).map((file) => `in the manifest, not produced: ${file}`),
     ...undeclaredDirectories(files, declared).map((directory) => `undeclared directory: ${directory}`),
-    ...[...declared].filter((pack) => !modelled.has(pack)).map((pack) => `declared pack without a model: ${pack}`),
+    ...[...declared].filter((pack) => !modelled.has(pack)).map((pack) => `declared pack without a model or sound: ${pack}`),
   ].sort(byText);
 }
