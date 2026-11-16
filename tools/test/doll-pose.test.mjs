@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, test } from 'node:test';
-import { clearanceProbe, COINCIDENT, coveredSurface, PITCH, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
+import { COINCIDENT, coveredSurface, PITCH, posedSolid, restClearance, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { hides } from '../../site/hiding.mjs';
@@ -69,7 +69,6 @@ const rest = restIn(WEAR);
 const { meshOf: itemMesh, entryOf: thingOf } = heldItems(built, manifest);
 const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
-const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
@@ -97,7 +96,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
   const jacket = { body: rest.body, pieces };
   const surface = coveredSurface(rig, jacket);
   assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), 'the boxes cover the body');
-  assert.deepEqual(counted(clearanceProbe(rig, jacket, surface)(still)), CLEAN);
+  assert.deepEqual(counted(restClearance(rig, jacket, surface)), CLEAN);
 });
 
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
@@ -118,7 +117,7 @@ test('upper sleeves narrowed inside their arms let the upper arms poke through',
   };
   const pieces = rest.pieces.map((piece) => (piece.piece === `${WEAR}_worn_upper` ? { ...piece, mesh: narrowed(piece) } : piece));
   assert.ok(pieces.some((piece, i) => piece !== rest.pieces[i]), 'the jacket has upper sleeves to narrow');
-  const { pokes } = clearanceProbe(rig, { ...rest, pieces })(still);
+  const { pokes } = restClearance(rig, { ...rest, pieces });
   assert.ok(pokes.some(({ bone }) => bone.startsWith('upperArm.')), 'an upper arm shows through');
 });
 
