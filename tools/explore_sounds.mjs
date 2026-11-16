@@ -1,5 +1,5 @@
 // Renders a batch of random sounds from the Faust patches, for a listener to audition and name uses for.
-// Usage: node tools/explore_sounds.mjs --out <dir> [--seed 1] [--count N] [--patch bone --patch hiss ...]
+// Usage: node tools/explore_sounds.mjs --out <dir> [--seed 1] [--count N] [--patch glass --patch hiss ...]
 import { join } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
