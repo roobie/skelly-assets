@@ -333,7 +333,8 @@ local pressings(id, title, s) = {
       box('lamp_surround_inner', 'trim', [face, lampY, lampZ - 0.25], [face + 0.03125, lampY + 0.22, lampZ - 0.17]),
       box('lamp_surround_outer', 'trim', [face, lampY, lampZ + 0.17], [face + 0.03125, lampY + 0.22, lampZ + 0.25]),
     ]), finish),
-    bumper('_front_bumper', 'front bumper', s.front - 0.04, s.front + 0.07, 40),
+    // Stands on the front panel's face, not through it.
+    bumper('_front_bumper', 'front bumper', face, s.front + 0.07, 40),
   ],
   // A bonnet stands on the cowl and carries its own wings, because the wheel it clears sits ahead of the body.
   local bon = std.get(s, 'bonnet', null),
@@ -365,7 +366,8 @@ local pressings(id, title, s) = {
   ],
   local driver = s.driver,
   local rearRows = [
-    bumper('_rear_bumper', 'rear bumper', s.rear - 0.07, s.rear + 0.03, 35),
+    // A rear engine's hatch closes the body's end down to the bumper, which stands on the hatch's face.
+    bumper('_rear_bumper', 'rear bumper', s.rear - 0.07, if has(s, 'engineHatch') then s.rear - 0.02 else s.rear + 0.03, 35),
   ] + (if rearGlazed(s) then [
          part('_rear_window', 'rear window', 12 * std.length(rearGlass(s)) + (if flank == null then 0 else 12), [
            box('glass_' + i, 'glass', [s.rear + 0.02, rearGlass(s)[i].y[0], -rearGlass(s)[i].z], [s.rear + 0.06, rearGlass(s)[i].y[1], rearGlass(s)[i].z])
