@@ -61,7 +61,8 @@ function load(model) {
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
     cache.set(entry.id, (async () => {
-      const parts = await Promise.all(entry.sites.map((site) => load(modelsById.get(site.model))));
+      const drawn = (model) => (entry.smoothSites ? smoothEntry(model) : model);
+      const parts = await Promise.all(entry.sites.map((site) => load(drawn(modelsById.get(site.model)))));
       const scene = new THREE.Group();
       const materials = new Map();
       let triangles = 0;
@@ -203,6 +204,11 @@ export const loadEntry = (entry) => (isVehicle(entry) ? loadSites(entry) : load(
 // A wearable's worn view: the doll wearing it (models.json's `worn`, from tools/dress.mjs), drawn as sites.
 export const isWearable = (entry) => Boolean(entry.worn);
 export const wornEntry = (entry) => ({ id: `${entry.id} worn`, sites: entry.worn });
+// An entry drawn smooth rather than in voxels (docs/decisions/0020-smooth-copy.md): a model as its own smooth copy
+// (models.json's `smooth`), and a vehicle or a worn view as every site's model's copy, so one is never shown half
+// smooth. Mobs and severed parts have no copy.
+export const hasSmooth = (entry) => (isVehicle(entry) ? entry.sites.every(({ model }) => Boolean(modelsById.get(model)?.smooth)) : Boolean(entry.smooth));
+export const smoothEntry = (entry) => ({ ...entry, id: `${entry.id} smooth`, ...(isVehicle(entry) ? { smoothSites: true } : entry.smooth) });
 // What the loose view of a wearable is called: folded when it lies folded.
 export const looseName = (entry) => (entry.tags?.state?.includes('folded') ? 'Folded' : 'Loose');
 

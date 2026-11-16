@@ -15,7 +15,9 @@ registerHooks({
   },
 });
 const THREE = await import('three');
-const { explodable, movers, siteNode, spread, swing } = await import('../../site/render.mjs');
+const { explodable, hasSmooth, movers, registerModels, siteNode, smoothEntry, spread, swing, wornEntry } = await import(
+  '../../site/render.mjs'
+);
 
 const door = [{ kind: 'hinge', axis: { from: [1, 0, 0], to: [1, 1, 0] }, angle: 90, share: 1 }];
 const placed = (name, at) => {
@@ -43,4 +45,35 @@ test('a part that opens still comes apart in the exploded view, whatever its pos
     assert.ok(moved.length() > 0.01, `the door stays put when exploded at clock ${clock}`);
     assert.ok(moved.distanceTo(parts[1].offset) < 1e-9);
   }
+});
+
+test('a model, a vehicle or a worn view is drawn smooth only when everything it shows has a smooth copy', () => {
+  const copy = (id) => ({ file: `pack.smooth/${id}.glb`, bytes: 10 });
+  const panel = { id: 'panel', file: 'pack/panel.glb', bytes: 30, smooth: copy('panel') };
+  const doll = { id: 'doll', file: 'pack/doll.glb', bytes: 40, smooth: copy('doll') };
+  const mob = { id: 'mob', file: 'mobs/mob.glb', bytes: 50 };
+  registerModels([panel, doll, mob]);
+  const smooth = smoothEntry(panel);
+  assert.deepEqual([smooth.file, smooth.bytes], [panel.smooth.file, panel.smooth.bytes]);
+  assert.notEqual(smooth.id, panel.id, 'the smooth copy would share the voxel file in the load cache');
+  assert.ok(!hasSmooth(mob));
+  const vehicle = {
+    id: 'cart',
+    sites: [
+      { site: 'left', model: 'panel' },
+      { site: 'right', model: 'panel' },
+    ],
+  };
+  assert.ok(hasSmooth(vehicle));
+  assert.ok(smoothEntry(vehicle).smoothSites);
+  assert.deepEqual(smoothEntry(vehicle).sites, vehicle.sites);
+  assert.ok(!hasSmooth({ id: 'mixed', sites: [...vehicle.sites, { site: 'rider', model: 'mob' }] }));
+  const vest = {
+    id: 'vest',
+    worn: [
+      { site: 'bust', model: 'doll' },
+      { site: 'vest', model: 'panel' },
+    ],
+  };
+  assert.ok(hasSmooth(wornEntry(vest)));
 });

@@ -79,8 +79,9 @@ local thumbBones = {
   // The eyes, from the head's joint in the head's frame, which a generated frame turns the head to look from.
   eye: [0, 0.11, 0.08],
   bones: {
+    // The root's flex is the body's pitch in the world, no joint's, so it reaches a figure lying on its front or back.
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
-                    limits: { flex: [-20, 20], twist: [-30, 30], abduct: [-15, 15] } },
+                    limits: { flex: [-90, 90], twist: [-30, 30], abduct: [-15, 15] } },
     spine: trunk { part: 'torso', parent: 'pelvis', pivot: { anchor: 'spine' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                    absorbs: ['chest'], limits: { flex: [-30, 60], twist: [-80, 80], abduct: [-35, 35] } },
     neck: trunk { part: 'neck', parent: 'spine', pivot: { anchor: 'neck' }, along: [0, 1, 0], flexAxis: [1, 0, 0],

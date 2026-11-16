@@ -141,7 +141,7 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 }
 .eyebrow { margin: 0 0 4px; color: var(--accent); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 .info h2 { font-size: 22px; padding-right: 32px; }
-.info code { color: var(--muted); font-size: 12px; }
+.info code { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .info h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 20px 0 8px; }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 18px 0 0; font-size: 14px; }
 .facts dt { color: var(--muted); }
@@ -149,6 +149,23 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
 .materials { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
 .materials li { display: flex; align-items: center; gap: 8px; }
 .swatch { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--line); flex: none; }
+/* The form switch: a track whose knob slides to the accent when the model is drawn smooth. */
+.form-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 14px; font-size: 14px; }
+.switch { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; cursor: pointer; }
+.switch input {
+  appearance: none; position: relative; flex: none; margin: 0; width: 36px; height: 20px; cursor: inherit;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); transition: background 120ms ease;
+}
+.switch input::before {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--muted); transition: transform 120ms ease;
+}
+.switch input:checked { background: var(--accent); border-color: var(--accent); }
+.switch input:checked::before { transform: translateX(16px); background: var(--accent-text); }
+.switch input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.switch:has(input:disabled) { cursor: default; color: var(--muted); }
+.switch input:disabled { opacity: 0.6; }
+.switch-note { color: var(--muted); font-size: 12px; }
 .actions { display: flex; gap: 8px; margin-top: 24px; }
 .button {
   display: inline-block; border: 1px solid var(--accent); border-radius: 8px;
@@ -209,5 +226,6 @@ dialog::backdrop { background: rgb(0 0 0 / 0.55); }
   .count { margin-left: 0; width: 100%; font-size: 12px; }
   .viewer { grid-template-columns: 1fr; grid-template-rows: 55% 45%; }
   .info { border-left: 0; border-top: 1px solid var(--line); }
+  .switch { min-height: 44px; }
 }
 .notice { max-width: 1400px; margin: 0 auto 14px; padding: 10px 24px; color: var(--muted); }

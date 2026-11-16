@@ -1,5 +1,5 @@
 // Builds the showcase site into _site/: the page, the models of a built tree and a models.json that lists them with
-// their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
+// their category, tags, keywords, printed label, sidecar, mass and smooth copy, and the components a model comes apart into
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
 // labels (models/taxonomy.json), and a sounds.json of the tree's sound rows with each take's file. It serves the tool pages site/tools.json lists and links them from the index.
@@ -58,9 +58,10 @@ const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files 
   })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
-  .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
+  .map(({ id, title, pack, path, smooth, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
+    smooth: smooth && outputPath(smooth.pack, smooth.path),
     category: category ?? null,
     label: label ?? null,
     tags: tags ?? {},
@@ -74,11 +75,12 @@ const models = manifest.models
     volumeM3,
   }))
   .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0))
-  .map(({ id, title, file, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
+  .map(({ id, title, file, smooth, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
     id,
     title,
     file,
     bytes: statSync(join(built, file)).size,
+    ...(smooth ? { smooth: { file: smooth, bytes: statSync(join(built, smooth)).size } } : {}),
     category,
     tags,
     keywords,
@@ -219,7 +221,7 @@ for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
   // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
-  // names the clip actor's plain clips and its walk speed, which paces its walk.
+  // names the clip actor's plain clips and its walk speed, which paces its walk; `motions`, the clips baked for the doll.
   const rig = dollRig(readRigContent(root), doll, dressing);
   // A worn piece hides what it declares it covers, so a declaration it does not enclose would open the body to view.
   // Every declaring item is dressed, shown or not, since a consumer hides by the declaration wherever it wears it.
@@ -243,7 +245,8 @@ if (doll) {
     if (unwritten.length > 0) throw new Error(`sequence frames with no pose file (node ${tool}): ${unwritten.join(', ')}`);
   }
   const sequences = Object.assign({}, ...generated.map(({ sequences }) => sequences));
-  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, doll: doll.sites, poses, sequences }));
+  const motions = manifest.motions.map(({ id, pack, path }) => ({ id, file: outputPath(pack, path) }));
+  writeFileSync(join(out, 'rig.json'), JSON.stringify({ ...rig, clips: { file: actor.clips, walkSpeed: actor.walkSpeed }, motions, doll: doll.sites, poses, sequences }));
   mkdirSync(join(out, 'poses'));
   for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
 }
