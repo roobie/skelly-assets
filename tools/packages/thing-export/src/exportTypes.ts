@@ -167,5 +167,10 @@ export type GlbExportResult =
     }
   | { readonly ok: false; readonly error: GlbExportError };
 
+/** A shipped model's file and its smooth copy; see `glb.ts`, `exportModelGlbs`. */
+export type ModelGlbsResult =
+  | (Extract<GlbExportResult, { readonly ok: true }> & { readonly smoothGlb: Uint8Array })
+  | Extract<GlbExportResult, { readonly ok: false }>;
+
 /** Signature only; the writer refuses unresolved/partly placed assemblies and invalid export metadata. */
 export type ExportGlb = (input: GlbExportInput) => GlbExportResult;

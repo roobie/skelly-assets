@@ -31,6 +31,7 @@ import type {
   GlbExportError,
   GlbExportInput,
   GlbExportResult,
+  ModelGlbsResult,
   Palette,
   PartPortId,
   SrgbColor,
@@ -445,11 +446,43 @@ const refusal = (input: Parameters<ExportGlb>[0]): GlbExportError | undefined =>
 };
 
 /**
+ * How a part drawn smooth is cut into primitives: one per display item, which tools reading a solid's own primitive
+ * need, or one per finish and piece, as a voxel part is.
+ */
+type SmoothPrimitives = 'per-item' | 'per-finish';
+
+/** The meshes of one finish as one, in metres: their vertices end to end and their indices shifted to match. */
+const joinedMesh = (
+  meshes: readonly { readonly positions: Float32Array; readonly normals: Float32Array; readonly indices: Uint32Array }[],
+  metresPerUnit: number,
+) => {
+  const positions = new Float32Array(meshes.reduce((sum, mesh) => sum + mesh.positions.length, 0));
+  const normals = new Float32Array(positions.length);
+  const indices = new Uint32Array(meshes.reduce((sum, mesh) => sum + mesh.indices.length, 0));
+  let vertex = 0;
+  let index = 0;
+  for (const mesh of meshes) {
+    positions.set(
+      mesh.positions.map((x) => x * metresPerUnit),
+      vertex * 3,
+    );
+    normals.set(mesh.normals, vertex * 3);
+    indices.set(
+      mesh.indices.map((i) => i + vertex),
+      index,
+    );
+    vertex += mesh.positions.length / 3;
+    index += mesh.indices.length;
+  }
+  return { positions, normals, indices };
+};
+
+/**
  * Writes a resolved assembly as a `.glb`. Refuses (as an error value, never an exception) an assembly with
  * structure issues or unplaced parts, ids that can't form a stable port id, a palette colour outside sRGB [0,1],
  * and an asset file outside `assets/models/<name>.glb`.
  */
-const writeGlb: ExportGlb = (input) => {
+const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'per-item'): GlbExportResult => {
   checkNesting(input);
   const error = refusal(input);
   if (error) {
@@ -647,20 +680,18 @@ const writeGlb: ExportGlb = (input) => {
     });
   };
   /**
-   * One primitive per finish and piece: the part's drawn solids sampled at the grain, so later solids paint over
-   * earlier ones. Each piece's primitives together form a closed surface.
+   * The part's display items grouped by finish and piece, in the order each group first draws: per item its group, none
+   * for an item that draws nothing, since a primitive carries one material and one piece.
    */
-  const voxelPrimitivesFor = (part: PartExport, items: DisplayItem[], grain: number): Json[] => {
+  const finishGroupsOf = (part: PartExport, items: DisplayItem[], draws: (index: number) => boolean) => {
     const finishes: {
       appearance: ReturnType<typeof resolveAppearance>;
       piece: string | undefined;
       solids: string[];
     }[] = [];
     const finishOf = new Map<string, number>();
-    const drawn = drawnOf(part);
-    /** Per display item, its finish; none for an item that draws nothing. */
     const groups = items.map((item, index) => {
-      if (drawn[index] === undefined) {
+      if (!draws(index)) {
         return undefined;
       }
       const solid = item.solids[0]!;
@@ -675,6 +706,35 @@ const writeGlb: ExportGlb = (input) => {
       finishes[group]!.solids.push(...item.solids.map(({ id }) => id));
       return group;
     });
+    return { finishes, groups };
+  };
+  const finishExtras = (finish: ReturnType<typeof finishGroupsOf>['finishes'][number]): Json => ({
+    solids: finish.solids,
+    ...pieceExtras(finish.piece),
+    ...appearanceExtras(finish.appearance),
+  });
+  /**
+   * One primitive per finish and piece of the authored meshes, as a voxel part draws, so a consumer pays a draw call per
+   * finish rather than per solid.
+   */
+  const smoothFinishPrimitivesFor = (part: PartExport, items: DisplayItem[]): Json[] => {
+    const drawn = items.map((item) => {
+      const mesh = meshOf(item);
+      return mesh.triangleCount === 0 || mesh.indices.length === 0 ? undefined : mesh;
+    });
+    const { finishes, groups } = finishGroupsOf(part, items, (index) => drawn[index] !== undefined);
+    return finishes.map((finish, group) => {
+      const meshes = drawn.filter((mesh, index): mesh is NonNullable<typeof mesh> => mesh !== undefined && groups[index] === group);
+      return bufferPrimitive(joinedMesh(meshes, metresPerUnit), materialFor(finish.appearance), finishExtras(finish), part);
+    });
+  };
+  /**
+   * One primitive per finish and piece: the part's drawn solids sampled at the grain, so later solids paint over
+   * earlier ones. Each piece's primitives together form a closed surface.
+   */
+  const voxelPrimitivesFor = (part: PartExport, items: DisplayItem[], grain: number): Json[] => {
+    const drawn = drawnOf(part);
+    const { finishes, groups } = finishGroupsOf(part, items, (index) => drawn[index] !== undefined);
     const origin = latticeOrigin(part.placed, grain, metresPerUnit);
     const fill =
       input.drawnVoxels?.(part.id) ??
@@ -700,12 +760,7 @@ const writeGlb: ExportGlb = (input) => {
       bufferPrimitive(
         buffers,
         materialFor(finishes[group]!.appearance),
-        {
-          voxelGrain: grain,
-          solids: finishes[group]!.solids,
-          ...pieceExtras(finishes[group]!.piece),
-          ...appearanceExtras(finishes[group]!.appearance),
-        },
+        { voxelGrain: grain, ...finishExtras(finishes[group]!) },
         part,
       ),
     );
@@ -730,13 +785,15 @@ const writeGlb: ExportGlb = (input) => {
       input.voxelGrain === undefined
         ? undefined
         : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
-    const primitives =
-      grain === undefined
-        ? itemsOf(seatedInHost(part)).flatMap((item) => {
+    const smoothPrimitivesFor = (items: DisplayItem[]): Json[] =>
+      smoothPrimitives === 'per-finish'
+        ? smoothFinishPrimitivesFor(part, items)
+        : items.flatMap((item) => {
             const primitive = primitiveFor(part, item);
             return primitive ? [primitive] : [];
-          })
-        : voxelPrimitivesFor(part, itemsOf(part), grain);
+          });
+    const primitives =
+      grain === undefined ? smoothPrimitivesFor(itemsOf(seatedInHost(part))) : voxelPrimitivesFor(part, itemsOf(part), grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
     const node: Json = { name };
@@ -849,13 +906,30 @@ const writeGlb: ExportGlb = (input) => {
   return { ok: true, glb: glbFile(json, bin.bytes()), partNodes: parts.map(({ id, family }) => partNodeName(id, family)) };
 };
 
-export const exportGlb: ExportGlb = (input) => {
+const refusingBadSkin = (write: () => GlbExportResult): GlbExportResult => {
   try {
-    return writeGlb(input);
+    return write();
   } catch (error) {
     if (error instanceof SkinError) {
       return fail({ code: 'invalid-skin', message: error.message });
     }
     throw error;
   }
+};
+
+export const exportGlb: ExportGlb = (input) => refusingBadSkin(() => writeGlb(input));
+
+/**
+ * A shipped model's two files from one input: the file as asked, and its smooth copy, the same assembly as its authored
+ * meshes, so the copy can never drift from the build its datums are read off. The copy is drawn one primitive per
+ * finish and piece, as a voxel part is, since it ships to be drawn, not to be inspected solid by solid.
+ */
+export const exportModelGlbs = (input: GlbExportInput): ModelGlbsResult => {
+  const file = exportGlb(input);
+  if (!file.ok) {
+    return file;
+  }
+  const { voxelGrain, voxelDetailGrain, voxelDetailThinParts, drawnVoxels, ...authored } = input;
+  const smooth = refusingBadSkin(() => writeGlb(authored, 'per-finish'));
+  return smooth.ok ? { ...file, smoothGlb: smooth.glb } : smooth;
 };
