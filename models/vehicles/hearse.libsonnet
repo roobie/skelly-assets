@@ -19,10 +19,18 @@ local nose = s.front - 0.075;
 local hoodNose = s.hoodBack - (nose - s.aPost) * s.hoodFall;
 local vane = 0.0625;
 local pleat = 0.0625;
-local drape(id, from, count) = [
-  box(id + '_' + i, if i % 2 == 0 then 'cloth' else 'fold', [from + i * pleat, s.waist, s.skin - 0.04 - (i % 2) * 0.03 - lean], [from + (i + 1) * pleat, windowTop, s.skin - 0.01 - lean])
+// The drapes hang against the side glass's inner face (`car-body.libsonnet`, `paneZ`) and step in with it.
+local glassIn = s.skin + 0.01 - 2 * shape.grain;
+local hang(id, slot, x, y, depth) = shape.side(id, slot, [[x[0], y[0]], [x[1], y[0]], [x[1], y[1]], [x[0], y[1]]], [glassIn - depth, glassIn]);
+local drape(id, from, count) = std.flattenArrays([
+  hang(id + '_' + i, if i % 2 == 0 then 'cloth' else 'fold', [from + i * pleat, from + (i + 1) * pleat], [s.waist, windowTop], 0.03 + (i % 2) * 0.03)
   for i in std.range(0, count - 1)
-];
+]);
+// The coffin deck lies between the rear arch liners (`car-body.libsonnet`, `archLiner`).
+local deckHalf = 0.6;
+// The partition stands over the floor's tunnel (`car-body.libsonnet`, `tunnel`).
+local tunnelHalf = 0.12;
+local tunnelTop = 0.45;
 local landauX(t) = -2.42 + t * 0.96;
 local landauY(t) = 1.25 + 0.14 * std.sin(t * 2 * std.pi);
 local landauSteps = 8;
@@ -85,9 +93,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
     ]
   ), { cover: 'vinyl-black', bright: 'steel-bright' }) + { title: 'Hearse coach' },
   k.compound('hearse_curtains', 8, k.bothSides(
-    drape('rear_drape', s.cWaist, 5) + drape('front_drape', s.bRear - 5 * pleat, 5) + [
-      box('valance', 'cloth', [s.cWaist, windowTop - 0.1, s.skin - 0.05 - lean], [s.bRear, windowTop, s.skin - 0.01 - lean]),
-    ]
+    // The drapes and valance stop at the partition, which stands across the window.
+    drape('rear_drape', s.cWaist, 5) + drape('front_drape', deckFront - 5 * pleat, 5)
+    + hang('valance', 'cloth', [s.cWaist, deckFront], [windowTop - 0.1, windowTop], 0.04)
   ), { cloth: 'cloth-cream', fold: 'cloth-heather-grey' }) + { title: 'Hearse curtains' },
   k.compound('hearse_grille', 9, [
     box('head', 'bright', [nose, hoodNose - 0.03, -0.42], [nose + 0.075, hoodNose + 0.02, 0.42]),
@@ -101,20 +109,22 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
   ], { bright: 'steel-bright', dark: 'plastic-black' }) + { title: 'Hearse grille' },
   // A load floor's cargo face is its highest point, so the slats and rollers finish level and the rails stand in their own part.
   k.compound('hearse_deck', 45, [
-    box('bed', 'deck', [deckRear, 0.48, -0.72], [deckFront, deckTop - 0.03, 0.72]),
-    box('slat_tail', 'deck', [deckRear, deckTop - 0.03, -0.72], [deckRear + 0.2, deckTop, 0.72]),
+    box('bed', 'deck', [deckRear, 0.48, -deckHalf], [deckFront, deckTop - 0.03, deckHalf]),
+    box('slat_tail', 'deck', [deckRear, deckTop - 0.03, -deckHalf], [deckRear + 0.2, deckTop, deckHalf]),
   ] + [
-    box('roller_' + i, 'rail', [deckRear + 0.2 + i * 0.4, deckTop - 0.03, -0.72], [deckRear + 0.26 + i * 0.4, deckTop, 0.72])
+    box('roller_' + i, 'rail', [deckRear + 0.2 + i * 0.4, deckTop - 0.03, -deckHalf], [deckRear + 0.26 + i * 0.4, deckTop, deckHalf])
     for i in std.range(0, 4)
   ] + [
-    box('slat_' + i, 'deck', [deckRear + 0.26 + i * 0.4, deckTop - 0.03, -0.72], [std.min(deckRear + 0.6 + i * 0.4, deckFront), deckTop, 0.72])
+    box('slat_' + i, 'deck', [deckRear + 0.26 + i * 0.4, deckTop - 0.03, -deckHalf], [std.min(deckRear + 0.6 + i * 0.4, deckFront), deckTop, deckHalf])
     for i in std.range(0, 4)
   ] + [
-    box('slat_front', 'deck', [deckRear + 2.26, deckTop - 0.03, -0.72], [deckFront, deckTop, 0.72]),
+    box('slat_front', 'deck', [deckRear + 2.26, deckTop - 0.03, -deckHalf], [deckFront, deckTop, deckHalf]),
   ], { deck: 'plastic-black', rail: 'steel-stainless' }) + { title: 'Hearse deck' },
   k.compound('hearse_partition', 30, [
-    box('partition', 'wall', [deckFront, s.floor, -s.skin + 0.04], [deckFront + 0.05, s.waist, s.skin - 0.04]),
-  ] + shape.across('partition_head', 'wall', [[deckFront, s.waist], [deckFront + 0.05, s.waist], [deckFront + 0.05, s.roof - 0.02], [deckFront, s.roof - 0.02]], s.skin - 0.04) + k.bothSides([
+    box('partition_top', 'wall', [deckFront, tunnelTop, -tunnelHalf], [deckFront + 0.05, s.waist, tunnelHalf]),
+  ] + k.bothSides([
+    box('partition', 'wall', [deckFront, s.floor, tunnelHalf], [deckFront + 0.05, s.waist, s.skin - 0.04]),
+  ]) + shape.across('partition_head', 'wall', [[deckFront, s.waist], [deckFront + 0.05, s.waist], [deckFront + 0.05, s.roof - 0.02], [deckFront, s.roof - 0.02]], s.skin - 0.04) + k.bothSides([
     box('rail', 'rail', [deckRear + 0.05, deckTop, 0.3], [deckFront - 0.08, deckTop + 0.06, 0.36]),
     box('stop', 'rail', [deckFront - 0.08, deckTop, 0.24], [deckFront - 0.04, deckTop + 0.1, 0.38]),
   ]), { wall: 'plastic-black', rail: 'steel-stainless' }) + { title: 'Hearse partition' },
