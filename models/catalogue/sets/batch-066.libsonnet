@@ -265,5 +265,5 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     h.prism('tip', 'metal', 'x', [[0.003, -0.006], [0.013, -0.008], [0.009, 0.005]], 0.02, 0.03),
     h.prism('fin', 'metal', 'z', [[-0.006, 0.012], [0.014, 0.016], [0.026, 0.028], [0.006, 0.022]], -0.002, 0.002),
     h.prism('window', 'window', 'x', [[0.008, 0.003], [0.014, 0.004], [0.01, 0.009]], -0.006, 0.006),
-  ] + h.crescent('loop', 'metal', 0.003, 0.0045, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + { title: 'Angular whistle' } + h.inHand('angular_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
+  ] + h.crescent('loop', 'metal', 0.003, 0.0055, 0, 360, 8, 0.004, 0.007, 0.034, 0), { metal: 'steel-blued', window: 'void-black' }) + { title: 'Angular whistle' } + h.inHand('angular_whistle', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'arcana', tags: { material: ['metal'], setting: ['fantasy'] } } },
 ]

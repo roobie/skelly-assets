@@ -277,8 +277,8 @@ local flat(id, slot, outline, y0, y1, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[1
   h.compound('ballistic_collar', 0.4,
     ring('front', 'cloth', crescent(0.09, 0.15, 95, 265, 12), 0, 0.025, 0, -0.05)
     + ring('back', 'cloth', crescent(0.1, 0.15, -55, 55, 6), 0, 0.025, 0, -0.06)
-    + ring('front-edge', 'strap', crescent(0.09, 0.1, 95, 265, 12), 0.025, 0.028, 0, -0.05)
-    + ring('back-edge', 'strap', crescent(0.1, 0.11, -55, 55, 6), 0.025, 0.028, 0, -0.06)
+    + ring('front-edge', 'strap', crescent(0.09, 0.1, 95, 265, 12), 0.025, 0.03, 0, -0.05)
+    + ring('back-edge', 'strap', crescent(0.1, 0.11, -55, 55, 6), 0.025, 0.03, 0, -0.06)
     + [
       box('tab-front', 'strap', [-0.02, 0, -0.145], [0.02, 0.004, -0.1]),
       box('tab-back', 'strap', [-0.02, 0, -0.005], [0.02, 0.004, 0.045]),

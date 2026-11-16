@@ -72,7 +72,7 @@ local dress(o) =
   local cz = c.d / 2;
   h.foldedGarment(c.w, c.d, c.ht, c.folds)
   + [flat('neckline', 'lining', [g.onArc(c.neckR, 90 + 180 * i / 10, cz) for i in std.range(0, 10)], c.ht - 0.001, 0.002)]
-  + h.crescent('neck-trim', 'trim', c.neckR, c.neckR + 0.01, 90, 270, 10, c.ht, c.ht + 0.003, 0, cz);
+  + h.crescent('neck-trim', 'trim', c.neckR, c.neckR + 0.01, 90, 270, 10, c.ht, c.ht + 0.005, 0, cz);
 
 [
   // A cotton kitchen apron folded to 260 mm by 320 mm and 24 mm tall: the bib on top, its neck strap along

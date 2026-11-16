@@ -172,7 +172,8 @@ local sheetSuit(o) =
     [flat('skirt', 'mail', [[-0.21, skirtZ], [0.21, skirtZ], [0.22, skirtZ + 0.09], [-0.22, skirtZ + 0.09]], 0, 0.006)]
     + [box('skirt-row-%d' % i, 'mail', [-0.21, 0.006, skirtZ + 0.035 + i * 0.016], [0.21, 0.009, skirtZ + 0.04 + i * 0.016]) for i in std.range(0, 2)]
   else [];
-  local strapAt(id, rr, a, z, x) = bandZ(id, 'strap', rr, t, a, z, 0.025, x, 0.003, 3);
+  // Straps stand 4.5 mm proud so their three facets, each thinner than the strap across its corners, keep a full voxel.
+  local strapAt(id, rr, a, z, x) = bandZ(id, 'strap', rr, t, a, z, 0.025, x, 0.0045, 3);
   local limb(p, x, z0, segs, rr) = std.flattenArrays([
     shellZ('%s-%d' % [p, k], 'sheet', rr[k], t, 55, segs[k][0], segs[k][1], x, 3)
     + strapAt('%s-strap-%d' % [p, k], rr[k], 55, (segs[k][0] + segs[k][1]) / 2, x)
