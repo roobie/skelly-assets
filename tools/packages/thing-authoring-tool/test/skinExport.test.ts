@@ -159,3 +159,13 @@ it('refuses ambiguous authoring regions instead of choosing the first one', () =
     exportItem({ ...item, skin: { ...skin, regions: [...skin.regions, skin.regions[0]!] } }, loaded, asset, voxel),
   ).toThrow('ambiguous');
 });
+
+it('ships a smooth copy skinned to the same joints, drawing the authored mesh rather than voxels', async () => {
+  const gltf = await new GLTFLoader().parseAsync(Uint8Array.from(exported().smoothGlb).buffer, '');
+  const mesh = meshOf(gltf.scene);
+  expect(mesh.skeleton.bones.map(({ name }) => name).sort()).toEqual(item.skin!.joints.map(({ name }) => name).sort());
+  const primitives: { extras?: { voxelGrain?: number } }[] = gltf.parser.json.meshes.flatMap(
+    ({ primitives }: { primitives: { extras?: { voxelGrain?: number } }[] }) => primitives,
+  );
+  expect(primitives.some(({ extras }) => extras?.voxelGrain !== undefined)).toBe(false);
+});

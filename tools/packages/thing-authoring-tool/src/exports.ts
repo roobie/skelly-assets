@@ -1,6 +1,6 @@
 import { MATERIALS } from '@skelly/thing-core/materials';
 import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
-import { exportGlb, paintMaterials } from '@skelly/thing-export/glb.ts';
+import { exportModelGlbs, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
 import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
@@ -49,7 +49,7 @@ export const exportItem = (
   if (density) {
     checkDrawnDensity(item, report.resolved, drawn, masses, density);
   }
-  const out = exportGlb({
+  const out = exportModelGlbs({
     resolved: report.resolved,
     ...(item.skin ? { skin: authoredSkin(item.skin) } : {}),
     asset,
@@ -65,6 +65,7 @@ export const exportItem = (
   }
   if (glow) {
     checkGlow(item.id, glow, out.glb);
+    checkGlow(item.id, glow, out.smoothGlb);
   }
   const parts = modelParts(
     report.resolved,
@@ -84,6 +85,7 @@ export const exportItem = (
   const motion = itemMotion(item, settings, built, voxel.voxelGrain);
   return {
     glb: out.glb,
+    smoothGlb: out.smoothGlb,
     partNodes: out.partNodes,
     modelEntry: {
       ...asset,
