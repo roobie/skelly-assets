@@ -4,13 +4,13 @@ local s = import 'ambulance.spec.libsonnet';
 local tail = van.tail(s);
 {
   title: 'Ambulance',
-  overlaps: van.engineSeat,
+  overlaps: van.engineSeat + van.twinWheelSeat,
   sites: van.fittings(site.kit, 'ambulance', s) + [
     site.one('locker', 'ambulance_locker'),
     site.one('stretcher', 'stretcher', [-1.8, s.box.floor, 0.1]),
     site.one('attendant_seat', 'attendant_seat', [-0.55, s.box.floor, -0.35]),
     site.one('light_bar', 'light_bar_blue', [0.3, s.roof, 0]),
-    site.one('rear_step', 'rear_step_tread', [s.rear + 0.12, 0.6, 0]),
+    site.one('rear_step', 'rear_step_tread', [tail, 0.6, 0]),
     site.one('markings', 'ambulance_markings'),
     site.one('door_markings', 'ambulance_door_markings', rides='side_door'),
   ]
