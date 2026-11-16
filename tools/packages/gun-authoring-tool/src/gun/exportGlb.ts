@@ -940,12 +940,17 @@ export const exportGunGlb = (
   if ('code' in anchors) {
     return { ok: false, error: anchors };
   }
+  // Datums read off placements are written as the file draws them, so they read the file-frame assembly, and the
+  // file meshes the voxels they were read off.
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, grains);
   const result: GlbExportResult = exportGlb({
     resolved,
     palette: GUN_PALETTE,
     appearance,
     asset,
     ...grains,
+    drawnVoxels: drawn.voxels,
   });
   if (!result.ok) {
     return result;
@@ -958,9 +963,6 @@ export const exportGunGlb = (
   } = resolved.domain;
   const fittedAttachments = attachmentData(resolved);
   const magazine = magazineSlotData(resolved);
-  // Datums read off placements are written as the file draws them, so they read the file-frame assembly.
-  const fileResolved = inFileFrame(resolved);
-  const drawn = drawnGeometry(fileResolved, grains);
   const replaceableNodes = new Set([
     ...fittedAttachments.map(({ node }) => node),
     ...(magazine ? [magazine.node] : []),
