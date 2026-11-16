@@ -60,7 +60,9 @@ export const exportAttachmentGlb = (
     throw new Error(`Attachment ${id} has no game metadata`);
   }
   const rootMount = attachmentMountPort(part, metadata.mount)!.id;
-  const result = exportGlb({ resolved, palette: GUN_PALETTE, asset, rootMount, ...voxel });
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, voxel);
+  const result = exportGlb({ resolved, palette: GUN_PALETTE, asset, rootMount, ...voxel, drawnVoxels: drawn.voxels });
   if (!result.ok) {
     return result;
   }
@@ -71,7 +73,7 @@ export const exportAttachmentGlb = (
     modelEntry: {
       id: asset.id,
       file: asset.file as DeadvoxModelFile,
-      collision: modelCollision(inFileFrame(resolved), drawnGeometry(inFileFrame(resolved), voxel)),
+      collision: modelCollision(fileResolved, drawn),
       gun: { attachment: metadata },
     },
   };
