@@ -41,6 +41,8 @@ local s = import 'suv.spec.libsonnet';
   + site.headlamps(s.front - 0.07, 0.95, 0.62)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.7, -0.44]),
   unjudged: [
+    site.unjudged('engine', 'front_axle', 0.083,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
     site.unjudged('dashboard', 'gearbox', 0.221,
       'The inline gearbox\'s case rises above the tunnel into the dashboard\'s console.'),
     site.unjudged('drive_belt', 'front_axle', 0.051,
