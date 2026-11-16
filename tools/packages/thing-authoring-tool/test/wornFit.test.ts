@@ -50,9 +50,16 @@ const shell = async (id: string) => {
 };
 
 // Both torso garments take the over-jacket gear, so it must clear each of them.
-it.each(['jacket_worn_body', 'hoodie_worn_body'])('exports the over-jacket utility vest clear of %s', async (id) => {
-  const garment = await shell(id);
-  const vest = await shell('utility_vest_worn_jacket');
+const GARMENTS = ['jacket_worn_body', 'hoodie_worn_body'];
+// Each shell exports once, as the file loads: a garment's export fills its whole volume with voxels, which costs far
+// more than the check, and the time limit of a case belongs to its check, not to the models it reads.
+const shells = new Map(
+  await Promise.all([...GARMENTS, 'utility_vest_worn_jacket'].map(async (id) => [id, await shell(id)] as const)),
+);
+const vest = shells.get('utility_vest_worn_jacket')!;
+
+it.each(GARMENTS)('exports the over-jacket utility vest clear of %s', (id) => {
+  const garment = shells.get(id)!;
   expect(garment.points.filter(vest.contains)).toHaveLength(0);
   expect(vest.points.filter(garment.contains)).toHaveLength(0);
 });
