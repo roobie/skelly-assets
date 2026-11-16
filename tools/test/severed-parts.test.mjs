@@ -10,7 +10,7 @@ const { safeParse } = await import('valibot');
 const { NeutralModelSchema } = await import('../packages/thing-core/src/schema.ts');
 const { glbJson } = await import('../glb.mjs');
 const { partMassProperties } = await import('../actorMass.mjs');
-const { exportMob, severedIndexFiles } = await import('../mobs.mjs');
+const { exportMob, mobStore, severedIndexFiles } = await import('../mobs.mjs');
 const { outputPath } = await import('../layout.mjs');
 const { CUT_MATERIAL } = await import('../severedPartBake.mjs');
 const { readSeveredParts, SEVERED_INDEX, severedPartPlan } = await import('../severedParts.mjs');
@@ -49,6 +49,19 @@ test('every cut point of each named mob type bakes a part weighing its template\
     }
   } finally {
     rmSync(out, { recursive: true, force: true });
+  }
+});
+
+test('a severed-part source row served from the cache gives the sidecars a fresh bake does', async () => {
+  const [plan] = await readSeveredParts();
+  const root = mkdtempSync(join(tmpdir(), 'severed-cache-'));
+  try {
+    const store = mobStore(join(root, 'cache'));
+    const fresh = exportMob(plan.source, join(root, 'stored'), store, plan);
+    const served = exportMob(plan.source, join(root, 'served'), store, plan);
+    assert.deepEqual([served.entry.reused, served.cuts], [true, fresh.cuts]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });
 
