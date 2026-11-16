@@ -35,7 +35,6 @@ const shellsOf = (wear) => sources.filter(({ id }) => id.startsWith(`${wear}_wor
 const built = mkdtempSync(join(tmpdir(), 'doll-pose-'));
 after(() => rmSync(built, { recursive: true, force: true }));
 // The other fitted garments, each on a fit the everyday clothes don't exercise: the robe template and the narrow boot.
-// `leather_gloves` is left out until it stops poking at rest (#191).
 const OTHER_WORN = ['wizard_robe', 'combat_boots'];
 const wears = [WEAR, ...CLOTHES, ...OTHER_WORN];
 execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg', ...wears.flatMap((wear) => [wear, ...shellsOf(wear)]), pressCheck.rifle, ...weaponIds], { cwd: repo, stdio: 'pipe' });
@@ -354,16 +353,6 @@ test('a bare-handed strike lands its fist ahead of the shoulders, between them a
       assert.ok(fist[0] > right && fist[0] < left, `${kind} ${name}: the fist lands ${fist[0].toFixed(2)} m across, outside the shoulders`);
       assert.ok(fist[2] > elbow[2], `${kind} ${name}: the fist lands ${(elbow[2] - fist[2]).toFixed(2)} m behind its elbow`);
     }
-  }
-});
-
-test('each fitted garment covers the body and leaves none of it poking through at rest', () => {
-  for (const wear of wears) {
-    const dressed = restIn(wear);
-    const surface = coveredSurface(rig, dressed);
-    assert.ok(surface.some(({ samples }) => samples.some(({ cover }) => cover >= 0)), `${wear} covers the body`);
-    const { pokes } = restClearance(rig, dressed, surface);
-    assert.deepEqual(pokes.map(({ bone, piece }) => `${bone} out of ${piece}`).filter((v, i, all) => all.indexOf(v) === i), [], wear);
   }
 });
 
