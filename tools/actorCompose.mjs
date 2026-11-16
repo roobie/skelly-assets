@@ -140,7 +140,8 @@ export function applyMotion(base, motion, time, seed) {
 }
 
 /** The walk cross-faded into the idle: fully the idle standing still, fully the walk at and above `idleBlendSpeed`. */
-export const walkToIdle = (walk, idle, speed, idleBlendSpeed) => blendPose(walk, idle, clamp(1 - speed / idleBlendSpeed, 0, 1));
+export const walkToIdle = (walk, idle, speed, idleBlendSpeed) =>
+  blendPose(walk, idle, clamp(1 - speed / idleBlendSpeed, 0, 1));
 
 /** `headYaw` radians about the look-at head bone's own y, innermost, held to its limits where it is a framed joint. */
 export function applyHeadYaw(body, pose, headYaw) {
@@ -148,8 +149,9 @@ export function applyHeadYaw(body, pose, headYaw) {
   const id = body.lookAt?.headBone ?? 'head';
   const head = body.bones.find((bone) => bone.id === id);
   if (!head) throw new Error(`missing head bone ${id}`);
-  const turned = mulMM(pose.rotations[id] ?? IDENTITY_M, rotY(headYaw * 180 / Math.PI));
-  const held = head.frame && head.limits ? jointRotation(head, clampJointAngles(head, jointAngles(head, turned))) : turned;
+  const turned = mulMM(pose.rotations[id] ?? IDENTITY_M, rotY((headYaw * 180) / Math.PI));
+  const held =
+    head.frame && head.limits ? jointRotation(head, clampJointAngles(head, jointAngles(head, turned))) : turned;
   return { ...pose, rotations: { ...pose.rotations, [id]: held } };
 }
 
