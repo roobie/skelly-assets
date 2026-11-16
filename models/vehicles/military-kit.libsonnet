@@ -58,6 +58,10 @@ local transferX(s) = s.cabBack - 0.25;
 local frontShaft(s) = { from: transferX(s) + 0.24, to: s.frontAxle - 0.16, y: 0.6 };
 // Where the gearbox's middle stands, behind the engine.
 local gearboxX(s) = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
+// Where the chassis's crossmembers stand, and the battery tray's x: it sits between the rails, so it stands in the
+// middle of a bay between two crossmembers rather than across one.
+local crossXs(s) = k.crossmemberXs(s.rear + 0.1, gearboxX(s) - s.gearboxLength / 2, s.nose, 8, 0.05);
+local batteryX(s) = local cross = crossXs(s); (cross[4] + cross[5]) / 2;
 
 local id = 'military_truck';
 local title = 'Military truck';
@@ -65,7 +69,7 @@ local truckRows(s0) = {
   local s = truckSpec(s0),
   local finish = { paint: s.paint, trim: 'paint-charcoal', glass: 'glass-clear', dark: 'steel-spall-black', frame: s.frame, liner: 'cloth-olive-drab', spring: 'steel-grey' },
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2,
-  local cross = k.crossmemberXs(s.rear + 0.1, gearboxX(s) - s.gearboxLength / 2, s.nose, 8, 0.05),
+  local cross = crossXs(s),
   local bearers = [s.bedRear + 0.1 + i * (s.bedFront - s.bedRear - 0.2) / 6 for i in std.range(0, 6)],
   // The winch hangs under the rails' front ends, its drum behind the bumper and its worm gearbox behind the drum.
   local winchX = s.nose - 0.04,
@@ -254,8 +258,8 @@ local truckFittings(kit, s0) =
     fitting('exhaust', 'exhaust_side_high', [s.cabBack - 0.01, 1.05, s.side], ['engine', 'chassis']),
     fitting('steering_wheel', 'steering_wheel', [s.cabFront - 0.32, s.floor + 0.83, -s.seatZ], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [s.cabFront - 0.42, s.floor + 0.28, 0], ['cab']),
-    fitting('battery_tray', 'truck_battery_tray', [-0.15, 0.96, 0], ['chassis']),
-    fitting('battery', 'car_battery', [-0.15, 0.99, 0], ['battery_tray']),
+    fitting('battery_tray', 'truck_battery_tray', [batteryX(s), 0.96, 0], ['chassis']),
+    fitting('battery', 'car_battery', [batteryX(s), 0.99, 0], ['battery_tray']),
   ]
   + pair('front_wheel', id + '_wheel', [s.frontAxle, s.r, s.wheelZ], on(['front_axle']))
   + pair('middle_wheel', id + '_wheel', [s.rearAxles[0], s.r, s.wheelZ], on(['rear_axle_0']))
