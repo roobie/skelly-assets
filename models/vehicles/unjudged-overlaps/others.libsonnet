@@ -148,8 +148,6 @@ local site = import '../site.libsonnet';
       '`knuckle_far` of front_strut runs into `rim_far` of wheel_265_75r16; the others family is not judged under this measure.'),
     site.unjudged('front_strut_near', 'front_wheel_near', 0.044,
       '`knuckle` of front_strut runs into `rim` of wheel_265_75r16; the others family is not judged under this measure.'),
-    site.unjudged('shell', 'gearbox', 0.231,
-      '`bulkhead` of classic_4x4_shell runs into `case` of gearbox_inline; the others family is not judged under this measure.'),
     site.unjudged('shell', 'headlamp_far', 0.041,
       '`slam_panel` of classic_4x4_shell runs into `bowl_far` of headlamp_round; the others family is not judged under this measure.'),
     site.unjudged('shell', 'headlamp_near', 0.041,
