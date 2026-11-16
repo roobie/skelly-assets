@@ -55,3 +55,27 @@ export const severedBoneSet = (bones: readonly Bone[], cuts: readonly string[]):
   }
   return hidden;
 };
+
+/**
+ * Every set of cut points below `part` that a cut there may find already gone, each given by its top-most cut
+ * points, the empty set first: what a cut leaves is the part less those, since each already left as a part of
+ * its own. Generic over any parent-linked bone list.
+ */
+export const remnantCuts = (bones: readonly Bone[], part: string): readonly (readonly string[])[] => {
+  const cuts = new Set(severableParts(bones));
+  const parentOf = new Map(bones.map((bone) => [bone.id, bone.parent]));
+  // The nearest cut point above each cut point, so the cut points form their own tree.
+  const cutAbove = (id: string): string | null => {
+    let parent = parentOf.get(id) ?? null;
+    while (parent !== null && !cuts.has(parent)) parent = parentOf.get(parent) ?? null;
+    return parent;
+  };
+  const below = (id: string): readonly (readonly string[])[] =>
+    [...cuts]
+      .filter((child) => cutAbove(child) === id)
+      .reduce<readonly (readonly string[])[]>(
+        (sets, child) => sets.flatMap((set) => [...below(child), [child]].map((gone) => [...set, ...gone])),
+        [[]],
+      );
+  return below(part);
+};

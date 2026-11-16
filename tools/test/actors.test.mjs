@@ -975,8 +975,8 @@ test('a mob served from the cache writes the bytes a fresh bake does, without ba
   try {
     const [row] = readMobRows();
     const store = mobStore(join(root, 'cache'));
-    const first = exportMob(row, join(root, 'stored'), store);
-    const again = exportMob(row, join(root, 'served'), store);
+    const { entry: first } = exportMob(row, join(root, 'stored'), store);
+    const { entry: again } = exportMob(row, join(root, 'served'), store);
     exportMob(row, join(root, 'fresh'));
     assert.deepEqual([first.reused, again.reused, again.key], [false, true, first.key]);
     assert.deepEqual(treeMismatches(join(root, 'fresh'), join(root, 'served')), []);

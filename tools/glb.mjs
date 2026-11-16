@@ -22,3 +22,37 @@ export function glbAccessor(buffer, gltf, index) {
   for (let i = 0; i < count; i++) for (let c = 0; c < components; c++) out[i * components + c] = read(view, i * stride + c * size);
   return out;
 }
+
+const GLB_JSON = 0x4e4f534a;
+const GLB_BIN = 0x004e4942;
+
+// A GLB of `json` over the typed arrays `parts`, laid end to end in one buffer with a buffer view each, in order; the
+// json's accessors name those views by index.
+export function writeGlb(json, parts) {
+  const offsets = [];
+  let length = 0;
+  for (const part of parts) {
+    offsets.push(length);
+    length += part.byteLength + ((4 - (part.byteLength % 4)) % 4);
+  }
+  const bin = Buffer.alloc(length);
+  parts.forEach((part, i) => Buffer.from(part.buffer, part.byteOffset, part.byteLength).copy(bin, offsets[i]));
+  const full = {
+    ...json,
+    buffers: [{ byteLength: bin.length }],
+    bufferViews: parts.map((part, i) => ({ buffer: 0, byteOffset: offsets[i], byteLength: part.byteLength })),
+  };
+  const raw = Buffer.from(JSON.stringify(full));
+  const js = Buffer.concat([raw, Buffer.alloc((4 - (raw.length % 4)) % 4, 0x20)]);
+  const header = Buffer.alloc(12);
+  header.write('glTF');
+  header.writeUInt32LE(2, 4);
+  header.writeUInt32LE(12 + 8 + js.length + 8 + bin.length, 8);
+  const chunk = (size, type) => {
+    const bytes = Buffer.alloc(8);
+    bytes.writeUInt32LE(size);
+    bytes.writeUInt32LE(type, 4);
+    return bytes;
+  };
+  return Buffer.concat([header, chunk(js.length, GLB_JSON), js, chunk(bin.length, GLB_BIN), bin]);
+}

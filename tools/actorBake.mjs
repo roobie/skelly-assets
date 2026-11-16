@@ -3,6 +3,7 @@ import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
 import { crowdEmission } from './packages/mobgen/src/mob/crowd.ts';
 import { LOOK_AT_PROFILES } from './packages/mobgen/src/mob/lookAtProfiles.ts';
 import { actorBody } from './actorBody.mjs';
+import { writeGlb } from './glb.mjs';
 import { fileBody, fileClips, turnCellIndex, turnPointArray } from './actorFrame.mjs';
 import { figureFor } from './actorFigure.mjs';
 import { acidClips, creatureClips, fusedClips, humanoidClips, leaperClips, walkerClips } from './actorClips.mjs';
@@ -19,7 +20,18 @@ const clipEmitters = {
   leaper: leaperClips,
   walker: walkerClips,
 };
-const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2];
+export const SHADE_FACTORS = [0.72, 0.88, 1.04, 1.2];
+
+// The box a flat xyz position array spans, as a glTF POSITION accessor states it.
+export function pointBounds(positions) {
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (let v = 0; v < positions.length; v += 3) for (let a = 0; a < 3; a++) {
+    min[a] = Math.min(min[a], positions[v + a]);
+    max[a] = Math.max(max[a], positions[v + a]);
+  }
+  return { min, max };
+}
 
 function actorGlb(row, realized, meshes) {
   const nv = [...meshes.values()].reduce((n, mesh) => n + mesh.colors.length, 0);
@@ -50,33 +62,15 @@ function actorGlb(row, realized, meshes) {
     vo += mesh.colors.length;
   }
   const parts = [pos, nor, col, bone, emission, ...(cell ? [cell] : []), indices];
-  const offsets = [];
-  let length = 0;
-  for (const part of parts) { offsets.push(length); length += part.byteLength; }
-  const bin = Buffer.alloc(length);
-  parts.forEach((part, i) => Buffer.from(part.buffer, part.byteOffset, part.byteLength).copy(bin, offsets[i]));
-  const min = [Infinity, Infinity, Infinity];
-  const max = [-Infinity, -Infinity, -Infinity];
-  for (let v = 0; v < nv; v++) for (let a = 0; a < 3; a++) {
-    min[a] = Math.min(min[a], pos[v * 3 + a]);
-    max[a] = Math.max(max[a], pos[v * 3 + a]);
-  }
   const attributes = { POSITION: 0, NORMAL: 1, COLOR_0: 2, TEXCOORD_1: 3, TEXCOORD_2: 4, ...(cell ? { TEXCOORD_3: 5 } : {}) };
   const types = ['VEC3', 'VEC3', 'VEC4', 'VEC2', 'VEC2', ...(cell ? ['VEC2'] : []), 'SCALAR'];
-  const json = {
+  const { min, max } = pointBounds(pos);
+  return writeGlb({
     asset: { version: '2.0', generator: 'skelly-assets tools/mobs.mjs' }, scene: 0, scenes: [{ nodes: [0] }],
     nodes: [{ mesh: 0, name: row.id, extras: { bones: realized.body.bones.map((bone) => bone.id) } }],
     meshes: [{ primitives: [{ attributes, indices: parts.length - 1, mode: 4 }] }],
-    buffers: [{ byteLength: bin.length }],
-    bufferViews: parts.map((part, i) => ({ buffer: 0, byteOffset: offsets[i], byteLength: part.byteLength })),
     accessors: parts.map((part, i) => ({ bufferView: i, componentType: part === indices ? 5125 : 5126, count: part === indices ? ni : nv, type: types[i], ...(i === 0 ? { min, max } : {}) })),
-  };
-  const raw = Buffer.from(JSON.stringify(json));
-  const js = Buffer.concat([raw, Buffer.alloc((4 - raw.length % 4) % 4, 0x20)]);
-  const header = Buffer.alloc(12);
-  header.write('glTF'); header.writeUInt32LE(2, 4); header.writeUInt32LE(12 + 8 + js.length + 8 + bin.length, 8);
-  const chunk = (size, type) => { const bytes = Buffer.alloc(8); bytes.writeUInt32LE(size); bytes.writeUInt32LE(type, 4); return bytes; };
-  return Buffer.concat([header, chunk(js.length, 0x4e4f534a), js, chunk(bin.length, 0x004e4942), bin]);
+  }, parts);
 }
 
 /**

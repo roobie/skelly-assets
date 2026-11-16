@@ -1,5 +1,5 @@
-// Loose lumps of flesh torn from a body, from a few centimetres to a hand's size, in the finishes the severed
-// shambler parts use. Each lump lies on a skin underside with torn gore heaped above it, so either face can land up.
+// Loose lumps of flesh torn from a body, from a few centimetres to a hand's size, in the body finishes. Each lump
+// lies on a skin underside with torn gore heaped above it, so either face can land up.
 // The outlines are two fixed irregular convex shapes, only scaled and moved, so every piece stays convex.
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local outlineA = [[1.0, 0.1], [0.6, 0.8], [-0.2, 0.95], [-0.85, 0.5], [-0.95, -0.3], [-0.4, -0.9], [0.5, -0.75]];

@@ -44,7 +44,6 @@ import {
 import { avatarArm, avatarLeg } from './families/avatarLimbs.ts';
 import { bearTrap } from './families/bearTrap.ts';
 import { block } from './families/block.ts';
-import { head, limb, torso } from './families/body.ts';
 import { bust } from './families/bust.ts';
 import { bag, boots, cap } from './families/carried.ts';
 import { coil } from './families/coil.ts';
@@ -266,9 +265,6 @@ const builders = {
   bag,
   boots,
   cap,
-  limb,
-  torso,
-  head,
   bust,
   avatarArm,
   avatarLeg,

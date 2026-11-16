@@ -28,6 +28,7 @@ import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
+import { readSeveredParts } from './severedParts.mjs';
 import { SOUND_SAMPLE_RATE } from './sounds.mjs';
 import { loadOutStowage } from './stowage.mjs';
 import { recipeTools } from './recipeTools.mjs';
@@ -300,7 +301,7 @@ async function main() {
     }
     for (const file of recipes.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
-      const mobs = mobManifest(readMobRows(repo));
+      const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
       const dressing = readDressing(repo);
       const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
