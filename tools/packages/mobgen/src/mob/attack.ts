@@ -327,7 +327,11 @@ export const blendArmBase = (baseR: Mat3, weight: number): Mat3 => {
 
 /** Base-independent action values for serialized overlays. */
 export const attackOverlayFrame = (actor: WalkActor, clip: AttackClip, time: number) => {
-  const { clipAngles, armWalkWeight } = attackRotations(actor, clip, time, { root: [0, 0, 0], rotations: {}, angles: {} });
+  const { clipAngles, armWalkWeight } = attackRotations(actor, clip, time, {
+    root: [0, 0, 0],
+    rotations: {},
+    angles: {},
+  });
   return {
     angles: clipAngles!,
     walkBlendWeight: armWalkWeight,

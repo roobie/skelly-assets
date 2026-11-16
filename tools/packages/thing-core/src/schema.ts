@@ -1,11 +1,11 @@
 import {
   array,
-  type BaseSchema,
   type BaseIssue,
+  type BaseSchema,
   check,
-  literal,
   finite,
   type InferOutput,
+  literal,
   maxValue,
   minValue,
   nonEmpty,
@@ -34,7 +34,7 @@ export const Id = pipe(string(), regex(ID_PATTERN, 'must be lowercase letters, d
 export const Name = pipe(string(), nonEmpty('must not be empty'));
 export const CalibreId = pipe(string(), regex(CALIBRE_ID_PATTERN, 'must be a cartridge-data id'));
 
-export { firearmModelSchema, type FirearmPrimitives } from './firearmModelSchema.ts';
+export { type FirearmPrimitives, firearmModelSchema } from './firearmModelSchema.ts';
 
 /** Consumer primitives preserve their output types, including runtime brands. */
 export interface VehiclePrimitives {
@@ -140,7 +140,10 @@ export const MotionSchema = pipe(
         kind: literal('hinge'),
         axis: pipe(
           strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
-          check(({ from, to }) => from.some((value, axis) => value !== to[axis]), 'hinge axis needs two distinct points'),
+          check(
+            ({ from, to }) => from.some((value, axis) => value !== to[axis]),
+            'hinge axis needs two distinct points',
+          ),
         ),
         angle: pipe(
           number(),
@@ -159,7 +162,10 @@ export const MotionSchema = pipe(
     ]),
   ),
   nonEmpty(),
-  check((stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9, 'stage shares must sum to 1'),
+  check(
+    (stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9,
+    'stage shares must sum to 1',
+  ),
 );
 
 export const NeutralModelSchema = strictObject({

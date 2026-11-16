@@ -722,8 +722,11 @@ describe('attachment parts and export metadata', () => {
   });
 
   it("ships the AR with a removable rear iron and offers a scope on the upper's rail in its place", () => {
-    const { attachments, compatibility, compatibilityPairs = [] } = exported(design('archetype-ar'), 'ar_irons')
-      .modelEntry.gun;
+    const {
+      attachments,
+      compatibility,
+      compatibilityPairs = [],
+    } = exported(design('archetype-ar'), 'ar_irons').modelEntry.gun;
     const rear = attachments?.find(({ id }) => id === 'rail-rear-sight');
     expect(rear?.kind).toBe('iron-sight');
     expect(attachments?.some(({ kind }) => kind === 'optic')).toBe(false);

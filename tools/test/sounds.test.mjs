@@ -20,7 +20,10 @@ test('the bake writes every sound row as data and a take per seed, and the manif
       const entry = manifest.sounds.find((sound) => sound.pack === pack && sound.id === id);
       assert.ok(entry, `${pack}/${id} has no manifest entry`);
       assert.deepEqual(JSON.parse(readFileSync(join(out, outputPath(pack, data)), 'utf8')), row);
-      assert.deepEqual(entry.variants.map(({ seed }) => seed), row.seeds);
+      assert.deepEqual(
+        entry.variants.map(({ seed }) => seed),
+        row.seeds,
+      );
       for (const { path } of variants) {
         const file = join(out, outputPath(pack, path));
         assert.ok(existsSync(file), `${file} is not written`);

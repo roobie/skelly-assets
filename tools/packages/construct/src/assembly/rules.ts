@@ -26,7 +26,6 @@ const label = (r: Resolved, part: string): string => {
 export const portCompat: Rule = {
   id: 'port-compat',
   title: 'Ports are compatible',
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
   check(r) {
     const issues: Issue[] = [];
     const used = new Map<string, number>();
@@ -90,7 +89,6 @@ export const portCompat: Rule = {
 const axisAlignment: Rule = {
   id: 'axis-alignment',
   title: 'Axes line up with the main axis',
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
   check(r) {
     const issues: Issue[] = [];
     for (const [part, t] of r.placed) {
@@ -212,46 +210,54 @@ export const solidOverlapForPart = (r: Resolved, part: string): Issue[] => check
 export const solidOverlapBetweenParts = (r: Resolved, first: string, second: string): Issue[] =>
   checkSolidOverlap(r, [first, second]);
 
+const checkConnectionContact = (r: Resolved, focusPart?: string): Issue[] => {
+  const issues: Issue[] = [];
+  const solids = placedSolids(r);
+  // One grid step is the most two connected solids may be apart.
+  const maxGap = r.domain.units.grid;
+  for (const rc of r.connections) {
+    if (focusPart !== undefined && rc.from.part !== focusPart && rc.to.part !== focusPart) {
+      continue;
+    }
+    const a = solids.get(rc.from.part);
+    const b = solids.get(rc.to.part);
+    if (!(a && b)) {
+      continue;
+    }
+    const candidates = a
+      .flatMap((sa) => b.map((sb) => ({ a: sa, b: sb, lowerBound: lowerBoundDistanceWorld(sa, sb) })))
+      .sort((left, right) => left.lowerBound - right.lowerBound);
+    let gap = Number.POSITIVE_INFINITY;
+    for (const pair of candidates) {
+      if (pair.lowerBound > gap) {
+        break;
+      }
+      gap = Math.min(gap, distanceWorld(pair.a, pair.b));
+      if (gap <= maxGap) {
+        break;
+      }
+    }
+    if (gap > maxGap) {
+      issues.push({
+        rule: 'connection-contact',
+        message: `${rc.conn.from} and ${rc.conn.to} have a ${fmt(gap)}u gap between their solids (maximum: ${fmt(maxGap)}u).`,
+        parts: [rc.from.part, rc.to.part],
+        ports: [rc.conn.from, rc.conn.to],
+      });
+    }
+  }
+  return issues;
+};
+
 /** Solids on the two parts of every connection touch or lie within tolerance. */
 export const connectionContact: Rule = {
   id: 'connection-contact',
   title: 'Connected parts touch',
-  check(r) {
-    const issues: Issue[] = [];
-    const solids = placedSolids(r);
-    // One grid step is the most two connected solids may be apart.
-    const maxGap = r.domain.units.grid;
-    for (const rc of r.connections) {
-      const a = solids.get(rc.from.part);
-      const b = solids.get(rc.to.part);
-      if (!(a && b)) {
-        continue;
-      }
-      const candidates = a
-        .flatMap((sa) => b.map((sb) => ({ a: sa, b: sb, lowerBound: lowerBoundDistanceWorld(sa, sb) })))
-        .sort((left, right) => left.lowerBound - right.lowerBound);
-      let gap = Number.POSITIVE_INFINITY;
-      for (const pair of candidates) {
-        if (pair.lowerBound > gap) {
-          break;
-        }
-        gap = Math.min(gap, distanceWorld(pair.a, pair.b));
-        if (gap <= maxGap) {
-          break;
-        }
-      }
-      if (gap > maxGap) {
-        issues.push({
-          rule: 'connection-contact',
-          message: `${rc.conn.from} and ${rc.conn.to} have a ${fmt(gap)}u gap between their solids (maximum: ${fmt(maxGap)}u).`,
-          parts: [rc.from.part, rc.to.part],
-          ports: [rc.conn.from, rc.conn.to],
-        });
-      }
-    }
-    return issues;
-  },
+  check: (r) => checkConnectionContact(r),
 };
+
+/** Existing connection-contact rule restricted to the connections of one newly placed part. */
+export const connectionContactForPart = (r: Resolved, part: string): Issue[] => checkConnectionContact(r, part);
 
 const keepOutAllowedParts = (r: Resolved, owner: string, allowPort?: string): ReadonlySet<string> => {
   const allowed = new Set([owner]);

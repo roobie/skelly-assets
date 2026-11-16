@@ -19,7 +19,11 @@ import content from '../../../../models/finishes.json' with { type: 'json' };
 
 const Fraction = pipe(number(), finite(), minValue(0), maxValue(1));
 const Colour = tuple([Fraction, Fraction, Fraction]);
-const Metres = pipe(number(), finite(), check((metres) => metres > 0, 'must be a positive length in metres'));
+const Metres = pipe(
+  number(),
+  finite(),
+  check((metres) => metres > 0, 'must be a positive length in metres'),
+);
 
 /** The surface patterns a renderer draws a fabric finish's grain with, one per kind of cloth, hide or rubber. */
 export const FABRIC_KINDS = ['woven', 'twill', 'knit', 'felt', 'leather', 'rubber'] as const;
@@ -74,7 +78,13 @@ export type FabricDef = NonNullable<MaterialDef['finish']['fabric']>;
  */
 export const surfaceOf = (finish: MaterialDef['finish']) => {
   const opacity = finish.opacity ?? 1;
-  return { opacity, transparent: opacity < 1, depthWrite: opacity >= 1, sheen: finish.sheen, clearcoat: finish.clearcoat };
+  return {
+    opacity,
+    transparent: opacity < 1,
+    depthWrite: opacity >= 1,
+    sheen: finish.sheen,
+    clearcoat: finish.clearcoat,
+  };
 };
 export const MaterialReferenceSchema = strictObject({
   materialId: pipe(string(), nonEmpty()),

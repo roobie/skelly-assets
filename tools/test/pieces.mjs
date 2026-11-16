@@ -4,7 +4,9 @@ import { solid } from '../pieceSolid.mjs';
 // A piece's shape and material, ignoring the id and slot names, which a fused row may prefix with a part's site.
 const shape = (piece, finish) => {
   const { id, slot, ...geometry } = piece;
-  return JSON.stringify({ geometry, material: finish[slot] }, (_key, value) => (typeof value === 'number' ? Math.round(value * 1e9) / 1e9 : value));
+  return JSON.stringify({ geometry, material: finish[slot] }, (_key, value) =>
+    typeof value === 'number' ? Math.round(value * 1e9) / 1e9 : value,
+  );
 };
 // Every shape that drawn parts draw, as a sorted list, so two fittings drawing the same things compare equal.
 export const shapes = (drawn) => drawn.flatMap((d) => d.pieces.map((p) => shape(p, d.finish))).sort();
@@ -47,7 +49,9 @@ export const overlaps = (a, b, step = 0.002) => holds(a, b, step, 0, (dp, dq) =>
 // The pairs among drawn parts that share space, as [i, j] with i < j, from `{ parts, step }`: one fitting's whole scan as a
 // task, so a test can spread its fittings over a worker pool (tools/workerPool.mjs).
 export const overlappingPairs = ({ parts, step }) =>
-  parts.flatMap((a, i) => parts.slice(i + 1).flatMap((b, k) => (overlaps(a.pieces, b.pieces, step) ? [[i, i + 1 + k]] : [])));
+  parts.flatMap((a, i) =>
+    parts.slice(i + 1).flatMap((b, k) => (overlaps(a.pieces, b.pieces, step) ? [[i, i + 1 + k]] : [])),
+  );
 
 // Both of how two drawn parts meet, for a test that asks both.
 export const meeting = (a, b, step = 0.002) => ({ touches: touches(a, b, step), overlaps: overlaps(a, b, step) });

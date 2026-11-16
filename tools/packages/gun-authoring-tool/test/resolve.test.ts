@@ -13,7 +13,6 @@ const at = (r: ReturnType<typeof resolve>, part: string, p: readonly [number, nu
 
 const expectVec = (actual: readonly number[], expected: readonly number[]) => {
   for (const [i, v] of actual.entries()) {
-    // biome-ignore lint/suspicious/noMisplacedAssertion: helper, only called from inside it()
     expect(v).toBeCloseTo(expected[i]!);
   }
 };

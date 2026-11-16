@@ -239,14 +239,43 @@ const CLAW_AMPLITUDE_DEG = 10;
 /** Bake-facing oscillator data, in right-multiplication order (sway before breath). The live idle runs on the
  * saved Sim wander clock, so each period names that clock. */
 export const idleMotion = (stance: IdleStance) => [
-  { periodSimSeconds: 2 * Math.PI / SWAY_RATE, amplitudeDeg: SWAY_AMPLITUDE_DEG, salt: 2,
-    bones: [{ bone: 'spine', axis: 'z', scale: 0.6 }, { bone: 'chest', axis: 'z', scale: 1 }] },
-  { periodSimSeconds: 2 * Math.PI / BREATH_RATE, amplitudeDeg: BREATH_AMPLITUDE_DEG, salt: 1,
-    bones: [{ bone: 'spine', axis: 'x', scale: 0.6 }, { bone: 'chest', axis: 'x', scale: 1 }] },
-  { periodSimSeconds: 2 * Math.PI / HEAD_RATE, amplitudeDeg: HEAD_AMPLITUDE_DEG, salt: 3,
-    bones: [{ bone: 'head', axis: 'y', scale: 1 }] },
-  ...(stance === 'aggravated' ? [{ periodSimSeconds: 2 * Math.PI / CLAW_RATE, amplitudeDeg: CLAW_AMPLITUDE_DEG, salt: 4,
-    bones: [{ bone: 'forearm.L', axis: 'x', scale: 1 }, { bone: 'forearm.R', axis: 'x', scale: -1 }] }] : []),
+  {
+    periodSimSeconds: (2 * Math.PI) / SWAY_RATE,
+    amplitudeDeg: SWAY_AMPLITUDE_DEG,
+    salt: 2,
+    bones: [
+      { bone: 'spine', axis: 'z', scale: 0.6 },
+      { bone: 'chest', axis: 'z', scale: 1 },
+    ],
+  },
+  {
+    periodSimSeconds: (2 * Math.PI) / BREATH_RATE,
+    amplitudeDeg: BREATH_AMPLITUDE_DEG,
+    salt: 1,
+    bones: [
+      { bone: 'spine', axis: 'x', scale: 0.6 },
+      { bone: 'chest', axis: 'x', scale: 1 },
+    ],
+  },
+  {
+    periodSimSeconds: (2 * Math.PI) / HEAD_RATE,
+    amplitudeDeg: HEAD_AMPLITUDE_DEG,
+    salt: 3,
+    bones: [{ bone: 'head', axis: 'y', scale: 1 }],
+  },
+  ...(stance === 'aggravated'
+    ? [
+        {
+          periodSimSeconds: (2 * Math.PI) / CLAW_RATE,
+          amplitudeDeg: CLAW_AMPLITUDE_DEG,
+          salt: 4,
+          bones: [
+            { bone: 'forearm.L', axis: 'x', scale: 1 },
+            { bone: 'forearm.R', axis: 'x', scale: -1 },
+          ],
+        },
+      ]
+    : []),
 ];
 
 /** A cheap, deterministic 0..2π phase from `seed` and a `salt` (so different motions don't all line up) —

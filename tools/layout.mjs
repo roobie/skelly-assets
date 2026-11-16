@@ -15,7 +15,12 @@ function assertPackId(packId) {
 
 export function outputPath(packId, file) {
   assertPackId(packId);
-  if (!file || file.includes('\\') || posix.isAbsolute(file) || file.split('/').some(segment => segment === '..' || segment === '.' || segment === '')) {
+  if (
+    !file ||
+    file.includes('\\') ||
+    posix.isAbsolute(file) ||
+    file.split('/').some((segment) => segment === '..' || segment === '.' || segment === '')
+  ) {
     throw new Error(`Invalid logical output path: ${file}`);
   }
   return posix.join(packId, file);
@@ -52,23 +57,30 @@ export function readMobRows(root = repo) {
 // models/sounds/<packId>.jsonnet: each file holds one pack's sound rows, so its name declares the pack, as a recipe
 // file's does, and the packs are known without compiling the rows.
 export const SOUNDS = 'models/sounds';
-export const soundPackIds = (root = repo) => readdirSync(join(root, SOUNDS)).filter((name) => name.endsWith('.jsonnet')).sort()
-  .map((name) => name.slice(0, -'.jsonnet'.length));
+export const soundPackIds = (root = repo) =>
+  readdirSync(join(root, SOUNDS))
+    .filter((name) => name.endsWith('.jsonnet'))
+    .sort()
+    .map((name) => name.slice(0, -'.jsonnet'.length));
 
 // Pack id -> its compiled rows by id, as written; tools/packages/impact-synth/src/schema.ts validates them.
-export const readSoundPacks = (root = repo) => Object.fromEntries(soundPackIds(root)
-  .map((pack) => [pack, JSON.parse(readFileSync(join(root, SOUNDS, `${pack}.json`), 'utf8'))]));
+export const readSoundPacks = (root = repo) =>
+  Object.fromEntries(
+    soundPackIds(root).map((pack) => [pack, JSON.parse(readFileSync(join(root, SOUNDS, `${pack}.json`), 'utf8'))]),
+  );
 
 // Every sound row with the files it is baked to under its pack: the row itself as data, so a tool can render it again,
 // and one audio file per seed.
-export const readSoundRows = (root = repo) => Object.entries(readSoundPacks(root)).flatMap(([pack, rows]) => Object.entries(rows)
-  .map(([id, row]) => ({
-    id,
-    pack,
-    row,
-    data: `sounds/${id}.json`,
-    variants: row.seeds.map((seed) => ({ seed, path: `sounds/${id}/${seed}.ogg` })),
-  })));
+export const readSoundRows = (root = repo) =>
+  Object.entries(readSoundPacks(root)).flatMap(([pack, rows]) =>
+    Object.entries(rows).map(([id, row]) => ({
+      id,
+      pack,
+      row,
+      data: `sounds/${id}.json`,
+      variants: row.seeds.map((seed) => ({ seed, path: `sounds/${id}/${seed}.ogg` })),
+    })),
+  );
 
 export function declaredPacks(root = repo) {
   return new Set([
@@ -81,6 +93,14 @@ export function declaredPacks(root = repo) {
 
 // Every directory directly under built/ must be a declared pack; flat files are not directories.
 export function undeclaredDirectories(paths, declared) {
-  const directories = new Set(paths.map((path) => path.split('/')).filter((parts) => parts[0] === 'built' && parts.length > 2).map((parts) => parts[1]));
-  return [...directories].filter((directory) => !declared.has(directory)).sort().map((directory) => `built/${directory}`);
+  const directories = new Set(
+    paths
+      .map((path) => path.split('/'))
+      .filter((parts) => parts[0] === 'built' && parts.length > 2)
+      .map((parts) => parts[1]),
+  );
+  return [...directories]
+    .filter((directory) => !declared.has(directory))
+    .sort()
+    .map((directory) => `built/${directory}`);
 }

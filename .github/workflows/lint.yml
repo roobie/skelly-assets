@@ -1,0 +1,39 @@
+name: lint
+
+# Biome over tools/: formatting, lint and import order (see tools/biome.jsonc).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/**'
+      - '.node-version'
+      - '.github/actions/node/**'
+      - '.github/workflows/lint.yml'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - 'tools/**'
+      - '.node-version'
+      - '.github/actions/node/**'
+      - '.github/workflows/lint.yml'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  biome:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/node
+        with:
+          npm-cache: true
+      - run: npm ci
+      # The npm script runs the lockfile's @biomejs/biome; `npx biome` could fall back to the unrelated `biome` package.
+      - run: npm run lint -- --reporter=github

@@ -11,7 +11,6 @@ export type Layers = EngineLayers;
 export const disposeGroup = disposeEngineGroup;
 
 // Preserve the viewer's existing call shape while supplying the Gungen renderer and palette.
-// biome-ignore lint/complexity/useMaxParams: Mirrors the existing scene API; only renderer dependencies are injected.
 export function buildLayers(
   report: Report,
   focus: readonly Issue[],

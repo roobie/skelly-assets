@@ -1,12 +1,13 @@
 import {
+  array,
   check,
   finite,
   type InferOutput,
   integer,
-  maxValue,
-  minValue,
   maxLength,
+  maxValue,
   minLength,
+  minValue,
   nullable,
   number,
   parse,
@@ -15,12 +16,15 @@ import {
   regex,
   strictObject,
   string,
-  array,
 } from 'valibot';
 
 const Fraction = pipe(number(), finite(), minValue(0), maxValue(1));
 const NonNegative = pipe(number(), finite(), minValue(0));
-const Positive = pipe(number(), finite(), check((value) => value > 0, 'must be greater than 0'));
+const Positive = pipe(
+  number(),
+  finite(),
+  check((value) => value > 0, 'must be greater than 0'),
+);
 const Hz = pipe(Positive, maxValue(96000));
 const Ms = pipe(Positive, maxValue(10000));
 const Seconds = pipe(Positive, maxValue(10));
@@ -39,12 +43,12 @@ const ordered = <T extends Record<string, number>>(low: keyof T & string, high: 
 const ModeSchema = strictObject({ hz: Hz, ms: Ms, gain: NonNegative });
 
 /** A pair of close frequencies per mode, which beat; `lean` shifts the level between the pair. */
-const SplitSchema = strictObject({ ratio: pipe(NonNegative, maxValue(0.1)), lean: pipe(number(), finite(), minValue(-1), maxValue(1)) });
+const SplitSchema = strictObject({
+  ratio: pipe(NonNegative, maxValue(0.1)),
+  lean: pipe(number(), finite(), minValue(-1), maxValue(1)),
+});
 
-const SpinSchema = pipe(
-  strictObject({ minHz: Hz, maxHz: Hz, depth: Fraction }),
-  ordered('minHz', 'maxHz'),
-);
+const SpinSchema = pipe(strictObject({ minHz: Hz, maxHz: Hz, depth: Fraction }), ordered('minHz', 'maxHz'));
 
 const DoubleStrikeSchema = pipe(
   strictObject({
@@ -90,7 +94,12 @@ const SurfaceSchema = strictObject({
 });
 
 /** Below 1, so a drop's bounces always die away. */
-const Restitution = pipe(number(), finite(), minValue(0), check((value) => value < 1, 'must be below 1'));
+const Restitution = pipe(
+  number(),
+  finite(),
+  minValue(0),
+  check((value) => value < 1, 'must be below 1'),
+);
 
 const StrikeSchema = pipe(
   strictObject({
@@ -104,8 +113,16 @@ const StrikeSchema = pipe(
       ordered('hardAttackSeconds', 'softAttackSeconds'),
     ),
     body: pipe(
-      strictObject({ attackSeconds: Seconds, overtoneLevel: NonNegative, hardnessShare: Fraction, randomShare: Fraction }),
-      check(({ hardnessShare, randomShare }) => hardnessShare + randomShare <= 1, 'the pitch shares must not sum above 1'),
+      strictObject({
+        attackSeconds: Seconds,
+        overtoneLevel: NonNegative,
+        hardnessShare: Fraction,
+        randomShare: Fraction,
+      }),
+      check(
+        ({ hardnessShare, randomShare }) => hardnessShare + randomShare <= 1,
+        'the pitch shares must not sum above 1',
+      ),
     ),
     landing: strictObject({ scatter: NonNegative, poseWeight: NonNegative }),
     splitSpacing: strictObject({ least: NonNegative, spread: NonNegative }),

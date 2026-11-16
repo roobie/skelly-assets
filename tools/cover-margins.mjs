@@ -11,7 +11,10 @@ import { coveringItems, modelMeshes, readDoll, readDressing, wornSites } from '.
 import { MANIFEST } from './manifest.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
-const { values, positionals } = parseArgs({ allowPositionals: true, options: { built: { type: 'string', default: join(repo, 'built') } } });
+const { values, positionals } = parseArgs({
+  allowPositionals: true,
+  options: { built: { type: 'string', default: join(repo, 'built') } },
+});
 const built = resolve(values.built);
 const manifest = JSON.parse(readFileSync(join(built, MANIFEST), 'utf8'));
 const models = manifest.models.filter(({ path }) => path.endsWith('.glb'));
@@ -20,14 +23,21 @@ const dressing = readDressing(repo);
 const doll = readDoll(built, manifest, dressing);
 const rig = dollRig(readRigContent(repo), doll, dressing);
 const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, byId.get(id).pack, byId.get(id).path)), keep);
-const unplaced = () => { throw new Error('a covering item is dressed by its worn pieces, never placed whole'); };
+const unplaced = () => {
+  throw new Error('a covering item is dressed by its worn pieces, never placed whole');
+};
 
 // Worst first: the lesser of the margins across and along the bone, then the other.
-const order = (a, b) => Math.min(a.margin, a.end) - Math.min(b.margin, b.end) || Math.max(a.margin, a.end) - Math.max(b.margin, b.end);
+const order = (a, b) =>
+  Math.min(a.margin, a.end) - Math.min(b.margin, b.end) || Math.max(a.margin, a.end) - Math.max(b.margin, b.end);
 // The worse side of each declaration, since a consumer hides it on both.
 const worst = new Map();
 for (const id of positionals.length > 0 ? positionals : coveringItems(models)) {
-  for (const row of coverMargins(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf)) {
+  for (const row of coverMargins(
+    rig,
+    wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }),
+    meshesOf,
+  )) {
     const key = `${row.piece} ${row.name}`;
     if (!worst.has(key) || order(row, worst.get(key)) < 0) worst.set(key, row);
   }
@@ -37,5 +47,7 @@ const point = (at) => (at ? at.map((x) => x.toFixed(3)).join(', ') : '');
 console.log('| piece | covers | margin (mm) | at (m) | end (mm) | end at (m) | beneath | open | samples | side |');
 console.log('|---|---|--:|---|--:|---|--:|--:|--:|---|');
 for (const { piece, name, margin, at, end, endAt, beneath, open, samples, side } of [...worst.values()].sort(order)) {
-  console.log(`| ${piece} | ${name} | ${mm(margin)} | ${point(at)} | ${mm(end)} | ${point(endAt)} | ${beneath} | ${open} | ${samples} | ${side} |`);
+  console.log(
+    `| ${piece} | ${name} | ${mm(margin)} | ${point(at)} | ${mm(end)} | ${point(endAt)} | ${beneath} | ${open} | ${samples} | ${side} |`,
+  );
 }

@@ -17,9 +17,7 @@ import { pumpShotgun, TEMPLATES } from '../src/gun/templates.ts';
 const PUMP_LENGTH = /^(M|L)$/;
 
 const pumpSamples = (): Assembly[] => {
-  const loaded = loadGunDesign(
-    readFileSync(join(DESIGNS, 'archetype-pump-shotgun.json'), 'utf8'),
-  );
+  const loaded = loadGunDesign(readFileSync(join(DESIGNS, 'archetype-pump-shotgun.json'), 'utf8'));
   if (!loaded.ok) {
     throw new Error(loaded.error.message);
   }

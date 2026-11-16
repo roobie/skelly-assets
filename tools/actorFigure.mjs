@@ -5,9 +5,11 @@ import { fusedMassManifest } from './packages/mobgen/src/mob/fusedMass.ts';
 
 /** A body exports only hit regions naming bones it realizes, so an amputated plan leaves no dangling references. */
 export const realizedRegionBones = (regionBones, boneIds) =>
-  regionBones === undefined ? undefined : Object.fromEntries(
-    Object.entries(regionBones).map(([region, ids]) => [region, ids.filter((id) => boneIds.has(id))]),
-  );
+  regionBones === undefined
+    ? undefined
+    : Object.fromEntries(
+        Object.entries(regionBones).map(([region, ids]) => [region, ids.filter((id) => boneIds.has(id))]),
+      );
 
 /** Adapt an already-realized row in the generator's rest-world frame, which the export turns (tools/actorFrame.mjs). */
 export function figureFor(generated, template, scale) {
@@ -16,33 +18,57 @@ export function figureFor(generated, template, scale) {
   const voxelCentersByBone = new Map();
   const limits = new Map();
   const total = { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
-  for (let k = 0; k < voxels.dims[2]; k++) for (let j = 0; j < voxels.dims[1]; j++) for (let i = 0; i < voxels.dims[0]; i++) {
-    const owner = voxels.owner[i + j * voxels.dims[0] + k * voxels.dims[0] * voxels.dims[1]];
-    if (!owner) continue;
-    const id = body.bones[owner - 1].id;
-    const point = worldPosition(voxels, i, j, k);
-    if (!voxelCentersByBone.has(id)) voxelCentersByBone.set(id, []);
-    voxelCentersByBone.get(id).push(point);
-    if (!limits.has(id)) limits.set(id, { min: [...point], max: [...point] });
-    const bounds = limits.get(id);
-    for (let axis = 0; axis < 3; axis++) {
-      bounds.min[axis] = Math.min(bounds.min[axis], point[axis]);
-      bounds.max[axis] = Math.max(bounds.max[axis], point[axis]);
-      total.min[axis] = Math.min(total.min[axis], point[axis] - voxels.size / 2);
-      total.max[axis] = Math.max(total.max[axis], point[axis] + voxels.size / 2);
-    }
-  }
+  for (let k = 0; k < voxels.dims[2]; k++)
+    for (let j = 0; j < voxels.dims[1]; j++)
+      for (let i = 0; i < voxels.dims[0]; i++) {
+        const owner = voxels.owner[i + j * voxels.dims[0] + k * voxels.dims[0] * voxels.dims[1]];
+        if (!owner) continue;
+        const id = body.bones[owner - 1].id;
+        const point = worldPosition(voxels, i, j, k);
+        if (!voxelCentersByBone.has(id)) voxelCentersByBone.set(id, []);
+        voxelCentersByBone.get(id).push(point);
+        if (!limits.has(id)) limits.set(id, { min: [...point], max: [...point] });
+        const bounds = limits.get(id);
+        for (let axis = 0; axis < 3; axis++) {
+          bounds.min[axis] = Math.min(bounds.min[axis], point[axis]);
+          bounds.max[axis] = Math.max(bounds.max[axis], point[axis]);
+          total.min[axis] = Math.min(total.min[axis], point[axis] - voxels.size / 2);
+          total.max[axis] = Math.max(total.max[axis], point[axis] + voxels.size / 2);
+        }
+      }
   const fused = template.bodyPlan === 'fused-mass';
   const manifest = fused ? fusedMassManifest(body, voxels) : undefined;
   const regions = fused
     ? Object.fromEntries(manifest.regions.map((r) => [r.id, r.boneIds]))
     : realizedRegionBones(planOf(template.bodyPlan).regionBones, new Set(body.bones.map((bone) => bone.id)));
   const margin = voxels.size / 2 + (fused ? 0 : 0.001);
-  const boxes = regions === undefined ? undefined : Object.fromEntries(Object.entries(regions).map(([region, ids]) => [region, ids.flatMap((bone) => {
-    const bounds = limits.get(bone);
-    return bounds ? [{ bone, center: bounds.min.map((v, a) => (v + bounds.max[a]) / 2), halfSize: bounds.min.map((v, a) => (bounds.max[a] - v) / 2 + margin) }] : [];
-  })]));
-  const figure = { seed: genome.seed, genome, realized, ...(regions === undefined ? {} : { regions, boxes, severableParts: regionSeverableParts(body.bones, regions) }), voxelCentersByBone };
+  const boxes =
+    regions === undefined
+      ? undefined
+      : Object.fromEntries(
+          Object.entries(regions).map(([region, ids]) => [
+            region,
+            ids.flatMap((bone) => {
+              const bounds = limits.get(bone);
+              return bounds
+                ? [
+                    {
+                      bone,
+                      center: bounds.min.map((v, a) => (v + bounds.max[a]) / 2),
+                      halfSize: bounds.min.map((v, a) => (bounds.max[a] - v) / 2 + margin),
+                    },
+                  ]
+                : [];
+            }),
+          ]),
+        );
+  const figure = {
+    seed: genome.seed,
+    genome,
+    realized,
+    ...(regions === undefined ? {} : { regions, boxes, severableParts: regionSeverableParts(body.bones, regions) }),
+    voxelCentersByBone,
+  };
   if (!fused) return figure;
   if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError('fused scale must be positive and finite');
   const bounds = { min: total.min.map((v) => v * scale), max: total.max.map((v) => v * scale) };
@@ -53,6 +79,15 @@ export function figureFor(generated, template, scale) {
   const centroid = centers.reduce((sum, point) => sum.map((v, a) => v + point[a] / centers.length), [0, 0, 0]);
   const distance = (p) => p.reduce((sum, v, a) => sum + (v - centroid[a]) ** 2, 0);
   const coreInteriorPoint = centers.some((p) => p.every((v, a) => Math.abs(v - centroid[a]) < voxels.size / 2))
-    ? centroid : centers.reduce((nearest, point) => distance(point) < distance(nearest) ? point : nearest, centers[0]);
-  return { ...figure, scale, manifest, bounds, originOffset, coreInteriorPoint, restStrikeOrigin: coreInteriorPoint.map((v, a) => v * scale + originOffset[a]) };
+    ? centroid
+    : centers.reduce((nearest, point) => (distance(point) < distance(nearest) ? point : nearest), centers[0]);
+  return {
+    ...figure,
+    scale,
+    manifest,
+    bounds,
+    originOffset,
+    coreInteriorPoint,
+    restStrikeOrigin: coreInteriorPoint.map((v, a) => v * scale + originOffset[a]),
+  };
 }

@@ -6,8 +6,8 @@
 // lift its sole stands the figure on { soleLift }.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { glbAccessor, glbJson } from './glb.mjs';
+import { evaluateJsonnet } from './jsonnet/index.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -17,11 +17,16 @@ export const readDressing = (root = repo) => JSON.parse(evaluateJsonnet("import 
 
 const AXES = [0, 1, 2];
 const empty = () => ({ min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] });
-const union = (boxes) => boxes.reduce((into, { min, max }) => ({
-  min: AXES.map((a) => Math.min(into.min[a], min[a])),
-  max: AXES.map((a) => Math.max(into.max[a], max[a])),
-}), empty());
-const corners = ({ min, max }) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => AXES.map((a) => ((i >> a) & 1 ? max[a] : min[a])));
+const union = (boxes) =>
+  boxes.reduce(
+    (into, { min, max }) => ({
+      min: AXES.map((a) => Math.min(into.min[a], min[a])),
+      max: AXES.map((a) => Math.max(into.max[a], max[a])),
+    }),
+    empty(),
+  );
+const corners = ({ min, max }) =>
+  [0, 1, 2, 3, 4, 5, 6, 7].map((i) => AXES.map((a) => ((i >> a) & 1 ? max[a] : min[a])));
 const boxOf = (points) => union(points.map((p) => ({ min: p, max: p })));
 const moved = (box, by) => ({ min: box.min.map((x, a) => x + by[a]), max: box.max.map((x, a) => x + by[a]) });
 const mirrorX = ([x, y, z]) => [-x, y, z];
@@ -35,13 +40,27 @@ const rotate = ([x, y, z, w], v) => {
   const q = [x, y, z];
   const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const t = cross(q, v).map((c) => 2 * c);
-  return sum(sum(v, t.map((c) => w * c)), cross(q, t));
+  return sum(
+    sum(
+      v,
+      t.map((c) => w * c),
+    ),
+    cross(q, t),
+  );
 };
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
 
 // A glTF node's transform as a function of a point in its own frame.
-const nodeTransform = ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale = [1, 1, 1] }) =>
-  (p) => sum(rotate(rotation, p.map((x, a) => x * scale[a])), translation);
+const nodeTransform =
+  ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale = [1, 1, 1] }) =>
+  (p) =>
+    sum(
+      rotate(
+        rotation,
+        p.map((x, a) => x * scale[a]),
+      ),
+      translation,
+    );
 
 // ---- reading a built model ----
 
@@ -54,12 +73,21 @@ function meshNodes(buffer, gltf = glbJson(buffer)) {
     const node = gltf.nodes[index];
     const local = nodeTransform(node);
     const here = (p) => toModel(local(p));
-    const own = node.extras?.part === undefined ? part : { name: node.extras.part, at: here([0, 0, 0]), turned: Boolean(node.rotation) && node.rotation.some((x, i) => x !== (i === 3 ? 1 : 0)) };
+    const own =
+      node.extras?.part === undefined
+        ? part
+        : {
+            name: node.extras.part,
+            at: here([0, 0, 0]),
+            turned: Boolean(node.rotation) && node.rotation.some((x, i) => x !== (i === 3 ? 1 : 0)),
+          };
     if (node.mesh !== undefined) {
-      const box = union(gltf.meshes[node.mesh].primitives.map(({ attributes }) => {
-        const { min, max } = gltf.accessors[attributes.POSITION];
-        return boxOf(corners({ min, max }).map(here));
-      }));
+      const box = union(
+        gltf.meshes[node.mesh].primitives.map(({ attributes }) => {
+          const { min, max } = gltf.accessors[attributes.POSITION];
+          return boxOf(corners({ min, max }).map(here));
+        }),
+      );
       found.push({ part: own, box, mesh: gltf.meshes[node.mesh], toModel: here });
     }
     for (const child of node.children ?? []) walk(child, here, own);
@@ -77,7 +105,8 @@ export function modelParts(buffer) {
   const byName = new Map();
   for (const { part, box } of meshNodes(buffer)) {
     if (!part) continue;
-    if (part.turned) throw new Error(`part ${part.name} is turned in its model; a doll part must keep the model's axes`);
+    if (part.turned)
+      throw new Error(`part ${part.name} is turned in its model; a doll part must keep the model's axes`);
     const seen = byName.get(part.name);
     byName.set(part.name, { part: part.name, at: part.at, box: seen ? union([seen.box, box]) : box });
   }
@@ -98,11 +127,15 @@ export function modelMeshes(buffer, keep = () => true) {
     byName.set(part.name, into);
     for (const { attributes, indices, mode = TRIANGLES, extras } of mesh.primitives) {
       if (!keep(part.name, extras?.piece, extras?.slot)) continue;
-      if (mode !== TRIANGLES) throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
+      if (mode !== TRIANGLES)
+        throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
       const base = into.positions.length / 3;
       const positions = glbAccessor(buffer, gltf, attributes.POSITION);
       for (let i = 0; i < positions.length; i += 3) into.positions.push(...toModel(positions.slice(i, i + 3)));
-      const order = indices === undefined ? Array.from({ length: positions.length / 3 }, (_, i) => i) : glbAccessor(buffer, gltf, indices);
+      const order =
+        indices === undefined
+          ? Array.from({ length: positions.length / 3 }, (_, i) => i)
+          : glbAccessor(buffer, gltf, indices);
       for (const index of order) into.indices.push(base + index);
       for (let t = 0; t < order.length / 3; t++) into.pieces.push(extras?.piece);
     }
@@ -132,7 +165,14 @@ export function dollOf(dressing, figure) {
       const site = sites.push({ model, at: difference(hung, flip(own)), ...(mirror ? { mirror } : {}) }) - 1;
       for (const { part, at, box } of figure[model].parts) {
         const local = moved(box, difference([0, 0, 0], own));
-        add({ part, side, site, at: sum(hung, flip(difference(at, own))), box: moved(mirror ? mirrored(local) : local, hung), ...(mirror ? { mirror } : {}) });
+        add({
+          part,
+          side,
+          site,
+          at: sum(hung, flip(difference(at, own))),
+          box: moved(mirror ? mirrored(local) : local, hung),
+          ...(mirror ? { mirror } : {}),
+        });
       }
     }
   }
@@ -167,7 +207,10 @@ export function wornPieces(id, models, dressing) {
   return models.flatMap((model) => {
     const piece = pieceOf(model);
     if (piece?.garment !== id) return [];
-    const declared = { ...(model.covers ? { covers: model.covers } : {}), ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }) };
+    const declared = {
+      ...(model.covers ? { covers: model.covers } : {}),
+      ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
+    };
     return [{ model: model.id, part: piecePart(model.id, piece, dressing), ...declared }];
   });
 }
@@ -175,25 +218,38 @@ export function wornPieces(id, models, dressing) {
 // What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
 // regions the dressing cuts that part into, since a consumer hides by those names and no other.
 export function coversProblems(models, dressing) {
-  return models.filter(({ covers }) => covers).flatMap(({ id, covers }) => {
-    const worn = /_worn(?:_([^_]+))?$/.exec(id);
-    if (!worn) return [`${id} declares what it covers but is no worn piece`];
-    const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
-    if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
-    const names = [part, ...(dressing.regions[part] ?? [])];
-    return covers.filter((name) => !names.includes(name)).map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
-  });
+  return models
+    .filter(({ covers }) => covers)
+    .flatMap(({ id, covers }) => {
+      const worn = /_worn(?:_([^_]+))?$/.exec(id);
+      if (!worn) return [`${id} declares what it covers but is no worn piece`];
+      const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
+      if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
+      const names = [part, ...(dressing.regions[part] ?? [])];
+      return covers
+        .filter((name) => !names.includes(name))
+        .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
+    });
 }
 
 // The items any of whose worn pieces declares what it covers, by the pieces' ids, whether or not the tree holds the item
 // itself: a set of worn shells with no ground model is still dressed to check what it declares.
-export const coveringItems = (models) => [...new Set(models.flatMap((model) => {
-  const item = model.covers && tagsOf(model, 'fit').includes('worn') ? /^(.+)_worn(?:_[^_]+)?$/.exec(model.id)?.[1] : undefined;
-  return item ? [item] : [];
-}))];
+export const coveringItems = (models) => [
+  ...new Set(
+    models.flatMap((model) => {
+      const item =
+        model.covers && tagsOf(model, 'fit').includes('worn')
+          ? /^(.+)_worn(?:_[^_]+)?$/.exec(model.id)?.[1]
+          : undefined;
+      return item ? [item] : [];
+    }),
+  ),
+];
 
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
-export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
+export const isWearable = (model, models) =>
+  tagsOf(model, 'fit').length === 0 &&
+  (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
 
 // The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
 export function placeOf(model, dressing) {
@@ -208,7 +264,8 @@ export function placeOf(model, dressing) {
 function layerTwinOf(model, dressing) {
   if (!tagsOf(model, 'fit').some((fit) => dressing.layers.includes(fit))) return undefined;
   const match = PIECE_ID.exec(model.id);
-  if (match?.[2] === undefined) throw new Error(`${model.id}: a piece fitted over other clothing is named <item>_worn_<layer>`);
+  if (match?.[2] === undefined)
+    throw new Error(`${model.id}: a piece fitted over other clothing is named <item>_worn_<layer>`);
   return `${match[1]}_worn`;
 }
 
@@ -219,7 +276,8 @@ function layerTwinOf(model, dressing) {
 export function wornOnParts(models, dressing, dollParts) {
   const byId = new Map(models.map((model) => [model.id, model]));
   const garments = new Set(models.map((model) => pieceOf(model)?.garment).filter(Boolean));
-  const placed = (model) => tagsOf(model, 'fit').length === 0 && tagsOf(model, 'slot').length > 0 && !garments.has(model.id);
+  const placed = (model) =>
+    tagsOf(model, 'fit').length === 0 && tagsOf(model, 'slot').length > 0 && !garments.has(model.id);
   const pieceOn = (piece) => ({ part: piecePart(piece.id, pieceOf(piece), dressing) });
   const wornOn = new Map();
   for (const model of models) {
@@ -227,7 +285,8 @@ export function wornOnParts(models, dressing, dollParts) {
     if (pieceOf(model)) wornOn.set(model.id, pieceOn(model));
     else if (twinId !== undefined) {
       const twin = byId.get(twinId);
-      if (!twin || !pieceOf(twin)) throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
+      if (!twin || !pieceOf(twin))
+        throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
       wornOn.set(model.id, pieceOn(twin));
     } else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, dollParts));
   }
@@ -255,7 +314,9 @@ export async function readDollParts(dressing) {
     return found;
   };
   return {
-    anchors: Object.fromEntries(Object.entries(row(dressing.doll.bust).anchors ?? {}).map(([name, { part }]) => [name, part])),
+    anchors: Object.fromEntries(
+      Object.entries(row(dressing.doll.bust).anchors ?? {}).map(([name, { part }]) => [name, part]),
+    ),
     sided: dressing.doll.limbs.flatMap(({ model }) => row(model).parts.map(({ id }) => id)),
   };
 }
@@ -289,9 +350,20 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   if (pieces.length > 0) {
     // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part, and a piece
     // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs).
-    return [...sites, ...pieces.flatMap(({ model: piece, part, covers, soleLift }) => copiesOf(part).map(({ side, at, mirror, site }) => ({
-      model: piece, part, side, at, ...(mirror ? { mirror } : {}), ...(covers ? { covers, bodySite: site } : {}), ...(soleLift === undefined ? {} : { soleLift }),
-    })))];
+    return [
+      ...sites,
+      ...pieces.flatMap(({ model: piece, part, covers, soleLift }) =>
+        copiesOf(part).map(({ side, at, mirror, site }) => ({
+          model: piece,
+          part,
+          side,
+          at,
+          ...(mirror ? { mirror } : {}),
+          ...(covers ? { covers, bodySite: site } : {}),
+          ...(soleLift === undefined ? {} : { soleLift }),
+        })),
+      ),
+    ];
   }
   const place = placeOf(model, dressing);
   if (place.anchor) {
@@ -305,16 +377,29 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).
   const at = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
-  return [...sites, { model: model.id, at, ...(lying ? { turn: STAND } : {}), ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }) }];
+  return [
+    ...sites,
+    {
+      model: model.id,
+      at,
+      ...(lying ? { turn: STAND } : {}),
+      ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
+    },
+  ];
 }
 
 // The doll as the built tree holds it: each doll model's parts from its GLB and anchors from its things sidecar.
 export function readDoll(built, manifest, dressing) {
   const names = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
-  return dollOf(dressing, Object.fromEntries(names.map((id) => {
-    const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    if (!entry) throw new Error(`doll: the built tree holds no ${id}`);
-    const { anchors } = JSON.parse(readFileSync(join(built, entry.pack, 'things', `${id}.model.json`), 'utf8'));
-    return [id, { parts: modelParts(readFileSync(join(built, entry.pack, entry.path))), anchors }];
-  })));
+  return dollOf(
+    dressing,
+    Object.fromEntries(
+      names.map((id) => {
+        const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
+        if (!entry) throw new Error(`doll: the built tree holds no ${id}`);
+        const { anchors } = JSON.parse(readFileSync(join(built, entry.pack, 'things', `${id}.model.json`), 'utf8'));
+        return [id, { parts: modelParts(readFileSync(join(built, entry.pack, entry.path))), anchors }];
+      }),
+    ),
+  );
 }

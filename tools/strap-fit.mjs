@@ -8,7 +8,7 @@
 // `packages/deadvox/test/playerFigure.test.ts`, `expectSnugStrap`.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { COINCIDENT, meshProbe, sampledSurface, STEP } from '../site/clearance.mjs';
+import { COINCIDENT, meshProbe, STEP, sampledSurface } from '../site/clearance.mjs';
 import { modelMeshes } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
@@ -26,14 +26,16 @@ export const at = (p) => `(${p.map((value) => value.toFixed(3)).join(', ')})`;
 // A point in a gear model's frame, carried into the bust model frame: turned `turn` degrees about y, then lifted `lift`.
 function placedPoint([x, y, z], turn, lift) {
   const angle = (turn * Math.PI) / 180;
-  const cos = Math.round(Math.cos(angle) * 1e12) / 1e12, sin = Math.round(Math.sin(angle) * 1e12) / 1e12;
+  const cos = Math.round(Math.cos(angle) * 1e12) / 1e12,
+    sin = Math.round(Math.sin(angle) * 1e12) / 1e12;
   return [cos * x + sin * z, y + lift, -sin * x + cos * z];
 }
 
 // `mesh`, in a gear model's frame, carried into the bust model frame point by point.
 export function placed(mesh, turn, lift) {
   const positions = [];
-  for (let i = 0; i < mesh.positions.length; i += 3) positions.push(...placedPoint(mesh.positions.slice(i, i + 3), turn, lift));
+  for (let i = 0; i < mesh.positions.length; i += 3)
+    positions.push(...placedPoint(mesh.positions.slice(i, i + 3), turn, lift));
   return { positions, indices: mesh.indices };
 }
 
@@ -50,23 +52,30 @@ export function strapFindings({ head, strap, grain, frame, worn, model }) {
   // Sampling at half the strap's grain puts a sample on every patch of its faces, which are whole lattice cells.
   const surface = sampledSurface(seated, grain / 2);
   // The inner face: a side face that shows, rather than lying inside another of the strap's boxes, and looks at the head.
-  const inner = surface.filter(({ point, normal }) => Math.abs(normal[1]) < 0.5
-    && onStrap.depth(point.map((value, k) => value + normal[k] * STEP)) > 0
-    && Number.isFinite(onHead.reach(point, normal)));
+  const inner = surface.filter(
+    ({ point, normal }) =>
+      Math.abs(normal[1]) < 0.5 &&
+      onStrap.depth(point.map((value, k) => value + normal[k] * STEP)) > 0 &&
+      Number.isFinite(onHead.reach(point, normal)),
+  );
   if (inner.length === 0) return [`${model}: no face of the strap looks at the head`];
   const depths = inner.map(({ point }) => ({ point, depth: onHead.depth(point) }));
   const findings = [];
   const sunk = depths.filter(({ depth }) => depth < -COINCIDENT);
   if (sunk.length > 0) {
     const deepest = sunk.reduce((worst, sample) => (sample.depth < worst.depth ? sample : worst));
-    findings.push(`${model}: ${sunk.length} of ${inner.length} samples of the strap's inner face lie inside the head, `
-      + `${millimetres(-deepest.depth)} deep at ${at(deepest.point)}`);
+    findings.push(
+      `${model}: ${sunk.length} of ${inner.length} samples of the strap's inner face lie inside the head, ` +
+        `${millimetres(-deepest.depth)} deep at ${at(deepest.point)}`,
+    );
   }
   const loose = depths.filter(({ depth }) => depth > bound + COINCIDENT);
   if (loose.length > 0) {
     const furthest = loose.reduce((worst, sample) => (sample.depth > worst.depth ? sample : worst));
-    findings.push(`${model}: ${loose.length} of ${inner.length} samples of the strap's inner face stand further off `
-      + `the head than a strap voxel's ${millimetres(bound)} diagonal, ${millimetres(furthest.depth)} at ${at(furthest.point)}`);
+    findings.push(
+      `${model}: ${loose.length} of ${inner.length} samples of the strap's inner face stand further off ` +
+        `the head than a strap voxel's ${millimetres(bound)} diagonal, ${millimetres(furthest.depth)} at ${at(furthest.point)}`,
+    );
   }
   return findings;
 }
@@ -79,7 +88,8 @@ export function strapFindings({ head, strap, grain, frame, worn, model }) {
  */
 export function anchorFindings({ head, anchors, frame, worn, model }) {
   const onHead = meshProbe(head);
-  const turn = frame.turn + worn.turn, lift = frame.height + worn.at;
+  const turn = frame.turn + worn.turn,
+    lift = frame.height + worn.at;
   const sides = Object.keys(anchors).flatMap((name) => /^strap_(.+)_inner$/.exec(name)?.slice(1) ?? []);
   if (sides.length === 0) return [`${model}: no strap anchors`];
   return sides.flatMap((side) => {
@@ -89,19 +99,28 @@ export function anchorFindings({ head, anchors, frame, worn, model }) {
     const outer = placedPoint(outerAnchor, turn, lift);
     const inward = inner.map((value, k) => value - outer[k]);
     const thickness = Math.hypot(...inward);
-    const reach = onHead.reach(inner, inward.map((value) => value / thickness));
+    const reach = onHead.reach(
+      inner,
+      inward.map((value) => value / thickness),
+    );
     if (reach <= thickness + COINCIDENT) return [];
     const off = Number.isFinite(reach) ? `lies ${millimetres(reach)} off` : 'is missed';
-    return [`${model}: looking in from its ${side} strap's inner anchor ${at(inner)}, the head ${off}, `
-      + `beyond the strap's ${millimetres(thickness)} thickness`];
+    return [
+      `${model}: looking in from its ${side} strap's inner anchor ${at(inner)}, the head ${off}, ` +
+        `beyond the strap's ${millimetres(thickness)} thickness`,
+    ];
   });
 }
 
 // A gear model's strap as one mesh in its model frame, with the voxel grain its strap is drawn at.
 function strapOf(buffer, model) {
-  const meshes = modelMeshes(buffer, (part, piece, slot) => slot === STRAP);
-  const grains = new Set(glbJson(buffer).meshes.flatMap(({ primitives }) => primitives)
-    .filter(({ extras }) => extras?.slot === STRAP).map(({ extras }) => extras.voxelGrain));
+  const meshes = modelMeshes(buffer, (_part, _piece, slot) => slot === STRAP);
+  const grains = new Set(
+    glbJson(buffer)
+      .meshes.flatMap(({ primitives }) => primitives)
+      .filter(({ extras }) => extras?.slot === STRAP)
+      .map(({ extras }) => extras.voxelGrain),
+  );
   if (meshes.length !== 1 || grains.size !== 1) throw new Error(`${model} draws no single strap on one voxel grain`);
   return { strap: meshes[0], grain: [...grains][0] };
 }
@@ -117,7 +136,8 @@ export function builtModels(built, manifest) {
     return entry;
   };
   const glbOf = (id) => readFileSync(join(built, entryOf(id).pack, entryOf(id).path));
-  const anchorsOf = (id) => JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
+  const anchorsOf = (id) =>
+    JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
   return { glbOf, anchorsOf, head };

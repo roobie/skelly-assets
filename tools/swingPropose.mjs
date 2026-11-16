@@ -6,10 +6,11 @@
 // `tools/packages/vehicle-authoring-tool/README.md`, "Save is a download to hand-merge", says of Save, because the pins
 // are drawn by a template that other vehicles share. The reason for the search is in
 // `docs/decisions/0016-swing-check.md`, "A failing site gets a proposal, never an edit".
+
+import { AUTHORED_LATERAL, motionAtSite } from '../site/motionPose.mjs';
 import { dot, normalize, sub } from './packages/construct/src/foundation/math.ts';
 import { centreOf, piecesBounds } from './packages/thing-core/src/motion.ts';
-import { AUTHORED_LATERAL, motionAtSite } from '../site/motionPose.mjs';
-import { adjustedMotion, sweepTasks, swingReport, sweepVehicle } from './swingClearance.mjs';
+import { adjustedMotion, sweepTasks, sweepVehicle, swingReport } from './swingClearance.mjs';
 
 const WINDOW = 4; // grains the hinge line may move each way
 const DOWN = [0, -1, 0];
@@ -59,7 +60,9 @@ export function proposeFix(pieces, vehicle, siteId) {
   const { part } = site;
   const ofPart = task.sites.filter((other) => other.part === part);
   const ids = new Set(ofPart.map(({ id }) => id));
-  const family = Object.fromEntries([vehicle, vehicles[vehicle].parent].filter(Boolean).map((name) => [name, vehicles[name]]));
+  const family = Object.fromEntries(
+    [vehicle, vehicles[vehicle].parent].filter(Boolean).map((name) => [name, vehicles[name]]),
+  );
   const reportOf = (adjust, only) => {
     const result = sweepVehicle({ ...task, adjust: { [part]: adjust }, only: only ? siteId : undefined });
     return swingReport({ grain, vehicles: family }, { [vehicle]: result });
@@ -70,7 +73,10 @@ export function proposeFix(pieces, vehicle, siteId) {
   // contact between two other parts, or one that a part's rest pose makes with a part that moves, is not the part's to fix.
   const failing = (report) => ofPart.some(({ id }) => report.verdicts[vehicle][id]?.status === 'fails');
   // The entries of this vehicle on the part's sites that a report has gone stale or capped far above their contact.
-  const wornBy = (report) => report.entryProblems.filter((entry) => entry.vehicle === vehicle && entry.sites.some((id) => ids.has(id))).map(({ message }) => message);
+  const wornBy = (report) =>
+    report.entryProblems
+      .filter((entry) => entry.vehicle === vehicle && entry.sites.some((id) => ids.has(id)))
+      .map(({ message }) => message);
   const before = reportOf({}, false);
   const start = before.verdicts[vehicle][siteId];
   if (!failing(before)) return { status: 'ok', clear: start.clear };
@@ -80,7 +86,11 @@ export function proposeFix(pieces, vehicle, siteId) {
     const report = reportOf(adjust, false);
     return failing(report) ? null : { entries: wornBy(report).filter((message) => !known.has(message)) };
   };
-  const [stage, ...rest] = motionAtSite(adjustedMotion(task.motions[part], {}, task.forward, grain), site, AUTHORED_LATERAL);
+  const [stage, ...rest] = motionAtSite(
+    adjustedMotion(task.motions[part], {}, task.forward, grain),
+    site,
+    AUTHORED_LATERAL,
+  );
   let reachable = start.clear;
   if (rest.length > 0) return { status: 'none', clear: start.clear, reachable };
   if (stage.kind === 'hinge') {
@@ -96,20 +106,35 @@ export function proposeFix(pieces, vehicle, siteId) {
       reachable = Math.max(reachable, quick.clear);
       const held = quick.status === 'fails' ? null : holds(adjust);
       if (held) {
-        return { status: 'moved', clear: 1, offset: offset.map(rounded), partOffset: adjust.offset.map(rounded), reachable: 1, ...held };
+        return {
+          status: 'moved',
+          clear: 1,
+          offset: offset.map(rounded),
+          partOffset: adjust.offset.map(rounded),
+          reachable: 1,
+          ...held,
+        };
       }
     }
   }
   const slide = stage.kind === 'slide';
   const total = slide ? Math.round(stage.travel * 1e3) : Math.round(Math.abs(stage.angle));
   // Only a stop short of the first contact nobody allows can help; one short of an allowed contact is already allowed.
-  const unallowed = ofPart.flatMap(({ id }) => before.verdicts[vehicle][id]?.contacts ?? []).filter(({ allowed, at }) => !allowed && at !== undefined);
+  const unallowed = ofPart
+    .flatMap(({ id }) => before.verdicts[vehicle][id]?.contacts ?? [])
+    .filter(({ allowed, at }) => !allowed && at !== undefined);
   const first = unallowed.length > 0 ? Math.min(...unallowed.map(({ at }) => at)) : 1;
   for (let stop = Math.min(Math.floor(first * total), total - 1); stop > 0; stop -= 1) {
     const adjust = { scale: stop / total };
     const held = quickClear(adjust).status === 'fails' ? null : holds(adjust);
     if (held) {
-      return { status: 'shortened', clear: start.clear, stop: { value: stop, total, unit: slide ? 'mm' : '°' }, reachable, ...held };
+      return {
+        status: 'shortened',
+        clear: start.clear,
+        stop: { value: stop, total, unit: slide ? 'mm' : '°' },
+        reachable,
+        ...held,
+      };
     }
   }
   return { status: 'none', clear: start.clear, reachable };

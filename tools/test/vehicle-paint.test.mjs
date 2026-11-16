@@ -16,12 +16,15 @@ function withOwnPressings(use) {
   const copy = mkdtempSync(join(tmpdir(), 'own-pressings-'));
   try {
     cpSync(vehicles, copy, { recursive: true });
-    writeFileSync(join(copy, 'kit.libsonnet'), `(import ${JSON.stringify(join(vehicles, 'kit.libsonnet'))}) + {
+    writeFileSync(
+      join(copy, 'kit.libsonnet'),
+      `(import ${JSON.stringify(join(vehicles, 'kit.libsonnet'))}) + {
       borrows(s, suffix): false,
       partId(id, s, suffix): id + suffix,
       unborrowed(id, s, rows): rows,
       painted(id, s, pressings, fittings): fittings,
-    }`);
+    }`,
+    );
     const index = join(copy, 'index.libsonnet');
     writeFileSync(index, readFileSync(index, 'utf8').replaceAll("import 'models/vehicles/", "import '"));
     return use(copy);
@@ -31,9 +34,15 @@ function withOwnPressings(use) {
 }
 
 // The body part of each named row, from a row index. Only those rows are manifested.
-const bodies = (indexImport, ids) => JSON.parse(evaluateJsonnet(`
+const bodies = (indexImport, ids) =>
+  JSON.parse(
+    evaluateJsonnet(
+      `
   local byId = { [row.id]: row for row in std.flattenArrays(std.objectValues(import ${JSON.stringify(indexImport)})) };
-  { [id]: byId[id].parts[0] for id in ${JSON.stringify([...ids])} }`, repo));
+  { [id]: byId[id].parts[0] for id in ${JSON.stringify([...ids])} }`,
+      repo,
+    ),
+  );
 
 const drawnSlots = (part) => new Set(JSON.parse(part.params.pieces).map((piece) => piece.slot));
 
@@ -42,8 +51,11 @@ const drawnSlots = (part) => new Set(JSON.parse(part.params.pieces).map((piece) 
 function shown(part, finish) {
   const { finish: slots, paintable = [], ...rest } = part;
   const drawn = drawnSlots(part);
-  const looks = Object.fromEntries(Object.entries(slots).filter(([slot]) => drawn.has(slot))
-    .map(([slot, material]) => [slot, paintable.includes(slot) ? finish ?? material : material]));
+  const looks = Object.fromEntries(
+    Object.entries(slots)
+      .filter(([slot]) => drawn.has(slot))
+      .map(([slot, material]) => [slot, paintable.includes(slot) ? (finish ?? material) : material]),
+  );
   return { ...rest, finish: looks };
 }
 
@@ -71,7 +83,11 @@ test('a merged vehicle still places a part at every former site', () => {
     const lent = bodies(join(repo, VEHICLE_ROWS_SOURCE), new Set(moved.map(({ lender }) => lender)));
     const owned = bodies(join(copy, 'index.libsonnet'), new Set(moved.map(({ own }) => own)));
     for (const { where, lender, own, finish, ownFinish } of moved) {
-      assert.deepEqual(shown(lent[lender], finish), shown(owned[own], ownFinish), `${where}: ${lender} in place of ${own}`);
+      assert.deepEqual(
+        shown(lent[lender], finish),
+        shown(owned[own], ownFinish),
+        `${where}: ${lender} in place of ${own}`,
+      );
     }
   });
 });

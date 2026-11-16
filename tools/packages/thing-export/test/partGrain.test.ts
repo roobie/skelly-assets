@@ -20,7 +20,10 @@ const span = FEATURE_VOXELS * GRAIN;
 const thin = part(plate('bar', [0, 0, 0], [0.05, span * 0.99, span]));
 const fits = part(plate('bar', [0, 0, 0], [0.05, span, span]));
 // Two thin walls a block apart, as a receiver's sides are: the part is thick as a whole.
-const walls = part(plate('left', [0, 0, -0.02], [0.05, 0.05, DETAIL]), plate('right', [0, 0, 0.02], [0.05, 0.05, DETAIL]));
+const walls = part(
+  plate('left', [0, 0, -0.02], [0.05, 0.05, DETAIL]),
+  plate('right', [0, 0, 0.02], [0.05, 0.05, DETAIL]),
+);
 
 describe('the grain a part is drawn at', () => {
   it('gives the detail grain to a part thinner on one axis than a feature needs, in a class that asks for it', () => {

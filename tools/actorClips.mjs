@@ -1,19 +1,54 @@
-import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
-import { acidDeathPose, acidIdlePose, acidStrideLength } from './packages/mobgen/src/mob/acidPoses.ts';
-import { clamp, smoothstep } from './packages/mobgen/src/core/math.ts';
-import { mat3ToQuat } from './packages/mobgen/src/core/math.ts';
-import { createGaitCache, footRestExtents, IDLE_BLEND_SPEED_MPS, legGeometryFor, stepLengthMeters, walkPose } from './packages/mobgen/src/mob/gait.ts';
-import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
-import { crawlGaitPose, crawlHitAngles, CRAWL_HIT_PEAK_FRACTION } from './packages/mobgen/src/mob/crawl.ts';
-import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
-import { HIT_FLINCH, flinchClipFor } from './packages/mobgen/src/mob/reactions.ts';
+import { clamp, mat3ToQuat, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
+import { acidDeathPose, acidIdlePose, acidStrideLength } from './packages/mobgen/src/mob/acidPoses.ts';
+import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
+import { ARM_BONES, attackClipFor, attackOverlayFrame, attackRotations } from './packages/mobgen/src/mob/attack.ts';
+import { CRAWL_HIT_PEAK_FRACTION, crawlGaitPose, crawlHitAngles } from './packages/mobgen/src/mob/crawl.ts';
+import {
+  CRITTER_DEATH_SECONDS,
+  CRITTER_FLINCH,
+  CRITTER_POUNCE,
+  critterAttackPose,
+  critterDeathPose,
+  critterGaitPose,
+  critterHitPose,
+  critterIdlePose,
+  critterStance,
+  critterStrideLength,
+} from './packages/mobgen/src/mob/critter.ts';
+import {
+  DRAGON_LUNGE,
+  dragonAttackPose,
+  dragonIdlePose,
+  dragonStompPose,
+  dragonStrideLength,
+} from './packages/mobgen/src/mob/dragon.ts';
 import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from './packages/mobgen/src/mob/floater.ts';
-import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } from './packages/mobgen/src/mob/dragon.ts';
-import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
-import { CRITTER_DEATH_SECONDS, CRITTER_FLINCH, CRITTER_POUNCE, critterAttackPose, critterDeathPose, critterGaitPose, critterHitPose, critterIdlePose, critterStance, critterStrideLength } from './packages/mobgen/src/mob/critter.ts';
-import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
+import {
+  createGaitCache,
+  footRestExtents,
+  IDLE_BLEND_SPEED_MPS,
+  legGeometryFor,
+  stepLengthMeters,
+  walkPose,
+} from './packages/mobgen/src/mob/gait.ts';
+import { idleBasePose, idleMotion } from './packages/mobgen/src/mob/idle.ts';
+import {
+  INSECT_LUNGE,
+  insectAttackPose,
+  insectGaitPose,
+  insectIdlePose,
+  insectStrideLength,
+} from './packages/mobgen/src/mob/insect.ts';
 import { leaperClip, leaperFrame } from './packages/mobgen/src/mob/leaper/motion.ts';
+import {
+  DOG_POUNCE,
+  dogAttackPose,
+  dogIdlePose,
+  quadrupedGaitPose,
+  quadrupedStrideLength,
+} from './packages/mobgen/src/mob/quadruped.ts';
+import { flinchClipFor, HIT_FLINCH } from './packages/mobgen/src/mob/reactions.ts';
 import { walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
 
 /** Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs). */
@@ -26,64 +61,133 @@ export const poseFrame = (pose) => ({
  * finite span's clock, so a new clip cannot get one by accident. A walk loop states the distance of one stride
  * (`strideMetres`), because travel advances it and no clock does; an idle loop states `periodSimSeconds`, because
  * the live idle runs on the saved Sim wander clock. */
-export function poseClip(at, { frames, loop, duration, durationSimSeconds, durationRealSeconds, period, periodSimSeconds, strideMetres, samplePeriod, cycles, ...metadata }) {
+export function poseClip(
+  at,
+  {
+    frames,
+    loop,
+    duration,
+    durationSimSeconds,
+    durationRealSeconds,
+    period,
+    periodSimSeconds,
+    strideMetres,
+    samplePeriod,
+    cycles,
+    ...metadata
+  },
+) {
   if (!Number.isInteger(frames) || frames < 1) throw new RangeError('frames must be a positive integer');
   if (typeof loop !== 'boolean') throw new TypeError('loop must be explicit');
-  if (duration !== undefined) throw new TypeError('a finite span must name its clock: durationSimSeconds or durationRealSeconds');
+  if (duration !== undefined)
+    throw new TypeError('a finite span must name its clock: durationSimSeconds or durationRealSeconds');
   if (period !== undefined) throw new TypeError('a loop period must name its clock: periodSimSeconds');
-  if (periodSimSeconds !== undefined && strideMetres !== undefined) throw new TypeError('a loop states a period or a stride, not both');
+  if (periodSimSeconds !== undefined && strideMetres !== undefined)
+    throw new TypeError('a loop states a period or a stride, not both');
   const span = samplePeriod ?? periodSimSeconds ?? durationSimSeconds ?? durationRealSeconds ?? 1;
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
-  if (strideMetres !== undefined && !(Number.isFinite(strideMetres) && strideMetres > 0)) throw new RangeError('strideMetres must be positive and finite');
+  if (strideMetres !== undefined && !(Number.isFinite(strideMetres) && strideMetres > 0))
+    throw new RangeError('strideMetres must be positive and finite');
   const clip = { kind: 'pose', loop, ...metadata };
   if (durationSimSeconds !== undefined) clip.durationSimSeconds = durationSimSeconds;
   if (durationRealSeconds !== undefined) clip.durationRealSeconds = durationRealSeconds;
   if (periodSimSeconds !== undefined) clip.periodSimSeconds = periodSimSeconds;
   if (strideMetres !== undefined) clip.strideMetres = strideMetres;
   if (cycles !== undefined) clip.cycles = cycles;
-  clip.frames = Array.from({ length: frames }, (_, i) => poseFrame(at(frames === 1 ? 0 : span * i / (loop ? frames : frames - 1))));
+  clip.frames = Array.from({ length: frames }, (_, i) =>
+    poseFrame(at(frames === 1 ? 0 : (span * i) / (loop ? frames : frames - 1))),
+  );
   return clip;
 }
 
 /** Acid curves are serialized before live-base joint limits or speed weighting are applied. */
 export function acidClips(figure, row) {
   const tuning = acidTemplate.animation;
-  if (!(Number.isInteger(row.walk_frames) && row.walk_frames >= 2 && Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) throw new RangeError('acid frame counts must be at least two');
-  const weighted = (values, weight) => Object.fromEntries(Object.entries(values).map(([id, angles]) => [id, angles.map((a) => a * weight)]));
-  const pulse = (t, peak, duration) => t <= 0 || t >= duration ? 0 : smoothstep(t < peak ? t / peak : (duration - t) / (duration - peak));
+  if (
+    !(
+      Number.isInteger(row.walk_frames) &&
+      row.walk_frames >= 2 &&
+      Number.isInteger(row.attack_frames) &&
+      row.attack_frames >= 2
+    )
+  )
+    throw new RangeError('acid frame counts must be at least two');
+  const weighted = (values, weight) =>
+    Object.fromEntries(Object.entries(values).map(([id, angles]) => [id, angles.map((a) => a * weight)]));
+  const pulse = (t, peak, duration) =>
+    t <= 0 || t >= duration ? 0 : smoothstep(t < peak ? t / peak : (duration - t) / (duration - peak));
   const action = (name, cursor, weight, metadata = {}) => ({
-    kind: 'jointDelta', cursor, speedWeight: false, sideScalesZ: name === 'hit', footSoleHold: false, ...metadata,
-    frames: Array.from({ length: row.attack_frames }, (_, i) => ({ angles: weighted(tuning[name], weight(i / (row.attack_frames - 1))) })),
+    kind: 'jointDelta',
+    cursor,
+    speedWeight: false,
+    sideScalesZ: name === 'hit',
+    footSoleHold: false,
+    ...metadata,
+    frames: Array.from({ length: row.attack_frames }, (_, i) => ({
+      angles: weighted(tuning[name], weight(i / (row.attack_frames - 1))),
+    })),
   });
   // Canonical baked fall: absolute, endpoint-inclusive, from idle frame zero; the last frame is the settled fold.
   const rest = acidIdlePose(figure.realized, 0);
-  const death = (direction) => poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), { loop: false, durationRealSeconds: tuning.deathDuration, frames: row.attack_frames });
-  return { standing: {
-    idle: poseClip((time) => acidIdlePose(figure.realized, time), { loop: true, periodSimSeconds: tuning.idlePeriod, frames: row.walk_frames }),
-    death: { forward: death(1), backward: death(-1) },
-    walk: {
-      kind: 'jointDelta', loop: true, cursor: 'gaitPhase', speedWeight: true, sideScalesZ: false, footSoleHold: true, cycles: 1,
-      strideMetres: acidStrideLength(figure.realized),
-      frames: Array.from({ length: row.walk_frames }, (_, i) => {
-        const angles = {};
-        for (const [index, side] of ['L', 'R'].entries()) {
-          const wave = Math.sin(2 * Math.PI * i / row.walk_frames + index * Math.PI);
-          const lift = Math.max(0, wave);
-          angles[`thigh.${side}`] = [tuning.swing * lift, 0, 0];
-          angles[`shin.${side}`] = [tuning.kneeLift * lift, 0, 0];
-          angles[`arm.${side}`] = [-tuning.armSwing * wave, 0, 0];
-        }
-        return { angles };
+  const death = (direction) =>
+    poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), {
+      loop: false,
+      durationRealSeconds: tuning.deathDuration,
+      frames: row.attack_frames,
+    });
+  return {
+    standing: {
+      idle: poseClip((time) => acidIdlePose(figure.realized, time), {
+        loop: true,
+        periodSimSeconds: tuning.idlePeriod,
+        frames: row.walk_frames,
+      }),
+      death: { forward: death(1), backward: death(-1) },
+      walk: {
+        kind: 'jointDelta',
+        loop: true,
+        cursor: 'gaitPhase',
+        speedWeight: true,
+        sideScalesZ: false,
+        footSoleHold: true,
+        cycles: 1,
+        strideMetres: acidStrideLength(figure.realized),
+        frames: Array.from({ length: row.walk_frames }, (_, i) => {
+          const angles = {};
+          for (const [index, side] of ['L', 'R'].entries()) {
+            const wave = Math.sin((2 * Math.PI * i) / row.walk_frames + index * Math.PI);
+            const lift = Math.max(0, wave);
+            angles[`thigh.${side}`] = [tuning.swing * lift, 0, 0];
+            angles[`shin.${side}`] = [tuning.kneeLift * lift, 0, 0];
+            angles[`arm.${side}`] = [-tuning.armSwing * wave, 0, 0];
+          }
+          return { angles };
+        }),
+      },
+      attack: action(
+        'attack',
+        'time',
+        (u) => pulse(u * tuning.attackDuration, tuning.attackPeak, tuning.attackDuration),
+        { durationSimSeconds: tuning.attackDuration, hitAtSimSeconds: tuning.attackPeak },
+      ),
+      spitDraw: action('spitDraw', 'progress', (u) => smoothstep(clamp(u, 0, 1))),
+      hit: action('hit', 'time', (u) => pulse(u * tuning.hitDuration, tuning.hitPeak, tuning.hitDuration), {
+        durationSimSeconds: tuning.hitDuration,
+        peakAtSimSeconds: tuning.hitPeak,
       }),
     },
-    attack: action('attack', 'time', (u) => pulse(u * tuning.attackDuration, tuning.attackPeak, tuning.attackDuration), { durationSimSeconds: tuning.attackDuration, hitAtSimSeconds: tuning.attackPeak }),
-    spitDraw: action('spitDraw', 'progress', (u) => smoothstep(clamp(u, 0, 1))),
-    hit: action('hit', 'time', (u) => pulse(u * tuning.hitDuration, tuning.hitPeak, tuning.hitDuration), { durationSimSeconds: tuning.hitDuration, peakAtSimSeconds: tuning.hitPeak }),
-  } };
+  };
 }
 
 export function fusedClips(figure) {
-  return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
+  return {
+    standing: {
+      idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), {
+        loop: false,
+        frames: 1,
+      }),
+    },
+  };
 }
 
 /** Non-humanoid plans bake mobgen's own absolute poses. A plan with its own reactions adds a flinch and one death
@@ -115,9 +219,19 @@ export function creatureClips(figure, template, row) {
     walk = (cursor) => critterGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
     action = CRITTER_POUNCE;
     attack = (time) => critterAttackPose(realized, rest, time);
-    const death = (side) => poseClip((time) => critterDeathPose(realized, rest, time, side), { loop: false, durationRealSeconds: CRITTER_DEATH_SECONDS, frames: frames.attack });
+    const death = (side) =>
+      poseClip((time) => critterDeathPose(realized, rest, time, side), {
+        loop: false,
+        durationRealSeconds: CRITTER_DEATH_SECONDS,
+        frames: frames.attack,
+      });
     reactions = {
-      flinch: poseClip((time) => critterHitPose(realized, rest, time), { loop: false, durationSimSeconds: CRITTER_FLINCH.duration, frames: frames.attack, peakAtSimSeconds: CRITTER_FLINCH.peakTime }),
+      flinch: poseClip((time) => critterHitPose(realized, rest, time), {
+        loop: false,
+        durationSimSeconds: CRITTER_FLINCH.duration,
+        frames: frames.attack,
+        peakAtSimSeconds: CRITTER_FLINCH.peakTime,
+      }),
       death: { left: death('L'), right: death('R') },
     };
   } else if (template.bodyPlan === 'insect') {
@@ -142,12 +256,19 @@ export function creatureClips(figure, template, row) {
     action = DRAGON_LUNGE;
     attack = (time) => dragonAttackPose(realized, params, time);
   } else throw new Error(`unsupported creature body plan ${template.bodyPlan}`);
-  return { standing: {
-    idle: poseClip(idle, { loop: true, periodSimSeconds: 1, frames: 1 }),
-    walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
-    attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
-    ...reactions,
-  } };
+  return {
+    standing: {
+      idle: poseClip(idle, { loop: true, periodSimSeconds: 1, frames: 1 }),
+      walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
+      attack: poseClip(attack, {
+        loop: false,
+        durationSimSeconds: action.duration,
+        frames: frames.attack,
+        hitAtSimSeconds: action.hitTime,
+      }),
+      ...reactions,
+    },
+  };
 }
 
 /**
@@ -156,22 +277,42 @@ export function creatureClips(figure, template, row) {
  * the attack. Returns the baker of one named clip, with the cut points already severed.
  */
 function trackClipBaker(figure, row, mob, clipOf, frameOf) {
-  if (!(Number.isInteger(row.walk_frames) && row.walk_frames >= 2 && Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) {
+  if (
+    !(
+      Number.isInteger(row.walk_frames) &&
+      row.walk_frames >= 2 &&
+      Number.isInteger(row.attack_frames) &&
+      row.attack_frames >= 2
+    )
+  ) {
     throw new RangeError(`${mob} frame counts must be at least two`);
   }
   return (name, cut = {}) => {
     const clip = clipOf(name);
     const at = (u) => frameOf(figure.realized, name, u, cut);
-    const inPlace = (u) => { const { pose } = at(u); return { ...pose, root: [pose.root[0], pose.root[1], 0] }; };
+    const inPlace = (u) => {
+      const { pose } = at(u);
+      return { ...pose, root: [pose.root[0], pose.root[1], 0] };
+    };
     const travel = clip.travel?.at(-1)[1];
     const baked = clip.loop
-      ? poseClip(inPlace, { loop: true, samplePeriod: 1, frames: row.walk_frames, ...(travel ? { strideMetres: travel, cycles: 1 } : { periodSimSeconds: clip.seconds }) })
+      ? poseClip(inPlace, {
+          loop: true,
+          samplePeriod: 1,
+          frames: row.walk_frames,
+          ...(travel ? { strideMetres: travel, cycles: 1 } : { periodSimSeconds: clip.seconds }),
+        })
       : poseClip((u) => at(u).pose, {
-        loop: false, samplePeriod: 1, frames: row.attack_frames, durationSimSeconds: clip.seconds,
-        ...(clip.hit === undefined ? {} : { hitAtSimSeconds: clip.hit * clip.seconds }),
-        ...(clip.peak === undefined ? {} : { peakAtSimSeconds: clip.peak * clip.seconds }),
-        ...(clip.air === undefined ? {} : { takeoffAtSimSeconds: clip.air.from * clip.seconds, landAtSimSeconds: clip.air.to * clip.seconds }),
-      });
+          loop: false,
+          samplePeriod: 1,
+          frames: row.attack_frames,
+          durationSimSeconds: clip.seconds,
+          ...(clip.hit === undefined ? {} : { hitAtSimSeconds: clip.hit * clip.seconds }),
+          ...(clip.peak === undefined ? {} : { peakAtSimSeconds: clip.peak * clip.seconds }),
+          ...(clip.air === undefined
+            ? {}
+            : { takeoffAtSimSeconds: clip.air.from * clip.seconds, landAtSimSeconds: clip.air.to * clip.seconds }),
+        });
     // A charged telegraph is per frame, so it stays aligned with the pose it brightens.
     const cursor = (i) => (clip.loop ? i / baked.frames.length : i / (baked.frames.length - 1));
     if (clip.charge) baked.frames = baked.frames.map((frame, i) => ({ ...frame, charge: at(cursor(i)).charge }));
@@ -184,8 +325,17 @@ function trackClipBaker(figure, row, mob, clipOf, frameOf) {
 export function leaperClips(figure, _template, row) {
   const bake = trackClipBaker(figure, row, 'leaper', leaperClip, leaperFrame);
   return {
-    standing: { idle: bake('idle'), walk: bake('stalk'), run: bake('bound'), attack: bake('rake'), pounce: bake('pounce'), flinch: bake('flinch') },
-    limping: { walk: { left: bake('limp', { cuts: ['thigh.L'] }), right: bake('limp', { cuts: ['thigh.R'], mirrored: true }) } },
+    standing: {
+      idle: bake('idle'),
+      walk: bake('stalk'),
+      run: bake('bound'),
+      attack: bake('rake'),
+      pounce: bake('pounce'),
+      flinch: bake('flinch'),
+    },
+    limping: {
+      walk: { left: bake('limp', { cuts: ['thigh.L'] }), right: bake('limp', { cuts: ['thigh.R'], mirrored: true }) },
+    },
     dragging: { walk: bake('drag', { cuts: ['thigh.L', 'thigh.R'] }) },
   };
 }
@@ -203,30 +353,68 @@ export function walkerClips(figure, _template, row) {
  * states the row's authored `crawl_stride` as `strideMetres`, like the standing walk states its own distance.
  */
 export function humanoidPoseClips(figure, row) {
-  if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0)) throw new RangeError('walkCycles must be a positive integer');
+  if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0))
+    throw new RangeError('walkCycles must be a positive integer');
   if (typeof row.crawls !== 'boolean') throw new TypeError('crawls must be a boolean');
   if (row.legCut !== undefined && !row.crawls) throw new RangeError('a legless rig only crawls');
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
-    params: figure.genome.params, seed: figure.seed,
-    cache: createGaitCache(), planPeriodSteps: 2 * row.walkCycles,
+    params: figure.genome.params,
+    seed: figure.seed,
+    cache: createGaitCache(),
+    planPeriodSteps: 2 * row.walkCycles,
   };
-  const crawling = row.crawls ? {
-    idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
-    walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), { frames: row.walk_frames, loop: true, strideMetres: row.crawl_stride, samplePeriod: 1, cycles: 1 }),
-  } : undefined;
+  const crawling = row.crawls
+    ? {
+        idle: poseClip(() => crawlGaitPose(figure.realized, 0, 0), { frames: 1, loop: false }),
+        walk: poseClip((cursor) => crawlGaitPose(figure.realized, cursor * 2 * Math.PI, row.walk_speed), {
+          frames: row.walk_frames,
+          loop: true,
+          strideMetres: row.crawl_stride,
+          samplePeriod: 1,
+          cycles: 1,
+        }),
+      }
+    : undefined;
   if (row.legCut !== undefined) return { crawling };
-  const gaitBasis = { params: actor.params, geomL: legGeometryFor(actor.bones, actor.extents, 'L'), speed: row.walk_speed, seed: actor.seed, cache: actor.cache, planPeriodSteps: actor.planPeriodSteps };
-  const standingStrideMetres = Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce((sum, length) => sum + length, 0) / row.walkCycles;
+  const gaitBasis = {
+    params: actor.params,
+    geomL: legGeometryFor(actor.bones, actor.extents, 'L'),
+    speed: row.walk_speed,
+    seed: actor.seed,
+    cache: actor.cache,
+    planPeriodSteps: actor.planPeriodSteps,
+  };
+  const standingStrideMetres =
+    Array.from({ length: actor.planPeriodSteps }, (_, step) => stepLengthMeters(gaitBasis, step)).reduce(
+      (sum, length) => sum + length,
+      0,
+    ) / row.walkCycles;
   const standing = {
-    idle: Object.fromEntries(['slack', 'aggravated'].map((stance) => [stance, {
-      base: poseFrame(idleBasePose(actor, stance)), motion: idleMotion(stance),
-    }])),
-    walk: poseClip((cursor) => {
-      const steps = cursor * 2 * row.walkCycles;
-      return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
-    }, { frames: row.walk_frames * row.walkCycles, loop: true, strideMetres: standingStrideMetres, samplePeriod: 1, cycles: row.walkCycles, idleBlendSpeed: IDLE_BLEND_SPEED_MPS }),
+    idle: Object.fromEntries(
+      ['slack', 'aggravated'].map((stance) => [
+        stance,
+        {
+          base: poseFrame(idleBasePose(actor, stance)),
+          motion: idleMotion(stance),
+        },
+      ]),
+    ),
+    walk: poseClip(
+      (cursor) => {
+        const steps = cursor * 2 * row.walkCycles;
+        return walkPose(actor, { stepIndex: Math.floor(steps), progress: steps % 1 }, row.walk_speed);
+      },
+      {
+        frames: row.walk_frames * row.walkCycles,
+        loop: true,
+        strideMetres: standingStrideMetres,
+        samplePeriod: 1,
+        cycles: row.walkCycles,
+        idleBlendSpeed: IDLE_BLEND_SPEED_MPS,
+      },
+    ),
   };
   return crawling ? { standing, crawling } : { standing };
 }
@@ -237,15 +425,19 @@ export function humanoidClips(figure, template, row) {
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
-    params: figure.genome.params, seed: figure.seed,
+    params: figure.genome.params,
+    seed: figure.seed,
   };
-  if (!(Number.isInteger(row.attack_frames) && row.attack_frames >= 2)) throw new RangeError('attack_frames must be at least two');
+  if (!(Number.isInteger(row.attack_frames) && row.attack_frames >= 2))
+    throw new RangeError('attack_frames must be at least two');
   const overlay = (clip, flinch, crawling) => ({
-    kind: 'overlay', durationSimSeconds: clip.duration,
+    kind: 'overlay',
+    durationSimSeconds: clip.duration,
     ...(flinch ? { peakAtSimSeconds: clip.keys[1].t } : { hitAtSimSeconds: clip.hitTime }),
-    sideScalesZ: flinch, walkBlendBones: [...ARM_BONES],
+    sideScalesZ: flinch,
+    walkBlendBones: [...ARM_BONES],
     frames: Array.from({ length: row.attack_frames }, (_, i) => {
-      const time = clip.duration * i / (row.attack_frames - 1);
+      const time = (clip.duration * i) / (row.attack_frames - 1);
       if (!crawling) return attackOverlayFrame(actor, clip, time);
       // A crawling rig may have no lower legs; its live action never computes a standing pelvis drop.
       const frame = attackRotations(actor, clip, time, { root: [0, 0, 0], rotations: {}, angles: {} });
@@ -259,10 +451,15 @@ export function humanoidClips(figure, template, row) {
   if (!sets.crawling) return sets;
   sets.crawling.attack = overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true);
   sets.crawling.flinch = {
-    kind: 'overlay', durationSimSeconds: HIT_FLINCH.duration, peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
-    sideScalesZ: true, walkBlendBones: [],
+    kind: 'overlay',
+    durationSimSeconds: HIT_FLINCH.duration,
+    peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
+    sideScalesZ: true,
+    walkBlendBones: [],
     frames: Array.from({ length: row.attack_frames }, (_, i) => ({
-      angles: crawlHitAngles(HIT_FLINCH.duration * i / (row.attack_frames - 1)), walkBlendWeight: 1, dropMetres: 0,
+      angles: crawlHitAngles((HIT_FLINCH.duration * i) / (row.attack_frames - 1)),
+      walkBlendWeight: 1,
+      dropMetres: 0,
     })),
   };
   return sets;

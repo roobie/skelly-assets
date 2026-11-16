@@ -1,8 +1,8 @@
 // A fixed front post on an anti-materiel barrel shroud, built from its content table. See
 // `models/guns/tables/shroudFrontSight.jsonnet` for what each measure is.
 
-import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { finite, minValue, number, parse, pipe, strictObject } from 'valibot';
 import content from '../../../../../models/guns/tables/shroudFrontSight.json' with { type: 'json' };

@@ -69,10 +69,7 @@ export const writeModelExports = (
   mkdirSync(resolve(base, 'assets/models'), { recursive: true });
   const files: string[] = [];
   if (index) {
-    writeFileSync(
-      resolve(base, directory, 'index.json'),
-      formattedJson(outputs.map(({ modelEntry }) => modelEntry)),
-    );
+    writeFileSync(resolve(base, directory, 'index.json'), formattedJson(outputs.map(({ modelEntry }) => modelEntry)));
     files.push(`${directory}/index.json`);
   }
   for (const { modelEntry, glb } of outputs) {
@@ -104,4 +101,10 @@ export const writeRecipeExports = (
   base: string,
   directory: string,
   options: { readonly index?: boolean } = {},
-): WrittenRecipe => writeModelExports(recipe.map((row) => generateModel(row)), base, directory, options);
+): WrittenRecipe =>
+  writeModelExports(
+    recipe.map((row) => generateModel(row)),
+    base,
+    directory,
+    options,
+  );

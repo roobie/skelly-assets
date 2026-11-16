@@ -4,9 +4,10 @@
 // of the clock at once: the cell's centre sets how deep any of its points can lie in the mover and, once its furthest
 // possible travel is added, in the other solid. Cells that cannot be cleared are split down to the sample lattice,
 // where the depth is read for real. The reason for the rule is in `docs/decisions/0016-swing-check.md`.
+
+import { apply, compose, IDENTITY, invert, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { cornersOf } from './packages/thing-core/src/motion.ts';
 import { solid } from './pieceSolid.mjs';
-import { apply, compose, IDENTITY, invert, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 
 const distanceFromLine = ([px, py, pz], { from, to }) => {
   const d = [0, 1, 2].map((i) => to[i] - from[i]);
@@ -23,8 +24,9 @@ function pacesOf(motion, corners, carried, first = 0) {
   let pace = 0;
   for (let i = motion.length - 1; i >= first; i--) {
     const stage = motion[i];
-    const radius = stage.kind === 'slide' ? 0 : Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried;
-    const reach = stage.kind === 'slide' ? stage.travel : (Math.abs(stage.angle) * Math.PI / 180) * radius;
+    const radius =
+      stage.kind === 'slide' ? 0 : Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried;
+    const reach = stage.kind === 'slide' ? stage.travel : ((Math.abs(stage.angle) * Math.PI) / 180) * radius;
     pace = Math.max(pace, reach / stage.share);
     carried += stage.kind === 'slide' ? stage.travel : Math.min(reach, 2 * radius);
   }
@@ -49,13 +51,14 @@ export function paceOf(layers, bounds, first = 0) {
 // The stow planes of one shape over the window of the clock from `start` to `end`: `from` and `to` carry a point of
 // the shape, read in the frame that `frame` carries to the shape's rest, into each plane's frame at the window's ends,
 // and `reach` is how far the plane's pose carries a point of the shape in the window, from the plane's `pace`.
-const stowsOver = (planes, start, end, frame = IDENTITY) => planes.map(({ layers, first, direction, stow, pace = 0 }) => ({
-  from: compose(poseAt(layers, start, first), frame),
-  to: compose(poseAt(layers, end, first), frame),
-  direction,
-  stow,
-  reach: pace * (end - start),
-}));
+const stowsOver = (planes, start, end, frame = IDENTITY) =>
+  planes.map(({ layers, first, direction, stow, pace = 0 }) => ({
+    from: compose(poseAt(layers, start, first), frame),
+    to: compose(poseAt(layers, end, first), frame),
+    direction,
+    stow,
+    reach: pace * (end - start),
+  }));
 
 // How far a point lies on the shown side of the stow planes `stows`, Infinity when nothing stows: read at the window's
 // end with `atEnd`, else the most it can be anywhere in the window. A depth inside a shape is no deeper than this.
@@ -63,7 +66,10 @@ function shownBy(stows, point, atEnd, out) {
   let shown = Infinity;
   for (const { from, to, direction, stow, reach } of stows) {
     apply(atEnd ? to : from, point, out);
-    shown = Math.min(shown, stow - (out[0] * direction[0] + out[1] * direction[1] + out[2] * direction[2]) + (atEnd ? 0 : reach));
+    shown = Math.min(
+      shown,
+      stow - (out[0] * direction[0] + out[1] * direction[1] + out[2] * direction[2]) + (atEnd ? 0 : reach),
+    );
   }
   return shown;
 }
@@ -122,7 +128,19 @@ export function placedShape(shape, pose) {
 // `moverStows` and `obstacleStows` are the stow planes (`stowsOver`) that hide parts of each over the same window, read
 // in the mover's rest frame and in the frame the obstacle is read in. With `probe` it answers only whether any cell
 // could not be cleared, as `true`, and stops at the first such cell it splits down to `probeCell` lattice cells across.
-export function deepestShared({ mover, obstacle, from, to, reach, floor, step, moverStows = [], obstacleStows = [], probe = false, probeCell = 4 }) {
+export function deepestShared({
+  mover,
+  obstacle,
+  from,
+  to,
+  reach,
+  floor,
+  step,
+  moverStows = [],
+  obstacleStows = [],
+  probe = false,
+  probeCell = 4,
+}) {
   const dims = [0, 1, 2].map((i) => Math.max(1, Math.ceil((mover.max[i] - mover.min[i]) / step - 1e-9)));
   const centre = [0, 0, 0];
   const world = [0, 0, 0];
@@ -137,7 +155,8 @@ export function deepestShared({ mover, obstacle, from, to, reach, floor, step, m
     const inMover = -mover.distance(centre);
     if (Math.min(inMover, shownBy(moverStows, centre, false, scratch)) + radius <= floor) return;
     apply(from, centre, world);
-    if (Math.min(-obstacle.distance(world), shownBy(obstacleStows, world, false, scratch)) + radius + reach <= floor) return;
+    if (Math.min(-obstacle.distance(world), shownBy(obstacleStows, world, false, scratch)) + radius + reach <= floor)
+      return;
     if (size[0] === 1 && size[1] === 1 && size[2] === 1) {
       if (probe) {
         open = true;
@@ -152,7 +171,14 @@ export function deepestShared({ mover, obstacle, from, to, reach, floor, step, m
       open = true;
       return;
     }
-    const halves = size.map((n, i) => (n === 1 ? [[lo[i], hi[i]]] : [[lo[i], lo[i] + (n >> 1)], [lo[i] + (n >> 1), hi[i]]]));
+    const halves = size.map((n, i) =>
+      n === 1
+        ? [[lo[i], hi[i]]]
+        : [
+            [lo[i], lo[i] + (n >> 1)],
+            [lo[i] + (n >> 1), hi[i]],
+          ],
+    );
     for (const [a, b] of halves[0]) {
       for (const [c, d] of halves[1]) {
         for (const [e, f] of halves[2]) visit([a, c, e], [b, d, f]);
@@ -165,10 +191,21 @@ export function deepestShared({ mover, obstacle, from, to, reach, floor, step, m
 
 // The depth (m) two shapes share at rest, 0 when they share none. `moverPlanes` and `obstaclePlanes` are the stow planes
 // of each (`stowPlanesOf`), so the rest depth is measured as the sweep measures.
-export const restDepth = (mover, obstacle, step, moverPlanes = [], obstaclePlanes = []) => Math.max(0, deepestShared({
-  mover, obstacle, from: IDENTITY, to: IDENTITY, reach: 0, floor: 0, step,
-  moverStows: stowsOver(moverPlanes, 0, 0), obstacleStows: stowsOver(obstaclePlanes, 0, 0),
-}));
+export const restDepth = (mover, obstacle, step, moverPlanes = [], obstaclePlanes = []) =>
+  Math.max(
+    0,
+    deepestShared({
+      mover,
+      obstacle,
+      from: IDENTITY,
+      to: IDENTITY,
+      reach: 0,
+      floor: 0,
+      step,
+      moverStows: stowsOver(moverPlanes, 0, 0),
+      obstacleStows: stowsOver(obstaclePlanes, 0, 0),
+    }),
+  );
 
 // How many leading layers of `layers` are the very motions that lead `other`: what both are carried by.
 const sharedLayers = (layers, other) => {
@@ -197,10 +234,12 @@ export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
       if (own.length === 0) continue;
       const paces = [paceOf(own, mover.shape), other.length > 0 ? paceOf(other, obstacle.shape) : 0];
       const bounds = sweptBounds(mover.shape, own, paces[0]);
-      if (!boundsMeet(bounds, other.length > 0 ? sweptBounds(obstacle.shape, other, paces[1]) : obstacle.shape)) continue;
+      if (!boundsMeet(bounds, other.length > 0 ? sweptBounds(obstacle.shape, other, paces[1]) : obstacle.shape))
+        continue;
       const planes = [stowPlanesOf(layers), stowPlanesOf(obstacle.layers ?? [])];
       const rest = restDepth(mover.shape, obstacle.shape, step, ...planes);
-      const paced = (list, shape) => list.map((plane) => ({ ...plane, pace: paceOf(plane.layers, shape, plane.first) }));
+      const paced = (list, shape) =>
+        list.map((plane) => ({ ...plane, pace: paceOf(plane.layers, shape, plane.first) }));
       const stows = [paced(planes[0], mover.shape), paced(planes[1], obstacle.shape)];
       pairs.push({ mover, obstacle, own, other, stows, pace: paces[0] + paces[1], floor: rest + tolerance });
     }
@@ -215,19 +254,23 @@ export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
     if (!known.has(c)) known.set(c, poseAt(list, c));
     return known.get(c);
   };
-  const relativeAt = ({ own, other }, c) => (other.length === 0 ? poseOf(own, c) : compose(invert(poseOf(other, c)), poseOf(own, c)));
-  const across = (start, end, probe) => pairs.map((pair) => deepestShared({
-    mover: pair.mover.shape,
-    obstacle: pair.obstacle.shape,
-    from: relativeAt(pair, start),
-    to: relativeAt(pair, end),
-    reach: pair.pace * (end - start),
-    floor: pair.floor,
-    step,
-    moverStows: stowsOver(pair.stows[0], start, end),
-    obstacleStows: stowsOver(pair.stows[1], start, end),
-    probe,
-  }));
+  const relativeAt = ({ own, other }, c) =>
+    other.length === 0 ? poseOf(own, c) : compose(invert(poseOf(other, c)), poseOf(own, c));
+  const across = (start, end, probe) =>
+    pairs.map((pair) =>
+      deepestShared({
+        mover: pair.mover.shape,
+        obstacle: pair.obstacle.shape,
+        from: relativeAt(pair, start),
+        to: relativeAt(pair, end),
+        reach: pair.pace * (end - start),
+        floor: pair.floor,
+        step,
+        moverStows: stowsOver(pair.stows[0], start, end),
+        obstacleStows: stowsOver(pair.stows[1], start, end),
+        probe,
+      }),
+    );
   let clear = 1;
   let clock = 0;
   let span = Math.min(1, unit * 8);
@@ -280,16 +323,23 @@ export function sweepOpenPose({ bodies, step, tolerance, key, related = () => fa
           if (!boundsMeet(moved, posedOther)) continue;
           const rest = restDepth(mover, other, step, a.planes, b.planes);
           const depth = deepestShared({
-            mover, obstacle: posedOther, from: a.pose, to: a.pose, reach: 0, floor: rest + tolerance, step,
-            moverStows, obstacleStows,
+            mover,
+            obstacle: posedOther,
+            from: a.pose,
+            to: a.pose,
+            reach: 0,
+            floor: rest + tolerance,
+            step,
+            moverStows,
+            obstacleStows,
           });
           if (!(depth > rest + tolerance)) continue;
           const pair = key(a.site, b.site);
-          if (depth > (found.get(pair)?.depth ?? 0)) found.set(pair, { sites: [a.site, b.site], depth, pieces: [mover.id, other.id] });
+          if (depth > (found.get(pair)?.depth ?? 0))
+            found.set(pair, { sites: [a.site, b.site], depth, pieces: [mover.id, other.id] });
         }
       }
     }
   }
   return found;
 }
-

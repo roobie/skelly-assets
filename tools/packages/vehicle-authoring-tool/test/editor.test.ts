@@ -65,9 +65,7 @@ describe('editor download round-trip', () => {
 
     const fixed = setSupportedBy(removed, 'bolt', ['frame']);
     expect(roundTrip(fixed).issues).toEqual([]);
-    expect(checkedExport(fixed).vehicleBlueprints[0].fittings).toHaveLength(
-      host.fittings.length - 1,
-    );
+    expect(checkedExport(fixed).vehicleBlueprints[0].fittings).toHaveLength(host.fittings.length - 1);
   });
 
   it('leaves no key behind when cargo and service are cleared', () => {
@@ -139,7 +137,6 @@ describe('editor download round-trip', () => {
     expect(record(result.reloaded, 'cap').supportedBy).toEqual(['wheel_near', 'wheel_far']);
     expect(record(result.reloaded, 'reflector').supportedBy).toEqual(['wheel_far', 'frame']);
     expect([near.service?.name, far.service?.name]).toEqual(['Near wheel', 'Far wheel']);
-
   });
 
   it('applies no default to a pair: a missing choice refuses the operation', () => {
