@@ -5,6 +5,7 @@ local s = import 'skid_steer.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local tailPins = k.hingePins('hinge', 'y', [s.tailDoor - k.grain, 0.58, 0.5], [s.tailDoor - k.grain, 1.06, 0.5], slot='trim');
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('skid_steer_frame', s.shellMass, [
     box('floor', 'steel', [s.cageRear, 0.4, -0.36], [s.cageFront, s.floor, 0.36]),
@@ -40,10 +41,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('stile_near', 'bar', [s.cageFront, s.floor + 0.03, s.cageSide - 0.1], [s.cageFront + 0.04, s.roof - 0.02, s.cageSide - 0.04]),
     box('stile_far', 'bar', [s.cageFront, s.floor + 0.03, -s.cageSide + 0.04], [s.cageFront + 0.04, s.roof - 0.02, -s.cageSide + 0.1]),
     box('glass', 'glass', [s.cageFront + 0.01, s.floor + 0.09, -s.cageSide + 0.1], [s.cageFront + 0.03, s.roof - 0.08, s.cageSide - 0.1]),
-  ], { bar: 'paint-charcoal', glass: 'glass-clear' }, {
-    hinge_a: ['stile_near', [0.5, 0.1, 1]],
-    hinge_b: ['stile_near', [0.5, 0.9, 1]],
-  }) + { title: 'Skid-steer loader door' },
+  ], { bar: 'paint-charcoal', glass: 'glass-clear' }) + { title: 'Skid-steer loader door' },
   // The cover rests on the frame's sponsons, dropping between them and behind them to the frame's floor.
   k.compound('skid_steer_engine_cover', 90, [
     prism('hood', 'paint', [[-1.24, 0.8], [s.cageRear, 0.8], [s.cageRear, 1.42], [-1.1, 1.42], [-1.24, 1.24]], [-0.47, 0.47]),
@@ -53,11 +51,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('tail', 'paint', [-1.24, 0.5, 0.35], [-1.05, 0.8, 0.47]),
   ]), { paint: s.paint, trim: 'paint-charcoal' }) + { title: 'Skid-steer loader engine cover' },
   k.compound('skid_steer_tail_door', 30, [
-    box('panel', 'trim', [-1.28, 0.42, -0.5], [-1.22, 1.22, 0.5]),
-    box('grille_a', 'bar', [-1.29, 0.66, -0.36], [-1.28, 0.7, 0.36]),
-    box('grille_b', 'bar', [-1.29, 0.78, -0.36], [-1.28, 0.82, 0.36]),
-    box('grille_c', 'bar', [-1.29, 0.9, -0.36], [-1.28, 0.94, 0.36]),
-  ], { trim: 'paint-charcoal', bar: 'plastic-black' }) + { title: 'Skid-steer loader tail door' },
+    box('panel', 'trim', [s.tailDoor, 0.42, -0.5], [s.tailDoor + 0.06, 1.22, 0.5]),
+    box('grille_a', 'bar', [s.tailDoor - 0.01, 0.66, -0.36], [s.tailDoor, 0.7, 0.36]),
+    box('grille_b', 'bar', [s.tailDoor - 0.01, 0.78, -0.36], [s.tailDoor, 0.82, 0.36]),
+    box('grille_c', 'bar', [s.tailDoor - 0.01, 0.9, -0.36], [s.tailDoor, 0.94, 0.36]),
+  ] + tailPins, { trim: 'paint-charcoal', bar: 'plastic-black' }, motion=k.motion.hinge(tailPins, 'rear', s.tailDoorOpens))
+  + { title: 'Skid-steer loader tail door' },
   k.compound('skid_steer_lift_arms', 260, [
     k.bar('brace', 'paint', [0.7, 1.22], [0.78, 1.32], 0.12, [-0.62, 0.62]),
   ] + bothSides([

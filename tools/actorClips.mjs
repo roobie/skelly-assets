@@ -11,6 +11,7 @@ import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
 import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from './packages/mobgen/src/mob/floater.ts';
 import { DRAGON_LUNGE, dragonAttackPose, dragonIdlePose, dragonStompPose, dragonStrideLength } from './packages/mobgen/src/mob/dragon.ts';
 import { DOG_POUNCE, dogAttackPose, dogIdlePose, quadrupedGaitPose, quadrupedStrideLength } from './packages/mobgen/src/mob/quadruped.ts';
+import { CRITTER_DEATH_SECONDS, CRITTER_FLINCH, CRITTER_POUNCE, critterAttackPose, critterDeathPose, critterGaitPose, critterHitPose, critterIdlePose, critterStance, critterStrideLength } from './packages/mobgen/src/mob/critter.ts';
 import { INSECT_LUNGE, insectAttackPose, insectGaitPose, insectIdlePose, insectStrideLength } from './packages/mobgen/src/mob/insect.ts';
 import { leaperClip, leaperFrame } from './packages/mobgen/src/mob/leaper/motion.ts';
 import { walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
@@ -85,7 +86,8 @@ export function fusedClips(figure) {
   return { standing: { idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), { loop: false, frames: 1 }) } };
 }
 
-/** Non-humanoid plans bake mobgen's own absolute poses. */
+/** Non-humanoid plans bake mobgen's own absolute poses. A plan with its own reactions adds a flinch and one death
+ * per side its body can fall on. */
 export function creatureClips(figure, template, row) {
   const { realized, genome } = figure;
   const frames = { walk: row.walk_frames, attack: row.attack_frames };
@@ -97,6 +99,7 @@ export function creatureClips(figure, template, row) {
   let attack;
   let action;
   let cycleMetres;
+  let reactions = {};
   if (template.bodyPlan === 'quadruped') {
     const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
     idle = () => dogIdlePose(realized, stance);
@@ -104,6 +107,19 @@ export function creatureClips(figure, template, row) {
     walk = (cursor) => quadrupedGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
     action = DOG_POUNCE;
     attack = (time) => dogAttackPose(realized, idle(), time);
+  } else if (template.bodyPlan === 'critter') {
+    const stance = critterStance(genome.params);
+    const rest = critterIdlePose(realized, stance);
+    idle = () => rest;
+    cycleMetres = critterStrideLength(realized, stance);
+    walk = (cursor) => critterGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    action = CRITTER_POUNCE;
+    attack = (time) => critterAttackPose(realized, rest, time);
+    const death = (side) => poseClip((time) => critterDeathPose(realized, rest, time, side), { loop: false, durationRealSeconds: CRITTER_DEATH_SECONDS, frames: frames.attack });
+    reactions = {
+      flinch: poseClip((time) => critterHitPose(realized, rest, time), { loop: false, durationSimSeconds: CRITTER_FLINCH.duration, frames: frames.attack, peakAtSimSeconds: CRITTER_FLINCH.peakTime }),
+      death: { left: death('L'), right: death('R') },
+    };
   } else if (template.bodyPlan === 'insect') {
     const stance = { mandibleOpen: genome.params.mandibleOpen };
     idle = () => insectIdlePose(realized, 0.9);
@@ -130,6 +146,7 @@ export function creatureClips(figure, template, row) {
     idle: poseClip(idle, { loop: true, periodSimSeconds: 1, frames: 1 }),
     walk: poseClip(walk, { loop: true, strideMetres: cycleMetres, samplePeriod: 1, frames: frames.walk, cycles: 1 }),
     attack: poseClip(attack, { loop: false, durationSimSeconds: action.duration, frames: frames.attack, hitAtSimSeconds: action.hitTime }),
+    ...reactions,
   } };
 }
 

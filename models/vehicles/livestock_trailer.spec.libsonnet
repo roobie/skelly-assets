@@ -5,5 +5,7 @@
   frameLow: 0.3, frameHigh: 0.44, floor: 0.49, kickTop: 0.90625, railLow: 1.75, eave: 1.84, roof: 1.9,
   slats: [[0.96875, 1.0625], [1.125, 1.21875], [1.28125, 1.375], [1.4375, 1.53125], [1.59375, 1.6875]],
   hub: 0.325, wheelZ: 0.92, axles: [-0.62, 0.11], tip: 3.0, rampTop: 1.53125,
+  // Degrees from closed, so the lowered ramp's lip rests on the ground.
+  rampOpen: 120,
   paint: 'paint-green', slat: 'alu-bare', frame: 'paint-charcoal',
 }

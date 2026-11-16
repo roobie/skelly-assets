@@ -4,9 +4,9 @@
 // the clearance probe (site/clearance.mjs) compares in a pose, and the check that a worn piece encloses what it hides.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { coveredSurface } from '../site/clearance.mjs';
+import { COINCIDENT, coveredSurface, posedSolid, runAlong, signedDepth } from '../site/clearance.mjs';
 import { hides } from '../site/hiding.mjs';
-import { add, dot, frameAbout, scale, sub } from '../site/kinematics.mjs';
+import { add, dot, frameAbout, IDENTITY_M, scale, sub } from '../site/kinematics.mjs';
 import { modelMeshes } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 
@@ -124,6 +124,7 @@ export function dollRig(content, doll, dressing) {
 
 // ---- rest meshes ----
 
+const STILL = { r: IDENTITY_M, t: [0, 0, 0] };
 const mirrorX = (positions) => positions.map((x, i) => (i % 3 === 0 ? -x : x));
 const placed = (mesh, { at, mirror }) => {
   const flipped = mirror ? mirrorX(mesh.positions) : mesh.positions;
@@ -172,18 +173,65 @@ const boneOf = (rig, { model, part, side }) => {
  * (tools/dress.mjs, `modelMeshes`) of the primitives `keep(part, piece)` picks.
  */
 export function coverGaps(rig, sites, meshesOf) {
+  return declaredSurfaces(rig, sites, meshesOf).flatMap(({ declaration, samples }) => {
+    if (!samples) return [{ ...declaration, open: 'nothing' }];
+    const open = samples.filter(({ whole }) => !whole);
+    return open.length === 0 ? [] : [{ ...declaration, open: open.length, at: open[0].point }];
+  });
+}
+
+/**
+ * How near each declaration of `sites` comes to failing `coverGaps`: { piece, side, name, samples, open, beneath,
+ * margin, at, end, endAt }. A sample of the named surface lies `depth` beneath the riding pieces: how far it could move
+ * out along its face's normal and stay enclosed, so a body change that swells that skin by more, or a shell change that
+ * draws in by more, opens it; zero where it lies flush, and negative, by how far it stands proud of every piece, where
+ * it passes only because a piece runs beneath it (site/clearance.mjs, `coverage`), as a yoke beneath a deltoid.
+ * `margin` and `at` are the least depth among the samples facing across the bone and where it is; `end` and `endAt`
+ * the same along the bone, where a piece cut as its part ends meets the part's end face flush, so a longer part opens
+ * it. `beneath` counts the samples that pass beneath alone, `open` those that fail. A declaration that names nothing of
+ * its copy has samples 0.
+ */
+export function coverMargins(rig, sites, meshesOf) {
+  return declaredSurfaces(rig, sites, meshesOf).map(({ declaration, samples, pieces, bone }) => {
+    if (!samples) return { ...declaration, samples: 0, open: 0, beneath: 0, margin: -Infinity, at: null, end: -Infinity, endAt: null };
+    const solids = pieces.map(({ mesh }) => posedSolid(mesh, STILL));
+    const depth = (point, normal) => Math.max(...solids.map((solid) => {
+      const inside = -signedDepth(solid, point);
+      return inside > COINCIDENT ? runAlong(solid, point, normal) : inside;
+    }));
+    const axis = sub(bone.tail, bone.head);
+    const least = { across: { depth: Infinity, at: null }, along: { depth: Infinity, at: null } };
+    let beneath = 0;
+    for (const { point, normal, whole } of samples) {
+      const d = depth(point, normal);
+      if (whole && d < -COINCIDENT) beneath++;
+      // Across or along the bone as the probe tells them apart (site/clearance.mjs, `coverage`).
+      const facing = Math.abs(dot(normal, axis)) >= Math.SQRT1_2 * Math.hypot(...axis) ? least.along : least.across;
+      if (d < facing.depth) Object.assign(facing, { depth: d, at: point });
+    }
+    return {
+      ...declaration, samples: samples.length, open: samples.filter(({ whole }) => !whole).length, beneath,
+      margin: least.across.depth, at: least.across.at, end: least.along.depth, endAt: least.along.at,
+    };
+  });
+}
+
+// Each declaration of `sites`' worn pieces, { declaration: { piece, side, name }, samples, pieces, bone }: the samples of the
+// doll surface it names on its part copy, with whether each is wholly covered (site/clearance.mjs, `coveredSurface`), or
+// none when the name hides nothing of the copy, and the pieces riding that copy, which alone count since only they move
+// with it in every pose, and the bone that moves the copy.
+function declaredSurfaces(rig, sites, meshesOf) {
   const riding = (site) => sites.filter((other) => other.part === site.part && other.side === site.side);
   return sites.filter(({ covers }) => covers).flatMap((site) => {
-    const bone = boneOf(rig, site).id;
+    const bone = boneOf(rig, site);
     const doll = sites[site.bodySite];
-    const pieces = riding(site).map((other) => ({ piece: other.model, bone, covers: other.covers, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
-    return site.covers.flatMap((name) => {
+    const pieces = riding(site).map((other) => ({ piece: other.model, bone: bone.id, covers: other.covers, mesh: placed(wholeModel(meshesOf(other.model)), other) }));
+    return site.covers.map((name) => {
       const [hidden] = meshesOf(doll.model, (part, piece) => part === site.part && hides([name], part, piece));
-      const gap = { piece: site.model, side: site.side, name };
-      if (!hidden) return [{ ...gap, open: 'nothing' }];
-      const [{ samples }] = coveredSurface(rig, { body: [{ bone, part: site.part, mesh: placed(hidden, doll) }], pieces }, { whole: true });
-      const open = samples.filter(({ whole }) => !whole);
-      return open.length === 0 ? [] : [{ ...gap, open: open.length, at: open[0].point }];
+      const declaration = { piece: site.model, side: site.side, name };
+      if (!hidden) return { declaration, samples: null, pieces, bone };
+      const [{ samples }] = coveredSurface(rig, { body: [{ bone: bone.id, part: site.part, mesh: placed(hidden, doll) }], pieces }, { whole: true });
+      return { declaration, samples, pieces, bone };
     });
   });
 }

@@ -40,4 +40,8 @@ local s = import 'army_jeep.spec.libsonnet';
   + pair('headlamp', 'headlamp_military', [s.nose + 0.06, 0.595, 0.27])
   + site.batteryBay('battery_tray', [0.72, 0.72, -0.3]),
   tags: { 'vehicle-role': ['military'] },
+  unjudged: [
+    site.unjudged('front_axle', 'engine', 0.041,
+      'The front axle\'s centred differential stands up into the engine\'s sump; a solid front axle under a sump wants its differential beside it.'),
+  ],
 }

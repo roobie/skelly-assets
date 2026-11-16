@@ -523,7 +523,7 @@ const smoothstep = (value: number): number => value * value * (3 - 2 * value);
  * planted paws are the lowest points keeps them exactly on the ground; a swing paw that lifts does not.
  * Severed bones are excluded, so the body rests or falls on its surviving geometry rather than hovering on
  * a hidden leg. */
-const groundDogPose = (realized: Realized, pose: Pose, severed?: ReadonlySet<string>): Pose => {
+export const groundDogPose = (realized: Realized, pose: Pose, severed?: ReadonlySet<string>): Pose => {
   const probe: Pose = { root: [pose.root[0], 0, pose.root[2]], rotations: pose.rotations };
   const surviving = realized.body.bones.map((bone) => bone.id).filter((id) => !(severed?.has(id) ?? false));
   const surfaces = posedVoxelSurfaceBoundsForBones(realized, probe, surviving);
@@ -738,6 +738,9 @@ export interface QuadrupedHitOptions {
   readonly severed?: ReadonlySet<string>;
 }
 
+/** The share of the flinch's duration at which its brace is deepest. */
+export const QUADRUPED_HIT_PEAK_FRACTION = 0.2;
+
 /** A short brace/recoil layered over the current pose and re-grounded against the surviving supports. */
 export const quadrupedHitPose = (realized: Realized, base: Pose, time: number, options: QuadrupedHitOptions = {}): Pose => {
   if (!(time > 0) || time >= HIT_FLINCH.duration) {
@@ -745,7 +748,8 @@ export const quadrupedHitPose = (realized: Realized, base: Pose, time: number, o
   }
   const side = options.side ?? 0;
   const progress = time / HIT_FLINCH.duration;
-  const intensity = progress < 0.2 ? smoothstep(progress / 0.2) : 1 - smoothstep((progress - 0.2) / 0.8);
+  const peak = QUADRUPED_HIT_PEAK_FRACTION;
+  const intensity = progress < peak ? smoothstep(progress / peak) : 1 - smoothstep((progress - peak) / (1 - peak));
   const rotations: Record<string, Mat3> = { ...base.rotations };
   const addRotation = (bone: string, delta: Mat3): void => {
     rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, delta);
@@ -802,8 +806,15 @@ export const DOG_POUNCE = {
   ] as readonly PounceKey[],
 } as const;
 
+/** How a pounce lands: the cuts whose bones must not bear its regrounding, and `reach`, a factor on the keys' lunge, so a body far from a
+ * dog's size springs a distance in proportion to its own (1 is the dog's). */
+export interface DogAttackOptions {
+  readonly severed?: ReadonlySet<string>;
+  readonly reach?: number;
+}
+
 /** The pounce at `time` over `base` (the idle or walk pose), eased between its keys and re-grounded on the surviving paws. */
-export const dogAttackPose = (realized: Realized, base: Pose, time: number, options: { readonly severed?: ReadonlySet<string> } = {}): Pose => {
+export const dogAttackPose = (realized: Realized, base: Pose, time: number, options: DogAttackOptions = {}): Pose => {
   const { keys, duration } = DOG_POUNCE;
   const t = Math.max(0, Math.min(duration, time));
   let hi = keys.findIndex((key) => key.t >= t);
@@ -820,6 +831,6 @@ export const dogAttackPose = (realized: Realized, base: Pose, time: number, opti
     const b = keys[hi]!.rotations[bone] ?? 0;
     rotations[bone] = mulMM(rotations[bone] ?? IDENTITY_M, rotX(a + (b - a) * u));
   }
-  const lunge = keys[lo]!.lunge + (keys[hi]!.lunge - keys[lo]!.lunge) * u;
+  const lunge = (keys[lo]!.lunge + (keys[hi]!.lunge - keys[lo]!.lunge) * u) * (options.reach ?? 1);
   return groundDogPose(realized, { root: [base.root[0], base.root[1], base.root[2] + lunge], rotations }, options.severed);
 };

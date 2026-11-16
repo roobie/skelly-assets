@@ -235,7 +235,6 @@ const ammoMeshes: AmmoMeshes | undefined = ammoCartridge
       ammoCartridge,
       ammoFinishFromQuery(ammoCartridge, initialQuery.get('ammoCase')),
       ammoEnvironment(renderer),
-      revolveFacets,
     )
   : undefined;
 const showMagazine = initialQuery.has('mag');

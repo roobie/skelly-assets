@@ -9,6 +9,7 @@ local mk = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local grain = k.grain;
 // A prism along x has the (y, z) profile.
 local slats(id, slot, from, to, count, make) = [
   local at = from + (to - from) * i / (count - 1);
@@ -49,11 +50,18 @@ local truckDefaults = {
   frame: 'steel-parkerized',
   gearboxLength: 0.95,
   engineLength: 1.0,
+  doorOpens: 65,
 };
 local truckSpec(s) = truckDefaults + s;
 // Where the transfer case hangs, and the front shaft that runs from its front face to the front axle's differential.
 local transferX(s) = s.cabBack - 0.25;
 local frontShaft(s) = { from: transferX(s) + 0.24, to: s.frontAxle - 0.16, y: 0.6 };
+// Where the gearbox's middle stands, behind the engine.
+local gearboxX(s) = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
+// Where the chassis's crossmembers stand, and the battery tray's x: it sits between the rails, so it stands in the
+// middle of a bay between two crossmembers rather than across one.
+local crossXs(s) = k.crossmemberXs(s.rear + 0.1, gearboxX(s) - s.gearboxLength / 2, s.nose, 8, 0.05);
+local batteryX(s) = local cross = crossXs(s); (cross[4] + cross[5]) / 2;
 
 local id = 'military_truck';
 local title = 'Military truck';
@@ -61,12 +69,22 @@ local truckRows(s0) = {
   local s = truckSpec(s0),
   local finish = { paint: s.paint, trim: 'paint-charcoal', glass: 'glass-clear', dark: 'steel-spall-black', frame: s.frame, liner: 'cloth-olive-drab', spring: 'steel-grey' },
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2,
-  local cross = [s.rear + 0.1 + i * (s.nose - s.rear - 0.3) / 7 for i in std.range(0, 7)],
+  local cross = crossXs(s),
   local bearers = [s.bedRear + 0.1 + i * (s.bedFront - s.bedRear - 0.2) / 6 for i in std.range(0, 6)],
   // The winch hangs under the rails' front ends, its drum behind the bumper and its worm gearbox behind the drum.
   local winchX = s.nose - 0.04,
   local winchY = s.railBottom - 0.18,
   local shaft = frontShaft(s),
+  // The door turns on pins at its leaves' outer fore corners, so no part of it reaches past the axis into the cab. Its
+  // rear edge stands off the rear post by as far as its inboard corner swings back on the way out: that corner lies no
+  // farther from the axis than the post's face does.
+  local doorBack = s.doorFront - std.sqrt(std.pow(s.doorFront - s.doorRear, 2) - std.pow(s.side + grain - s.skin, 2)),
+  local leafY = [s.waist - 0.11, s.floor + 0.15],
+  local doorLeaves = [
+    box('hinge_' + leaf[0], 'trim', [s.doorFront - 0.07, leaf[1] - 0.03, s.side], [s.doorFront, leaf[1] + 0.03, s.side + grain])
+    for leaf in [['top', leafY[0]], ['low', leafY[1]]]
+  ],
+  local doorPins = k.hingePins('hinge', 'y', [s.doorFront, leafY[0], s.side + grain], [s.doorFront, leafY[1], s.side + grain], 'trim'),
   rows: [
     k.compound(id + '_chassis', s.chassisMass, [
       box('crossmember_' + i, 'frame', [cross[i] - 0.05, s.railBottom + 0.03, -s.railZ], [cross[i] + 0.05, s.railTop - 0.03, s.railZ])
@@ -96,7 +114,7 @@ local truckRows(s0) = {
       box('sill', 'paint', [s.cabBack, s.floor - 0.12, s.skin], [s.cabFront, s.floor, s.side]),
       box('rear_post', 'paint', [s.cabBack, s.floor, s.skin], [s.doorRear, s.roof, s.side]),
       box('corner', 'paint', [s.doorFront, s.floor, s.skin], [s.cabFront, s.waist, s.side]),
-      box('a_post', 'paint', [s.doorFront + 0.1, s.waist, s.skin], [s.cabFront, s.roof, s.side]),
+      box('a_post', 'paint', [s.doorFront, s.waist, s.skin], [s.cabFront, s.roof, s.side]),
       box('cant_rail', 'paint', [s.cabBack, s.roof - 0.08, s.skin], [s.cabFront, s.roof, s.side]),
     ]) + [
       box('floor', 'trim', [s.cabBack, s.floor - 0.05, -s.skin], [s.cabFront, s.floor, s.skin]),
@@ -111,14 +129,12 @@ local truckRows(s0) = {
       box('headliner', 'liner', [s.cabBack + 0.05, s.roof - 0.02, -s.skin], [s.cabFront - 0.06, s.roof, s.skin]),
     ], finish) + { title: title + ' cab' },
     k.compound(id + '_door', 55, [
-      box('skin', 'paint', [s.doorRear, s.floor, s.skin], [s.doorFront, s.waist, s.side]),
-      box('rail_rear', 'paint', [s.doorRear, s.waist, s.skin], [s.doorRear + 0.06, s.roof - 0.08, s.side]),
-      box('rail_front', 'paint', [s.doorFront - 0.06, s.waist, s.skin], [s.doorFront + 0.1, s.roof - 0.08, s.side]),
+      box('skin', 'paint', [doorBack, s.floor, s.skin], [s.doorFront, s.waist, s.side]),
+      box('rail_rear', 'paint', [doorBack, s.waist, s.skin], [s.doorRear + 0.06, s.roof - 0.08, s.side]),
+      box('rail_front', 'paint', [s.doorFront - 0.06, s.waist, s.skin], [s.doorFront, s.roof - 0.08, s.side]),
       box('glass', 'glass', [s.doorRear + 0.06, s.waist, s.skin + 0.01], [s.doorFront - 0.06, s.roof - 0.08, s.skin + 0.03]),
       box('handle', 'trim', [s.doorRear + 0.08, s.waist - 0.12, s.side], [s.doorRear + 0.22, s.waist - 0.08, s.side + 0.02]),
-      box('hinge_top', 'trim', [s.doorFront - 0.03, s.waist - 0.14, s.side], [s.doorFront + 0.04, s.waist - 0.08, s.side + 0.015]),
-      box('hinge_low', 'trim', [s.doorFront - 0.03, s.floor + 0.12, s.side], [s.doorFront + 0.04, s.floor + 0.18, s.side + 0.015]),
-    ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: title + ' door' },
+    ] + doorLeaves + doorPins, finish, motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: title + ' door' },
     k.compound(id + '_windscreen', 26, [
       box('glass_' + side.n, 'glass', [s.cabFront - 0.04, s.waist, side.a], [s.cabFront - 0.01, s.roof - 0.02, side.b])
       for side in [{ n: 'near', a: 0.04, b: s.skin }, { n: 'far', a: -s.skin, b: -0.04 }]
@@ -216,8 +232,7 @@ local truckFittings(kit, s0) =
   local on = kit.on;
   local origin = kit.origin;
   local bogie = (s.rearAxles[0] + s.rearAxles[1]) / 2;
-  local gearboxX = s.engineX - s.engineLength / 2 - s.gearboxLength / 2;
-  local shaftFrom = gearboxX - s.gearboxLength / 2;
+  local shaftFrom = gearboxX(s) - s.gearboxLength / 2;
   local front = frontShaft(s);
   [
     fitting('chassis', id + '_chassis', origin),
@@ -232,7 +247,7 @@ local truckFittings(kit, s0) =
     fitting('rear_axle_0', id + '_axle', [s.rearAxles[0], s.r - 0.52, 0], ['chassis']),
     fitting('rear_axle_1', id + '_axle', [s.rearAxles[1], s.r - 0.52, 0], ['chassis']),
     fitting('engine', 'engine_v8_diesel', [s.engineX, s.engineY, 0], ['chassis']),
-    fitting('gearbox', 'gearbox_heavy', [gearboxX, s.engineY - 0.08, 0], ['engine']),
+    fitting('gearbox', 'gearbox_heavy', [gearboxX(s), s.engineY - 0.08, 0], ['engine']),
     fitting('transfer_case', id + '_transfer_case', [transferX(s), s.railBottom - 0.5, 0], ['chassis']),
     fitting('front_shaft', id + '_front_shaft', [(front.from + front.to) / 2, front.y, 0], ['transfer_case', 'front_axle']),
     fitting('winch', id + '_winch', origin, ['chassis']),
@@ -243,8 +258,8 @@ local truckFittings(kit, s0) =
     fitting('exhaust', 'exhaust_side_high', [s.cabBack - 0.01, 1.05, s.side], ['engine', 'chassis']),
     fitting('steering_wheel', 'steering_wheel', [s.cabFront - 0.32, s.floor + 0.83, -s.seatZ], ['dashboard']),
     fitting('gear_lever', 'gear_lever', [s.cabFront - 0.42, s.floor + 0.28, 0], ['cab']),
-    fitting('battery_tray', 'truck_battery_tray', [-0.15, 0.96, 0], ['chassis']),
-    fitting('battery', 'car_battery', [-0.15, 0.99, 0], ['battery_tray']),
+    fitting('battery_tray', 'truck_battery_tray', [batteryX(s), 0.96, 0], ['chassis']),
+    fitting('battery', 'car_battery', [batteryX(s), 0.99, 0], ['battery_tray']),
   ]
   + pair('front_wheel', id + '_wheel', [s.frontAxle, s.r, s.wheelZ], on(['front_axle']))
   + pair('middle_wheel', id + '_wheel', [s.rearAxles[0], s.r, s.wheelZ], on(['rear_axle_0']))

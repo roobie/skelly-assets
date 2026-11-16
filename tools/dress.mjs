@@ -172,6 +172,26 @@ export function wornPieces(id, models, dressing) {
   });
 }
 
+// What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
+// regions the dressing cuts that part into, since a consumer hides by those names and no other.
+export function coversProblems(models, dressing) {
+  return models.filter(({ covers }) => covers).flatMap(({ id, covers }) => {
+    const worn = /_worn(?:_([^_]+))?$/.exec(id);
+    if (!worn) return [`${id} declares what it covers but is no worn piece`];
+    const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
+    if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
+    const names = [part, ...(dressing.regions[part] ?? [])];
+    return covers.filter((name) => !names.includes(name)).map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
+  });
+}
+
+// The items any of whose worn pieces declares what it covers, by the pieces' ids, whether or not the tree holds the item
+// itself: a set of worn shells with no ground model is still dressed to check what it declares.
+export const coveringItems = (models) => [...new Set(models.flatMap((model) => {
+  const item = model.covers && tagsOf(model, 'fit').includes('worn') ? /^(.+)_worn(?:_[^_]+)?$/.exec(model.id)?.[1] : undefined;
+  return item ? [item] : [];
+}))];
+
 // Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
 export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
 
