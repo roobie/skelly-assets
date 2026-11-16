@@ -1,5 +1,6 @@
 // A long-wheelbase formal saloon: 5.3 m long, 1.9 m wide, with a 3.2 m wheelbase, an upright rear screen and a wide
 // blind C-pillar. Metres in the vehicle frame.
+local gearbox = (import 'gearboxes.libsonnet').gearbox_inline;
 {
   rear: -2.65, front: 2.65, side: 0.9375, skin: 0.87, sill: 0.18, floor: 0.31, waist: 1.02, roof: 1.5,
   rearAxle: -1.55, frontAxle: 1.65, arch: 0.4, archTop: 0.74, tyre: 'wheel_225_60r17',
@@ -11,4 +12,6 @@
   tumble: 0.125, boot: true, archLiner: true, grilleHalf: 0.34, bumperLow: 0.36, bumperTop: 0.5,
   bumperPaint: 'steel-bright', roofPaint: 'vinyl-black',
   shellMass: 1180, paint: 'paint-oxblood',
+  gearboxAt: [self.frontAxle - 0.7, 0.26, 0],
+  tunnel: { half: gearbox.width / 2, top: $.gearboxAt[1] + gearbox.height },
 }

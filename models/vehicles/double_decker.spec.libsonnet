@@ -6,6 +6,8 @@ local single(x, sides) = bus.single(x, sides, y=0.38);
 local upper = 2.45;
 {
   rear: -5.25, front: 5.25, side: 1.275, skin: 1.2, sill: 0.3,
+  // Under the stairs behind the front wheel.
+  batteryLocker: 1.88,
   floor: 0.38, floorRear: 0.82, floorStep: -1.3, engineDeck: { x: -3.75, y: 1.28 },
   roofBase: 4.12, roof: 4.3,
   decks: [
@@ -34,17 +36,16 @@ local upper = 2.45;
     [single(x, 'near') for x in [3.05, 2.5]]
     + [seat(x, 0.38, 'near') for x in [2.0, 1.2, 0.4, -0.4]]
     + [seat(x, 0.38, 'far') for x in [1.2, 0.4, -0.4]]
-    + [seat(-2.1, 1.18, 'both'), seat(-3.0, 0.82, 'both'), seat(-4.3, 1.28, 'both')]
+    + [seat(-2.1, 1.18, 'both'), seat(-3.0, 0.82, 'both'), seat(-4.3, self.engineDeck.y, 'both')]
     + [seat(4.3, upper, 'both')]
     + [seat(x, upper, 'near') for x in [3.5, 2.7, 1.9]]
     + [seat(x, upper, 'both') for x in [1.1, 0.3, -0.5, -1.3, -2.1, -2.9, -3.7, -4.5]],
   power: {
-    engine: 'engine_i6_heavy_diesel', engineAt: [-4.4, 0.32, 0],
+    engine: 'engine_i6_heavy_diesel', engineAt: [-4.4, 0.24, 0],
     gearbox: 'gearbox_heavy', gearboxAt: [-3.38, 0.37, 0],
     shafts: [{ part: 'prop_shaft_short', at: [-2.6, 0.55, 0] }],
-    radiator: 'radiator_truck', radiatorAt: [-5.05, 0.32, 0],
+    radiator: 'radiator_truck', radiatorAt: [-5.05, 0.24, 0],
     tank: 'fuel_tank_truck', tankAt: [-3.2, 0.32, 0.86],
     exhaust: 'exhaust_bus_rear', exhaustAt: [-4.47, 0.34, -0.62],
-    batteryAt: [4.5, 0.42, -0.9],
   },
 }

@@ -276,7 +276,8 @@ local doorMirrorBus =
     box('foot', 'arm', [-0.07, -0.07, 0], [0.07, 0.07, 0.03125]),
   ] + [
     local c = hornAt(i);
-    box('horn_' + i, 'arm', [c[0] - 0.035, c[1] - 0.035, c[2] - 0.035], [c[0] + 0.035, c[1] + 0.035, c[2] + 0.035])
+    // The horn rises off the foot's face, not out of the body behind it.
+    box('horn_' + i, 'arm', [c[0] - 0.035, c[1] - 0.035, std.max(c[2] - 0.035, 0)], [c[0] + 0.035, c[1] + 0.035, c[2] + 0.035])
     for i in std.range(0, count)
   ] + [
     box('drop', 'arm', [sweep - 0.035, top - 0.04, reach - 0.035], [sweep + 0.035, 0.035, reach + 0.035]),
