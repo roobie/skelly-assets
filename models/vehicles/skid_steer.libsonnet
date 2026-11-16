@@ -11,14 +11,47 @@ local bothSides = k.bothSides;
 local doorHeight(share) = s.doorSill + share * (s.roof - 0.02 - s.doorSill);
 local doorPins = k.hingePins('hinge', 'y', [s.cageFront + 0.04 + k.grain, doorHeight(0.1), -s.cageSide + 0.04],
                              [s.cageFront + 0.04 + k.grain, doorHeight(0.9), -s.cageSide + 0.04], slot='bar');
-local sponsonInner = 0.35;
+// The sponsons' inner walls stand clear of the engine's alternator, the widest thing on the block.
+local sponsonInner = 0.42;
 local sponsonTop = 0.8;
 local tailPins = k.hingePins('hinge', 'y', [s.tailDoor - k.grain, 0.58, 0.5], [s.tailDoor - k.grain, 1.06, 0.5], slot='trim');
+local round(piece) = piece + { sides: 12 };
+// The engine cover's outline in (x, y): its sheet's thickness, measured square to the top and the sides and upright
+// through the slope.
+local coverTop = 1.42;
+local coverSide = 0.47;
+local slopeFoot = 1.24;
+local skin = 0.04;
+local slopeSkin = 0.065;
+local coverProfile = [[-1.24, sponsonTop], [s.cageRear, sponsonTop], [s.cageRear, coverTop], [-1.1, coverTop], [-1.24, slopeFoot]];
+// The engine room's fitted parts, which the hoses run between.
+local engine = (import 'engines.libsonnet')[s.engine.name];
+local radiator = (import 'radiators.libsonnet')[s.radiator.name];
+local cooling = import 'cooling-kit.libsonnet';
+local engineFront = s.engine.at[0] + engine.length / 2;
+local radiatorFront = s.radiator.at[0] + cooling.front;
+local radiatorTop = s.radiator.at[1] + radiator.height;
+local hose = 0.02;
+// Each coolant hose's (y, z) where it leaves its side tank, as the kit's own hoses do, and the height the lower one
+// runs forward at, under the exhaust manifold.
+local upperHose = [radiatorTop - 0.06, radiator.width / 2 - 0.02];
+local lowerHose = [s.radiator.at[1] + 0.06, -(radiator.width / 2 - 0.02)];
+local lowerRun = 0.64;
+local coolerX = s.radiator.at[0];
+local coolerBase = radiatorTop + 0.01;
+local coolerTop = coolerBase + 0.09;
+local coolerMiddle = (coolerBase + coolerTop) / 2;
+local coolerHalf = 0.28;
+local oilHose = 0.0175;
+local tank = { x: [-1.22, -0.97], z: [0.06, 0.34], top: 0.74 };
+// The cooler's return drops between the radiator's near tank and the tail door.
+local returnX = -1.21;
+local returnZ = 0.32;
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('skid_steer_frame', s.shellMass, [
-    box('floor', 'steel', [s.cageRear, 0.4, -0.36], [s.cageFront, s.floor, 0.36]),
-    box('belly', 'steel', [-1.2, 0.3, -0.36], [s.cageFront, 0.5, 0.36]),
-    box('foot_board', 'mat', [0.3, s.floor, -0.36], [s.cageFront, s.floor + 0.03, 0.36]),
+    box('floor', 'steel', [s.cageRear, 0.4, -sponsonInner - 0.01], [s.cageFront, s.floor, sponsonInner + 0.01]),
+    box('belly', 'steel', [-1.2, 0.3, -sponsonInner - 0.01], [s.cageFront, 0.5, sponsonInner + 0.01]),
+    box('foot_board', 'mat', [0.3, s.floor, -sponsonInner], [s.cageFront, s.floor + 0.03, sponsonInner]),
     box('seat_box', 'steel', [-0.32, s.floor, -0.28], [0.14, s.floor + 0.2, 0.28]),
   ] + bothSides([
     box('sponson', 'steel', [-1.05, 0.28, sponsonInner], [0.95, sponsonTop, 0.56]),
@@ -53,14 +86,49 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('glass', 'glass', [s.cageFront + 0.01, s.doorSill + 0.06, -s.cageSide + 0.1], [s.cageFront + 0.03, s.roof - 0.08, s.cageSide - 0.1]),
   ] + doorPins, { bar: 'paint-charcoal', glass: 'glass-clear' }, motion=k.motion.hinge(doorPins, 'fore', s.doorOpens))
   + { title: 'Skid-steer loader door' },
-  // The cover rests on the frame's sponsons, dropping between them and behind them to the frame's floor.
+  // The cover is a sheet-metal shell on the frame's sponsons, the cab's rear wall closing its front, so the open tail
+  // door looks into the engine room.
   k.compound('skid_steer_engine_cover', 90, [
-    prism('hood', 'paint', [[-1.24, 0.8], [s.cageRear, 0.8], [s.cageRear, 1.42], [-1.1, 1.42], [-1.24, 1.24]], [-0.47, 0.47]),
-    box('skirt', 'paint', [-1.24, 0.5, -0.35], [s.cageRear, 0.8, 0.35]),
-    box('hood_top_vent', 'trim', [-1.0, 1.42, -0.3], [-0.55, 1.44, 0.3]),
+    box('top', 'paint', [-1.1, coverTop - skin, -coverSide], [s.cageRear, coverTop, coverSide]),
+    prism('slope', 'paint', [[-1.24, slopeFoot], [-1.1, coverTop], [-1.1, coverTop - slopeSkin], [-1.24, slopeFoot - slopeSkin]], [-coverSide, coverSide]),
+    box('hood_top_vent', 'trim', [-1.0, coverTop, -0.3], [-0.55, coverTop + 0.02, 0.3]),
   ] + bothSides([
-    box('tail', 'paint', [-1.24, 0.5, 0.35], [-1.05, 0.8, 0.47]),
+    prism('side', 'paint', coverProfile, [coverSide - skin, coverSide]),
+    box('tail', 'paint', [-1.24, 0.5, sponsonInner], [-1.05, sponsonTop, coverSide]),
   ]), { paint: s.paint, trim: 'paint-charcoal' }) + { title: 'Skid-steer loader engine cover' },
+  // The coolant hoses run forward from the radiator's side tanks to the water jacket beside the head and the block,
+  // because the water pump is at the engine's front, by the cab.
+  k.compound('skid_steer_coolant_hoses', 1.2, [
+    round(k.turned('upper', 'hose', 'x', k.disc(hose, radiatorFront, engineFront - 0.05), [0, upperHose[0], upperHose[1]])),
+    round(k.turned('upper_elbow', 'hose', 'z', k.disc(hose, engine.width * 0.44, upperHose[1]), [engineFront - 0.05, upperHose[0], 0])),
+    k.bar('lower_drop', 'hose', [radiatorFront, lowerHose[0]], [radiatorFront + 0.1, lowerRun], 2 * hose, [lowerHose[1] - hose, lowerHose[1] + hose]),
+    round(k.turned('lower', 'hose', 'x', k.disc(hose, radiatorFront + 0.1, engineFront - 0.18), [0, lowerRun, lowerHose[1]])),
+    round(k.turned('lower_elbow', 'hose', 'z', k.disc(hose, lowerHose[1], -engine.width / 2), [engineFront - 0.18, lowerRun, 0])),
+  ], { hose: 'rubber-black' }) + { title: 'Skid-steer loader coolant hoses' },
+  // The hydraulic oil cooler stands on the radiator, under the cover's slope, so the pusher fan's air leaves through the
+  // tail door's grille past both cores.
+  k.compound('skid_steer_oil_cooler', 6, [
+    box('core', 'core', [coolerX - 0.025, coolerBase, -coolerHalf + 0.04], [coolerX + 0.025, coolerTop, coolerHalf - 0.04]),
+  ] + bothSides([
+    box('tank', 'tank', [coolerX - 0.04, coolerBase, coolerHalf - 0.04], [coolerX + 0.04, coolerTop, coolerHalf]),
+  ]), { core: 'paint-charcoal', tank: 'alu-bare' }) + { title: 'Skid-steer loader hydraulic oil cooler' },
+  // The tank stands on the frame's floor below the cooler stack, its sight gauge facing the tail door and its return
+  // filter on top, where the oil level and the filter can be serviced through the open door.
+  k.compound('skid_steer_hydraulic_tank', 22, [
+    box('tank', 'tank', [tank.x[0], 0.5, tank.z[0]], [tank.x[1], tank.top, tank.z[1]]),
+    box('gauge', 'glass', [tank.x[0] - 0.01, 0.58, tank.z[0] + 0.08], [tank.x[0], 0.7, tank.z[0] + 0.12]),
+    round(k.turned('filler', 'cap', 'y', k.disc(0.03, tank.top, tank.top + 0.015), [tank.x[0] + 0.05, 0, tank.z[0] + 0.09])),
+    round(k.turned('filter', 'filter', 'y', k.disc(0.045, tank.top, tank.top + 0.12), [tank.x[1] - 0.05, 0, tank.z[0] + 0.12])),
+  ], { tank: 'paint-charcoal', glass: 'glass-clear', cap: 'plastic-black', filter: 'plastic-yellow' })
+  + { title: 'Skid-steer loader hydraulic tank' },
+  // The cooler's feed comes from the control valve under the cab; its return drops behind the radiator's near tank into
+  // the hydraulic tank.
+  k.compound('skid_steer_hydraulic_hoses', 2, [
+    round(k.turned('feed', 'hose', 'x', k.disc(oilHose, coolerX + 0.04, s.cageRear), [0, coolerMiddle, coolerHalf - 0.02])),
+    round(k.turned('return_out', 'hose', 'x', k.disc(oilHose, returnX, coolerX - 0.04), [0, coolerMiddle, coolerHalf - 0.02])),
+    round(k.turned('return_across', 'hose', 'z', k.disc(oilHose, coolerHalf - 0.02, returnZ), [returnX, coolerMiddle, 0])),
+    round(k.turned('return_drop', 'hose', 'y', k.disc(oilHose, tank.top, coolerMiddle), [returnX, 0, returnZ])),
+  ], { hose: 'rubber-black' }) + { title: 'Skid-steer loader hydraulic hoses' },
   k.compound('skid_steer_tail_door', 30, [
     box('panel', 'trim', [s.tailDoor, 0.42, -0.5], [s.tailDoor + 0.06, 1.22, 0.5]),
     box('grille_a', 'bar', [s.tailDoor - 0.01, 0.66, -0.36], [s.tailDoor, 0.7, 0.36]),
