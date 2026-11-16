@@ -152,8 +152,11 @@ local pressings(id, title, s) = {
     local c = archChamfer;
     local lid = 0.06;
     local top = s.archTop;
+    // The inner wall hangs from the lid to just above the axle, whose beam, spring seats and king pins run under it to
+    // the hub.
+    local innerFoot = s.wheelR + 0.13;
     [
-      prism(tag + '_inner', 'pan', [[a[0], s.sill], [a[1], s.sill], [a[1], top - c + lid], [a[1] - c, top + lid], [a[0] + c, top + lid], [a[0], top - c + lid]], zs(well, well + 0.05)),
+      prism(tag + '_inner', 'pan', [[a[0], innerFoot], [a[1], innerFoot], [a[1], top - c + lid], [a[1] - c, top + lid], [a[0] + c, top + lid], [a[0], top - c + lid]], zs(well, well + 0.05)),
       box(tag + '_lid', 'pan', [a[0] + c, top, zs(well, s.skin)[0]], [a[1] - c, top + lid, zs(well, s.skin)[1]]),
       prism(tag + '_slope_rear', 'pan', [[a[0], top - c], [a[0] + c, top], [a[0] + c, top + lid], [a[0], top - c + lid]], zs(well, s.skin)),
       prism(tag + '_slope_front', 'pan', [[a[1] - c, top], [a[1], top - c], [a[1], top - c + lid], [a[1] - c, top + lid]], zs(well, s.skin)),
