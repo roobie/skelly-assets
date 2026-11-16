@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
-import { meeting, shapes } from './pieces.mjs';
+import { workerPool } from '../workerPool.mjs';
+import { shapes, touches } from './pieces.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 
@@ -105,23 +106,33 @@ const rests = {
   ],
 };
 
-test('every part of a wheel and its brake rests on another and cuts into none', () => {
+// No part cuts into another, so the scans find none and run whole; each fitting's is a task of a worker pool.
+test('every part of a wheel and its brake rests on another and cuts into none', async () => {
+  const scans = [];
   for (const [name, { tyre, rim, brakes }] of wheels) {
     for (const [kind, { sites, salvage }] of Object.entries(brakes)) {
       const named = (p) => (p === 'rim' ? rim : p);
       const pairs = [[tyre, rim], ...rests[kind](sites, salvage).map(([a, b]) => [a, named(b)])];
       for (const [part, base] of pairs) {
         assert.ok(
-          meeting(part.pieces, base.pieces, STEP).touches,
+          touches(part.pieces, base.pieces, STEP),
           `${name} ${kind}: ${part.part} floats clear of ${base.part}`,
         );
       }
-      const all = [tyre, rim, ...new Set(pairs.flat())].filter((p, i, list) => list.indexOf(p) === i);
-      for (const [i, a] of all.entries()) {
-        for (const b of all.slice(i + 1)) {
-          assert.ok(!meeting(a.pieces, b.pieces, STEP).overlaps, `${name} ${kind}: ${a.part} cuts into ${b.part}`);
-        }
-      }
+      scans.push({
+        name,
+        kind,
+        parts: [tyre, rim, ...new Set(pairs.flat())].filter((p, i, list) => list.indexOf(p) === i),
+      });
     }
+  }
+  const pool = workerPool(new URL('./pieces.mjs', import.meta.url), 'overlappingPairs');
+  try {
+    const found = await Promise.all(scans.map(({ parts }) => pool.run({ parts, step: STEP })));
+    for (const [at, { name, kind, parts }] of scans.entries()) {
+      for (const [i, j] of found[at]) assert.fail(`${name} ${kind}: ${parts[i].part} cuts into ${parts[j].part}`);
+    }
+  } finally {
+    await pool.close();
   }
 });
