@@ -87,7 +87,7 @@ export function pressCheckPoses(rig, check, strokes, sockets) {
     const held = { model: check.rifle, at: r4(rifle.at), turn: r4(mat3ToQuat(rifle.turn)) };
     const file = {
       ...standing(rig),
-      angles: { ...check.stance, ...lookAt(rig, check.stance, inWorld(rifle, look), tilt) },
+      angles: { ...check.stance, ...lookAt(rig, check.stance, inWorld(rifle, look), { tilt }) },
       hands: { 'hand.R': check.sockets.grip.hands, 'hand.L': left.hands },
       hold: { 'hand.R': { ...held, pole: gripPole, socket: sockets.grip, ...graspOf(check.sockets.grip) } },
     };

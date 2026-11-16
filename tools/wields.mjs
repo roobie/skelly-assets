@@ -174,7 +174,7 @@ const SIGHT_RANGE = 10;
  * stand it, from the shoulder of the hand they belong to (`shoulderPoints`). A weapon stands with its grip point at
  * the key's `at`, from the leading hand's shoulder, or, shouldered, with its butt (the class's `butt`, `anchorPoint`)
  * at the key's `pocket`, from the same shoulder. The eyes look at the class's `look`, or down the gun's sight when the
- * key has them `sight` along it, tilted `sight.tilt` degrees toward the figure's right to lay the cheek on the stock.
+ * key has them `sight` along it, the head carried as `sight` bears it (`lookAt`) to lay the cheek on the stock.
  */
 function poseOf(rig, cls, key, weapon, sockets) {
   const header = standing(rig);
@@ -208,7 +208,7 @@ function poseOf(rig, cls, key, weapon, sockets) {
       };
     }
   }
-  Object.assign(file.angles, lookAt(rig, key.body, look, key.sight?.tilt ?? 0));
+  Object.assign(file.angles, lookAt(rig, key.body, look, key.sight));
   for (const [hand, { hands }] of Object.entries(cls.free ?? {})) {
     const { at, pole, twist = 0, wrist = [0, 0] } = key.free[hand];
     file.hands[hand] = hands;

@@ -39,10 +39,12 @@ const share = (angle, [lowA, highA], [lowB, highB]) => {
 
 /**
  * The neck and head angles that bring the eyes (the rig's `eye`, in the head's frame) onto `target` past the trunk's
- * own lean and twist, tilted `tilt` degrees toward the figure's right. Turning the head moves the eyes, so the aim is
- * taken again from where they end.
+ * own lean and twist, as `bearing` carries the head: tilted `tilt` degrees toward the figure's right, jutted forward by
+ * the neck bending `jut` degrees forward and the head as far back, and leant `lean` degrees forward of the line the
+ * eyes look along, as a head bowed over a stock looks out from under the brow. Turning the head moves the eyes, so the
+ * aim is taken again from where they end.
  */
-export function lookAt(rig, angles, target, tilt = 0) {
+export function lookAt(rig, angles, target, { tilt = 0, jut = 0, lean = 0 } = {}) {
   const bone = (id) => rig.bones.find((b) => b.id === id);
   const trunk = ['pelvis', 'spine'].map((id) => angles[id] ?? [0, 0, 0]);
   const [neckTilt, headTilt] = share(tilt, bone('neck').limits.abduct, bone('head').limits.abduct);
@@ -52,7 +54,10 @@ export function lookAt(rig, angles, target, tilt = 0) {
   for (let pass = 0; pass < 4; pass++) {
     const [neckPitch, headPitch] = share(pitch, bone('neck').limits.flex, bone('head').limits.flex);
     const [neckTwist, headTwist] = share(twist, bone('neck').limits.twist, bone('head').limits.twist);
-    look = { neck: r4([neckPitch, neckTwist, neckTilt]), head: r4([headPitch, headTwist, headTilt]) };
+    look = {
+      neck: r4([neckPitch + jut, neckTwist, neckTilt]),
+      head: r4([headPitch - jut + lean, headTwist, headTilt]),
+    };
     const d = sub(
       target,
       applyPoint(posedAt(rig, { ...angles, ...look }).get('head'), add(bone('head').head, rig.eye)),
