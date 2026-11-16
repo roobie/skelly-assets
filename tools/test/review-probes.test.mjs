@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { rankedQueue, reviewedIds } from '../review-probe.mjs';
 import { stairRuns, thinRuns } from '../runProbe.mjs';
 import { cellGrid, pieces, shapeFindings } from '../shapeProbe.mjs';
 
@@ -78,4 +79,19 @@ const wire = (n, width) => Array.from({ length: n }, (_, k) => ({
 test('slanted prisms thinner than the grain are a thin run, and ones a few grains wide are not', () => {
   assert.equal(thinRuns(wire(4, GRAIN / 2), GRAIN).length, 1);
   assert.deepEqual(thinRuns(wire(4, GRAIN * 3), GRAIN), []);
+});
+
+test('the queue puts rows more probes find first, then the surest finding, and leaves out rows with none', () => {
+  const queue = rankedQueue({
+    clean: [],
+    lopsided: [{ probe: 'mirror', cells: 30, of: 100 }],
+    nudged: [{ probe: 'mirror', cells: 5, of: 100 }],
+    loose: [{ probe: 'floating', cells: 5, of: 100 }, { probe: 'mirror', cells: 5, of: 100 }],
+  });
+  assert.deepEqual(queue.map(({ id }) => id), ['loose', 'lopsided', 'nudged']);
+});
+
+test('a verdict on a row since renamed marks the row under its current id reviewed', () => {
+  const verdicts = '{"id":"old_kettle","verdict":"ok"}\n{"batch":true}\n{"id":"pot","verdict":"fix"}\n';
+  assert.deepEqual([...reviewedIds(verdicts, { old_kettle: 'kettle' })].sort(), ['kettle', 'pot']);
 });
