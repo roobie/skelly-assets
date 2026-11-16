@@ -30,5 +30,5 @@ local s = import 'news_helicopter.spec.libsonnet';
   ]
   + pair('front_door', 'news_helicopter_front_door')
   + pair('rear_door', 'news_helicopter_rear_door')
-  + pair('seat', 'helicopter_seat', [1.0, s.floor, 0.32]),
+  + pair('seat', 'helicopter_seat', [1.0, s.floor, 0.31]),
 }

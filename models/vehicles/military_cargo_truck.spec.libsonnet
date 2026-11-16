@@ -12,4 +12,6 @@
   chassisMass: 1330, shellMass: 428, frontAxleMass: 670, axleMass: 649, transferCaseMass: 178,
   wheelMass: 175, winchMass: 387, frontShaftMass: 15,
   bedMass: 380, bedFloorMass: 320, tiltMass: 180,
+  // Degrees, so the dropped tailgate lies level with the deck.
+  tailgateOpen: 90,
 }

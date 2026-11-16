@@ -6,6 +6,7 @@
   floor: 0.875, floorRear: -1.85, floorFront: 1.2,
   // How far the sliding door stands out before it rolls back to the cabin's rear end, so its head clears the roof aft.
   slidingDoorPlug: 0.12,
+  frontDoorOpens: 90, clamshellOpens: 110,
   rotorRadius: 5.5, hub: 3.55, mastFoot: 2.72,
   tailRotor: { x: -6.85, y: 2.2, z: 0.2, radius: 0.98 },
   boom: { root: { x: -1.7, y: 2.1, r: 0.3 }, tip: { x: -6.75, y: 2.2, r: 0.09 }, band: [-3.3, -3.8] },

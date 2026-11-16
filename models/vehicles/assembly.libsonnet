@@ -3,8 +3,9 @@
 // pieces and weigh the same, so a vehicle or a mod picks the detail without changing what it is; see
 // `docs/decisions/0004-assemblies.md`.
 //
-// A drawing is { pieces, finish }. An accessory is { site, id, massKg, drawn, at }: the site it is fitted at, its row,
-// and where its own frame's origin sits in the part's frame. One row may be fitted at several sites.
+// A drawing is { pieces, finish } and, for one that opens, its `motion`. An accessory is { site, id, massKg, drawn,
+// at }: the site it is fitted at, its row, and where its own frame's origin sits in the part's frame. One row may be
+// fitted at several sites.
 local k = import 'kit.libsonnet';
 local site = import 'site.libsonnet';
 local plus(a, b) = [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -38,8 +39,8 @@ local merged(core, dressed) = std.foldl(function(all, d)
       k.compound(coreId, massKg - accessoryMass, core.pieces, core.finish) + { title: coreTitle },
       k.compound(fusedId, massKg, core.pieces + std.flattenArrays([d.pieces for d in dressed]), merged(core, dressed)) + { title: title },
     ],
-  // An accessory's own row.
-  row(id, title, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish) + { title: title },
+  // An accessory's own row, which moves as its drawing does; fused into its part, it stays put.
+  row(id, title, massKg, drawn): k.compound(id, massKg, drawn.pieces, drawn.finish, motion=std.get(drawn, 'motion')) + { title: title },
   // Every site the part can take: its core's and each accessory's.
   siteIds(coreSite, accessories): [coreSite] + [a.site for a in accessories],
   // The part's sites, its frame placed at `at`. `detail` picks how much of it is salvageable: 'fused' fits the whole

@@ -2,6 +2,7 @@
   "tools": [
     { "label": "Pose", "page": "pose.html" },
     { "label": "Model look", "page": "look.html" },
+    { "label": "Sounds", "page": "sounds.html" },
     { "label": "Mob viewer", "viewer": "mobgen" },
     { "label": "Gun viewer", "viewer": "gun-authoring-tool" },
     { "label": "Thing authoring", "viewer": "thing-authoring-tool" },

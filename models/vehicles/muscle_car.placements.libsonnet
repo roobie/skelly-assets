@@ -33,4 +33,10 @@ local s = import 'muscle_car.spec.libsonnet';
   + site.pair('door_mirror', 'door_mirror', [s.cowl - 0.04, s.waist, s.side - 0.03])
   + site.headlamps(s.front - 0.07, 0.68, 0.7)
   + site.batteryBay('battery_tray', [s.aPost + 0.25, 0.5, -0.44]),
+  unjudged: [
+    site.unjudged('gearbox', 'shell', 0.241,
+      'The inline gearbox\'s case is taller and wider than the tunnel drawn for it, so it stands up through the tunnel or the bulkhead; the tunnel or the case wants resizing.'),
+    site.unjudged('prop_shaft', 'shell', 0.061,
+      'The prop shaft\'s tube runs through the floor pan outside the tunnel drawn for it.'),
+  ],
 }

@@ -114,7 +114,7 @@ export function motionAtSite(motion, { at, mirror }, lateral) {
 // though it does not move on its own.
 export function motionLayers(site, byId, motionOf) {
   const chain = [];
-  for (let at = site; at; at = byId.get(at.rides)) chain.unshift(at);
+  for (let at = site; at; at = at.rides === undefined ? undefined : byId.get(at.rides)) chain.unshift(at);
   return chain.map(motionOf).filter(Boolean);
 }
 

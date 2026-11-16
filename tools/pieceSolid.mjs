@@ -18,6 +18,7 @@ function outline(polygon, [u, v]) {
 export function solid(piece) {
   if (piece.kind === 'box') {
     return {
+      box: true, // a box fills its bounds, so a reader may take them as the solid
       min: piece.min,
       max: piece.max,
       distance: (p) => Math.max(...[0, 1, 2].map((i) => Math.max(piece.min[i] - p[i], p[i] - piece.max[i]))),
