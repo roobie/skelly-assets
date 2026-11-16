@@ -129,16 +129,19 @@ local shaftAdd(r) =
   [oct('lame-%d' % i, 'collar', shaft.start + 0.04 + i * 0.045, shaft.start + 0.07 + i * 0.045, 0.14, 0.14, 0.03) for i in [0, 1]];
 
 // The armet: a rounded skull with a low comb, a neck flange, and a pointed visor over a vision slit with breaths below.
+// Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline.
+local slit = { min: [-0.085, 0.178, 0.112], max: [0.085, 0.192, 0.122] };
+local skull = { radius: 0.135, y0: 0.03, y1: 0.27 };
 local helmet = [
   round(h.disc('flange', 'trim', 0.15, 0, 0.034)),
-  round(h.disc('shell', 'plate', 0.135, 0.03, 0.27)),
+  round(h.disc('shell', 'plate', skull.radius, skull.y0, skull.y1)),
   round(h.dome('crown', 'plate', 0.135, 0.085, 0.014, 'y', [0, 0.265, 0])),
   round(h.disc('brim', 'trim', 0.142, 0.255, 0.27)),
   h.box('comb', 'trim', [-0.012, 0.27, -0.12], [0.012, 0.325, 0.11]),
   // Pointed visor, hinged at the sides, over a pale slit.
   h.prism('visor', 'plate', 'x', [[0.15, 0.115], [0.25, 0.115], [0.255, 0.14], [0.215, 0.185], [0.15, 0.17]], -0.1, 0.1),
   h.prism('bevor', 'plate', 'x', [[0.03, 0.115], [0.15, 0.115], [0.15, 0.165], [0.1, 0.205], [0.04, 0.17]], -0.09, 0.09),
-  h.box('slit', 'lens', [-0.085, 0.178, 0.112], [0.085, 0.192, 0.122]),
+  h.box('slit', 'lens', slit.min, slit.max),
   h.box('visor-ridge', 'trim', [-0.01, 0.15, 0.17], [0.01, 0.245, 0.19]),
 ] + [
   h.box('breath-%d' % i, 'lens', [0.02 + (i % 2) * 0.03 - 0.014, 0.065 + (i - i % 2) * 0.017, 0.185], [0.02 + (i % 2) * 0.03 - 0.004, 0.073 + (i - i % 2) * 0.017, 0.2])
@@ -166,5 +169,10 @@ armour.of('medieval', [
   if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r
   for r in gloves + boots
 ] + [
-  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + { title: 'Plate armet' } + { voxelGrain: 0.006 },
+  h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + {
+    title: 'Plate armet',
+    voxelGrain: 0.006,
+    anchors: { brow: fit.browAnchor('helmet_plate_armet', 'shell', [-skull.radius, skull.y0, -skull.radius], [skull.radius, skull.y1, skull.radius],
+                                    fit.headroom(fit.eyesAt((slit.min[1] + slit.max[1]) / 2)).brow) },
+  },
 ])

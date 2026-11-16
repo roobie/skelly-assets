@@ -9,6 +9,7 @@ local mk = import 'machine-kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local grain = k.grain;
 // A prism along x has the (y, z) profile.
 local slats(id, slot, from, to, count, make) = [
   local at = from + (to - from) * i / (count - 1);
@@ -49,6 +50,7 @@ local truckDefaults = {
   frame: 'steel-parkerized',
   gearboxLength: 0.95,
   engineLength: 1.0,
+  doorOpens: 65,
 };
 local truckSpec(s) = truckDefaults + s;
 // Where the transfer case hangs, and the front shaft that runs from its front face to the front axle's differential.
@@ -69,6 +71,16 @@ local truckRows(s0) = {
   local winchX = s.nose - 0.04,
   local winchY = s.railBottom - 0.18,
   local shaft = frontShaft(s),
+  // The door turns on pins at its leaves' outer fore corners, so no part of it reaches past the axis into the cab. Its
+  // rear edge stands off the rear post by as far as its inboard corner swings back on the way out: that corner lies no
+  // farther from the axis than the post's face does.
+  local doorBack = s.doorFront - std.sqrt(std.pow(s.doorFront - s.doorRear, 2) - std.pow(s.side + grain - s.skin, 2)),
+  local leafY = [s.waist - 0.11, s.floor + 0.15],
+  local doorLeaves = [
+    box('hinge_' + leaf[0], 'trim', [s.doorFront - 0.07, leaf[1] - 0.03, s.side], [s.doorFront, leaf[1] + 0.03, s.side + grain])
+    for leaf in [['top', leafY[0]], ['low', leafY[1]]]
+  ],
+  local doorPins = k.hingePins('hinge', 'y', [s.doorFront, leafY[0], s.side + grain], [s.doorFront, leafY[1], s.side + grain], 'trim'),
   rows: [
     k.compound(id + '_chassis', s.chassisMass, [
       box('crossmember_' + i, 'frame', [cross[i] - 0.05, s.railBottom + 0.03, -s.railZ], [cross[i] + 0.05, s.railTop - 0.03, s.railZ])
@@ -98,7 +110,7 @@ local truckRows(s0) = {
       box('sill', 'paint', [s.cabBack, s.floor - 0.12, s.skin], [s.cabFront, s.floor, s.side]),
       box('rear_post', 'paint', [s.cabBack, s.floor, s.skin], [s.doorRear, s.roof, s.side]),
       box('corner', 'paint', [s.doorFront, s.floor, s.skin], [s.cabFront, s.waist, s.side]),
-      box('a_post', 'paint', [s.doorFront + 0.1, s.waist, s.skin], [s.cabFront, s.roof, s.side]),
+      box('a_post', 'paint', [s.doorFront, s.waist, s.skin], [s.cabFront, s.roof, s.side]),
       box('cant_rail', 'paint', [s.cabBack, s.roof - 0.08, s.skin], [s.cabFront, s.roof, s.side]),
     ]) + [
       box('floor', 'trim', [s.cabBack, s.floor - 0.05, -s.skin], [s.cabFront, s.floor, s.skin]),
@@ -113,14 +125,12 @@ local truckRows(s0) = {
       box('headliner', 'liner', [s.cabBack + 0.05, s.roof - 0.02, -s.skin], [s.cabFront - 0.06, s.roof, s.skin]),
     ], finish) + { title: title + ' cab' },
     k.compound(id + '_door', 55, [
-      box('skin', 'paint', [s.doorRear, s.floor, s.skin], [s.doorFront, s.waist, s.side]),
-      box('rail_rear', 'paint', [s.doorRear, s.waist, s.skin], [s.doorRear + 0.06, s.roof - 0.08, s.side]),
-      box('rail_front', 'paint', [s.doorFront - 0.06, s.waist, s.skin], [s.doorFront + 0.1, s.roof - 0.08, s.side]),
+      box('skin', 'paint', [doorBack, s.floor, s.skin], [s.doorFront, s.waist, s.side]),
+      box('rail_rear', 'paint', [doorBack, s.waist, s.skin], [s.doorRear + 0.06, s.roof - 0.08, s.side]),
+      box('rail_front', 'paint', [s.doorFront - 0.06, s.waist, s.skin], [s.doorFront, s.roof - 0.08, s.side]),
       box('glass', 'glass', [s.doorRear + 0.06, s.waist, s.skin + 0.01], [s.doorFront - 0.06, s.roof - 0.08, s.skin + 0.03]),
       box('handle', 'trim', [s.doorRear + 0.08, s.waist - 0.12, s.side], [s.doorRear + 0.22, s.waist - 0.08, s.side + 0.02]),
-      box('hinge_top', 'trim', [s.doorFront - 0.03, s.waist - 0.14, s.side], [s.doorFront + 0.04, s.waist - 0.08, s.side + 0.015]),
-      box('hinge_low', 'trim', [s.doorFront - 0.03, s.floor + 0.12, s.side], [s.doorFront + 0.04, s.floor + 0.18, s.side + 0.015]),
-    ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: title + ' door' },
+    ] + doorLeaves + doorPins, finish, motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: title + ' door' },
     k.compound(id + '_windscreen', 26, [
       box('glass_' + side.n, 'glass', [s.cabFront - 0.04, s.waist, side.a], [s.cabFront - 0.01, s.roof - 0.02, side.b])
       for side in [{ n: 'near', a: 0.04, b: s.skin }, { n: 'far', a: -s.skin, b: -0.04 }]

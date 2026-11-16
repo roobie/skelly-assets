@@ -25,7 +25,7 @@ describe('detached magazine viewer', () => {
     }
     const report = validate(loaded.design.assembly, gunDomain);
     const layers = buildLayers(report, report.issues, 'finish', { appearanceProfile: 'ak' }, 8);
-    const ammo = buildAmmoMeshes(cartridge, cartridgeFinish(cartridge), new Texture(), 8);
+    const ammo = buildAmmoMeshes(cartridge, cartridgeFinish(cartridge), new Texture());
     const detached = buildDetachedMagazine(report, layers.solids, cartridge, ammo);
     expect(detached).toBeDefined();
     expect(detached!.capacity).toBeGreaterThan(0);

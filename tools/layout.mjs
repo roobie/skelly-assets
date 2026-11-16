@@ -26,12 +26,9 @@ export function readRoster(root = repo) {
   const packs = JSON.parse(readFileSync(join(root, 'models/export.json'), 'utf8'));
   return Object.entries(packs).flatMap(([packId, ids]) => {
     if (!Array.isArray(ids)) throw new Error(`models/export.json: ${packId} must list ids`);
-    return ids.map((id) => ({ packId, id, file: rosterFile(packId, id) }));
+    return ids.map((id) => ({ packId, id }));
   });
 }
-
-// A roster row's GLB at TAT's logical path under its pack.
-export const rosterFile = (packId, id) => outputPath(packId, `assets/models/${id}.glb`);
 
 // models/mobs.json's rows with the sheet's defaults applied; a row's taxonomy inherits the defaults' by the taxonomy rule.
 export function readMobRows(root = repo) {
@@ -46,6 +43,7 @@ export function readMobRows(root = repo) {
       glb: row.glb ?? `assets/models/${stem}.glb`,
       body: row.body ?? `${stem}.body.json`,
       clips: row.clips ?? `${stem}.clips.json`,
+      genome: row.genome ?? `${stem}.genome.json`,
       taxonomy: inheritTaxonomy(sheet.defaults?.taxonomy, row.taxonomy),
     };
   });
