@@ -21,7 +21,7 @@ not whether it was meant.
 
 ## Decision
 
-The probes rank the rows nobody has reviewed, most likely defects first, so a review spends its time where a fix is
+The probes rank the rows nobody has reviewed, most likely defects first, by how many kinds of defect they find, so a review spends its time where a fix is
 likeliest; they are a report, run on demand, and never a check in the build or CI. A check needs no false findings on
 the catalogue, or a true reason recorded for each allowed one, and these probes flag intended shapes too often for
 either: the allowance list would hold most findings and stop meaning anything. See `tools/review-probe.mjs`,
@@ -31,11 +31,17 @@ Shape probes judge the built model as the cells of its own voxel lattice that it
 judged at the grain it is drawn at, which is the grain a reviewer sees. Symmetry is judged per slot about the slot's
 own middle, because a model's parts are rarely all symmetric about one plane, and only across the level axes, because
 a thing's top is rarely its base turned over. A near miss counts only between what sampling a true mirror leaves
-unmatched and what a shape not meant to be symmetric misses. See `tools/shapeProbe.mjs`, `shapeFindings`.
+unmatched and what a shape not meant to be symmetric misses. A piece apart counts as floating only when it is much
+smaller than the largest, because like pieces apart are a pair or a set. See `tools/shapeProbe.mjs`, `shapeFindings`.
+
+A model is read no finer than a bounded number of cells along its longest side, so one large model drawn at a fine
+grain cannot stall or exhaust a run; the largest models lose one-cell findings for it. See `tools/shapeProbe.mjs`,
+`readGrain`.
 
 Run probes judge a row's pieces, because a staircase of round pieces stepping along a slant is one pipe drawn the wrong
-way whatever it looks like voxelized, and the source says so plainly where the cells would not. See
-`tools/runProbe.mjs`, `stairRuns` and `thinRuns`.
+way whatever it looks like voxelized, and the source says so plainly where the cells would not. A run counts only
+when its pieces touch end to end and, for a staircase, step evenly, because like pieces side by side, such as fingers
+or strings, are not one path. See `tools/runProbe.mjs`, `stairRuns` and `thinRuns`.
 
 The verdicts that say which rows were reviewed are the review's own tracking and stay out of the repository, so the
 tool takes them as an argument.
@@ -43,7 +49,8 @@ tool takes them as an argument.
 ## Consequences
 
 Each probe was shown to find a defect a review recorded as fixed, in the model or source from before the fix, and to
-miss it after.
+miss it after. Rows a reviewer passed still show symmetry findings, which is why the queue ranks by kinds of
+defect before the size of any one finding.
 
 A part set beside the middle of another, such as a brush head off the line of its handle, is not found: both parts are
 their own mirror, and telling a part meant to sit to one side from one that slipped needs to know which parts are meant
