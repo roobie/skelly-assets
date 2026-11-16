@@ -474,12 +474,8 @@ local site = import '../site.libsonnet';
   skid_steer: [
     site.unjudged('lift_arms', 'bucket', 0.081,
       '`tip_pin_near` of skid_steer_lift_arms runs into `mount` of skid_steer_bucket; the others family is not judged under this measure.'),
-    site.unjudged('frame', 'cage', 0.131,
+    site.unjudged('frame', 'cage', 0.061,
       '`sponson_near` of skid_steer_frame runs into `rear_wall` of skid_steer_cage; the others family is not judged under this measure.'),
-    site.unjudged('engine_cover', 'engine', 0.321,
-      '`hood` of skid_steer_engine_cover runs into `cover` of engine_i4_diesel; the others family is not judged under this measure.'),
-    site.unjudged('engine_cover', 'radiator', 0.106,
-      '`hood` of skid_steer_engine_cover runs into `tank_near` of radiator_small; the others family is not judged under this measure.'),
     site.unjudged('frame', 'fuel_tank', 0.181,
       '`floor` of skid_steer_frame runs into `body` of fuel_tank_car; the others family is not judged under this measure.'),
     site.unjudged('frame', 'lift_arms', 0.161,
@@ -488,8 +484,6 @@ local site = import '../site.libsonnet';
       '`beam_rear_far` of skid_steer_lift_arms runs into `lug_far` of skid_steer_lift_ram; the others family is not judged under this measure.'),
     site.unjudged('lift_arms', 'lift_ram_near', 0.046,
       '`beam_rear_near` of skid_steer_lift_arms runs into `lug` of skid_steer_lift_ram; the others family is not judged under this measure.'),
-    site.unjudged('tail_door', 'radiator', 0.076,
-      '`panel` of skid_steer_tail_door runs into `radiator_hose_upper_hose` of radiator_small; the others family is not judged under this measure.'),
   ],
   small_tractor: [
     site.unjudged('chassis', 'bonnet', 0.064,
