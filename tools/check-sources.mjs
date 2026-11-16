@@ -13,8 +13,8 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { readMobRows, readRoster } from './layout.mjs';
-import { readSeveredParts } from './severedParts.mjs';
 import { readRecipes } from './recipes.mjs';
+import { readSeveredParts } from './severedParts.mjs';
 import { overlapReport, readSitePieces } from './siteOverlap.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { stowageReport } from './stowage.mjs';
@@ -43,7 +43,9 @@ export async function modelSources(root = repo) {
       value.map((row) => ({ pack: packId, id: row.id, title: row.title, taxonomy: row.taxonomy })),
     ),
     ...readMobRows(root).map(({ pack, id, title, taxonomy }) => ({ pack, id, title, taxonomy })),
-    ...(await readSeveredParts(root)).flatMap(({ pack, parts }) => parts.map(({ id, title, taxonomy }) => ({ pack, id, title, taxonomy }))),
+    ...(await readSeveredParts(root)).flatMap(({ pack, parts }) =>
+      parts.map(({ id, title, taxonomy }) => ({ pack, id, title, taxonomy })),
+    ),
   ];
 }
 

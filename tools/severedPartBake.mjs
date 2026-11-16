@@ -1,10 +1,10 @@
-import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
-import { templatePartMassProperties } from './packages/mobgen/src/core/templateMass.ts';
-import { CUT_FACE } from './packages/mobgen/src/mob/crowd.ts';
-import { severedBoneSet } from './packages/mobgen/src/mob/dismember.ts';
 import { pointBounds, SHADE_FACTORS } from './actorBake.mjs';
 import { turnPoint, turnPointArray } from './actorFrame.mjs';
 import { writeGlb } from './glb.mjs';
+import { templatePartMassProperties } from './packages/mobgen/src/core/templateMass.ts';
+import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
+import { CUT_FACE } from './packages/mobgen/src/mob/crowd.ts';
+import { severedBoneSet } from './packages/mobgen/src/mob/dismember.ts';
 
 // The key the sheet's materials draw a part's cut face by, the face the body it came from leaves open.
 export const CUT_MATERIAL = 'cut';
@@ -22,7 +22,8 @@ const toCut = (colour) => colour.map((x, a) => x + (CUT_FACE.color[a] - x) * CUT
  */
 function partGlb(id, realized, subtree, stumps, centre, materials) {
   const drawnAs = (name) => {
-    if (!Object.hasOwn(materials, name)) throw new Error(`models/mobs.json severed: materials does not draw ${name}, a material of ${id}`);
+    if (!Object.hasOwn(materials, name))
+      throw new Error(`models/mobs.json severed: materials does not draw ${name}, a material of ${id}`);
     return materials[name];
   };
   const groups = new Map();
@@ -37,7 +38,8 @@ function partGlb(id, realized, subtree, stumps, centre, materials) {
       if (subtree.has(neighbour)) continue;
       const cut = stumps.has(neighbour);
       const name = drawnAs(cut ? CUT_MATERIAL : materialOf(realized.voxels, mesh.colors[corners[0]]));
-      if (!groups.has(name)) groups.set(name, { positions: [], normals: [], colours: [], indices: [], seen: new Map() });
+      if (!groups.has(name))
+        groups.set(name, { positions: [], normals: [], colours: [], indices: [], seen: new Map() });
       const group = groups.get(name);
       for (const corner of corners) {
         if (!group.seen.has(`${owner}:${corner}`)) {
@@ -61,7 +63,12 @@ function partGlb(id, realized, subtree, stumps, centre, materials) {
     const group = groups.get(name);
     const first = arrays.length;
     const position = new Float32Array(group.positions);
-    arrays.push(position, new Float32Array(group.normals), new Float32Array(group.colours), new Uint32Array(group.indices));
+    arrays.push(
+      position,
+      new Float32Array(group.normals),
+      new Float32Array(group.colours),
+      new Uint32Array(group.indices),
+    );
     const count = group.colours.length / 3;
     accessors.push(
       { bufferView: first, componentType: 5126, count, type: 'VEC3', ...pointBounds(position) },
@@ -69,15 +76,28 @@ function partGlb(id, realized, subtree, stumps, centre, materials) {
       { bufferView: first + 2, componentType: 5126, count, type: 'VEC3' },
       { bufferView: first + 3, componentType: 5125, count: group.indices.length, type: 'SCALAR' },
     );
-    return { attributes: { POSITION: first, NORMAL: first + 1, COLOR_0: first + 2 }, indices: first + 3, material, mode: 4 };
+    return {
+      attributes: { POSITION: first, NORMAL: first + 1, COLOR_0: first + 2 },
+      indices: first + 3,
+      material,
+      mode: 4,
+    };
   });
-  return writeGlb({
-    asset: { version: '2.0', generator: 'skelly-assets tools/mobs.mjs' }, scene: 0, scenes: [{ nodes: [0] }],
-    nodes: [{ mesh: 0, name: id }],
-    meshes: [{ primitives }],
-    materials: names.map((name) => ({ name, pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 } })),
-    accessors,
-  }, arrays);
+  return writeGlb(
+    {
+      asset: { version: '2.0', generator: 'skelly-assets tools/mobs.mjs' },
+      scene: 0,
+      scenes: [{ nodes: [0] }],
+      nodes: [{ mesh: 0, name: id }],
+      meshes: [{ primitives }],
+      materials: names.map((name) => ({
+        name,
+        pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 },
+      })),
+      accessors,
+    },
+    arrays,
+  );
 }
 
 /**
@@ -98,12 +118,26 @@ export function bakeSeveredParts(plan, template, realized) {
     const gone = part.without.map((below) => ({ part: below, boneIndices: indicesOf(severedBoneSet(bones, [below])) }));
     const goneBones = new Set(gone.flatMap(({ boneIndices }) => boneIndices));
     const subtree = whole.filter((index) => !goneBones.has(index));
-    const mass = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: whole, bodyBoneIndices: all, voxelSize: realized.voxels.size, template, part: part.bone, without: gone });
+    const mass = templatePartMassProperties({
+      voxels: realized.voxels,
+      partBoneIndices: whole,
+      bodyBoneIndices: all,
+      voxelSize: realized.voxels.size,
+      template,
+      part: part.bone,
+      without: gone,
+    });
     const { parent } = bones.find((bone) => bone.id === part.bone);
-    const stumps = new Set([bones.findIndex((bone) => bone.id === parent), ...part.without.map((below) => bones.findIndex((bone) => bone.id === below))]);
+    const stumps = new Set([
+      bones.findIndex((bone) => bone.id === parent),
+      ...part.without.map((below) => bones.findIndex((bone) => bone.id === below)),
+    ]);
     files[part.id] = partGlb(part.id, realized, new Set(subtree), stumps, turnPoint(mass.center), plan.materials);
     cuts[part.bone] ??= [];
-    cuts[part.bone].push({ without: part.without, model: { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } } });
+    cuts[part.bone].push({
+      without: part.without,
+      model: { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } },
+    });
   }
   return { cuts: JSON.stringify(cuts), ...files };
 }
