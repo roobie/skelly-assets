@@ -4,6 +4,10 @@ local pole(id, x, z) = site.one(id, 'grab_pole', [x, s.floor, z]);
 {
   title: 'City bus',
   doorPairs:: (import 'bus-body.libsonnet').doorPairs(s),
+  overlaps: [
+    site.overlap(onRail[0], 'rail_' + onRail[1], 0.042, 'The grab pole\'s head runs up through the ceiling rail it is clamped to.')
+    for onRail in [['pole_front', 'near'], ['pole_door_fwd', 'near'], ['pole_door_aft', 'near'], ['pole_stand_far', 'far'], ['pole_step', 'far']]
+  ],
   sites: (import 'bus-body.libsonnet').fittings(site.kit, 'city_bus', s) + [
     pole('pole_front', 3.9, 0.3),
     pole('pole_door_fwd', 1.6, 0.3),
