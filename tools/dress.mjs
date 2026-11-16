@@ -176,7 +176,7 @@ export function wornPieces(id, models, dressing) {
 export const isWearable = (model, models) => tagsOf(model, 'fit').length === 0 && (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
 
 // The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
-function placeOf(model, dressing) {
+export function placeOf(model, dressing) {
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));
   if (!place) throw new Error(`${model.id}: none of its slots ${slots.join(' ')} has a place on the doll`);
