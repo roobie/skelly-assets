@@ -6,6 +6,7 @@ import { meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
 import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
 import { expect, it } from 'vitest';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
+import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { boltCartridge } from '../src/gun/boltCartridge.ts';
 import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
@@ -106,9 +107,17 @@ it('fits the staggered stack through the stock aperture clear of the full bolt s
     parts: { ...hunting.parts, packed: { family: family.name } },
     connections: [...hunting.connections, { from: `${receiver}.rail`, to: 'packed.base', slot: 0 }],
   };
-  expect(
-    sweepTurningAction(resolve(fixture, { ...gunDomain, families: { ...gunDomain.families, [family.name]: family } })),
-  ).toEqual([]);
+  const withStack = resolve(fixture, { ...gunDomain, families: { ...gunDomain.families, [family.name]: family } });
+  // The bare rifle's sweep is certified with the other designs' in `test/boltExport.test.ts`, so only the rounds,
+  // the obstacles this fixture adds, are swept.
+  const moving = new Set(Object.values(resolveGunAction(withStack)!.parts).map(({ id }) => id));
+  const roundsOnly: Resolved = {
+    ...withStack,
+    defs: new Map(
+      [...withStack.defs].map(([id, def]) => [id, moving.has(id) || id === 'packed' ? def : { ...def, solids: [] }]),
+    ),
+  };
+  expect(sweepTurningAction(roundsOnly)).toEqual([]);
 });
 
 const stock = FAMILIES.stock!.params;
