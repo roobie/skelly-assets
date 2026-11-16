@@ -16,4 +16,6 @@ worth keeping faster than hand-writing a synth per sound the way `../impact-synt
   because the compiler and its standard library decide the samples.
 - A sound is named by its patch and seed alone, because the listener reports back by file name and that name must be
   enough to render the same sound again: `node tools/explore_sounds.mjs --out <dir> --patch <patch> --seed <seed> --count 1`.
-- Every render gets a fresh instance, so a render's noise restarts and the same seed gives the same samples.
+- Every render gets a fresh instance, so a render's noise restarts and the same seed gives the same samples. The
+  noise itself is seeded by a slider `sfx.lib` gives every patch, drawn like any other, because noises.lib alone
+  starts every instance on the one stream and every seed of a family would share its noise.

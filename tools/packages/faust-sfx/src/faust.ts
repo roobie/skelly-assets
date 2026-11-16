@@ -8,8 +8,11 @@ import {
   LibFaust,
 } from '@grame/faustwasm/dist/esm/index.js';
 
-/** One slider a patch exposes, with the range it declares; the range is the patch's, never the tool's. */
-export type Slider = { address: string; label: string; min: number; max: number; step: number; log: boolean };
+/**
+ * One slider a patch exposes, with the range it declares; the range is the patch's, never the tool's. A `noise`
+ * slider seeds the patch's noise rather than shaping the sound.
+ */
+export type Slider = { address: string; label: string; min: number; max: number; step: number; log: boolean; noise: boolean };
 
 export type Patch = { name: string; seconds: number; sliders: Slider[]; generator: Generator };
 
@@ -63,4 +66,5 @@ const toSlider = (item: FaustUIInputItem): Slider => ({
   max: item.max ?? 0,
   step: item.step ?? 0,
   log: item.meta?.some((entry) => entry.scale === 'log') ?? false,
+  noise: item.meta?.some((entry) => 'noise' in entry) ?? false,
 });

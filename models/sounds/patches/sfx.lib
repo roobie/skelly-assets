@@ -1,5 +1,29 @@
-// Shared by every patch, so a one-shot means the same strike and the same envelope everywhere.
-import("stdfaust.lib");
+// Shared by every patch, so a one-shot means the same strike, envelope and noise everywhere.
+
+// Not stdfaust.lib, so that `no` and `pm` here can be the seeded ones; a patch needing another library adds its
+// prefix here.
+ba = library("basics.lib");
+de = library("delays.lib");
+en = library("envelopes.lib");
+fi = library("filters.lib");
+ma = library("maths.lib");
+os = library("oscillators.lib");
+ro = library("routes.lib");
+si = library("signals.lib");
+
+// Drawn by the renderer like a setting, so each seed gets its own noise instead of every render replaying the one
+// stream noises.lib always starts from.
+noiseSeed = int(hslider("noise seed [noise:seed]", 0, 0, 65535, 1));
+// Odd, because the generator only keeps its full period with an odd increment.
+stream = library("noises.lib")._noise_env(2 * noiseSeed + 1);
+// Every noise noises.lib makes, and so every exciter and breath in physmodels.lib, comes from the seeded stream.
+no = library("noises.lib")[
+  noise = stream.noise;
+  multirandom(N) = stream.multirandom(N);
+  multinoise(N) = stream.multinoise(N);
+  noises(N, i) = stream.noises(N, i);
+];
+pm = library("physmodels.lib")[no = no;];
 
 // A patch is struck once, at the first sample, so an offline render needs no gate timing from the host.
 strike = 1 - 1';

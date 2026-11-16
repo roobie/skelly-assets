@@ -3,11 +3,13 @@ import type { Slider } from './faust.ts';
 
 /**
  * A slider setting drawn from the slider's own range, the same for the same seed on any machine. A log slider
- * is drawn evenly in octaves, so a pitch range does not spend nearly all its draws in the top octave.
+ * is drawn evenly in octaves, so a pitch range does not spend nearly all its draws in the top octave. Noise seeds
+ * are drawn after the shaping sliders, so a family that gains a noise seed keeps the settings its seeds drew before.
  */
 export function drawValues(sliders: readonly Slider[], seed: number): Record<string, number> {
   const rng = seededRng(seed);
-  return Object.fromEntries(sliders.map((slider) => [slider.address, onStep(slider, spanAt(slider, rng()))]));
+  const ordered = [...sliders.filter((slider) => !slider.noise), ...sliders.filter((slider) => slider.noise)];
+  return Object.fromEntries(ordered.map((slider) => [slider.address, onStep(slider, spanAt(slider, rng()))]));
 }
 
 const spanAt = ({ min, max, log }: Slider, at: number) =>
