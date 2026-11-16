@@ -3,7 +3,7 @@ type: breaking
 ---
 The classic small car's doors and boot lid, the army 4x4's side rails and the school bus's rear exit now export a hinge
 motion on drawn round pins in place of their hinge anchors, so the showcase's Open view swings them and a game plays
-the swing the build proved clear. The army 4x4's side rails swing in. The small car's boot lid is shorter, behind a
+the swing the build proved clear. The army 4x4's side rails hang just outside the tub's side and swing out. The small car's boot lid is shorter, behind a
 fixed deck under the rear screen, and its door mirrors sit a little further aft and ride the doors.
 
 Upgrade:
