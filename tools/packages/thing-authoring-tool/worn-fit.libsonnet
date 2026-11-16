@@ -20,6 +20,13 @@ local outline(w, d, c) = [
 // An upright octagonal shell from y0 to y1, `w` across x and `d` along z, corners cut by `c`.
 local oct(id, slot, y0, y1, w, d, c, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[0] + cz, p[1] + cx] for p in outline(w, d, c)], y0, y1);
 
+// How far out from the thigh's centre line a thigh piece may reach on its outer side, a few millimetres short of the
+// hand hanging beside the thigh at rest, which a bulkier piece would sink into.
+local handClear = 0.125;
+// An `oct` whose outer side (local -x: the right leg is the reference, the left its mirror) stops at `handClear`, while
+// its inner side and its depth keep their bulk.
+local besideHand(id, slot, y0, y1, w, d, c) = oct(id, slot, y0, y1, w / 2 + handClear, d, c, (w / 2 - handClear) / 2);
+
 // A chamfered outline set out by `g` stays parallel when its cut grows by g (2 - sqrt 2).
 local around(c, g) = c + g * (2 - std.sqrt(2));
 
@@ -75,6 +82,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 {
   layers: layers,
   oct: oct,
+  handClear: handClear,
+  besideHand: besideHand,
   // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
   // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
   // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
