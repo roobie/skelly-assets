@@ -187,25 +187,25 @@ test("a piece that declares the regions it covers passes beneath none of its par
   );
 });
 
-test('a piece sunk into a part it is not meant to cover, or met only past the bone, covers none of that part', () => {
+test('a piece sunk into a part it is not meant to cover, or met only past the middle of a part, covers none of it', () => {
   // A leg standing on the ground with an arm hanging beside it, joined only through the hips: a shin with a foot
   // reaching forward from the ankle, and a hand whose glove cuff sinks into the thigh, as a gauntlet's cuff at the hip.
   // Each piece passes inside a part, and a ray from that part's far side, straight in, meets it: across the whole thigh
-  // to the cuff, and up through the whole foot from the sole to the shin guard's rim sunk into its top. Neither is skin
-  // the garment fails to cover, however long the ray.
+  // to the cuff, and up through the whole foot from the sole to the shin guard's rim sunk into its top, below the foot's
+  // bone at the ankle. Neither is skin the garment fails to cover, however long the ray.
   const limbs = {
     bones: [
       { id: 'hips', parent: null, head: [0, 0, 0], tail: [0, 0.1, 0] },
       { id: 'thigh', parent: 'hips', head: [0, 0, 0], tail: [0, -0.4, 0] },
-      { id: 'shin', parent: 'thigh', head: [0, -0.4, 0], tail: [0, -0.74, 0] },
-      { id: 'foot', parent: 'shin', head: [0, -0.74, 0], tail: [0, -0.74, 0.2] },
+      { id: 'shin', parent: 'thigh', head: [0, -0.4, 0], tail: [0, -0.72, 0] },
+      { id: 'foot', parent: 'shin', head: [0, -0.72, 0], tail: [0, -0.72, 0.2] },
       { id: 'hand', parent: 'hips', head: [0.13, -0.05, 0], tail: [0.13, -0.2, 0] },
     ],
   };
   const legs = [
     { bone: 'thigh', mesh: boxMesh([0.14, 0.4, 0.14], [0, -0.2, 0]) },
     { bone: 'shin', mesh: boxMesh([0.1, 0.34, 0.1], [0, -0.57, 0]) },
-    { bone: 'foot', mesh: boxMesh([0.08, 0.08, 0.26], [0, -0.76, 0.05]) },
+    { bone: 'foot', mesh: boxMesh([0.08, 0.12, 0.26], [0, -0.76, 0.05]) },
     { bone: 'hand', mesh: boxMesh([0.04, 0.15, 0.08], [0.13, -0.125, 0]) },
   ];
   const cuff = { piece: 'cuff', bone: 'hand', mesh: boxMesh([0.1, 0.08, 0.1], [0.11, -0.08, 0]) };

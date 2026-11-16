@@ -262,14 +262,12 @@ function reachOf(bones) {
   return reach;
 }
 
-// How far the ray from `p` along `dir` runs before it passes nearest the line through `head` along the unit `axis`:
-// beneath a point, a piece that wraps the part lies between the skin and the bone, so what the ray meets past it lies
-// beneath the far side of the part.
-function toAxis(p, dir, { head, axis }) {
-  const across = sub(dir, scale(axis, dot(dir, axis)));
-  const offset = sub(p, head);
-  const off = sub(offset, scale(axis, dot(offset, axis)));
-  return -dot(off, across) / dot(across, across);
+// How far the ray from `p` on the surface under `node`, pointing into it, runs before it leaves it: past the faces where
+// the shells it is built of overlap, to the first beyond which none encloses it.
+function runThrough(node, p, dir) {
+  let t = 0;
+  while (t < Infinity && (t === 0 || winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0)) t += firstHit(node, add(p, scale(dir, t)), dir, Infinity);
+  return t;
 }
 
 /**
@@ -279,8 +277,8 @@ function toAxis(p, dir, { head, axis }) {
  * the points
  * - it encloses at rest, flush included;
  * - it passes beneath: a ray from the point straight into its body part, across the part's bone, meets the piece before
- *   the ray passes the bone and while still inside that part, as a jacket's yoke passes through a deltoid that stands
- *   proud of it, or a sleeve too narrow for its arm passes through the arm.
+ *   the ray is halfway through the part, as a jacket's yoke passes through a deltoid that stands proud of it, or a
+ *   sleeve too narrow for its arm passes through the arm. What the ray meets further on lies nearer the far side.
  * A ray along the bone runs out through the part's end, where it nests into the next piece through that piece's
  * opening: a fingertip's ray meets the cuff its hand reaches into, and the cuff does not cover the fingertip. Nor does a
  * piece cover what it only sits beside, as a belt bag beside the waist it hangs on, or what lies beneath the part's far
@@ -293,7 +291,7 @@ export function coverage(rig, rest) {
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
   const bodySolids = new Map(rest.body.map(({ bone, mesh }) => [bone, carried(solidOf(mesh), STILL)]));
   const parts = new Map(rest.body.map(({ bone, part }) => [bone, part]));
-  const bones = new Map(rig.bones.map(({ id, head, tail }) => [id, { head, axis: normalize(sub(tail, head)) }]));
+  const axes = new Map(rig.bones.map(({ id, head, tail }) => [id, normalize(sub(tail, head))]));
   const reach = reachOf(rig.bones);
   // The pieces meant to cover each part, which a part whose box misses all of theirs, a coincident face's width wide,
   // has none of.
@@ -305,17 +303,19 @@ export function coverage(rig, rest) {
   );
   const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
   const beneath = (id, indices, { point, normal, region }) => {
-    const bone = bones.get(id);
-    if (Math.abs(dot(normal, bone.axis)) >= Math.SQRT1_2) return -1;
+    if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
-    let hit = { t: toAxis(point, dir, bone), index: -1 };
+    const part = bodySolids.get(id).tree;
+    let hit = { t: runThrough(part, point, dir) / 2, index: -1 };
     for (const index of indices) {
       if (declaresBare(rest.pieces[index], id, region)) continue;
       const t = firstHit(pieceSolids[index].tree, point, dir, hit.t);
       if (t < hit.t) hit = { t, index };
     }
     if (hit.index < 0) return -1;
-    return winding(bodySolids.get(id).tree, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
+    // A ray running along a face's edge can slip past the face it leaves the part through, and run on through a gap
+    // into the next shell, so the hit must also lie inside the part.
+    return winding(part, add(point, scale(dir, hit.t))) !== 0 ? hit.index : -1;
   };
   return (id, sample) => {
     const indices = meant.get(id) ?? [];

@@ -33,10 +33,12 @@ than a review pixel. Neither is a fit allowance, so neither should grow to quiet
 **What a piece covers is what it encloses or passes beneath.** A body point is meant to be covered when a piece
 encloses it at rest, or when a ray from it into its part, across the bone, meets the piece still inside the part, as a
 jacket's yoke passes through a deltoid standing proud of it. Only a piece riding the part's bone or a bone across one
-of its joints is meant to cover it, and the ray stops where it passes the bone. Without that tie a gauntlet's cuff
-resting against the thigh made the whole thigh its cover, and a shin guard's rim sunk into the ankle made the sole on
-the ground its cover, each poking by the width of the limb: what a piece meets of a limb it does not ride is a clip,
-not skin it fails to cover, and what a ray meets past the bone lies beneath the part's far side. Coverage by span
+of its joints is meant to cover it, and the ray stops halfway through the part. Without that tie a gauntlet's cuff
+resting against the thigh made the whole thigh its cover, and without that stop a shin guard's rim sunk into the foot
+made the sole on the ground its cover, each poking by the width of the limb: what a piece meets of a limb it does not
+ride is a clip, not skin it fails to cover, and what a ray meets past the part's middle lies beneath its far side.
+The stop is the part's own middle, not its bone, because a bone can sit far off it: the foot's runs at the ankle,
+and a rim below that line is still on the foot's top. Coverage by span
 along the bone was tried and dropped: it gave a belt bag the whole small of the back to cover. A ray along the bone is
 not used, because it leaves through the part's end into the next piece's opening and would make a cuff cover the
 fingertips. A piece that declares what it covers of the part copy it rides (`docs/decisions/0012-hidden-body.md`,
