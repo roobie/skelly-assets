@@ -9,6 +9,7 @@ local bottle(id, massKg, radius, height, body, label, cap, exportMass, dimension
 // Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
 local fine = { voxelGrain: 0.002 };
 [
+  // Beans and soup draw a serving spilled from its tin, as when a player pours one out.
   atom('beans', 'foodPortion', inventoryMass('beans'), { radius: 0.055, height: 0.04, chunkRadius: 0.004, chunkLength: 0.012, chunks: 40 }, { body: 'paint-terracotta', chunks: 'paperboard-tan' }, exportMass='inventory-atom') + { title: 'Beans' } + { taxonomy: { category: 'food', tags: { material: ['plant'], place: ['kitchen'] } } } + fine,
   atom('soup', 'foodPortion', inventoryMass('soup'), { radius: 0.055, height: 0.035, chunkRadius: 0.004, chunkLength: 0.01, chunks: 9 }, { body: 'paint-terracotta', chunks: 'plastic-green' }, exportMass='inventory-atom') + { title: 'Soup' } + { taxonomy: { category: 'food', tags: { place: ['kitchen'] } } } + fine,
   atom('soda', 'drinkCup', inventoryMass('soda'), { radius: 0.04, baseRadius: 0.03, height: 0.115, wall: 0.002, fillDepth: 0.085 }, { body: 'glass-clear', liquid: 'paint-oxblood' }, exportMass='inventory-atom') + { title: 'Soda' } + { taxonomy: { category: 'food', tags: { material: ['glass'], setting: ['modern'] } } } + fine,
