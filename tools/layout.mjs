@@ -43,6 +43,7 @@ export function readMobRows(root = repo) {
       glb: row.glb ?? `assets/models/${stem}.glb`,
       body: row.body ?? `${stem}.body.json`,
       clips: row.clips ?? `${stem}.clips.json`,
+      genome: row.genome ?? `${stem}.genome.json`,
       taxonomy: inheritTaxonomy(sheet.defaults?.taxonomy, row.taxonomy),
     };
   });

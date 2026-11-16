@@ -131,9 +131,10 @@ test('a rename to an id the build does not hold is refused, so one lookup always
 });
 
 test('a mob row joins the manifest with its actor files and no part nodes', () => {
-  const { models, files } = mobManifest([{ id: 'fixture_mob', title: 'Fixture mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json' }]);
-  assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob.body.json', 'fixture.mobs/fixture_mob.clips.json']);
-  assert.deepEqual(models, [{ id: 'fixture_mob', title: 'Fixture mob', kind: 'mob', pack: 'fixture.mobs', path: 'fixture_mob.glb', clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json' }]);
+  const actorFiles = { clips: 'fixture_mob.clips.json', body: 'fixture_mob.body.json', genome: 'fixture_mob.genome.json' };
+  const { models, files } = mobManifest([{ id: 'fixture_mob', title: 'Fixture mob', pack: 'fixture.mobs', glb: 'fixture_mob.glb', ...actorFiles }]);
+  assert.deepEqual(files, ['fixture.mobs/fixture_mob.glb', 'fixture.mobs/fixture_mob.body.json', 'fixture.mobs/fixture_mob.clips.json', 'fixture.mobs/fixture_mob.genome.json']);
+  assert.deepEqual(models, [{ id: 'fixture_mob', title: 'Fixture mob', kind: 'mob', pack: 'fixture.mobs', path: 'fixture_mob.glb', ...actorFiles }]);
   assert.ok(!Object.hasOwn(models[0], 'nodes'));
 });
 
