@@ -37,14 +37,18 @@ local spareCarrier = k.compound('spare_wheel_carrier', 38, [
   k.turned('rim', 'steel', 'x', k.disc(0.19, -0.24, -0.04)) + { sides: roundSides },
   k.turned('hub', 'cap', 'x', k.disc(0.08, -0.26, -0.24)) + { sides: 12 },
 ], { tyre: 'rubber-black', steel: 'steel-grey', cap: 'paint-charcoal' }) + { title: 'Spare wheel carrier' };
-// An engine with its crank along x; `length` is along the crank.
-local inline(id, massKg, length, width, height) = k.compound(id, massKg, [
-  box('sump', 'casting', [-length / 2, 0, -width * 0.42], [length / 2, height * 0.2, width * 0.42]),
-  box('block', 'casting', [-length / 2, height * 0.2, -width / 2], [length / 2, height * 0.72, width / 2]),
-  box('head', 'casting', [-length * 0.47, height * 0.72, -width * 0.44], [length * 0.47, height * 0.92, width * 0.44]),
-  box('cover', 'cover', [-length * 0.43, height * 0.92, -width * 0.36], [length * 0.43, height, width * 0.36]),
-  box('intake', 'casting', [-length * 0.38, height * 0.45, width / 2], [length * 0.38, height * 0.82, width * 0.68]),
-], { casting: 'steel-grey', cover: 'paint-charcoal' });
+// An engine with its crank along x; `length` is along the crank. The intake manifold bolts to the head's ports, so it
+// stands on the block's deck against the head's side rather than down the block, where a truck's frame rails run.
+local inline(id, massKg, length, width, height) =
+  local deck = height * 0.72;
+  local headHalf = width * 0.44;
+  k.compound(id, massKg, [
+    box('sump', 'casting', [-length / 2, 0, -width * 0.42], [length / 2, height * 0.2, width * 0.42]),
+    box('block', 'casting', [-length / 2, height * 0.2, -width / 2], [length / 2, deck, width / 2]),
+    box('head', 'casting', [-length * 0.47, deck, -headHalf], [length * 0.47, height * 0.92, headHalf]),
+    box('cover', 'cover', [-length * 0.43, height * 0.92, -width * 0.36], [length * 0.43, height, width * 0.36]),
+    box('intake', 'casting', [-length * 0.38, deck, headHalf], [length * 0.38, height * 0.82, width * 0.68]),
+  ], { casting: 'steel-grey', cover: 'paint-charcoal' });
 // A vee has two rows of cylinders, so it reads wider and lower than an inline of the same mass.
 local vee(id, massKg, length, width, height) = k.compound(id, massKg, [
   box('sump', 'casting', [-length / 2, 0, -width * 0.3], [length / 2, height * 0.22, width * 0.3]),

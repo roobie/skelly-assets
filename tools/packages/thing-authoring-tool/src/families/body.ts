@@ -1,4 +1,4 @@
-import type { BoxSolid, ExtrudedPolygonSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { parse, strictObject } from 'valibot';
 import { positive, scalar } from './shapes.ts';
 
@@ -151,6 +151,12 @@ export const block = (
   },
   slot,
 });
+/**
+ * Solids marked as one region of a doll part, a piece the export keeps as its own primitives, so a worn shell's `covers`
+ * can hide that region alone (docs/decisions/0012-hidden-body.md).
+ */
+export const region = <T extends ExtrudedPolygonSolid | BoxSolid | RevolvedSolid>(piece: string, solids: T[]): T[] =>
+  solids.map((solid) => ({ ...solid, display: { ...solid.display, piece } }));
 // The severed face: a gore plate set into the part's end with a bone stub standing out of it.
 const cutFace = (id: string, { halfX, halfZ, cx = 0, cz = 0 }: Footprint, y: number, outward: 1 | -1) => {
   const depth = 0.012;

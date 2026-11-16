@@ -198,6 +198,13 @@ const carried = (tree, { r, t }) => {
 // A mesh carried by a transform; a grip closes on one (site/fingers.mjs).
 export const posedSolid = (mesh, transform) => carried(solidOf(mesh), transform);
 
+// How far the ray from `p` in direction `dir` runs before it meets the solid's surface beyond a coincident face, or
+// Infinity: from a point inside it, how far the point could move that way and stay enclosed.
+export function runAlong({ tree, local }, p, dir) {
+  const q = local(p);
+  return firstHit(tree, q, sub(local(add(p, dir)), q), Infinity);
+}
+
 /**
  * How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray. A
  * grip probes hundreds of points per joint step, so it can name a `reach` past which only the side matters: the
