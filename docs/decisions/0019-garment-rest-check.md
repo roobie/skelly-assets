@@ -49,4 +49,6 @@ every other cache entry, so a probe no shard made is found rather than run on on
 
 A test keeps only the fixture that shows the check finds a poke by its depth and honours an entry, so the suite no
 longer pays for the catalogue. The check proves only the rest pose; what a pose drives through a garment is the
-clearance sweep's report, `tools/clearance-sweep.mjs`.
+clearance sweep's report, `tools/clearance-sweep.mjs`. Nor does it see a piece sunk at rest into a limb it does not
+ride, as a thigh guard into the hand hanging beside it: no skin is left uncovered there, so it is no poke (decision
+11), and calling it one charged the hand's whole far side to the guard, which no entry could judge.
