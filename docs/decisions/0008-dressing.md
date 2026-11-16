@@ -4,6 +4,7 @@ read_if:
   - adding a body slot, a worn segment or a wearable whose pieces are drawn in a new doll part
   - changing the default player avatar's models, parts or anchors
   - wondering why a wearable without worn pieces sits on the doll as it does
+  - reading which doll part a worn model sits on from the manifest, `wornOn`
 ---
 
 # 8. One dressing rule dresses the doll
@@ -46,7 +47,10 @@ shows as such on the doll too.
 ## Consequences
 
 Every slot the vocabulary names needs a place on the doll, or the showcase build fails for the first wearable that
-names it; a test holds the content to that, see `tools/test/dress.test.mjs`. A worn-only set, with pieces but no loose
+names it; a test holds the content to that, see `tools/test/dress.test.mjs`. The doll part each worn piece and each wearable placed by its slot sits on is
+carried in its manifest entry, `wornOn`, from this same rule, so a game seats it on the bone of that part without a
+copy of the segment map or the places that could drift from it; the offsets the places rest a wearable by are left
+out, because they only show roughly where an item belongs and are no fit a game should copy. A worn-only set, with pieces but no loose
 model, is not a wearable here and stays shown as its pieces. A rigid head piece is placed by its slot rather than by
 the fit a consumer gives it, so its opening must clear the doll's head and hair with its brim at the brow: a hat whose
 cone is the head's own width would clip the hair's corners. The wizard hat (`models/catalogue/sets/batch-129.libsonnet`)
