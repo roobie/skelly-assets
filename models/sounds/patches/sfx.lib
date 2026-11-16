@@ -40,3 +40,7 @@ audible(f) = min(f, 0.45 * ma.SR);
 
 // A short filtered noise burst: the contact of a hit, softer as `hardness` falls.
 contact(hardness) = no.noise * riseFall(0.0002, 0.004) : fi.lowpass(2, hardness);
+
+// A mode's time to -60 dB in a material whose internal friction (tan phi) is `loss`. Decay shrinks as frequency
+// rises, and how fast it shrinks is what tells wood and bone from glass and metal.
+frictionT60(loss, f) = 6.9078 / (ma.PI * f * loss);
