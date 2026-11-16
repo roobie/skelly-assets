@@ -8,13 +8,13 @@ import {
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 
 /** Gun-domain names; core treats these as caller-supplied strings. */
-export type GunAnchorName = 'hold' | 'support' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port';
+export type GunAnchorName = 'hold' | 'support' | 'butt' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port';
 
 export interface SelectedAnchors {
   readonly hold: AnchorFrame;
   readonly others: Readonly<Record<string, AnchorFrame>>;
-  /** The part whose `support` anchor was selected, so the export can read its drawn underside. */
-  readonly supportPart?: string;
+  /** The part each of `others` was selected from, so the export can read that part's drawn faces. */
+  readonly sourceParts?: Readonly<Partial<Record<GunAnchorName, string>>>;
 }
 
 export type AnchorSelectionError =
@@ -67,6 +67,7 @@ export const GUN_ANCHOR_POLICY: GunAnchorSelectionPolicy = {
 
 const OTHER_ANCHORS = [
   'support',
+  'butt',
   'muzzle',
   'ejection',
   'magwell',
@@ -104,7 +105,10 @@ export const selectGunAnchors: SelectGunAnchors = (resolved, declarations, polic
 
 const along = ({ position, forward }: AnchorFrame): number =>
   position[0] * forward[0] + position[1] * forward[1] + position[2] * forward[2];
-const frontmost = (best: AnchorFrame, frame: AnchorFrame): AnchorFrame => (along(frame) > along(best) ? frame : best);
+
+/** The part whose muzzle lies furthest along its own forward; the first of equals. */
+const frontmostMuzzle = (frames: ResolvedAnchors<GunAnchorName>, declaring: readonly string[]): string =>
+  declaring.reduce((best, id) => (along(frames[id]!.muzzle!) > along(frames[best]!.muzzle!) ? id : best));
 
 const selectOthers = (
   frames: ResolvedAnchors<GunAnchorName>,
@@ -112,19 +116,16 @@ const selectOthers = (
   hold: AnchorFrame,
 ): SelectedAnchors => {
   const others: Partial<Record<GunAnchorName, AnchorFrame>> = {};
-  let supportPart: string | undefined;
+  const sourceParts: Partial<Record<GunAnchorName, string>> = {};
   for (const name of OTHER_ANCHORS) {
     const declaring = ids.filter((id) => frames[id]![name]);
     const [first] = declaring;
     if (!first) {
       continue;
     }
-    const candidate = frames[first]![name]!;
-    others[name] =
-      name === 'muzzle' ? declaring.reduce((best, id) => frontmost(best, frames[id]![name]!), candidate) : candidate;
-    if (name === 'support') {
-      supportPart = first;
-    }
+    const source = name === 'muzzle' ? frontmostMuzzle(frames, declaring) : first;
+    others[name] = frames[source]![name]!;
+    sourceParts[name] = source;
   }
-  return { hold, others, ...(supportPart === undefined ? {} : { supportPart }) };
+  return { hold, others, sourceParts };
 };

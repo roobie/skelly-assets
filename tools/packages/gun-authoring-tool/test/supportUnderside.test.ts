@@ -32,9 +32,8 @@ const sightless = (assembly: Parameters<typeof exportGunGlb>[0]): typeof assembl
 /** Every published design that selects a support anchor, with the part that declares it. */
 const supportForends = loadDesigns().flatMap(({ label, assembly, items }) => {
   const selected = selectGunAnchors(resolve(assembly, gunDomain), GUN_ANCHORS, GUN_ANCHOR_POLICY);
-  return !('code' in selected) && selected.supportPart !== undefined
-    ? [{ label, assembly, items, partId: selected.supportPart }]
-    : [];
+  const partId = 'code' in selected ? undefined : selected.sourceParts?.support;
+  return partId === undefined ? [] : [{ label, assembly, items, partId }];
 });
 
 describe('the exported support anchor rides the underside the voxelized file draws', () => {

@@ -1,12 +1,13 @@
-// The doll's melee wields (models/poses/wields/wields.libsonnet): each class's stances and strikes as pose files
-// (models/poses/<class>_<action>_<kind>[-<key>].json), as sequences the pose page plays, and as baked clips a game plays
-// (`wieldClips`). A key frame states where the weapon's grip is and how it is turned against the chest, so its pose file
-// states world points that would drift from the frame if written by hand, as the press check's do.
+// The doll's wields, its melee weapons (models/poses/wields/wields.libsonnet) and its guns (models/poses/guns/
+// guns.libsonnet): each class's stances and strikes as pose files (models/poses/<class>_<action>_<kind>[-<key>].json),
+// as sequences the pose page plays, and as baked clips a game plays (`wieldClips`). A key frame states where the
+// weapon's grip is and how it is turned against the chest, so its pose file states world points that would drift from
+// the frame if written by hand, as the press check's do.
 // Usage: node tools/wields.mjs [--built built]
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { posedSolid, signedDepth } from '../site/clearance.mjs';
+import { COINCIDENT, posedSolid, runAlong, signedDepth } from '../site/clearance.mjs';
 import { decodeFrame, easingOf } from '../site/clipFrames.mjs';
 import {
   add,
@@ -29,14 +30,19 @@ import { compilePose, frameAngles } from '../site/poseFile.mjs';
 import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { lookAt, posedAt, poseJson, r4, standing } from './keyFrames.mjs';
+import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
+import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
 
-export const readWields = (root = repo) =>
-  JSON.parse(evaluateJsonnet(`import '${POSES}/wields/wields.libsonnet'`, root));
+/**
+ * A set of wields: `{ classes, framesPerSecond, easing }` from its content file under models/poses, each class's stances
+ * and, for a set that swings, its strikes.
+ */
+export const readWields = (root = repo, file = 'wields/wields.libsonnet') =>
+  JSON.parse(evaluateJsonnet(`import '${POSES}/${file}'`, root));
 
 /** A strike's phases in the order it passes through them; the hit lands where `strike` ends. */
 export const PHASES = ['windup', 'strike', 'follow', 'recovery'];
@@ -82,14 +88,19 @@ export function strikeTiming(strike) {
 const fromEulerXyz = ([x, y, z]) => [rotX(x), rotY(y), rotZ(z)].reduce(mulMM);
 
 /**
- * What the wields need of a held model, from its things sidecar (`grip`, `roll`) and its mesh: the turn `held` that
- * carries its file's axes onto the held axes (working end +z, up +y), the grip point `at` in its file, and its solid.
+ * What the wields need of a held model, from its sidecar (`grip`, `roll`, `anchors`) and its mesh: the turn `held`
+ * that carries its file's axes onto the held axes (working end +z, up +y), the grip point `at` in its file, its named
+ * points in its file (`anchors`, the grip point among them as `grip`), a gun's sight (`sight`: the `eye` point and the
+ * `direction` it looks along, in its file) and its solid.
  */
 export function heldWeapon(entry, mesh) {
   const held = mulMM(fromEulerXyz(entry.grip?.turn ?? [0, 0, 0]), rotZ(entry.roll ?? 0));
+  const at = entry.grip?.at ?? [0, 0, 0];
   return {
     held,
-    at: entry.grip?.at ?? [0, 0, 0],
+    at,
+    anchors: { ...entry.anchors, grip: at },
+    sight: entry.gun?.sight,
     solid: posedSolid(mesh, { r: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [0, 0, 0] }),
   };
 }
@@ -109,45 +120,95 @@ export function gripSocket(weapon, { seat, into }) {
   return { at: r4(sub(centre, scale(across, radius))), into: r4(across), axis: r4(axis) };
 }
 
+/** The anchor `from` of the weapon (`heldWeapon`'s `anchors`) moved by `offset` (held axes, metres), in its file. */
+export function anchorPoint(weapon, { from, offset = [0, 0, 0] }) {
+  const anchor = weapon.anchors[from];
+  if (!anchor) throw new Error(`the weapon has no ${from} anchor`);
+  return add(anchor, mulMV(transpose(weapon.held), offset));
+}
+
+// How far a socket may lie from its anchor's point along `into`, past which the anchor is not on that part of the
+// weapon.
+const PRESS_REACH = 0.03;
+
+/**
+ * The socket a hand closes on at a named point of the weapon, in its file: the anchor `from` (`heldWeapon`'s
+ * `anchors`), moved by `offset` (held axes, metres), pressed along `into` (held axes, from the palm into the weapon)
+ * onto the weapon's surface, so a reshaped weapon carries the palm with it. `axis` is the way the thumb points.
+ */
+export function anchorSocket(weapon, { from, offset, into, axis }) {
+  const toFile = transpose(weapon.held);
+  const start = anchorPoint(weapon, { from, offset });
+  const inward = mulMV(toFile, normalize(into));
+  const depth = signedDepth(weapon.solid, start);
+  // Out to the surface from inside, in to it from outside; a point already on it stays.
+  const run =
+    Math.abs(depth) < COINCIDENT
+      ? 0
+      : depth > 0
+        ? runAlong(weapon.solid, start, inward)
+        : -runAlong(weapon.solid, start, scale(inward, -1));
+  if (!(Math.abs(run) <= PRESS_REACH)) throw new Error(`the socket from ${from} lies off the weapon along its into`);
+  return { at: r4(add(start, scale(inward, run))), into: r4(mulMV(toFile, into)), axis: r4(mulMV(toFile, axis)) };
+}
+
+/** A hand's socket on the weapon: from a named point (`anchorSocket`) when it names one, else a seat along the handle. */
+export const handSocket = (weapon, hand) => (hand.from ? anchorSocket : gripSocket)(weapon, hand);
+
+// What of a hand's spec its hold passes to the pose file: how deep the item seats in the palm and how it slants across.
+const GRASP = ['grip', 'slant'];
+export const graspOf = (hand) =>
+  Object.fromEntries(GRASP.filter((key) => hand[key] !== undefined).map((key) => [key, hand[key]]));
+
 // ---- key frames ----
 
 const lerpV = (a, b, w) => a.map((x, i) => x + (b[i] - x) * w);
 const mapValues = (object, f) => Object.fromEntries(Object.entries(object).map(([key, value]) => [key, f(value, key)]));
 
+// How far ahead of a gun's sight the eyes look down it, far enough that the line they look along is the sight's.
+const SIGHT_RANGE = 10;
+
 /**
  * The pose file of key frame `key` of class `cls` (`readWields().classes`), for `rig`, the weapon (`heldWeapon`) and its
- * hands' sockets (`gripSocket`) given when the class wields one. Points are read off the figure as its body angles
- * stand it, from the shoulder of the hand they belong to (a grip point from the class's leading hand's), in the chest's
- * frame, so a twisting chest carries the hands round with it.
+ * hands' sockets (`handSocket`) given when the class wields one. Points are read off the figure as its body angles
+ * stand it, from the shoulder of the hand they belong to (`shoulderPoints`). A weapon stands with its grip point at
+ * the key's `at`, from the leading hand's shoulder, or, shouldered, with its butt (the class's `butt`, `anchorPoint`)
+ * at the key's `pocket`, from the same shoulder. The eyes look at the class's `look`, or down the gun's sight when the
+ * key has them `sight` along it, the head carried as `sight` bears it (`lookAt`) to lay the cheek on the stock.
  */
 function poseOf(rig, cls, key, weapon, sockets) {
-  const bone = (id) => rig.bones.find((b) => b.id === id);
-  const shoulder = (hand) => bone(bone(hand).reach.chain[0]).head;
   const header = standing(rig);
   const chest = posedAt(rig, key.body).get('spine');
-  const inChest = (hand, p) => applyPoint(chest, add(shoulder(hand), p));
+  const inChest = shoulderPoints(rig, key.body);
   const file = {
     ...header,
-    angles: { ...key.body, ...lookAt(rig, key.body, cls.look) },
+    angles: { ...key.body },
     hands: {},
     reach: {},
     hold: {},
   };
+  let look = cls.look;
   if (cls.weapon) {
     const { pitch, yaw, roll } = key.weapon.aim;
     const r = [chest.r, rotY(yaw), rotX(pitch), rotZ(roll), weapon.held].reduce(mulMM);
-    const at = sub(inChest(cls.weapon.lead, key.weapon.at), mulMV(r, weapon.at));
-    for (const [hand, { hands }] of Object.entries(cls.weapon.hands)) {
-      file.hands[hand] = hands;
+    const at = key.weapon.pocket
+      ? sub(inChest(cls.weapon.lead, key.weapon.pocket), mulMV(r, anchorPoint(weapon, cls.weapon.butt)))
+      : sub(inChest(cls.weapon.lead, key.weapon.at), mulMV(r, weapon.at));
+    if (key.sight)
+      look = add(add(at, mulMV(r, weapon.sight.eye)), scale(mulMV(r, weapon.sight.direction), SIGHT_RANGE));
+    for (const [hand, spec] of Object.entries(cls.weapon.hands)) {
+      file.hands[hand] = spec.hands;
       file.hold[hand] = {
         model: cls.weapon.model,
         at: r4(at),
         turn: r4(mat3ToQuat(r)),
         pole: key.weapon.poles[hand],
         socket: sockets[hand],
+        ...graspOf(spec),
       };
     }
   }
+  Object.assign(file.angles, lookAt(rig, key.body, look, key.sight));
   for (const [hand, { hands }] of Object.entries(cls.free ?? {})) {
     const { at, pole, twist = 0, wrist = [0, 0] } = key.free[hand];
     file.hands[hand] = hands;
@@ -159,14 +220,14 @@ function poseOf(rig, cls, key, weapon, sockets) {
 }
 
 /**
- * What the wields need of the built tree: each class's weapon (`heldWeapon`) and its hands' sockets (`gripSocket`),
+ * What the wields need of the built tree: each class's weapon (`heldWeapon`) and its hands' sockets (`handSocket`),
  * by class. `entryOf(model)` gives a held model's things sidecar and `meshOf(model)` its closed mesh.
  */
 export function wieldWeapons(wields, entryOf, meshOf) {
   return mapValues(wields.classes, (cls) => {
     if (!cls.weapon) return {};
     const weapon = heldWeapon(entryOf(cls.weapon.model), meshOf(cls.weapon.model));
-    return { weapon, sockets: mapValues(cls.weapon.hands, (hand) => gripSocket(weapon, hand)) };
+    return { weapon, sockets: mapValues(cls.weapon.hands, (hand) => handSocket(weapon, hand)) };
   });
 }
 
@@ -177,7 +238,7 @@ export function wieldPoses(rig, wields, weapons) {
     const { weapon, sockets } = weapons[name];
     for (const [stance, key] of Object.entries(cls.stances))
       poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       for (const key of Object.values(ENDS))
         poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
     }
@@ -192,7 +253,7 @@ const easings = (wields, strike) => PHASES.map((phase) => strike.easing?.[phase]
 export function wieldSequences(wields) {
   const sequences = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const guard = clipName(name, 'stance', 'guard');
       const phases = strikePhases(spec);
@@ -316,6 +377,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
                     turn: mat3ToQuat(item.r),
                     pole: mulMV(rotAxis(normalize(reach), swing), pole),
                     socket: sockets[id],
+                    ...graspOf(cls.weapon.hands[id]),
                   },
                 ];
               }),
@@ -343,7 +405,7 @@ export function wieldClips(rig, wields, weapons, meshOf) {
       clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
       reports[clipName(name, 'stance', stance)] = [report];
     }
-    for (const [strike, spec] of Object.entries(cls.strikes)) {
+    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
       const phases = strikePhases(spec);
@@ -374,19 +436,22 @@ export function readWieldTree(built, root = repo) {
   return wieldTree(built, manifest, root);
 }
 
-/** As `readWieldTree`, for a tree whose models `manifest` lists. */
+/** As `readWieldTree`, for a tree whose models `manifest` lists: each of `WIELD_SETS` as `{ wields, weapons }`. */
 export function wieldTree(built, manifest, root = repo) {
   const dressing = readDressing(root);
   const doll = readDoll(built, manifest, dressing);
   const rig = dollRig(readRigContent(root), doll, dressing);
-  const wields = readWields(root);
   const { meshOf, entryOf } = heldItems(built, manifest);
-  return { rig, doll, wields, meshOf, weapons: wieldWeapons(wields, entryOf, meshOf) };
+  const sets = mapValues(WIELD_SETS, ({ file }) => {
+    const wields = readWields(root, file);
+    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
+  });
+  return { rig, doll, meshOf, sets };
 }
 
 /**
  * What a hand needs of the models a built tree holds: `meshOf(id)`, the model's parts at rest as one mesh, and
- * `entryOf(id)`, its things sidecar.
+ * `entryOf(id)`, its sidecar, from whichever tool's folder under its pack holds it.
  */
 export function heldItems(built, manifest) {
   const meshes = treeMeshes(built, manifest);
@@ -403,7 +468,10 @@ export function heldItems(built, manifest) {
     );
   const entryOf = (id) => {
     const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    return JSON.parse(readFileSync(join(built, pack, 'things', `${id}.model.json`), 'utf8'));
+    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, pack, folder, `${id}.model.json`));
+    const sidecar = sidecars.find((path) => existsSync(path));
+    if (!sidecar) throw new Error(`${id}: no sidecar under ${pack}`);
+    return JSON.parse(readFileSync(sidecar, 'utf8'));
   };
   return { meshOf, entryOf };
 }
@@ -431,42 +499,69 @@ export function wieldProblems(reports) {
 // What the rig holds for authoring poses, not for playing clips: the pose page's clips, the eye a look aims, the hand
 // presets a pose file names.
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
-const CLIPS_DOC =
+const MELEE_DOC =
   "The doll's melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
 /** Where a release carries the doll's motions: the pack of its parts, and the rig every motions file of it poses. */
 export const DOLL_MOTIONS = { pack: 'skelly.body', rig: 'motions/doll.rig.json' };
-const MOTIONS = { id: 'doll_melee', ...DOLL_MOTIONS, path: 'motions/doll.melee.json' };
+const GUNS_DOC =
+  "The doll's held gun clips by name, <gun>_stance_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
+/**
+ * The doll's sets of wields: each one's content file under models/poses, and the motions entry a release carries its
+ * baked clips in, in the pack of the doll's parts, so a game that plays only one set loads only its file.
+ */
+export const WIELD_SETS = {
+  melee: {
+    file: 'wields/wields.libsonnet',
+    motions: { id: 'doll_melee', ...DOLL_MOTIONS, path: 'motions/doll.melee.json' },
+    doc: MELEE_DOC,
+  },
+  guns: {
+    file: 'guns/guns.libsonnet',
+    motions: { id: 'doll_guns', ...DOLL_MOTIONS, path: 'motions/doll.guns.json' },
+    doc: GUNS_DOC,
+  },
+};
 
 /**
- * Writes the doll's rig and its baked wields into the built tree `out`, whose models `manifest` lists, for a game to
- * play: the rig a clip's frames turn, with each part's site on it, and the clips by name. Returns the files written,
- * under their packs, and the manifest's motions entry for them.
+ * Writes the doll's rig and each of `sets` of its baked wields (all of `WIELD_SETS` unless given) into the built tree `out`, whose models
+ * `manifest` lists, for a game to play: the rig a clip's frames turn, with each part's site on it, and each set's clips
+ * by name. Refuses a set whose frames show any `wieldProblems`. Returns the files written, under their packs, and the
+ * manifest's motions entries for them.
  */
-export function exportWields(out, manifest, root = repo) {
-  const { rig, doll, wields, meshOf, weapons } = wieldTree(out, manifest, root);
-  const { clips, reports } = wieldClips(rig, wields, weapons, meshOf);
-  const problems = wieldProblems(reports);
+export function exportWields(out, manifest, root = repo, sets = WIELD_SETS) {
+  const tree = wieldTree(out, manifest, root);
+  const { rig, doll, meshOf } = tree;
+  const baked = mapValues(sets, (_, name) => {
+    const { wields, weapons } = tree.sets[name];
+    return wieldClips(rig, wields, weapons, meshOf);
+  });
+  const problems = Object.values(baked).flatMap(({ reports }) => wieldProblems(reports));
   if (problems.length > 0) throw new Error(`baked wields: ${problems.join('; ')}`);
   const posing = Object.fromEntries(Object.entries(rig).filter(([key]) => !AUTHORING.has(key)));
-  const files = {
-    [MOTIONS.rig]: { ...posing, doll: doll.sites },
-    [MOTIONS.path]: { _doc: CLIPS_DOC, rig: { id: rig.id, revision: rig.revision }, clips },
-  };
-  return {
-    files: Object.entries(files).map(([path, value]) => {
-      const file = outputPath(MOTIONS.pack, path);
-      mkdirSync(dirname(join(out, file)), { recursive: true });
-      writeFileSync(join(out, file), `${JSON.stringify(value)}\n`);
-      return file;
-    }),
-    motions: [MOTIONS],
-  };
+  const rigFile = { ...posing, doll: doll.sites };
+  const files = new Map();
+  for (const [name, { motions, doc }] of Object.entries(sets)) {
+    files.set(outputPath(motions.pack, motions.rig), rigFile);
+    files.set(outputPath(motions.pack, motions.path), {
+      _doc: doc,
+      rig: { id: rig.id, revision: rig.revision },
+      clips: baked[name].clips,
+    });
+  }
+  for (const [file, value] of files) {
+    mkdirSync(dirname(join(out, file)), { recursive: true });
+    writeFileSync(join(out, file), `${JSON.stringify(value)}\n`);
+  }
+  return { files: [...files.keys()], motions: Object.values(sets).map((set) => set.motions) };
 }
 
 if (import.meta.main) {
   const { values } = parseArgs({ options: { built: { type: 'string', default: join(repo, 'built') } } });
-  const { rig, wields, weapons } = readWieldTree(resolve(values.built));
-  const poses = wieldPoses(rig, wields, weapons);
+  const { rig, sets } = readWieldTree(resolve(values.built));
+  const poses = Object.assign(
+    {},
+    ...Object.values(sets).map(({ wields, weapons }) => wieldPoses(rig, wields, weapons)),
+  );
   for (const [name, file] of Object.entries(poses))
     writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} wield poses -> ${POSES}`);
