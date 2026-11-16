@@ -6,7 +6,7 @@ local bus = import 'bus-body.libsonnet';
 local seat = bus.seat;
 local single = bus.single;
 local portalTop = 2.6;
-local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engineDeck', 'engineHatch', 'sign'], city) + {
+local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engineDeck', 'engineHatch', 'sign', 'batteryLocker'], city) + {
   paint: 'paint-white', band: 'paint-green', bumperFinish: 'paint-green',
   power: {
     engine: 'engine_i6_heavy_diesel', engineAt: [-8.15, 0.32, 0],
@@ -15,7 +15,6 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     radiator: 'radiator_truck', radiatorAt: [-8.8, 0.32, 0],
     tank: 'fuel_tank_truck', tankAt: [-6.75, 0.32, 0.86],
     exhaust: 'exhaust_long', exhaustAt: [-8.2, 0.36, -0.56],
-    batteryAt: [8.4, 0.42, -0.9],
   },
 };
 {
@@ -24,6 +23,8 @@ local common = std.foldl(std.objectRemoveKey, ['floorRear', 'floorStep', 'engine
     rear: -0.4, front: 9,
     decks: [{ waist: 1.15, top: 2.55, bayFront: 8.6, pitch: 1.4, bays: 6 }],
     frontAxle: 6.3, rearAxle: 0.4,
+    // Between the legs of the far seats behind the front wheel.
+    batteryLocker: 4.825,
     doors: [{ bay: 0 }, { bay: 3 }],
     rearHoles: [{ y: [0.36, portalTop], z: 1.0, door: true }],
     sign: city.sign,

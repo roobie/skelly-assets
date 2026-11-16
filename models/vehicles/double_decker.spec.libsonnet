@@ -6,6 +6,8 @@ local single(x, sides) = bus.single(x, sides, y=0.38);
 local upper = 2.45;
 {
   rear: -5.25, front: 5.25, side: 1.275, skin: 1.2, sill: 0.3,
+  // Under the stairs behind the front wheel.
+  batteryLocker: 1.88,
   floor: 0.38, floorRear: 0.82, floorStep: -1.3, engineDeck: { x: -3.75, y: 1.28 },
   roofBase: 4.12, roof: 4.3,
   decks: [
@@ -45,6 +47,5 @@ local upper = 2.45;
     radiator: 'radiator_truck', radiatorAt: [-5.05, 0.24, 0],
     tank: 'fuel_tank_truck', tankAt: [-3.2, 0.32, 0.86],
     exhaust: 'exhaust_bus_rear', exhaustAt: [-4.47, 0.34, -0.62],
-    batteryAt: [4.5, 0.42, -0.9],
   },
 }

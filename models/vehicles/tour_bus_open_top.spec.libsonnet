@@ -21,6 +21,7 @@ dd {
     _front_panel: 'double_decker_front_panel', _rear_panel: 'double_decker_rear_panel',
     _side_window: 'double_decker_side_window',
     _dashboard: 'double_decker_dashboard', _destination_sign: 'double_decker_destination_sign',
+    _battery_flap: 'double_decker_battery_flap',
   } + {
     [leaf.suffix + '_' + panel]: 'double_decker' + leaf.suffix + '_' + panel
     for leaf in bus.layout(dd).leaves

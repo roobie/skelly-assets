@@ -30,6 +30,10 @@ local dashTop(s) = std.get(s, 'dashTop', s.driver.y + 0.55);
 // A low-floor driver sits on a plinth, raised to see over the dash.
 local plinthed(s) = s.driver.y > s.floor + 0.05;
 local rearGlazed(s) = std.length(rearGlass(s)) > 0 || has(s, 'rearFlank');
+// A battery locker's inside holds the truck battery tray with its battery standing on it, a hand's room above.
+local lockerSize = { length: 0.62, depth: 0.46, height: 0.3, wall: 0.03 };
+// How far a battery locker's flap opens.
+local lockerOpens = 90;
 local layout(s) = {
   local bonneted = has(s, 'bonnet'),
   local face = if bonneted then s.bonnet.cowl else s.front,
@@ -46,6 +50,22 @@ local layout(s) = {
     for door in s.doors
   ],
   arches: [[s.rearAxle - s.arch, s.rearAxle + s.arch]] + (if bonneted then [] else [[s.frontAxle - s.arch, s.frontAxle + s.arch]]),
+  // A low floor leaves no room for the battery under the dash, so a spec's `batteryLocker`, the middle along x of a
+  // locker behind the front wheel on the driver's side, puts it in a box let into the skirt behind a flap. `x` is its
+  // inside, `footprint` its walls' extent, `floor` and `top` the inside's foot and head, `back` its inside's inboard face.
+  locker: if !has(s, 'batteryLocker') then null else
+    local w = lockerSize.wall;
+    local x = [s.batteryLocker - lockerSize.length / 2, s.batteryLocker + lockerSize.length / 2];
+    local arches = self.arches;
+    assert std.all([x[1] + w <= a[0] || x[0] - w >= a[1] for a in arches]) : 'a battery locker stands clear of the wheel arches';
+    {
+      x: x,
+      footprint: [x[0] - w, x[1] + w],
+      wall: w,
+      floor: s.sill + w,
+      top: s.sill + w + lockerSize.height,
+      back: -s.skin + lockerSize.depth,
+    },
   // Every doorway is as wide as the first, so one leaf width fits them all; a pair of leaves each take half the span.
   local spans = [way[1] - way[0] for way in self.doorways],
   assert std.all([std.abs(width - spans[0]) < 1e-9 for width in spans]) : 'every doorway of a bus is as wide as the first',
@@ -130,10 +150,12 @@ local pressings(id, title, s) = {
     ]
     for a in g.arches
   ]),
-  // Paint lines and rub rails stand just proud of the skin and stop at doors and, low down, at wheel arches.
-  local stripes(tag, doors, z) = std.flattenArrays([
+  // Paint lines and rub rails stand just proud of the skin and stop at doors and, low down, at wheel arches and lockers.
+  local stripes(tag, doors, lockers, z) = std.flattenArrays([
     local stripe = std.get(s, 'stripes', [])[i];
-    band(tag + '_stripe_' + i, stripe.slot, spans(s.rear, face, (if stripe.y[0] < deck0.top then doors else []) + (if stripe.y[0] < s.archTop then g.arches else [])), stripe.y[0], stripe.y[1], z)
+    local cuts = (if stripe.y[0] < deck0.top then doors else []) + (if stripe.y[0] < s.archTop then g.arches else [])
+                 + [locker.x for locker in lockers if stripe.y[0] < locker.top];
+    band(tag + '_stripe_' + i, stripe.slot, spans(s.rear, face, cuts), stripe.y[0], stripe.y[1], z)
     for i in std.range(0, std.length(std.get(s, 'stripes', [])) - 1)
   ]),
   local doorFillers(z) = [
@@ -141,12 +163,26 @@ local pressings(id, title, s) = {
     for d in std.range(0, std.length(s.doors) - 1)
     if std.objectHas(s.doors[d], 'width')
   ],
-  local side(tag, doors, z, proud) =
-    band(tag + '_skirt', 'band', spans(s.rear, face, g.arches + doors), s.sill, s.archTop, z)
+  // The skirt stands over a locker's opening, down to its flap.
+  local side(tag, doors, lockers, z, proud) =
+    band(tag + '_skirt', 'band', spans(s.rear, face, g.arches + doors + [locker.x for locker in lockers]), s.sill, s.archTop, z)
+    + [box(tag + '_skirt_over_locker', 'band', [locker.x[0], locker.top, z[0]], [locker.x[1], s.archTop, z[1]]) for locker in lockers]
     + band(tag + '_lower', 'paint', spans(s.rear, face, doors), s.archTop, deck0.waist, z)
     + fillets(tag, z)
     + deckBands(tag, z)
-    + stripes(tag, doors, proud),
+    + stripes(tag, doors, lockers, proud),
+  local lockers = if g.locker == null then [] else [g.locker],
+  // The locker's box stands inside the far skirt on its own floor, open to the skirt.
+  local lockerBox = std.flattenArrays([
+    [
+      box('locker_floor', 'pan', [l.footprint[0], s.sill, -s.skin], [l.footprint[1], l.floor, l.back + l.wall]),
+      box('locker_lid', 'pan', [l.footprint[0], l.top, -s.skin], [l.footprint[1], l.top + l.wall, l.back + l.wall]),
+      box('locker_back', 'pan', [l.footprint[0], l.floor, l.back], [l.footprint[1], l.top, l.back + l.wall]),
+      box('locker_end_rear', 'pan', [l.footprint[0], l.floor, -s.skin], [l.x[0], l.top, l.back]),
+      box('locker_end_front', 'pan', [l.x[1], l.floor, -s.skin], [l.footprint[1], l.top, l.back]),
+    ]
+    for l in lockers
+  ]),
   local wheelhouse(tag, a, well, sign) =
     local zs(lo, hi) = if sign > 0 then [lo, hi] else [-hi, -lo];
     local c = archChamfer;
@@ -181,19 +217,23 @@ local pressings(id, title, s) = {
   local floorFront = xf(s.floor) - voxel,
   local raised = has(s, 'floorRear'),
   local floorRearEnd = if raised then s.floorStep else s.rear,
-  // A floor below a wheelhouse's lid narrows to the wells there, or its edge would lie across the tyre.
-  local archWells = [{ x: g.arches[0], well: s.rearWell }] + (if g.bonneted then [] else [{ x: g.arches[1], well: s.frontWell }]),
+  // A floor below a wheelhouse's lid narrows to the wells there, or its edge would lie across the tyre, and one beside
+  // a locker stops at the locker's back.
+  local notches = [{ x: g.arches[0], z: [-s.rearWell, s.rearWell] }]
+                  + (if g.bonneted then [] else [{ x: g.arches[1], z: [-s.frontWell, s.frontWell] }])
+                  + [{ x: l.footprint, z: [l.back + l.wall, s.skin], under: l.top + l.wall } for l in lockers],
   local slab(name, x0, x1, y0, y1) =
     if y0 >= s.archTop + 0.06 then [box(name, 'floor', [x0, y0, -s.skin], [x1, y1, s.skin])]
     else
-      local runs = spans(x0, x1, g.arches);
+      local cut = [n for n in notches if y0 < std.get(n, 'under', s.archTop + 0.06)];
+      local runs = spans(x0, x1, [n.x for n in cut]);
       [
         box(name + '_' + i, 'floor', [runs[i][0], y0, -s.skin], [runs[i][1], y1, s.skin])
         for i in std.range(0, std.length(runs) - 1)
       ] + [
-        box(name + '_well_' + w.x[0], 'floor', [std.max(x0, w.x[0]), y0, -w.well], [std.min(x1, w.x[1]), y1, w.well])
-        for w in archWells
-        if w.x[1] > x0 && w.x[0] < x1
+        box(name + '_well_' + n.x[0], 'floor', [std.max(x0, n.x[0]), y0, n.z[0]], [std.min(x1, n.x[1]), y1, n.z[1]])
+        for n in cut
+        if n.x[1] > x0 && n.x[0] < x1
       ],
   // Never under the sill, or the floor's edge shows as a strip below the skirt.
   local floorUnder = std.max(s.floor - 0.08, s.sill),
@@ -276,9 +316,10 @@ local pressings(id, title, s) = {
   ]) + (if g.bonneted then [
          box('cowl_wall', 'paint', [face - 0.08, s.sill, -s.skin], [face, screens[0][0], s.skin]),
        ] else [])
-    + side('near', g.doorways, [s.skin, s.side], [s.side, s.side + 0.015])
+    + side('near', g.doorways, [], [s.skin, s.side], [s.side, s.side + 0.015])
     + doorFillers([s.skin, s.side])
-    + side('far', [], [-s.side, -s.skin], [-s.side - 0.015, -s.side]), finish + {
+    + side('far', [], lockers, [-s.side, -s.skin], [-s.side - 0.015, -s.side])
+    + lockerBox, finish + {
     black: 'plastic-black',
     yellow: 'paint-crane-yellow',
   }),
@@ -400,7 +441,20 @@ local pressings(id, title, s) = {
         box('beside_well', 'floor', [well.x[0], y - 0.1, well.z], [well.x[1], y, s.skin]),
       ], finish),
     ],
-  pressings: [shell, screenRow] + upperFloor + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
+  // The locker's flap hangs on its leading edge, as the doors do, so the wind closes one left unlatched, and its pins
+  // stand on its outer face so its free edge swings out clear of the skirt behind.
+  local lockerFlaps = [
+    local hinge = s.side + k.grain;
+    local pins = k.hingePins('hinge', 'y', [l.x[1], l.floor + 0.06, -hinge], [l.x[1], l.top - 0.06, -hinge], slot='band');
+    local rear = l.x[0] + k.doorTailGap(l.x[1] - l.x[0], hinge - s.skin);
+    local mid = (l.floor + l.top) / 2;
+    part('_battery_flap', 'battery locker flap', 4, [
+      box('skin', 'band', [rear, s.sill + k.swingGap, -s.side], [l.x[1] - k.swingGap, l.top - k.swingGap, -s.skin - k.swingGap]),
+      box('latch', 'steel', [rear + 0.03, mid - 0.04, -s.side - 0.015], [rear + 0.07, mid + 0.04, -s.side]),
+    ] + pins, finish + { steel: 'steel-stainless' }, motion=k.motion.hinge(pins, 'far', lockerOpens))
+    for l in lockers
+  ],
+  pressings: [shell, screenRow] + upperFloor + lockerFlaps + [paneRow(i) for i in std.range(0, std.length(s.decks) - 1)] + leaves + flatFront + bonnetRows + rearRows + [
     // Starts clear of the steering wheel's rim, leaving the driver's knees room.
     part('_dashboard', 'dashboard', 40, [
       box('binnacle', 'trim', [driver.x + 0.48, s.floor, -s.skin], [xf(dashTop(s)) - glassGap, dashTop(s), -0.28]),
@@ -446,7 +500,8 @@ local items(kit, id, name, s) =
      ] else [panel('_front_panel', 'front panel', ['protection'])])
   + (if rearGlazed(s) then [panel('_rear_window', 'rear window', ['glazing'])] else [])
   + (if has(s, 'engineHatch') then [panel('_rear_panel', 'engine hatch', ['protection'])] else [])
-  + (if has(s, 'sign') then [panel('_destination_sign', 'destination sign', ['light'])] else []);
+  + (if has(s, 'sign') then [panel('_destination_sign', 'destination sign', ['light'])] else [])
+  + (if g.locker == null then [] else [panel('_battery_flap', 'battery locker flap', ['protection'])]);
   [kit.part(id + p[0], name + ' ' + p[1], kit.pileSize, p[2]) for p in panels if !k.borrows(s, p[0])];
 local laid(kit, id, s) =
   local fitting = kit.fitting;
@@ -538,7 +593,12 @@ local laid(kit, id, s) =
   + pair('door_mirror', 'door_mirror_bus', s.mirrorAt, on(['shell']))
   + pair('tail_lamp', 'tail_lamp_tall', s.tailLampAt, on(['shell']))
   + pair('headlamp', 'headlamp_large', s.headlampAt, on([if g.bonneted then 'grille' else 'front_panel']))
-  + kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell']);
+  + (if g.locker != null then
+       local l = g.locker;
+       [fitting('battery_flap', part('_battery_flap'), origin, ['shell'])]
+       + kit.batteryBay('truck_battery_tray', [(l.x[0] + l.x[1]) / 2, l.floor, (-s.skin + l.back) / 2], ['shell'])
+     else if has(p, 'batteryAt') then kit.batteryBay('truck_battery_tray', p.batteryAt, ['shell'])
+     else []);
 local fittings(kit, id, s) = k.painted(id, s, pressings(id, '', s), laid(kit, id, s));
 {
   rows: rows, items: items, fittings: fittings, layout: layout,

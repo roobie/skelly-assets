@@ -7,7 +7,7 @@ local startsWith(id, prefixes) = std.length([1 for prefix in prefixes if std.sta
 local foreDropped = ['engine', 'gearbox', 'radiator', 'fuel_tank', 'exhaust', 'prop_shaft_', 'rear_bumper', 'tail_lamp_'];
 local aftDropped = [
   'windscreen', 'front_bumper', 'dashboard', 'driver_seat', 'driver_plinth', 'steering_', 'instruments', 'gear_lever', 'front_axle', 'bonnet',
-  'grille', 'front_wing_', 'destination_sign', 'front_wheel_', 'door_mirror_', 'headlamp_', 'battery',
+  'grille', 'front_wing_', 'destination_sign', 'front_wheel_', 'door_mirror_', 'headlamp_',
 ];
 // The rear section takes its windows, doors and fittings from the fore section's rows, and only its own shell and
 // rear end from its own.
