@@ -5,7 +5,8 @@
 // With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
 // sites clear of each other (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
-// (tools/placements.mjs), the doll's baked wields (tools/wields.mjs, exportWields) and built/manifest.json over them,
+// (tools/placements.mjs), the doll's baked wields and locomotion (tools/wields.mjs and tools/locomotion.mjs) and
+// built/manifest.json over them,
 // the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files), with each pack's
 // dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
 // rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
@@ -22,6 +23,7 @@ import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows, smoothPack } from './layout.mjs';
+import { exportLocomotion } from './locomotion.mjs';
 import {
   buildManifest,
   MANIFEST,
@@ -403,6 +405,8 @@ async function main() {
       for (const file of placed.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models });
       for (const file of wields.files) console.log(`built ${file}`);
+      const locomotion = exportLocomotion(out, { models });
+      for (const file of locomotion.files) console.log(`built ${file}`);
       const files = [
         ...built.files,
         ...recipes.files,
@@ -410,13 +414,14 @@ async function main() {
         ...sounds.files,
         ...placed.files,
         ...wields.files,
+        ...locomotion.files,
       ];
       const dangling = danglingPartItems({ files, out, models });
       if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
         vehicles: placed.vehicles,
-        motions: wields.motions,
+        motions: [...wields.motions, ...locomotion.motions],
         sounds: sounds.sounds,
         dependsOn,
         files,
