@@ -504,7 +504,7 @@ local site = import '../site.libsonnet';
       '`brace` of skid_steer_lift_arms runs into `barrel_far` of skid_steer_tilt_ram; the others family is not judged under this measure.'),
     site.unjudged('lift_arms', 'tilt_ram_near', 0.095,
       '`brace` of skid_steer_lift_arms runs into `barrel` of skid_steer_tilt_ram; the others family is not judged under this measure.'),
-    site.unjudged('tail_door', 'radiator', 0.056,
+    site.unjudged('tail_door', 'radiator', 0.076,
       '`panel` of skid_steer_tail_door runs into `radiator_hose_upper_hose` of radiator_small; the others family is not judged under this measure.'),
   ],
   small_tractor: [
