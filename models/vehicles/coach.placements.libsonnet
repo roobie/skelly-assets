@@ -11,4 +11,8 @@ local s = import 'coach.spec.libsonnet';
   ])
   + [site.one('roof_vent_' + i, 'roof_vent', [[2.0, -2.5][i], s.roof, 0]) for i in [0, 1]]
   + site.pair('parcel_rack', 'coach_parcel_rack', [-0.65, 2.78, 0.98]),
+  unjudged: [
+    site.unjudged('shell', 'door_free_0', 0.004,
+      'The free panel\'s seal flap passes right through the end of the floor slab beside the doorway; the flap could stop at the floor, or the slab short of the flap.'),
+  ],
 }

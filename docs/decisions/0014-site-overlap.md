@@ -19,12 +19,14 @@ tunnel, a wall panel into its floor. Listing each per vehicle would have buried 
 
 ## Decision
 
-The build and `tools/check-sources.mjs` fail when pieces of parts at two different sites sink more than one voxel
-grain into each other, naming the vehicle, both parts, both sites and the pieces that meet. How deep two pieces sink is
+The build and `tools/check-sources.mjs` fail when pieces of parts at two different sites sink into each other more
+than the finer of the two parts' voxel grains, naming the vehicle, both parts, both sites and the pieces that meet. How deep two pieces sink is
 the shortest move along an axis that parts them, so a piece that passes right through a thin panel reads as deep as
 it passes: the panel's thickness would read an engine through a floor like a shallow seat, and a fit sized to that
-reading would hide the clash under a false reason. Faces that touch, or sink less than a grain into each other, are
-contact: the vehicle grain closes gaps under a voxel anyway, so a finer difference cannot be seen or built. The pieces
+reading would hide the clash under a false reason. Faces that touch, or sink less than that grain into each other, are
+contact: a grain closes gaps under one of its voxels, so a finer difference cannot be seen or built. The finer part's
+grain sets it because that part shows the sink: a door panel drawn on millimetres would visibly sink a whole vehicle
+voxel into the shell it meets. The pieces
 of one site are the part's own business and are not compared. Of all the piece pairs two sites have, the deepest is the
 one judged, so the order the pieces are swept in cannot hide a deep overlap behind a shallow one. See
 `tools/siteOverlap.mjs`, `siteOverlaps`.
