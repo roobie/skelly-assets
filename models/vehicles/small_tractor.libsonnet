@@ -34,12 +34,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     + k.arc('plate', 'paint', s.rearAxle, s.rearHub, 0.2, s.fenderInner, 22, 168, 9, [s.fenderZ, s.fenderZ + 0.02])
     + [box('bracket', 'trim', [s.rearAxle - 0.2, 0.8, 0.24], [s.rearAxle + 0.4, s.deck, s.fenderZ])],
     { paint: s.paint, trim: 'paint-charcoal' }) + { title: 'Small tractor fender' },
-  // The footboard is the way aboard an open tractor: it folds up about its inner edge for transport.
   k.compound('small_tractor_footboard', 9, [
     box('board', 'tread', [-0.18, 0.56, 0.24], [0.47, 0.6, 0.58]),
     box('step', 'tread', [0.0, 0.36, 0.5], [0.3, 0.39, 0.62]),
     box('hanger', 'tread', [0.12, 0.38, 0.54], [0.16, 0.56, 0.58]),
-  ], { tread: 'paint-charcoal' }, { hinge_a: ['board', [0.2, 0.5, 0]], hinge_b: ['board', [0.8, 0.5, 0]] }) + { title: 'Small tractor footboard' },
+  ], { tread: 'paint-charcoal' }) + { title: 'Small tractor footboard' },
   k.compound('small_tractor_roll_bar', 22, [
     box('top_bar', 'frame', [s.barX - 0.04, s.barTop - 0.08, -s.barZ - 0.04], [s.barX + 0.04, s.barTop, s.barZ + 0.04]),
     box('mid_bar', 'frame', [s.barX - 0.03, 1.2, -s.barZ], [s.barX + 0.03, 1.26, s.barZ]),
