@@ -133,14 +133,14 @@ local helmet = [
   round(h.rod('filter', 'trim', 0.03, 0.2, 0.26, 0.08)) + { origin: [-0.235, 0.08, 0.09] },
 ];
 
-local body = fit.trooper('armor_heavy', livery, title='Heavy body armour').rows;
-local legs = fit.trooperLegs('legguard_heavy', livery, title='Heavy leg guards').rows;
+local body = fit.trooper('armor_heavy', livery, title='Heavy body armour');
+local legs = fit.trooperLegs('legguard_heavy', livery, title='Heavy leg guards');
 local gloves = fit.hands('gloves_heavy', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.07, hem: 0.02, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}, 'Heavy gauntlets').rows;
+}, 'Heavy gauntlets');
 local boots = fit.feet('boots_heavy', bootFinish,
-                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, title='Heavy boots').rows;
+                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, title='Heavy boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03);
@@ -154,14 +154,15 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-armour.of(null, [
-  local seg = std.split(r.id, '_worn_')[1];
-  if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
-  for r in body + gloves + legs + boots
-] + [
-  h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
-    title: 'Heavy helmet',
-    voxelGrain: 0.006,
-    anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(fit.eyesAt((visor.min[1] + visor.max[1]) / 2)).brow) },
+// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+local worn = { armor_heavy: body, legguard_heavy: legs, gloves_heavy: gloves, boots_heavy: boots };
+local heavy(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
+{ [k]: worn[k] + { rows: armour.of(null, [heavy(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
+  helmet_heavy: fit.head('helmet_heavy', helmetBase) + {
+    rows: armour.of(null, [h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
+      title: 'Heavy helmet',
+      voxelGrain: 0.006,
+      anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+    }]),
   },
-])
+}

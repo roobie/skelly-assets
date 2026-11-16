@@ -149,14 +149,14 @@ local helmet = [
   for i in [0, 1]
 ];
 
-local body = fit.trooper('armor_power', livery, title='Power body armour').rows;
-local legs = fit.trooperLegs('legguard_power', livery, title='Power leg guards').rows;
+local body = fit.trooper('armor_power', livery, title='Power body armour');
+local legs = fit.trooperLegs('legguard_power', livery, title='Power leg guards');
 local gloves = fit.hands('gloves_power', gauntlet, {
   layer: 'normal', cuff: 0.13, flare: 0.05, hem: 0.018, backRidges: 0,
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
-}, 'Power gauntlets').rows;
+}, 'Power gauntlets');
 local boots = fit.feet('boots_power', bootFinish,
-                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots').rows;
+                       { l: 0.33, w: 0.135, s: 0.04, toe: 0.115, instep: 0.14, top: 0.315, shaft: 0.14, laces: 0 }, title='Power boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   h.prism('shaft-guard', 'toe', 'z', [[-0.07, shaft.start + 0.015], [0.07, shaft.start + 0.015], [0.08, shaft.end - 0.01], [-0.08, shaft.end - 0.01]], 0.065, 0.085);
@@ -170,14 +170,15 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-armour.of('sci-fi', [
-  local seg = std.split(r.id, '_worn_')[1];
-  if std.objectHas(forArmour, seg) then forArmour[seg](r) else r
-  for r in body + gloves + legs + boots
-] + [
-  h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
-    title: 'Power helmet',
-    voxelGrain: 0.004,
-    anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(fit.eyesAt((visor.min[1] + visor.max[1]) / 2)).brow) },
+// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+local worn = { armor_power: body, legguard_power: legs, gloves_power: gloves, boots_power: boots };
+local powered(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
+{ [k]: worn[k] + { rows: armour.of('sci-fi', [powered(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
+  helmet_power: fit.head('helmet_power', helmetBase) + {
+    rows: armour.of('sci-fi', [h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
+      title: 'Power helmet',
+      voxelGrain: 0.004,
+      anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+    }]),
   },
-])
+}
