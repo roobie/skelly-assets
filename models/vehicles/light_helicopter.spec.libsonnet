@@ -2,6 +2,7 @@
 // empty. The mast stands at x = 0 and the skids rest on y = 0. Metres in the vehicle frame.
 {
   nose: 2.1, bulkhead: 0.15, doorFront: 1.25, doorRear: 0.35, doorArc: 36,
+  doorOpens: 90,
   rotorRadius: 4.4, hub: 2.7, mastFoot: 1.85,
   tailRotor: { x: -4.25, y: 1.62, z: 0.14, radius: 0.55 },
   floor: 0.88,

@@ -76,27 +76,33 @@ local loft(id, slot, stations, x=null, arc=[-180, 180], step=0.0625, sides=16, s
     for i in std.range(0, std.length(slices(spanOf(sorted, x), step)) - 1)
   ]);
 
-// The inner wall follows the narrower neighbouring slice, so a steep taper leaves no hole between slices.
+// A wall slice's outer section and the inner one `thick` within it. The inner wall follows the narrower neighbouring
+// slice, so a steep taper leaves no hole between slices.
+local wallOf(sorted, slice, thick) =
+  local mid = (slice[0] + slice[1]) / 2;
+  local width = slice[1] - slice[0];
+  local section = sectionOf(sorted, mid);
+  local around = [sectionOf(sorted, mid - width), section, sectionOf(sorted, mid + width)];
+  local up = std.min(std.min(around[0].top - around[0].waist, around[1].top - around[1].waist), around[2].top - around[2].waist);
+  local down = std.min(std.min(around[0].waist - around[0].bottom, around[1].waist - around[1].bottom), around[2].waist - around[2].bottom);
+  local wide = std.min(std.min(around[0].half, around[1].half), around[2].half);
+  {
+    outer: section,
+    inner: {
+      waist: section.waist,
+      top: section.waist + std.max(up - thick, 0),
+      bottom: section.waist - std.max(down - thick, 0),
+      half: std.max(wide - thick, 0),
+    },
+  };
 local shell(id, slot, stations, thick=0.075, x=null, arc=[-180, 180], step=0.0625, sides=16, square=2.4) =
   local sorted = ordered(stations);
   local all = slices(spanOf(sorted, x), step);
   std.prune(std.flattenArrays([
     local slice = all[i];
-    local mid = (slice[0] + slice[1]) / 2;
-    local width = slice[1] - slice[0];
-    local section = sectionOf(sorted, mid);
-    local around = [sectionOf(sorted, mid - width), section, sectionOf(sorted, mid + width)];
-    local up = std.min(std.min(around[0].top - around[0].waist, around[1].top - around[1].waist), around[2].top - around[2].waist);
-    local down = std.min(std.min(around[0].waist - around[0].bottom, around[1].waist - around[1].bottom), around[2].waist - around[2].bottom);
-    local wide = std.min(std.min(around[0].half, around[1].half), around[2].half);
-    local inner = {
-      waist: section.waist,
-      top: section.waist + std.max(up - thick, 0),
-      bottom: section.waist - std.max(down - thick, 0),
-      half: std.max(wide - thick, 0),
-    };
-    local outer = outline(section, arc, sides, square);
-    local within = outline(inner, arc, sides, square);
+    local wall = wallOf(sorted, slice, thick);
+    local outer = outline(wall.outer, arc, sides, square);
+    local within = outline(wall.inner, arc, sides, square);
     [
       local profile = solidProfile([outer[j], outer[j + 1], within[j + 1], within[j]]);
       if profile == null then null else k.xPrism(id + '_' + i + '_' + j, slot, profile, slice)
@@ -104,12 +110,91 @@ local shell(id, slot, stations, thick=0.075, x=null, arc=[-180, 180], step=0.062
     ]
     for i in std.range(0, std.length(all) - 1)
   ]));
+// A door's trailing edge and the lip the post draws to meet it. As the door swings out, a point at depth b inboard of
+// its pins and a m from them first closes on the post, so an edge cut square across would dig in; leaning the edge
+// toward the pins by more than b / a at every depth moves every point of it off the post.
+local trailingEdge(stations, x, arc, pin, band, thick=0.075, sides=16, square=2.4, gap=0.002) =
+  local toward = if pin[0] > x then 1 else -1;
+  local reach = toward * (pin[0] - x);
+  local sorted = ordered(stations);
+  local skin = outline(sectionOf(sorted, x), arc, sides, square);
+  local outmost = std.foldl(std.max, [p[1] for p in skin], -1e9);
+  local inmost = std.foldl(std.min, [p[1] for p in skin], 1e9) - thick;
+  // The lean wanted at `z`, a wall's thickness deeper than `z` for the depth of the wall behind it, and the edge's
+  // offset from `x` toward the pins there, its integral in from the outmost point of the skin.
+  local margin = 1.25;
+  local rake(arm) = {
+    lean(z):: margin * (pin[1] - z + thick) / arm + 0.05,
+    offset(z):: margin / (2 * arm) * (std.pow(pin[1] - z + thick, 2) - std.pow(pin[1] - outmost + thick, 2)) + 0.05 * (outmost - z),
+  };
+  // The pins' reach to the edge where it rakes furthest, so the lean holds there too.
+  local edge = rake(reach - rake(reach).offset(inmost));
+  local width = edge.offset(inmost) + band;
+  local span = std.sort([x, x + toward * width]);
+  local wall = wallOf(sorted, span, thick);
+  local outer = outline(wall.outer, arc, sides, square);
+  local within = outline(wall.inner, arc, sides, square);
+  local facets = std.prune([
+    local corners = [outer[j], outer[j + 1], within[j + 1], within[j]];
+    local profile = solidProfile(corners);
+    local z = std.sum([p[1] for p in corners]) / 4;
+    if profile == null then null else {
+      j: j,
+      profile: profile,
+      // The edge's tangent at the facet's middle, as the plane toward * x + lean * z = at: the edge is convex, so the
+      // door's side of it is the side of every facet's tangent, and the post's side of one facet's is behind the edge.
+      lean: edge.lean(z),
+      at: toward * x + edge.offset(z) + edge.lean(z) * z,
+      // How far the post's lip reaches past `x` at the facet's deepest corner, where it reaches furthest.
+      lip: edge.offset(z) - edge.lean(z) * (std.foldl(std.min, [p[1] for p in corners], 1e9) - z),
+    }
+    for j in std.range(0, std.length(outer) - 2)
+  ]);
+  local prism(id, facet, slot) = k.xPrism(id + '_' + facet.j, slot, facet.profile, span);
+  // A facet's tangent passes behind the edge toward the facet's outer corners, so the door also stops `gap` short of the
+  // post's face at `x`.
+  local doorSide = [{ normal: [-toward, 0, 0], offset: -(toward * x + gap) }]
+                   + [{ normal: [-toward, 0, -f.lean], offset: -(f.at + gap) } for f in facets];
+  {
+    door(id, slot):: [k.clipped(prism(id, facet, slot), doorSide) for facet in facets],
+    // A facet where the edge leaves the skin at the post needs no lip. The post's part is drawn once for both sides,
+    // and the far door is the near one mirrored, so the lip is too.
+    post(id, slot):: k.bothSides([
+      k.clipped(prism(id, facet, slot), [{ normal: [toward, 0, facet.lean], offset: facet.at }])
+      for facet in facets
+      if facet.lip > 0.001
+    ]),
+    // Where the rest of the door begins, past the strip.
+    end:: x + toward * width,
+  };
 
 local point(stations, x, degrees, square=2.4) = outlinePoint(sectionOf(ordered(stations), x), degrees, square);
-local hingeRib(id, stations, x, high, low, slot='frame', depth=0.06, square=2.4) =
-  local bottom = point(stations, x, low, square);
-  local top = point(stations, x, high, square);
-  k.box(id, slot, [x - 0.03, bottom[0], top[1] - depth], [x + 0.03, top[0], top[1]]);
+local edgeAxis(stations, x, square=2.4) = [x, point(stations, x, 90, square)[1] + k.grain];
+local edgePins(stations, x, slot='paint', low=86, high=70, square=2.4) =
+  local z = edgeAxis(stations, x, square)[1];
+  k.hingePins('hinge', 'y', [x, point(stations, x, low, square)[0], z], [x, point(stations, x, high, square)[0], z], slot);
+// Degrees of arc a door stands off the walls above and below it: walls sliced at other stations step by a few
+// millimetres where the body tapers, and the door must clear the steps from its first degree of swing.
+local seam = 0.4;
+// The arc at which a door spanning `x` ends above the wall below it at the waist, `gap` m above the waist at both ends
+// of the span. The outline falls so steeply there that `seam` would open a slot the voxels show, and how steeply depends
+// on the section's squareness and rise, so the arc is found from the gap rather than fixed.
+local waist(stations, x, square=2.4, gap=0.0015) =
+  local sorted = ordered(stations);
+  local rise = std.min(sectionOf(sorted, x[0]).top - sectionOf(sorted, x[0]).waist,
+                       sectionOf(sorted, x[1]).top - sectionOf(sorted, x[1]).waist);
+  90 - std.asin(std.pow(gap / rise, square / 2)) * 180 / std.pi;
+// The gap ahead of a door's leading edge, so the edge's outer corner, which leaves the post slowest, starts clear.
+local leadGap = 0.002;
+// A front-hinged side door between the bows centred on `rear` and `front`, each `bow` m wide either side, over `arc`:
+// its trailing edge, which a frame strip `band` m wide at the waist carries, the span of the door's rest, and its pins.
+local frontHinged(stations, rear, front, arc, band=0.05, bow=0.035, thick=0.075) =
+  local hinge = front - bow - leadGap;
+  local edge = trailingEdge(stations, rear + bow, arc, edgeAxis(stations, hinge), band, thick);
+  edge {
+    rest:: [edge.end, hinge],
+    pins(slot):: edgePins(stations, hinge, slot),
+  };
 local lerp(a, b, t) = a + (b - a) * t;
 // A quad in plan, from `a` to `b`, each (x, z); a y prism's profile is (z, x).
 local planQuad(a, b, halfA, halfB) =
@@ -166,19 +251,31 @@ local mainLegs(x, radius, width, z, top, root) = k.bothSides([
   skin(id, slot, stations, x, arc, sides):: shell(id, slot, stations, thick=self.skinThick, x=x, arc=arc, sides=sides),
   // A canopy frame's bow over the crown at `x`.
   bow(id, stations, x):: shell(id, 'paint', stations, x=[x - 0.035, x + 0.035], arc=[-90, 90], step=0.07),
-  // A rib standing on the skin at `x` from arc `high` down to `low`, carrying a door's hinges.
-  hingeRib: hingeRib,
-  // A door glazed between `rear` and `front` from the roof line at `roofArc` down to the waist, hinged on its leading
-  // edge.
-  door(id, massKg, stations, rear, front, roofArc, paint)::
-    local pane = [rear + 0.035, front - 0.035];
+  // A door glazed between `rear` and `front` from the roof line at `roofArc` down to the waist, swinging `opens` degrees
+  // out on its leading edge.
+  door(id, massKg, stations, rear, front, roofArc, paint, opens)::
+    local low = waist(stations, [rear, front]);
+    local door = frontHinged(stations, rear, front, [roofArc + seam, low]);
+    local pins = door.pins('frame');
     k.compound(id, massKg,
-               shell('pane', 'glass', stations, x=pane, arc=[roofArc, 90])
-               + shell('sill', 'frame', stations, x=pane, arc=[82, 90], sides=48)
-               + shell('head', 'frame', stations, x=pane, arc=[roofArc, roofArc + 5], sides=120)
-               + [hingeRib('hinge_rib', stations, front - 0.065, roofArc + 4, 88)],
+               shell('pane', 'glass', stations, x=door.rest, arc=[roofArc + seam, low])
+               + shell('sill', 'frame', stations, x=door.rest, arc=[82, low], sides=48)
+               + shell('head', 'frame', stations, x=door.rest, arc=[roofArc + seam, roofArc + 5], sides=120)
+               + door.door('trail', 'frame')
+               + pins,
                { glass: 'glass-clear', frame: paint },
-               { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }),
+               motion=k.motion.hinge(pins, 'near', opens)),
+  // The lip the post behind `door` draws to meet the door's trailing edge.
+  doorPost(id, stations, rear, front, roofArc):: frontHinged(stations, rear, front, [roofArc + seam, waist(stations, [rear, front])]).post(id, 'paint'),
+  seam: seam,
+  waist: waist,
+  leadGap: leadGap,
+  frontHinged: frontHinged,
+  trailingEdge: trailingEdge,
+  edgeAxis: edgeAxis,
+  // Upright pins on a side door's hinge edge at `x`, just outside the waist, where the section is widest, so the door
+  // swings out clear of the skin beside it.
+  edgePins: edgePins,
   // The { x, y, r } of a straight boom from `boom.root` to `boom.tip` at `x`, where a band of paint meets it.
   boomAt(boom, x)::
     local u = (boom.root.x - x) / (boom.root.x - boom.tip.x);

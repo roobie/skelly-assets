@@ -5,6 +5,9 @@ local s = import 'technical.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
+local grain = k.grain;
+// The pins stand that gap clear of the valance below them as they turn.
+local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain - k.swingGap, s.deckBottom, s.panelIn - grain], [s.rear - grain - k.swingGap, s.deckBottom, -s.panelIn + grain]);
 local finish = { paint: 'paint-olive', cream: 'paint-cream', rust: 'scrap-rusted', rustred: 'rust-red', frame: 'steel-grey', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear', floor: 'wood-pine', steel: 'steel-parkerized' };
 taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_frame', s.frameMass, [
@@ -27,8 +30,9 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     box('corner', 'paint', [s.doorFront, s.floor, s.skinIn], [s.cowl, s.waist, s.skin]),
     prism('a_post', 'paint', [[0.9, s.waist], [s.cowl + 0.02, s.waist], [0.72, s.roof], [0.62, s.roof]], [s.skinIn, s.skin]),
     box('cant_rail', 'paint', [s.cabBack, s.roof - 0.06, s.skinIn], [0.72, s.roof, s.skin]),
-    box('sill_rust', 'rust', [0.02, s.sill - 0.005, s.skin], [0.6, s.floor + 0.04, s.skin + 0.01]),
+    box('sill_rust', 'rust', [0.02, s.sill - 0.005, s.skin], [0.6, s.floor, s.skin + 0.01]),
     box('corner_rust', 'rust', [s.doorFront + 0.04, s.floor + 0.02, s.skin], [s.cowl - 0.02, s.floor + 0.14, s.skin + 0.01]),
+    k.doorJamb('door_jamb', s.doorRear, [s.floor, s.roof - 0.06], s.skinIn),
   ]) + [
     box('floor', 'trim', [s.cabBack, s.floor - 0.03, -s.skinIn], [s.cowl, s.floor, s.skinIn]),
     box('tunnel', 'trim', [0.1, s.floor, -0.18], [s.cowl, s.floor + 0.18, 0.18]),
@@ -43,20 +47,28 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     prism('header', 'paint', [[0.62, s.roof - 0.06], [0.74, s.roof - 0.06], [0.74, s.roof], [0.62, s.roof]], [-s.skin, s.skin]),
     box('back_rust', 'rust', [s.cabBack - 0.01, 0.7, -0.5], [s.cabBack, 0.98, -0.18]),
   ], finish) + { title: 'Technical cab' },
+  // The door hangs on pins at its front edge's outer face and opens outboard. Its trailing edge stands off the rear
+  // post by its tail gap, closed by the cab's jamb. The quarter light straddles the pins' line, so its part ahead of
+  // them would swing inboard into the windscreen; it is the windows' own.
+  local tail = s.doorRear + k.doorTailGap(s.doorFront - s.doorRear, s.skin + k.grain - s.skinIn);
+  local top = s.roof - 0.06 - k.swingGap;
+  local pin(f) = [s.doorFront, s.floor + f * (s.waist - s.floor), s.skin + k.grain];
+  local pins = k.hingePins('hinge', 'y', pin(0.2), pin(0.8));
   k.compound('technical_door', 32, [
-    box('skin', 'paint', [s.doorRear, s.floor, s.skinIn], [s.doorFront, s.waist, s.skin]),
-    box('stile', 'paint', [s.doorRear, s.waist, s.skinIn], [s.doorRear + 0.06, s.roof - 0.06, s.skin]),
-    box('head', 'paint', [s.doorRear, s.roof - 0.12, s.skinIn], [s.windowFront, s.roof - 0.06, s.skin]),
+    box('skin', 'paint', [tail, s.floor + k.swingGap, s.skinIn], [s.doorFront, s.waist, s.skin]),
+    box('stile', 'paint', [tail, s.waist, s.skinIn], [s.doorRear + 0.06, top, s.skin]),
+    box('head', 'paint', [tail, s.roof - 0.12, s.skinIn], [s.windowFront, top, s.skin]),
     box('glass', 'glass', [s.doorRear + 0.06, s.waist, s.skinIn + 0.01], [s.windowFront, s.roof - 0.12, s.skin - 0.01]),
-    prism('quarter', 'glass', [[s.windowFront, s.waist], [0.92, s.waist], [0.68, s.roof - 0.06], [s.windowFront, s.roof - 0.06]], [s.skinIn + 0.01, s.skin - 0.01]),
     box('handle', 'dark', [s.doorRear + 0.08, s.waist - 0.1, s.skin], [s.doorRear + 0.22, s.waist - 0.06, s.skin + 0.02]),
     box('rust_low', 'rust', [s.doorRear + 0.1, s.floor + 0.02, s.skin], [s.doorFront - 0.24, s.floor + 0.14, s.skin + 0.01]),
     box('rust_patch', 'rustred', [0.32, 0.86, s.skin], [0.56, 1.02, s.skin + 0.01]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Technical door' },
+  ] + pins, finish, motion=k.motion.hinge(pins, 'near', 65)) + { title: 'Technical door' },
   k.compound('technical_windows', 22, [
     prism('windscreen', 'glass', [[0.93, s.waist], [0.97, s.waist], [0.7, s.roof - 0.04], [0.66, s.roof - 0.04]], [-s.skinIn, s.skinIn]),
     box('back_glass', 'glass', [s.cabBack + 0.01, s.waist, -0.58], [s.cabBack + 0.03, s.roof - 0.1, 0.58]),
-  ], finish) + { title: 'Technical windows' },
+  ] + bothSides([
+    prism('quarter', 'glass', [[s.windowFront, s.waist], [0.92, s.waist], [0.68, s.roof - 0.06], [s.windowFront, s.roof - 0.06]], [s.skinIn + 0.01, s.skin - 0.01]),
+  ]), finish) + { title: 'Technical windows' },
   k.compound('technical_dashboard', 11, [
     box('panel', 'trim', [s.cowl - 0.3, s.floor + 0.42, -s.skinIn], [s.cowl - 0.04, s.waist - 0.02, s.skinIn]),
     box('column', 'dark', [s.cowl - 0.33, s.floor + 0.66, -0.4], [s.cowl - 0.3, s.floor + 0.7, -0.36]),
@@ -91,7 +103,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_bed_floor', 50, [
     box('floor', 'floor', [s.rear + 0.04, s.deckBottom, -s.panelIn], [s.bedFront, s.deckTop, s.panelIn]),
   ], finish) + { title: 'Technical bed floor' },
-  k.compound('technical_bed', 110, bothSides(
+  k.compound('technical_bed', 118, bothSides(
     m.arched('side', 'paint', [s.rear + 0.04, s.bedFront], [s.sill, s.bedTop], [s.panelIn, s.side], [{ x: s.rearAxle, y: s.hub, r: s.archR }])
     + [
       box('rail_cap', 'trim', [s.rear + 0.04, s.bedTop, s.panelIn - 0.04], [s.bedFront, s.bedTop + 0.03, s.side + 0.01]),
@@ -105,12 +117,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
     ]
   ) + [
     box('headboard', 'paint', [s.bedFront - 0.04, s.deckTop, -s.side], [s.bedFront, s.bedTop, s.side]),
+    // The panel under the tailgate, down to the bumper, stays on the bed, so the gate hinges at the deck and drops level
+    // with it.
+    box('valance', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.deckBottom - k.swingGap, s.panelIn]),
+    // The foot of the rust patch, left on the valance when the gate drops; it stops short of the pins at the gate's ends.
+    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, s.deckBottom - k.swingGap, 0.2]),
   ], finish) + { title: 'Technical bed' },
-  k.compound('technical_tailgate', 26, [
-    box('gate', 'paint', [s.rear, s.deckBottom - 0.2, -s.panelIn], [s.rear + 0.04, s.bedTop, s.panelIn]),
-    box('rust', 'rust', [s.rear - 0.01, 0.74, -0.5], [s.rear, 1.0, 0.2]),
+  k.compound('technical_tailgate', 18, [
+    // Its front face slides up the deck's and the bed sides' rear ends as it drops, so it stands that gap behind them.
+    box('gate', 'paint', [s.rear, s.deckBottom, -s.panelIn], [s.rear + 0.04 - k.swingGap, s.bedTop, s.panelIn]),
+    box('rust', 'rust', [s.rear - 0.01, s.deckBottom, -0.5], [s.rear, 1.0, 0.2]),
     box('catch', 'dark', [s.rear - 0.02, s.bedTop - 0.08, 0.76], [s.rear, s.bedTop - 0.04, 0.84]),
-  ], finish) + { title: 'Technical tailgate' },
+  ] + tailgatePins, finish, motion=k.motion.hinge(tailgatePins, 'rear', s.tailgateOpen)) + { title: 'Technical tailgate' },
   k.compound('technical_roll_hoop', 34, [
     box('top', 'rust', [s.bedFront - 0.12, 1.8, -0.72], [s.bedFront - 0.06, 1.86, 0.72]),
     box('foot_bar', 'rust', [s.bedFront - 0.14, s.deckTop, -0.72], [s.bedFront - 0.04, s.deckTop + 0.03, 0.72]),

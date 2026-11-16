@@ -72,11 +72,13 @@ local exhaustSideHigh = k.compound('exhaust_side_high', 16, [
   k.turned('silencer', 'steel', 'y', k.disc(0.09, 0.2, 0.7), [0, 0, 0.11]) + { sides: 12 },
   k.turned('lip', 'steel', 'y', k.disc(0.065, 0.9, 0.94), [0, 0, 0.11]) + { sides: 12 },
 ], { steel: 'steel-spall-black' }) + { title: 'High side exhaust' };
-// MacPherson strut, near side, about the hub. A beam axle carries both wheels at `track` / 2 from the centre plane.
+// MacPherson strut, near side, about the hub. The damper stands inboard of the tyre's inner wall, which its site puts
+// 0.05 m outboard of the origin, and the knuckle reaches in to it; it is short enough to end under the lowest bonnet
+// that covers it. A beam axle carries both wheels at `track` / 2 from the centre plane.
 local strut(id, massKg) = k.compound(id, massKg, [
   box('lower_arm', 'steel', [-0.14, -0.1, -0.27], [0.14, -0.05, -0.04]),
-  box('knuckle', 'steel', [-0.05, -0.06, -0.05], [0.05, 0.06, 0]),
-  k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.47), [0, 0.06, -0.02]),
+  box('knuckle', 'steel', [-0.05, -0.06, -0.12], [0.05, 0.06, 0]),
+  k.turned('damper', 'spring', 'y', k.disc(0.035, 0, 0.4), [0, 0.06, -0.1]),
 ], { steel: 'steel-grey', spring: 'paint-charcoal' }, { hub: ['knuckle', [0.5, 0.5, 1]] });
 // An axle's spring seat (`driveline.libsonnet`, `axles`), resting on its beam's top at `beamTop`.
 local springSeat(id, beamTop, halfLength) =

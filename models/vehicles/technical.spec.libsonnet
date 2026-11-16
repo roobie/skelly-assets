@@ -6,4 +6,6 @@
   bedFront: -0.38, deckBottom: 0.8125, deckTop: 0.84375, bedTop: 1.22,
   pedestalX: -1.1,
   cabMass: 430, frameMass: 194,
+  // Degrees, so the dropped tailgate lies level with the deck.
+  tailgateOpen: 90,
 }

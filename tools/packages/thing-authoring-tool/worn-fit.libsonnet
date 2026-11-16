@@ -573,7 +573,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // Gloves: a palm and cuff on the wrist, a piece on each phalanx and on each thumb bone, so a curled hand bends its
   // glove at every joint. `cuff` is how far the cuff reaches up the forearm; `fingers` false leaves stubs on the knuckle
   // phalanges only. The model arm is a right arm whose palm faces +x, so the back of the hand, where `back` details go,
-  // is -x.
+  // is -x. A finger piece follows the doll's hand at the glove's layer, so gloves at one layer share their finger shapes
+  // on purpose and tell themselves apart by their `hand` finish and what they add to the palm.
   hands(id, finish, spec, title=null)::
     local s = { layer: 'under', cuff: 0.05, flare: 0.006, hem: 0.006, fingers: true, backRidges: 0,
                 slots: { hand: 'hand', cuff: 'cuff', hem: 'hem', ridge: 'stitch' } } + spec;

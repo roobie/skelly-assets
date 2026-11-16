@@ -2,7 +2,7 @@
 // their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
-// labels (models/taxonomy.json). It serves the tool pages site/tools.json lists and links them from the index.
+// labels (models/taxonomy.json), and a sounds.json of the tree's sound rows with each take's file. It serves the tool pages site/tools.json lists and links them from the index.
 // Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [--analytics] [--history file] [outDir]; the tree defaults to built/. --no-tree
 // leaves the tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs).
 // --require-viewers fails on an unbuilt viewer, so a deploy never drops one. --analytics adds the visit counter to every
@@ -20,7 +20,7 @@ import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } f
 import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
-import { readMobRows } from '../tools/layout.mjs';
+import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { farSlot, readStowage, stowedPose } from '../tools/stowage.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
@@ -252,6 +252,8 @@ for (const model of models) if (model.clips && model.body) {
   mkdirSync(dirname(join(out, 'built', model.clips)), { recursive: true });
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
+const sounds = manifest.sounds.map(({ id, object, surface, pack, variants }) => ({ id, object, surface, takes: variants.map(({ seed, path }) => ({ seed, url: `built/${outputPath(pack, path)}` })) }));
+writeFileSync(join(out, 'sounds.json'), JSON.stringify({ sounds }));
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
 writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `${REPOSITORY}/releases/tag/` } } : {}) }));
 // A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
@@ -268,4 +270,4 @@ const unlinked = unlinkedTools(out, tools);
 if (unlinked.length > 0) throw new Error(`the site serves tool pages that site/tools.json does not list: ${unlinked.join(' ')}`);
 if (values.analytics) addAnalytics(out, versionHtml(readVersion(root)));
 writeFileSync(join(out, '.nojekyll'), '');
-console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
+console.log(`${models.length} models, ${vehicles.length} vehicles, ${assemblies.length} assemblies and ${sounds.length} sounds into ${out}`);
