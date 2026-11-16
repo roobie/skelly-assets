@@ -21,6 +21,7 @@ import { parseArgs } from 'node:util';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
+import { danglingPartItems } from './partItems.mjs';
 import { readDependencies } from './packs.mjs';
 import { readSitePieces } from './siteOverlap.mjs';
 import { swingResults } from './swingClearance.mjs';
@@ -308,13 +309,16 @@ async function main() {
       for (const file of placed.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models });
       for (const file of wields.files) console.log(`built ${file}`);
+      const files = [...built.files, ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files];
+      const dangling = danglingPartItems({ files, out, models });
+      if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
         vehicles: placed.vehicles,
         motions: wields.motions,
         sounds: sounds.sounds,
         dependsOn,
-        files: [...built.files, ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files],
+        files,
         credit: readCredits(repo),
         renames: readRenames(repo),
         finishes,
