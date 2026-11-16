@@ -1,13 +1,13 @@
 // The showcase page: a grid of thumbnails drawn by one shared offscreen renderer, and a viewer dialog with orbit
 // controls and, for creatures, their body-backed pose clips. A vehicle is shown assembled from its parts' models, and
 // can be exploded to show each part apart from the others, as can a model that comes in components, or opened, with
-// every door, lid and shutter at its stop; a wearable can be shown loose or worn on the doll. What it draws, and how, is
-// render.mjs's.
+// every door, lid and shutter at its stop; a wearable can be shown loose or worn on the doll. Whatever it shows can be
+// drawn smooth where it has a smooth copy. What it draws, and how, is render.mjs's.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeCombobox } from './combobox.mjs';
 import { ALL, FORM, KEYWORD, PAGE_SIZE, UNCATEGORISED, VEHICLES, dailySeed, emptyFilter, isBrowsing, knownOnly, landingModels, landingSeed, matches, parseState, sameGrid, shelfOf, stateHash, suggestions } from './filter.mjs';
-import { canPose, clipSet, comesApart, explodable, frame, isVehicle, isWearable, loadEntry, looseName, makeStage, movers, opens, playable, pose, registerModels, setupRenderer, spread, stillInstance, swing, wornEntry } from './render.mjs';
+import { canPose, clipSet, comesApart, explodable, frame, hasSmooth, isVehicle, isWearable, loadEntry, looseName, makeStage, movers, opens, playable, pose, registerModels, setupRenderer, smoothEntry, spread, stillInstance, swing, wornEntry } from './render.mjs';
 
 const $ = (id) => document.getElementById(id);
 const FINITE_REST = 0.6; // s held after a finite clip, such as an attack, before it plays again
@@ -211,7 +211,7 @@ function showCards(upTo) {
 // The page's state as it stands, which is what the hash holds.
 const currentState = () => {
   const open = $('viewer').open && viewer.model;
-  return { filter, reshuffle, model: open ? viewer.model.id : null, view: open ? viewer.view : null, info: Boolean(open) && $('v-meta').open };
+  return { filter, reshuffle, model: open ? viewer.model.id : null, view: open ? viewer.view : null, info: Boolean(open) && $('v-meta').open, smooth: Boolean(open) && viewer.smooth };
 };
 
 // A change of state replaces the hash's history entry, so that Back does not step through every keystroke and filter pick;
@@ -257,6 +257,7 @@ function restore(state) {
   const model = byId.get(state.model);
   if (model) {
     if (model.id !== was.model || state.view !== was.view || state.info !== was.info) openViewer(model, state);
+    else if (state.smooth !== was.smooth) drawSmooth(state.smooth);
   } else if ($('viewer').open) {
     closedByHash = true;
     $('viewer').close();
@@ -275,7 +276,7 @@ function initViewer() {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
-  viewer = { view: null, renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, parts: [], spread: 0, exploded: false, movers: [], swing: 0, opened: false, worn: false };
+  viewer = { view: null, renderer, camera, controls, stage: makeStage(renderer), obj: null, loaded: null, clip: null, t0: 0, model: null, size: null, parts: [], spread: 0, exploded: false, movers: [], swing: 0, opened: false, worn: false, smooth: false };
 
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
@@ -312,6 +313,7 @@ function initViewer() {
     showMeta();
     writeHash();
   });
+  $('v-smooth').addEventListener('change', () => drawSmooth($('v-smooth').checked));
   $('v-prev').onclick = () => step(-1);
   $('v-next').onclick = () => step(1);
   document.addEventListener('keydown', (e) => {
@@ -356,22 +358,58 @@ function showView(view) {
 
 // Switches a wearable between loose and worn on the doll, keeping the camera's direction and fitting the camera to the
 // view it is switching to.
-async function wear(worn) {
+function wear(worn) {
   const v = viewer;
-  const model = v.model;
   v.worn = worn;
   v.view = worn ? 'worn' : null;
   writeHash();
   for (const b of $('v-clips').children) b.setAttribute('aria-pressed', String((b.dataset.view === 'worn') === worn));
-  const entry = worn ? wornEntry(model) : model;
+  markSmooth();
+  return redraw(true);
+}
+
+// Switches between the voxels and the smooth copy, keeping the camera as it is, since both are the one model in one
+// frame and the reader is comparing them.
+function drawSmooth(smooth) {
+  viewer.smooth = smooth;
+  writeHash();
+  markSmooth();
+  return Promise.all([redraw(false), describe(viewer.model)]);
+}
+
+// What the stage shows of the open model, the worn view or the model itself, and that in the form the switch picks.
+const viewed = () => (viewer.worn ? wornEntry(viewer.model) : viewer.model);
+const formOf = (entry) => (viewer.smooth && hasSmooth(entry) ? smoothEntry(entry) : entry);
+
+// Draws the open model anew after a change of view or form, its parts as far apart and as open as they were; `refit`
+// fits the camera to the new view, keeping its direction.
+async function redraw(refit) {
+  const v = viewer;
+  const entry = formOf(viewed());
   const loaded = await loadEntry(entry);
-  if (v.model !== model || v.worn !== worn) return; // a later pick overtook this load
+  if (formOf(viewed()).id !== entry.id) return; // a later pick overtook this load
   v.stage.remove(v.obj);
   v.obj = stillInstance(loaded, entry);
+  v.loaded = loaded;
+  v.parts = comesApart(entry) ? explodable(v.obj, entry) : [];
+  v.movers = opens(loaded) ? movers(v.obj, loaded) : [];
+  spread(v.parts, v.spread);
+  swing(v.movers, v.swing);
   v.stage.add(v.obj);
+  if (!refit) return;
   const direction = v.camera.position.clone().sub(v.controls.target).normalize();
   frame(v.camera, v.obj, v.controls.target, direction);
   v.controls.update();
+}
+
+// The switch is on while the model is drawn smooth, and off and disabled, saying why, for a view with no smooth copy.
+function markSmooth() {
+  const available = hasSmooth(viewed());
+  $('v-smooth').disabled = !available;
+  $('v-smooth').checked = available && viewer.smooth;
+  $('v-smooth-none').hidden = available;
+  if (available) $('v-smooth').removeAttribute('aria-describedby');
+  else $('v-smooth').setAttribute('aria-describedby', 'v-smooth-none');
 }
 
 function step(d) {
@@ -380,12 +418,15 @@ function step(d) {
   openViewer(list[(i + d + list.length) % list.length]);
 }
 
-// `restored` is the state to show when a link or history brought the model: its view and whether its details are open.
+// `restored` is the state to show when a link or history brought the model: its view, whether its details are open and
+// whether it is drawn smooth. Otherwise the form stays as the reader last switched it.
 async function openViewer(model, restored = null) {
   if (!viewer) return;
   const opening = !$('viewer').open;
   viewer.model = model;
   viewer.view = null;
+  viewer.worn = false;
+  if (restored) viewer.smooth = restored.smooth;
   if (opening) $('viewer').showModal();
   if (restored) $('v-meta').open = restored.info;
   writeHash(opening && !restored);
@@ -393,71 +434,37 @@ async function openViewer(model, restored = null) {
 
   $('v-category').textContent = shelfLabel(shelfOf(model));
   $('v-name').textContent = model.title;
-  const file = isVehicle(model) ? model.placements : model.file;
-  $('v-id').textContent = file;
-  $('v-download').href = `built/${file}`;
-  $('v-download').setAttribute('download', file);
-  $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
   // A wearable's fit in a pose is reviewed on the posing page (pose.html).
   $('v-pose').hidden = !isWearable(model);
   $('v-pose').href = `pose.html?${new URLSearchParams({ wear: model.id })}`;
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
+  $('v-smooth').disabled = true; // until the model is drawn
   showMeta();
   $('v-clips').replaceChildren();
   $('v-clips').setAttribute('aria-label', comesApart(model) || isWearable(model) ? 'View' : 'Clip');
 
-  const loaded = await loadEntry(model);
+  const entry = formOf(model);
+  const loaded = await loadEntry(entry);
   if (viewer.model !== model) return; // a later pick overtook this load
 
   if (viewer.obj) viewer.stage.remove(viewer.obj);
-  viewer.obj = stillInstance(loaded, model);
+  viewer.obj = stillInstance(loaded, entry);
   viewer.loaded = loaded;
   viewer.clip = null;
-  viewer.parts = comesApart(model) ? explodable(viewer.obj, model) : [];
+  viewer.parts = comesApart(entry) ? explodable(viewer.obj, entry) : [];
   viewer.spread = 0;
   viewer.exploded = false;
   viewer.movers = opens(loaded) ? movers(viewer.obj, loaded) : [];
   viewer.swing = 0;
   viewer.opened = false;
-  viewer.worn = false;
   viewer.stage.add(viewer.obj);
   const { box, target } = frame(viewer.camera, viewer.obj);
   viewer.controls.target.copy(target);
   viewer.controls.update();
-
-  const size = box.getSize(new THREE.Vector3());
-  const shelfKey = shelfOf(model);
-  const facts = [
-    ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
-    ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
-    ['Form', labelOf(model.form), FORM_MEANINGS[model.form]],
-    ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
-    ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
-    ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),
-    ...(model.massKg > 0 && model.volumeM3 > 0 ? [['Density', `${Math.round(model.massKg / model.volumeM3).toLocaleString('en')} kg/m³`]] : []),
-    ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
-    ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
-    ...(isVehicle(model) ? [] : [['File', kb(model.bytes)]]),
-    ...(model.history === undefined ? [] : [['Versions', versionsOf(model.history), 'The releases that introduced the model and last changed it.']]),
-  ];
-  if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
-  $('v-facts').replaceChildren(...facts.flatMap(([k, v, title = '']) => [
-    Object.assign(document.createElement('dt'), { textContent: k, title }),
-    definition(v),
-  ]));
-
-  const mats = loaded.materials.length
-    ? loaded.materials.map((m) => {
-      const li = document.createElement('li');
-      const sw = document.createElement('span');
-      sw.className = 'swatch';
-      sw.style.background = `#${m.color.getHexString(THREE.SRGBColorSpace)}`;
-      li.append(sw, m.userData?.materialId ?? m.name);
-      return li;
-    })
-    : [Object.assign(document.createElement('li'), { textContent: 'Vertex colours' })];
-  $('v-materials').replaceChildren(...mats);
+  viewer.size = box.getSize(new THREE.Vector3());
+  showDrawn(model, entry, loaded);
+  markSmooth();
 
   if (canPose(model, loaded.clips, loaded.body)) {
     const clips = clipSet(loaded.clips);
@@ -487,6 +494,55 @@ async function openViewer(model, restored = null) {
   }
   if (isWearable(model)) $('v-clips').replaceChildren(...viewChips([['loose', looseName(model)], ['worn', 'Worn']], (view) => wear(view === 'worn')));
   if (isWearable(model) && restored?.view === 'worn') wear(true);
+}
+
+// The model in the form the switch picks, once that form has loaded.
+async function describe(model) {
+  const entry = formOf(model);
+  const loaded = await loadEntry(entry);
+  if (viewer.model === model && formOf(model).id === entry.id) showDrawn(model, entry, loaded);
+}
+
+// The facts and materials of `model` as `entry` draws it: what it is, from the model, and what is drawn, from the file
+// in the form shown. Its size stays as framed on opening, since both forms are the one model within half a voxel.
+function showDrawn(model, entry, loaded) {
+  const file = isVehicle(model) ? model.placements : entry.file;
+  $('v-id').textContent = file;
+  $('v-download').href = `built/${file}`;
+  $('v-download').setAttribute('download', file);
+  $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
+  const size = viewer.size;
+  const shelfKey = shelfOf(model);
+  const facts = [
+    ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
+    ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
+    ['Form', labelOf(model.form), FORM_MEANINGS[model.form]],
+    ...(model.keywords.length > 0 ? [['Keywords', model.keywords.map(labelOf).join(', ')]] : []),
+    ...(isVehicle(model) ? [['Parts', model.sites.length]] : model.components ? [['Components', model.components.length]] : []),
+    ...(model.massKg === undefined ? [] : [['Mass', kg(model.massKg)]]),
+    ...(model.massKg > 0 && model.volumeM3 > 0 ? [['Density', `${Math.round(model.massKg / model.volumeM3).toLocaleString('en')} kg/m³`]] : []),
+    ['Size', `${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m`],
+    ['Triangles', Math.round(loaded.triangles).toLocaleString('en')],
+    ...(isVehicle(model) ? [] : [['File', kb(entry.bytes)]]),
+    ...(model.history === undefined ? [] : [['Versions', versionsOf(model.history), 'The releases that introduced the model and last changed it.']]),
+  ];
+  if (canPose(model, loaded.clips, loaded.body)) facts.push(['Bones', loaded.body.bones.length]);
+  $('v-facts').replaceChildren(...facts.flatMap(([k, v, title = '']) => [
+    Object.assign(document.createElement('dt'), { textContent: k, title }),
+    definition(v),
+  ]));
+
+  const mats = loaded.materials.length
+    ? loaded.materials.map((m) => {
+      const li = document.createElement('li');
+      const sw = document.createElement('span');
+      sw.className = 'swatch';
+      sw.style.background = `#${m.color.getHexString(THREE.SRGBColorSpace)}`;
+      li.append(sw, m.userData?.materialId ?? m.name);
+      return li;
+    })
+    : [Object.assign(document.createElement('li'), { textContent: 'Vertex colours' })];
+  $('v-materials').replaceChildren(...mats);
 }
 
 // A chip for each of a model's views, [view, text], the first pressed; picking one calls `pick` with its view.

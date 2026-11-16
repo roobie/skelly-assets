@@ -64,15 +64,17 @@ export function suggestions(entries, filter, dimension) {
 // ---- the page's state, as a URL hash ----
 
 // Everything that makes the page look as it does lives in the hash, so that a link restores it and the server never sees
-// it: the filter, the landing page's reshuffle count, and the open model with its chosen view and whether its details are
-// unfolded. The shape is { filter, reshuffle, model, view, info }; `model` and `view` are null when nothing is open or chosen.
-export const emptyState = () => ({ filter: emptyFilter(), reshuffle: 0, model: null, view: null, info: false });
+// it: the filter, the landing page's reshuffle count, and the open model with its chosen view, whether its details are
+// unfolded and whether it is drawn smooth. The shape is { filter, reshuffle, model, view, info, smooth }; `model` and
+// `view` are null when nothing is open or chosen.
+export const emptyState = () => ({ filter: emptyFilter(), reshuffle: 0, model: null, view: null, info: false, smooth: false });
 
-export function stateHash({ filter, reshuffle, model, view, info }) {
+export function stateHash({ filter, reshuffle, model, view, info, smooth }) {
   const params = new URLSearchParams();
   if (model) params.set('m', model);
   if (model && view) params.set('v', view);
   if (model && info) params.set('info', '1');
+  if (model && smooth) params.set('smooth', '1');
   if (filter.q.trim()) params.set('q', filter.q.trim());
   if (filter.shelf !== ALL) params.set('cat', filter.shelf);
   // Dimensions go in a fixed order, not the order the reader picked them, so that the hash a state writes is the one it
@@ -110,6 +112,7 @@ export function parseState(hash) {
     model: params.get('m') || null,
     view: params.get('v') || null,
     info: params.get('info') === '1',
+    smooth: params.get('smooth') === '1',
   };
 }
 

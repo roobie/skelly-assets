@@ -149,7 +149,7 @@ test('every roster wearable the doll seats by an anchor builds with that anchor,
 // One mob row per template bakes every clip shape the templates make, so the showcase must compose each of them.
 const mobRowPerTemplate = () => [...new Map(readMobRows().map((row) => [row.template, row])).values()];
 
-test("the showcase lists every model of the manifest at its pack path, ships the file there and can play every template's clips", () => {
+test("the showcase lists every model of the manifest at its pack path, ships the file there with any smooth copy and can play every template's clips", () => {
   const root = mkdtempSync(join(tmpdir(), 'site-'));
   const built = join(root, 'built');
   const out = join(root, 'site');
@@ -160,7 +160,19 @@ test("the showcase lists every model of the manifest at its pack path, ships the
       [join(repo, 'tools/mobs.mjs'), '--no-cache', '--out', built, ...rows.map((row) => row.id)],
       { cwd: repo, stdio: 'pipe' },
     );
-    const manifest = buildManifest({ ...mobManifest(rows), credit: readCredits(repo) });
+    // A roster model beside the mobs, since a mob has no smooth copy and the model has.
+    const [{ packId, id }] = readRoster();
+    execFileSync(process.execPath, [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, id], {
+      cwd: repo,
+      stdio: 'pipe',
+    });
+    const path = `assets/models/${id}.glb`;
+    const thing = { id, title: id, kind: 'thing', pack: packId, path, smooth: { pack: smoothPack(packId), path } };
+    const manifest = buildManifest({
+      models: [...mobManifest(rows).models, thing],
+      files: filesUnder(built),
+      credit: readCredits(repo),
+    });
     writeFileSync(join(built, MANIFEST), manifestJson(manifest));
     execFileSync(process.execPath, [join(repo, 'site/build.mjs'), '--built', built, out], { cwd: repo, stdio: 'pipe' });
     const { models } = JSON.parse(readFileSync(join(out, 'models.json'), 'utf8'));
@@ -171,11 +183,16 @@ test("the showcase lists every model of the manifest at its pack path, ships the
       const clips = row.clips === undefined ? null : outputPath(row.pack, row.clips);
       assert.equal(listed.get(file)?.clips, clips, `${file} is not listed with its clips`);
       assert.equal(listed.get(file)?.title, row.title, `${file} is not listed under its authored title`);
+      const smooth = row.smooth === undefined ? undefined : outputPath(row.smooth.pack, row.smooth.path);
+      assert.equal(listed.get(file)?.smooth?.file, smooth, `${file} is not listed with its smooth copy`);
     }
+    assert.ok(models.some((model) => model.smooth) && models.some((model) => !model.smooth));
     assert.equal(new Set(models.map((model) => model.id)).size, models.length, 'two showcase models share an id');
     let sampledDeaths = 0;
     for (const model of models) {
       assert.ok(existsSync(join(out, 'built', model.file)), `${model.file} is not shipped`);
+      if (model.smooth)
+        assert.ok(existsSync(join(out, 'built', model.smooth.file)), `${model.smooth.file} is not shipped`);
       if (model.clips) assert.ok(existsSync(join(out, 'built', model.clips)), `${model.clips} is not shipped`);
       if (model.body) assert.ok(existsSync(join(out, 'built', model.body)), `${model.file} is missing its actor body`);
       if (model.clips) {
