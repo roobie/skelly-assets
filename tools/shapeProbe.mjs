@@ -46,12 +46,28 @@ const cellAt = ({ low, size }, index) => [
 ];
 const drawnCells = (grid) => grid.slot.reduce((found, slot, index) => (slot > 0 ? (found.push(index), found) : found), []);
 
+// The most cells a model is read across along its longest side. A model larger than this at its own grain is read
+// coarser, so a model's cost stays bounded at the price of missing one-cell defects on the largest models.
+export const MOST_CELLS = 256;
+
+// The grain a model is read at: its own, or coarser when MOST_CELLS of it would not span the model's longest side.
+export function readGrain(meshes, grain) {
+  const low = [Infinity, Infinity, Infinity], high = [-Infinity, -Infinity, -Infinity];
+  for (const { positions } of meshes) for (let i = 0; i < positions.length; i++) {
+    low[i % 3] = Math.min(low[i % 3], positions[i]);
+    high[i % 3] = Math.max(high[i % 3], positions[i]);
+  }
+  return Math.max(grain, Math.max(...high.map((h, a) => h - low[a])) / MOST_CELLS);
+}
+
 // The lattice cells the model's surface passes through, as a cell grid. A surface sample steps a quarter cell inward
 // along its normal before it is binned, so a voxel face, which lies on a cell boundary, counts for the cell it closes.
-export function surfaceCells(buffer, grain = modelGrain(glbJson(buffer))) {
+export function surfaceCells(buffer) {
   const gltf = glbJson(buffer);
   const slots = [...new Set(gltf.meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.slot ?? '')))];
-  const drawn = slots.flatMap((name, slot) => modelMeshes(buffer, (_part, _piece, own) => (own ?? '') === name)
+  const bySlot = slots.map((name) => modelMeshes(buffer, (_part, _piece, own) => (own ?? '') === name));
+  const grain = readGrain(bySlot.flat(), modelGrain(gltf));
+  const drawn = bySlot.flatMap((meshes, slot) => meshes
     .flatMap((mesh) => sampledSurface(mesh, grain / 2))
     .map(({ point, normal }) => ({ cell: point.map((x, a) => Math.floor((x - (normal[a] * grain) / 4) / grain)), slot })));
   return cellGrid(drawn, slots);

@@ -5,7 +5,8 @@
 //   [--workers n] [id ...]
 // The verdicts file holds one JSON object per line, and any line with an `id` marks that row reviewed. A row renamed
 // since its review is found through the built manifest's renames and the `--renames` list of { id, newId }. With ids,
-// only those rows are probed, reviewed or not. Writes <out>/queue.json: the rows with findings, most likely first.
+// only those rows are probed, reviewed or not. Writes <out>/queue.json: the rows with findings, most likely first, and
+// the rows that could not be probed.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -78,10 +79,15 @@ async function main() {
 
   const pool = workerPool(new URL('./shapeProbe.mjs', import.meta.url), 'modelFindings', ...(values.workers ? [Number(values.workers)] : []));
   const found = {};
+  const failed = {};
   try {
     await Promise.all(rows.map(async (row) => {
-      const shapes = models.has(row.id) ? await pool.run(models.get(row.id)) : [];
-      found[row.id] = [...shapes, ...rowRunFindings(row)];
+      try {
+        const shapes = models.has(row.id) ? await pool.run(models.get(row.id)) : [];
+        found[row.id] = [...shapes, ...rowRunFindings(row)];
+      } catch (error) {
+        failed[row.id] = error.message;
+      }
     }));
   } finally {
     await pool.close();
@@ -89,9 +95,11 @@ async function main() {
 
   const queue = rankedQueue(found);
   mkdirSync(values.out, { recursive: true });
-  writeFileSync(join(values.out, 'queue.json'), `${JSON.stringify({ probed: rows.length, queue }, null, 2)}\n`);
+  writeFileSync(join(values.out, 'queue.json'), `${JSON.stringify({ probed: rows.length, failed, queue }, null, 2)}\n`);
   const missing = rows.filter(({ id }) => !models.has(id)).length;
   console.log(`probed ${rows.length} rows (${missing} without a built model); ${queue.length} have findings`);
+  for (const [id, message] of Object.entries(failed)) console.log(`FAILED ${id}: ${message}`);
+  if (Object.keys(failed).length > 0) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) await main();
