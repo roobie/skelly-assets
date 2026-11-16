@@ -95,7 +95,12 @@ local fit(why, pairs) = { why: why, pairs: pairs };
       ['engine', 'front_bumper', 0.068],
       ['engine', 'fuselage', 0.055],
       ['engine', 'gearbox', 0.115],
-      ['engine', 'shell', 0.092],
+      ],
+    ),
+    fit(
+      'A car\'s engine stands in its bay with its sump in the nose pan under it, which the shell draws as a solid slab.',
+      [
+      ['engine', 'shell', 0.041],
       ],
     ),
     fit(
