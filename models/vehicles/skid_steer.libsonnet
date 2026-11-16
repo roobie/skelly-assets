@@ -90,7 +90,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   // door looks into the engine room.
   k.compound('skid_steer_engine_cover', 90, [
     box('top', 'paint', [-1.1, coverTop - skin, -coverSide], [s.cageRear, coverTop, coverSide]),
-    prism('slope', 'paint', [[-1.24, slopeFoot], [-1.1, coverTop], [-1.1, coverTop - slopeSkin], [-1.24, slopeFoot - slopeSkin]], [-coverSide, coverSide]),
+    prism('slope', 'paint', [[-1.24, slopeFoot - slopeSkin], [-1.1, coverTop - slopeSkin], [-1.1, coverTop], [-1.24, slopeFoot]], [-coverSide, coverSide]),
     box('hood_top_vent', 'trim', [-1.0, coverTop, -0.3], [-0.55, coverTop + 0.02, 0.3]),
   ] + bothSides([
     prism('side', 'paint', coverProfile, [coverSide - skin, coverSide]),
@@ -123,7 +123,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   + { title: 'Skid-steer loader hydraulic tank' },
   // The cooler's feed comes from the control valve under the cab; its return drops behind the radiator's near tank into
   // the hydraulic tank.
-  k.compound('skid_steer_hydraulic_hoses', 2, [
+  k.compound('skid_steer_hydraulic_hoses', 1.4, [
     round(k.turned('feed', 'hose', 'x', k.disc(oilHose, coolerX + 0.04, s.cageRear), [0, coolerMiddle, coolerHalf - 0.02])),
     round(k.turned('return_out', 'hose', 'x', k.disc(oilHose, returnX, coolerX - 0.04), [0, coolerMiddle, coolerHalf - 0.02])),
     round(k.turned('return_across', 'hose', 'z', k.disc(oilHose, coolerHalf - 0.02, returnZ), [returnX, coolerMiddle, 0])),
