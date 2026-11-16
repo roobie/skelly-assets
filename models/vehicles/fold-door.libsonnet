@@ -30,7 +30,14 @@ local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9
   // -1, folding its jamb panel `fold` degrees. Every panel `span`s the same stretch along x from its origin, toward the
   // leaf's free end; each panel's origin lies `at` along the leaf from the leaf's centre; `pins` are its hinge pins, in
   // the slot `slot` names.
-  leaf(width, height, thick, jambSign, fold=90, slot='paint')::
+  // A `seal` puts a rubber strip on the free panel's free end, the boxes `free.seal` in the slot 'seal', since the fold
+  // leaves a gap at rest between that end and what lies past it: the other leaf of a pair, or a pillar. The strip is a
+  // flap that runs `gap` past the end and `lap` further, lying behind the face of what it laps, `face` deep in the
+  // leaf's z, with a web from the leaf's inner face down to the flap when that face lies deeper. Past the free end and
+  // behind the inner face, every point of it turns inward and away from what it laps as the free panel folds back, and
+  // none of it lies over the jamb panel the free panel folds flat against. `from` and `to` bound it in height, so it can
+  // stop above steps or a floor inside the doorway.
+  leaf(width, height, thick, jambSign, fold=90, slot='paint', seal=null)::
     // A free panel turning twice its jamb panel's angle folds flat only on a panel of equal width.
     local panel = width / 2;
     assert fold > 0 && fold <= 90 : 'a leaf folds more than 0 and at most 90 degrees, so its free panel turns at most 180';
@@ -49,6 +56,17 @@ local whole(length) = std.abs(length / grain - std.round(length / grain)) < 1e-9
         at: 0,
         pins: pins('fold_pin', -thick / 2),
         motion: k.motion.hinge(self.pins, 'far', 2 * fold),
+        seal: if seal == null then [] else
+          // Rounded outward to whole grains, so the voxels never leave the gap open or the lap short.
+          local up(length) = grain * std.ceil(length / grain - 1e-9);
+          local inner = -thick / 2;
+          local face = -up(-std.min(seal.face, inner));
+          local end = -jambSign * panel;
+          local across(reach) = std.sort([end, end - jambSign * up(reach)]);
+          local flap = across(seal.gap + seal.lap);
+          local web = across(grain);
+          [k.box('seal_flap', 'seal', [flap[0], seal.from, face - grain], [flap[1], seal.to, face])]
+          + (if face < inner then [k.box('seal_web', 'seal', [web[0], seal.from, face - grain], [web[1], seal.to, inner])] else []),
       },
     },
 }

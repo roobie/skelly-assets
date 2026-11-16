@@ -7,8 +7,11 @@
   floorTop: 1.125, floorBase: 1.0, floorHalf: 1.65, floorRear: -6.0, floorFront: 5.0,
   bulkhead: 5.0,
   windscreen: [6.45, 7.7], screenArc: 76,
-  door: [4.9, 5.85], doorArc: 56, doorPane: [58, 74], doorPaneX: [5.05, 5.7],
-  rampTip: -8.45,
+  // The crew door's aft, hinged edge stands just ahead of the cockpit bulkhead, so the door turns clear of it.
+  door: [4.965, 5.85], doorArc: 56, doorOpens: 90, doorPane: [58, 74], doorPaneX: [5.05, 5.7],
+  // Where the lowered ramp's lip rests on the ground, and how far it turns up from there to close under the tail's
+  // lintel.
+  rampTip: -8.45, rampOpens: 66,
   frontGear: { x: 4.6, radius: 0.46875, width: 0.3, z: 2.08, top: 0.72, root: 1.35 },
   rearGear: { x: -4.5, radius: 0.46875, width: 0.3, z: 2.08, top: 0.72, root: 1.35 },
   sponson: { front: 3.6, rear: -3.6, taper: 1.0, inner: 1.78, outer: 2.35, low: 0.62, high: 1.72 },

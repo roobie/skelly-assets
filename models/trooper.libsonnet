@@ -5,6 +5,7 @@ local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
 local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 // Olive paint over parkerized fittings, brass rivets and a yellow chevron and edging.
 local livery = { plate: 'paint-olive', trim: 'steel-parkerized', strap: 'webbing-olive-dark', rivet: 'brass', insignia: 'paint-crane-yellow' };
+// The gauntlet's palm and fingers are a black leather glove under its cuff, as a soldier's are.
 local gauntlet = livery + { hand: 'leather-black' };
 local trooperBoot = { upper: 'leather-black', toe: 'paint-olive', sole: 'rubber-tread', collar: 'paint-crane-yellow', laces: 'webbing-olive-dark' };
 // A worn template's own ground shells as the item's ground model.

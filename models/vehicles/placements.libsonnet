@@ -109,6 +109,7 @@
   'security_walker_sleek': import 'security_walker_sleek.placements.libsonnet',
   'semi_tractor': import 'semi_tractor.placements.libsonnet',
   'semi_trailer': import 'semi_trailer.placements.libsonnet',
+  'short_military_transport_helicopter': import 'short_military_transport_helicopter.placements.libsonnet',
   'shuttle_bus': import 'shuttle_bus.placements.libsonnet',
   'skid_steer': import 'skid_steer.placements.libsonnet',
   'small_tractor': import 'small_tractor.placements.libsonnet',

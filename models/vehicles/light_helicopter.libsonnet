@@ -4,6 +4,10 @@ local h = import 'helicopter-kit.libsonnet';
 local s = import 'light_helicopter.spec.libsonnet';
 local box = k.box;
 local doorX = [s.doorRear, s.doorFront];
+// The door fills its opening between the bows and under the rail.
+local doorArc = [s.doorArc + 3 + h.seam, h.waist(s.body, [s.doorRear, s.doorFront])];
+local door = h.frontHinged(s.body, s.doorRear, s.doorFront, doorArc, bow=0.03);
+local doorPins = door.pins('frame');
 local trim = 'paint-charcoal';
 // Stands proud of the fairing, so it never shares a surface with the wall beneath it.
 local ventBody = [station + { half: station.half + 0.035, top: station.top + 0.035, bottom: station.bottom - 0.035 } for station in s.body];
@@ -28,17 +32,18 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('light_helicopter_canopy_frame', 6,
              h.shell('front_bow', 'frame', s.body, x=[s.doorFront - 0.03, s.doorFront + 0.03], arc=h.dome, step=0.06)
              + h.shell('rear_bow', 'frame', s.body, x=[s.doorRear - 0.03, s.doorRear + 0.03], arc=h.dome, step=0.06)
+             + door.post('door_lip', 'frame')
              + h.shell('spine', 'frame', s.body, x=[s.bulkhead, s.doorFront], arc=[-5, 5], sides=32)
              + h.shell('rail_near', 'frame', s.body, x=doorX, arc=[s.doorArc - 3, s.doorArc + 3], sides=120)
              + h.shell('rail_far', 'frame', s.body, x=doorX, arc=[360 - s.doorArc - 3, 360 - s.doorArc + 3], sides=120),
              { frame: s.paint }) + { title: 'Light helicopter canopy frame' },
   k.compound('light_helicopter_door', 7,
-             h.shell('pane', 'glass', s.body, x=doorX, arc=[s.doorArc, 90])
-             + h.shell('sill', 'frame', s.body, x=doorX, arc=[80, 90], sides=48)
-             + h.shell('rear_rib', 'frame', s.body, x=[s.doorRear, s.doorRear + 0.05], arc=[s.doorArc, 90], step=0.05)
-             + [h.hingeRib('hinge_rib', s.body, s.doorFront - 0.03, 66, 88)],
+             h.shell('pane', 'glass', s.body, x=door.rest, arc=doorArc)
+             + h.shell('sill', 'frame', s.body, x=door.rest, arc=[80, doorArc[1]], sides=48)
+             + door.door('trail', 'frame')
+             + doorPins,
              { glass: 'glass-clear', frame: s.paint },
-             { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] }) + { title: 'Light helicopter door' },
+             motion=k.motion.hinge(doorPins, 'near', s.doorOpens)) + { title: 'Light helicopter door' },
   k.compound('light_helicopter_tail_boom', 12,
              h.boom('boom', 'paint', { x: -1.85, y: 1.38, r: 0.14 }, { x: s.tailRotor.x + 0.1, y: s.tailRotor.y, r: 0.06 })
              + [box('gearbox', 'dark', [s.tailRotor.x - 0.08, s.tailRotor.y - 0.07, -0.07], [s.tailRotor.x + 0.08, s.tailRotor.y + 0.07, 0.07])],
@@ -69,7 +74,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('helicopter_seat', 7, [
     box('pan', 'dark', [-0.24, 0, -0.23], [0.22, 0.08, 0.23]),
     box('cushion', 'seat', [-0.24, 0.08, -0.23], [0.22, 0.18, 0.23]),
-    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.23, 0.23]),
+    // The back is narrower than the cushion, inside the doors where the cabin's sides curve in towards the roof.
+    k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.78], [-0.33, 0.78]], [-0.17, 0.17]),
   ], { dark: trim, seat: 'cloth-seat' }) + { title: 'Helicopter seat' },
   k.compound('light_helicopter_console', 6, [
     box('pedestal', 'dark', [-0.12, 0, -0.14], [0.12, 0.34, 0.14]),

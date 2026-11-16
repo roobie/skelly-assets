@@ -29,9 +29,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('box_truck', ve
   k.compound('box_truck_box_roof', 130, [
     box('roof', 'roof', [s.boxRear, s.boxTop, -s.boxSide], [s.boxFront, s.boxTop + 0.0625, s.boxSide]),
   ], { roof: 'alu-bare' }) + { title: 'Box truck box roof' },
+  // One leaf of the pair, hinged on the box's outer edge and opened square to it, so the opening is clear to load.
+  local rearDoorPin(f) = [s.boxRear - k.grain, s.boxFloorTop + f * (s.boxTop - 0.1 - s.boxFloorTop), s.boxSide - 0.04];
+  local rearDoorPins = k.hingePins('hinge', 'y', rearDoorPin(0.1), rearDoorPin(0.9), 'rail');
   k.compound('box_truck_rear_door', 62, [
-    box('skin', 'wall', [s.boxRear, s.boxFloorTop, 0.012], [s.boxRear + 0.05, s.boxTop - 0.1, s.boxSide - 0.04]),
+    box('skin', 'wall', [s.boxRear, s.boxFloorTop + k.swingGap, 0.012], [s.boxRear + 0.05, s.boxTop - 0.1, s.boxSide - 0.04]),
     box('bar', 'rail', [s.boxRear - 0.015, s.boxFloorTop + 0.02, s.boxSide * 0.5], [s.boxRear, s.boxTop - 0.14, s.boxSide * 0.5 + 0.03]),
     box('handle', 'rail', [s.boxRear - 0.02, 2.0, s.boxSide * 0.5 - 0.22], [s.boxRear - 0.01, 2.04, s.boxSide * 0.5 + 0.03]),
-  ], { wall: 'paint-white', rail: 'alu-bare' }, { hinge_a: ['skin', [0, 0.1, 1]], hinge_b: ['skin', [0, 0.9, 1]] }) + { title: 'Box truck rear door' },
+  ] + rearDoorPins, { wall: 'paint-white', rail: 'alu-bare' }, motion=k.motion.hinge(rearDoorPins, 'rear', 90)) + { title: 'Box truck rear door' },
 ])

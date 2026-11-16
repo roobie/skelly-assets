@@ -9,6 +9,7 @@ local axleDisc(id, slot, x, y, radius, z, sides=24) =
   k.turned(id, slot, 'z', k.disc(radius, -half, half), [x, y, (z[0] + z[1]) / 2]) + { sides: sides };
 // How high a driven axle's spring seats stand in its frame, bottom and top.
 local driveAxleSeat = [0.6, 0.64];
+local cabDoorThick = 0.04;
 {
   axleDisc: axleDisc,
   // A driven axle in `beamAxle`'s frame (`shared.libsonnet`), its housing and drums sized for the drawn steel to carry
@@ -56,28 +57,31 @@ local driveAxleSeat = [0.6, 0.64];
       for i in std.range(0, teeth - 1)
     ],
   // A cab's side door written outboard-positive at `side`: a skin up to the belt, a glazed frame above it under a head
-  // rail, and a handle by its leading edge; it hangs on its rear stile. `y` is [bottom, belt, head, top], and `place`
-  // moves each piece onto the side of the machine its cab stands on.
-  cabDoor(id, massKg, x, y, side, paint, place=function(piece) piece):: k.compound(id, massKg, std.map(place, [
-    box('skin', 'paint', [x[0], y[0], side - 0.04], [x[1], y[1], side]),
-    box('top', 'paint', [x[0], y[2], side - 0.04], [x[1], y[3], side]),
-    box('stile_rear', 'paint', [x[0], y[1], side - 0.04], [x[0] + 0.05, y[2], side]),
-    box('stile_front', 'paint', [x[1] - 0.05, y[1], side - 0.04], [x[1], y[2], side]),
-    box('glass', 'glass', [x[0] + 0.05, y[1], side - 0.03], [x[1] - 0.05, y[2], side - 0.01]),
-    box('handle', 'trim', [x[1] - 0.2, y[1] - 0.12, side], [x[1] - 0.06, y[1] - 0.08, side + 0.02]),
-  ]), { paint: paint, trim: 'plastic-black', glass: 'glass-clear' }, {
-    hinge_a: ['skin', [0, 0.2, 0]],
-    hinge_b: ['skin', [0, 0.8, 0]],
-  }),
-  // A folding step with a grab rail is how an open machine is entered: its hinge runs along the tread's rear edge.
+  // rail, and a handle by its leading edge. It hangs on pins on its rear stile's outer face and opens outboard, toward
+  // `toward`, so its leading edge stands off the panel ahead by the door's tail gap, which a `cabDoorJamb` closes. `y`
+  // is [bottom, belt, head, top], and `place` moves each piece onto the side of the machine its cab stands on.
+  cabDoor(id, massKg, x, y, side, paint, toward, place=function(piece) piece)::
+    local front = x[1] - k.doorTailGap(x[1] - x[0], cabDoorThick + k.grain);
+    local bottom = y[0] + k.swingGap;
+    local top = y[3] - k.swingGap;
+    local pin(f) = [x[0], bottom + f * (top - bottom), side + k.grain];
+    local pins = std.map(place, k.hingePins('hinge', 'y', pin(0.2), pin(0.8)));
+    k.compound(id, massKg, std.map(place, [
+      box('skin', 'paint', [x[0], bottom, side - cabDoorThick], [front, y[1], side]),
+      box('top', 'paint', [x[0], y[2], side - cabDoorThick], [front, top, side]),
+      box('stile_rear', 'paint', [x[0], y[1], side - cabDoorThick], [x[0] + 0.05, y[2], side]),
+      box('stile_front', 'paint', [front - 0.05, y[1], side - cabDoorThick], [front, y[2], side]),
+      box('glass', 'glass', [x[0] + 0.05, y[1], side - 0.03], [front - 0.05, y[2], side - 0.01]),
+      box('handle', 'trim', [front - 0.2, y[1] - 0.12, side], [front - 0.06, y[1] - 0.08, side + 0.02]),
+    ]) + pins, { paint: paint, trim: 'plastic-black', glass: 'glass-clear' }, motion=k.motion.hinge(pins, toward, 65)),
+  // The lip a `cabDoor` from `x` over heights `y` at `side` closes its leading edge against, inside the panel ahead.
+  cabDoorJamb(name, x, y, side):: k.doorJamb(name, x[1], [y[0], y[3]], side - cabDoorThick),
+  // A step, with a grab rail up to `rail` when one is given, is how an open machine is entered.
   step(id, massKg, x, y, z, finish='paint-charcoal', rail=null):: k.compound(id, massKg, [
     box('tread', 'tread', [x[0], y - 0.06, z[0]], [x[1], y, z[1]]),
   ] + (if rail == null then [] else [
     box('hanger_a', 'tread', [x[0] + 0.02, y, z[0]], [x[0] + 0.06, rail, z[0] + 0.04]),
     box('hanger_b', 'tread', [x[1] - 0.06, y, z[0]], [x[1] - 0.02, rail, z[0] + 0.04]),
     box('rail', 'tread', [x[0] + 0.02, rail - 0.04, z[0]], [x[1] - 0.02, rail, z[0] + 0.04]),
-  ]), { tread: finish }, {
-    hinge_a: ['tread', [0, 0.5, 0]],
-    hinge_b: ['tread', [1, 0.5, 0]],
-  }),
+  ]), { tread: finish }),
 }

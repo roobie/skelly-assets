@@ -18,7 +18,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     prism('blade', 'blade', 'y', [[-0.055, 0.100], [0.055, 0.100], [0.015, 0.500], [-0.015, 0.500]], -0.002, 0.002),
   ], { handle: 'wood-walnut', blade: 'steel-grey' }) + { title: 'Hand saw' } + gripOn('hand_saw', 'rear') + {
     voxelGrain: 0.004,
-    taxonomy: { category: 'tools', keywords: ['woodworking'] },
+    taxonomy: { category: 'tools', keywords: ['woodworking'], tags: { material: ['metal', 'wood'], place: ['workshop'], setting: ['modern'] } },
   },
   // A 150 mm shank with a 105 mm moulded handle, 0.255 m overall.
   compound('screwdriver', 0.160, [
@@ -26,13 +26,13 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     turned('shaft', 'shaft', 'x', [[0.105, 0], [0.105, 0.0035], [0.250, 0.0035], [0.255, 0.002], [0.255, 0]]),
   ], { handle: 'plastic-yellow', shaft: 'steel-blued' }) + { title: 'Screwdriver' } + gripOn('screwdriver', 'handle') + {
     voxelGrain: 0.002,
-    taxonomy: { category: 'tools' },
+    taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] } },
   },
   // A small reel of bare copper wire, 94 mm across the flanges and 60 mm wide.
   item('copper_wire', 'spool', 0.080, {
     outerRadius: 0.047, coreRadius: 0.015, windingRadius: 0.040, height: 0.060,
     flangeHeight: 0.004, flangeInset: 0.002, windings: 6, grooveDepth: 0.002,
-  }, { core: 'plastic-black', winding: 'copper' }) + { title: 'Copper wire' } + { voxelGrain: 0.004, taxonomy: { category: 'electrical' } },
+  }, { core: 'plastic-black', winding: 'copper' }) + { title: 'Copper wire' } + { voxelGrain: 0.004, taxonomy: { category: 'electrical', tags: { material: ['metal'], setting: ['modern'] } } },
   // A 32 mm outer diameter compression spring of 4 mm stock, eight turns.
   item('small_spring', 'coil', 0.020, { radius: 0.014, tubeRadius: 0.002, turns: 8, pitch: 0.005 }, { body: 'steel-grey' }) + { title: 'Small spring' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
   // Four 75 mm brass butt hinges with steel pins, opened flat, two by two.
@@ -54,11 +54,11 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     turned('lens', 'lens', 'x', [[0.125, 0], [0.125, 0.017], [0.130, 0.017], [0.130, 0]], [-0.060, 0.022, 0]),
     box('band-a', 'band', [-0.040, 0, -0.021], [-0.032, 0.041, 0.021]),
     box('band-b', 'band', [0.010, 0, -0.021], [0.018, 0.041, 0.021]),
-  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { title: 'Taped flashlight mount' } + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'] } },
+  ], { plate: 'steel-grey', torch: 'polymer-black', lens: 'plastic-white', band: 'tape-grey' }) + { title: 'Taped flashlight mount' } + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'], tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
   // A vertical grip: an 80 mm wood handle in a rubber sleeve under a clamp plate.
   compound('scrap_foregrip', 0.180, [
     box('plate', 'plate', [-0.025, 0.080, -0.025], [0.025, 0.086, 0.025]),
     turned('handle', 'handle', 'y', [[0, 0], [0, 0.018], [0.010, 0.022], [0.070, 0.022], [0.080, 0.018], [0.080, 0]]),
     turned('sleeve', 'sleeve', 'y', [[0.015, 0], [0.015, 0.0235], [0.065, 0.0235], [0.065, 0]]),
-  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { title: 'Scrap foregrip' } + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'] } },
+  ], { plate: 'scrap-rusted', handle: 'wood-birch', sleeve: 'rubber-black' }) + { title: 'Scrap foregrip' } + { voxelGrain: 0.004, taxonomy: { category: 'weapon-parts', keywords: ['improvised'], tags: { material: ['metal', 'wood'] } } },
 ]

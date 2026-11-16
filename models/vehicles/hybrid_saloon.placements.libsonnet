@@ -18,4 +18,8 @@ local s = import 'saloon.spec.libsonnet';
     inverter: { part: 'inverter_car', at: [s.frontAxle - 0.05, 0.6, -0.4] },
     pack: { part: 'hybrid_pack', at: [s.rearAxle - 0.5, 0.2, 0] },
   }),
+  unjudged: [
+    site.unjudged('engine', 'motor', 0.041,
+      'The engine\'s alternator boss runs into the motor\'s stator.'),
+  ],
 }
