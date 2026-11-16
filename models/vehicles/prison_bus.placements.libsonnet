@@ -25,4 +25,8 @@ local bars(j) =
            site.one('roof_vent_aft', 'roof_vent', [-2.5, s.roof, 0]),
          ],
   tags: { 'vehicle-role': ['utility'] },
+  unjudged: [
+    site.unjudged('shell', 'door_free_0', 0.004,
+      'The free panel\'s seal flap passes right through the end of the floor slab beside the doorway; the flap could stop at the floor, or the slab short of the flap.'),
+  ],
 }
