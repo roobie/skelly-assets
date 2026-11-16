@@ -8,7 +8,7 @@ import {
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 
 /** Gun-domain names; core treats these as caller-supplied strings. */
-export type GunAnchorName = 'hold' | 'support' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port';
+export type GunAnchorName = 'hold' | 'support' | 'butt' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port';
 
 export interface SelectedAnchors {
   readonly hold: AnchorFrame;
@@ -67,6 +67,7 @@ export const GUN_ANCHOR_POLICY: GunAnchorSelectionPolicy = {
 
 const OTHER_ANCHORS = [
   'support',
+  'butt',
   'muzzle',
   'ejection',
   'magwell',

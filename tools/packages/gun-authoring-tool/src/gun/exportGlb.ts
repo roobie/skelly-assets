@@ -464,19 +464,28 @@ const PLANE_OF: Readonly<Record<Axis, readonly [Axis, Axis]>> = { 0: [1, 2], 1: 
 const withCoordinate = (point: Vec3, axis: Axis, value: number): Vec3 =>
   point.map((coordinate, k) => (k === axis ? value : coordinate)) as unknown as Vec3;
 
-/** Whether the triangle's winding turns its face towards +`axis`. */
-const facesTowards = (axis: Axis, [a, b, c]: readonly [Vec3, Vec3, Vec3]): boolean => {
+/** Along an axis (1) or against it (-1). */
+type Sense = 1 | -1;
+
+/** Whether the triangle's winding turns its face towards `axis`, or away from it with `sense` -1. */
+const facesTowards = (axis: Axis, [a, b, c]: readonly [Vec3, Vec3, Vec3], sense: Sense = 1): boolean => {
   const [u, v] = PLANE_OF[axis];
-  return (b[u] - a[u]) * (c[v] - a[v]) - (b[v] - a[v]) * (c[u] - a[u]) > 0;
+  return sense * ((b[u] - a[u]) * (c[v] - a[v]) - (b[v] - a[v]) * (c[u] - a[u])) > 0;
 };
 
 /**
- * The furthest face along `axis` that the drawn meshes in the model file turn that way, so voxelized metadata reports
- * what the file actually draws. With a column, only faces over it count, which keeps a post's top from being read off
- * the guard ears beside it. A column range on `axis` itself bounds where the face may lie, which keeps a post's top
- * from being read off a hood ring over it.
+ * The furthest face along `axis`, or against it with `sense` -1, that the drawn meshes in the model file turn that
+ * way, so voxelized metadata reports what the file actually draws. With a column, only faces over it count, which keeps
+ * a post's top from being read off the guard ears beside it. A column range on `axis` itself bounds where the face may
+ * lie, which keeps a post's top from being read off a hood ring over it.
  */
-const drawnFaceMetres = (glb: Uint8Array, axis: Axis, column: Column, partId: string | ReadonlySet<string>) => {
+const drawnFaceMetres = (
+  glb: Uint8Array,
+  axis: Axis,
+  column: Column,
+  partId: string | ReadonlySet<string>,
+  sense: Sense = 1,
+) => {
   const [u, v] = PLANE_OF[axis];
   const over = (values: readonly number[], range: Column[0]) =>
     range === undefined || (Math.min(...values) < range[1] && Math.max(...values) > range[0]);
@@ -485,17 +494,17 @@ const drawnFaceMetres = (glb: Uint8Array, axis: Axis, column: Column, partId: st
   for (const triangle of drawnTriangles(glb, partId)) {
     const [a, b, c] = triangle;
     if (
-      facesTowards(axis, triangle) &&
+      facesTowards(axis, triangle, sense) &&
       a[axis] === b[axis] &&
       b[axis] === c[axis] &&
       (bound === undefined || (a[axis] >= bound[0] && a[axis] <= bound[1])) &&
       over([a[u], b[u], c[u]], column[u]) &&
       over([a[v], b[v], c[v]], column[v])
     ) {
-      far = Math.max(far, a[axis]);
+      far = Math.max(far, sense * a[axis]);
     }
   }
-  return Number.isFinite(far) ? round6(far) : undefined;
+  return Number.isFinite(far) ? round6(sense * far) : undefined;
 };
 
 /** The voxelized file a sight line is read off, and the grains it was sampled at. */
@@ -734,17 +743,39 @@ const drawnSupport = (file: VoxelFile, partId: string, support: Vec3): Vec3 => {
   return withCoordinate(support, up, round6(low));
 };
 
+/**
+ * The butt on the rearmost face the stock part's drawn meshes turn back over its middle, because the shoulder takes the
+ * stock where the file draws it: a raked pad lies forward of its heel at mid-height, and voxels move the face.
+ */
+const drawnButt = (file: VoxelFile, partId: string, butt: Vec3): Vec3 => {
+  const { bore, up, side } = FILE_AXES;
+  // A quarter grain each way overlaps the voxel face over the middle wherever the middle falls on the lattice.
+  const reach = file.grains.voxelGrain / 4;
+  const column = {
+    [up]: [butt[up] - reach, butt[up] + reach],
+    [side]: [butt[side] - reach, butt[side] + reach],
+  } as const;
+  const rear = drawnFaceMetres(file.glb, bore, column, partId, -1);
+  if (rear === undefined) {
+    throw new Error(`Stock part ${partId} draws no rear face behind its butt`);
+  }
+  return withCoordinate(butt, bore, rear);
+};
+
 const voxelFileOf = (glb: Uint8Array, grains: Partial<VoxelGrains>): VoxelFile | undefined => {
   const { voxelGrain } = grains;
   return voxelGrain === undefined ? undefined : { glb, grains: { ...grains, voxelGrain } };
 };
 
-/** The entry's anchors with the muzzle moved onto the drawn front and the support onto the drawn forend underside. */
+/**
+ * The entry's anchors with the muzzle moved onto the drawn front, the support onto the drawn forend underside and the
+ * butt onto the drawn rear face of the stock.
+ */
 const drawnAnchors = (
   anchors: GunDeadvoxModelEntry['anchors'],
   file: VoxelFile | undefined,
   {
-    sourceParts: { support: supportPart } = {},
+    sourceParts: { support: supportPart, butt: buttPart } = {},
     hostParts,
   }: { readonly sourceParts: SelectedAnchors['sourceParts']; readonly hostParts: ReadonlySet<string> },
 ) =>
@@ -754,6 +785,7 @@ const drawnAnchors = (
           ...anchors,
           ...(anchors.muzzle ? { muzzle: drawnMuzzle(file, hostParts, anchors.muzzle) } : {}),
           ...(anchors.support && supportPart ? { support: drawnSupport(file, supportPart, anchors.support) } : {}),
+          ...(anchors.butt && buttPart ? { butt: drawnButt(file, buttPart, anchors.butt) } : {}),
         },
       }
     : {};
