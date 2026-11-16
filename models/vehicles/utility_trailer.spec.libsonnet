@@ -2,4 +2,6 @@
 {
   rear: -1.1, front: 1.1, side: 0.6, deck: 0.58, wall: 0.98, frameLow: 0.44, frameHigh: 0.54,
   axle: -0.1, hub: 0.281, wheelZ: 0.75, tip: 1.95, paint: 'steel-galvanised',
+  // Degrees, so the dropped tailgate lies level with the deck.
+  tailgateOpen: 90,
 }

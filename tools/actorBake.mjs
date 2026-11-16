@@ -79,18 +79,21 @@ function actorGlb(row, realized, meshes) {
 }
 
 /**
- * The actor's files by role, `body`, `clips` and `glb`, which the row's fields of those names place. Every file is in
- * the model frame (tools/actorFrame.mjs); positions stay unscaled and rotations local.
+ * The actor's files by role, `body`, `clips`, `genome` and `glb`, which the row's fields of those names place. Every
+ * file is in the model frame (tools/actorFrame.mjs); positions stay unscaled and rotations local. The genome is every
+ * value the generator drew, after the row narrowed its template, so a consumer comparing two releases can tell a
+ * re-rolled figure from one the same draws built differently: a seed alone names neither, since a change to the draw
+ * order or a builder changes the figure under the same seed.
  */
 export function bakeActor(row, template, generated) {
   const emitClips = clipEmitters[template.bodyPlan];
   if (!emitClips) throw new Error(`unsupported actor body plan ${template.bodyPlan}`);
-  for (const field of ['glb', 'body', 'clips']) if (typeof row[field] !== 'string' || !row[field]) throw new Error(`pose row requires ${field}`);
+  for (const field of ['glb', 'body', 'clips', 'genome']) if (typeof row[field] !== 'string' || !row[field]) throw new Error(`pose row requires ${field}`);
   const model = row.model ?? row.template;
   const figure = figureFor(generated, template, row.scale);
   const body = fileBody(actorBody(figure, template, { type: row.type ?? row.id, model, seed: row.seed, scale: row.scale, lookAt: row.lookAt ?? LOOK_AT_PROFILES[model] }));
   const clips = fileClips(emitClips(figure, template, row));
   const fused = template.bodyPlan === 'fused-mass';
   const meshes = fused ? meshBones(generated.realized.voxels, body.bones.length, { perCell: true }) : generated.realized.meshes;
-  return { body: JSON.stringify(body), clips: JSON.stringify(clips), glb: actorGlb({ ...row, fused }, generated.realized, meshes) };
+  return { body: JSON.stringify(body), clips: JSON.stringify(clips), genome: JSON.stringify(generated.genome), glb: actorGlb({ ...row, fused }, generated.realized, meshes) };
 }

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridgeExport.ts';
 import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
+import { cartridgeSolids } from '../src/gun/cartridgeSolids.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
 import { loadCartridges, loadCartridgeFile } from './ammoHelpers.ts';
 
@@ -75,6 +76,18 @@ describe('standalone cartridge GLBs', () => {
         );
       }
     }
+  });
+
+  it('turns every revolved cartridge solid, metallic or shotshell, with the content side count', () => {
+    const kinds = new Set<string>();
+    for (const entry of loadCartridges()) {
+      kinds.add(entry.kind);
+      const { round, case: fired } = cartridgeSolids(entry);
+      for (const solid of [...round, ...fired].filter(({ kind }) => kind === 'revolved')) {
+        expect(solid.kind === 'revolved' && solid.sides, `${entry.id} ${solid.id}`).toBe(GUN_APPEARANCE.roundSides);
+      }
+    }
+    expect(kinds).toEqual(new Set(['metallic', 'shotshell']));
   });
 
   it('lets a cartridge named in the case table override the shared case, and no other', () => {

@@ -16,6 +16,11 @@ local wall(z, railZ, openings) =
   ]
   + (if std.length(openings) > 0 then [box('rub_rail_front', 'frame', [s.doorFront, s.rubRail - 0.03, railZ[0]], [s.front, s.rubRail + 0.03, railZ[1]])] else []);
 local finish = { paint: s.paint, frame: s.frame };
+local grain = k.grain;
+// At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
+local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
+local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.doorLow + 0.42, s.side + grain], [s.doorFront - 0.02, s.doorTop - 0.3, s.side + grain], 'frame');
+local topDoorPins = k.hingePins('hinge', 'y', [s.rear - 0.06, s.eave - 0.06, s.side], [s.rear - 0.06, s.rampTop + 0.07, s.side], 'frame');
 taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_chassis', 340, [
     box('rear_rail', 'frame', [s.rear - 0.08, s.frameLow, -s.side], [s.rear + 0.06, s.frameHigh, s.side]),
@@ -42,7 +47,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('handle', 'frame', [s.doorRear + 0.05, 1.2, s.side], [s.doorRear + 0.17, 1.24, s.side + 0.03]),
     box('strap_low', 'frame', [s.doorFront - 0.3, s.doorLow + 0.4, s.side], [s.doorFront - 0.02, s.doorLow + 0.44, s.side + 0.02]),
     box('strap_high', 'frame', [s.doorFront - 0.3, s.doorTop - 0.32, s.side], [s.doorFront - 0.02, s.doorTop - 0.28, s.side + 0.02]),
-  ], finish, { hinge_a: ['skin', [1, 0.2, 1]], hinge_b: ['skin', [1, 0.8, 1]] }) + { title: 'Horse box door' },
+  ] + doorPins, finish, motion=k.motion.hinge(doorPins, 'near', s.doorOpen)) + { title: 'Horse box door' },
   // Fitted at its lower rear corner, high on the wall where a horse's head does not reach it.
   k.compound('horse_box_vent', 3, [
     box('plate', 'frame', [0, 0, s.side - 0.02], [s.ventWidth, ventHeight, s.side + 0.02]),
@@ -68,9 +73,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_ramp', 90, [
     box('skin', 'paint', [s.rear - 0.05, s.frameHigh, -s.side], [s.rear, s.rampTop, s.side]),
     box('catch', 'frame', [s.rear - 0.08, s.rampTop - 0.14, -0.3], [s.rear - 0.05, s.rampTop - 0.08, 0.3]),
-  ] + [box('batten_' + i, 'frame', [s.rear - 0.07, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear - 0.05, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 6)]
-  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])]),
-  finish, { hinge_a: ['skin', [0.5, 0, 0.1]], hinge_b: ['skin', [0.5, 0, 0.9]] }) + { title: 'Horse box ramp' },
+  ] + [box('batten_' + i, 'frame', [s.rear, s.frameHigh + 0.12 + 0.2 * i, -s.side + 0.1], [s.rear + 0.02, s.frameHigh + 0.15 + 0.2 * i, s.side - 0.1]) for i in std.range(0, 6)]
+  + bothSides([box('spring_arm', 'frame', [s.rear - 0.08, s.frameHigh, s.side - 0.1], [s.rear - 0.05, s.rampTop - 0.08, s.side - 0.04])])
+  + rampPins,
+  finish, motion=k.motion.hinge(rampPins, 'rear', s.rampOpen)) + { title: 'Horse box ramp' },
   // The upper doors close above the ramp and meet on the centre line.
   k.compound('horse_box_top_door', 14, [
     box('skin', 'paint', [s.rear - 0.04, s.rampTop, 0.01], [s.rear, s.eave, s.side]),
@@ -78,7 +84,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
     box('louvre_b', 'frame', [s.rear - 0.05, s.rampTop + 0.24, 0.2], [s.rear - 0.04, s.rampTop + 0.27, s.side - 0.12]),
     box('hinge_top', 'frame', [s.rear - 0.06, s.eave - 0.08, s.side - 0.2], [s.rear - 0.04, s.eave - 0.04, s.side]),
     box('hinge_low', 'frame', [s.rear - 0.06, s.rampTop + 0.05, s.side - 0.2], [s.rear - 0.04, s.rampTop + 0.09, s.side]),
-  ], finish, { hinge_a: ['skin', [0.5, 0.1, 1]], hinge_b: ['skin', [0.5, 0.9, 1]] }) + { title: 'Horse box top door' },
+  ] + topDoorPins, finish, motion=k.motion.hinge(topDoorPins, 'rear', s.topDoorOpen)) + { title: 'Horse box top door' },
   // Hangs clear of the floor from its front post, so it swings aside for loading.
   k.compound('horse_box_partition', 28, [
     box('post', 'frame', [0.96, s.floor, -0.03], [1.02, s.eave, 0.03]),

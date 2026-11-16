@@ -4,5 +4,7 @@
   axle: -0.25, hub: 0.367, wheelZ: 0.9, archHalf: 0.45, archTop: 0.75, archChamfer: 0.156, tip: 3.55, drawLow: 0.46, drawHigh: 0.56,
   windowLow: 1.25, windowHigh: 1.9, doorRear: -1.5, doorFront: -0.84, doorTop: 2.14, stripeLow: 1.02, stripeHigh: 1.14,
   smallWindow: 0.7, largeWindow: 1.4, smallRear: -2.35, largeFront: 0.35, farRear: -2.25, frontGlassHalf: 0.82, rearGlassHalf: 0.72,
+  // Degrees, so the door stands square to the wall.
+  doorOpen: 90,
   paint: 'paint-white', stripe: 'paint-terracotta',
 }
