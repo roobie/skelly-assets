@@ -1,7 +1,7 @@
 local atom = (import 'packages/thing-authoring-tool/food-medical.libsonnet').atom;
 local containerMasses = import 'models/measures/container-masses.libsonnet';
 local inventoryMass(id) = containerMasses[id].massKg;
-local bottle(id, radius, height, body, label, cap, exportMass, dimensions={}) = atom(id, 'vessel', inventoryMass(id), {
+local bottle(id, massKg, radius, height, body, label, cap, exportMass, dimensions={}) = atom(id, 'vessel', massKg, {
   radius: radius, height: height, shoulderHeight: 0.008,
   neckRadius: radius * 0.65, neckHeight: 0.008, capRadius: radius * 0.8, capHeight: 0.01,
   rimHeight: 0.001, bandHeight: height * 0.6, bandInset: 0.0003,
@@ -12,9 +12,11 @@ local bottle(id, radius, height, body, label, cap, exportMass, dimensions={}) = 
   atom('soda', 'drinkCup', inventoryMass('soda'), { radius: 0.04, baseRadius: 0.03, height: 0.115, wall: 0.002, fillDepth: 0.085 }, { body: 'glass-clear', liquid: 'paint-oxblood' }, exportMass='inventory-atom') + { title: 'Soda' } + { taxonomy: { category: 'food' } },
   atom('apple', 'stemmedFruit', 0.180, { radius: 0.04, height: 0.071, stemRadius: 0.0017, stemHeight: 0.017, leafLength: 0.021, leafWidth: 0.011, leafThickness: 0.0008 }, { body: 'plastic-red', stem: 'wood-walnut', leaf: 'plastic-green' }, exportMass='parts') + { title: 'Apple' } + { taxonomy: { category: 'food' } },
   atom('bandage', 'woundRoll', 0.020, { radius: 0.0375, boreRadius: 0.009, width: 0.045, layers: 8, groove: 0.0007, tailLength: 0.035, tailThickness: 0.0008 }, { body: 'plastic-white', edge: 'paperboard-tan' }, exportMass='parts') + { title: 'Bandage' } + { taxonomy: { category: 'medical' } },
-  bottle('antiseptic', 0.023, 0.074, 'paperboard-brown', 'plastic-white', 'plastic-red', exportMass='inventory-atom') + { title: 'Antiseptic' } + { taxonomy: { category: 'medical' } },
-  bottle('antibiotics', 0.018, 0.054, 'plastic-white', 'plastic-blue', 'plastic-white', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Antibiotics' } + { taxonomy: { category: 'medical' } },
-  bottle('painkillers', 0.018, 0.044, 'plastic-white', 'plastic-red', 'plastic-white', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Painkillers' } + { taxonomy: { category: 'medical' } },
-  bottle('codeine', 0.018, 0.054, 'paperboard-brown', 'plastic-white', 'plastic-blue', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Codeine' } + { taxonomy: { category: 'medical', keywords: ['painkiller'] } },
-  bottle('morphine', 0.009, 0.051, 'glass-grey', 'plastic-white', 'plastic-blue', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.012, neckRadius: 0.004, neckHeight: 0.009, capRadius: 0.005, capHeight: 0.008, bandHeight: 0.02 }) + { title: 'Morphine' } + { taxonomy: { category: 'medical', keywords: ['painkiller'] } },
+  bottle('antiseptic', inventoryMass('antiseptic'), 0.023, 0.074, 'paperboard-brown', 'plastic-white', 'plastic-red', exportMass='inventory-atom') + { title: 'Antiseptic' } + { taxonomy: { category: 'medical' } },
+  bottle('antibiotics', inventoryMass('antibiotics'), 0.018, 0.054, 'plastic-white', 'plastic-blue', 'plastic-white', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Antibiotics' } + { taxonomy: { category: 'medical' } },
+  // A pill bottle's inventory item weighs one dose, so painkillers and codeine carry the mass of the bottle they draw, with
+  // its tablets.
+  bottle('painkillers', 0.030, 0.018, 0.044, 'plastic-white', 'plastic-red', 'plastic-white', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Painkillers' } + { taxonomy: { category: 'medical' } },
+  bottle('codeine', 0.035, 0.018, 0.054, 'paperboard-brown', 'plastic-white', 'plastic-blue', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.005, neckHeight: 0.005, capRadius: 0.019, capHeight: 0.016 }) + { title: 'Codeine' } + { taxonomy: { category: 'medical', keywords: ['painkiller'] } },
+  bottle('morphine', inventoryMass('morphine'), 0.009, 0.051, 'glass-grey', 'plastic-white', 'plastic-blue', exportMass='inventory-atom', dimensions={ shoulderHeight: 0.012, neckRadius: 0.004, neckHeight: 0.009, capRadius: 0.005, capHeight: 0.008, bandHeight: 0.02 }) + { title: 'Morphine' } + { taxonomy: { category: 'medical', keywords: ['painkiller'] } },
 ]
