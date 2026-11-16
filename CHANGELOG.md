@@ -7,6 +7,23 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.11.0 - 2026-11-16
+
+### Added
+
+- The skid-steer loader's open tail door shows an engine room: the engine cover is a shell, the engine and radiator are
+  fitted as assemblies, and an oil cooler on the radiator, a hydraulic tank with its filter, coolant and hydraulic hoses
+  and the battery stand where a mechanic reaches them through the door.
+- Every built model except mobs and severed parts has a smooth copy, its authored shapes rather than voxels, in a `<pack>.smooth` pack named by the entry's `smooth: { pack, path }`; load that pack beside the model's to draw it smooth.
+  The copy has the same part nodes, pieces and skin, and uses the entry's sidecar unchanged, so mass, anchors and collision are the voxel model's and sit within half its voxel grain of the smooth surface.
+
+### Changed
+
+- The build fails when the doll pokes through a fitted garment at rest, for every fitted garment; a poke a garment is
+  allowed is listed, with its depth and why, in `models/rest-pokes.libsonnet`.
+- The mob build refuses a row whose genome records a param outside that row's range, so every shipped genome is a draw
+  the row's ranges allow.
+
 ## 0.10.0 - 2026-11-16
 
 ### Breaking
