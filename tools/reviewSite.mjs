@@ -17,7 +17,10 @@ export function buildSite(built, site) {
 }
 
 // Serves `site` on a free local port; a path under built/ the site does not hold is read from the tree at `built`.
-export async function serveSite(site, built) {
+// Both roots are made absolute first, since a requested path resolves to an absolute one that must lie under its root.
+export async function serveSite(siteRoot, builtRoot) {
+  const site = resolve(siteRoot);
+  const built = resolve(builtRoot);
   const sitePath = (pathname) => {
     const path = resolve(site, `.${pathname}`);
     if (!path.startsWith(site + sep)) return undefined;
