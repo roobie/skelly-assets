@@ -14,6 +14,7 @@ local g = fit.layers.cloak;
 
 // Graphite panels, gunmetal fittings and pistons, black straps, teal light (`insignia` is the light of the trooper frames).
 local livery = { plate: 'steel-gunmetal', trim: 'paint-graphite', strap: 'rubber-offblack', rivet: 'paint-graphite', insignia: 'cell-glow-teal', glow: 'cell-glow-teal' };
+// The gauntlet's palm and fingers are a stretch under-glove, so the hand stays free to grip inside the plate and cuff.
 local gauntlet = livery + { hand: 'lycra-black' };
 local bootFinish = { upper: 'steel-gunmetal', toe: 'paint-graphite', sole: 'rubber-tread', collar: 'cell-glow-teal', laces: 'rubber-offblack' };
 

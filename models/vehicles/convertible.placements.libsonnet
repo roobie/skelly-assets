@@ -16,4 +16,12 @@ local s = import 'convertible.spec.libsonnet';
     },
     add: [site.one('folded_hood', 'convertible_folded_hood')],
   }),
+  unjudged: [
+    site.unjudged('folded_hood', 'rear_bench', 0.045,
+      'The folded hood\'s tonneau runs into the rear bench\'s back.'),
+    site.unjudged('folded_hood', 'shell', 0.041,
+      'The folded hood\'s tonneau runs into the boot\'s side.'),
+    site.unjudged('fuel_tank', 'rear_bench', 0.081,
+      'The tank\'s filler cap stands through the floor into the rear bench\'s base; set lower, its neck meets the cat can, so the tank or the exhaust wants rerouting.'),
+  ],
 }

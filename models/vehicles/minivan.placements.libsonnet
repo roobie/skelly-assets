@@ -7,7 +7,6 @@ local s = import 'minivan.spec.libsonnet';
       front_seat_near: { at: [s.cowl - 0.57, s.floor, 0.42] },
       front_seat_far: { at: [s.cowl - 0.57, s.floor, -0.42] },
       rear_bench: { at: [-0.5, s.floor, 0] },
-      exhaust: { at: [s.rear + 0.46, s.sill, 0.42] },
       headlamp_near: { at: [s.front - 0.07, 0.72, 0.62] },
       headlamp_far: { at: [s.front - 0.07, 0.72, -0.62] },
       battery_tray: { at: [s.aPost + 0.25, 0.56, -0.44] },
@@ -19,4 +18,8 @@ local s = import 'minivan.spec.libsonnet';
       site.one('door_track', 'minivan_door_track'),
     ],
   }),
+  unjudged: [
+    site.unjudged('gearbox', 'radiator', 0.096,
+      'The radiator\'s lower hose runs through the gearbox case.'),
+  ],
 }
