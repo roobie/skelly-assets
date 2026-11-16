@@ -6,6 +6,7 @@ import type { Issue } from '@skelly/construct/foundation/issue.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { MaterialDef } from '@skelly/thing-core/materials';
 import type { ExportSkin } from './skin.ts';
+import type { VoxelFill } from './voxelize.ts';
 
 /**
  * An sRGB colour as normalized red, green, blue channels in [0, 1]. TypeScript cannot enforce finiteness or range;
@@ -131,6 +132,12 @@ export interface GlbExportInput {
   readonly voxelDetailGrain?: number;
   /** Also gives `voxelDetailGrain` to every part too thin for `voxelGrain`; see `glb.ts`, `partVoxelGrain`. */
   readonly voxelDetailThinParts?: boolean;
+  /**
+   * Fills a part's drawn solids were already sampled into, one source per display item, so the voxels a caller read
+   * datums off are the ones the file meshes rather than a second sampling of the same solids; see `drawn.ts`,
+   * `DrawnGeometry`, `voxels`. A part without one is sampled here.
+   */
+  readonly drawnVoxels?: (part: string) => VoxelFill | undefined;
   /**
    * The port by which the root part mounts on a host the file does not hold, such as a loose attachment's base; a
    * smooth root seats through it as a smooth part seats in a host the file holds (see `glb.ts`, `seatedDef`).
