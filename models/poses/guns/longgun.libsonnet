@@ -7,8 +7,9 @@
 // and the left the fore-end wherever the gun is, as a melee second hand takes its seat, so no key places a hand.
 local body = import '../wields/body.libsonnet';
 // Bladed, the left shoulder forward and leaning in, as the press check stands: it brings the left hand within reach of
-// a fore-end as far ahead as the pump's. A key's yaw turns the bore back past the chest's twist.
-local bladed(twist) = body { spine: [4, -twist, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] };
+// a fore-end as far ahead as the pump's. A key's yaw turns the bore back past the chest's twist, and its lean tips the
+// chest forward (degrees).
+local bladed(twist, lean=4) = body { spine: [lean, -twist, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] };
 function(model, sockets) {
   look: [0, 1.4, 4],
   weapon: {
@@ -18,20 +19,21 @@ function(model, sockets) {
     hands: { 'hand.R': sockets.grip, 'hand.L': sockets.support },
   },
   stances: {
-    // Low ready, the carry a figure walks with: the butt low in the shoulder, standing a little off it so the stock's
-    // heel clears the chest, the muzzle tipped well down and a little toward the left, so the gun points at the ground
+    // Low ready, the carry a figure walks with: the butt low in the shoulder, inside the arm, so the stock bears on the
+    // chest by its edge and clears the arm, the muzzle tipped well down and a little toward the left, so the gun points at the ground
     // ahead rather than at anyone and comes up to guard by a lift of the arms.
     idle: {
       body: bladed(45),
-      weapon: { pocket: [0.04, -0.07, 0.11], aim: { pitch: 22, yaw: 50, roll: 0 }, poles: { 'hand.R': [-1, -0.5, -0.3], 'hand.L': [-0.3, -1, 0] } },
+      weapon: { pocket: [0.055, -0.07, 0.11], aim: { pitch: 22, yaw: 50, roll: 0 }, poles: { 'hand.R': [-1, -0.3, 0], 'hand.L': [-0.3, -1, 0] } },
     },
-    // Shouldered, ready to fire: the butt high in the pocket inside the right shoulder, the bore level and straight
-    // ahead, the right elbow out and the left under the fore-end, the head tilted onto the stock and the eyes down the
-    // sight.
+    // Shouldered, ready to fire, leaning into the gun: the chest tipped forward over the hips, the butt high in the
+    // pocket ahead of the right shoulder joint, where the stock bears on the flat of the chest by its inner edge and the
+    // raised elbow opens the arm away from it, the bore level and straight ahead, the left elbow under the fore-end, and
+    // the head jutted forward, bowed and tilted onto the stock, the eyes down the sight.
     guard: {
-      body: bladed(35),
-      weapon: { pocket: [0.06, -0.03, 0.04], aim: { pitch: -4, yaw: 35, roll: 0 }, poles: { 'hand.R': [-1, -1, 0], 'hand.L': [-0.3, -1, 0] } },
-      sight: { tilt: 30 },
+      body: bladed(40, 10),
+      weapon: { pocket: [0.0275, -0.04, 0.085], aim: { pitch: -5, yaw: 40, roll: 0 }, poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
+      sight: { tilt: 30, jut: 15, lean: 10 },
     },
   },
 }

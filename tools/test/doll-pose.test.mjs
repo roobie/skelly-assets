@@ -636,26 +636,21 @@ test("a gun seated by its clip's held seat stands where the clip's key holds it"
   }
 });
 
-test('at guard the bore points level and straight ahead, the butt against the chest', () => {
-  const torso = rest.body.find((part) => part.bone === 'spine').mesh;
+test('at guard the bore points level and straight ahead', () => {
   assert.ok(stancesOf('guard').length > 0);
   for (const name of stancesOf('guard')) {
-    const { item, weapon, posed, at } = gunStance(name);
-    const bore = mulMV(item.r, [0, 0, 1]);
+    const bore = mulMV(gunStance(name).item.r, [0, 0, 1]);
     const heading = Math.atan2(bore[0], bore[2]) * DEG,
       tip = -Math.asin(bore[1]) * DEG;
     assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
     assert.ok(Math.abs(tip) <= 5, `${name}: the bore tips ${tip.toFixed(1)}°`);
-    const gap = signedDepth(posedSolid(torso, posed.get('spine')), at(weapon.anchors.butt), 0.1);
-    assert.ok(Math.abs(gap) < 0.01, `${name}: the butt stands ${(gap * 1000).toFixed(0)} mm off the chest`);
   }
 });
 
-test('at idle the muzzle points down ahead of the toes, the gun clear of the torso and thighs', () => {
-  const solids = ['spine', 'thigh.L', 'thigh.R'];
+test('at idle the muzzle points down ahead of the toes', () => {
   assert.ok(stancesOf('idle').length > 0);
   for (const name of stancesOf('idle')) {
-    const { family, weapon, posed, at } = gunStance(name);
+    const { weapon, posed, at } = gunStance(name);
     const muzzle = at(weapon.anchors.muzzle),
       grip = at(weapon.at);
     assert.ok(muzzle[1] < grip[1], `${name}: the muzzle stands ${(muzzle[1] - grip[1]).toFixed(2)} m above the grip`);
@@ -663,15 +658,14 @@ test('at idle the muzzle points down ahead of the toes, the gun clear of the tor
       ...['foot.L', 'foot.R'].map((id) => applyPoint(posed.get(id), rig.bones.find((b) => b.id === id).tail)[2]),
     );
     assert.ok(muzzle[2] > toes, `${name}: the muzzle stands ${(toes - muzzle[2]).toFixed(2)} m behind the toes`);
-    const { positions } = itemMesh(family);
-    for (const bone of solids) {
-      const solid = posedSolid(rest.body.find((part) => part.bone === bone).mesh, posed.get(bone));
-      let deepest = -Infinity;
-      for (let i = 0; i < positions.length; i += 3) {
-        deepest = Math.max(deepest, -signedDepth(solid, at(positions.slice(i, i + 3)), 0.02));
-      }
-      assert.ok(deepest <= 0.005, `${name}: the gun stands ${(deepest * 1000).toFixed(0)} mm into the ${bone}`);
-    }
+  }
+});
+
+test('in every stance the stock is borne in the shoulder, no part of the gun sunk into the body', () => {
+  assert.ok(Object.keys(gunPoses).length > 0);
+  for (const name of Object.keys(gunPoses)) {
+    const { family, posed, at } = gunStance(name);
+    assertBorne(name, sinking(posed, itemMesh(family).positions, at));
   }
 });
 
