@@ -97,26 +97,41 @@ export function anchorFindings({ head, anchors, frame, worn, model }) {
   });
 }
 
-// A gear model's strap as one mesh in its model frame, with the voxel grain its strap is drawn at.
-function strapOf(buffer, model) {
+// A gear model's strap as one mesh in its model frame, as its file draws it.
+export function strapMesh(buffer, model) {
   const meshes = modelMeshes(buffer, (part, piece, slot) => slot === STRAP);
+  if (meshes.length !== 1) throw new Error(`${model} draws no single strap`);
+  return meshes[0];
+}
+
+// The voxel grain a gear model's voxel file draws its strap at.
+export function strapGrain(buffer, model) {
   const grains = new Set(glbJson(buffer).meshes.flatMap(({ primitives }) => primitives)
     .filter(({ extras }) => extras?.slot === STRAP).map(({ extras }) => extras.voxelGrain));
-  if (meshes.length !== 1 || grains.size !== 1) throw new Error(`${model} draws no single strap on one voxel grain`);
-  return { strap: meshes[0], grain: [...grains][0] };
+  if (grains.size !== 1 || grains.has(undefined)) throw new Error(`${model} draws its strap on no one voxel grain`);
+  return [...grains][0];
+}
+
+// A built model's file of `form`: its GLB as drawn in voxels, or its smooth copy (tools/manifest.mjs, `smooth`).
+export function formFile(entry, form) {
+  if (form === 'voxel') return join(entry.pack, entry.path);
+  if (form !== 'smooth') throw new Error(`no model form ${form}`);
+  if (!entry.smooth) throw new Error(`${entry.id} has no smooth copy`);
+  return join(entry.smooth.pack, entry.smooth.path);
 }
 
 /**
- * A built tree's models, whose manifest is `manifest`: `glbOf(id)` and `anchorsOf(id)` read a model's file and its
- * anchors, and `head` is the player bust's head as one mesh in the bust model frame.
+ * A built tree's models, whose manifest is `manifest`, in `form` (`formFile`): `glbOf(id)` and `anchorsOf(id)` read a
+ * model's file and its anchors, which are the voxel build's in either form, and `head` is the player bust's head as one
+ * mesh in the bust model frame.
  */
-export function builtModels(built, manifest) {
+export function builtModels(built, manifest, form = 'voxel') {
   const entryOf = (id) => {
     const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
     if (!entry) throw new Error(`the built tree holds no ${id}`);
     return entry;
   };
-  const glbOf = (id) => readFileSync(join(built, entryOf(id).pack, entryOf(id).path));
+  const glbOf = (id) => readFileSync(join(built, formFile(entryOf(id), form)));
   const anchorsOf = (id) => JSON.parse(readFileSync(join(built, entryOf(id).pack, 'things', `${id}.model.json`), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
@@ -132,7 +147,7 @@ export function treeStrapFindings(built, manifest, root = repo, worn = readBandF
   const { frame } = readBandFit(root);
   const { glbOf, anchorsOf, head } = builtModels(built, manifest);
   return Object.entries(worn).flatMap(([model, place]) => [
-    ...strapFindings({ head, ...strapOf(glbOf(model), model), frame, worn: place, model }),
+    ...strapFindings({ head, strap: strapMesh(glbOf(model), model), grain: strapGrain(glbOf(model), model), frame, worn: place, model }),
     ...anchorFindings({ head, anchors: anchorsOf(model), frame, worn: place, model }),
   ]);
 }

@@ -125,8 +125,10 @@ Treat the manifest as the produced-file authority. See `manifest.mjs`, `buildMan
 manifest and the declared packs (`manifest.mjs`, `treeDifferences`), so no produced file goes unnamed and no
 declared pack goes unbuilt. CI hands the check two independent builds from `build-all.mjs`, `buildAll`, and
 requires them byte-equal (`check-built.mjs`, `treeMismatches`), so a release built from a tag is known to reproduce
-rather than assumed to. A build reuses every export whose code and inputs are unchanged, so its cost follows what
-changed rather than the size of the catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
+rather than assumed to. The smooth copies are held to the same fit checks only as a report, since those checks were
+tuned to the voxel lattice; see `smooth-fit.mjs` and `../docs/decisions/0019-smooth-copy.md`. A build reuses
+every export whose code and inputs are unchanged, so its cost follows what changed rather than the size of the
+catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
 content an export reads, not a dependency graph, so a kit or library edit rebuilds exactly the models whose compiled
 rows it changes, and nothing has to be kept in step with the imports. A key that leaves out something an export reads
 would serve stale bytes, so a tool caches only rows that name their inputs, data its code imports whatever the row
