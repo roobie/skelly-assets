@@ -15,6 +15,4 @@
   equipment: { fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'forward', roll: 0 },
   // A raw material, held as it lies.
   material: { fraction: [0.5, 0.5, 0.5], turn: [0, 0, 0], hold: 'upright', roll: 0 },
-  // A shambler part; its grip names the solid, fraction and hold.
-  shamblerPart: { turn: [0, -90, 0], roll: 0 },
 }
