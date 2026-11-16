@@ -67,7 +67,7 @@ Vehicles are swept on worker threads, one each, and a sweep is cached by the veh
 checker, the shared geometry packages it runs on and the Node version, in the export cache folder, so a PR pays only
 for the vehicles it changes. The cache key leaves out the allowances: a sweep does not depend on them, and applying
 them on every run means an allowance edit takes effect at once and a stale one cannot hide behind a cached result. CI
-shards the sweeps over the same runners as the models (`tools/build.mjs`, `fillCacheShard`) so the final build finds
+shards the sweeps over the same runners as the models (`tools/build.mjs`, `fillShard`) so the final build finds
 every entry present.
 
 The budget is a reason, not a figure: the check may cost a PR what the rest of its build does and no more, and a

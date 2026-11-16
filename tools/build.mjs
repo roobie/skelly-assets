@@ -1,6 +1,6 @@
 // Builds the repo's models from their sources in models/ into GLB files.
 // Usage: node tools/build.mjs [--out dir] [--cache dir | --no-cache] [rowId ...], or node tools/build.mjs --shard i/n
-// [--cache dir] to only fill the cache with one shard of the complete build's cacheable rows (fillCacheShard). The cache
+// [--cache dir] to only fill the cache with one shard of the complete build's cacheable rows and vehicle sweeps (fillShard). The cache
 // is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; --no-cache generates every model.
 // With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
 // sites clear of each other (tools/check-sources.mjs), then builds every
@@ -234,10 +234,16 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
     console.log(cacheReport(pool.usage()));
-    await swingResults(readSitePieces(repo), { cache, shard });
   } finally {
     await pool.close();
   }
+}
+
+// A CI shard fills the cache with its share of the vehicle sweeps as well as of the rows, so the final build finds every
+// entry present. The sweeps stay out of fillCacheShard because they read the repository's vehicles, not its root's.
+async function fillShard({ shard, cache }) {
+  await fillCacheShard({ shard, cache });
+  await swingResults(readSitePieces(repo), { cache, shard });
 }
 
 async function main() {
@@ -248,7 +254,7 @@ async function main() {
   const cache = cacheFolder(values);
   if (values.shard !== undefined) {
     if (cache === undefined || positionals.length > 0) throw new Error('--shard fills a cache and takes no ids');
-    await fillCacheShard({ shard: parseShard(values.shard), cache });
+    await fillShard({ shard: parseShard(values.shard), cache });
     return;
   }
   const roster = new Map(readRoster().map((row) => [row.id, row]));

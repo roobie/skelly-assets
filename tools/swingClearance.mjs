@@ -153,7 +153,7 @@ const CACHE_FOLDER = 'swing';
 // they were, else swept on worker threads, one vehicle each, and kept. Vehicles with the same inputs share one sweep.
 // `checker` is the fingerprint of the code that sweeps, which a test may change. With `shard`, only that shard of the
 // distinct sweeps is made, so CI can spread a clean build's sweeps over runners like its models (tools/build.mjs,
-// fillCacheShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
+// fillShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
 export async function swingResults(data, { cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {}) {
   const tasks = sweepTasks(data);
   const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
