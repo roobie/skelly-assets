@@ -5,8 +5,8 @@ import { fitDepth, overlapReport, roleOf, seatingProblems, siteOverlaps } from '
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
 const site = (id, part, ...pieces) => ({ id, part, pieces });
-const vehicle = (sites, { overlaps = [], unjudged = [], parent = null } = {}) =>
-  ({ parent, sites, overlaps, unjudged });
+const vehicle = (sites, { overlaps = [], unjudged = [], ledger = [], parent = null } = {}) =>
+  ({ parent, sites, overlaps, unjudged, ledger });
 const fit = (...pairs) => ({ why: 'seated', pairs });
 const report = (vehicles, fits = [], roles = []) => overlapReport({ grain: GRAIN, fits, roles, vehicles });
 const unit = box('block', [0, 0, 0], [1, 1, 1]);
@@ -109,6 +109,19 @@ test('an unjudged entry is capped and goes stale like an allowance', () => {
   assert.match(shallow.problems.join(), /more than the 250 mm allowed/);
   const apart = [site('body', 'van_body', unit), site('lamp', 'van_lamp', shifted(1))];
   assert.match(report({ van: vehicle(apart, { unjudged: [entry(1)] }) }).problems.join(), /stale/);
+});
+
+test('a family-listed overlap may stand over a shallower allowance, and goes stale once that allowance covers it', () => {
+  const row = { sites: ['body', 'lamp'], depth: 0.5 + GRAIN / 2, note: 'family not judged' };
+  const over = report({ van: vehicle(bodyAndLamp, { overlaps: [allowance(0.25)], ledger: [row] }) });
+  assert.deepEqual(over.problems, []);
+  assert.match(over.notes.join('\n'), /not judged: family not judged/);
+  const covered = report({ van: vehicle(bodyAndLamp, { overlaps: [allowance()], ledger: [row] }) });
+  const stale = /family-listed overlap of body and lamp is stale: the seating or the vehicle/;
+  assert.match(covered.problems.join('\n'), stale);
+  const variant = vehicle(bodyAndLamp, { parent: 'van', ledger: [row] });
+  const inherited = report({ van: vehicle(bodyAndLamp, { ledger: [row] }), electric_van: variant });
+  assert.match(inherited.problems.join('\n'), /electric_van: family-listed overlap of body and lamp is listed twice/);
 });
 
 const lamps = [site('body', 'van_body', unit), site('lamp_near', 'van_lamp', shifted(0.5))];

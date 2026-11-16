@@ -5,10 +5,11 @@
 // are contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other
 // freely. An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which
 // holds for every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
-// correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run; a family's
-// unjudged overlaps may instead be listed in `models/vehicles/unjudged-overlaps.libsonnet`. Both are capped at the depth
-// they were written for, and a variant shares its parent's. An entry that no longer applies is reported, so the lists
-// cannot rot. The reason for the rule is in `docs/decisions/0014-site-overlap.md`.
+// correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run. A family's
+// unjudged overlaps may instead be listed in `models/vehicles/unjudged-overlaps.libsonnet`, even over a pair the
+// vehicle allows to a lesser depth. All are capped at the depth they were written for, and a variant shares its
+// parent's. An entry that no longer applies is reported, so the lists cannot rot. The reason for the rule is in
+// `docs/decisions/0014-site-overlap.md`.
 import { resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { solid } from './pieceSolid.mjs';
@@ -18,14 +19,15 @@ const repo = resolve(import.meta.dirname, '..');
 // Every vehicle's sites that name a part of the vehicle rows, with the part's pieces placed in the vehicle frame, and
 // the overlaps it allows and has not judged, the fits by role and every drawn site's id: { grain, fits, roles, motions,
 // vehicles: { vehicle: { parent?, forward, sites: [{ id, part, pieces, mirror?, at, rides? }], overlaps, unjudged,
-// swingContacts, swingUnjudged } } }. A site whose part is a roster model has no pieces to compare, so it is left out.
+// ledger, swingContacts, swingUnjudged } } }, where `ledger` is the vehicle's rows of its family's unjudged list. A
+// site whose part is a roster model has no pieces to compare, so it is left out.
 // `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
 // tools/swingClearance.mjs turns into the motion at each site.
 export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
   local k = import 'models/vehicles/kit.libsonnet';
   local placements = import 'models/vehicles/placements.libsonnet';
-  local unjudged = import 'models/vehicles/unjudged-overlaps.libsonnet';
+  local ledger = import 'models/vehicles/unjudged-overlaps.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   local drawn = { [row.id]: std.parseJson(row.parts[0].params.pieces) for row in rows };
   local placed(site) = [
@@ -48,7 +50,8 @@ export function readSitePieces(root = repo) {
         forward: placements[vehicle].forward,
         sites: [site { pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
         overlaps: std.get(placements[vehicle], 'overlaps', []),
-        unjudged: std.get(placements[vehicle], 'unjudged', []) + std.get(unjudged, vehicle, []),
+        unjudged: std.get(placements[vehicle], 'unjudged', []),
+        ledger: std.get(ledger, vehicle, []),
         swingContacts: std.get(placements[vehicle], 'swingContacts', []),
         swingUnjudged: std.get(placements[vehicle], 'swingUnjudged', []),
       }
@@ -248,28 +251,31 @@ const millimetres = (metres) => Math.round(metres * 1e3);
 // The report on every vehicle's overlaps, as { problems, notes } messages. A problem is an overlap that no fit,
 // allowance or `unjudged` entry covers, or covers only to a lesser depth, and an entry that is stale: its pair no
 // longer overlaps, a fit already covers it, or it is listed twice. A note is an overlap marked `unjudged`, said again
-// on every run so nothing is silent. Each message names the vehicle, both parts and their sites.
+// on every run so nothing is silent. Each message names the vehicle, both parts and their sites. A row of the family
+// list may stand over a pair the vehicle allows, since its allowance was sized by an earlier measure, so the row is
+// stale only once the fits or that allowance cover the overlap again.
 export function overlapReport({ grain, fits, roles, vehicles }) {
   const problems = seatingProblems(fits, roles);
   const notes = [];
   const measured = new Map();
   const pending = new Set();
-  for (const [vehicle, { parent, sites, overlaps, unjudged }] of Object.entries(vehicles)) {
+  for (const [vehicle, { parent, sites, overlaps, unjudged, ledger = [] }] of Object.entries(vehicles)) {
     const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
     const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
-    const entries = [...overlaps, ...unjudged];
-    const inherited = [...(vehicles[parent]?.overlaps ?? []), ...(vehicles[parent]?.unjudged ?? [])];
-    const allowed = new Map([...inherited, ...entries].map((entry) => [key(...entry.sites), entry]));
-    const notJudged = new Set([...(vehicles[parent]?.unjudged ?? []), ...unjudged]);
-    const inheritedPairs = new Set(inherited.map((entry) => key(...entry.sites)));
+    const from = (name) => vehicles[parent]?.[name] ?? [];
+    const allowed = byPair([...from('overlaps'), ...from('unjudged'), ...overlaps, ...unjudged]);
+    const listed = byPair([...from('ledger'), ...ledger]);
+    const notJudged = new Set([...from('unjudged'), ...unjudged]);
     const describe = ({ sites: [a, b], parts: [partA, partB] }) =>
       `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
     for (const overlap of found.values()) {
+      const pair = key(...overlap.sites);
       const rolePair = key(...overlap.sites.map(roleOf));
       measured.set(rolePair, [...(measured.get(rolePair) ?? []), overlap.depth]);
-      const allowance = allowed.get(key(...overlap.sites));
-      if (notJudged.has(allowance) && overlap.depth > roleDepth(overlap) + EPSILON) pending.add(rolePair);
-      const cap = Math.max(roleDepth(overlap), allowance?.depth ?? 0);
+      const allowance = allowed.get(pair);
+      const unsettled = notJudged.has(allowance) || listed.has(pair);
+      if (unsettled && overlap.depth > roleDepth(overlap) + EPSILON) pending.add(rolePair);
+      const cap = Math.max(roleDepth(overlap), allowance?.depth ?? 0, listed.get(pair)?.depth ?? 0);
       const [partA, partB] = overlap.parts;
       const [a, b] = overlap.sites;
       const detail = `by ${millimetres(overlap.depth)} mm (${overlap.pieces[0]} in ${overlap.pieces[1]})`;
@@ -278,32 +284,39 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
         problems.push(`${vehicle}: ${partA} at ${a} overlaps ${partB} at ${b} ${detail}${limit}`);
       }
     }
-    const seen = new Set();
-    for (const entry of entries) {
-      const pair = key(...entry.sites);
-      const [a, b] = entry.sites;
-      const where = `${vehicle}: allowed overlap of ${a} and ${b}`;
-      const overlap = found.get(pair);
-      if (seen.has(pair) || inheritedPairs.has(pair)) problems.push(`${where} is listed twice`);
-      else if (!overlap) problems.push(`${where} is stale: the parts no longer overlap`);
-      else if (roleDepth(overlap) + EPSILON >= overlap.depth) {
-        problems.push(`${where} is stale: the seating already covers it`);
-      } else if (entry.depth - overlap.depth > LOOSE * grain) {
-        const [capped, measures] = [entry.depth, overlap.depth].map(millimetres);
-        problems.push(`${where} is capped at ${capped} mm, far above the ${measures} mm it measures`);
+    const audit = (entries, inherited, covered, what, coverer) => {
+      const seen = new Set(inherited.map((entry) => key(...entry.sites)));
+      for (const entry of entries) {
+        const pair = key(...entry.sites);
+        const [a, b] = entry.sites;
+        const where = `${vehicle}: ${what} of ${a} and ${b}`;
+        const overlap = found.get(pair);
+        if (seen.has(pair)) problems.push(`${where} is listed twice`);
+        else if (!overlap) problems.push(`${where} is stale: the parts no longer overlap`);
+        else if (covered(overlap) + EPSILON >= overlap.depth) {
+          problems.push(`${where} is stale: ${coverer} already covers it`);
+        } else if (entry.depth - overlap.depth > LOOSE * grain) {
+          const [capped, measures] = [entry.depth, overlap.depth].map(millimetres);
+          problems.push(`${where} is capped at ${capped} mm, far above the ${measures} mm it measures`);
+        }
+        seen.add(pair);
+        if (overlap && 'note' in entry) {
+          const depth = millimetres(overlap.depth);
+          notes.push(`${describe(overlap)} overlap by ${depth} mm and are not judged: ${entry.note}`);
+        }
       }
-      seen.add(pair);
-      if (overlap && unjudged.includes(entry)) {
-        const depth = millimetres(overlap.depth);
-        notes.push(`${describe(overlap)} overlap by ${depth} mm and are not judged: ${entry.note}`);
-      }
-    }
+    };
+    audit([...overlaps, ...unjudged], [...from('overlaps'), ...from('unjudged')], roleDepth, 'allowed overlap', 'the seating');
+    const judged = (overlap) => Math.max(roleDepth(overlap), allowed.get(key(...overlap.sites))?.depth ?? 0);
+    audit(ledger, from('ledger'), judged, 'family-listed overlap', 'the seating or the vehicle');
   }
   const use = seatingUse(fits, grain, measured);
   problems.push(...use.filter(({ pair }) => !pending.has(pair)).map(({ message }) => message));
   notes.push(...use.filter(({ pair }) => pending.has(pair)).map(({ message }) => `${message}, until its unjudged overlaps are judged`));
   return { problems, notes };
 }
+
+const byPair = (entries) => new Map(entries.map((entry) => [key(...entry.sites), entry]));
 
 // Pairs of the fits that no vehicle uses: one no vehicle overlaps on, or one whose depth is far above the deepest
 // overlap it covers, so the table keeps no pair that has lost its reason and no cap that has come loose. Each is

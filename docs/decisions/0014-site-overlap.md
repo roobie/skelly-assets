@@ -46,7 +46,9 @@ An overlap is allowed in two places, so each fact is stated once where it is tru
   `unjudged`. A variant allows its parent's entries as well as its own. A whole family's unjudged overlaps may be
   listed apart from its placements files instead (`models/vehicles/unjudged-overlaps.libsonnet`), so that a change of
   measure that reaches every vehicle can land with nothing hidden and each family judged in a review of its own, while
-  the placements files stay what someone decided.
+  the placements files stay what someone decided. A row of that list may stand over a pair the vehicle already allows
+  less deeply: the allowance was sized by an earlier measure, and raising it would put a decided reason on a depth
+  nobody has judged. The row goes stale once the fits or the allowance cover the overlap again.
 
 Every allowance is a depth cap: a pair or entry that grows deeper than declared fails again, so the cap is the
 contract, not the pair. An entry whose pair no longer overlaps, that a fit already covers, that is listed twice or
