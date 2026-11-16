@@ -122,5 +122,5 @@ local coil(turns, r0, pitch, t, w) = std.flattenArrays([
   h.compound('paraffin_wax', 0.2, [
     h.prism('block', 'wax', 'z', [[-0.05, 0], [0.045, 0], [0.05, 0.02], [0.032, 0.042], [-0.02, 0.046], [-0.05, 0.034]], -0.03, 0.026),
     h.prism('lump', 'wax', 'z', [[-0.04, 0.045], [0.02, 0.045], [0.0, 0.055], [-0.035, 0.052]], -0.02, 0.012),
-  ], { wax: 'wax-ivory' }) + { title: 'Paraffin wax' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { setting: ['modern'] } } },
+  ], { wax: 'wax-ivory' }) + { title: 'Paraffin wax' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['wax'], setting: ['modern'] } } },
 ]

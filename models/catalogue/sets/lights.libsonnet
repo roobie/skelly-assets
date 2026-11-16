@@ -30,7 +30,7 @@ local fine = { voxelGrain: 0.002 };
   {
     id: 'candle',
     title: 'Candle',
-    taxonomy: { category: 'lighting', tags: { material: ['plant'] } },
+    taxonomy: { category: 'lighting', tags: { material: ['wax'] } },
     exportMass: 'inventory-atom',
     parts: [part('candle', 'candle', 0.150, { radius: 0.023, height: 0.10, wickRadius: 0.0012, wickHeight: 0.012 }, { body: 'wax-ivory', wick: 'cloth-charred' })],
     connections: [],
