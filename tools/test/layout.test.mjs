@@ -19,6 +19,8 @@ function fixtureRoot() {
   const root = mkdtempSync(join(tmpdir(), 'layout-'));
   mkdirSync(join(root, 'models/recipes'), { recursive: true });
   writeFileSync(join(root, 'models/recipes/fixture.recipe.jsonnet'), '[]');
+  mkdirSync(join(root, 'models/sounds'), { recursive: true });
+  writeFileSync(join(root, 'models/sounds/fixture.sounds.jsonnet'), '{}');
   writeFileSync(join(root, 'models/export.json'), JSON.stringify({ 'fixture.roster': ['fixture_gun'] }));
   writeFileSync(join(root, 'models/mobs.json'), JSON.stringify({
     defaults: { pack: 'fixture.mobs' },
@@ -27,10 +29,10 @@ function fixtureRoot() {
   return root;
 }
 
-test('every pack a recipe file, a roster pack or a mob row names is declared, and nothing else', () => {
+test('every pack a recipe file, a roster pack, a mob row or a sound file names is declared, and nothing else', () => {
   const root = fixtureRoot();
   try {
-    assert.deepEqual(declaredPacks(root), new Set(['fixture.recipe', 'fixture.roster', 'fixture.mobs']));
+    assert.deepEqual(declaredPacks(root), new Set(['fixture.recipe', 'fixture.roster', 'fixture.mobs', 'fixture.sounds']));
     assert.deepEqual(readRoster(root), [{ packId: 'fixture.roster', id: 'fixture_gun' }]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

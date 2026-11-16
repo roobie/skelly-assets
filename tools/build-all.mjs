@@ -1,5 +1,5 @@
-// Builds the complete produced tree, the roster and recipe exports with their manifest (build.mjs) and every mob
-// (mobs.mjs), into one output folder. The determinism check and CI build through this one entry so both hold the
+// Builds the complete produced tree, the roster and recipe exports with their manifest (build.mjs), every mob
+// (mobs.mjs) and every sound (sounds.mjs), into one output folder. The determinism check and CI build through this one entry so both hold the
 // same tree to the manifest.
 // Usage: node tools/build-all.mjs [--out dir] [--cache dir | --no-cache]: built/ by default, from the builders' default
 // cache unless --cache names another; with --no-cache every model is generated.
@@ -16,8 +16,9 @@ const repo = resolve(here, '..');
 // `cache` is the folder both builders reuse unchanged models from, or undefined to generate every model.
 export function buildAll(out, { cache }) {
   const options = cache === undefined ? ['--no-cache'] : ['--cache', resolve(cache)];
-  for (const builder of ['build.mjs', 'mobs.mjs']) {
-    execFileSync(process.execPath, [join(here, builder), '--out', resolve(out), ...options], { cwd: repo, stdio: 'inherit' });
+  // Sounds bake in seconds, so they have no cache to choose.
+  for (const [builder, ...args] of [['build.mjs', ...options], ['mobs.mjs', ...options], ['sounds.mjs']]) {
+    execFileSync(process.execPath, [join(here, builder), '--out', resolve(out), ...args], { cwd: repo, stdio: 'inherit' });
   }
 }
 
