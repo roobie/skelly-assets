@@ -17,4 +17,14 @@ local s = import 'hearse.spec.libsonnet';
       site.one('brightwork', 'hearse_brightwork'),
     ],
   }),
+  unjudged: [
+    site.unjudged('curtains', 'partition', 0.056,
+      'The front drapes hang through the partition\'s head.'),
+    site.unjudged('curtains', 'shell', 0.043,
+      'The rear drapes hang through the quarter lights.'),
+    site.unjudged('deck', 'shell', 0.116,
+      'The coffin deck\'s bed runs into the rear arch liners.'),
+    site.unjudged('partition', 'shell', 0.151,
+      'The partition stands through the tunnel.'),
+  ],
 }

@@ -16,7 +16,13 @@ local slideTravel = s.doorRear - s.tail;
 // The door runs on a sill track at the waist, grown sideways by the plug so it meets the plugged door's inner face, along
 // the door's whole path.
 local tracked = [station + { half: station.half + s.slidingDoorPlug - h.skinThick } for station in s.body];
-local hinges = { hinge_a: ['hinge_rib', [0.5, 0, 0.5]], hinge_b: ['hinge_rib', [0.5, 1, 0.5]] };
+local frontWaist = h.waist(s.body, [s.doorMid, s.doorFront]);
+// The roof narrows so steeply toward the nose that its slices step past the kit's seam over the door's head.
+local frontHead = s.roofArc + 0.5;
+local frontDoor = h.frontHinged(s.body, s.doorMid, s.doorFront, [frontHead, frontWaist], thick=h.skinThick);
+local frontPins = frontDoor.pins('frame');
+// A pin's width aft of the seam, so the pins stand clear of the cabin's rear end.
+local clamshellPins = h.edgePins(s.clamshell, s.tail - 2 * k.grain, low=110, high=70);
 local proudCowl = h.proud(s.cowl, 0.035);
 // A green cross on a white field in the lower band behind the sliding door, below the rear window. Skin tiles follow the
 // curved flank, so the field and the plus are laid edge to edge instead of stacked.
@@ -58,7 +64,8 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              skin('roof', 'paint', [s.doorRear, s.doorFront + 0.035], [-s.roofArc, s.roofArc], 32)
              + h.bow('front_bow', s.body, s.doorFront)
              + h.bow('mid_bow', s.body, s.doorMid)
-             + h.bow('rear_bow', s.body, s.doorRear),
+             + h.bow('rear_bow', s.body, s.doorRear)
+             + frontDoor.post('mid_lip', 'paint'),
              { paint: s.paint }) + { title: 'Air ambulance roof' },
   k.compound('air_ambulance_cabin_rear', 90,
              skin('roof', 'paint', [s.tail, s.doorRear - 0.035], [-48, 48], 32)
@@ -73,12 +80,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              + h.loft('lintel', 'paint', s.body, x=[s.tail, s.tail + 0.04], arc=[-50, 50], step=0.04),
              { paint: s.paint, accent: s.accent, glass: 'glass-clear', cross: 'paint-green' }) + { title: 'Air ambulance cabin rear' },
   k.compound('air_ambulance_front_door', 20,
-             skin('pane', 'glass', [s.doorMid + 0.035, s.doorFront - 0.035], [s.roofArc + 5, 72], 48)
-             + skin('sill', 'accent', [s.doorMid + 0.035, s.doorFront - 0.035], [72, 90])
-             + skin('head', 'frame', [s.doorMid + 0.035, s.doorFront - 0.035], [s.roofArc, s.roofArc + 5])
-             + [h.hingeRib('hinge_rib', s.body, s.doorFront - 0.065, s.roofArc + 4, 88)],
+             skin('pane', 'glass', frontDoor.rest, [s.roofArc + 5, 72], 48)
+             + skin('sill', 'accent', frontDoor.rest, [72, frontWaist])
+             + skin('head', 'frame', frontDoor.rest, [frontHead, s.roofArc + 5])
+             + frontDoor.door('trail', 'frame')
+             + frontPins,
              { glass: 'glass-clear', frame: s.paint, accent: s.accent },
-             hinges) + { title: 'Air ambulance front door' },
+             motion=k.motion.hinge(frontPins, 'near', s.frontDoorOpens)) + { title: 'Air ambulance front door' },
   k.compound('air_ambulance_sliding_door', 38,
              skin('head', 'paint', [s.doorRear + 0.035, s.doorMid - 0.035], [s.roofArc, 40])
              + skin('pane', 'glass', [s.doorRear + 0.14, s.doorMid - 0.14], [40, 62], 48)
@@ -93,16 +101,16 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
              h.shell('sill_track', 'dark', tracked, thick=s.slidingDoorPlug - h.skinThick, x=[s.doorRear - slideTravel, s.doorMid], arc=[90, 95], sides=120),
              { dark: trim }) + { title: 'Air ambulance door track' },
   k.compound('air_ambulance_clamshell_door', 26,
-             h.shell('wall', 'paint', s.clamshell, thick=0.06, x=[-2.19, s.tail - 0.0], arc=[3, 177], sides=32)
+             h.shell('wall', 'paint', s.clamshell, thick=0.06, x=[-2.19, s.tail - h.leadGap], arc=[3, 177], sides=32)
              + h.loft('plate', 'paint', s.clamshell, x=[-2.25, -2.19], arc=[3, 177], step=0.06, sides=32)
              + [
                box('band', 'accent', [-2.27, 0.84, 0.03], [-2.25, 1.02, 0.42]),
                box('window', 'tint', [-2.27, 1.2, 0.1], [-2.25, 1.58, 0.46]),
                box('handle', 'dark', [-2.28, 1.1, 0.04], [-2.25, 1.14, 0.18]),
-               h.hingeRib('hinge_rib', s.clamshell, s.tail - 0.03, 40, 140),
-             ],
-             { paint: s.paint, accent: s.accent, tint: 'glass-grey', dark: trim, frame: s.paint },
-             hinges) + { title: 'Air ambulance clamshell door' },
+             ] + clamshellPins,
+             { paint: s.paint, accent: s.accent, tint: 'glass-grey', dark: trim },
+             // Toward the rear: the door's bulk lies inboard of its pins, so it first swings aft before it swings out.
+             motion=k.motion.hinge(clamshellPins, 'rear', s.clamshellOpens)) + { title: 'Air ambulance clamshell door' },
   k.compound('air_ambulance_engine_cowl', 38,
              h.loft('cowl', 'paint', s.cowl)
              + h.shell('intake_near', 'dark', proudCowl, thick=0.05, x=[-1.05, -0.65], arc=[50, 100], sides=24)

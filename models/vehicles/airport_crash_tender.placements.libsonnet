@@ -45,7 +45,6 @@ local engineSites =
     ],
   ) + [
     site.one('body', 'airport_crash_tender_body'),
-    site.one('cab_stripe', 'airport_crash_tender_cab_stripe'),
     site.one('water_tank', 'airport_crash_tender_water_tank'),
     site.one('foam_tank', 'airport_crash_tender_foam_tank'),
     site.one('pump', 'airport_crash_tender_pump'),
@@ -57,6 +56,7 @@ local engineSites =
     site.one('crew_bench', 'bench_seat_3', [3.35, s.floor, 0]),
     site.one('light_bar', 'light_bar_blue', [s.face - s.lean - 0.3, s.crown, 0]),
   ]
+  + t.stripeSites(site, id, s)
   + std.flattenArrays([site.pair('locker_shutter_' + name, 'airport_crash_tender_locker_shutter_' + name) for name in std.objectFields(s.lockers)])
   + std.flattenArrays([
     site.pair('locker_stowage_' + name, 'airport_crash_tender_locker_stowage_' + name, stowed=loadOut[name], behind='locker_shutter_' + name)

@@ -2,7 +2,7 @@
 // their category, tags, keywords, printed label, sidecar and mass, and the components a model comes apart into
 // (tools/components.mjs), the vehicles the tree places with their mass and the assemblies the kits build with the model
 // at each of their sites, the sites that dress each wearable on the doll, and the vocabulary's meanings for the page's
-// labels (models/taxonomy.json). It serves the tool pages site/tools.json lists and links them from the index.
+// labels (models/taxonomy.json), and a sounds.json of the tree's sound rows with each take's file. It serves the tool pages site/tools.json lists and links them from the index.
 // Usage: node site/build.mjs [--built dir] [--no-tree] [--require-viewers] [--analytics] [--history file] [outDir]; the tree defaults to built/. --no-tree
 // leaves the tree's unchanged files out, for a local server that reads them from the tree itself (tools/model-sheet.mjs).
 // --require-viewers fails on an unbuilt viewer, so a deploy never drops one. --analytics adds the visit counter to every
@@ -20,7 +20,7 @@ import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } f
 import { readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
-import { readMobRows } from '../tools/layout.mjs';
+import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { farSlot, readStowage, stowedPose } from '../tools/stowage.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
@@ -30,7 +30,7 @@ import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
 import { MIRRORED_AXIS } from './modelFrame.mjs';
 import { readVersion, REPOSITORY, versionHtml } from './version.mjs';
-import { NAV_MARK, readTools, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
+import { NAV_MARK, readTools, SITE_FILES, TOOLS_FILES, toolLinks, unlinkedTools, viewerDist } from './tools.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
 
 
@@ -49,10 +49,13 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
-// Each model's sidecar, keyed by the model file it names.
+// Each model's sidecar, keyed by the model file it names, with the motion the sidecar declares for a part that moves.
 const sidecars = new Map(Object.entries(manifest.packs).flatMap(([pack, { files }]) => files
   .filter((f) => f.endsWith('.model.json'))
-  .map((f) => [`${pack}/${JSON.parse(readFileSync(join(built, pack, f), 'utf8')).file}`, { sidecar: `${pack}/${f}` }])));
+  .map((f) => {
+    const { file, motion } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
+    return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...(motion ? { motion } : {}) }];
+  })));
 const models = manifest.models
   .filter(({ path }) => path.endsWith('.glb'))
   .map(({ id, title, pack, path, category, tags, keywords, label, clips, body, covers, soleLift, massKg, volumeM3 }) => ({
@@ -122,11 +125,12 @@ const shown = models.map((model) => {
   return { ...entry, form: formOf(entry), ...(history ? { history: stands[model.id] } : {}) };
 });
 const missingParts = (sites) => sites.flatMap(({ part, stowed }) => [part, ...Object.values(stowed ?? {})]).filter((id) => !modelsById.has(id));
-const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish }) => ({
+const placedSites = (sites) => sites.map(({ id: site, part, at, mirror, finish, rides }) => ({
   site,
   model: part,
   at,
   ...(mirror ? { mirror } : {}),
+  ...(rides ? { rides } : {}),
   ...(finish ? { paint: paintOf(finish) } : {}),
 }));
 
@@ -209,10 +213,8 @@ const plainClips = (clips, body) => ({
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'skin.mjs', 'pose.mjs']) cpSync(join(here, f), join(out, f));
-// The authoring tools draw the same fabric grain, and its declaration types it from their packages, which resolve only
-// under tools/, so the shader lives there.
-cpSync(join(root, 'tools/fabric.mjs'), join(out, 'fabric.mjs'));
+for (const f of SITE_FILES) cpSync(join(here, f), join(out, f));
+for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -'.json'.length)).sort();
@@ -250,6 +252,8 @@ for (const model of models) if (model.clips && model.body) {
   mkdirSync(dirname(join(out, 'built', model.clips)), { recursive: true });
   writeFileSync(join(out, 'built', model.clips), JSON.stringify(plainClips(clips, body)));
 }
+const sounds = manifest.sounds.map(({ id, object, surface, pack, variants }) => ({ id, object, surface, takes: variants.map(({ seed, path }) => ({ seed, url: `built/${outputPath(pack, path)}` })) }));
+writeFileSync(join(out, 'sounds.json'), JSON.stringify({ sounds }));
 const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
 writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `${REPOSITORY}/releases/tag/` } } : {}) }));
 // A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
@@ -266,4 +270,4 @@ const unlinked = unlinkedTools(out, tools);
 if (unlinked.length > 0) throw new Error(`the site serves tool pages that site/tools.json does not list: ${unlinked.join(' ')}`);
 if (values.analytics) addAnalytics(out, versionHtml(readVersion(root)));
 writeFileSync(join(out, '.nojekyll'), '');
-console.log(`${models.length} models, ${vehicles.length} vehicles and ${assemblies.length} assemblies into ${out}`);
+console.log(`${models.length} models, ${vehicles.length} vehicles, ${assemblies.length} assemblies and ${sounds.length} sounds into ${out}`);

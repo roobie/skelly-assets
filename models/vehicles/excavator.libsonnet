@@ -9,8 +9,11 @@ local bothSides = k.bothSides;
 local doorRear = -0.08;
 local doorFront = 0.72;
 local belt = 1.92;
-// The cab stands on the machine's left, at -z, with its boxes written outboard-positive.
-local left(piece) = piece { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] };
+local doorY = [s.deck + 0.06, belt, s.cabRoof - 0.12, s.cabRoof - 0.06];
+// The cab stands on the machine's left, at -z, with its boxes and the door's pins along y written outboard-positive.
+local left(piece) =
+  if piece.kind == 'turned' then piece { origin: [piece.origin[0], piece.origin[1], -piece.origin[2]] }
+  else piece { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] };
 taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('excavator_carbody', 2900, [
     box('centre', 'steel', [-0.9, 0.42, -0.85], [0.9, 0.86, 0.85]),
@@ -46,6 +49,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('outer_sill', 'paint', [doorFront, s.deck, s.side - 0.05], [s.cabFront, belt, s.side]),
     box('outer_post', 'paint', [doorFront, s.deck, s.side - 0.05], [doorFront + 0.06, s.cabRoof, s.side]),
     box('outer_rear_post', 'paint', [s.cabRear, s.deck, s.side - 0.05], [doorRear, s.cabRoof, s.side]),
+    m.cabDoorJamb('door_jamb', [doorRear, doorFront], doorY, s.side),
     box('outer_glass', 'glass', [doorFront + 0.06, belt, s.side - 0.04], [s.cabFront, s.cabRoof - 0.06, s.side - 0.01]),
     box('roof', 'paint', [s.cabRear - 0.04, s.cabRoof - 0.06, s.cabIn - 0.04], [s.cabFront + 0.06, s.cabRoof + 0.03, s.side + 0.04]),
     box('front_foot', 'paint', [s.cabFront - 0.06, s.deck, s.cabIn], [s.cabFront, s.deck + 0.28, s.side]),
@@ -54,7 +58,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('seat_box', 'floor', [-0.1, s.deck + 0.06, 0.5], [0.4, s.deck + 0.2, 1.05]),
     box('console', 'trim', [0.42, s.deck + 0.06, 0.48], [0.62, s.deck + 0.52, 1.08]),
   ]), { paint: s.paint, floor: 'rubber-black', trim: 'plastic-black', glass: 'glass-clear' }) + { title: 'Excavator cab' },
-  m.cabDoor('excavator_cab_door', 40, [doorRear, doorFront], [s.deck + 0.02, belt, s.cabRoof - 0.12, s.cabRoof - 0.06], s.side, s.paint, left) + { title: 'Excavator cab door' },
+  m.cabDoor('excavator_cab_door', 40, [doorRear, doorFront], doorY, s.side, s.paint, 'far', left) + { title: 'Excavator cab door' },
   k.compound('excavator_windscreen', 18, [
     left(box('glass', 'glass', [s.cabFront - 0.045, s.deck + 0.28, s.cabIn + 0.06], [s.cabFront - 0.015, s.cabRoof - 0.06, s.side - 0.06])),
   ], { glass: 'glass-clear' }) + { title: 'Excavator windscreen' },

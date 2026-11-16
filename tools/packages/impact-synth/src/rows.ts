@@ -1,5 +1,7 @@
-import content from '../../../../models/sounds/impacts.json' with { type: 'json' };
-import { parseImpactRows } from './schema.ts';
+import { readSoundPacks } from '../../../layout.mjs';
+import { type ImpactRow, parseImpactRows } from './schema.ts';
 
-/** The shipped impact rows by id, validated; their source is `models/sounds/impacts.jsonnet`. */
-export const impactRows = parseImpactRows(content);
+/** The shipped impact rows, validated, by pack and id; their sources are `models/sounds/<pack>.jsonnet`. */
+export const impactPacks: Record<string, Record<string, ImpactRow>> = Object.fromEntries(
+  Object.entries(readSoundPacks()).map(([pack, rows]) => [pack, parseImpactRows(rows)]),
+);
