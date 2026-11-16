@@ -78,14 +78,16 @@ test('the whole page state survives the round trip through the URL hash', () => 
     picks: { [KEYWORD]: ['entrance'], material: ['wood', 'steel'], place: ['urban'] },
   });
   for (const view of ['exploded', 'open']) {
-    const state = { filter, reshuffle: 3, model: 'oak_door', view, info: true };
-    assert.deepEqual(parseState(`#${stateHash(state)}`), state);
+    for (const smooth of [false, true]) {
+      const state = { filter, reshuffle: 3, model: 'oak_door', view, info: true, smooth };
+      assert.deepEqual(parseState(`#${stateHash(state)}`), state);
+    }
   }
   assert.equal(stateHash(emptyState()), '');
 });
 
-test('a view and the details belong to an open model only', () => {
-  const state = { ...emptyState(), view: 'walk', info: true };
+test('a view, the details and the smooth form belong to an open model only', () => {
+  const state = { ...emptyState(), view: 'walk', info: true, smooth: true };
   assert.deepEqual(parseState(stateHash(state)), emptyState());
 });
 
@@ -129,7 +131,7 @@ test('a reshuffle of one day does not land on the seed of the next day', () => {
 
 test('states with the same filter and reshuffle draw the same grid, whichever model is open', () => {
   const base = { ...emptyState(), filter: filterOf({ q: 'e' }) };
-  assert.ok(sameGrid(base, { ...base, model: 'oak_door', view: 'front', info: true }));
+  assert.ok(sameGrid(base, { ...base, model: 'oak_door', view: 'front', info: true, smooth: true }));
   assert.ok(!sameGrid(base, { ...base, filter: filterOf({ q: 'ea' }) }));
   assert.ok(!sameGrid(base, { ...base, reshuffle: 1 }));
 });
