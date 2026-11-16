@@ -13,14 +13,14 @@ const shaded = (colour, byte) => colour.map((x) => Math.min(1, x * SHADE_FACTORS
 const toCut = (colour) => colour.map((x, a) => x + (CUT_FACE.color[a] - x) * CUT_FACE.mix);
 
 /**
- * One part's GLB: the faces of the cut subtree's bone meshes that face out of it, one primitive per catalogue material
- * the plan draws its mobgen materials and its cut face as, named by it so a consumer classes its wear as it does any
- * drawn model's. A face between two bones of
- * the subtree lies inside the part and is left out. Only a face on the cut bone's parent is the cut: another bone the
- * part merely touches, such as a hanging hand against a thigh, leaves skin there. The colours stay in the vertices, as
- * the actor's do, and the origin is the part's centre of mass.
+ * One part's GLB: the faces of the part's bone meshes that face out of it, one primitive per catalogue material the
+ * plan draws its mobgen materials and its cut faces as, named by it so a consumer classes its wear as it does any drawn
+ * model's. A face between two bones of the part lies inside it and is left out. Only a face on the cut bone's parent,
+ * or on a bone already cut away below, is a cut: another bone the part merely touches, such as a hanging hand against a
+ * thigh, leaves skin there. The colours stay in the vertices, as the actor's do, and the origin is the part's centre of
+ * mass.
  */
-function partGlb(id, realized, subtree, parent, centre, materials) {
+function partGlb(id, realized, subtree, stumps, centre, materials) {
   const drawnAs = (name) => {
     if (!Object.hasOwn(materials, name)) throw new Error(`models/mobs.json severed: materials does not draw ${name}, a material of ${id}`);
     return materials[name];
@@ -35,7 +35,7 @@ function partGlb(id, realized, subtree, parent, centre, materials) {
       const corners = [mesh.indices[t], mesh.indices[t + 1], mesh.indices[t + 2]];
       const neighbour = mesh.neighbourBone[corners[0]];
       if (subtree.has(neighbour)) continue;
-      const cut = neighbour === parent;
+      const cut = stumps.has(neighbour);
       const name = drawnAs(cut ? CUT_MATERIAL : materialOf(realized.voxels, mesh.colors[corners[0]]));
       if (!groups.has(name)) groups.set(name, { positions: [], normals: [], colours: [], indices: [], seen: new Map() });
       const group = groups.get(name);
@@ -82,23 +82,28 @@ function partGlb(id, realized, subtree, parent, centre, materials) {
 
 /**
  * A plan's files (tools/severedParts.mjs, severedPartPlan) from its source row's realized body and template: `cuts`,
- * each cut bone's model sidecar by bone, and one GLB per part under its id. A part is the cut bone with every bone
- * below it, as a cut takes them (mobgen's dismember.ts, severedBoneSet), and weighs its template's share of the body
- * mass for that bone (mobgen's templateMass.ts, templatePartMassProperties).
+ * each cut bone's parts by bone, each with the cut points below already gone and its model sidecar, and one GLB per
+ * part under its id. A part is the cut bone with every bone below it, as a cut takes them (mobgen's dismember.ts,
+ * severedBoneSet), less the bones already cut away, and weighs its template's share of the body mass for that bone
+ * less the shares already gone (mobgen's templateMass.ts, templatePartMassProperties).
  */
 export function bakeSeveredParts(plan, template, realized) {
   const { bones } = realized.body;
   const all = bones.map((_, index) => index);
+  const indicesOf = (cut) => all.filter((index) => cut.has(bones[index].id));
   const files = {};
   const cuts = {};
   for (const part of plan.parts) {
-    const cut = severedBoneSet(bones, [part.bone]);
-    const subtree = all.filter((index) => cut.has(bones[index].id));
-    const mass = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: subtree, bodyBoneIndices: all, voxelSize: realized.voxels.size, template, part: part.bone });
-    const { parent: parentId } = bones.find((bone) => bone.id === part.bone);
-    const parent = bones.findIndex((bone) => bone.id === parentId);
-    files[part.id] = partGlb(part.id, realized, new Set(subtree), parent, turnPoint(mass.center), plan.materials);
-    cuts[part.bone] = { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } };
+    const whole = indicesOf(severedBoneSet(bones, [part.bone]));
+    const gone = part.without.map((below) => ({ part: below, boneIndices: indicesOf(severedBoneSet(bones, [below])) }));
+    const goneBones = new Set(gone.flatMap(({ boneIndices }) => boneIndices));
+    const subtree = whole.filter((index) => !goneBones.has(index));
+    const mass = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: whole, bodyBoneIndices: all, voxelSize: realized.voxels.size, template, part: part.bone, without: gone });
+    const { parent } = bones.find((bone) => bone.id === part.bone);
+    const stumps = new Set([bones.findIndex((bone) => bone.id === parent), ...part.without.map((below) => bones.findIndex((bone) => bone.id === below))]);
+    files[part.id] = partGlb(part.id, realized, new Set(subtree), stumps, turnPoint(mass.center), plan.materials);
+    cuts[part.bone] ??= [];
+    cuts[part.bone].push({ without: part.without, model: { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } } });
   }
   return { cuts: JSON.stringify(cuts), ...files };
 }

@@ -41,7 +41,7 @@ const bakeMob = (row, severed) => {
 // edit to another costs only a rebake of the mobs.
 const MOB_FILES = ['body', 'clips', 'genome', 'glb'];
 const partRole = (id) => `severed.${id}`;
-// A severed-part source row's sidecars by bone, which go into their pack's index rather than a file of their own.
+// A severed-part source row's parts by bone, which go into their pack's index rather than a file of their own.
 const CUTS_ROLE = 'severed';
 // Each role with the path its file is written to.
 const mobFiles = (row, severed) => [
@@ -49,7 +49,7 @@ const mobFiles = (row, severed) => [
   ...(severed === undefined ? [] : severed.parts.map((part) => [partRole(part.id), outputPath(severed.pack, part.path)])),
 ];
 const mobRoles = (row, severed) => [...mobFiles(row, severed).map(([role]) => role), ...(severed === undefined ? [] : [CUTS_ROLE])];
-const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, materials: severed.materials, parts: severed.parts.map(({ bone, id, path }) => ({ bone, id, path })) } });
+const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, materials: severed.materials, parts: severed.parts.map(({ bone, without, id, path }) => ({ bone, without, id, path })) } });
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
   return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));
@@ -64,14 +64,14 @@ const writeOut = (out, file, bytes) => {
 };
 
 // Bakes the row, or takes its files from the store, and writes each where its row field, or its severed-part plan,
-// places it; returns the store entry when there is one, and the sidecars by bone of the parts the row is cut into.
+// places it; returns the store entry when there is one, and by bone the parts the row is cut into.
 export function exportMob(row, out, store, severed) {
   const { files, ...entry } = store ? storedMob(store, row, severed) : { files: bakeMob(row, severed) };
   for (const [role, file] of mobFiles(row, severed)) writeOut(out, file, files[role]);
   return { entry: store ? entry : undefined, cuts: severed && JSON.parse(files[CUTS_ROLE]) };
 }
 
-// The severed parts index of every plan's pack, from each plan's cut sidecars by mob type.
+// The severed parts index of every plan's pack, from each plan's parts by bone, by mob type.
 export function severedIndexFiles(plans, cutsByMob) {
   const packs = new Map();
   for (const { mob, pack } of [...plans].sort((a, b) => (a.mob < b.mob ? -1 : 1))) {
