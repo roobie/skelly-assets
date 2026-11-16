@@ -154,6 +154,8 @@ local pressings(id, title, s0) = {
   local crossmemberFront = crossmemberXs[crossmemberCount - 1] - crossmemberHalf,
   assert s.radiatorX + cooling.front <= crossmemberFront : id + "'s radiator must stand behind its front crossmember",
   assert s.engineX + s.engineLength / 2 <= crossmemberFront : id + "'s engine must stand behind its front crossmember",
+  local frontDrop = std.get(std.get(driveline.axles, s.frontAxlePart, {}), 'drop'),
+  assert frontDrop == null || s.engineY > s.frontAxleY + frontDrop.y[1] : id + "'s engine sump must stand over its front axle's dropped beam",
   local springs =
     [spring('spring_0', s, s.frontAxle, s.frontAxleY, s.frontSeat, s.radiatorX - cooling.back(s.radiator))]
     + [spring('spring_' + (i + 1), s, s.rearAxles[i], s.rearAxleY, s.rearSeat, back=s.rear + underrunDepth) for i in std.range(0, std.length(s.rearAxles) - 1)],
