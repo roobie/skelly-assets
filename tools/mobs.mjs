@@ -1,7 +1,8 @@
 // Usage: node tools/mobs.mjs [--out dir] [--cache dir | --no-cache] [mobId ...], or node tools/mobs.mjs --shard i/n
 // [--cache dir] to only fill the cache with one shard of the mob rows. With no ids it builds every models/mobs.json row.
 // Every row is baked as an actor pose: GLB, body, clips and genome files live at their logical paths under the row's pack. A
-// type's severed-part source row also bakes its parts (tools/severedParts.mjs). The cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
+// type's severed-part source row also bakes its parts (tools/severedParts.mjs), and a run over every row writes their
+// pack's index of them. The cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -9,7 +10,7 @@ import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { outputPath, readMobRows } from './layout.mjs';
 import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
-import { readSeveredParts } from './severedParts.mjs';
+import { readSeveredParts, SEVERED_INDEX } from './severedParts.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
@@ -31,8 +32,8 @@ const bakeMob = (row, severed) => {
   const { genome, realized } = row.lod_divisor > 0 ? realizeLod(found, 0.5 / row.lod_divisor) : found;
   const actor = bakeActor(row, template, { ...found, genome, realized });
   if (severed === undefined) return actor;
-  const { map, ...parts } = bakeSeveredParts(severed, template, realized);
-  return { ...actor, severed: map, ...Object.fromEntries(Object.entries(parts).map(([id, glb]) => [partRole(id), glb])) };
+  const { cuts, ...parts } = bakeSeveredParts(severed, template, realized);
+  return { ...actor, [CUTS_ROLE]: cuts, ...Object.fromEntries(Object.entries(parts).map(([id, glb]) => [partRole(id), glb])) };
 };
 
 // A mob's files are fixed by its resolved row and the code that bakes it: mobgen with the data it imports, and the
@@ -40,32 +41,44 @@ const bakeMob = (row, severed) => {
 // edit to another costs only a rebake of the mobs.
 const MOB_FILES = ['body', 'clips', 'genome', 'glb'];
 const partRole = (id) => `severed.${id}`;
+// A severed-part source row's sidecars by bone, which go into their pack's index rather than a file of their own.
+const CUTS_ROLE = 'severed';
 // Each role with the path its file is written to.
 const mobFiles = (row, severed) => [
   ...MOB_FILES.map((role) => [role, outputPath(row.pack, row[role])]),
-  ...(severed === undefined ? [] : [
-    ['severed', outputPath(severed.pack, severed.map)],
-    ...severed.parts.map((part) => [partRole(part.id), outputPath(severed.pack, part.path)]),
-  ]),
+  ...(severed === undefined ? [] : severed.parts.map((part) => [partRole(part.id), outputPath(severed.pack, part.path)])),
 ];
-const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, map: severed.map, materials: severed.materials, parts: severed.parts.map(({ bone, id, path }) => ({ bone, id, path })) } });
+const mobRoles = (row, severed) => [...mobFiles(row, severed).map(([role]) => role), ...(severed === undefined ? [] : [CUTS_ROLE])];
+const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, materials: severed.materials, parts: severed.parts.map(({ bone, id, path }) => ({ bone, id, path })) } });
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
   return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));
 };
 
-const storedMob = (store, row, severed) => store.entry(mobFiles(row, severed).map(([role]) => role), mobInputs(row, severed), () => bakeMob(row, severed));
+const storedMob = (store, row, severed) => store.entry(mobRoles(row, severed), mobInputs(row, severed), () => bakeMob(row, severed));
+
+const writeOut = (out, file, bytes) => {
+  const path = join(out, file);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, bytes);
+};
 
 // Bakes the row, or takes its files from the store, and writes each where its row field, or its severed-part plan,
-// places it; returns the store entry when there is one.
+// places it; returns the store entry when there is one, and the sidecars by bone of the parts the row is cut into.
 export function exportMob(row, out, store, severed) {
   const { files, ...entry } = store ? storedMob(store, row, severed) : { files: bakeMob(row, severed) };
-  for (const [role, file] of mobFiles(row, severed)) {
-    const path = join(out, file);
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, files[role]);
+  for (const [role, file] of mobFiles(row, severed)) writeOut(out, file, files[role]);
+  return { entry: store ? entry : undefined, cuts: severed && JSON.parse(files[CUTS_ROLE]) };
+}
+
+// The severed parts index of every plan's pack, from each plan's cut sidecars by mob type.
+export function severedIndexFiles(plans, cutsByMob) {
+  const packs = new Map();
+  for (const { mob, pack } of [...plans].sort((a, b) => (a.mob < b.mob ? -1 : 1))) {
+    if (!packs.has(pack)) packs.set(pack, {});
+    packs.get(pack)[mob] = cutsByMob.get(mob);
   }
-  return store ? entry : undefined;
+  return [...packs].map(([pack, index]) => [outputPath(pack, SEVERED_INDEX), JSON.stringify(index)]);
 }
 
 const reportCache = (reused, total) => console.log(`mob cache: ${reused} mob(s) reused, ${total - reused} baked`);
@@ -96,9 +109,12 @@ async function main() {
   let failed = false;
   const used = new Set();
   let reused = 0;
+  const cutsByMob = new Map();
   for (const id of wanted) {
     try {
-      const entry = exportMob(rows.find((row) => row.id === id), out, store, plans.get(id));
+      const plan = plans.get(id);
+      const { entry, cuts } = exportMob(rows.find((row) => row.id === id), out, store, plan);
+      if (cuts) cutsByMob.set(plan.mob, cuts);
       if (entry) used.add(entry.key);
       if (entry?.reused) reused += 1;
     } catch (error) {
@@ -106,8 +122,12 @@ async function main() {
       failed = true;
     }
   }
-  // Only a run over every row may prune, so the store keeps exactly what the next complete build reuses.
-  if (store && positionals.length === 0 && !failed) pruneEntries(join(cache, 'mob'), used);
+  // Only a run over every row may prune, so the store keeps exactly what the next complete build reuses, or index the
+  // severed parts, since an index of some types would hide the others.
+  if (positionals.length === 0 && !failed) {
+    if (store) pruneEntries(join(cache, 'mob'), used);
+    for (const [file, json] of severedIndexFiles(plans.values(), cutsByMob)) writeOut(out, file, json);
+  }
   reportCache(reused, wanted.length);
   return failed ? 1 : 0;
 }

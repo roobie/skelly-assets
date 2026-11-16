@@ -10,10 +10,10 @@ const { safeParse } = await import('valibot');
 const { NeutralModelSchema } = await import('../packages/thing-core/src/schema.ts');
 const { glbJson } = await import('../glb.mjs');
 const { partMassProperties } = await import('../actorMass.mjs');
-const { exportMob } = await import('../mobs.mjs');
+const { exportMob, severedIndexFiles } = await import('../mobs.mjs');
 const { outputPath } = await import('../layout.mjs');
 const { CUT_MATERIAL } = await import('../severedPartBake.mjs');
-const { readSeveredParts, severedPartPlan } = await import('../severedParts.mjs');
+const { readSeveredParts, SEVERED_INDEX, severedPartPlan } = await import('../severedParts.mjs');
 const { mobManifest } = await import('../manifest.mjs');
 
 // The bone ids a cut at `bone` takes, walked down the body file's parent links.
@@ -29,9 +29,8 @@ test('every cut point of each named mob type bakes a part weighing its template\
   const out = mkdtempSync(join(tmpdir(), 'severed-parts-'));
   try {
     for (const plan of plans) {
-      exportMob(plan.source, out, undefined, plan);
+      const { cuts: map } = exportMob(plan.source, out, undefined, plan);
       const body = JSON.parse(readFileSync(join(out, outputPath(plan.source.pack, plan.source.body))));
-      const map = JSON.parse(readFileSync(join(out, outputPath(plan.pack, plan.map))));
       const cuts = body.bones.filter((bone) => bone.disposition === 'sever').map((bone) => bone.id);
       assert.deepEqual(Object.keys(map).sort(), [...cuts].sort(), `${plan.mob}: one part per cut point`);
       const bodyVoxelCount = body.bones.reduce((n, bone) => n + (bone.voxels?.length ?? 0), 0);
@@ -53,11 +52,17 @@ test('every cut point of each named mob type bakes a part weighing its template\
   }
 });
 
-test('the manifest lists each severed part with the mob type, bone and cut map it is cut at', () => {
-  const plan = { mob: 'm', pack: 'p', map: 'severed/m.json', parts: [{ bone: 'arm.L', id: 'm_arm_l', title: 'M left arm', path: 'assets/models/m_arm_l.glb' }] };
+test('the manifest lists each severed part with the mob type and bone it is cut at, and its pack\'s index', () => {
+  const plan = { mob: 'm', pack: 'p', index: SEVERED_INDEX, parts: [{ bone: 'arm.L', id: 'm_arm_l', title: 'M left arm', path: 'assets/models/m_arm_l.glb' }] };
   const { models, files } = mobManifest([], [plan]);
-  assert.deepEqual(models, [{ id: 'm_arm_l', title: 'M left arm', kind: 'severed-part', pack: 'p', path: 'assets/models/m_arm_l.glb', cut: { mob: 'm', bone: 'arm.L', map: 'severed/m.json' } }]);
-  assert.deepEqual(files.sort(), ['p/assets/models/m_arm_l.glb', 'p/severed/m.json']);
+  assert.deepEqual(models, [{ id: 'm_arm_l', title: 'M left arm', kind: 'severed-part', pack: 'p', path: 'assets/models/m_arm_l.glb', cut: { mob: 'm', bone: 'arm.L', index: SEVERED_INDEX } }]);
+  assert.deepEqual(files.sort(), ['p/assets/models/m_arm_l.glb', `p/${SEVERED_INDEX}`]);
+});
+
+test('a pack\'s severed index holds every type cut into it, by type', () => {
+  const cuts = new Map([['a', { head: { id: 'a_head' } }], ['b', { head: { id: 'b_head' } }]]);
+  const files = severedIndexFiles([{ mob: 'b', pack: 'p' }, { mob: 'a', pack: 'p' }], cuts);
+  assert.deepEqual(files.map(([file, json]) => [file, JSON.parse(json)]), [[`p/${SEVERED_INDEX}`, { a: cuts.get('a'), b: cuts.get('b') }]]);
 });
 
 test('a severed type without a row in its pack, a cut point without a title, or a material drawn as no catalogue material, is refused', () => {

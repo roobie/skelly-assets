@@ -7,10 +7,14 @@ import { readMobRows } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
+// The file of a severed parts pack that holds every cut point's model sidecar by mob type and bone, so a game finds the
+// part each cut leaves with one lookup.
+export const SEVERED_INDEX = 'severed/index.json';
+
 const slug = (bone) => bone.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/\./g, '_').toLowerCase();
 
 /**
- * Each named mob type's plan: its source row, the pack and file of its cut map, the catalogue material each mobgen
+ * Each named mob type's plan: its source row, its pack and that pack's index, the catalogue material each mobgen
  * material is drawn as, and per cut point the part's id, title, GLB and taxonomy. `cutsOf(row)` gives the bones a cut
  * may start at on the row's body, parents first; `catalogue` is the set of catalogue material ids.
  */
@@ -30,7 +34,7 @@ export function severedPartPlan(severed, rows, cutsOf, catalogue) {
       source,
       pack,
       materials,
-      map: `severed/${mob}.json`,
+      index: SEVERED_INDEX,
       parts: bones.map((bone) => {
         if (!Object.hasOwn(cuts, bone)) throw new Error(`models/mobs.json severed: cuts has no title for ${bone}, a cut point of ${mob}`);
         const id = `${mob}_${slug(bone)}`;

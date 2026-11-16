@@ -81,7 +81,7 @@ function partGlb(id, realized, subtree, parent, centre, materials) {
 }
 
 /**
- * A plan's files (tools/severedParts.mjs, severedPartPlan) from its source row's realized body and template: `map`,
+ * A plan's files (tools/severedParts.mjs, severedPartPlan) from its source row's realized body and template: `cuts`,
  * each cut bone's model sidecar by bone, and one GLB per part under its id. A part is the cut bone with every bone
  * below it, as a cut takes them (mobgen's dismember.ts, severedBoneSet), and weighs its template's share of the body
  * mass for that bone (mobgen's templateMass.ts, templatePartMassProperties).
@@ -90,7 +90,7 @@ export function bakeSeveredParts(plan, template, realized) {
   const { bones } = realized.body;
   const all = bones.map((_, index) => index);
   const files = {};
-  const map = {};
+  const cuts = {};
   for (const part of plan.parts) {
     const cut = severedBoneSet(bones, [part.bone]);
     const subtree = all.filter((index) => cut.has(bones[index].id));
@@ -98,7 +98,7 @@ export function bakeSeveredParts(plan, template, realized) {
     const { parent: parentId } = bones.find((bone) => bone.id === part.bone);
     const parent = bones.findIndex((bone) => bone.id === parentId);
     files[part.id] = partGlb(part.id, realized, new Set(subtree), parent, turnPoint(mass.center), plan.materials);
-    map[part.bone] = { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } };
+    cuts[part.bone] = { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } };
   }
-  return { map: JSON.stringify(map), ...files };
+  return { cuts: JSON.stringify(cuts), ...files };
 }
