@@ -363,5 +363,3 @@ function seatingUse(fits, grain, measured) {
     }),
   );
 }
-
-export const siteOverlapReport = (root = repo) => overlapReport(readSitePieces(root));
