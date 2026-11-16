@@ -50,7 +50,7 @@ local fine = { voxelGrain: 0.002 };
   }, { body: 'wood-walnut' }) + { title: 'Stick' } + { taxonomy: { category: 'materials', tags: { material: ['wood'] } } },
   atom('wax', 'turnedStock', 'parts', 0.050, {
     axis: 'y', profile: [[0, 0], [0, 0.021], [0.007, 0.030], [0.020, 0.027], [0.029, 0.015], [0.031, 0], [0, 0]],
-  }, { body: 'wax-cream' }) + { title: 'Wax' } + { taxonomy: { category: 'materials', tags: { material: ['wax'] } } } + fine,
+  }, { body: 'wax-cream' }) + { title: 'Wax' } + { taxonomy: { category: 'materials', tags: { material: ['plant'] } } } + fine,
   atom('wooden_plank', 'cutStock', 'parts', 0.500, {
     axis: 'y', start: 0, end: 0.022,
     profile: [[-0.045, -0.40], [0.045, -0.395], [0.045, 0.395], [-0.04, 0.40]],
