@@ -13,6 +13,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { readMobRows, readRoster } from './layout.mjs';
+import { readSeveredParts } from './severedParts.mjs';
 import { readRecipes } from './recipes.mjs';
 import { overlapReport, readSitePieces } from './siteOverlap.mjs';
 import { installJsonnetSources } from './sources.mjs';
@@ -27,7 +28,7 @@ export const ROSTER_ROWS = 'tools/packages/thing-authoring-tool/exports/deadvox.
 
 // Every model the production build writes, from its source row: { pack, id, title, taxonomy }. A recipe or roster row
 // carries its title and its taxonomy already resolved by Jsonnet; a mob row's taxonomy is resolved over the sheet's
-// defaults (layout.mjs, readMobRows).
+// defaults (layout.mjs, readMobRows), and a severed part takes the sheet's severed taxonomy (severedParts.mjs).
 export async function modelSources(root = repo) {
   await installJsonnetSources();
   const rosterRows = new Map(JSON.parse(readFileSync(join(root, ROSTER_ROWS), 'utf8')).map((row) => [row.id, row]));
@@ -42,6 +43,7 @@ export async function modelSources(root = repo) {
       value.map((row) => ({ pack: packId, id: row.id, title: row.title, taxonomy: row.taxonomy })),
     ),
     ...readMobRows(root).map(({ pack, id, title, taxonomy }) => ({ pack, id, title, taxonomy })),
+    ...(await readSeveredParts(root)).flatMap(({ pack, parts }) => parts.map(({ id, title, taxonomy }) => ({ pack, id, title, taxonomy }))),
   ];
 }
 

@@ -13,6 +13,64 @@
     "crawl_stride": 1.2,
     "taxonomy": {"category": "creatures"}
   },
+  "severed": {
+    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): the parts a cut at each cut point, a bone a cut may start at, leaves from each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one set of parts, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. A cut point bakes its whole part and one part for each set of cut points below it a cut there may find already gone, since each of those left as a part of its own and its mass must not be counted twice; without titles each such cut point by bone id, after the title of the part it is missing from. pack is where the parts are placed, beside the other body parts, with taxonomy. materials names each mobgen material, and the cut face, by the catalogue material it is drawn as (tools/packages/thing-core/src/materials.json), so a game classes a part's wear as it does any drawn model's.",
+    "pack": "skelly.body",
+    "taxonomy": {"category": "body-parts", "tags": {"material": ["flesh"]}},
+    "mobs": {
+      "skelly.deadvox.actors": {
+        "shambler": "Shambler",
+        "military_shambler": "Military shambler",
+        "farmer_shambler": "Farmer shambler",
+        "worker_shambler": "Worker shambler",
+        "medic_shambler": "Medic shambler",
+        "brute_shambler": "Brute shambler",
+        "runner": "Runner",
+        "crawler": "Crawler",
+        "acid_zombie": "Acid zombie"
+      }
+    },
+    "cuts": {
+      "head": "head",
+      "skull": "head",
+      "maw": "jaw",
+      "upperArm.L": "left arm",
+      "upperArm.R": "right arm",
+      "arm.L": "left arm",
+      "arm.R": "right arm",
+      "forearm.L": "left forearm",
+      "forearm.R": "right forearm",
+      "fore.L": "left forearm",
+      "fore.R": "right forearm",
+      "hand.L": "left hand",
+      "hand.R": "right hand",
+      "thigh.L": "left leg",
+      "thigh.R": "right leg",
+      "shin.L": "left shin",
+      "shin.R": "right shin",
+      "foot.L": "left foot",
+      "foot.R": "right foot"
+    },
+    "without": {
+      "maw": "without jaw",
+      "forearm.L": "without forearm",
+      "forearm.R": "without forearm",
+      "fore.L": "without forearm",
+      "fore.R": "without forearm",
+      "hand.L": "without hand",
+      "hand.R": "without hand",
+      "shin.L": "without shin",
+      "shin.R": "without shin",
+      "foot.L": "without foot",
+      "foot.R": "without foot"
+    },
+    "materials": {
+      "cut": "body-gore", "gore": "body-gore", "acid": "body-gore",
+      "skin": "body-skin-sickly", "bruise": "body-skin-sickly", "mottle": "body-skin-sickly", "crust": "body-skin-sickly",
+      "hair": "body-hair", "eye": "body-eye", "mouth": "body-mouth", "claw": "body-bone",
+      "shirt": "cloth-shirt-faded", "pants": "cloth-pants-grey", "trousers": "cloth-pants-grey", "shoe": "rubber-black"
+    }
+  },
   "mobs": [
     {
       "id": "shambler",

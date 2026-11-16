@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type VoxelBuffers, voxelize } from '../src/voxelize.ts';
+import { fillVoxels, type VoxelBuffers, type VoxelSource, voxelize } from '../src/voxelize.ts';
 
 const POSITIVE = /positive/;
 
@@ -25,6 +25,14 @@ const box = (min: readonly number[], max: readonly number[], group = 0) => {
   };
 };
 
+/** Fills the sources together and meshes each in its own `group`, as an export draws a part's solids. */
+const draw = (
+  sources: readonly (VoxelSource & { readonly group: number })[],
+  grain: number,
+  origin?: readonly number[],
+  options: Omit<NonNullable<Parameters<typeof voxelize>[1]>, 'groupOf'> = {},
+) => voxelize(fillVoxels(sources, grain, origin), { ...options, groupOf: (index) => sources[index]!.group });
+
 /** The volume a triangle mesh encloses, by the divergence theorem: right only when the surface is closed and outward. */
 const enclosedVolume = ({ positions, indices }: VoxelBuffers): number => {
   let sum = 0;
@@ -45,7 +53,7 @@ describe('voxelize', () => {
   const grain = 0.05;
 
   it('turns a closed mesh into a closed outward voxel mesh of the same extent', () => {
-    const { groups, stats } = voxelize([box([0.01, 0.02, 0.0], [0.31, 0.16, 0.2])], grain);
+    const { groups, stats } = draw([box([0.01, 0.02, 0.0], [0.31, 0.16, 0.2])], grain);
     const [mesh] = [...groups.values()];
     expect(stats.voxels).toBeGreaterThan(0);
     expect(enclosedVolume(mesh!)).toBeCloseTo(stats.voxels * grain ** 3, 6);
@@ -59,7 +67,7 @@ describe('voxelize', () => {
   });
 
   it('merges flat faces into fewer quads than faces', () => {
-    const { stats } = voxelize([box([0, 0, 0], [0.4, 0.4, 0.4])], grain);
+    const { stats } = draw([box([0, 0, 0], [0.4, 0.4, 0.4])], grain);
     expect(stats.quads).toBe(6);
     expect(stats.faces).toBeGreaterThan(stats.quads);
   });
@@ -70,12 +78,12 @@ describe('voxelize', () => {
       origin,
       origin.map((value) => value + 8 * grain),
     );
-    const rigid = voxelize([source], grain, origin);
-    const disabled = voxelize([source], grain, origin, { preserveFace: () => false });
+    const rigid = draw([source], grain, origin);
+    const disabled = draw([source], grain, origin, { preserveFace: () => false });
     expect(disabled).toEqual(rigid);
     const low = origin[1]! + 3 * grain;
     const high = origin[1]! + 5 * grain;
-    const banded = voxelize([source], grain, origin, {
+    const banded = draw([source], grain, origin, {
       preserveFace: (min, max) => max[1]! > low && min[1]! < high,
     });
     const quadCells = (mesh: VoxelBuffers, i: number): string[] => {
@@ -121,7 +129,7 @@ describe('voxelize', () => {
   });
 
   it('keeps a plate thinner than the grain as one voxel layer', () => {
-    const { stats } = voxelize([box([0, 0, 0.011], [0.2, 0.2, 0.013])], grain);
+    const { stats } = draw([box([0, 0, 0.011], [0.2, 0.2, 0.013])], grain);
     expect(stats.voxels).toBe(16);
   });
 
@@ -146,7 +154,7 @@ describe('voxelize', () => {
     ['a solid wider than the grain', diamondRod()],
     ['a speck no sample line crosses', box([0.001, 0.001, 0.001], [0.004, 0.004, 0.004])],
   ])('keeps a voxel for %s that holds no voxel centre', (_, solid) => {
-    expect(voxelize([solid], grain).stats.voxels).toBeGreaterThan(0);
+    expect(draw([solid], grain).stats.voxels).toBeGreaterThan(0);
   });
 
   // A wall a fifth of a voxel thick, set on the diagonal so its box is wider than a voxel every way, like a trigger
@@ -253,7 +261,7 @@ describe('voxelize', () => {
       [...diamondTube(0.2, 0.3), box([-0.1, -0.1, 0.1], [0.1, 0.1, 0.2], 1)],
     ],
   ])('draws %s as one connected body', (_, sources) => {
-    const voxelized = voxelize(sources, grain);
+    const voxelized = draw(sources, grain);
     expect(voxelized.groups.size).toBe(2);
     expect(bodies(voxelized)).toBe(1);
   });
@@ -265,8 +273,8 @@ describe('voxelize', () => {
     const bar = diagonalWall([0.2, 0.2], [0.45, 0.47], 0.15);
     expect(
       bodies(
-        voxelize([block], grain, [0, 0, 0], { neighbours: [bar] }),
-        voxelize([bar], grain, [0, 0, 0], { neighbours: [block] }),
+        draw([block], grain, [0, 0, 0], { neighbours: [bar] }),
+        draw([bar], grain, [0, 0, 0], { neighbours: [block] }),
       ),
     ).toBe(1);
   });
@@ -305,13 +313,13 @@ describe('voxelize', () => {
         height,
       ),
     ];
-    const whole = filledCells([voxelize([box([low, low, 0], [high, high, height])], grain)]);
+    const whole = filledCells([draw([box([low, low, 0], [high, high, height])], grain)]);
     expect(whole.size).toBeGreaterThan(0);
-    expect(filledCells([voxelize(pieces, grain)])).toEqual(whole);
+    expect(filledCells([draw(pieces, grain)])).toEqual(whole);
   });
 
   it('lets a later source paint over an earlier one and meshes each group alone', () => {
-    const { groups, stats } = voxelize(
+    const { groups, stats } = draw(
       [box([0, 0, 0], [0.2, 0.2, 0.2], 0), box([0.1, 0.1, 0.1], [0.3, 0.2, 0.2], 1)],
       grain,
     );
@@ -321,7 +329,7 @@ describe('voxelize', () => {
 
   it('puts every voxel corner on the lattice that starts at the given origin', () => {
     const origin = [0.013, -0.021, 0.034];
-    const { groups } = voxelize([box([0.01, 0.02, 0.0], [0.31, 0.16, 0.2])], grain, origin);
+    const { groups } = draw([box([0.01, 0.02, 0.0], [0.31, 0.16, 0.2])], grain, origin);
     const [mesh] = [...groups.values()];
     expect(mesh!.positions.length).toBeGreaterThan(0);
     for (let i = 0; i < mesh!.positions.length; i += 1) {
@@ -332,7 +340,7 @@ describe('voxelize', () => {
 
   it('draws a solid symmetric about the origin symmetrically when its faces lie on rows of voxel centres', () => {
     // At a 2 mm grain, centres sit at odd millimetres, so a 33 mm half-width puts every face on a row of centres.
-    const { groups } = voxelize([box([-0.033, -0.033, -0.033], [0.033, 0.033, 0.033])], 0.002);
+    const { groups } = draw([box([-0.033, -0.033, -0.033], [0.033, 0.033, 0.033])], 0.002);
     const positions = Array.from([...groups.values()][0]!.positions);
     for (const axis of [0, 1, 2]) {
       const values = positions.filter((_, i) => i % 3 === axis);
@@ -344,7 +352,7 @@ describe('voxelize', () => {
     // A charging-handle stem: 3.45 mm wide about z = 0 at a 4 mm grain, so its middle lies on the plane between two
     // layers and the depth each sample line computes rounds to either side of it.
     const half = 0.15 * 0.0115;
-    const { groups, stats } = voxelize([box([-0.1626, 0.0201, -half], [-0.0345, 0.0224, half])], 0.004);
+    const { groups, stats } = draw([box([-0.1626, 0.0201, -half], [-0.0345, 0.0224, half])], 0.004);
     const positions = Array.from([...groups.values()][0]!.positions);
     const across = positions.filter((_, i) => i % 3 === 2);
     expect(stats.voxels).toBeGreaterThan(1);
@@ -352,7 +360,7 @@ describe('voxelize', () => {
   });
 
   it('refuses a grain that is not a positive number', () => {
-    expect(() => voxelize([box([0, 0, 0], [1, 1, 1])], 0)).toThrow(POSITIVE);
-    expect(() => voxelize([box([0, 0, 0], [1, 1, 1])], Number.NaN)).toThrow(POSITIVE);
+    expect(() => draw([box([0, 0, 0], [1, 1, 1])], 0)).toThrow(POSITIVE);
+    expect(() => draw([box([0, 0, 0], [1, 1, 1])], Number.NaN)).toThrow(POSITIVE);
   });
 });

@@ -63,14 +63,16 @@ const selectSlots = (
 const issueKey = (issue: Report['issues'][number]): string =>
   JSON.stringify([issue.rule, issue.message, issue.parts, issue.ports ?? [], issue.keepOut ?? null]);
 
+/** Whether a request may take the slot: any slot when it names no port, else that port's slots. */
+const requestsSlot = ({ port }: AttachmentFitRequest, { id }: { readonly id: string }): boolean =>
+  port === undefined || id === port || id.startsWith(`${port}.`);
+
 const chooseSlot = (
   request: AttachmentFitRequest,
   slots: ReturnType<typeof attachmentSlots>,
   compatibility: Readonly<Record<string, readonly string[]>>,
 ): (typeof slots)[number] | string => {
-  const matching = request.port
-    ? slots.filter(({ id }) => id === request.port || id.startsWith(`${request.port}.`))
-    : slots;
+  const matching = slots.filter((slot) => requestsSlot(request, slot));
   if (matching.length === 0) {
     return `Unknown attachment mount port: ${request.port}`;
   }
@@ -93,8 +95,10 @@ export const previewFittedAttachments = (
     return { ok: true, report: source };
   }
 
+  // Certification costs a validation per slot and attachment, so only the slots a request can take are certified.
   const slots = attachmentSlots(source.resolved);
-  const compatibility = attachmentCompatibility(source.resolved.assembly, slots, domain, excludedAttachments);
+  const requested = slots.filter((slot) => parsed.requests.some((request) => requestsSlot(request, slot)));
+  const compatibility = attachmentCompatibility(source.resolved.assembly, requested, domain, excludedAttachments);
   const selection = selectSlots(parsed.requests, slots, compatibility);
   if (!selection.ok) {
     return selection;

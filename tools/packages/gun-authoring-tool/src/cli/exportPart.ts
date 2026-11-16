@@ -46,19 +46,21 @@ export const exportPartItem = (
   const part = { ...built, ports: built.ports.map((port) => ({ ...port, required: false })) };
   const single = singlePart({ id: item.id, part, massKg: item.massKg, units: gunDomain.units });
   const resolved = resolve(single.assembly, single.domain);
+  const fileResolved = inFileFrame(resolved);
+  const drawn = drawnGeometry(fileResolved, voxel);
   const result = exportGunGeometry({
     resolved,
     palette: GUN_PALETTE,
     appearance: { finish: item.finish },
     asset,
     ...voxel,
+    drawnVoxels: drawn.voxels,
   });
   if (!result.ok) {
     return result;
   }
-  const fileResolved = inFileFrame(resolved);
   const parts = modelParts(fileResolved, (id, def) => ({ part: def, massKg: single.masses[id]!, item: item.id }), {
-    drawn: drawnGeometry(fileResolved, voxel),
+    drawn,
   });
   return {
     ok: true,

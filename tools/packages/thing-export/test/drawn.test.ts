@@ -5,8 +5,9 @@ import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { drawnGeometry } from '../src/drawn.ts';
+import { exportGlb } from '../src/glb.ts';
 import { modelParts } from '../src/physical.ts';
-import { voxelize } from '../src/voxelize.ts';
+import { fillVoxels, voxelize } from '../src/voxelize.ts';
 
 const GRAIN = 0.1;
 // Every face sits off the lattice, so a datum read off the authored solid would stand apart from the drawn voxels.
@@ -39,9 +40,9 @@ const fixture = (solids: readonly Solid[] = [slab]): Resolved => {
 const drawnBounds = (solids: readonly Solid[] = [slab]): [Vec3, Vec3] => {
   const sources = solids.map((solid) => {
     const mesh = meshForSolid(solid, 0);
-    return { positions: mesh.positions, indices: mesh.indices, group: 0 };
+    return { positions: mesh.positions, indices: mesh.indices };
   });
-  const [buffers] = voxelize(sources, GRAIN).groups.values();
+  const [buffers] = voxelize(fillVoxels(sources, GRAIN)).groups.values();
   const { positions } = buffers!;
   const low = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
   const high = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -122,5 +123,31 @@ describe('datums read off the drawn voxels', () => {
     for (let axis = 0; axis < 3; axis += 1) {
       expect(parts.body!.centreOfMass[axis]).toBeCloseTo((low[axis]! + high[axis]!) / 2, 6);
     }
+  });
+
+  // Two finishes, the later painting over the earlier where they overlap, so a fill meshed in the wrong groups shows.
+  it('writes the same file from the voxels its datums were read off as from its own sampling', () => {
+    const resolved = fixture([slab, { ...slab, id: 'over', box: { ...slab.box, center: [0.41, 0.27, 0.52] } }]);
+    const drawn = drawnGeometry(resolved, { voxelGrain: GRAIN });
+    const write = (drawnVoxels?: typeof drawn.voxels) => {
+      const result = exportGlb({
+        resolved,
+        voxelGrain: GRAIN,
+        ...(drawnVoxels ? { drawnVoxels } : {}),
+        asset: { id: 'fixture', file: 'assets/models/fixture.glb' },
+        palette: {
+          familyColors: {},
+          specialColors: { slab: [1, 0, 0], over: [0, 0, 1] },
+          fallbackColor: [0.5, 0.5, 0.5],
+          fallbackFinish: { metallic: 0, roughness: 0.5 },
+        },
+      });
+      if (!result.ok) {
+        throw new Error(JSON.stringify(result.error));
+      }
+      return result.glb;
+    };
+    expect(drawn.voxels('body')).toBeDefined();
+    expect(write(drawn.voxels)).toEqual(write());
   });
 });

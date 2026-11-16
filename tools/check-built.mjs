@@ -3,14 +3,14 @@
 // seat the rigid head shells clear of it (tools/head-fit.mjs);
 // every further fresh tree must equal the first byte for byte, which shows the build is deterministic across
 // independent runs.
-// Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a temporary folder.
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+// Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a folder under tools/.build.
+import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { buildAll } from './build-all.mjs';
+import { makeBuildDir } from './buildDir.mjs';
 import { treeSeatFindings } from './head-fit.mjs';
 import { declaredPacks } from './layout.mjs';
 import { MANIFEST, treeDifferences } from './manifest.mjs';
@@ -54,7 +54,7 @@ function freshDifferences([reference, ...others]) {
 
 function main() {
   const { values } = parseArgs({ options: { fresh: { type: 'string', multiple: true, default: [] } } });
-  const temporary = values.fresh.length === 0 ? mkdtempSync(join(tmpdir(), 'skelly-assets-built-')) : undefined;
+  const temporary = values.fresh.length === 0 ? makeBuildDir('check-built') : undefined;
   try {
     if (temporary) buildAll(temporary, { cache: undefined });
     const trees = temporary ? [temporary] : values.fresh.map((tree) => resolve(tree));

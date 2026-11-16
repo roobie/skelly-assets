@@ -282,7 +282,13 @@ export const CROWD_EMISSIVE_FRAGMENT = /* glsl */ `
 totalEmissiveRadiance += diffuseColor.rgb * vCrowdEmission;
 `;
 
+/** The colour a fresh cut face is mixed toward, and how far, on a stump and on the part cut from it alike. */
+export const CUT_FACE = { color: [0.32, 0.09, 0.06], mix: 0.85 } as const;
+
+// GLSL reads a literal without a point as an int, which a float expression rejects.
+const glslFloat = (value: number): string => (Number.isInteger(value) ? value.toFixed(1) : String(value));
+
 // Apply after vertex colour so a fresh cut remains legible even against light flesh.
 export const CROWD_COLOR_FRAGMENT = /* glsl */ `
-diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.32, 0.09, 0.06 ), vCrowdGore * 0.85 );
+diffuseColor.rgb = mix( diffuseColor.rgb, vec3( ${CUT_FACE.color.map(glslFloat).join(', ')} ), vCrowdGore * ${glslFloat(CUT_FACE.mix)} );
 `;

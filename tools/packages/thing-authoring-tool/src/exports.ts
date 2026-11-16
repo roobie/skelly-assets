@@ -61,6 +61,7 @@ export const exportItem = (
     palette: itemPalette(settings),
     revolveFacets: settings.facets,
     ...voxel,
+    drawnVoxels: drawn.voxels,
     generator: '@skelly/thing-authoring-tool',
     metadataNamespace: 'thing',
   });

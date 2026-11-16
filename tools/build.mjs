@@ -18,29 +18,22 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
-import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
-import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows } from './layout.mjs';
-import {
-  buildManifest,
-  MANIFEST,
-  manifestJson,
-  mobManifest,
-  readCredits,
-  readRenames,
-  soundManifest,
-} from './manifest.mjs';
-import { readDependencies } from './packs.mjs';
+import { buildManifest, MANIFEST, manifestJson, mobManifest, readCredits, readRenames, soundManifest } from './manifest.mjs';
 import { danglingPartItems } from './partItems.mjs';
+import { readDependencies } from './packs.mjs';
+import { readSitePieces } from './siteOverlap.mjs';
+import { swingResults } from './swingClearance.mjs';
 import { exportPlacements, readPlacements, readVehicleRows } from './placements.mjs';
 import { readRecipes } from './recipes.mjs';
-import { recipeTools } from './recipeTools.mjs';
-import { readSitePieces } from './siteOverlap.mjs';
+import { readSeveredParts } from './severedParts.mjs';
 import { SOUND_SAMPLE_RATE } from './sounds.mjs';
-import { installJsonnetSources } from './sources.mjs';
 import { loadOutStowage } from './stowage.mjs';
-import { swingResults } from './swingClearance.mjs';
+import { recipeTools } from './recipeTools.mjs';
+import { cacheFolder, CACHE_OPTIONS, parseShard, shardUnits } from './generation.mjs';
+import { installJsonnetSources } from './sources.mjs';
 import { readVocabulary } from './taxonomy.mjs';
 import { exportWields } from './wields.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -93,8 +86,7 @@ export function partitionRecipe(packId, rows, tools) {
   const partitions = Object.fromEntries(Object.keys(tools).map((name) => [name, []]));
   for (const row of rows) {
     const owner = owners.get(row?.kind);
-    if (owner === undefined)
-      throw new Error(`models/recipes/${packId}: ${row?.id} has kind ${row?.kind}, which no tool owns`);
+    if (owner === undefined) throw new Error(`models/recipes/${packId}: ${row?.id} has kind ${row?.kind}, which no tool owns`);
     partitions[owner].push(row);
   }
   const seen = new Map();
@@ -112,18 +104,13 @@ export function partitionRecipe(packId, rows, tools) {
 // Each recipe file's rows of the named tools, one unit per pack and tool, in source order.
 function recipeUnits(root, tools, names) {
   for (const name of names) if (!Object.hasOwn(tools, name)) throw new Error(`no recipe tool ${name}`);
-  const packs = readRecipes(root).map(({ packId, value }) => ({
-    packId,
-    partitions: partitionRecipe(packId, value, tools),
-  }));
+  const packs = readRecipes(root).map(({ packId, value }) => ({ packId, partitions: partitionRecipe(packId, value, tools) }));
   return packs.flatMap(({ packId, partitions }) =>
-    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })),
-  );
+    names.filter((name) => partitions[name].length > 0).map((name) => ({ packId, name, rows: partitions[name] })));
 }
 
 // Each unit with its tool's tasks, one per row, which loads (and so checks) every unit's rows.
-const withTasks = (tools, units) =>
-  Promise.all(units.map(async (unit) => ({ ...unit, tasks: await tools[unit.name].tasks(unit.rows) })));
+const withTasks = (tools, units) => Promise.all(units.map(async (unit) => ({ ...unit, tasks: await tools[unit.name].tasks(unit.rows) })));
 
 // Builds each recipe file of root's models/recipes/ through the named tools into out/<packId>/, in each tool's layout.
 // Every file is partitioned and loaded (and so checked) before any output is written. Returns every model written, with
@@ -135,18 +122,13 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
   await installJsonnetSources();
   const tools = await recipeTools();
   const units = await withTasks(tools, recipeUnits(root, tools, names));
-  const selected =
-    ids === undefined
-      ? units
-      : units
-          .map((unit) => ({ ...unit, tasks: unit.tasks.filter((_, at) => ids.has(unit.rows[at].id)) }))
-          .filter(({ tasks }) => tasks.length > 0);
+  const selected = ids === undefined ? units : units
+    .map((unit) => ({ ...unit, tasks: unit.tasks.filter((_, at) => ids.has(unit.rows[at].id)) }))
+    .filter(({ tasks }) => tasks.length > 0);
   const generator = pool ?? exportPool();
   let generated;
   try {
-    generated = await Promise.all(
-      selected.map(({ name, tasks }) => Promise.all(tasks.map((task) => generator.run({ tool: name, task })))),
-    );
+    generated = await Promise.all(selected.map(({ name, tasks }) => Promise.all(tasks.map((task) => generator.run({ tool: name, task })))));
   } finally {
     if (!pool) await generator.close();
   }
@@ -165,22 +147,10 @@ export async function exportRecipes({ root = repo, out = join(repo, 'built'), to
 // <packId>/<logical path>.
 async function writePack(out, packId, tool, generated, { index }) {
   const { writeModelExports } = await import('./packages/thing-export/src/files.ts');
-  const written = writeModelExports(generated, resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, {
-    index: index && tool.index,
-  });
+  const written = writeModelExports(generated, resolve(out, outputPath(packId, tool.directory), '..'), tool.directory, { index: index && tool.index });
   return {
     models: written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
-      id,
-      kind,
-      pack: packId,
-      path,
-      nodes: partNodes,
-      label,
-      paintable,
-      covers,
-      soleLift,
-      massKg: physical?.massKg,
-      volumeM3: physical?.volumeM3,
+      id, kind, pack: packId, path, nodes: partNodes, label, paintable, covers, soleLift, massKg: physical?.massKg, volumeM3: physical?.volumeM3,
     })),
     files: written.files.map((file) => outputPath(packId, file)),
   };
@@ -199,25 +169,15 @@ export function withSources(models, sources) {
   const unread = models.map(key).filter((model) => !byModel.has(model));
   const unbuilt = [...byModel.keys()].filter((model) => !built.has(model));
   if (unread.length > 0 || unbuilt.length > 0) {
-    throw new Error(
-      `model sources and built models differ: built without a source row ${unread.join(' ') || '(none)'}; ` +
-        `source row not built ${unbuilt.join(' ') || '(none)'}`,
-    );
+    throw new Error(`model sources and built models differ: built without a source row ${unread.join(' ') || '(none)'}; `
+      + `source row not built ${unbuilt.join(' ') || '(none)'}`);
   }
-  return models.map((model) => ({
-    ...model,
-    title: byModel.get(key(model)).title,
-    taxonomy: byModel.get(key(model)).taxonomy,
-  }));
+  return models.map((model) => ({ ...model, title: byModel.get(key(model)).title, taxonomy: byModel.get(key(model)).taxonomy }));
 }
 
 // Each model with the doll part it sits on, if it is worn (tools/dress.mjs, `wornOnParts`), read from its taxonomy.
 export function withWornOn(models, dressing, dollParts) {
-  const wornOn = wornOnParts(
-    models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })),
-    dressing,
-    dollParts,
-  );
+  const wornOn = wornOnParts(models.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags })), dressing, dollParts);
   return models.map((model) => (wornOn.has(model.id) ? { ...model, wornOn: wornOn.get(model.id) } : model));
 }
 
@@ -230,8 +190,7 @@ const finishLibrary = async () => {
 };
 
 // The roster's source rows: TAT's catalogue export, which the roster selects from.
-const rosterSource = () =>
-  JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
+const rosterSource = () => JSON.parse(readFileSync(join(here, 'packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
 
 // Builds the ids of the roster's source rows into out, each roster id into its pack as the thing tool writes a recipe's
 // (writePack), and an id outside the roster flat; with `index`, a complete build's, each pack's index too. A row that
@@ -275,13 +234,10 @@ export async function fillCacheShard({ root = repo, shard, cache }) {
   await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
-  const units = await withTasks(
-    tools,
-    [
-      { name: 'thing', rows: rosterSource().filter((row) => roster.has(row.id)) },
-      ...recipeUnits(root, tools, PRODUCTION_RECIPE_TOOLS),
-    ].filter(({ name, rows }) => tools[name].code !== undefined && rows.length > 0),
-  );
+  const units = await withTasks(tools, [
+    { name: 'thing', rows: rosterSource().filter((row) => roster.has(row.id)) },
+    ...recipeUnits(root, tools, PRODUCTION_RECIPE_TOOLS),
+  ].filter(({ name, rows }) => tools[name].code !== undefined && rows.length > 0));
   const tasks = units.flatMap(({ name, tasks }) => tasks.map((task) => ({ tool: name, task })));
   const pool = exportPool(cache);
   try {
@@ -333,12 +289,7 @@ async function main() {
   try {
     const [built, recipes] = await Promise.all([
       buildRoster((await recipeTools()).thing, rosterRows, ids, out, roster, pool, { index: positionals.length === 0 }),
-      exportRecipes({
-        out,
-        tools: PRODUCTION_RECIPE_TOOLS,
-        pool,
-        ids: positionals.length > 0 ? new Set(positionals) : undefined,
-      }),
+      exportRecipes({ out, tools: PRODUCTION_RECIPE_TOOLS, pool, ids: positionals.length > 0 ? new Set(positionals) : undefined }),
     ]);
     failed = built.failed;
     // The full build's ids are the roster's, which only the roster source may supply.
@@ -350,14 +301,10 @@ async function main() {
     }
     for (const file of recipes.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
-      const mobs = mobManifest(readMobRows(repo));
+      const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
       const dressing = readDressing(repo);
-      const models = withWornOn(
-        withSources([...built.models, ...recipes.models, ...mobs.models], sources),
-        dressing,
-        await readDollParts(dressing),
-      );
+      const models = withWornOn(withSources([...built.models, ...recipes.models, ...mobs.models], sources), dressing, await readDollParts(dressing));
       const placements = readPlacements(repo);
       const finishes = await finishLibrary();
       const placed = exportPlacements({
@@ -374,14 +321,7 @@ async function main() {
       for (const file of placed.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models });
       for (const file of wields.files) console.log(`built ${file}`);
-      const files = [
-        ...built.files,
-        ...recipes.files,
-        ...mobs.files,
-        ...sounds.files,
-        ...placed.files,
-        ...wields.files,
-      ];
+      const files = [...built.files, ...recipes.files, ...mobs.files, ...sounds.files, ...placed.files, ...wields.files];
       const dangling = danglingPartItems({ files, out, models });
       if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
@@ -406,9 +346,7 @@ async function main() {
       throw error;
     }
     for (const issue of error.issues) {
-      console.log(
-        `ROW ERROR ${(issue.path ?? []).map((p) => p.key).join('.')}: ${issue.message} (${JSON.stringify(issue.input)})`,
-      );
+      console.log(`ROW ERROR ${(issue.path ?? []).map((p) => p.key).join('.')}: ${issue.message} (${JSON.stringify(issue.input)})`);
     }
     failed = true;
   } finally {

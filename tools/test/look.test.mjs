@@ -161,6 +161,10 @@ test('a sheet shows one look, so a look with other options drops the rows drawn 
   );
 });
 
+test('an open look is a look of its own, so its rows never mix with the closed ones', () => {
+  assert.notEqual(lookName({ open: true }), lookName());
+});
+
 test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {
   const van = {
     id: 'fixture_van',
