@@ -20,8 +20,7 @@ local sabaton = { upper: 'steel-plate', toe: 'steel-bright', sole: 'leather-blac
 local round(piece) = piece + { sides: 16 };
 local row(id, pieces, grain=0.004) = h.compound(id, 0.1, pieces, livery) + { voxelGrain: grain };
 // A fitted row with `add` appended to its pieces.
-local extend(r, add, grain=0.004) =
-  h.compound(r.id, 0.1, std.parseJson(r.parts[0].params.pieces) + add, r.parts[0].finish) + { voxelGrain: grain, title: r.title };
+local extend(r, add, grain=0.004) = fit.refit(r, std.parseJson(r.parts[0].params.pieces) + add, grain);
 
 // Body: breastplate with a keel over a plackart, three fauld lames, a pair of tassets in front, a gorget of two lames.
 local waistTop = bust.pelvisHeight + bust.waistHeight;
@@ -158,12 +157,14 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
 local boots = fit.feet('sabaton_plate', sabaton,
                        { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons').rows;
 
+// The breastplate encloses the trunk and the greave the shin, so each hides that skin; the shoulders stay drawn under
+// the pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates leave a joint's cap bare.
 armour.of('medieval', [
-  row('armor_plate_worn_body', body) + { title: 'Plate body armour' },
+  row('armor_plate_worn_body', body) + { title: 'Plate body armour', covers: ['trunk'] },
   row('armor_plate_worn_upper', upper, 0.008) + { title: 'Plate upper arm armour' },
   row('armor_plate_worn_fore', fore) + { title: 'Plate forearm armour' },
   row('legguard_plate_worn_thigh', thigh) + { title: 'Plate thigh guard' },
-  row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard' },
+  row('legguard_plate_worn_shin', shin) + { title: 'Plate shin guard', covers: ['shin'] },
 ] + [
   local seg = std.split(r.id, '_worn_')[1];
   if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r

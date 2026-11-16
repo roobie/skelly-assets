@@ -75,6 +75,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 {
   layers: layers,
   oct: oct,
+  // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
+  // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
+  // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
+  refit(r, pieces, grain=0.004):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
+                                  + { [k]: r[k] for k in ['title', 'covers', 'soleLift'] if std.objectHas(r, k) },
 
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them; the yoke reaches past the
@@ -468,9 +473,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ] + [
       oct('vambrace-rim', 'insignia', -arm.foreLength + 0.012, -arm.foreLength + 0.028, fw + 0.024, fd + 0.022, 0.022),
     ];
-    // The vambrace stops short of the wrist.
+    // The vambrace stops short of the wrist. The body encloses the trunk but not the deltoid caps: the pauldrons over
+    // them ride the upper arm, a different part copy, so the shoulders stay drawn.
     fitted([
-      shell(id + '_worn_body', 'clothing_body', body, finish, ['torso'], title=named(title, 'body')),
+      shell(id + '_worn_body', 'clothing_body', body, finish, ['trunk'], ['torso'], title=named(title, 'body')),
       paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper'], title=named(title, 'upper arm')),
       paired(id + '_worn_fore', 'cuff', fore, finish, [], ['fore'], title=named(title, 'forearm')),
     ]) + { ground: h.lifted(body, -(beltY - 0.13)) },

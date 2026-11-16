@@ -19,7 +19,7 @@ local bootFinish = { upper: 'paint-armour-navy', toe: 'paint-armour-blue', sole:
 // A fitted row with its pieces filtered and added to: drops the pieces `drop` names, appends `add`.
 local remake(row, drop, add, grain=0.004) =
   local pieces = std.parseJson(row.parts[0].params.pieces);
-  h.compound(row.id, 0.1, [p for p in pieces if !drop(p.id)] + add, row.parts[0].finish) + { voxelGrain: grain, title: row.title };
+  fit.refit(row, [p for p in pieces if !drop(p.id)] + add, grain);
 local starts(prefixes) = function(id) std.length([1 for p in prefixes if std.startsWith(id, p)]) > 0;
 local round(piece) = piece + { sides: 16 };
 local find(row, id) = [p for p in std.parseJson(row.parts[0].params.pieces) if p.id == id][0];
