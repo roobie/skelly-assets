@@ -12,12 +12,13 @@ import type { Cartridge } from '../ammo/cartridge.ts';
 import { cartridgeFinish } from './cartridgeFinish.ts';
 import { cartridgeSolids } from './cartridgeSolids.ts';
 import type { DeadvoxModelEntry, DeadvoxModelFile } from './exportGlb.ts';
-import { exportGunGeometry as exportGlb } from './glbWriter.ts';
+import { exportGunModels } from './glbWriter.ts';
 import { AMMO_PALETTE } from './palette.ts';
 import { TOO_SMALL_TO_VOXELIZE } from './tooSmallToVoxelize.ts';
 
 interface CartridgeModel {
   readonly glb: Uint8Array;
+  readonly smoothGlb: Uint8Array;
   readonly partNodes: readonly string[];
   readonly modelEntry: DeadvoxModelEntry;
 }
@@ -80,7 +81,7 @@ const makeModelExport = (
     ...appearance,
     finish: { ...cartridgeFinish(cartridge), ...appearance?.finish },
   };
-  const result = exportGlb({
+  const result = exportGunModels({
     resolved,
     palette: AMMO_PALETTE,
     asset,
@@ -94,6 +95,7 @@ const makeModelExport = (
     ok: true,
     model: {
       glb: result.glb,
+      smoothGlb: result.smoothGlb,
       partNodes: result.partNodes,
       modelEntry: {
         id: asset.id,

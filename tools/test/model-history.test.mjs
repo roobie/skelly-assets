@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -115,6 +116,28 @@ test('only GLB models and vehicle placements are hashed, and a vehicle may not s
     assert.throws(
       () => hashModels(root, { ...manifest, vehicles: [{ ...car, id: 'one' }] }),
       /one names more than one/,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a model is hashed with its smooth copy, and one without a copy keeps the hash of its GLB alone', () => {
+  const root = mkdtempSync(join(tmpdir(), 'model-history-'));
+  try {
+    mkdirSync(join(root, 'fixture.a'));
+    mkdirSync(join(root, 'fixture.a.smooth'));
+    writeFileSync(join(root, 'fixture.a/one.glb'), 'one');
+    writeFileSync(join(root, 'fixture.a.smooth/one.glb'), 'smooth');
+    const one = { id: 'one', pack: 'fixture.a', path: 'one.glb' };
+    const alone = hashModels(root, { models: [one] }).one;
+    assert.equal(alone, createHash('sha256').update('one').digest('hex'));
+    const both = hashModels(root, { models: [{ ...one, smooth: { pack: 'fixture.a.smooth', path: 'one.glb' } }] }).one;
+    assert.notEqual(both, alone);
+    writeFileSync(join(root, 'fixture.a.smooth/one.glb'), 'smoother');
+    assert.notEqual(
+      hashModels(root, { models: [{ ...one, smooth: { pack: 'fixture.a.smooth', path: 'one.glb' } }] }).one,
+      both,
     );
   } finally {
     rmSync(root, { recursive: true, force: true });

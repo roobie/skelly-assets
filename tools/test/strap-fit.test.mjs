@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { anchorFindings, strapFindings, treeStrapFindings } from '../strap-fit.mjs';
+import { anchorFindings, formFile, strapFindings, treeStrapFindings } from '../strap-fit.mjs';
 import { boxes } from './boxes.mjs';
 
 // A box head 40 mm wide and 50 mm deep, and a strap drawn on a 2 mm grain with a two-voxel wall round a plan of the
@@ -73,4 +73,16 @@ test('an empty table of band-fitted models is a finding, not a pass', () => {
   assert.deepEqual(treeStrapFindings('', { models: [] }, undefined, {}), [
     'models/head-band.libsonnet wears no band-fitted model',
   ]);
+});
+
+test("a model is read in voxels from its own path, and smooth from its copy's, which a mob has not", () => {
+  const entry = {
+    id: 'gear',
+    pack: 'fixture.a',
+    path: 'assets/models/gear.glb',
+    smooth: { pack: 'fixture.a.smooth', path: 'assets/models/gear.glb' },
+  };
+  assert.equal(formFile(entry, 'voxel'), 'fixture.a/assets/models/gear.glb');
+  assert.equal(formFile(entry, 'smooth'), 'fixture.a.smooth/assets/models/gear.glb');
+  assert.throws(() => formFile({ ...entry, smooth: undefined }, 'smooth'), /gear has no smooth copy/);
 });

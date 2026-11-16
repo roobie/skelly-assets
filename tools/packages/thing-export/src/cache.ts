@@ -129,7 +129,7 @@ export interface ExportCache {
   readonly export: (row: RecipeExport) => CachedExport;
 }
 
-const MODEL_FILES = ['glb', 'json'];
+const MODEL_FILES = ['glb', 'smooth.glb', 'json'];
 
 export const exportCache = (dir: string, code: string): ExportCache => {
   const store = entryStore(dir, code);
@@ -143,6 +143,7 @@ export const exportCache = (dir: string, code: string): ExportCache => {
         generated = row.generate();
         return {
           glb: generated.glb,
+          'smooth.glb': generated.smoothGlb,
           json: JSON.stringify({
             modelEntry: generated.modelEntry,
             partNodes: generated.partNodes,
@@ -159,7 +160,13 @@ export const exportCache = (dir: string, code: string): ExportCache => {
         physical?: ModelPhysical;
       };
       return {
-        model: { modelEntry, partNodes, glb: files.glb as Uint8Array, ...(physical === undefined ? {} : { physical }) },
+        model: {
+          modelEntry,
+          partNodes,
+          glb: files.glb as Uint8Array,
+          smoothGlb: files['smooth.glb'] as Uint8Array,
+          ...(physical === undefined ? {} : { physical }),
+        },
         entry: { key, reused },
       };
     },

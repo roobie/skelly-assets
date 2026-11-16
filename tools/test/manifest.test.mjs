@@ -288,3 +288,24 @@ test('the tree check holds a fresh tree to its manifest and the declared packs',
   reports(differences(files, new Set(['fixture.a'])), 'fixture.b');
   reports(differences(files, new Set([...declared, 'fixture.unbuilt'])), 'fixture.unbuilt');
 });
+
+test("a model's smooth copy is named beside it, must be produced, and makes its pack a modelled one", () => {
+  const smooth = { pack: 'fixture.a.smooth', path: 'assets/models/fixture_a.glb' };
+  const model = {
+    id: 'fixture_a',
+    title: 'Fixture A',
+    kind: 'item',
+    pack: 'fixture.a',
+    path: 'assets/models/fixture_a.glb',
+    smooth,
+  };
+  const files = ['fixture.a/assets/models/fixture_a.glb', 'fixture.a.smooth/assets/models/fixture_a.glb'];
+  const manifest = buildManifest({ models: [model], files, credit });
+  assert.deepEqual(manifest.models[0].smooth, smooth);
+  const tree = [...files.map((file) => `built/${file}`), 'built/manifest.json'];
+  assert.deepEqual(
+    treeDifferences({ files: tree, manifest, declared: new Set(['fixture.a', 'fixture.a.smooth']) }),
+    [],
+  );
+  assert.throws(() => buildManifest({ models: [model], files: files.slice(0, 1), credit }), /smooth copy/);
+});
