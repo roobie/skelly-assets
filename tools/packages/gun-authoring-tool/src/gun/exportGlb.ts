@@ -375,7 +375,6 @@ interface GlbSightJson {
     mesh?: number;
     extras?: { part?: string };
   }[];
-  // biome-ignore lint/style/useNamingConvention: glTF attribute semantics are upper case
   readonly meshes: { primitives: { attributes: { POSITION: number }; indices: number }[] }[];
   readonly accessors: { bufferView: number; byteOffset?: number; count: number }[];
   readonly bufferViews: { byteOffset?: number }[];

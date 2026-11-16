@@ -44,7 +44,7 @@ const cellAt = ({ low, size }, index) => [
   (Math.floor(index / size[2]) % size[1]) + low[1],
   (index % size[2]) + low[2],
 ];
-const drawnCells = (grid) => grid.slot.reduce((found, slot, index) => (slot > 0 ? (found.push(index), found) : found), []);
+const drawnCells = (grid) => grid.slot.flatMap((slot, index) => (slot > 0 ? [index] : []));
 
 // The most cells a model is read across along its longest side. A model larger than this at its own grain is read
 // coarser, so a model's cost stays bounded at the price of missing one-cell defects on the largest models.

@@ -167,7 +167,6 @@ const boxKeepOutFallback = (keepOut: KeepOut): KeepOut => {
 type ParamTable = Map<string, Record<string, ResolvedParam>>;
 type ReportStructure = (message: string, parts?: string[]) => void;
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
 const resolveParams = (assembly: Assembly, domain: Domain, structure: ReportStructure): ParamTable => {
   const result: ParamTable = new Map();
   const pending: { part: string; name: string }[] = [];
@@ -278,7 +277,6 @@ const resolveParams = (assembly: Assembly, domain: Domain, structure: ReportStru
   return result;
 };
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
 export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
   const issues: Issue[] = [];
   const structure = (message: string, parts: string[] = []): void => {
@@ -360,7 +358,6 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
   };
 
   const pending: Omit<ResolvedConnection, 'role'>[] = [];
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
   assembly.connections.forEach((conn, index) => {
     const from = lookup(conn.from, index);
     const to = lookup(conn.to, index);

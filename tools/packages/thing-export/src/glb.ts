@@ -711,7 +711,6 @@ const writeGlb: ExportGlb = (input) => {
       : { ...part, def: seatedDef(part.def, port, input.voxelGrain / metresPerUnit) };
   };
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: existing glTF node construction; appearance metadata is conditional by contract.
   const addPart = (part: PartExport): void => {
     const drawn = part.def.displaySolids ?? part.def.solids;
     const grain =

@@ -99,7 +99,7 @@ export function anchorFindings({ head, anchors, frame, worn, model }) {
 
 // A gear model's strap as one mesh in its model frame, with the voxel grain its strap is drawn at.
 function strapOf(buffer, model) {
-  const meshes = modelMeshes(buffer, (part, piece, slot) => slot === STRAP);
+  const meshes = modelMeshes(buffer, (_part, _piece, slot) => slot === STRAP);
   const grains = new Set(glbJson(buffer).meshes.flatMap(({ primitives }) => primitives)
     .filter(({ extras }) => extras?.slot === STRAP).map(({ extras }) => extras.voxelGrain));
   if (meshes.length !== 1 || grains.size !== 1) throw new Error(`${model} draws no single strap on one voxel grain`);

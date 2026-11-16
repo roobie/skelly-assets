@@ -74,7 +74,7 @@ const still = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
   for (const { name, file } of fixtures) {
-    const { frame, report } = compilePose(rig, file, { meshOf: itemMesh });
+    const { report } = compilePose(rig, file, { meshOf: itemMesh });
     assert.deepEqual(report.clamped, [], `${name} asks past a limit`);
     for (const [id, left] of Object.entries(report.residuals)) assert.ok(left < 1e-6, `${name}: ${id} falls ${left} m short`);
     for (const [hand, digits] of Object.entries(report.grips)) {

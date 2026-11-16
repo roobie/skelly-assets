@@ -25,7 +25,6 @@ const resolvedOf = (label: string, assembly: (typeof akCorpus)[number]['assembly
     return cached;
   }
   const report = validate(assembly, gunDomain);
-  // biome-ignore lint/suspicious/noMisplacedAssertion: helper is called only by tests
   expect(report.issues, label).toEqual([]);
   validated.set(assembly, report.resolved);
   return report.resolved;

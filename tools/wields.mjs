@@ -39,8 +39,13 @@ export function strikePhases(strike) {
   if (!shares.every((share) => share > 0)) throw new Error(`a strike gives each of ${PHASES.join(', ')} a positive share`);
   const total = shares.reduce((sum, share) => sum + share, 0);
   if (Math.abs(total - 100) > 1e-9) throw new Error(`a strike's shares sum to 100, not ${total}`);
-  let at = 0;
-  return PHASES.map((phase, i) => ({ phase, from: at / 100, to: (at += shares[i]) / 100 }));
+  let from = 0;
+  return PHASES.map((phase, i) => {
+    const to = from + shares[i];
+    const span = { phase, from: from / 100, to: to / 100 };
+    from = to;
+    return span;
+  });
 }
 
 /** A strike's timing as its clip carries it, in Sim seconds: its span, its hit and where each phase ends. */

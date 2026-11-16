@@ -169,8 +169,6 @@ const highlights = (issues: readonly Issue[]) => ({
   keepOuts: new Set(issues.flatMap((i) => (i.keepOut ? [`${i.keepOut.part}.${i.keepOut.id}`] : []))),
 });
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
-// biome-ignore lint/complexity/useMaxParams: the existing positional signature plus the revolve level of detail; callers pass the first two or four.
 export function buildLayers(
   report: Report,
   focus: readonly Issue[],

@@ -7,7 +7,7 @@ import { downloadWithRetry } from '../jsonnet/setup.mjs';
 // Serves `statuses` in order (the last repeats); reports how many requests arrived.
 async function stubServer(statuses) {
   let requests = 0;
-  const server = createServer((request, response) => {
+  const server = createServer((_request, response) => {
     const status = statuses[Math.min(requests, statuses.length - 1)];
     requests += 1;
     response.writeHead(status);

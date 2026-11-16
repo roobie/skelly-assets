@@ -49,7 +49,10 @@ export function pressCheckClip(check) {
     if (!(hold >= 0)) throw new Error(`press check ${name}: hold must be seconds, 0 or more`);
     at += into ?? 0;
     keys.push({ fixture: name, at });
-    if (hold > 0) keys.push({ fixture: name, at: (at += hold) });
+    if (hold > 0) {
+      at += hold;
+      keys.push({ fixture: name, at });
+    }
   }
   return { keys, easing: check.easing };
 }

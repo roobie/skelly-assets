@@ -870,7 +870,7 @@ const applyLeaperFrame = (loaded: Loaded, dt: number): void => {
     }
   }
   const cuts = { cuts: severedCuts };
-  let shown;
+  let shown: ReturnType<typeof leaperFrame>;
   if (hitTime !== undefined) {
     shown = leaperFrame(loaded.realized, flinch.name, hitTime / flinch.seconds, cuts);
   } else if (attackTime !== undefined) {
@@ -896,7 +896,7 @@ const applyWalkerFrame = (loaded: Loaded, dt: number): void => {
   const fire = walkerClip('fire');
   advanceAttack(dt, fire.seconds);
   const cuts = { cuts: severedCuts };
-  let shown;
+  let shown: ReturnType<typeof walkerFrame>;
   if (attackTime !== undefined) {
     shown = walkerFrame(loaded.realized, fire.name, attackTime / fire.seconds, cuts);
   } else if (speed > 0) {

@@ -160,7 +160,6 @@ export const createMirroredPair = (
       ...rest,
       id: which === 'near' ? nearId : farId,
       // `0 - z`, not `-z`: a centred twin stays 0, because -0 doesn't survive a JSON round trip.
-      // biome-ignore lint/complexity/noImplicitCoercions: `-z` would give -0 for a centred twin.
       at: which === 'near' ? original.at : [original.at[0], original.at[1], 0 - original.at[2]],
       supportedBy: original.supportedBy.map((support) => {
         const choice = supports[support]!;

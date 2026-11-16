@@ -81,7 +81,6 @@ describe('generate', () => {
 describe('templates', () => {
   for (const t of TEMPLATES) {
     describe(t.name, () => {
-      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: predates the complexity limit; split it up when next changed
       it('only chooses families and param values that exist', () => {
         for (const slot of t.slots) {
           const family = gunDomain.families[slot.family];

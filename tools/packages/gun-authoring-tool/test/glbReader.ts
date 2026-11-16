@@ -29,7 +29,6 @@ export interface GltfJson {
 }
 
 export interface GltfPrimitive {
-  // biome-ignore lint/style/useNamingConvention: glTF attribute semantics are upper case
   attributes: { POSITION: number; NORMAL: number };
   indices: number;
   material: number;
