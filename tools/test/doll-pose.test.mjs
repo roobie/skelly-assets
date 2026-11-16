@@ -362,6 +362,30 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
   }
 });
 
+// A held gun stands clear of the body but for the hands that close on it: no point of its mesh deeper inside any other
+// part than a garment's thickness would hide (SINK), and some point within a finger's breadth of the torso or the
+// firing arm (TOUCH), so a shouldered stock bears on the body rather than floating before it.
+const SINK = 0.005,
+  TOUCH = 0.01;
+const holding = new Set();
+for (const { id, parent } of rig.bones) if (id.startsWith('hand.') || holding.has(parent)) holding.add(id);
+const unheld = rest.body.filter(({ bone }) => !holding.has(bone));
+// How deep the held mesh `positions`, placed in the world by `place`, stands inside each unheld part of the posed body.
+const sinking = (posed, positions, place) => {
+  const points = [];
+  for (let i = 0; i < positions.length; i += 3) points.push(place(positions.slice(i, i + 3)));
+  return unheld.map(({ bone, mesh }) => {
+    const solid = posedSolid(mesh, posed.get(bone));
+    return { bone, depth: Math.max(...points.map((p) => -signedDepth(solid, p, 0.1))) };
+  });
+};
+const assertBorne = (name, depths) => {
+  for (const { bone, depth } of depths)
+    assert.ok(depth <= SINK, `${name}: the gun stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
+  const touch = Math.max(...depths.filter(({ bone }) => ['spine', 'upperArm.R'].includes(bone)).map(({ depth }) => depth));
+  assert.ok(touch >= -TOUCH, `${name}: the gun stands ${(-touch * 1000).toFixed(0)} mm off the shoulder`);
+};
+
 const rifleEntry = models.find((model) => model.id === pressCheck.rifle);
 const pressPoses = pressCheckPoses(
   rig,
@@ -381,21 +405,19 @@ test("the press check's pose files are what its tool writes from its key frames"
   }
 });
 
-test('through the press check the rifle points ahead and down, its butt pad against the body', () => {
-  const torso = rest.body.find((part) => part.bone === 'spine').mesh;
+test('through the press check the rifle points ahead and down, its stock borne in the shoulder', () => {
+  const { positions } = itemMesh(pressCheck.rifle);
   for (const [name, file] of Object.entries(pressPoses)) {
-    const { model, at, turn } = file.hold['hand.R'];
+    const { model, turn } = file.hold['hand.R'];
     assert.equal(model, pressCheck.rifle);
-    const r = quatToMat3(turn),
-      bore = mulMV(r, [0, 0, 1]);
+    const bore = mulMV(quatToMat3(turn), [0, 0, 1]);
     const heading = (Math.atan2(bore[0], bore[2]) * 180) / Math.PI,
       tip = (-Math.asin(bore[1]) * 180) / Math.PI;
     assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
     assert.ok(tip > 0 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
-    const { frame } = compilePose(rig, file, { meshOf: itemMesh });
-    const chest = posedSolid(torso, boneTransforms(rig.bones, decodeFrame(frame)).get('spine'));
-    const gap = signedDepth(chest, add(mulMV(r, pressCheck.butt), at), 0.1);
-    assert.ok(Math.abs(gap) < 0.01, `${name}: the butt pad stands ${(gap * 1000).toFixed(0)} mm off the chest`);
+    const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
+    const item = held['hand.R'];
+    assertBorne(name, sinking(boneTransforms(rig.bones, decodeFrame(frame)), positions, (p) => applyPoint(item, p)));
   }
 });
 

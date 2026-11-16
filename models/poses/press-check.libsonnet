@@ -37,19 +37,21 @@ local pinch(drawn) = {
   hands: 'pinch',
   drawn: drawn,
 };
-// Low ready: the bore tipped down ahead, the right elbow out and a little down. Turned: rolled to bring the port up
+// Low ready: the bore tipped down ahead, the right elbow out to the side. Turned: rolled to bring the port up
 // toward the eyes, the right elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the
 // rifle.
-local ready = { carry: { pitch: 15, yaw: 0, roll: 0 }, gripPole: [-0.94, 0.342, 0], look: [0, 0, 3], left: support };
+local ready = { carry: { pitch: 15, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, 0], look: [0, 0, 3], left: support };
 local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: [-0.03, 0.005, -0.1], tilt: 20 };
 local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
 {
   rifle: 'rifle_assault',
   // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
   stance: { spine: [4, -15, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
-  // The butt pad's middle, pressed into the pocket: a point in the torso's frame, from the right shoulder joint.
+  // The butt pad's middle and the pocket it stands in: a point in the torso's frame, from the right shoulder joint. The
+  // pocket is ahead of the shoulder joint, on the flat of the chest just inside the arm, so the stock bears on the chest
+  // by its inner edge however the rifle rolls, rather than lying along the slope where the chest turns toward the arm.
   butt: [0, -0.02, -0.38],
-  pocket: [0.06, -0.11, 0.04],
+  pocket: [0.03, -0.11, 0.07],
   // The right palm on the pistol grip, each frame giving the elbow's pole.
   sockets: sockets,
   easing: 'minimum-jerk',
@@ -64,7 +66,7 @@ local retracted = { moved: { 'charging-handle': 1, 'bolt-carrier': 1 } };
     'press-6-released': turned {
       into: 0.12,
       left: {
-        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, 0], close: false },
+        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },
