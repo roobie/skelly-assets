@@ -23,17 +23,22 @@ export function runsOf(pieces) {
 const middle = ({ min, max }) => min.map((low, a) => (low + max[a]) / 2);
 const meet = (a, b, slack) => [0, 1, 2].every((k) => a.min[k] - slack <= b.max[k] && b.min[k] - slack <= a.max[k]);
 
-// Runs of square-cut pieces (boxes and turned pieces, which keep the model's axes) that step along a slant, each
+// Whether each piece of a run touches the next, within `slack`: a run that draws one path rather than a row of like
+// pieces apart, such as a violin's strings.
+const joined = (boxes, slack) => boxes.slice(1).every((box, n) => meet(box, boxes[n], slack));
+
+// Runs of square-cut pieces (boxes and turned pieces, which keep the model's axes) that step by one slanted step, each
 // touching the next: a staircase where the row means one slanted pipe or rail. A step along one axis, such as a
-// ladder's rungs or a coil's turns, is a plain stack and is not reported. `grain` is the slack within which two
-// pieces count as touching.
+// ladder's rungs or a coil's turns, is a plain stack, and steps that change, such as fingers of different lengths side
+// by side, are not one path; neither is reported. `grain` is the slack within which two pieces touch and two steps
+// are the same.
 export function stairRuns(pieces, grain) {
   return runsOf(pieces).filter(({ kind }) => kind === 'box' || kind === 'turned').flatMap(({ prefix, slot, pieces: list }) => {
     const boxes = list.map(solid);
     const steps = boxes.slice(1).map((box, n) => middle(box).map((x, a) => x - middle(boxes[n])[a]));
-    const slanted = steps.every((step) => step.filter((d) => Math.abs(d) > grain / 2).length >= 2);
-    const joined = boxes.slice(1).every((box, n) => meet(box, boxes[n], grain / 2));
-    return slanted && joined ? [{ prefix, slot, pieces: list.length }] : [];
+    const slanted = steps[0].filter((d) => Math.abs(d) > grain / 2).length >= 2;
+    const even = steps.every((step) => step.every((d, a) => Math.abs(d - steps[0][a]) <= grain / 2));
+    return slanted && even && joined(boxes, grain / 2) ? [{ prefix, slot, pieces: list.length }] : [];
   });
 }
 
@@ -51,8 +56,8 @@ function polygonWidth(points) {
   return least;
 }
 
-// Runs of slanted prisms thinner than the grain, across their section or along their extrusion: a wire bent through
-// short straight runs, which the voxel sampling turns into a jagged line of single cells rather than the curve it
+// Runs of slanted prisms thinner than the grain, across their section or along their extrusion, each touching the
+// next: a wire bent through short straight runs, which the voxel sampling turns into a jagged line of single cells rather than the curve it
 // follows. A prism whose section keeps the model's axes is a plain bar and is not reported.
 export function thinRuns(pieces, grain) {
   return runsOf(pieces).filter(({ kind }) => kind === 'prism').flatMap(({ prefix, slot, pieces: list }) => {
@@ -63,6 +68,6 @@ export function thinRuns(pieces, grain) {
       });
       return slanted && Math.min(polygonWidth(profile), end - start) < grain;
     });
-    return thin.length >= 3 ? [{ prefix, slot, pieces: list.length, thin: thin.length }] : [];
+    return thin.length >= 3 && joined(list.map(solid), grain / 2) ? [{ prefix, slot, pieces: list.length, thin: thin.length }] : [];
   });
 }

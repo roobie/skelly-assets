@@ -23,8 +23,12 @@ const tin = (shift) => grid(block([0, 0, 0], [12, 6, 12]), block([shift, 6, 0], 
 
 test('a piece apart from the rest by empty cells is floating, and touching across a corner is not', () => {
   assert.deepEqual(pieces(grid(block([0, 0, 0], [4, 4, 4]), block([4, 4, 4], [6, 6, 6]))).length, 1);
-  const apart = shapeFindings(grid(block([0, 0, 0], [4, 4, 4]), block([0, 6, 0], [4, 8, 4])));
-  assert.deepEqual(apart.map(({ probe, gap }) => [probe, gap]), [['floating', 2]]);
+  const apart = shapeFindings(grid(block([0, 0, 0], [4, 4, 4]), block([0, 6, 0], [2, 8, 2])));
+  assert.deepEqual(apart.filter(({ probe }) => probe === 'floating').map(({ gap }) => gap), [2]);
+});
+
+test('a piece apart as large as half the largest is one of a pair, not floating', () => {
+  assert.deepEqual(probes(shapeFindings(grid(block([0, 0, 0], [4, 4, 4]), block([0, 6, 0], [4, 8, 4])))), []);
 });
 
 test('a lid set a cell or two off its body misses the mirror, and a centred lid does not', () => {
@@ -60,9 +64,11 @@ test('boxes that step along a slant, each touching the next, are a staircase run
   assert.deepEqual(stairRuns(run(4, [0.008, -0.006, 0]), GRAIN), [{ prefix: 'arm', slot: 'copper', pieces: 4 }]);
 });
 
-test('a stack along one axis, or boxes that step apart, is not a staircase run', () => {
+test('a stack along one axis, boxes that step apart or boxes whose steps change are not a staircase run', () => {
   assert.deepEqual(stairRuns(run(4, [0.012, 0, 0]), GRAIN), []);
   assert.deepEqual(stairRuns(run(4, [0.02, -0.02, 0]), GRAIN), []);
+  const fingers = run(4, [0.008, -0.006, 0]).map((piece, k) => (k === 2 ? { ...piece, min: [piece.min[0], piece.min[1] - 0.006, 0], max: [piece.max[0], piece.max[1] - 0.006, piece.max[2]] } : piece));
+  assert.deepEqual(stairRuns(fingers, GRAIN), []);
 });
 
 // A run of wire segments along a slant, each a prism of section `width` square extruded along z.
@@ -81,10 +87,15 @@ test('slanted prisms thinner than the grain are a thin run, and ones a few grain
   assert.deepEqual(thinRuns(wire(4, GRAIN * 3), GRAIN), []);
 });
 
-test('the queue puts rows more probes find first, then the surest finding, and leaves out rows with none', () => {
+test('thin slanted prisms that do not touch, such as strings side by side, are not a thin run', () => {
+  const strings = wire(4, GRAIN / 2).map((piece, k) => ({ ...piece, start: k * 0.01, end: k * 0.01 + GRAIN / 2 }));
+  assert.deepEqual(thinRuns(strings, GRAIN), []);
+});
+
+test('the queue puts rows with more kinds of defect first, then the surest finding, and leaves out rows with none', () => {
   const queue = rankedQueue({
     clean: [],
-    lopsided: [{ probe: 'mirror', cells: 30, of: 100 }],
+    lopsided: [{ probe: 'mirror', cells: 30, of: 100 }, { probe: 'quarter', cells: 30, of: 100 }],
     nudged: [{ probe: 'mirror', cells: 5, of: 100 }],
     loose: [{ probe: 'floating', cells: 5, of: 100 }, { probe: 'mirror', cells: 5, of: 100 }],
   });

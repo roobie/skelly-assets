@@ -36,18 +36,22 @@ export function rowRunFindings(row) {
 // run, which is a way of drawing that always breaks up, as sure as can be.
 const weight = ({ cells, of }) => (of === undefined ? 1 : cells / of);
 
-// The rows with findings, most likely to need a fix first: by how many different probes find something, then by the
+// The kind of defect each probe looks for: a slot that misses its mirror usually misses its quarter turn too, so the
+// two count once.
+const DEFECT = { mirror: 'symmetry', quarter: 'symmetry' };
+
+// The rows with findings, most likely to need a fix first: by how many kinds of defect the probes find, then by the
 // surest finding.
 export function rankedQueue(found) {
   const ranked = Object.entries(found)
     .filter(([, findings]) => findings.length > 0)
     .map(([id, findings]) => ({
       id,
-      probes: [...new Set(findings.map(({ probe }) => probe))].sort(),
+      defects: [...new Set(findings.map(({ probe }) => DEFECT[probe] ?? probe))].sort(),
       sure: Math.max(...findings.map(weight)),
       findings,
     }));
-  return ranked.sort((a, b) => b.probes.length - a.probes.length || b.sure - a.sure || a.id.localeCompare(b.id));
+  return ranked.sort((a, b) => b.defects.length - a.defects.length || b.sure - a.sure || a.id.localeCompare(b.id));
 }
 
 // The row ids a verdicts file marks reviewed, under their current ids: a review of a row since renamed counts for it.

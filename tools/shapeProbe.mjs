@@ -60,17 +60,23 @@ export function readGrain(meshes, grain) {
   return Math.max(grain, Math.max(...high.map((h, a) => h - low[a])) / MOST_CELLS);
 }
 
-// The lattice cells the model's surface passes through, as a cell grid. A surface sample steps a quarter cell inward
-// along its normal before it is binned, so a voxel face, which lies on a cell boundary, counts for the cell it closes.
+// The lattice cells the model's surface passes through, as a cell grid. The surface is sampled a cell apart, which puts
+// a sample on every voxel face, and a sample steps a quarter cell inward along its normal before it is binned, so a
+// voxel face, which lies on a cell boundary, counts for the cell it closes.
 export function surfaceCells(buffer) {
   const gltf = glbJson(buffer);
   const slots = [...new Set(gltf.meshes.flatMap(({ primitives }) => primitives.map(({ extras }) => extras?.slot ?? '')))];
   const bySlot = slots.map((name) => modelMeshes(buffer, (_part, _piece, own) => (own ?? '') === name));
   const grain = readGrain(bySlot.flat(), modelGrain(gltf));
-  const drawn = bySlot.flatMap((meshes, slot) => meshes
-    .flatMap((mesh) => sampledSurface(mesh, grain / 2))
-    .map(({ point, normal }) => ({ cell: point.map((x, a) => Math.floor((x - (normal[a] * grain) / 4) / grain)), slot })));
-  return cellGrid(drawn, slots);
+  // Samples run to millions on a large fine model, so each mesh's are binned and let go before the next is sampled.
+  const drawn = new Map();
+  bySlot.forEach((meshes, slot) => {
+    for (const mesh of meshes) for (const { point, normal } of sampledSurface(mesh, grain)) {
+      const cell = point.map((x, a) => Math.floor((x - (normal[a] * grain) / 4) / grain));
+      drawn.set(`${cell} ${slot}`, { cell, slot });
+    }
+  });
+  return cellGrid([...drawn.values()], slots);
 }
 
 // The model's separate pieces: the groups of cells that touch across a face, edge or corner, largest first, each as
@@ -184,14 +190,16 @@ export const FLOATING_CELLS = 4;
 
 // The findings of the shape probes on a cell grid, each { probe, ...what it found }, with `cells` the size of the
 // finding in cells and `of` the cells it is a share of:
-// - `floating`: pieces apart from the largest, with the fewest empty cells between any of them and the rest when that is
+// - `floating`: pieces apart from the largest and much smaller than it, with the fewest empty cells between any of them and the rest when that is
 //   within the reach `pieces` looks;
 // - `mirror` and `quarter`: a slot that misses its own mirror across `axis`, or its quarter turn about it, by a little.
 //   A mirror is tried only across the level axes, since a thing stands on its base and its top is rarely its base
 //   turned over (see ../docs/decisions/0002-model-frame.md for which axis is up).
 export function shapeFindings(grid) {
   const findings = [];
-  const apart = pieces(grid).slice(1).filter(({ cells }) => cells >= FLOATING_CELLS);
+  // A piece as large as half the largest is one of a pair or a set, such as a pair of gloves or a set of dice.
+  const [largest, ...rest] = pieces(grid);
+  const apart = rest.filter(({ cells }) => cells >= FLOATING_CELLS && cells < largest.cells / 2);
   if (apart.length > 0) {
     const gap = Math.min(...apart.map(({ gap: own }) => own));
     findings.push({
