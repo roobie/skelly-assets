@@ -61,8 +61,10 @@ export function lookDigest(built, manifest, id) {
   return hash.digest('hex');
 }
 
-// A look's options as the sheet prints and keys them: its view set and the sites it keeps (site/lookOptions.mjs).
-export const lookName = ({ views = 'review', sites = [] } = {}) => (sites.length > 0 ? `${views} views, sites ${sites.join(', ')}` : `${views} views`);
+// A look's options as the sheet prints and keys them: its view set, whether it draws what opens open, and the sites it
+// keeps (site/lookOptions.mjs).
+export const lookName = ({ views = 'review', sites = [], open = false } = {}) =>
+  [`${views} views`, ...(open ? ['open'] : []), ...(sites.length > 0 ? [`sites ${sites.join(', ')}`] : [])].join(', ');
 
 // The sheet's rows after a look named `look` (lookName): each row drawn now replaces its earlier one, so a few redrawn
 // entries still show beside the rest of a batch, and a row whose entry the tree no longer holds is dropped. A sheet
