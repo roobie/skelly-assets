@@ -48,7 +48,7 @@ const mobFiles = (row, severed) => [
     ...severed.parts.map((part) => [partRole(part.id), outputPath(severed.pack, part.path)]),
   ]),
 ];
-const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, map: severed.map, parts: severed.parts.map(({ bone, id, path }) => ({ bone, id, path })) } });
+const mobInputs = (row, severed) => ({ row, severed: severed && { pack: severed.pack, map: severed.map, materials: severed.materials, parts: severed.parts.map(({ bone, id, path }) => ({ bone, id, path })) } });
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
   return entryStore(join(cache, 'mob'), codeFingerprint(here, ['package-lock.json', 'packages/mobgen/src', ...tools], ['packages/mobgen/src', '../models/mobs']));

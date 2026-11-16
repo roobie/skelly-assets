@@ -6,20 +6,25 @@ import { pointBounds, SHADE_FACTORS } from './actorBake.mjs';
 import { turnPoint, turnPointArray } from './actorFrame.mjs';
 import { writeGlb } from './glb.mjs';
 
-// The material of a part's cut face, which the body it came from leaves open.
+// The key the sheet's materials draw a part's cut face by, the face the body it came from leaves open.
 export const CUT_MATERIAL = 'cut';
 
 const shaded = (colour, byte) => colour.map((x) => Math.min(1, x * SHADE_FACTORS[shadeOf(byte)]));
 const toCut = (colour) => colour.map((x, a) => x + (CUT_FACE.color[a] - x) * CUT_FACE.mix);
 
 /**
- * One part's GLB: the faces of the cut subtree's bone meshes that face out of it, one primitive per mobgen material
- * and one for the cut face, each named by its material so a consumer can class its wear. A face between two bones of
+ * One part's GLB: the faces of the cut subtree's bone meshes that face out of it, one primitive per catalogue material
+ * the plan draws its mobgen materials and its cut face as, named by it so a consumer classes its wear as it does any
+ * drawn model's. A face between two bones of
  * the subtree lies inside the part and is left out. Only a face on the cut bone's parent is the cut: another bone the
  * part merely touches, such as a hanging hand against a thigh, leaves skin there. The colours stay in the vertices, as
  * the actor's do, and the origin is the part's centre of mass.
  */
-function partGlb(id, realized, subtree, parent, centre) {
+function partGlb(id, realized, subtree, parent, centre, materials) {
+  const drawnAs = (name) => {
+    if (!Object.hasOwn(materials, name)) throw new Error(`models/mobs.json severed: materials does not draw ${name}, a material of ${id}`);
+    return materials[name];
+  };
   const groups = new Map();
   for (const owner of subtree) {
     const mesh = realized.meshes.get(owner);
@@ -31,7 +36,7 @@ function partGlb(id, realized, subtree, parent, centre) {
       const neighbour = mesh.neighbourBone[corners[0]];
       if (subtree.has(neighbour)) continue;
       const cut = neighbour === parent;
-      const name = cut ? CUT_MATERIAL : materialOf(realized.voxels, mesh.colors[corners[0]]);
+      const name = drawnAs(cut ? CUT_MATERIAL : materialOf(realized.voxels, mesh.colors[corners[0]]));
       if (!groups.has(name)) groups.set(name, { positions: [], normals: [], colours: [], indices: [], seen: new Map() });
       const group = groups.get(name);
       for (const corner of corners) {
@@ -92,7 +97,7 @@ export function bakeSeveredParts(plan, template, realized) {
     const mass = templatePartMassProperties({ voxels: realized.voxels, partBoneIndices: subtree, bodyBoneIndices: all, voxelSize: realized.voxels.size, template, part: part.bone });
     const { parent: parentId } = bones.find((bone) => bone.id === part.bone);
     const parent = bones.findIndex((bone) => bone.id === parentId);
-    files[part.id] = partGlb(part.id, realized, new Set(subtree), parent, turnPoint(mass.center));
+    files[part.id] = partGlb(part.id, realized, new Set(subtree), parent, turnPoint(mass.center), plan.materials);
     map[part.bone] = { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } };
   }
   return { map: JSON.stringify(map), ...files };

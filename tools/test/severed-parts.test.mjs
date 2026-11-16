@@ -45,7 +45,7 @@ test('every cut point of each named mob type bakes a part weighing its template\
         if (body.massFractions?.[bone] !== undefined) assert.equal(massKg, expected.mass, `${model.id}: its authored share`);
         else assert(Math.abs(massKg - expected.mass) <= 1e-9 * expected.mass, `${model.id}: its voxel share`);
         const gltf = glbJson(readFileSync(join(out, outputPath(plan.pack, model.file))));
-        assert(gltf.materials.some(({ name }) => name === CUT_MATERIAL), `${model.id}: shows the face it was cut at`);
+        assert(gltf.materials.some(({ name }) => name === plan.materials[CUT_MATERIAL]), `${model.id}: shows the face it was cut at`);
       }
     }
   } finally {
@@ -60,9 +60,11 @@ test('the manifest lists each severed part with the mob type, bone and cut map i
   assert.deepEqual(files.sort(), ['p/assets/models/m_arm_l.glb', 'p/severed/m.json']);
 });
 
-test('a severed type without a row in its pack, or a cut point without a title, is refused', () => {
+test('a severed type without a row in its pack, a cut point without a title, or a material drawn as no catalogue material, is refused', () => {
   const row = { id: 'm.1', type: 'm', pack: 'p' };
-  const sheet = (mobs, cuts) => ({ pack: 'body', taxonomy: {}, mobs, cuts });
-  assert.throws(() => severedPartPlan(sheet({ q: { m: 'M' } }, { head: 'head' }), [row], () => ['head']), /q has no row of type m/);
-  assert.throws(() => severedPartPlan(sheet({ p: { m: 'M' } }, {}), [row], () => ['head']), /no title for head/);
+  const sheet = (mobs, cuts, materials = {}) => ({ pack: 'body', taxonomy: {}, mobs, cuts, materials });
+  const plan = (severed) => severedPartPlan(severed, [row], () => ['head'], new Set(['body-gore']));
+  assert.throws(() => plan(sheet({ q: { m: 'M' } }, { head: 'head' })), /q has no row of type m/);
+  assert.throws(() => plan(sheet({ p: { m: 'M' } }, {})), /no title for head/);
+  assert.throws(() => plan(sheet({ p: { m: 'M' } }, { head: 'head' }, { cut: 'gore' })), /draws cut as gore/);
 });

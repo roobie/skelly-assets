@@ -14,7 +14,7 @@
     "taxonomy": {"category": "creatures"}
   },
   "severed": {
-    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): one model per cut point, a bone a cut may start at, of each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one item per cut point, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. pack is where the parts are placed, beside the other body parts, with taxonomy.",
+    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): one model per cut point, a bone a cut may start at, of each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one item per cut point, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. pack is where the parts are placed, beside the other body parts, with taxonomy. materials names each mobgen material, and the cut face, by the catalogue material it is drawn as (tools/packages/thing-core/src/materials.json), so a game classes a part's wear as it does any drawn model's.",
     "pack": "skelly.body",
     "taxonomy": {"category": "body-parts", "tags": {"material": ["flesh"]}},
     "mobs": {
@@ -50,6 +50,12 @@
       "shin.R": "right shin",
       "foot.L": "left foot",
       "foot.R": "right foot"
+    },
+    "materials": {
+      "cut": "body-gore", "gore": "body-gore", "acid": "body-gore",
+      "skin": "body-skin-sickly", "bruise": "body-skin-sickly", "mottle": "body-skin-sickly", "crust": "body-skin-sickly",
+      "hair": "body-hair", "eye": "body-eye", "mouth": "body-mouth", "claw": "body-bone",
+      "shirt": "cloth-shirt-faded", "pants": "cloth-pants-grey", "trousers": "cloth-pants-grey", "shoe": "rubber-black"
     }
   },
   "mobs": [
