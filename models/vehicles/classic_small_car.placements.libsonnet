@@ -17,7 +17,7 @@ local s = import 'classic_small_car.spec.libsonnet';
     site.one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.32, -0.3]),
     site.one('radiator', 'radiator_small', [1.58, 0.34, 0]),
     site.one('fuel_tank', 'fuel_tank_car', [-1.55, 0.42, 0]),
-    site.one('exhaust', 'exhaust_small', [s.rear + 0.46, 0.17, 0.28]),
+    site.one('exhaust', 'exhaust_small', [s.rear + 0.46, 0.12, 0.28]),
     site.one('steering_wheel', 'steering_wheel', [0.48, 0.66, -0.26]),
     site.one('gear_lever', 'gear_lever', [0.45, s.floor, 0]),
     site.one('front_bench', 'bench_seat_low', [0.12, s.floor, 0]),

@@ -6,7 +6,7 @@ local s = import 'limousine.spec.libsonnet';
     engine: { name: 'v8_petrol', at: [s.frontAxle - 0.02, 0.2, 0] },
     over: {
       gearbox: { part: 'gearbox_inline', at: [s.frontAxle - 0.7, 0.26, 0] },
-      exhaust: { part: 'exhaust_long', at: [s.rear + 0.56, 0.2, 0.42] },
+      exhaust: { part: 'exhaust_long', at: [s.rear + 0.56, 0.12, 0.42] },
       rear_bench: { at: [-1.55, s.floor, 0] },
       front_seat_near: { at: [1.05, s.floor, 0.37] },
       front_seat_far: { at: [1.05, s.floor, -0.37] },
