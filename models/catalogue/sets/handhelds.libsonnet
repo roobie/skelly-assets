@@ -2,6 +2,8 @@ local b = import 'packages/thing-authoring-tool/handhelds.libsonnet';
 local stow = import 'models/stowage.libsonnet';
 local params = b.params, atom = b.atom, key = b.key, melee = b.melee, datum = b.datum, held = b.held;
 local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } } };
+// Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
+local fine = { voxelGrain: 0.002 };
 [
   melee('crowbar', 'crowbar', 1.5, {
     back: 0.4, reach: 0.231, kickBack: 0.438, kickRise: 0.113, clawAt: 0.105, clawDrop: 0.129, thickness: 0.03, depth: 0.03,
@@ -83,7 +85,7 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     display: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5], normal: [0, 1, 0], up: [0, 0, -1] },
     anchors: { needle_mount: { part: 'compass', solid: 'dial', fraction: [0.5, 1, 0.5] } },
     taxonomy: { category: 'tools', tags: { material: ['plastic', 'metal'], setting: ['modern'] } },
-  },
+  } + fine,
   local carrier = atom('lighter', 'lighter', 0.019, { width: 0.024, height: 0.055, depth: 0.012, capHeight: 0.009 }, { body: 'plastic-clear-red', cap: 'steel-grey', wheel: 'steel-grey' }) + { title: 'Lighter' };
   local port(id, gender, pos, normal) = { id: id, mount: 'fuel-fill', gender: gender, pos: pos, normal: normal, up: [1, 0, 0], required: true };
   carrier + {
@@ -95,14 +97,14 @@ local metalKey = { taxonomy: { category: 'keys', tags: { material: ['metal'] } }
     ],
     connections: [{ from: 'lighter.fill', to: 'fuel_fill.base' }],
   },
-  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { title: 'Matches' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['paper'], setting: ['modern'] } } },
-  key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey') + { title: 'Dad\'s cabin key' } + metalKey,
-  key('pharmacy_key', 0.010, 0.011, 0.039, 'brass') + { title: 'Pharmacy key' } + metalKey,
-  key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized') + { title: 'Camp armoury key' } + metalKey,
-  key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass') + { title: 'Camp HQ safe key' } + metalKey,
-  key('shed_key', 0.010, 0.012, 0.038, 'steel-grey') + { title: 'Shed key' } + metalKey,
-  key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued') + { title: 'Police armoury key' } + metalKey,
+  atom('matches', 'matchbox', 0.020, { width: 0.055, height: 0.015, depth: 0.035, sleeve: 0.004 }, { tray: 'paperboard-tan', sleeve: 'paint-terracotta', striker: 'paperboard-brown' }, 'tray') + { title: 'Matches' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['paper'], setting: ['modern'] } } } + fine,
+  key('dad_cabin_key', 0.010, 0.012, 0.038, 'steel-grey') + { title: 'Dad\'s cabin key' } + metalKey + fine,
+  key('pharmacy_key', 0.010, 0.011, 0.039, 'brass') + { title: 'Pharmacy key' } + metalKey + fine,
+  key('camp_armoury_key', 0.010, 0.014, 0.043, 'steel-parkerized') + { title: 'Camp armoury key' } + metalKey + fine,
+  key('camp_hq_safe_key', 0.010, 0.010, 0.040, 'brass') + { title: 'Camp HQ safe key' } + metalKey + fine,
+  key('shed_key', 0.010, 0.012, 0.038, 'steel-grey') + { title: 'Shed key' } + metalKey + fine,
+  key('police_armoury_key',0.010, 0.014, 0.043, 'steel-blued') + { title: 'Police armoury key' } + metalKey + fine,
   atom('gauntlet_lab_entry_card', 'keycard', 0.005, { width: 0.085, height: 0.055, thickness: 0.001, stripeHeight: 0.012 }, { card: 'plastic-white', stripe: 'plastic-blue' }, 'card') + { title: 'Gauntlet lab entry card' } + {
     taxonomy: { category: 'keys', tags: { material: ['plastic'] } },
-  },
+  } + fine,
 ]

@@ -4,6 +4,8 @@ local band = import 'models/head-band.libsonnet';
 local headlampGrain = 0.002;
 // The headlamp's family lays its lens toward -z, which the build turns onto +z.
 local headlampStrap = band.strap('headlamp', headlampGrain, 0.004, forward=180);
+// Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
+local fine = { voxelGrain: 0.002 };
 [
   equipment('blowtorch', 'blowtorch', 0.900, {
     radius: 0.026, bodyHeight: 0.115, footHeight: 0.008, neckRadius: 0.012,
@@ -35,7 +37,7 @@ local headlampStrap = band.strap('headlamp', headlampGrain, 0.004, forward=180);
   equipment('wire_strippers', 'pliers', 0.180, {
     kind: 'wire', length: 0.160, jawLength: 0.042, spread: 0.048,
     gripWidth: 0.014, thickness: 0.007, pivotRadius: 0.012, teeth: 5, toothDepth: 0.004,
-  }, { metal: 'steel-grey', grip: 'plastic-red', dark: 'paint-charcoal' }, 'grip--1', hold='upright') + { title: 'Wire strippers' } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] } } },
+  }, { metal: 'steel-grey', grip: 'plastic-red', dark: 'paint-charcoal' }, 'grip--1', hold='upright') + { title: 'Wire strippers' } + { taxonomy: { category: 'tools', tags: { material: ['metal', 'plastic'], place: ['workshop'], setting: ['modern'] } } } + fine,
   equipment('adjustable_pliers', 'pliers', 0.300, {
     kind: 'groove', length: 0.200, jawLength: 0.060, spread: 0.055,
     gripWidth: 0.014, thickness: 0.008, pivotRadius: 0.017, teeth: 5, toothDepth: 0.004,

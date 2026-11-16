@@ -1,5 +1,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local part = h.part, port = h.port;
+// Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
+local fine = { voxelGrain: 0.002 };
 [
   {
     id: 'frag_grenade',
@@ -12,7 +14,7 @@ local part = h.part, port = h.port;
     connections: [],
     handling: { part: 'grenade', solid: 'body', fraction: [0.5, 0.5, 0.5], turn: [0, -90, -90], hold: 'upright', roll: 0 },
     taxonomy: { category: 'weapons', tags: { weapon: ['explosive'], material: ['metal'], setting: ['modern'] } },
-  },
+  } + fine,
   // Burn-down mass belongs to the inventory row, so these export no part masses.
   {
     id: 'torch',

@@ -1,12 +1,14 @@
 local p = import 'packages/thing-authoring-tool/packages.libsonnet';
 local carton = p.carton, vessel = p.vessel;
+// Too small for the item grain, which draws it a few voxels across; the finest grain lets its shape read.
+local fine = { voxelGrain: 0.002 };
 [
-  vessel('canned_beans', 0.450, 0.037, 0.11, 'steel-grey', 'paint-terracotta', exportMass='parts') + { title: 'Canned beans' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } },
-  vessel('canned_soup', 0.430, 0.034, 0.12, 'steel-grey', 'paperboard-tan', exportMass='parts') + { title: 'Canned soup' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } },
+  vessel('canned_beans', 0.450, 0.037, 0.11, 'steel-grey', 'paint-terracotta', exportMass='parts') + { title: 'Canned beans' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } } + fine,
+  vessel('canned_soup', 0.430, 0.034, 0.12, 'steel-grey', 'paperboard-tan', exportMass='parts') + { title: 'Canned soup' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } } + fine,
   carton('crackers', 0.250, 0.14, 0.20, 0.055, 'paperboard-tan', 'paint-terracotta', exportMass='parts') + { title: 'Crackers' } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
-  carton('chocolate_bar', 0.100, 0.15, 0.012, 0.07, 'paperboard-brown', 'paperboard-tan', exportMass='parts', extra={ lidHeight: 0.0005 }) + { title: 'Chocolate bar' } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
-  vessel('soda_can', 0.360, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }) + { title: 'Soda can' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } },
-  vessel('empty_soda_can', 0.015, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }) + { title: 'Empty soda can' } + { taxonomy: { category: 'food', tags: { state: ['empty'] } } },
+  carton('chocolate_bar', 0.100, 0.15, 0.012, 0.07, 'paperboard-brown', 'paperboard-tan', exportMass='parts', extra={ lidHeight: 0.0005 }) + { title: 'Chocolate bar' } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } } + fine,
+  vessel('soda_can', 0.360, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }) + { title: 'Soda can' } + { taxonomy: { category: 'food', tags: { material: ['metal'], setting: ['modern'] } } } + fine,
+  vessel('empty_soda_can', 0.015, 0.033, 0.115, 'steel-grey', 'plastic-red', exportMass='inventory-atom', extra={ shoulderHeight: 0.005, neckRadius: 0.029, capRadius: 0.030 }) + { title: 'Empty soda can' } + { taxonomy: { category: 'food', tags: { state: ['empty'] } } } + fine,
   vessel('water_bottle', 1.050, 0.043, 0.20, 'glass-grey', 'plastic-blue', exportMass='parts', extra={ shoulderHeight: 0.025, neckRadius: 0.014, neckHeight: 0.015, capRadius: 0.016, capHeight: 0.012 }) + { title: 'Water bottle' } + { taxonomy: { category: 'food', tags: { material: ['glass'], setting: ['modern'] } } },
   carton('juice_carton', 1.050, 0.075, 0.19, 0.075, 'paperboard-tan', 'plastic-green', exportMass='parts', extra={ lidHeight: 0.015 }) + { title: 'Juice carton' } + { taxonomy: { category: 'food', tags: { material: ['paper'], setting: ['modern'] } } },
   carton('cartridge_box_308_h_winchester', 0.520, 0.15, 0.08, 0.035, 'paperboard-brown', 'paperboard-tan', exportMass='parts') + { title: '.308 cartridge box' } + { taxonomy: { category: 'ammunition', tags: { weapon: ['rifle'] } } },
