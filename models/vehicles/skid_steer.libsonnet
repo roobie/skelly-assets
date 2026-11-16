@@ -111,7 +111,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
     box('core', 'core', [coolerX - 0.025, coolerBase, -coolerHalf + 0.04], [coolerX + 0.025, coolerTop, coolerHalf - 0.04]),
   ] + bothSides([
     box('tank', 'tank', [coolerX - 0.04, coolerBase, coolerHalf - 0.04], [coolerX + 0.04, coolerTop, coolerHalf]),
-  ]), { core: 'paint-charcoal', tank: 'alu-bare' }) + { title: 'Skid-steer loader hydraulic oil cooler' },
+  ]), { core: 'alu-bare', tank: 'paint-charcoal' }) + { title: 'Skid-steer loader hydraulic oil cooler' },
   // The tank stands on the frame's floor below the cooler stack, its sight gauge facing the tail door and its return
   // filter on top, where the oil level and the filter can be serviced through the open door.
   k.compound('skid_steer_hydraulic_tank', 22, [
