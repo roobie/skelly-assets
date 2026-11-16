@@ -20,7 +20,7 @@ local part(suffix) = k.partId('police_car', s, suffix);
   ] + engine.sites('i4_petrol', [s.frontAxle - 0.02, 0.28, 0], 'assembly') + [
     site.one('gearbox', 'gearbox_transaxle', [s.frontAxle - 0.02, 0.3, -0.36]),
   ] + cooling.sites(engine.radiator('i4_petrol'), [s.front - 0.3, 0.32, 0], 'assembly')
-  + tank.sites('fuel_tank_car', [s.rearAxle + 0.65, s.sill, 0], 'assembly')
+  + tank.sites('fuel_tank_car', [s.rearAxle + 0.65, s.floor - 0.16, 0], 'assembly')
   + exhaust.sites('exhaust_saloon', [s.rear + 0.46, 0.14, 0.42], 'assembly') + [
     site.one('rear_axle', 'twist_beam', [s.rearAxle, 0, 0]),
     site.one('steering_wheel', 'steering_wheel', [s.cowl - 0.4, s.waist - 0.2, -0.37]),
