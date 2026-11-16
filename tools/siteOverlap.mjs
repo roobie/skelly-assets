@@ -5,9 +5,10 @@
 // are contact, not overlap. Parts that one site composes are out of scope: a site's pieces may overlap each other
 // freely. An overlap is allowed by a fit between the two parts' roles (`models/vehicles/seating.libsonnet`), which
 // holds for every vehicle, or by the vehicle's own placements file (`models/vehicles/site.libsonnet`): `overlap` for one that is
-// correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run. Both are capped
-// at the depth they were written for, and a variant shares its parent's. An entry that no longer applies is reported,
-// so the lists cannot rot. The reason for the rule is in `docs/decisions/0014-site-overlap.md`.
+// correct and says why, `unjudged` for one nobody has judged yet, which the report lists on every run; a family's
+// unjudged overlaps may instead be listed in `models/vehicles/unjudged-overlaps.libsonnet`. Both are capped at the depth
+// they were written for, and a variant shares its parent's. An entry that no longer applies is reported, so the lists
+// cannot rot. The reason for the rule is in `docs/decisions/0014-site-overlap.md`.
 import { resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { solid } from './pieceSolid.mjs';
@@ -24,6 +25,7 @@ export function readSitePieces(root = repo) {
   return JSON.parse(evaluateJsonnet(`
   local k = import 'models/vehicles/kit.libsonnet';
   local placements = import 'models/vehicles/placements.libsonnet';
+  local unjudged = import 'models/vehicles/unjudged-overlaps.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   local drawn = { [row.id]: std.parseJson(row.parts[0].params.pieces) for row in rows };
   local placed(site) = [
@@ -46,7 +48,7 @@ export function readSitePieces(root = repo) {
         forward: placements[vehicle].forward,
         sites: [site { pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
         overlaps: std.get(placements[vehicle], 'overlaps', []),
-        unjudged: std.get(placements[vehicle], 'unjudged', []),
+        unjudged: std.get(placements[vehicle], 'unjudged', []) + std.get(unjudged, vehicle, []),
         swingContacts: std.get(placements[vehicle], 'swingContacts', []),
         swingUnjudged: std.get(placements[vehicle], 'swingUnjudged', []),
       }
@@ -251,19 +253,23 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
   const problems = seatingProblems(fits, roles);
   const notes = [];
   const measured = new Map();
+  const pending = new Set();
   for (const [vehicle, { parent, sites, overlaps, unjudged }] of Object.entries(vehicles)) {
     const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
     const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
     const entries = [...overlaps, ...unjudged];
     const inherited = [...(vehicles[parent]?.overlaps ?? []), ...(vehicles[parent]?.unjudged ?? [])];
     const allowed = new Map([...inherited, ...entries].map((entry) => [key(...entry.sites), entry]));
+    const notJudged = new Set([...(vehicles[parent]?.unjudged ?? []), ...unjudged]);
     const inheritedPairs = new Set(inherited.map((entry) => key(...entry.sites)));
     const describe = ({ sites: [a, b], parts: [partA, partB] }) =>
       `${vehicle}: ${partA} at ${a} and ${partB} at ${b}`;
     for (const overlap of found.values()) {
       const rolePair = key(...overlap.sites.map(roleOf));
       measured.set(rolePair, [...(measured.get(rolePair) ?? []), overlap.depth]);
-      const cap = Math.max(roleDepth(overlap), allowed.get(key(...overlap.sites))?.depth ?? 0);
+      const allowance = allowed.get(key(...overlap.sites));
+      if (notJudged.has(allowance) && overlap.depth > roleDepth(overlap) + EPSILON) pending.add(rolePair);
+      const cap = Math.max(roleDepth(overlap), allowance?.depth ?? 0);
       const [partA, partB] = overlap.parts;
       const [a, b] = overlap.sites;
       const detail = `by ${millimetres(overlap.depth)} mm (${overlap.pieces[0]} in ${overlap.pieces[1]})`;
@@ -293,21 +299,27 @@ export function overlapReport({ grain, fits, roles, vehicles }) {
       }
     }
   }
-  problems.push(...seatingUseProblems(fits, grain, measured));
+  const use = seatingUse(fits, grain, measured);
+  problems.push(...use.filter(({ pair }) => !pending.has(pair)).map(({ message }) => message));
+  notes.push(...use.filter(({ pair }) => pending.has(pair)).map(({ message }) => `${message}, until its unjudged overlaps are judged`));
   return { problems, notes };
 }
 
 // Pairs of the fits that no vehicle uses: one no vehicle overlaps on, or one whose depth is far above the deepest
-// overlap it covers, so the table keeps no pair that has lost its reason and no cap that has come loose.
-function seatingUseProblems(fits, grain, measured) {
+// overlap it covers, so the table keeps no pair that has lost its reason and no cap that has come loose. Each is
+// { pair, message }, keyed by the pair's roles: while an overlap deeper than the pair is marked `unjudged`, the pair
+// may yet be refitted to it, so the report notes it rather than fails.
+function seatingUse(fits, grain, measured) {
   return fits.flatMap(({ pairs }, i) => pairs.flatMap(([seated, into, depth]) => {
-    const depths = measured.get(key(seated, into));
+    const pair = key(seated, into);
+    const depths = measured.get(pair);
     const covered = Math.max(0, ...(depths ?? []).filter((found) => found <= depth + EPSILON));
     const where = `seating fit ${i + 1}: pair ${seated} and ${into}`;
-    if (!depths) return [`${where} is unused: no vehicle overlaps on it`];
-    if (covered === 0) return [`${where} is dead: every overlap on it is deeper than ${millimetres(depth)} mm`];
+    const found = (message) => [{ pair, message: `${where} ${message}` }];
+    if (!depths) return found('is unused: no vehicle overlaps on it');
+    if (covered === 0) return found(`is dead: every overlap on it is deeper than ${millimetres(depth)} mm`);
     if (depth - covered > LOOSE * grain) {
-      return [`${where} is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`];
+      return found(`is capped at ${millimetres(depth)} mm, far above the ${millimetres(covered)} mm it covers`);
     }
     return [];
   }));

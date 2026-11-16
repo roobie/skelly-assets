@@ -140,6 +140,17 @@ test('a pair names whole roles: a prefix or a pattern of a role seats nothing', 
   assert.equal(fitDepth([fit(['lamp', 'body', 0.4])], 'body', 'lamp'), 0.4);
 });
 
+test('a pair whose deeper overlaps are unjudged is noted, not failed, until they are judged', () => {
+  const roles = ['body', 'lamp_near'];
+  const shallow = [fit(['lamp', 'body', 0.25])];
+  const entry = (kind) => ({ sites: ['body', 'lamp_near'], depth: 0.5 + GRAIN / 2, [kind]: 'n' });
+  const pending = report({ van: vehicle(lamps, { unjudged: [entry('note')] }) }, shallow, roles);
+  assert.deepEqual(pending.problems, []);
+  assert.match(pending.notes.join('\n'), /pair lamp and body is dead.*until its unjudged overlaps are judged/);
+  const judged = report({ van: vehicle(lamps, { overlaps: [entry('why')] }) }, shallow, roles);
+  assert.match(judged.problems.join('\n'), /pair lamp and body is dead/);
+});
+
 test('a pair no vehicle overlaps on is reported unused', () => {
   const apart = [site('body', 'van_body', unit), site('lamp', 'van_lamp', shifted(1))];
   const { problems } = report({ van: vehicle(apart) }, [fit(['lamp', 'body', 1])], ['body', 'lamp']);

@@ -43,11 +43,17 @@ An overlap is allowed in two places, so each fact is stated once where it is tru
 - The vehicle, for what only it does: `overlaps` in its placements file says why a pair is correct, and `unjudged`
   holds an overlap nobody has judged, which may be a defect. Neither fails the build, but `unjudged` prints a note on
   every run, so it stays visible until someone decides. See `models/vehicles/site.libsonnet`, `overlap` and
-  `unjudged`. A variant allows its parent's entries as well as its own.
+  `unjudged`. A variant allows its parent's entries as well as its own. A whole family's unjudged overlaps may be
+  listed apart from its placements files instead (`models/vehicles/unjudged-overlaps.libsonnet`), so that a change of
+  measure that reaches every vehicle can land with nothing hidden and each family judged in a review of its own, while
+  the placements files stay what someone decided.
 
 Every allowance is a depth cap: a pair or entry that grows deeper than declared fails again, so the cap is the
 contract, not the pair. An entry whose pair no longer overlaps, that a fit already covers, that is listed twice or
-whose cap is more than a grain above its measured depth fails the build, so the lists carry no dead weight.
+whose cap is more than a grain above its measured depth fails the build, so the lists carry no dead weight. A fit's
+pair that is dead or capped far above what it covers is only noted while an overlap deeper than it is unjudged: the
+judgment may yet refit the pair to that overlap, and failing first would push the cap down or the pair out before
+anyone has decided.
 
 ## Consequences
 
