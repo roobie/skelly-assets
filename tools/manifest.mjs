@@ -101,8 +101,8 @@ export function mobManifest(rows, severed = []) {
   }
   for (const { mob, pack, index, parts } of severed) {
     files.push(outputPath(pack, index));
-    for (const { bone, id, title, path } of parts) {
-      models.push({ id, title, kind: 'severed-part', pack, path, cut: { mob, bone, index } });
+    for (const { bone, id, title, path, taxonomy } of parts) {
+      models.push({ id, title, kind: 'severed-part', pack, path, taxonomy, cut: { mob, bone, index } });
       files.push(outputPath(pack, path));
     }
   }

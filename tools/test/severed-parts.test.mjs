@@ -65,10 +65,10 @@ test('a severed-part source row served from the cache gives the sidecars a fresh
   }
 });
 
-test('the manifest lists each severed part with the mob type and bone it is cut at, and its pack\'s index', () => {
-  const plan = { mob: 'm', pack: 'p', index: SEVERED_INDEX, parts: [{ bone: 'arm.L', id: 'm_arm_l', title: 'M left arm', path: 'assets/models/m_arm_l.glb' }] };
+test('the manifest lists each severed part with its taxonomy, the mob type and bone it is cut at, and its pack\'s index', () => {
+  const plan = { mob: 'm', pack: 'p', index: SEVERED_INDEX, parts: [{ bone: 'arm.L', id: 'm_arm_l', title: 'M left arm', path: 'assets/models/m_arm_l.glb', taxonomy: { category: 'body' } }] };
   const { models, files } = mobManifest([], [plan]);
-  assert.deepEqual(models, [{ id: 'm_arm_l', title: 'M left arm', kind: 'severed-part', pack: 'p', path: 'assets/models/m_arm_l.glb', cut: { mob: 'm', bone: 'arm.L', index: SEVERED_INDEX } }]);
+  assert.deepEqual(models, [{ id: 'm_arm_l', title: 'M left arm', kind: 'severed-part', pack: 'p', path: 'assets/models/m_arm_l.glb', taxonomy: { category: 'body' }, cut: { mob: 'm', bone: 'arm.L', index: SEVERED_INDEX } }]);
   assert.deepEqual(files.sort(), ['p/assets/models/m_arm_l.glb', `p/${SEVERED_INDEX}`]);
 });
 
