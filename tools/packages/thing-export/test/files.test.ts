@@ -34,7 +34,7 @@ it('leaves a model unweighed while any part is, and keeps a total the tool repor
   expect(written(generated({ a: { massKg: 1 } }, { massKg: 9, volumeM3: 2 }))).toEqual({ massKg: 9, volumeM3: 2 });
 });
 
-it('writes each smooth copy at its model\'s GLB path under the smooth base, and its sidecar only beside the file', () => {
+it("writes each smooth copy at its model's GLB path under the smooth base, and its sidecar only beside the file", () => {
   const base = mkdtempSync(join(tmpdir(), 'files-'));
   try {
     const model = { ...generated({}), glb: new Uint8Array([1]), smoothGlb: new Uint8Array([2]) };

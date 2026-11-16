@@ -22,7 +22,8 @@ export const insectTemplate: Template = {
     leg: material([0.28, 0.13, 0.03]),
     bone: material([0.28, 0.13, 0.03]), // the voxelizer's name for skeleton showing through the flesh: where a thin limb has none, it reads as leg
   },
-  description: 'Low, broad, six-legged crawler: a glossy oval carapace, long feelers, an alternating-tripod scuttle and a lunging bite.',
+  description:
+    'Low, broad, six-legged crawler: a glossy oval carapace, long feelers, an alternating-tripod scuttle and a lunging bite.',
   bodyPlan: 'insect',
   voxelSize: 0.5 / 14,
   bodyMassKg: 1.5,

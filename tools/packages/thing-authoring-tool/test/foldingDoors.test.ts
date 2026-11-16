@@ -17,7 +17,9 @@ interface Site {
 
 // Every vehicle's folding door panels, the sites that place them, the jamb panel sites of each doorway whose two leaves
 // close against each other, and the vehicle grain a row without its own is drawn at.
-const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
+const { grain, vehicles, doorPairs, rows } = JSON.parse(
+  evaluateJsonnet(
+    `
   local placements = import 'models/vehicles/placements.libsonnet';
   local frame = import 'models/vehicles/frame.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
@@ -34,14 +36,22 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(evaluateJsonnet(`
     doorPairs: { [v]: pairsOf(v) for v in std.objectFields(placements) if pairsOf(v) != null },
     rows: frame.rows([row for row in rows if std.member(parts, row.id)]),
   }
-`, resolve(import.meta.dirname, '../../../..'))) as {
+`,
+    resolve(import.meta.dirname, '../../../..'),
+  ),
+) as {
   grain: number;
   vehicles: Record<string, Site[]>;
   doorPairs: Record<string, [string, string][]>;
   rows: unknown[];
 };
 
-const loaded = loadCatalogue({ units: { metresPerUnit: 1, grid: 0.001, bevel: 0 }, facets: 12, defaultMaterial: 'paint-silver', items: rows });
+const loaded = loadCatalogue({
+  units: { metresPerUnit: 1, grid: 0.001, bevel: 0 },
+  facets: 12,
+  defaultMaterial: 'paint-silver',
+  items: rows,
+});
 
 // Each panel's motion and the box each of its solids' voxels fill, both in the model frame about the panel's origin.
 const panels = new Map(
@@ -93,7 +103,10 @@ const spansMeet = (a: Outline, b: Outline): boolean =>
 const separation = (a: Outline, b: Outline): number => {
   if (a.high <= b.low || b.high <= a.low) return Number.POSITIVE_INFINITY;
   let best = Number.NEGATIVE_INFINITY;
-  for (const [from, to] of [[a, b], [b, a]] as const) {
+  for (const [from, to] of [
+    [a, b],
+    [b, a],
+  ] as const) {
     from.corners.forEach(([x0, z0], i) => {
       const [x1, z1] = from.corners[(i + 1) % from.corners.length]!;
       const length = Math.hypot(x1 - x0, z1 - z0);
@@ -109,7 +122,8 @@ const separation = (a: Outline, b: Outline): number => {
 // A vehicle's folding leaves, each a panel that rides no other folding panel with every panel that rides it, keyed by
 // that panel's site, and how far apart two of them are at `clock`.
 const leavesOf = (vehicle: string, sites: readonly Site[]) => {
-  for (const site of sites) if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
+  for (const site of sites)
+    if (site.mirror) throw new Error(`${vehicle} ${site.id}: a far-side door is not posed here`);
   const pose = poser(sites);
   const carrier = (site: Site) => sites.find(({ id }) => id === site.rides);
   const leafOf = (site: Site): string => {
@@ -121,7 +135,14 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
   const drawOutlines = (leaf: string, clock: number): Outline[] =>
     leaves.get(leaf)!.flatMap((site) =>
       panels.get(site.part)!.boxes.map(({ min, max }) => {
-        const corners = ([[min[0], min[2]], [max[0], min[2]], [max[0], max[2]], [min[0], max[2]]] as const).map(([x, z]) => {
+        const corners = (
+          [
+            [min[0], min[2]],
+            [max[0], min[2]],
+            [max[0], max[2]],
+            [min[0], max[2]],
+          ] as const
+        ).map(([x, z]) => {
           const [px, , pz] = pose(site, [x, min[1], z], clock);
           return [px, pz] as const;
         });
@@ -163,7 +184,10 @@ it('keeps every folding leaf clear of every other leaf of its vehicle at every s
     ids.forEach((a, i) =>
       ids.slice(i + 1).forEach((b) => {
         compared += 1;
-        const depths = Array.from({ length: CLOCKS + 1 }, (_, step) => ({ clock: step / CLOCKS, depth: depth(a, b, step / CLOCKS) }));
+        const depths = Array.from({ length: CLOCKS + 1 }, (_, step) => ({
+          clock: step / CLOCKS,
+          depth: depth(a, b, step / CLOCKS),
+        }));
         const deepest = depths.reduce((high, next) => (next.depth > high.depth ? next : high));
         expect(deepest.depth, `${vehicle}: ${a} and ${b} at clock ${deepest.clock}`).toBeLessThanOrEqual(1e-9);
       }),

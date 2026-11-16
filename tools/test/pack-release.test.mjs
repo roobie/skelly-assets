@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { FINISHES_ASSET, packRelease, RENAMES_ASSET } from '../pack-release.mjs';
 
-test('release archives depend only on the tree\'s names and bytes, not its file times or modes', () => {
+test("release archives depend only on the tree's names and bytes, not its file times or modes", () => {
   const root = mkdtempSync(join(tmpdir(), 'pack-release-'));
   try {
     const tree = join(root, 'tree');
@@ -19,7 +19,9 @@ test('release archives depend only on the tree\'s names and bytes, not its file 
     packRelease(tree, join(root, 'second'));
     const archive = (out) => readFileSync(join(root, out, `${first}.tar.gz`));
     assert.ok(archive('first').equals(archive('second')));
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('a flat file other than the manifest is refused, not left out of the release', () => {
@@ -28,10 +30,12 @@ test('a flat file other than the manifest is refused, not left out of the releas
     writeFileSync(join(root, 'manifest.json'), '{}');
     writeFileSync(join(root, 'flat.glb'), 'x');
     assert.throws(() => packRelease(root, join(root, 'out')), /flat\.glb/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
-test('the release carries the manifest\'s renames and finishes as their own assets', () => {
+test("the release carries the manifest's renames and finishes as their own assets", () => {
   const root = mkdtempSync(join(tmpdir(), 'pack-release-'));
   try {
     const tree = join(root, 'tree');
@@ -43,5 +47,7 @@ test('the release carries the manifest\'s renames and finishes as their own asse
     packRelease(tree, join(root, 'out'));
     assert.deepEqual(JSON.parse(readFileSync(join(root, 'out', RENAMES_ASSET), 'utf8')), renames);
     assert.deepEqual(JSON.parse(readFileSync(join(root, 'out', FINISHES_ASSET), 'utf8')), finishes);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

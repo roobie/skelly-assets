@@ -39,7 +39,8 @@ const metres = (value: number): string => `${Math.round(value * 1000)} mm`;
 
 /** The failing vehicles first, then the rest by name, so what needs fixing is on top. */
 export const orderedVehicles = ({ vehicles }: VehicleVerdicts): [string, Readonly<Record<string, SiteVerdict>>][] => {
-  const fails = (sites: Readonly<Record<string, SiteVerdict>>) => Object.values(sites).some(({ status }) => status === 'fails');
+  const fails = (sites: Readonly<Record<string, SiteVerdict>>) =>
+    Object.values(sites).some(({ status }) => status === 'fails');
   return Object.entries(vehicles)
     .map(([name, { sites }]): [string, Readonly<Record<string, SiteVerdict>>] => [name, sites])
     .sort(([a, siteA], [b, siteB]) => Number(fails(siteB)) - Number(fails(siteA)) || compareCodeUnits(a, b));
@@ -56,7 +57,7 @@ export const describeSwing = ({ clear, stop, status, contacts }: SiteVerdict): s
 
 const describeFix = (proposal: Proposal): string => {
   const { status, offset, partOffset, stop, part, reachable } = proposal;
-  if (status === 'ok') return 'Nothing in the vehicle\'s report is against this part.';
+  if (status === 'ok') return "Nothing in the vehicle's report is against this part.";
   if (status === 'moved' && offset && partOffset) {
     return `Move every pin of ${part} by (${partOffset.map(metres).join(', ')}) in the part's frame; the same in the vehicle frame is (${offset.map(metres).join(', ')}). Every site of it in this vehicle then clears; other vehicles that place the part were not checked.`;
   }

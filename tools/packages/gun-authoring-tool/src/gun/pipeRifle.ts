@@ -1,6 +1,6 @@
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
-import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import {
   array,

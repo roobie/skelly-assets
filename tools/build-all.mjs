@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { cacheFolder, CACHE_OPTIONS } from './generation.mjs';
+import { CACHE_OPTIONS, cacheFolder } from './generation.mjs';
 
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
@@ -18,11 +18,16 @@ export function buildAll(out, { cache }) {
   const options = cache === undefined ? ['--no-cache'] : ['--cache', resolve(cache)];
   // Sounds bake in seconds, so they have no cache to choose.
   for (const [builder, ...args] of [['build.mjs', ...options], ['mobs.mjs', ...options], ['sounds.mjs']]) {
-    execFileSync(process.execPath, [join(here, builder), '--out', resolve(out), ...args], { cwd: repo, stdio: 'inherit' });
+    execFileSync(process.execPath, [join(here, builder), '--out', resolve(out), ...args], {
+      cwd: repo,
+      stdio: 'inherit',
+    });
   }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const { values } = parseArgs({ options: { out: { type: 'string', default: join(repo, 'built') }, ...CACHE_OPTIONS } });
+  const { values } = parseArgs({
+    options: { out: { type: 'string', default: join(repo, 'built') }, ...CACHE_OPTIONS },
+  });
   buildAll(values.out, { cache: cacheFolder(values) });
 }

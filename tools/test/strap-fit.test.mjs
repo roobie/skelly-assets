@@ -10,7 +10,10 @@ const WALL = 2 * GRAIN;
 const HALF = [0.02, 0.025];
 const strapRound = ({ gap = GRAIN, back = gap, left = gap, shift = 0 } = {}) => {
   const [x, z] = HALF;
-  const box = (minX, maxX, minZ, maxZ) => [[minX, -0.004, minZ + shift], [maxX, 0.004, maxZ + shift]];
+  const box = (minX, maxX, minZ, maxZ) => [
+    [minX, -0.004, minZ + shift],
+    [maxX, 0.004, maxZ + shift],
+  ];
   return boxes(
     box(x + left, x + left + WALL, -z - back - WALL, z + gap + WALL),
     box(-x - gap - WALL, -x - gap, -z - back - WALL, z + gap + WALL),
@@ -18,9 +21,14 @@ const strapRound = ({ gap = GRAIN, back = gap, left = gap, shift = 0 } = {}) => 
     box(-x - gap, x + left, -z - back - WALL, -z - back),
   );
 };
-const headAt = (y, z) => boxes([[-HALF[0], y - 0.03, z - HALF[1]], [HALF[0], y + 0.01, z + HALF[1]]]);
+const headAt = (y, z) =>
+  boxes([
+    [-HALF[0], y - 0.03, z - HALF[1]],
+    [HALF[0], y + 0.01, z + HALF[1]],
+  ]);
 const level = { frame: { height: 0, turn: 0 }, worn: { at: 0, turn: 0 } };
-const findings = (strap, head = headAt(0, 0), place = level) => strapFindings({ head, strap, grain: GRAIN, ...place, model: 'gear' });
+const findings = (strap, head = headAt(0, 0), place = level) =>
+  strapFindings({ head, strap, grain: GRAIN, ...place, model: 'gear' });
 
 test('a strap a voxel off the head, its corners a diagonal off, fits where the head frame and the worn place seat it', () => {
   const place = { frame: { height: 0.75, turn: 90 }, worn: { at: 0.25, turn: 90 } };
@@ -62,11 +70,18 @@ test('strap anchors naming the outer face as the inner one are reported', () => 
 });
 
 test('an empty table of band-fitted models is a finding, not a pass', () => {
-  assert.deepEqual(treeStrapFindings('', { models: [] }, undefined, {}), ['models/head-band.libsonnet wears no band-fitted model']);
+  assert.deepEqual(treeStrapFindings('', { models: [] }, undefined, {}), [
+    'models/head-band.libsonnet wears no band-fitted model',
+  ]);
 });
 
-test('a model is read in voxels from its own path, and smooth from its copy\'s, which a mob has not', () => {
-  const entry = { id: 'gear', pack: 'fixture.a', path: 'assets/models/gear.glb', smooth: { pack: 'fixture.a.smooth', path: 'assets/models/gear.glb' } };
+test("a model is read in voxels from its own path, and smooth from its copy's, which a mob has not", () => {
+  const entry = {
+    id: 'gear',
+    pack: 'fixture.a',
+    path: 'assets/models/gear.glb',
+    smooth: { pack: 'fixture.a.smooth', path: 'assets/models/gear.glb' },
+  };
   assert.equal(formFile(entry, 'voxel'), 'fixture.a/assets/models/gear.glb');
   assert.equal(formFile(entry, 'smooth'), 'fixture.a.smooth/assets/models/gear.glb');
   assert.throws(() => formFile({ ...entry, smooth: undefined }, 'smooth'), /gear has no smooth copy/);

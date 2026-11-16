@@ -8,11 +8,20 @@ import { exportGlb, exportModelGlbs } from '../src/glb.ts';
 interface Primitive {
   readonly attributes: { readonly POSITION: number };
   readonly material: number;
-  readonly extras: { readonly solids?: readonly string[]; readonly solid?: string; readonly piece?: string; readonly voxelGrain?: number };
+  readonly extras: {
+    readonly solids?: readonly string[];
+    readonly solid?: string;
+    readonly piece?: string;
+    readonly voxelGrain?: number;
+  };
 }
 interface Json {
   readonly meshes: readonly { readonly primitives: readonly Primitive[] }[];
-  readonly accessors: readonly { readonly count: number; readonly min?: readonly number[]; readonly max?: readonly number[] }[];
+  readonly accessors: readonly {
+    readonly count: number;
+    readonly min?: readonly number[];
+    readonly max?: readonly number[];
+  }[];
 }
 
 const jsonOf = (glb: Uint8Array): Json => {

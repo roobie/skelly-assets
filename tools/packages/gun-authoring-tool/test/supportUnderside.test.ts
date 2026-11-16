@@ -42,22 +42,25 @@ describe('the exported support anchor rides the underside the voxelized file dra
     expect(supportForends.length).toBeGreaterThan(0);
   });
 
-  it.each(supportForends)('sits on the forend part’s lowest drawn face: $label, $partId', ({ assembly, items, partId }) => {
-    const trimmed = sightless(assembly);
-    const result = exportGunGlb(
-      trimmed,
-      ASSET,
-      { appearanceProfile: 'ar' },
-      { ...recipeVoxel({ voxel: gunVoxel }), items: itemsKept(trimmed, items) },
-    );
-    if (!result.ok) {
-      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
-    }
-    const read = readGlb(result.glb);
-    const triangles = partTriangles(read.json, read, partId);
-    const lowest = Math.min(...triangles.flatMap((tri) => tri.map((p) => p[1]!)));
-    expect(Number.isFinite(lowest), `${partId} draws faces`).toBe(true);
-    // A hand copying the height would drift at the next re-export; the anchor must sit on the drawn underside.
-    expect(result.modelEntry.anchors!.support![1]).toBeCloseTo(lowest, 6);
-  });
+  it.each(supportForends)(
+    'sits on the forend part’s lowest drawn face: $label, $partId',
+    ({ assembly, items, partId }) => {
+      const trimmed = sightless(assembly);
+      const result = exportGunGlb(
+        trimmed,
+        ASSET,
+        { appearanceProfile: 'ar' },
+        { ...recipeVoxel({ voxel: gunVoxel }), items: itemsKept(trimmed, items) },
+      );
+      if (!result.ok) {
+        throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+      }
+      const read = readGlb(result.glb);
+      const triangles = partTriangles(read.json, read, partId);
+      const lowest = Math.min(...triangles.flatMap((tri) => tri.map((p) => p[1]!)));
+      expect(Number.isFinite(lowest), `${partId} draws faces`).toBe(true);
+      // A hand copying the height would drift at the next re-export; the anchor must sit on the drawn underside.
+      expect(result.modelEntry.anchors!.support![1]).toBeCloseTo(lowest, 6);
+    },
+  );
 });

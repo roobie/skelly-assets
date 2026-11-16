@@ -11,13 +11,13 @@ import type { EulerDeg } from '../../core/pose.ts';
 import { severedBoneSet } from '../dismember.ts';
 import {
   type Angles,
+  both,
   type ClipDef,
   type ClipFrame,
   channelAngles,
   clipLookup,
   groundedFrame,
   type ScalarKeys,
-  both,
   scalar,
 } from '../keyframes.ts';
 import { LEG_BONES, REVERSED_FLEX } from './plan.ts';
@@ -108,12 +108,7 @@ const CLIPS = {
         ],
       },
       hull: {
-        track: [
-          [0, rest],
-          ...servo(0.36, rest, [-1, 0, 0], 0.03),
-          ...servo(0.73, [-1, 0, 0], rest, 0.03),
-          [1, rest],
-        ],
+        track: [[0, rest], ...servo(0.36, rest, [-1, 0, 0], 0.03), ...servo(0.73, [-1, 0, 0], rest, 0.03), [1, rest]],
       },
     },
   },
@@ -210,12 +205,7 @@ const CLIPS = {
         ],
       },
       head: {
-        track: [
-          [0, rest],
-          ...servo(0.08, rest, [-3, 0, 0], 0.04),
-          [0.8, [-3, 0, 0]],
-          [1, rest],
-        ],
+        track: [[0, rest], ...servo(0.08, rest, [-3, 0, 0], 0.04), [0.8, [-3, 0, 0]], [1, rest]],
       },
       ...both('pod', [
         [0, rest],
@@ -280,7 +270,12 @@ const legOf = (bones: readonly Bone[], side: string): Leg => {
     hip,
     ball,
     lengths: [span(hip, knee), span(knee, hock), span(hock, ball)],
-    headings: [heading(minus(knee, hip)), heading(minus(hock, knee)), heading(minus(ball, hock)), heading(minus(toe, ball))],
+    headings: [
+      heading(minus(knee, hip)),
+      heading(minus(hock, knee)),
+      heading(minus(ball, hock)),
+      heading(minus(toe, ball)),
+    ],
   };
 };
 
@@ -302,7 +297,11 @@ const solveLeg = (leg: Leg, pivot: Planar, hullPitch: number, target: FootTarget
   const tarsus = tarsusRest + target.tuck;
   const hock = minus(target.ball, toward(tarsus, tarsusLength));
   const reach = minus(hock, hip);
-  const distance = clamp(Math.hypot(...reach), Math.abs(thighLength - shinLength) + 1e-6, thighLength + shinLength - 1e-6);
+  const distance = clamp(
+    Math.hypot(...reach),
+    Math.abs(thighLength - shinLength) + 1e-6,
+    thighLength + shinLength - 1e-6,
+  );
   const along = (thighLength ** 2 - shinLength ** 2 + distance ** 2) / (2 * distance);
   const rise = Math.sqrt(Math.max(0, thighLength ** 2 - along ** 2));
   const axis = heading(reach);
@@ -372,7 +371,7 @@ export const walkerAngles = (bones: readonly Bone[], name: string, u: number): A
     const target: FootTarget =
       clip.stride && clip.travel
         ? strideTarget(leg, clip.stride, clip.travel, u, q, sink)
-      : { ball: [leg.ball[0] + sink, leg.ball[1]], tuck: 0, tilt: 0 };
+        : { ball: [leg.ball[0] + sink, leg.ball[1]], tuck: 0, tilt: 0 };
     Object.assign(angles, solveLeg(leg, planar(hull), hullPitch, target));
   }
   return angles;

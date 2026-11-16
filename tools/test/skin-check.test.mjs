@@ -20,7 +20,12 @@ before(async () => {
   server = await serveSite(site, site);
   browser = await launchBrowser();
   page = await browser.newPage();
-  await page.route(`${server.origin}/skin-check.html`, (route) => route.fulfill({ contentType: 'text/html', body: `<!doctype html><html><head>${importMap}</head><body></body></html>` }));
+  await page.route(`${server.origin}/skin-check.html`, (route) =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: `<!doctype html><html><head>${importMap}</head><body></body></html>`,
+    }),
+  );
   await page.goto(`${server.origin}/skin-check.html`);
 });
 after(async () => {
@@ -30,26 +35,36 @@ after(async () => {
 
 // The covered skin showing in each review view of an arm in a sleeve `width` wide; the arm is 0.1 m thick, as in
 // tools/test/clearance.test.mjs.
-const showing = (width) => page.evaluate(async (sleeveWidth) => {
-  const THREE = await import('three');
-  const { coveredSurface } = await import('/clearance.mjs');
-  const { addCoveredSkin, skinCheck } = await import('/skin.mjs');
-  const boxMesh = ([w, h, d], centre) => {
-    const positions = [];
-    for (const z of [-d / 2, d / 2]) for (const y of [-h / 2, h / 2]) for (const x of [-w / 2, w / 2]) positions.push(x + centre[0], y + centre[1], z + centre[2]);
-    const indices = [0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6, 0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7, 0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5];
-    return { positions, indices };
-  };
-  const rig = { bones: [{ id: 'arm', head: [0, 0, 0], tail: [0, -0.3, 0] }] };
-  const rest = { body: [{ bone: 'arm', mesh: boxMesh([0.1, 0.3, 0.1], [0, -0.15, 0]) }], pieces: [{ piece: 'sleeve', bone: 'arm', mesh: boxMesh([sleeveWidth, 0.2, sleeveWidth], [0, -0.15, 0]) }] };
-  const joint = new THREE.Group();
-  for (const { mesh } of [...rest.body, ...rest.pieces]) {
-    const geometry = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(mesh.positions, 3)).setIndex(mesh.indices);
-    joint.add(new THREE.Mesh(geometry));
-  }
-  addCoveredSkin({ bones: new Map([['arm', { joint }]]) }, coveredSurface(rig, rest, { whole: true }));
-  return skinCheck(joint, 128, 'review').views.map(({ showing }) => showing);
-}, width);
+const showing = (width) =>
+  page.evaluate(async (sleeveWidth) => {
+    const THREE = await import('three');
+    const { coveredSurface } = await import('/clearance.mjs');
+    const { addCoveredSkin, skinCheck } = await import('/skin.mjs');
+    const boxMesh = ([w, h, d], centre) => {
+      const positions = [];
+      for (const z of [-d / 2, d / 2])
+        for (const y of [-h / 2, h / 2])
+          for (const x of [-w / 2, w / 2]) positions.push(x + centre[0], y + centre[1], z + centre[2]);
+      const indices = [
+        0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6, 0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7, 0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5,
+      ];
+      return { positions, indices };
+    };
+    const rig = { bones: [{ id: 'arm', head: [0, 0, 0], tail: [0, -0.3, 0] }] };
+    const rest = {
+      body: [{ bone: 'arm', mesh: boxMesh([0.1, 0.3, 0.1], [0, -0.15, 0]) }],
+      pieces: [{ piece: 'sleeve', bone: 'arm', mesh: boxMesh([sleeveWidth, 0.2, sleeveWidth], [0, -0.15, 0]) }],
+    };
+    const joint = new THREE.Group();
+    for (const { mesh } of [...rest.body, ...rest.pieces]) {
+      const geometry = new THREE.BufferGeometry()
+        .setAttribute('position', new THREE.Float32BufferAttribute(mesh.positions, 3))
+        .setIndex(mesh.indices);
+      joint.add(new THREE.Mesh(geometry));
+    }
+    addCoveredSkin({ bones: new Map([['arm', { joint }]]) }, coveredSurface(rig, rest, { whole: true }));
+    return skinCheck(joint, 128, 'review').views.map(({ showing }) => showing);
+  }, width);
 
 test('an arm a sleeve encloses shows no covered skin from any view', { skip }, async () => {
   assert.ok((await showing(0.12)).every((pixels) => pixels === 0));
@@ -59,6 +74,6 @@ test('an arm poking out of a sleeve too narrow for it shows covered skin', { ski
   assert.ok((await showing(0.099)).some((pixels) => pixels > 0));
 });
 
-test('an arm whose faces lie on its sleeve\'s shows covered skin, as the tie draws', { skip }, async () => {
+test("an arm whose faces lie on its sleeve's shows covered skin, as the tie draws", { skip }, async () => {
   assert.ok((await showing(0.1)).some((pixels) => pixels > 0));
 });

@@ -4,13 +4,32 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { compareVersions, hashModels, mergeHistory, previousTag, standings, vehicleStanding } from '../model-history.mjs';
+import {
+  compareVersions,
+  hashModels,
+  mergeHistory,
+  previousTag,
+  standings,
+  vehicleStanding,
+} from '../model-history.mjs';
 
 const entry = (introduced, updated, sha256) => ({ introduced, updated, sha256 });
-const before = { version: 'v1.0.0', models: { kept: entry('v0.1.0', 'v0.1.0', 'a'), edited: entry('v0.1.0', 'v0.2.0', 'b'), old_name: entry('v0.3.0', 'v0.3.0', 'c'), gone: entry('v0.1.0', 'v0.1.0', 'd') } };
+const before = {
+  version: 'v1.0.0',
+  models: {
+    kept: entry('v0.1.0', 'v0.1.0', 'a'),
+    edited: entry('v0.1.0', 'v0.2.0', 'b'),
+    old_name: entry('v0.3.0', 'v0.3.0', 'c'),
+    gone: entry('v0.1.0', 'v0.1.0', 'd'),
+  },
+};
 
 test('a model is new, edited or unchanged by its hash, and a release without it drops it', () => {
-  const { models } = mergeHistory({ previous: before, version: 'v1.1.0', hashes: { kept: 'a', edited: 'b2', fresh: 'f' } });
+  const { models } = mergeHistory({
+    previous: before,
+    version: 'v1.1.0',
+    hashes: { kept: 'a', edited: 'b2', fresh: 'f' },
+  });
   assert.deepEqual(models.kept, entry('v0.1.0', 'v0.1.0', 'a'));
   assert.deepEqual(models.edited, entry('v0.1.0', 'v1.1.0', 'b2'));
   assert.deepEqual(models.fresh, entry('v1.1.0', 'v1.1.0', 'f'));
@@ -18,14 +37,29 @@ test('a model is new, edited or unchanged by its hash, and a release without it 
 });
 
 test('a renamed model keeps its history, and is updated only when its bytes changed', () => {
-  const same = mergeHistory({ previous: before, version: 'v1.1.0', hashes: { new_name: 'c' }, renames: { old_name: 'new_name' } });
+  const same = mergeHistory({
+    previous: before,
+    version: 'v1.1.0',
+    hashes: { new_name: 'c' },
+    renames: { old_name: 'new_name' },
+  });
   assert.deepEqual(same.models.new_name, entry('v0.3.0', 'v0.3.0', 'c'));
-  const edited = mergeHistory({ previous: before, version: 'v1.1.0', hashes: { new_name: 'c2' }, renames: { old_name: 'new_name' } });
+  const edited = mergeHistory({
+    previous: before,
+    version: 'v1.1.0',
+    hashes: { new_name: 'c2' },
+    renames: { old_name: 'new_name' },
+  });
   assert.deepEqual(edited.models.new_name, entry('v0.3.0', 'v1.1.0', 'c2'));
 });
 
 test('models merged into one keep the earliest introduction and count as changed', () => {
-  const { models } = mergeHistory({ previous: before, version: 'v1.1.0', hashes: { whole: 'w' }, renames: { kept: 'whole', old_name: 'whole' } });
+  const { models } = mergeHistory({
+    previous: before,
+    version: 'v1.1.0',
+    hashes: { whole: 'w' },
+    renames: { kept: 'whole', old_name: 'whole' },
+  });
   assert.deepEqual(models.whole, entry('v0.1.0', 'v1.1.0', 'w'));
 });
 
@@ -70,12 +104,22 @@ test('only GLB models and vehicle placements are hashed, and a vehicle may not s
   try {
     mkdirSync(join(root, 'fixture.a'));
     writeFileSync(join(root, 'fixture.a/one.glb'), 'one');
-    const manifest = { models: [{ id: 'one', pack: 'fixture.a', path: 'one.glb' }, { id: 'rig', pack: 'fixture.a', path: 'rig.json' }] };
+    const manifest = {
+      models: [
+        { id: 'one', pack: 'fixture.a', path: 'one.glb' },
+        { id: 'rig', pack: 'fixture.a', path: 'rig.json' },
+      ],
+    };
     writeFileSync(join(root, 'fixture.a/car.json'), '{}');
     const car = { id: 'car', pack: 'fixture.a', path: 'car.json' };
     assert.deepEqual(Object.keys(hashModels(root, { ...manifest, vehicles: [car] })), ['one', 'car']);
-    assert.throws(() => hashModels(root, { ...manifest, vehicles: [{ ...car, id: 'one' }] }), /one names more than one/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+    assert.throws(
+      () => hashModels(root, { ...manifest, vehicles: [{ ...car, id: 'one' }] }),
+      /one names more than one/,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('a model is hashed with its smooth copy, and one without a copy keeps the hash of its GLB alone', () => {
@@ -91,6 +135,11 @@ test('a model is hashed with its smooth copy, and one without a copy keeps the h
     const both = hashModels(root, { models: [{ ...one, smooth: { pack: 'fixture.a.smooth', path: 'one.glb' } }] }).one;
     assert.notEqual(both, alone);
     writeFileSync(join(root, 'fixture.a.smooth/one.glb'), 'smoother');
-    assert.notEqual(hashModels(root, { models: [{ ...one, smooth: { pack: 'fixture.a.smooth', path: 'one.glb' } }] }).one, both);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+    assert.notEqual(
+      hashModels(root, { models: [{ ...one, smooth: { pack: 'fixture.a.smooth', path: 'one.glb' } }] }).one,
+      both,
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

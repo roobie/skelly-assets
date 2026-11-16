@@ -31,7 +31,13 @@ export type AnalyticPiece =
       readonly start: number;
       readonly end: number;
     }
-  | { readonly id: string; readonly kind: 'turned'; readonly axis: Axis; readonly origin?: Vec3 | undefined; readonly profile: Profile };
+  | {
+      readonly id: string;
+      readonly kind: 'turned';
+      readonly axis: Axis;
+      readonly origin?: Vec3 | undefined;
+      readonly profile: Profile;
+    };
 
 // The axis a prism or turned piece runs along, then the two axes its profile's coordinates lie on.
 type Index = 0 | 1 | 2;
@@ -102,7 +108,9 @@ export const centreOf = ({ min, max }: Bounds): Vec3 => scale([min[0] + max[0], 
 
 /** The eight corners of `bounds`. */
 export const cornersOf = ({ min, max }: Bounds): Vec3[] =>
-  [0, 1, 2, 3, 4, 5, 6, 7].map((corner) => [0, 1, 2].map((axis) => ((corner >> axis) & 1 ? max : min)[axis]!) as unknown as Vec3);
+  [0, 1, 2, 3, 4, 5, 6, 7].map(
+    (corner) => [0, 1, 2].map((axis) => ((corner >> axis) & 1 ? max : min)[axis]!) as unknown as Vec3,
+  );
 
 /** One pin's own line: a turned or prism piece runs along its declared axis, a box along its unique longest side. */
 const ownDirection = (pin: AnalyticPiece, bounds: Bounds, grain: number): Vec3 => {
@@ -185,7 +193,9 @@ export const mirrorMotion = (motion: Motion): Motion =>
   ) as unknown as Motion;
 
 /** A stage as authored, before the build gives it its share of the clock. */
-export type StageMove = { [Kind in MotionStage['kind']]: Omit<Extract<MotionStage, { kind: Kind }>, 'share'> }[MotionStage['kind']];
+export type StageMove = {
+  [Kind in MotionStage['kind']]: Omit<Extract<MotionStage, { kind: Kind }>, 'share'>;
+}[MotionStage['kind']];
 
 /** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
 const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
@@ -224,7 +234,11 @@ const stageFractions = (motion: Motion, clock: number): number[] => {
 const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
   if (stage.kind === 'slide') {
     const step = stage.travel * fraction;
-    return [point[0] + stage.direction[0] * step, point[1] + stage.direction[1] * step, point[2] + stage.direction[2] * step];
+    return [
+      point[0] + stage.direction[0] * step,
+      point[1] + stage.direction[1] * step,
+      point[2] + stage.direction[2] * step,
+    ];
   }
   const u = normalize(sub(stage.axis.to, stage.axis.from));
   const r = sub(point, stage.axis.from);

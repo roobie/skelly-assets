@@ -27,4 +27,3 @@ test('a task failure reaches the caller with its stack, cause and schema issues'
     await pool.close();
   }
 });
-

@@ -8,7 +8,9 @@ import { meeting } from './pieces.mjs';
 const root = resolve(import.meta.dirname, '../..');
 // Every site of the carrier with its part's pieces drawn where the site puts them, mirrored on the far side, and the
 // player doll's measures.
-const data = JSON.parse(evaluateJsonnet(`
+const data = JSON.parse(
+  evaluateJsonnet(
+    `
   local k = import 'models/vehicles/kit.libsonnet';
   local own = import 'models/vehicles/apc_scifi_wheeled.libsonnet';
   local placements = import 'models/vehicles/apc_scifi_wheeled.placements.libsonnet';
@@ -24,24 +26,46 @@ const data = JSON.parse(evaluateJsonnet(`
     sites: [s + { pieces: pieces(s) } for s in placements.sites],
     bust: import 'models/measures/bust.libsonnet',
     leg: import 'models/measures/leg.libsonnet',
-  }`, root));
+  }`,
+    root,
+  ),
+);
 const { spec, own, sites, bust, leg } = data;
 const site = Object.fromEntries(sites.map((s) => [s.id, s]));
 const drawn = (...ids) => ids.flatMap((id) => site[id].pieces);
 const sides = ['near', 'far'];
 // Pieces moved by an [x, y, z] offset, each kind along the axes its shape stores, its cut planes with it.
-const shifted = (pieces, by) => pieces.map((p) => {
-  const clip = p.clip?.map(({ normal, offset }) => ({ normal, offset: offset + normal[0] * by[0] + normal[1] * by[1] + normal[2] * by[2] }));
-  const moved = { ...p, ...(clip ? { clip } : {}) };
-  if (p.kind === 'box') return { ...moved, min: p.min.map((v, i) => v + by[i]), max: p.max.map((v, i) => v + by[i]) };
-  if (p.kind === 'turned') return { ...moved, origin: p.origin.map((v, i) => v + by[i]) };
-  const [along, u, v] = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[p.axis];
-  return { ...moved, profile: p.profile.map(([a, b]) => [a + by[u], b + by[v]]), start: p.start + by[along], end: p.end + by[along] };
-});
+const shifted = (pieces, by) =>
+  pieces.map((p) => {
+    const clip = p.clip?.map(({ normal, offset }) => ({
+      normal,
+      offset: offset + normal[0] * by[0] + normal[1] * by[1] + normal[2] * by[2],
+    }));
+    const moved = { ...p, ...(clip ? { clip } : {}) };
+    if (p.kind === 'box') return { ...moved, min: p.min.map((v, i) => v + by[i]), max: p.max.map((v, i) => v + by[i]) };
+    if (p.kind === 'turned') return { ...moved, origin: p.origin.map((v, i) => v + by[i]) };
+    const [along, u, v] = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[p.axis];
+    return {
+      ...moved,
+      profile: p.profile.map(([a, b]) => [a + by[u], b + by[v]]),
+      start: p.start + by[along],
+      end: p.end + by[along],
+    };
+  });
 const lift = (pieces, dy) => shifted(pieces, [0, dy, 0]);
 // The body every wheel turns inside: the hull, its glacis and what is fitted on its outside near the wheels.
-const body = drawn('hull', 'glacis', 'pannier_far', 'side_step', 'grab_rail_near', 'grab_rail_far', 'headlamp_near', 'headlamp_far',
-  'tail_lamp_near', 'tail_lamp_far');
+const body = drawn(
+  'hull',
+  'glacis',
+  'pannier_far',
+  'side_step',
+  'grab_rail_near',
+  'grab_rail_far',
+  'headlamp_near',
+  'headlamp_far',
+  'tail_lamp_near',
+  'tail_lamp_far',
+);
 const running = sites.filter((s) => /_wheel_(near|far)$|_wheel_(brake_disc|caliper)_/.test(s.id));
 // Wheels are large, so they are sampled coarsely: a meeting at this step means the well's air is gone.
 const AIR = 0.02;
@@ -66,7 +90,9 @@ test('a wheel raised by its well air rubs the well, so the clearance check can f
 // left out, so a tyre behind a gap does not hide it.
 const RAY_STEP = 0.05;
 function sightlinesOverFrontWheels(pieces) {
-  const lid = drawn('hull').filter((p) => p.id.startsWith('front_well_top')).map(solid);
+  const lid = drawn('hull')
+    .filter((p) => p.id.startsWith('front_well_top'))
+    .map(solid);
   const [x0, x1] = [Math.min(...lid.map((p) => p.min[0])), Math.max(...lid.map((p) => p.max[0]))];
   const top = Math.max(...lid.map((p) => p.max[1]));
   const solids = pieces.map(solid);
@@ -77,7 +103,8 @@ function sightlinesOverFrontWheels(pieces) {
     for (let y = spec.body.belly + RAY_STEP / 2; y < top; y += RAY_STEP) {
       const crossing = solids.filter((p) => p.min[0] <= x && x <= p.max[0] && p.min[1] <= y && y <= p.max[1]);
       let blocked = false;
-      for (let z = -half; z <= half && !blocked; z += spec.grain / 2) blocked = crossing.some((p) => p.distance([x, y, z]) < 0);
+      for (let z = -half; z <= half && !blocked; z += spec.grain / 2)
+        blocked = crossing.some((p) => p.distance([x, y, z]) < 0);
       rays++;
       if (!blocked) clear++;
     }
@@ -91,7 +118,7 @@ test('no sightline crosses the nose between the front wells', () => {
   assert.equal(clear, 0, `${clear} of ${rays} rays see through the nose`);
 });
 
-test('without the wells\' wedges a sightline crosses the nose, so the see-through check can fail', () => {
+test("without the wells' wedges a sightline crosses the nose, so the see-through check can fail", () => {
   const open = drawn('hull', 'glacis').filter((p) => !p.id.startsWith('well_wedge'));
   assert.ok(sightlinesOverFrontWheels(open).clear > 0);
 });
@@ -110,24 +137,45 @@ test('each axle stub reaches its brake disc hat and clears the caliper', () => {
 
 test('every fitting rests on the part that carries it', () => {
   const carried = [
-    ['roof', 'hull'], ['vision_block', 'glacis'], ['ramp', 'hull'], ['side_door', 'hull'],
-    ['side_step', 'hull'], ['driver_seat', 'hull'], ['controls', 'hull'], ['locker', 'hull'], ['rack', 'hull'],
-    ['bay_bench_far', 'hull'], ['pannier_far', 'hull'], ['weapon_station', 'roof'], ['cannon', 'weapon_station'],
-    ['sights', 'weapon_station'], ['periscopes', 'roof'],
+    ['roof', 'hull'],
+    ['vision_block', 'glacis'],
+    ['ramp', 'hull'],
+    ['side_door', 'hull'],
+    ['side_step', 'hull'],
+    ['driver_seat', 'hull'],
+    ['controls', 'hull'],
+    ['locker', 'hull'],
+    ['rack', 'hull'],
+    ['bay_bench_far', 'hull'],
+    ['pannier_far', 'hull'],
+    ['weapon_station', 'roof'],
+    ['cannon', 'weapon_station'],
+    ['sights', 'weapon_station'],
+    ['periscopes', 'roof'],
   ];
   for (const side of sides) {
-    carried.push([`rear_bench_${side}`, 'hull'], [`launcher_${side}`, 'weapon_station'], [`hatch_${side}`, 'roof'],
-      [`grab_rail_${side}`, 'hull'], [`headlamp_${side}`, 'hull'], [`tail_lamp_${side}`, 'hull']);
+    carried.push(
+      [`rear_bench_${side}`, 'hull'],
+      [`launcher_${side}`, 'weapon_station'],
+      [`hatch_${side}`, 'roof'],
+      [`grab_rail_${side}`, 'hull'],
+      [`headlamp_${side}`, 'hull'],
+      [`tail_lamp_${side}`, 'hull'],
+    );
   }
   // A gap finer than half the voxel grain closes in the build, so the check samples no finer.
-  for (const [fitting, carrier] of carried) assert.ok(meeting(drawn(fitting), drawn(carrier), spec.grain / 2).touches, `${fitting} floats off ${carrier}`);
+  for (const [fitting, carrier] of carried)
+    assert.ok(meeting(drawn(fitting), drawn(carrier), spec.grain / 2).touches, `${fitting} floats off ${carrier}`);
   // The glacis spans the whole nose, so it is sampled only against the side walls it rests on, to stay quick.
   const walls = drawn('hull').filter((p) => p.id.startsWith('side_wall_fore'));
   assert.ok(walls.length > 0 && meeting(drawn('glacis'), walls, spec.grain / 2).touches, 'glacis floats off the hull');
 });
 
 test('a vision block moved off the glacis floats, so the cut plates are sampled', () => {
-  assert.ok(!meeting(shifted(drawn('vision_block'), [0, 2 * spec.grain + spec.body.wall, 0]), drawn('glacis'), spec.grain / 2).touches);
+  assert.ok(
+    !meeting(shifted(drawn('vision_block'), [0, 2 * spec.grain + spec.body.wall, 0]), drawn('glacis'), spec.grain / 2)
+      .touches,
+  );
 });
 
 // The weapon station turns all round on its ring with its cannon at any elevation down to the deck's depression, so
@@ -137,9 +185,13 @@ const turret = spec.turret;
 const SWEEP_STEP = 0.02;
 const turning = ['weapon_station', 'cannon', 'sights', 'launcher_near', 'launcher_far'];
 const dipped = (point, degrees) => {
-  const a = degrees * Math.PI / 180;
+  const a = (degrees * Math.PI) / 180;
   const [dx, dy] = [point[0] - turret.trunnion, point[1] - turret.gunY];
-  return [turret.trunnion + dx * Math.cos(a) + dy * Math.sin(a), turret.gunY - dx * Math.sin(a) + dy * Math.cos(a), point[2]];
+  return [
+    turret.trunnion + dx * Math.cos(a) + dy * Math.sin(a),
+    turret.gunY - dx * Math.sin(a) + dy * Math.cos(a),
+    point[2],
+  ];
 };
 // The points of each piece's solid, or within half a step of it so a thin plate is not missed, inside `[lo, hi]`.
 function* filling(pieces, lo = [-Infinity, -Infinity, -Infinity], hi = [Infinity, Infinity, Infinity]) {
@@ -157,8 +209,11 @@ const cell = ([x, y, z]) => [Math.round(Math.hypot(x - turret.x, z) / SWEEP_STEP
 // The sites whose pieces come within a cell of the turret's sweep.
 function sweptInto(fixedSites) {
   // The ring is the bearing the station turns on, so it is part of the deck it sits in.
-  const turnsWith = turning.flatMap((id) => site[id].pieces.filter((p) => !(id === 'weapon_station' && p.id === 'ring'))
-    .map((piece) => ({ piece, dips: id === 'cannon' })));
+  const turnsWith = turning.flatMap((id) =>
+    site[id].pieces
+      .filter((p) => !(id === 'weapon_station' && p.id === 'ring'))
+      .map((piece) => ({ piece, dips: id === 'cannon' })),
+  );
   const swept = new Set();
   let [reach, low, high] = [0, Infinity, -Infinity];
   for (const degrees of [0, turret.deckDepression]) {
@@ -173,13 +228,16 @@ function sweptInto(fixedSites) {
   const radius = (reach + 1) * SWEEP_STEP;
   const lo = [turret.x - radius, (low - 1) * SWEEP_STEP, -radius];
   const hi = [turret.x + radius, (high + 1) * SWEEP_STEP, radius];
-  return fixedSites.filter((s) => {
-    for (const point of filling(s.pieces, lo, hi)) {
-      const [r, y] = cell(point);
-      for (let dr = -1; dr <= 1; dr++) for (let dy = -1; dy <= 1; dy++) if (swept.has(`${r + dr},${y + dy}`)) return true;
-    }
-    return false;
-  }).map((s) => s.id);
+  return fixedSites
+    .filter((s) => {
+      for (const point of filling(s.pieces, lo, hi)) {
+        const [r, y] = cell(point);
+        for (let dr = -1; dr <= 1; dr++)
+          for (let dy = -1; dy <= 1; dy++) if (swept.has(`${r + dr},${y + dy}`)) return true;
+      }
+      return false;
+    })
+    .map((s) => s.id);
 }
 const deck = sites.filter((s) => !turning.includes(s.id));
 
@@ -188,7 +246,7 @@ test('the weapon station traverses all round with its cannon dipped over the dec
   assert.deepEqual(sweptInto(deck), []);
 });
 
-test('periscopes raised to the gun\'s height are swept, so the traverse check can fail', () => {
+test("periscopes raised to the gun's height are swept, so the traverse check can fail", () => {
   const raised = { ...site.periscopes, pieces: lift(site.periscopes.pieces, turret.gunY - spec.body.top) };
   assert.deepEqual(sweptInto([raised]), ['periscopes']);
 });
@@ -201,7 +259,7 @@ test('no roof fitting stands on a hatch lid', () => {
 });
 
 // The hatch reaches furthest at its hinge, so the periscope behind it is the one it would meet first.
-test('a hatch slid a periscope\'s depth toward its aft periscope meets it, so the hatch check can fail', () => {
+test("a hatch slid a periscope's depth toward its aft periscope meets it, so the hatch check can fail", () => {
   const by = spec.optics.periscope.depth;
   assert.ok(meeting(drawn('periscopes'), shifted(drawn('hatch_near'), [-by, 0, 0]), spec.grain / 2).touches);
 });
@@ -229,8 +287,16 @@ test('a rail bar pushed against the side meets it, so the rail clearance check c
 // The player's doll crouching, from its own measures: the thighs level, so the hips sit at the shin and foot's height
 // below the bust upright on them, and as wide as its shoulders. Its depth is a level thigh and the shin in front of it.
 const crouch = {
-  height: leg.length - leg.thighLength
-    + bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.headHeight + bust.hairThickness,
+  height:
+    leg.length -
+    leg.thighLength +
+    bust.pelvisHeight +
+    bust.waistHeight +
+    bust.ribHeight +
+    bust.chestHeight +
+    bust.neckHeight +
+    bust.headHeight +
+    bust.hairThickness,
   width: bust.chestWidth + 2 * (bust.shoulderWidth - bust.deltoidInset),
   depth: leg.thighLength + leg.shinDepth,
 };
@@ -238,7 +304,10 @@ const crouch = {
 // of a stooped head or a shoulder against a door frame passes, a blocked aisle does not.
 const CROUCH_OVERLAP_ALLOWED = 0.1;
 // The doors swing clear of their openings, so their leaves are no obstacle to a crew walking in.
-const fixed = sites.filter((s) => !['ramp', 'side_door'].includes(s.id)).flatMap((s) => s.pieces).map(solid);
+const fixed = sites
+  .filter((s) => !['ramp', 'side_door'].includes(s.id))
+  .flatMap((s) => s.pieces)
+  .map(solid);
 const floorTop = spec.body.belly + spec.body.wall;
 const STRIDE = 0.1;
 const GRAIN = 0.03;
@@ -270,7 +339,8 @@ function walk(route, pieces = fixed) {
     const [[x0, z0], [x1, z1]] = [route[i], route[i + 1]];
     const along = Math.abs(x1 - x0) > Math.abs(z1 - z0) ? 'x' : 'z';
     const steps = Math.ceil(Math.hypot(x1 - x0, z1 - z0) / STRIDE);
-    for (let k = 0; k <= steps; k++) deepest = Math.max(deepest, reachInto(pieces, x0 + (x1 - x0) * k / steps, z0 + (z1 - z0) * k / steps, along));
+    for (let k = 0; k <= steps; k++)
+      deepest = Math.max(deepest, reachInto(pieces, x0 + ((x1 - x0) * k) / steps, z0 + ((z1 - z0) * k) / steps, along));
   }
   return deepest;
 }
@@ -280,7 +350,12 @@ const routes = Object.entries(spec.routes);
 // Each door's opening as the plan span it lets through, the axis across it and the side of the hull it is on.
 const openings = {
   side: { across: 0, span: spec.doors.side.x, along: 1, outside: (v) => v > spec.body.half },
-  rear: { across: 1, span: [-spec.doors.rear.half, spec.doors.rear.half], along: 0, outside: (v) => v < spec.body.rear },
+  rear: {
+    across: 1,
+    span: [-spec.doors.rear.half, spec.doors.rear.half],
+    along: 0,
+    outside: (v) => v < spec.body.rear,
+  },
 };
 const seats = sites.filter((s) => ['apc_scifi_wheeled_bench', 'apc_scifi_wheeled_driver_seat'].includes(s.part));
 // How a route fails to lead from outside, straight through its door's opening, to beside its own seat: the seat it
@@ -296,15 +371,19 @@ function routeFaults({ door, seat, path }) {
   const facingX = Math.abs(end[0] - path.at(-2)[0]) > Math.abs(end[1] - path.at(-2)[1]);
   const half = facingX ? [crouch.depth / 2, crouch.width / 2] : [crouch.width / 2, crouch.depth / 2];
   const apart = (lo, hi, at, reach) => Math.max(0, lo - (at + reach), at - reach - hi);
-  const gap = (s) => Math.min(...s.pieces.map(solid)
-    .map((p) => Math.hypot(apart(p.min[0], p.max[0], end[0], half[0]), apart(p.min[2], p.max[2], end[1], half[1]))));
+  const gap = (s) =>
+    Math.min(
+      ...s.pieces
+        .map(solid)
+        .map((p) => Math.hypot(apart(p.min[0], p.max[0], end[0], half[0]), apart(p.min[2], p.max[2], end[1], half[1]))),
+    );
   const nearest = seats.reduce((a, b) => (gap(b) < gap(a) ? b : a));
   if (nearest.id !== seat) faults.push(`ends nearer ${nearest.id} than ${seat}`);
   if (gap(site[seat]) > crouch.depth) faults.push(`ends ${gap(site[seat]).toFixed(2)} m from ${seat}`);
   return faults;
 }
 
-test('every route starts outside straight through its door\'s opening and ends beside its own seat', () => {
+test("every route starts outside straight through its door's opening and ends beside its own seat", () => {
   assert.ok(routes.length > 0 && seats.length > 1, 'vacuous: no routes or no seats to choose between');
   for (const [name, route] of routes) assert.deepEqual(routeFaults(route), [], name);
 });
@@ -317,11 +396,14 @@ test('a crouching player fits through every door and along every aisle to the se
   assert.ok(routes.length > 0, 'vacuous: no routes');
   for (const [name, { path }] of routes) {
     const deepest = walk(path);
-    assert.ok(deepest <= CROUCH_OVERLAP_ALLOWED, `${name}: the carrier reaches ${deepest.toFixed(2)} m into a crouching player`);
+    assert.ok(
+      deepest <= CROUCH_OVERLAP_ALLOWED,
+      `${name}: the carrier reaches ${deepest.toFixed(2)} m into a crouching player`,
+    );
   }
 });
 
-test('a route moved its door\'s width off the side door into the wall is blocked, so the crouch check can fail', () => {
+test("a route moved its door's width off the side door into the wall is blocked, so the crouch check can fail", () => {
   const side = spec.doors.side;
   const offDoor = spec.routes.sideToBayBench.path.map(([x, z]) => [x + side.x[1] - side.x[0], z]);
   assert.ok(walk(offDoor) > CROUCH_OVERLAP_ALLOWED);

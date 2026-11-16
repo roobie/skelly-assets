@@ -17,7 +17,8 @@ export function dependencyProblems(dependsOn, declared) {
   for (const [pack, targets] of Object.entries(dependsOn)) {
     if (!declared.has(pack)) problems.push(`${pack}: not a declared pack`);
     if (new Set(targets).size !== targets.length) problems.push(`${pack}: depends on a pack twice`);
-    for (const target of targets) if (!declared.has(target)) problems.push(`${pack}: depends on ${target}, which is not a declared pack`);
+    for (const target of targets)
+      if (!declared.has(target)) problems.push(`${pack}: depends on ${target}, which is not a declared pack`);
   }
   const done = new Set();
   const visit = (pack, path) => {
@@ -27,7 +28,7 @@ export function dependencyProblems(dependsOn, declared) {
       problems.push(`dependency cycle: ${[...path.slice(at), pack].join(' -> ')}`);
       return;
     }
-    for (const target of (Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : [])) visit(target, [...path, pack]);
+    for (const target of Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : []) visit(target, [...path, pack]);
     done.add(pack);
   };
   for (const pack of Object.keys(dependsOn).sort()) visit(pack, []);
@@ -38,15 +39,19 @@ export function dependencyProblems(dependsOn, declared) {
 // is the pack it is the copy of, whose sidecars its models are weighed and fitted by, so models/packs.json never names it.
 export function readDependencies(declared, root = repo) {
   const value = JSON.parse(readFileSync(join(root, PACKS), 'utf8'));
-  for (const key of Object.keys(value)) if (key !== '_doc' && key !== 'packs') throw new Error(`${PACKS}: unknown key ${key}`);
+  for (const key of Object.keys(value))
+    if (key !== '_doc' && key !== 'packs') throw new Error(`${PACKS}: unknown key ${key}`);
   if (!isObject(value.packs)) throw new Error(`${PACKS}: packs must map each pack id to its metadata`);
   const dependsOn = {};
   for (const [pack, entry] of Object.entries(value.packs)) {
     const unknown = isObject(entry) ? Object.keys(entry).filter((key) => !PACK_KEYS.has(key)) : [];
-    if (!isObject(entry) || unknown.length > 0) throw new Error(`${PACKS}: ${pack} holds only ${[...PACK_KEYS].join(' ')}`);
-    if (smoothedPack(pack) !== undefined) throw new Error(`${PACKS}: ${pack} is a smooth pack, which depends only on ${smoothedPack(pack)}`);
+    if (!isObject(entry) || unknown.length > 0)
+      throw new Error(`${PACKS}: ${pack} holds only ${[...PACK_KEYS].join(' ')}`);
+    if (smoothedPack(pack) !== undefined)
+      throw new Error(`${PACKS}: ${pack} is a smooth pack, which depends only on ${smoothedPack(pack)}`);
     const targets = entry.dependsOn ?? [];
-    if (!Array.isArray(targets) || targets.some((target) => typeof target !== 'string')) throw new Error(`${PACKS}: ${pack} dependsOn must list pack ids`);
+    if (!Array.isArray(targets) || targets.some((target) => typeof target !== 'string'))
+      throw new Error(`${PACKS}: ${pack} dependsOn must list pack ids`);
     dependsOn[pack] = [...targets].sort();
   }
   for (const pack of declared) if (smoothedPack(pack) !== undefined) dependsOn[pack] = [smoothedPack(pack)];

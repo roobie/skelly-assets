@@ -2,10 +2,10 @@
 // forward and leg stumps trailing. crawlGaitPose layers alternating arm reach, plant and pull onto it.
 
 import type { Realized } from '../core/generate.ts';
-import { eulerToMat3 } from './attack.ts';
 import { applyPoint, IDENTITY_M, type Mat3, mulMM, rotX, rotZ, smoothstep, transpose } from '../core/math.ts';
 import { boneTransforms, type Pose } from '../core/pose.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../core/voxelBounds.ts';
+import { eulerToMat3 } from './attack.ts';
 import { HIT_FLINCH } from './reactions.ts';
 
 const ROOT = [0, 0, 0] as const;
@@ -198,9 +198,12 @@ export const CRAWL_HIT_PEAK_FRACTION = 0.2;
 /** Base-independent recoil values for the overlay bake. */
 export const crawlHitAngles = (time: number, side = 1) => {
   const progress = time / HIT_FLINCH.duration;
-  const intensity = !(time > 0) || time >= HIT_FLINCH.duration ? 0
-    : progress < CRAWL_HIT_PEAK_FRACTION ? smoothstep(progress / CRAWL_HIT_PEAK_FRACTION)
-      : 1 - smoothstep((progress - CRAWL_HIT_PEAK_FRACTION) / (1 - CRAWL_HIT_PEAK_FRACTION));
+  const intensity =
+    !(time > 0) || time >= HIT_FLINCH.duration
+      ? 0
+      : progress < CRAWL_HIT_PEAK_FRACTION
+        ? smoothstep(progress / CRAWL_HIT_PEAK_FRACTION)
+        : 1 - smoothstep((progress - CRAWL_HIT_PEAK_FRACTION) / (1 - CRAWL_HIT_PEAK_FRACTION));
   return {
     spine: [-2 * intensity, 0, 0] as const,
     chest: [-3 * intensity, 0, 0] as const,

@@ -168,7 +168,8 @@ const defineOf = (kind) => `FABRIC_${kind.toUpperCase()}`;
 // the mesh's own coordinates: metres in an exported model. The program is shared by every material of the same kind;
 // each keeps its own numbers.
 export function wearFabric(material, fabric) {
-  if (!KINDS.includes(fabric.kind)) throw new Error(`${material.name}: no fabric kind ${fabric.kind}; the kinds are ${KINDS.join(', ')}`);
+  if (!KINDS.includes(fabric.kind))
+    throw new Error(`${material.name}: no fabric kind ${fabric.kind}; the kinds are ${KINDS.join(', ')}`);
   const uniforms = {
     fabricGrain: { value: fabric.grain },
     fabricRelief: { value: fabric.relief },
@@ -179,8 +180,10 @@ export function wearFabric(material, fabric) {
   material.defines = { ...material.defines, [defineOf(fabric.kind)]: '' };
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
-    shader.vertexShader = `${VERTEX_HEAD}${PLANE}${shader.vertexShader}`
-      .replace('#include <begin_vertex>', `#include <begin_vertex>\n${VERTEX_BODY}`);
+    shader.vertexShader = `${VERTEX_HEAD}${PLANE}${shader.vertexShader}`.replace(
+      '#include <begin_vertex>',
+      `#include <begin_vertex>\n${VERTEX_BODY}`,
+    );
     shader.fragmentShader = `${FRAGMENT_HEAD}${shader.fragmentShader}`
       .replace('#include <map_fragment>', `#include <map_fragment>\n${COLOUR}`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${NORMAL}`);

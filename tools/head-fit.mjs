@@ -20,15 +20,21 @@ export const readSeats = (root) => JSON.parse(evaluateJsonnet("import 'models/he
 export function seatFindings({ head, meshes, frame, worn, model }) {
   const onHead = meshProbe(head);
   // A face's corners and the centroids of its sampled patches, so a face dipping in between its corners is caught.
-  const points = meshes.map((mesh) => placed(mesh, frame.turn + worn.turn, frame.height + worn.at)).flatMap((mesh) => [
-    ...Array.from({ length: mesh.positions.length / 3 }, (_, i) => mesh.positions.slice(3 * i, 3 * i + 3)),
-    ...sampledSurface(mesh).map(({ point }) => point),
-  ]);
-  const sunk = points.map((point) => ({ point, depth: onHead.depth(point) })).filter(({ depth }) => depth < -COINCIDENT);
+  const points = meshes
+    .map((mesh) => placed(mesh, frame.turn + worn.turn, frame.height + worn.at))
+    .flatMap((mesh) => [
+      ...Array.from({ length: mesh.positions.length / 3 }, (_, i) => mesh.positions.slice(3 * i, 3 * i + 3)),
+      ...sampledSurface(mesh).map(({ point }) => point),
+    ]);
+  const sunk = points
+    .map((point) => ({ point, depth: onHead.depth(point) }))
+    .filter(({ depth }) => depth < -COINCIDENT);
   if (sunk.length === 0) return [];
   const deepest = sunk.reduce((worst, sample) => (sample.depth < worst.depth ? sample : worst));
-  return [`${model}: ${sunk.length} of ${points.length} points of its surface lie inside the head, `
-    + `${millimetres(-deepest.depth)} deep at ${at(deepest.point)}`];
+  return [
+    `${model}: ${sunk.length} of ${points.length} points of its surface lie inside the head, ` +
+      `${millimetres(-deepest.depth)} deep at ${at(deepest.point)}`,
+  ];
 }
 
 /**
@@ -39,5 +45,7 @@ export function treeSeatFindings(built, manifest, root = repo, seats = readSeats
   if (Object.keys(seats).length === 0) return ['models/head-seats.libsonnet seats no shell'];
   const { frame } = readBandFit(root);
   const { glbOf, head } = builtModels(built, manifest);
-  return Object.entries(seats).flatMap(([model, worn]) => seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model }));
+  return Object.entries(seats).flatMap(([model, worn]) =>
+    seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model }),
+  );
 }

@@ -121,8 +121,17 @@ export const drawnGeometry = (
   const { voxelGrain } = options;
   const unit = resolved.domain.units.metresPerUnit;
   const authoredMeasures = new Map<Solid, SolidMeasure>();
-  const grainOf = (def: PartDef): number | undefined =>
-    voxelGrain === undefined ? undefined : partVoxelGrain(def, { ...options, voxelGrain }, unit);
+  // Judging a part's grain bounds all its solids, and every solid of the part is measured, so it is judged once.
+  const grains = new Map<PartDef, number | undefined>();
+  const grainOf = (def: PartDef): number | undefined => {
+    if (voxelGrain === undefined) {
+      return undefined;
+    }
+    if (!grains.has(def)) {
+      grains.set(def, partVoxelGrain(def, { ...options, voxelGrain }, unit));
+    }
+    return grains.get(def);
+  };
   /** Per list of solids sampled together, their fill and each solid's drawn measure, undefined where it draws none. */
   const sampled = new Map<
     readonly Solid[],

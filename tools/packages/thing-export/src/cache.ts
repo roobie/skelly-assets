@@ -32,8 +32,14 @@ export const codeFingerprint = (root: string, code: readonly string[], data: rea
       hash.update(role).update('\0').update(relative(root, file)).update('\0').update(readFileSync(file)).update('\0');
     }
   };
-  add('code', code.flatMap((path) => filesUnder(join(root, path), (name) => SOURCE_FILE.test(name))));
-  add('data', data.flatMap((path) => filesUnder(join(root, path), () => true)));
+  add(
+    'code',
+    code.flatMap((path) => filesUnder(join(root, path), (name) => SOURCE_FILE.test(name))),
+  );
+  add(
+    'data',
+    data.flatMap((path) => filesUnder(join(root, path), () => true)),
+  );
   return hash.digest('hex');
 };
 
@@ -82,7 +88,11 @@ export const entryStore = (dir: string, code: string): EntryStore => {
     entry: (names, inputs, generate) => {
       const key = createHash('sha256').update(code).update('\0').update(canonical(inputs)).digest('hex');
       if (existsSync(path(key, names.at(-1)!))) {
-        return { key, reused: true, files: Object.fromEntries(names.map((name) => [name, readFileSync(path(key, name))])) };
+        return {
+          key,
+          reused: true,
+          files: Object.fromEntries(names.map((name) => [name, readFileSync(path(key, name))])),
+        };
       }
       const files = generate();
       for (const name of names) {
@@ -155,7 +165,8 @@ export const exportCache = (dir: string, code: string): ExportCache => {
           partNodes,
           glb: files.glb as Uint8Array,
           smoothGlb: files['smooth.glb'] as Uint8Array,
-          ...(physical === undefined ? {} : { physical }) },
+          ...(physical === undefined ? {} : { physical }),
+        },
         entry: { key, reused },
       };
     },

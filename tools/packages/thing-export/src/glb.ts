@@ -324,7 +324,9 @@ const SHEEN = 'KHR_materials_sheen';
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
   const extras = {
-    ...(material === undefined ? {} : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
+    ...(material === undefined
+      ? {}
+      : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
     ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
   };
   return {
@@ -380,7 +382,10 @@ interface PartExport {
 }
 
 const sameAppearance = (a: ReturnType<typeof resolveAppearance>, b: ReturnType<typeof resolveAppearance>): boolean =>
-  a.material === b.material && a.slot === b.slot && a.paintable === b.paintable && a.color.every((channel, index) => channel === b.color[index]);
+  a.material === b.material &&
+  a.slot === b.slot &&
+  a.paintable === b.paintable &&
+  a.color.every((channel, index) => channel === b.color[index]);
 
 /** Splits a merge group whose solids differ in finish or piece, because one primitive carries one of each. */
 const splitMixed = (
@@ -453,7 +458,11 @@ type SmoothPrimitives = 'per-item' | 'per-finish';
 
 /** The meshes of one finish as one, in metres: their vertices end to end and their indices shifted to match. */
 const joinedMesh = (
-  meshes: readonly { readonly positions: Float32Array; readonly normals: Float32Array; readonly indices: Uint32Array }[],
+  meshes: readonly {
+    readonly positions: Float32Array;
+    readonly normals: Float32Array;
+    readonly indices: Uint32Array;
+  }[],
   metresPerUnit: number,
 ) => {
   const positions = new Float32Array(meshes.reduce((sum, mesh) => sum + mesh.positions.length, 0));
@@ -724,8 +733,15 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     });
     const { finishes, groups } = finishGroupsOf(part, items, (index) => drawn[index] !== undefined);
     return finishes.map((finish, group) => {
-      const meshes = drawn.filter((mesh, index): mesh is NonNullable<typeof mesh> => mesh !== undefined && groups[index] === group);
-      return bufferPrimitive(joinedMesh(meshes, metresPerUnit), materialFor(finish.appearance), finishExtras(finish), part);
+      const meshes = drawn.filter(
+        (mesh, index): mesh is NonNullable<typeof mesh> => mesh !== undefined && groups[index] === group,
+      );
+      return bufferPrimitive(
+        joinedMesh(meshes, metresPerUnit),
+        materialFor(finish.appearance),
+        finishExtras(finish),
+        part,
+      );
     });
   };
   /**
@@ -778,7 +794,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       : { ...part, def: seatedDef(part.def, port, input.voxelGrain / metresPerUnit) };
   };
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: existing glTF node construction; appearance metadata is conditional by contract.
   const addPart = (part: PartExport): void => {
     const drawn = part.def.displaySolids ?? part.def.solids;
     const grain =
@@ -793,7 +808,9 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
             return primitive ? [primitive] : [];
           });
     const primitives =
-      grain === undefined ? smoothPrimitivesFor(itemsOf(seatedInHost(part))) : voxelPrimitivesFor(part, itemsOf(part), grain);
+      grain === undefined
+        ? smoothPrimitivesFor(itemsOf(seatedInHost(part)))
+        : voxelPrimitivesFor(part, itemsOf(part), grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
     const node: Json = { name };
@@ -903,7 +920,11 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       : {}),
   };
 
-  return { ok: true, glb: glbFile(json, bin.bytes()), partNodes: parts.map(({ id, family }) => partNodeName(id, family)) };
+  return {
+    ok: true,
+    glb: glbFile(json, bin.bytes()),
+    partNodes: parts.map(({ id, family }) => partNodeName(id, family)),
+  };
 };
 
 const refusingBadSkin = (write: () => GlbExportResult): GlbExportResult => {

@@ -1,6 +1,7 @@
 import {
   brand,
   finite,
+  type InferOutput,
   integer,
   maxValue,
   minValue,
@@ -9,7 +10,6 @@ import {
   pipe,
   safeParse,
   transform,
-  type InferOutput,
 } from 'valibot';
 import { expect, expectTypeOf, it } from 'vitest';
 import { CalibreId, firearmModelSchema, Id, modelSchema, Name } from '../src/schema.ts';

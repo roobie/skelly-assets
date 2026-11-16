@@ -146,6 +146,8 @@ describe('look-at pose', () => {
     });
     const dotWithRest = Math.abs(result.state[3]);
     const turnedRadians = 2 * Math.acos(Math.min(1, dotWithRest));
-    expect(turnedRadians).toBeLessThanOrEqual(((profile.turnRateDegPerRealSecond * Math.PI) / 180) * gazeFrameDelta + 1e-6);
+    expect(turnedRadians).toBeLessThanOrEqual(
+      ((profile.turnRateDegPerRealSecond * Math.PI) / 180) * gazeFrameDelta + 1e-6,
+    );
   });
 });

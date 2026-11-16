@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { MODEL_LATERAL, apply, motionAtSite, movingSites, poseAt, stowClips } from '../../site/motionPose.mjs';
+import { apply, MODEL_LATERAL, motionAtSite, movingSites, poseAt, stowClips } from '../../site/motionPose.mjs';
 import { isStowed, mirrorMotion, posePoint } from '../packages/thing-core/src/motion.ts';
 
 const hinge = { kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 1, 0] }, angle: 90, share: 0.5 };
@@ -10,7 +10,9 @@ const door = [{ ...hinge, axis: { from: [0.3, 0, 0.2], to: [0.3, 1, 0.2] } }];
 const roller = [shutter, { ...hinge, axis: { from: [0, 0, 0], to: [1, 0, 0] } }];
 const close = (a, b) => a.forEach((value, i) => assert.ok(Math.abs(value - b[i]) < 1e-9, `${a} vs ${b}`));
 // Points on a lattice around the part, so a plane is crossed from both sides.
-const lattice = [-0.5, -0.1, 0.35, 0.9, 1.4].flatMap((x) => [-0.5, 0.2, 0.7, 1.3, 1.9].flatMap((y) => [-0.4, 0.15, 0.8].map((z) => [x, y, z])));
+const lattice = [-0.5, -0.1, 0.35, 0.9, 1.4].flatMap((x) =>
+  [-0.5, 0.2, 0.7, 1.3, 1.9].flatMap((y) => [-0.4, 0.15, 0.8].map((z) => [x, y, z])),
+);
 
 test('a part is posed where the game would pose it, whatever the site it sits at or its mirror', () => {
   const at = [0.5, 0.25, -0.75];
@@ -20,7 +22,14 @@ test('a part is posed where the game would pose it, whatever the site it sits at
     for (const clock of [0, 0.4, 1]) {
       for (const p of lattice) {
         const expected = posePoint(game, p, clock);
-        close(apply(poseAt([placed], clock), p.map((v, i) => v + at[i]), [0, 0, 0]), expected.map((v, i) => v + at[i]));
+        close(
+          apply(
+            poseAt([placed], clock),
+            p.map((v, i) => v + at[i]),
+            [0, 0, 0],
+          ),
+          expected.map((v, i) => v + at[i]),
+        );
       }
     }
   }
@@ -41,7 +50,11 @@ test('what a slide stows is hidden exactly where the game hides it, at the site,
       assert.equal(clips.length, 1);
       const pose = poseAt([placed], clock);
       for (const p of lattice) {
-        const world = apply(pose, p.map((v, i) => v + at[i]), [0, 0, 0]);
+        const world = apply(
+          pose,
+          p.map((v, i) => v + at[i]),
+          [0, 0, 0],
+        );
         const [{ normal, constant }] = clips;
         const shown = normal[0] * world[0] + normal[1] * world[1] + normal[2] * world[2] + constant;
         if (Math.abs(shown) < 1e-6) continue;
@@ -61,9 +74,12 @@ const motions = new Map([['panel', door]]);
 
 test('a part that rides a moving carrier follows it, nested inside the carrier, and one that rides nothing moving stays', () => {
   const found = movingSites(sites, motions);
-  assert.deepEqual(found.map(({ index }) => index), [1, 2, 3]);
+  assert.deepEqual(
+    found.map(({ index }) => index),
+    [1, 2, 3],
+  );
   assert.equal(found[0].layers.length, 1);
-  assert.equal(found[1].layers.length, 1, 'the pane has no motion of its own, so it takes the door\'s');
+  assert.equal(found[1].layers.length, 1, "the pane has no motion of its own, so it takes the door's");
   assert.equal(found[2].layers.length, 2, 'the flap turns inside the door');
   assert.deepEqual(found[1].layers[0], found[0].layers[0]);
   assert.deepEqual(found[2].layers[0], found[0].layers[0], 'the door, the outermost carrier, comes first');
@@ -74,8 +90,15 @@ test('a vehicle whose models do not move has no site that moves, so nothing offe
 });
 
 test('sites that name no site, as the doll wears a piece, ride nothing, so each moves by its own motion alone', () => {
-  const worn = [{ model: 'shell', at: [0, 0, 0] }, { model: 'panel', at: [1, 0, 0] }, { model: 'pane', at: [2, 0, 0] }];
+  const worn = [
+    { model: 'shell', at: [0, 0, 0] },
+    { model: 'panel', at: [1, 0, 0] },
+    { model: 'pane', at: [2, 0, 0] },
+  ];
   const found = movingSites(worn, motions);
-  assert.deepEqual(found.map(({ index }) => index), [1]);
+  assert.deepEqual(
+    found.map(({ index }) => index),
+    [1],
+  );
   assert.equal(found[0].layers.length, 1);
 });

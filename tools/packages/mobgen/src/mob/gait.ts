@@ -715,7 +715,8 @@ const legAndFootRotations = (ctx: GaitContext): LegResult => {
 
   const legFor = (side: Side): LegBones => (side === 'L' ? legL : legR);
   const limpOf = (side: Side): number => (side === 'R' ? 1 - clamp(params.limp, 0, 1) : 1);
-  const plan = (i: number): StepPlan => stepPlanFor(seed, planIndex(i, ctx.planPeriodSteps), params, stepPlansOf(cache, seed));
+  const plan = (i: number): StepPlan =>
+    stepPlanFor(seed, planIndex(i, ctx.planPeriodSteps), params, stepPlansOf(cache, seed));
   const basis: GaitBasis = { params, geomL: legL, speed, seed, cache, planPeriodSteps: ctx.planPeriodSteps };
   const lenAt = (i: number): number => stepLengthMeters(basis, i);
   const geomFor = (side: Side, rollMul: number): FootGeometry => {

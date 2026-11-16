@@ -51,7 +51,8 @@ interface Context {
   sampleRate: number;
 }
 
-const tumbleSpread = ({ row }: Context) => Math.min(row.motion.maxTumbleSpread, row.drop.tumble / row.motion.referenceTumble);
+const tumbleSpread = ({ row }: Context) =>
+  Math.min(row.motion.maxTumbleSpread, row.drop.tumble / row.motion.referenceTumble);
 
 // Rim landings favour upper modes and body landings lower ones, plus scatter per mode.
 function landingWeights({ row }: Context, pose: number, spread: number, rng: Rng) {
@@ -142,7 +143,14 @@ function planEvents(context: Context, seed: number): Hit[] {
   return [...bounces, ...planRoll(context, lastBounce.t + motion.roll.settleSeconds, rng)];
 }
 
-function addContact(layer: Float32Array, start: number, hit: Hit, gain: number, { row, sampleRate }: Context, rng: Rng) {
+function addContact(
+  layer: Float32Array,
+  start: number,
+  hit: Hit,
+  gain: number,
+  { row, sampleRate }: Context,
+  rng: Rng,
+) {
   const { contact } = row.strike;
   const length = Math.max(2, Math.round(lerp(contact.softSeconds, contact.hardSeconds, hit.hardness) * sampleRate));
   const a = lowPassCoefficient(lerp(contact.softHz, contact.hardHz, hit.hardness), sampleRate);
@@ -170,7 +178,15 @@ function addTick(layer: Float32Array, start: number, hit: Hit, tick: Tick, gain:
   }
 }
 
-function addBody(layer: Float32Array, start: number, hit: Hit, body: Body, gain: number, { row, sampleRate }: Context, rng: Rng) {
+function addBody(
+  layer: Float32Array,
+  start: number,
+  hit: Hit,
+  body: Body,
+  gain: number,
+  { row, sampleRate }: Context,
+  rng: Rng,
+) {
   const shape = row.strike.body;
   const hz = lerp(body.lowHz, body.highHz, shape.hardnessShare * hit.hardness + shape.randomShare * rng());
   const seconds = body.ms * 0.001;
@@ -180,7 +196,8 @@ function addBody(layer: Float32Array, start: number, hit: Hit, body: Body, gain:
     const t = i / sampleRate;
     const envelope = Math.min(1, i / attack) * Math.exp((-LN_SILENCE * t) / seconds);
     const tone =
-      Math.sin(2 * Math.PI * hz * t) + (body.overtone ? shape.overtoneLevel * Math.sin(2 * Math.PI * hz * body.overtone * t) : 0);
+      Math.sin(2 * Math.PI * hz * t) +
+      (body.overtone ? shape.overtoneLevel * Math.sin(2 * Math.PI * hz * body.overtone * t) : 0);
     layer[start + i] = layer[start + i]! + tone * envelope * gain;
   }
 }
@@ -188,12 +205,18 @@ function addBody(layer: Float32Array, start: number, hit: Hit, body: Body, gain:
 function chokeRing(layer: Float32Array, start: number, factor: number, { row, sampleRate }: Context) {
   const fade = Math.max(1, Math.round(row.mix.chokeFadeSeconds * sampleRate));
   for (let i = start; i < layer.length; i++) {
-    layer[i] = layer[i]! * (lerp(1, factor, Math.min(1, (i - start) / fade)));
+    layer[i] = layer[i]! * lerp(1, factor, Math.min(1, (i - start) / fade));
   }
 }
 
 // The pair's gains sum to 1, so splitting a mode keeps its level; scatter 0 gives every hit the same pair.
-function ringPartials(hz: number, split: Split | null, spacing: { least: number; spread: number }, scatter: number, rng: Rng) {
+function ringPartials(
+  hz: number,
+  split: Split | null,
+  spacing: { least: number; spread: number },
+  scatter: number,
+  rng: Rng,
+) {
   const phase = () => rng() * 2 * Math.PI * scatter;
   if (!split) return [{ hz, share: 1, phase: phase() }];
   const apart = split.ratio * lerp(1, spacing.least + spacing.spread * rng(), scatter);
@@ -219,15 +242,30 @@ function tailSeconds(hit: Hit, { row }: Context) {
   return longest * 0.001 * row.surface.decayScale * row.motion.eventRing[hit.kind].decay;
 }
 
-function addRing(layer: Float32Array, start: number, hit: Hit, spinning: Variation['spin'], gain: number, context: Context, rng: Rng) {
+function addRing(
+  layer: Float32Array,
+  start: number,
+  hit: Hit,
+  spinning: Variation['spin'],
+  gain: number,
+  context: Context,
+  rng: Rng,
+) {
   const { row, sampleRate } = context;
   const { object, surface, motion, mix, strike } = row;
   const treatment = motion.eventRing[hit.kind];
   const lastMode = object.modes.length - 1;
-  const attack = Math.max(1, lerp(strike.ring.softAttackSeconds, strike.ring.hardAttackSeconds, hit.hardness) * sampleRate);
+  const attack = Math.max(
+    1,
+    lerp(strike.ring.softAttackSeconds, strike.ring.hardAttackSeconds, hit.hardness) * sampleRate,
+  );
   const scatter = hit.weights.some((w) => w !== 1) ? 1 : 0;
   const tilt = (1 - hit.hardness ** strike.ring.tiltExponent) * mix.upperModeTiltDb;
-  const spin = spinCurve(spinning, Math.min(Math.round(tailSeconds(hit, context) * sampleRate), layer.length - start), sampleRate);
+  const spin = spinCurve(
+    spinning,
+    Math.min(Math.round(tailSeconds(hit, context) * sampleRate), layer.length - start),
+    sampleRate,
+  );
   object.modes.forEach((mode, index) => {
     // Drawn before the Nyquist skip so the random draws, and so the sound, do not shift with the sample rate.
     const partials = ringPartials(mode.hz, object.split, strike.splitSpacing, scatter, rng);

@@ -14,7 +14,15 @@ import { coveringItems, modelMeshes, readDoll, readDressing, wornSites } from '.
 import { glbJson } from './glb.mjs';
 import { readSeats, seatFindings } from './head-fit.mjs';
 import { MANIFEST } from './manifest.mjs';
-import { anchorFindings, builtModels, formFile, readBandFit, strapFindings, strapGrain, strapMesh } from './strap-fit.mjs';
+import {
+  anchorFindings,
+  builtModels,
+  formFile,
+  readBandFit,
+  strapFindings,
+  strapGrain,
+  strapMesh,
+} from './strap-fit.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -30,16 +38,21 @@ const guarded = (model, check) => {
 // The ways a smooth file is not its voxel file's twin: unreadable, drawn in voxels, or naming other nodes.
 function fileFindings(built, models) {
   const nodesOf = (json) => json.nodes.map(({ name }) => name).sort();
-  return models.flatMap((entry) => guarded(entry.id, () => {
-    const smooth = glbJson(readFileSync(join(built, formFile(entry, 'smooth'))));
-    const voxel = glbJson(readFileSync(join(built, formFile(entry, 'voxel'))));
-    const findings = [];
-    if (smooth.meshes.flatMap(({ primitives }) => primitives).some(({ extras }) => extras?.voxelGrain !== undefined)) {
-      findings.push(`${entry.id}: its smooth copy draws voxels`);
-    }
-    if (JSON.stringify(nodesOf(smooth)) !== JSON.stringify(nodesOf(voxel))) findings.push(`${entry.id}: its smooth copy names other nodes`);
-    return findings;
-  }));
+  return models.flatMap((entry) =>
+    guarded(entry.id, () => {
+      const smooth = glbJson(readFileSync(join(built, formFile(entry, 'smooth'))));
+      const voxel = glbJson(readFileSync(join(built, formFile(entry, 'voxel'))));
+      const findings = [];
+      if (
+        smooth.meshes.flatMap(({ primitives }) => primitives).some(({ extras }) => extras?.voxelGrain !== undefined)
+      ) {
+        findings.push(`${entry.id}: its smooth copy draws voxels`);
+      }
+      if (JSON.stringify(nodesOf(smooth)) !== JSON.stringify(nodesOf(voxel)))
+        findings.push(`${entry.id}: its smooth copy names other nodes`);
+      return findings;
+    }),
+  );
 }
 
 // The strap findings of every band-fitted gear model drawn smooth on the smooth head, held to its voxel strap's grain.
@@ -47,17 +60,28 @@ function strapSmoothFindings(built, manifest, root) {
   const { frame, worn } = readBandFit(root);
   const voxel = builtModels(built, manifest, 'voxel');
   const { glbOf, anchorsOf, head } = builtModels(built, manifest, 'smooth');
-  return Object.entries(worn).flatMap(([model, place]) => guarded(model, () => [
-    ...strapFindings({ head, strap: strapMesh(glbOf(model), model), grain: strapGrain(voxel.glbOf(model), model), frame, worn: place, model }),
-    ...anchorFindings({ head, anchors: anchorsOf(model), frame, worn: place, model }),
-  ]));
+  return Object.entries(worn).flatMap(([model, place]) =>
+    guarded(model, () => [
+      ...strapFindings({
+        head,
+        strap: strapMesh(glbOf(model), model),
+        grain: strapGrain(voxel.glbOf(model), model),
+        frame,
+        worn: place,
+        model,
+      }),
+      ...anchorFindings({ head, anchors: anchorsOf(model), frame, worn: place, model }),
+    ]),
+  );
 }
 
 // The seat findings of every seated head shell drawn smooth on the smooth head.
 function seatSmoothFindings(built, manifest, root) {
   const { frame } = readBandFit(root);
   const { glbOf, head } = builtModels(built, manifest, 'smooth');
-  return Object.entries(readSeats(root)).flatMap(([model, worn]) => guarded(model, () => seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model })));
+  return Object.entries(readSeats(root)).flatMap(([model, worn]) =>
+    guarded(model, () => seatFindings({ head, meshes: modelMeshes(glbOf(model)), frame, worn, model })),
+  );
 }
 
 // The cover gaps of every covering item's worn pieces drawn smooth over the smooth doll, the most samples open first.
@@ -68,12 +92,26 @@ function coverSmoothFindings(built, manifest, root) {
   const doll = readDoll(built, manifest, dressing);
   const rig = dollRig(readRigContent(root), doll, dressing);
   const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, formFile(byId.get(id), 'smooth'))), keep);
-  const unplaced = () => { throw new Error('a covering item is dressed by its worn pieces, never placed whole'); };
-  const gaps = coveringItems(models).flatMap((id) => guarded(id, () => coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf)));
+  const unplaced = () => {
+    throw new Error('a covering item is dressed by its worn pieces, never placed whole');
+  };
+  const gaps = coveringItems(models).flatMap((id) =>
+    guarded(id, () =>
+      coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf),
+    ),
+  );
   const open = (gap) => (typeof gap === 'string' ? Infinity : gap.open === 'nothing' ? 0 : gap.open);
-  return gaps.sort((a, b) => open(b) - open(a)).map((gap) => (typeof gap === 'string' ? gap
-    : `${gap.piece} (${gap.side}) covers ${gap.name}, but ${gap.open === 'nothing' ? 'it names nothing there'
-      : `${gap.open} samples show, one at [${gap.at.map((x) => x.toFixed(3))}]`}`));
+  return gaps
+    .sort((a, b) => open(b) - open(a))
+    .map((gap) =>
+      typeof gap === 'string'
+        ? gap
+        : `${gap.piece} (${gap.side}) covers ${gap.name}, but ${
+            gap.open === 'nothing'
+              ? 'it names nothing there'
+              : `${gap.open} samples show, one at [${gap.at.map((x) => x.toFixed(3))}]`
+          }`,
+    );
 }
 
 /** Each smooth check's findings over the built tree at `built`, whose manifest is `manifest`. */

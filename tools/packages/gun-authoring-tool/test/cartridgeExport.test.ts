@@ -7,7 +7,7 @@ import { exportCartridgeModel, exportCartridgeModels } from '../src/gun/cartridg
 import { cartridgeFinish } from '../src/gun/cartridgeFinish.ts';
 import { cartridgeSolids } from '../src/gun/cartridgeSolids.ts';
 import { GUN_APPEARANCE } from '../src/gun/palette.ts';
-import { loadCartridges, loadCartridgeFile } from './ammoHelpers.ts';
+import { loadCartridgeFile, loadCartridges } from './ammoHelpers.ts';
 
 const cartridge: MetallicCartridge = {
   ...(loadCartridgeFile('7.62x39.json') as MetallicCartridge),
@@ -93,7 +93,9 @@ describe('standalone cartridge GLBs', () => {
   it('lets a cartridge named in the case table override the shared case, and no other', () => {
     const table = { [cartridge.id]: 'steel' };
     expect(cartridgeFinish(cartridge, table).case).toBe('steel');
-    expect(cartridgeFinish({ ...cartridge, id: 'fixture.other' }, table).case).toBe(GUN_APPEARANCE.cartridgeFinish.case);
+    expect(cartridgeFinish({ ...cartridge, id: 'fixture.other' }, table).case).toBe(
+      GUN_APPEARANCE.cartridgeFinish.case,
+    );
     expect(cartridgeFinish(cartridge, {}).case).toBe(GUN_APPEARANCE.cartridgeFinish.case);
   });
 

@@ -27,9 +27,9 @@ it.each([
   { kind: 'attachment' },
   { kind: 'magazine', options: { cartridge: 'fixture-cartridge.json', appearanceProfile: 'fixture' } },
 ])('refuses unresolved $kind sources at recipe load', (selection) => {
-  expect(() => loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }])).toThrow(
-    SOURCE_CONTEXT,
-  );
+  expect(() =>
+    loadExportRecipe([{ id: 'fixture', title: 'Fixture', source: 'fixture-source', voxel, ...selection }]),
+  ).toThrow(SOURCE_CONTEXT);
 });
 
 it('rejects two rows owning the same output identity before resolving sources', () => {
@@ -49,6 +49,9 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
   ]);
   return exported!.generate();
 };
+
+// Exported once at file load: a voxelized rifle export costs seconds under load, and both lattice tests read it.
+const arExport = designExport(voxel);
 
 /** A node's transform when its rotation is a whole number of quarter turns, which keep the world lattice. */
 const quarterTurned = (node: { translation?: number[]; rotation?: number[] }): Matrix4 | undefined => {
@@ -101,7 +104,7 @@ const eyeOnSmoothSight = (source: string): boolean =>
   );
 
 it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
-  const { json, floats } = readGlb(designExport(voxel).glb);
+  const { json, floats } = readGlb(arExport.glb);
   const seen = new Set<number>();
   for (const node of json.nodes) {
     const transform = quarterTurned(node);
@@ -127,7 +130,7 @@ it('puts every part turned only by quarter turns, coarse or fine, on the fine la
 
 it('exports a voxelized sight whose up is perpendicular to its direction', () => {
   const { sight } = (
-    designExport(voxel) as unknown as {
+    arExport as unknown as {
       modelEntry: { gun: { sight: { direction: readonly number[]; up: readonly number[] } } };
     }
   ).modelEntry.gun;
@@ -207,9 +210,9 @@ describe('recipe output grain', () => {
     expect(partNodes(smoothGlb).map(({ family }) => family)).toEqual(partNodes(glb).map(({ family }) => family));
     const primitives = readGlb(smoothGlb).json.meshes.flatMap(({ primitives }) => primitives);
     expect(primitives.length, `${row.id}: no smooth primitives`).toBeGreaterThan(0);
-    expect(primitives.some(({ extras }) => (extras as { voxelGrain?: number } | undefined)?.voxelGrain !== undefined)).toBe(
-      false,
-    );
+    expect(
+      primitives.some(({ extras }) => (extras as { voxelGrain?: number } | undefined)?.voxelGrain !== undefined),
+    ).toBe(false);
   });
 });
 
@@ -235,7 +238,9 @@ describe('loose smooth attachment seat', () => {
               const { min, max } = json.accessors[attributes.POSITION!] as { min: number[]; max: number[] };
               const at = node.translation ?? [0, 0, 0];
               return Math.max(
-                ...[min, max].map((corner) => corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0)),
+                ...[min, max].map((corner) =>
+                  corner.reduce((sum, value, axis) => sum + (value + at[axis]!) * normal[axis]!, 0),
+                ),
               );
             }),
       ),
@@ -251,7 +256,14 @@ it('refuses a detail grain the gun grain is not a whole multiple of', () => {
 it('rejects options not taken by the selected exporter', () => {
   expect(() =>
     loadExportRecipe([
-      { id: 'fixture', title: 'Fixture', kind: 'design', source: 'fixture-source', voxel, options: { component: 'round' } },
+      {
+        id: 'fixture',
+        title: 'Fixture',
+        kind: 'design',
+        source: 'fixture-source',
+        voxel,
+        options: { component: 'round' },
+      },
     ]),
   ).toThrow('Invalid key');
 });

@@ -7,7 +7,7 @@ import { downloadWithRetry } from '../jsonnet/setup.mjs';
 // Serves `statuses` in order (the last repeats); reports how many requests arrived.
 async function stubServer(statuses) {
   let requests = 0;
-  const server = createServer((request, response) => {
+  const server = createServer((_request, response) => {
     const status = statuses[Math.min(requests, statuses.length - 1)];
     requests += 1;
     response.writeHead(status);
@@ -23,7 +23,12 @@ async function stubServer(statuses) {
 
 function recordingSleep() {
   const waits = [];
-  return { waits, sleep: async (milliseconds) => { waits.push(milliseconds); } };
+  return {
+    waits,
+    sleep: async (milliseconds) => {
+      waits.push(milliseconds);
+    },
+  };
 }
 
 test('download succeeds after transient 5xx responses', async () => {
@@ -58,10 +63,7 @@ test('a 4xx response fails at once without retrying', async () => {
   const stub = await stubServer([404]);
   const { waits, sleep } = recordingSleep();
   try {
-    await assert.rejects(
-      downloadWithRetry(stub.url, { attempts: 3, delaysMs: [1, 2], sleep }),
-      /404/,
-    );
+    await assert.rejects(downloadWithRetry(stub.url, { attempts: 3, delaysMs: [1, 2], sleep }), /404/);
     assert.equal(stub.requests(), 1);
     assert.equal(waits.length, 0);
   } finally {
