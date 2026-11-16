@@ -38,8 +38,6 @@ local s = import 'abandoned_ambulance.spec.libsonnet';
       'The far cab door, left ajar, has sagged on its hinges onto the sill.'),
     site.overlap('cab', 'lamp', 0.041,
       'The lamp\'s lens is let into its socket in the cab.'),
-    site.overlap('chassis', 'cab', 0.101,
-      'The chassis rails run into the cab floor they carry.'),
     site.overlap('chassis', 'wheel_front_far', 0.081,
       'The axle runs on into the back of the hub of the wheel on it.'),
     site.overlap('chassis', 'wheel_front_near', 0.081,
