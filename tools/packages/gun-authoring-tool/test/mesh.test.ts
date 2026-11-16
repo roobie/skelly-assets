@@ -269,12 +269,19 @@ describe('watertightness (welded at 1e-5u)', () => {
 
   // Checks every solid, including display geometry, across templates and seeds.
   it('is watertight for every solid (including displaySolids) of every template at a few seeds', () => {
+    // Templates and seeds share most solids, and a solid always meshes the same, so each is checked once.
+    const checked = new Set<string>();
     for (const t of TEMPLATES) {
       for (const seed of [0, 1, 2]) {
         const resolved = resolve(generate(t, gunDomain, seed), gunDomain);
         for (const part of resolved.placed.keys()) {
           const def = resolved.defs.get(part)!;
           for (const s of def.displaySolids ?? def.solids) {
+            const key = JSON.stringify(s);
+            if (checked.has(key)) {
+              continue;
+            }
+            checked.add(key);
             const label = `${t.name} seed ${seed} part ${part} solid ${s.id}`;
             expectWatertightMesh(meshForSolid(s), label);
           }

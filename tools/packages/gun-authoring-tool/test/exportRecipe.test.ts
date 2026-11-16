@@ -48,6 +48,9 @@ const designExport = (grains: { grain: number; detailGrain?: number }) => {
   return exported!.generate();
 };
 
+// Exported once at file load: a voxelized rifle export costs seconds under load, and both lattice tests read it.
+const arExport = designExport(voxel);
+
 /** A node's transform when its rotation is a whole number of quarter turns, which keep the world lattice. */
 const quarterTurned = (node: { translation?: number[]; rotation?: number[] }): Matrix4 | undefined => {
   const turn = new Matrix4().makeRotationFromQuaternion(
@@ -99,7 +102,7 @@ const eyeOnSmoothSight = (source: string): boolean =>
   );
 
 it('puts every part turned only by quarter turns, coarse or fine, on the fine lattice so the two grains nest', () => {
-  const { json, floats } = readGlb(designExport(voxel).glb);
+  const { json, floats } = readGlb(arExport.glb);
   const seen = new Set<number>();
   for (const node of json.nodes) {
     const transform = quarterTurned(node);
@@ -125,7 +128,7 @@ it('puts every part turned only by quarter turns, coarse or fine, on the fine la
 
 it('exports a voxelized sight whose up is perpendicular to its direction', () => {
   const { sight } = (
-    designExport(voxel) as unknown as {
+    arExport as unknown as {
       modelEntry: { gun: { sight: { direction: readonly number[]; up: readonly number[] } } };
     }
   ).modelEntry.gun;
