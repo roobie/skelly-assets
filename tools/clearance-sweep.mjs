@@ -9,12 +9,12 @@
 // Writes <out>/report.json, the findings of every wearable in every pose ranked by the covered skin that shows, and for
 // each wearable and pose with a finding <out>/<wear>-<pose>.png, the tile with the probe's marks, and
 // <out>/<wear>-<pose>-skin.png, the skin check's masks; prints the ranking.
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { COINCIDENT, PITCH } from '../site/clearance.mjs';
+import { makeBuildDir } from './buildDir.mjs';
 import { buildSite, launchBrowser, openPage, serveSite } from './reviewSite.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -35,7 +35,7 @@ const fixtures = readdirSync(join(repo, 'models/poses')).filter((name) => name.e
 const poses = positionals.length > 0 ? positionals : fixtures;
 
 // The site is built aside, so the output folder holds only the report and the pictures.
-const site = mkdtempSync(join(tmpdir(), 'clearance-sweep-'));
+const site = makeBuildDir('clearance-sweep');
 process.on('exit', () => rmSync(site, { recursive: true, force: true }));
 buildSite(built, site);
 const readSite = (file) => JSON.parse(readFileSync(join(site, file), 'utf8'));

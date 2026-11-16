@@ -8,6 +8,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { BUILD_ROOT } from './buildDir.mjs';
 import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
 
@@ -191,8 +192,8 @@ export const compilerCode = () => [
 
 const installOptions = () => ({
   root: repositoryRoot,
-  stamp: join(here, '.build', 'jsonnet-twins.json'),
-  store: process.env.JSONNET_TWIN_STORE || join(here, '.build', 'jsonnet'),
+  stamp: join(BUILD_ROOT, 'jsonnet-twins.json'),
+  store: process.env.JSONNET_TWIN_STORE || join(BUILD_ROOT, 'jsonnet'),
   code: compilerCode(),
   rowIndexes: ROW_DIRS.map((dir) => join(dir, INDEX)),
 });
