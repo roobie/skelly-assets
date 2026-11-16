@@ -6,7 +6,7 @@ read_if:
   - you add a non-humanoid mob that Deadvox must hit, sever, pose or light
   - you change acid animation, gaze or the spit mouth anchor
   - you change Deadvox body-plan selection or its mobgen realization boundary
-  - you change creature-owned severed-part item policy
+  - you change which severed part a cut leaves
   - you build the cross-mob far level of detail for per-bone meshes
 ---
 
@@ -164,9 +164,9 @@ https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`, `region
   are listed in the cut logic. See `src/mob/dismember.ts`, `regionSeverableParts`. The crowd
   gore mask sizes itself from the widest body (deadvox
   passes the bone count to `crowdTextureLayout`), so the acid bone count needs no encoding
-  change. A severed acid part follows its creature kind's authored drop policy,
-  independently of bone names. See https://github.com/roobie/skelly, `packages/deadvox/src/core/schema.ts`,
-  `severedItems`, and https://github.com/roobie/skelly, `packages/deadvox/src/game/session.ts`, `createSession`.
+  change. Each acid cut point bakes its own severed part, as every cut point of a named
+  mob type does, so no item list names acid bones by hand. See `tools/severedParts.mjs`,
+  `severedPartPlan`.
 - **Death burst.** On death the sac's voxels are removed without leaving a severed item and
   without any simulation consequence, so presentation reads death and the sac stays out of
   saves and fingerprints. Keeping it a disposition rather than a Deadvox special case lets a
