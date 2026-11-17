@@ -34,6 +34,7 @@ import {
 import { DEFAULT_REVOLVE_FACETS, meshForRevolved } from './revolve.ts';
 import type { ConvexPolyhedron, TriangleMesh } from './shapeTypes.ts';
 import type { Box, DomainUnits, Solid, Vec2 } from './solid.ts';
+import { type TerraceLattice, terraceBands } from './terrace.ts';
 
 // Default chamfer size: half a grid step. This keeps the edge readable while
 // preserving the part's overall shape; each solid clamps it to its geometry.
@@ -323,13 +324,28 @@ export const meshForSolid = (
     if (!polyhedron) {
       throw new Error(`Solid "${solid.id}" clips to an empty or degenerate mesh.`);
     }
-    const builder = new MeshBuilder();
+    return meshForPolyhedra([polyhedron]);
+  }
+  return orientExtrusion(chamferedPrism(solid.profile, solid.z, bevel), solid.axis);
+};
+
+const meshForPolyhedra = (polyhedra: readonly ConvexPolyhedron[]): TriangleMesh => {
+  const builder = new MeshBuilder();
+  for (const polyhedron of polyhedra) {
     for (const face of polyhedron.faces) {
       builder.face(face.map((index) => polyhedron.vertices[index]!));
     }
-    return builder.build();
   }
-  return orientExtrusion(chamferedPrism(solid.profile, solid.z, bevel), solid.axis);
+  return builder.build();
+};
+
+/**
+ * The mesh a voxel copy samples for a solid that terraces on `lattice` (`terrace.ts`), unbevelled since a step's edges
+ * are layer boundaries rather than authored edges; undefined for a solid drawn as authored.
+ */
+export const terracedMesh = (solid: Solid, lattice: TerraceLattice): TriangleMesh | undefined => {
+  const bands = terraceBands(solid, lattice);
+  return bands && meshForPolyhedra(bands);
 };
 
 const GROUP_WELD_TOLERANCE_U = 1e-5;
