@@ -6,19 +6,26 @@ import { exportItem } from '../packages/thing-authoring-tool/src/exports.ts';
 import { compound } from '../packages/thing-authoring-tool/src/families/compound.ts';
 import { coplanarArea, trianglesOf } from './surface-helpers.mjs';
 
-const { spec, rows, settings, legacy, cabin, legacyDoor } = JSON.parse(
+const { spec, rows, settings, legacy, placed, legacyDoor } = JSON.parse(
   evaluateJsonnet(`
 local s = import 'models/vehicles/city_car.spec.libsonnet';
 local shape = import 'models/vehicles/car-shape.libsonnet';
-local rows = import 'models/vehicles/city_car.libsonnet';
 local k = import 'models/vehicles/kit.libsonnet';
+local placements = import 'models/vehicles/placements.libsonnet';
+local drawn = {
+  [row.id]: std.parseJson(row.parts[0].params.pieces)
+  for row in std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'))
+};
 {
   legacyDoor: [r for r in (import 'models/vehicles/car-body.libsonnet').rows('city_car', 'City car', s + { continuousCabin: false }) if r.id == 'city_car_front_door'][0],
-  cabin: std.flattenArrays([
-    local ps = std.parseJson(r.parts[0].params.pieces);
-    [p + { owner: r.id } for p in ps + (if r.id == 'city_car_front_door' then std.map(k.far, ps) else [])]
-    for r in rows if std.member(['city_car_shell', 'city_car_front_door', 'city_car_windscreen', 'city_car_tailgate'], r.id)
-  ]),
+  placed: {
+    [car]: std.flattenArrays([
+      [k.moved(if std.objectHas(site, 'mirror') then k.far(p) else p, site.at) + { owner: site.id } for p in drawn[site.part]]
+      for site in placements[car].sites
+      if std.objectHas(drawn, site.part)
+    ])
+    for car in ['city_car', 'electric_city_car']
+  },
   spec: s,
   rows: (import 'models/vehicles/frame.libsonnet').rows(import 'models/vehicles/city_car.libsonnet'),
   settings: import 'models/item-settings.libsonnet',
@@ -95,20 +102,42 @@ test('pane/frame end faces have their declared sub-voxel assembly clearance', ()
   near(spec.bRear - quarter.profile[1][0], 0.002);
 });
 
-test('smooth cabin panes share no positive-area coplanar faces with opaque cabin pieces, on either side', () => {
-  const surfaces = cabin.map(({ owner, ...piece }) => ({
-    owner,
-    ...piece,
-    triangles: trianglesOf(compound({ pieces: JSON.stringify([piece]) })[0]),
-  }));
-  const conflicts = [];
-  for (const pane of surfaces.filter((p) => p.slot === 'glass')) {
-    for (const frame of surfaces.filter((p) => p.slot !== 'glass')) {
-      const area = coplanarArea(pane.triangles, frame.triangles);
-      if (area > 1e-8) conflicts.push(`${pane.owner}/${pane.id} vs ${frame.owner}/${frame.id}: ${area}`);
+// Pieces whose bounding boxes are apart cannot share a face, so only touching pairs pay for the planar comparison.
+const boundsOf = (triangles) => {
+  const points = triangles.flatMap((t) => t.points);
+  return [0, 1, 2].map((i) => [Math.min(...points.map((p) => p[i])), Math.max(...points.map((p) => p[i]))]);
+};
+const touching = (a, b) => a.every(([lo, hi], i) => lo <= b[i][1] + 1e-6 && b[i][0] <= hi + 1e-6);
+
+test('smooth city car panes share no positive-area face with any other piece at any site, on either side', () => {
+  for (const [car, pieces] of Object.entries(placed)) {
+    const surfaces = pieces.map(({ owner, ...piece }) => {
+      const triangles = trianglesOf(compound({ pieces: JSON.stringify([piece]) })[0]);
+      return { owner, ...piece, triangles, bounds: boundsOf(triangles) };
+    });
+    const panes = surfaces.filter((p) => p.slot === 'glass');
+    assert.deepEqual(
+      panes.map((p) => `${p.owner}/${p.id}`).sort(),
+      [
+        'front_door_far/glass_far',
+        'front_door_near/glass',
+        'shell/quarter_light_far',
+        'shell/quarter_light_near',
+        'tailgate/glass',
+        'windscreen/glass',
+      ],
+      car,
+    );
+    const conflicts = [];
+    for (const pane of panes) {
+      for (const other of surfaces) {
+        if (other === pane || !touching(pane.bounds, other.bounds)) continue;
+        const area = coplanarArea(pane.triangles, other.triangles);
+        if (area > 1e-8) conflicts.push(`${pane.owner}/${pane.id} vs ${other.owner}/${other.id}: ${area}`);
+      }
     }
+    assert.deepEqual(conflicts, [], car);
   }
-  assert.deepEqual(conflicts, []);
 });
 
 test('coplanar detector catches both winding senses, but not edge contact or a setback', () => {
