@@ -19,8 +19,9 @@ local pressings(id, title, s) = {
   local lean = shape.tumble,
   local grain = shape.grain,
   local continuousCabin = std.get(s, 'continuousCabin', false),
-  // A 2 mm glazing assembly clearance, measured along the named x/y/z boundary axes, not a voxel gap.
-  // Keeps pane end faces off exposed frame faces in the continuous copy; well below the 31.25 mm grain.
+  // A 2 mm glazing clearance, so no pane end face lies in the same plane as a frame face and the smooth copy does not
+  // z-fight there. It is far below the grain, yet it still moves a few voxel cells where a boundary sat on a cell
+  // centre: glass cells at the quarter light and the windscreen foot, and a few door cells. None of them opens a hole.
   local glazingEdgeGap = if continuousCabin then 0.002 else 0,
   local glazedTop = s.roof - glazingEdgeGap,
   local glazedRise = (glazedTop - s.waist) / (s.roof - s.waist),
