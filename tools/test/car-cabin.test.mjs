@@ -135,6 +135,39 @@ test('coplanar detector catches both winding senses, but not edge contact or a s
   near(coplanarArea(a, recessed), 0);
 });
 
+test('a continuous lean holds the waist and roof spans past the profile ends, and refuses a flat profile', () => {
+  const lean = (profile) =>
+    JSON.parse(
+      evaluateJsonnet(`
+local s = import 'models/vehicles/city_car.spec.libsonnet';
+(import 'models/vehicles/car-shape.libsonnet')(s).side('post', 'paint', ${JSON.stringify(profile)}, [0.5, 0.6])`),
+    );
+  const [low, high] = [spec.waist - 0.1, spec.roof + 0.1];
+  const [foot, post, head] = lean([
+    [0, low],
+    [0.2, low],
+    [0.2, high],
+    [0, high],
+  ]);
+  assert.deepEqual([foot.id, post.id, head.id], ['post_foot', 'post', 'post_head']);
+  assert.deepEqual([foot.start, foot.end], [0.5, 0.6]);
+  assert.deepEqual([head.start, head.end], [0.5 - spec.tumble, 0.6 - spec.tumble]);
+  for (const y of [spec.waist, spec.roof]) {
+    const [inner, outer] = spanAt(post, 0, y);
+    near(outer, y === spec.waist ? 0.6 : 0.6 - spec.tumble);
+    near(outer - inner, 0.1);
+  }
+  assert.throws(
+    () =>
+      lean([
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ]),
+    /flat profile/,
+  );
+});
+
 test('other cars retain the legacy band construction until explicitly migrated', () => {
   assert.equal(legacy.length, 4);
   assert.ok(legacy.every((p) => !p.clip));

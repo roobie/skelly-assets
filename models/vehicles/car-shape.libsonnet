@@ -54,28 +54,37 @@ function(s) {
       for i in std.range(0, steps - 1)
       if std.length(slice(i)) >= 3
     ],
-  // A straight lean bounded by two planes, not a staircase. The profile bounds x/y; the planes bound z.
+  // A straight lean bounded by two planes, not a staircase. The profile bounds x/y; the planes bound z. As with `band`,
+  // whatever lies below the waist keeps the waist's span and whatever lies above the roof keeps the roof's.
   continuous(id, slot, profile, range):
     local low = std.foldl(std.min, [p[1] for p in profile], profile[0][1]);
     local high = std.foldl(std.max, [p[1] for p in profile], profile[0][1]);
-    local at(y) = range(outer.tumble * (y - s.waist) / rise);
-    local a = at(low);
-    local b = at(high);
-    local slope = [(b[i] - a[i]) / (high - low) for i in [0, 1]];
-    [k.clipped(k.prism(id, slot, profile, [std.min(a[0], b[0]), std.max(a[1], b[1])]), [
-      { normal: [0, slope[0], -1], offset: slope[0] * low - a[0] },
-      { normal: [0, -slope[1], 1], offset: a[1] - slope[1] * low },
-    ])],
+    assert high > low : id + ' has a flat profile, which leaves its lean no height to slope over';
+    local at(y) = range(outer.tumble * (std.clamp(y, s.waist, s.roof) - s.waist) / rise);
+    local foot = std.max(low, s.waist);
+    local head = std.min(high, s.roof);
+    local within(from, to) = tidy(clipY(clipY(profile, from, true), to, false));
+    local upright(suffix, from, to, y) =
+      local part = within(from, to);
+      if std.length(part) >= 3 then [k.prism(id + suffix, slot, part, at(y))] else [];
+    local a = at(foot);
+    local b = at(head);
+    local slope = [(b[i] - a[i]) / (head - foot) for i in [0, 1]];
+    local leaning = if low >= s.waist && high <= s.roof then profile else within(foot, head);
+    (if low < s.waist then upright('_foot', low, s.waist, s.waist) else [])
+    + (if head > foot && std.length(leaning) >= 3 then [k.clipped(k.prism(id, slot, leaning, [std.min(a[0], b[0]), std.max(a[1], b[1])]), [
+      { normal: [0, slope[0], -1], offset: slope[0] * foot - a[0] },
+      { normal: [0, -slope[1], 1], offset: a[1] - slope[1] * foot },
+    ])] else [])
+    + (if high > s.roof then upright('_head', s.roof, high, s.roof) else []),
+  // Whether this car's cabin leans continuously or in bands.
+  continuousCabin: std.get(s, 'continuousCabin', false),
+  local lean(id, slot, profile, range) =
+    if outer.continuousCabin then outer.continuous(id, slot, profile, range) else outer.band(id, slot, profile, range),
   // Near side's z span at the waist, moved in whole.
-  side(id, slot, profile, z):
-    local range(inset) = [z[0] - inset, z[1] - inset];
-    if std.get(s, 'continuousCabin', false) then outer.continuous(id, slot, profile, range)
-    else outer.band(id, slot, profile, range),
+  side(id, slot, profile, z): lean(id, slot, profile, function(inset) [z[0] - inset, z[1] - inset]),
   // Across the centre line, `half` at the waist.
-  across(id, slot, profile, half):
-    local range(inset) = [inset - half, half - inset];
-    if std.get(s, 'continuousCabin', false) then outer.continuous(id, slot, profile, range)
-    else outer.band(id, slot, profile, range),
+  across(id, slot, profile, half): lean(id, slot, profile, function(inset) [inset - half, half - inset]),
 
   // The transmission tunnel is a hollow hump over the gearbox and shafts, so a car with an inline gearbox gives
   // `s.tunnel` the space its driveline needs inside it: a half width, a top and how far back it runs. Its outer
