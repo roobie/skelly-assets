@@ -134,7 +134,12 @@ rows it changes, and nothing has to be kept in step with the imports. A key that
 would serve stale bytes, so a tool caches only rows that name their inputs, data its code imports whatever the row
 counts whole beside the code (`recipeTools.mjs`, `recipeTools`, and `mobs.mjs`, `mobStore`), and an over-wide key
 costs only a miss. A complete build prunes the entries it did not use, so the cache holds what the next build can
-reuse rather than an entry for every edit ever built. The determinism check builds uncached, since a check that read
+reuse rather than an entry for every edit ever built. Worktrees and users on one host can share a cache, since a
+fresh worktree would otherwise regenerate the whole catalogue: `SKELLY_EXPORT_CACHE` names its folder, and a folder
+that is setgid and group-writable is treated as shared. One build there cannot name the entries the other builds
+still reuse, so a shared cache instead drops an entry no build has used for a week, and the cache gives the group
+the access its owner has to whatever it makes, whatever each user's umask; see `cache.ts`, `pruneEntries`. The
+determinism check builds uncached, since a check that read
 the cache could not show the cache was right. A worker exports a
 row from the task its tool hands it, the row with the slice of its sources the export reads, because loading the whole
 item catalogue in every worker costs more than most exports; see `recipeTools.mjs`, `recipeTools`, and
