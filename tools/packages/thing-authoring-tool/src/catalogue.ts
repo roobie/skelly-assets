@@ -2,6 +2,7 @@ import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/as
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { BuildingSchema } from '@skelly/thing-core/building';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import {
@@ -177,7 +178,7 @@ const ItemSchema = pipe(
     ),
     covers: optional(NeutralModelSchema.entries.covers),
     soleLift: NeutralModelSchema.entries.soleLift,
-    building: NeutralModelSchema.entries.building,
+    building: optional(BuildingSchema),
     /** Named datums on solids, exported as the model's anchors. */
     anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
     /**

@@ -8,7 +8,8 @@ local row(id, title, kg, pieces) = h.compound('medieval_stone_' + id, kg, pieces
   title: 'Medieval stone ' + title,
   voxelGrain: s.grain,
   taxonomy: { category: 'structures', tags: { setting: ['medieval'], material: ['stone'] } },
-} + (if std.objectHas(metadata, 'medieval_stone_' + id) then { building: metadata['medieval_stone_' + id] } else {});
+  building: metadata['medieval_stone_' + id],
+};
 local rect(x0, y0, x1, y1) = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
 local swap(poly) = [[p[1], p[0]] for p in poly];
 local band(poly, lo, hi) = h.clipX(h.clipX(poly, lo, true), hi, false);

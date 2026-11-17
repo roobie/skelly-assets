@@ -123,14 +123,7 @@ test('the gable stays under the roof surface, including its tie ends at the eave
 });
 
 // Building pieces depend on preserved datums. Checking only source lengths missed a coarse grain widening posts.
-for (const id of [
-  'medieval_timber_post',
-  'medieval_timber_wall',
-  'medieval_timber_braced_wall',
-  'medieval_timber_doorway',
-  'medieval_timber_window',
-  'medieval_timber_floor',
-]) {
+for (const { id } of rows) {
   test(`${id} retains its placement bounds in voxel and smooth production exports`, () => {
     const item = loadCatalogue({ ...settings, items: [byId.get(id)] }).items[0];
     const exported = exportItem(item, settings, { id, file: `assets/models/${id}.glb` }, { voxelGrain: spec.grain });

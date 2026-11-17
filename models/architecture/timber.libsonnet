@@ -8,7 +8,7 @@ local finish = { plaster: 'chalk-white', timber: 'wood-walnut', board: 'wood-oak
 local taxonomy = { category: 'structures', tags: { setting: ['medieval'] } };
 local row(id, title, kg, pieces, materials=['wood']) =
   h.compound(id, kg, pieces, finish) + { title: title, voxelGrain: s.grain, taxonomy: taxonomy + { tags+: { material: materials } } }
-  + (if std.objectHas(metadata, id) then { building: metadata[id] } else {});
+  + { building: metadata[id] };
 local panel(id, x0, y0, x1, y1) = h.box(id, 'plaster', [x0, y0, -s.plaster / 2], [x1, y1, s.plaster / 2]);
 local beam(id, x0, y0, x1, y1) = h.box(id, 'timber', [x0, y0, -s.timber / 2], [x1, y1, s.timber / 2]);
 local cap = beam('cap', -half, s.storey - s.timber, half, s.storey);
