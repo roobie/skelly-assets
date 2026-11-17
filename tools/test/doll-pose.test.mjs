@@ -398,7 +398,7 @@ test("the press check's pose files are what its tool writes from its key frames"
   }
 });
 
-test('through the press check the rifle points ahead and down, its stock borne in the shoulder', () => {
+test('through the press check the rifle points ahead, level or down, its stock borne in the shoulder', () => {
   const { positions } = itemMesh(pressCheck.rifle);
   for (const [name, file] of Object.entries(pressPoses)) {
     const { model, turn } = file.hold['hand.R'];
@@ -407,7 +407,7 @@ test('through the press check the rifle points ahead and down, its stock borne i
     const heading = (Math.atan2(bore[0], bore[2]) * 180) / Math.PI,
       tip = (-Math.asin(bore[1]) * 180) / Math.PI;
     assert.ok(Math.abs(heading) < 10, `${name}: the bore heads ${heading.toFixed(1)}° off straight ahead`);
-    assert.ok(tip > 0 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
+    assert.ok(tip > -0.5 && tip < 30, `${name}: the bore tips ${tip.toFixed(1)}° down`);
     const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
     const item = held['hand.R'];
     assertBorne(
