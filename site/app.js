@@ -507,12 +507,16 @@ async function describe(model) {
 // in the form shown. Its size stays as framed on opening, since both forms are the one model within half a voxel.
 function showDrawn(model, entry, loaded) {
   const file = isVehicle(model) ? model.placements : entry.file;
-  $('v-id').textContent = file;
-  $('v-download').href = `built/${file}`;
-  $('v-download').setAttribute('download', file);
-  $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
+  $('v-id').textContent = file ?? model.id;
+  $('v-download').hidden = !file;
+  if (file) {
+    $('v-download').href = `built/${file}`;
+    $('v-download').setAttribute('download', file);
+    $('v-download').textContent = isVehicle(model) ? 'Download placements' : 'Download .glb';
+  }
   const size = viewer.size;
-  const shelfKey = shelfOf(model);
+  // A kit layout has sites like a vehicle, but is not itself a whole vehicle in the catalogue.
+  const shelfKey = isVehicle(model) && !model.placements ? UNCATEGORISED : shelfOf(model);
   const facts = [
     ...(shelfKey === UNCATEGORISED ? [] : [['Category', shelfLabel(shelfKey), taxonomy.categories[shelfKey] ?? shelfTitles[shelfKey]]]),
     ...Object.entries(model.tags).map(([facet, terms]) => [labelOf(facet), terms.map(labelOf).join(', ')]),
@@ -684,12 +688,13 @@ async function main() {
     note.textContent = `The 3D previews need WebGL, which this browser did not provide (${err.message}). The models are still listed and can be downloaded from the repository.`;
     $('grid').before(note);
   }
-  const { taxonomy: vocabulary, models, vehicles, release: latest = null } = await fetch('models.json').then((r) => r.json());
+  const { taxonomy: vocabulary, models, vehicles, assemblies = [], release: latest = null } = await fetch('models.json').then((r) => r.json());
   taxonomy = vocabulary;
   release = latest;
   registerModels(models);
   entries = [...vehicles, ...models];
-  for (const m of entries) byId.set(m.id, m);
+  // Kit assemblies are deep-linkable for review without duplicating their fused models in the catalogue grid.
+  for (const m of [...entries, ...assemblies]) byId.set(m.id, m);
   renderShelves();
   renderFacets();
   $('search').addEventListener('input', () => {

@@ -17,7 +17,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
-import { readAssemblies } from '../tools/assemblies.mjs';
+import { ASSEMBLY_SUFFIX, readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { coveringItems, isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { outputPath, readMobRows } from '../tools/layout.mjs';
@@ -174,7 +174,17 @@ const assemblies = readAssemblies(root)
   .filter(({ sites }) => missingParts(sites).length === 0)
   .map(({ id, sites }) => {
     if (modelsById.has(id) || vehicleIds.has(id)) throw new Error(`assembly ${id} shares its id with a model or vehicle`);
-    return { id, sites: placedSites(sites) };
+    const fused = modelsById.get(id.slice(0, -ASSEMBLY_SUFFIX.length));
+    const placed = placedSites(sites);
+    return {
+      id,
+      title: `${fused?.title ?? id.slice(0, -ASSEMBLY_SUFFIX.length).replaceAll('_', ' ')} assembly`,
+      tags: fused?.tags ?? {},
+      keywords: [],
+      sites: placed,
+      form: formOf({ sites: placed }),
+      ...vehiclePhysical(placed),
+    };
   });
 
 // The browser cannot import actorCompose: it reaches mobgen TypeScript and Jsonnet source installation, while this
