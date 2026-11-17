@@ -3,6 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parse } from 'valibot';
+import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { outputPath } from './layout.mjs';
 import { BuildingKitSchema, BuildingSchema, validateBuildingKit } from './packages/thing-core/src/building.ts';
 
@@ -60,7 +61,7 @@ export function exportBuildingKits({ models, out, root = repo, complete = true }
   }
   const buildingKits = [];
   const files = [];
-  for (const { pack, path, kit } of [...used.values()].sort((a, b) => keyOf(a.kit).localeCompare(keyOf(b.kit)))) {
+  for (const { pack, path, kit } of [...used.values()].sort((a, b) => compareCodeUnits(keyOf(a.kit), keyOf(b.kit)))) {
     const file = outputPath(pack, path);
     mkdirSync(join(out, pack, 'building-kits'), { recursive: true });
     writeFileSync(join(out, file), `${JSON.stringify(kit, null, 2)}\n`);
