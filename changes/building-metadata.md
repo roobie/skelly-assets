@@ -1,0 +1,1 @@
+Add optional versioned building metadata with kit definitions, sidecar/manifest discovery and production/cache validation. The first increment describes the medieval timber and stone wall/post/floor joins without inferring placements from mesh bounds or promising navigation and collision behavior.

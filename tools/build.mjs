@@ -19,6 +19,7 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { exportBuildingKits } from './buildingKits.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { entryFolder } from './entryFolder.mjs';
@@ -191,20 +192,23 @@ async function writePack(out, packId, tool, generated, { index }) {
     smoothBase: base(smooth),
   });
   return {
-    models: written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
-      id,
-      kind,
-      pack: packId,
-      path,
-      smooth: { pack: smooth, path },
-      nodes: partNodes,
-      label,
-      paintable,
-      covers,
-      soleLift,
-      massKg: physical?.massKg,
-      volumeM3: physical?.volumeM3,
-    })),
+    models: written.models.map(
+      ({ id, kind, path, partNodes, label, paintable, covers, soleLift, building, physical }) => ({
+        id,
+        kind,
+        pack: packId,
+        path,
+        smooth: { pack: smooth, path },
+        nodes: partNodes,
+        label,
+        paintable,
+        covers,
+        soleLift,
+        ...(building === undefined ? {} : { building }),
+        massKg: physical?.massKg,
+        volumeM3: physical?.volumeM3,
+      }),
+    ),
     files: [
       ...written.files.map((file) => outputPath(packId, file)),
       ...written.smoothFiles.map((file) => outputPath(smooth, file)),
@@ -383,6 +387,8 @@ async function main() {
       failed = true;
     }
     for (const file of recipes.files) console.log(`built ${file}`);
+    const kits = exportBuildingKits({ models: [...built.models, ...recipes.models], out });
+    for (const file of kits.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
@@ -417,6 +423,7 @@ async function main() {
       const files = [
         ...built.files,
         ...recipes.files,
+        ...kits.files,
         ...mobs.files,
         ...sounds.files,
         ...placed.files,
@@ -427,6 +434,7 @@ async function main() {
       if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
+        buildingKits: kits.buildingKits,
         vehicles: placed.vehicles,
         motions: [...wields.motions, ...locomotion.motions],
         sounds: sounds.sounds,

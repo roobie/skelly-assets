@@ -8,6 +8,7 @@ import {
   buildItem,
   type Catalogue,
   type CatalogueSettings,
+  itemBuilding,
   itemMotion,
   itemPalette,
   type ToolItem,
@@ -49,6 +50,7 @@ export const exportItem = (
   voxel: VoxelGrains,
   { collision = false, density }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
+  const building = itemBuilding(item, settings);
   const built = buildItem(item, settings, voxel);
   const { report, masses, handling, label, drawn, glow, paintable } = built;
   if (density) {
@@ -94,6 +96,7 @@ export const exportItem = (
     partNodes: out.partNodes,
     modelEntry: {
       ...asset,
+      ...(building ? { building } : {}),
       ...(item.exportMass === 'parts' ? { parts } : {}),
       ...handling,
       ...(motion ? { motion } : {}),

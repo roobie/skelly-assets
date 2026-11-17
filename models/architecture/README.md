@@ -11,6 +11,9 @@ corresponding smooth copies in `skelly.structures.smooth`. They share 2 m bays, 
 floor datums, but stone uses thicker walls and different infill ends. These are building fabrics, not yet
 a complete castle, village or dungeon collection.
 
+Plain walls, posts/piers and floors now ship optional [building placement metadata](../../docs/building-metadata.md).
+Its kit profiles distinguish timber and stone joins; the other modules still use the placement conventions below.
+
 ## Timber kit
 
 Timber and pale plaster with a tiled pitched roof, demonstrated by a cottage-width assembly.
