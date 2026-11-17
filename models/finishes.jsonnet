@@ -87,6 +87,8 @@ local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
   'clay-terracotta': material([0.66, 0.36, 0.24]) + { finish: { metallic: 0, roughness: 0.95 } },
   'ceramic-white': material([0.88, 0.87, 0.83]) + { finish: { metallic: 0, roughness: 0.3 } },
   'stone-grey': material([0.5, 0.49, 0.47]) + { finish: { metallic: 0, roughness: 0.95 } },
+  'stone-limestone': material([0.6, 0.58, 0.52]) + { finish: { metallic: 0, roughness: 0.95 } },
+  'mortar-grey': material([0.34, 0.33, 0.3]) + { finish: { metallic: 0, roughness: 1 } },
   'wood-pine': material([0.76, 0.6, 0.4]),
   'leather-brown': fabric([0.36, 0.22, 0.13], 'leather', { roughness: 0.6 }),
   'paper-white': material([0.9, 0.89, 0.85]),
