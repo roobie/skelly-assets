@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { loadCatalogue } from '../packages/thing-authoring-tool/src/catalogue.ts';
 import { exportItem } from '../packages/thing-authoring-tool/src/exports.ts';
+import { bounds, close, contains, glbBounds, placed } from './architecture-helpers.mjs';
 
 const { spec, rows, cottage, settings, recipe } = JSON.parse(
   evaluateJsonnet(`{
@@ -15,30 +16,6 @@ const { spec, rows, cottage, settings, recipe } = JSON.parse(
 );
 const byId = new Map(rows.map((row) => [row.id, row]));
 const pieces = (id) => JSON.parse(byId.get(id).parts[0].params.pieces);
-const close = (actual, expected, message) =>
-  assert.ok(Math.abs(actual - expected) < 1e-6, `${message}: ${actual} != ${expected}`);
-const bounds = (ps) => {
-  const points = ps.flatMap((p) =>
-    p.kind === 'box'
-      ? [p.min, p.max]
-      : p.profile.flatMap(([u, v]) =>
-          [p.start, p.end].map((along) =>
-            p.axis === 'x' ? [along, u, v] : p.axis === 'y' ? [v, along, u] : [u, v, along],
-          ),
-        ),
-  );
-  return [Math.min, Math.max].map((extreme) => [0, 1, 2].map((axis) => extreme(...points.map((p) => p[axis]))));
-};
-const contains = (p, point) => {
-  if (p.kind === 'box') return point.every((v, axis) => v >= p.min[axis] && v <= p.max[axis]);
-  const axis = 'xyz'.indexOf(p.axis);
-  if (point[axis] < p.start || point[axis] > p.end) return false;
-  const [u, v] = p.axis === 'x' ? [point[1], point[2]] : p.axis === 'y' ? [point[2], point[0]] : [point[0], point[1]];
-  return p.profile.every(([x, y], i, poly) => {
-    const [nx, ny] = poly[(i + 1) % poly.length];
-    return (nx - x) * (v - y) - (ny - y) * (u - x) >= -1e-9;
-  });
-};
 
 test('the ten timber kit modules are selected once by the production structures recipe', () => {
   assert.equal(rows.length, 10);
@@ -91,12 +68,6 @@ test('doorway and unglazed window have genuine through-openings and a separately
   assert.ok(min[1] > 0 && max[1] < spec.door.height);
 });
 
-const placed = (site, point) => {
-  const angle = 2 * Math.atan2(site.turn[1], site.turn[3]);
-  const c = Math.round(Math.cos(angle)),
-    s = Math.round(Math.sin(angle));
-  return [c * point[0] + s * point[2], point[1], -s * point[0] + c * point[2]].map((v, axis) => v + site.at[axis]);
-};
 test('the cottage example closes every wall end with a post and tiles its finished floor', () => {
   const sites = cottage.sites;
   assert.equal(new Set(sites.map(({ site }) => site)).size, sites.length);
@@ -152,21 +123,6 @@ test('the gable stays under the roof surface, including its tie ends at the eave
 });
 
 // Building pieces depend on preserved datums. Checking only source lengths missed a coarse grain widening posts.
-const glbBounds = (bytes) => {
-  const data = Buffer.from(bytes);
-  const gltf = JSON.parse(data.subarray(20, 20 + data.readUInt32LE(12)));
-  for (const node of gltf.nodes) {
-    assert.ok(!node.matrix);
-    if (node.translation) assert.ok(node.translation.every((v) => Math.abs(v) < 1e-9));
-    if (node.rotation) assert.deepEqual(node.rotation, [0, 0, 0, 1]);
-  }
-  const positions = gltf.meshes.flatMap(({ primitives }) =>
-    primitives.map(({ attributes }) => gltf.accessors[attributes.POSITION]),
-  );
-  return [Math.min, Math.max].map((extreme, side) =>
-    [0, 1, 2].map((axis) => extreme(...positions.map((p) => p[side === 0 ? 'min' : 'max'][axis]))),
-  );
-};
 for (const id of [
   'medieval_timber_post',
   'medieval_timber_wall',
