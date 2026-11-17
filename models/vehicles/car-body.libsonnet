@@ -25,11 +25,19 @@ local pressings(id, title, s) = {
   local glazingEdgeGap = if continuousCabin then 0.002 else 0,
   local glazedTop = s.roof - glazingEdgeGap,
   local glazedRise = (glazedTop - s.waist) / (s.roof - s.waist),
-  // These glazing quadrilaterals have a horizontal foot at the waist panel's top. Trim that contact too,
-  // interpolating the sloped edges so moving the foot does not change the pane's rake.
+  // These glazing quadrilaterals have a horizontal foot at the waist panel's top. Trim that contact too, sliding each
+  // foot corner up its own sloped edge so moving the foot does not change the pane's rake. The foot is found, not
+  // assumed, so the corners may come in any order.
   local clearWaist(profile) = if glazingEdgeGap == 0 then profile else
+    local n = std.length(profile);
+    local footY = std.foldl(std.min, [p[1] for p in profile], profile[0][1]);
+    local onFoot(i) = profile[i % n][1] == footY;
+    assert n == 4 && std.length([i for i in std.range(0, n - 1) if onFoot(i) && onFoot(i + 1)]) == 1
+           && std.length([i for i in std.range(0, n - 1) if onFoot(i)]) == 2 :
+           'a pane cleared off the waist must be a quadrilateral with one horizontal foot edge';
     local lift(a, b) = [a[0] + (b[0] - a[0]) * glazingEdgeGap / (b[1] - a[1]), a[1] + glazingEdgeGap];
-    [lift(profile[0], profile[3]), lift(profile[1], profile[2]), profile[2], profile[3]],
+    local edgeTop(i) = profile[if onFoot(i + 1) then (i + n - 1) % n else (i + 1) % n];
+    [if onFoot(i) then lift(profile[i], edgeTop(i)) else profile[i] for i in std.range(0, n - 1)],
   local roofHalf = s.glassOut - 0.09 - lean,
   local hood(x) = s.hoodBack - (x - s.aPost) * s.hoodFall,
   local nose = s.front - 0.075,
