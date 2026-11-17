@@ -3,6 +3,7 @@ _site/
 tools/.build/
 models/recipes/*.json
 models/architecture/*.example.json
+models/nature/*.example.json
 models/building-kits.json
 models/finishes.json
 models/guns/cartridges/120x570.json
