@@ -196,11 +196,14 @@ local taperedShell(t, gunLow, gunHigh) =
   local inner(y) = inset(outer(y), t.wall);
   local point(corner, y) = [corner[1], y, corner[0]];
   local roofLow = t.height - t.wall;
+  // The voxel copy steps the slopes in whole terraces two layers tall, as armour reads at voxel grain, instead of
+  // stair-stepping them a layer at a time.
+  local terrace = 2;
   // Collision boxes each solid, so a full-height sloped wall would box the whole cone's interior. Stacking each
-  // wall in courses two voxel layers tall keeps the boxes hugging the slope, and the pieces meet on hidden faces.
-  // The cuts lie on lattice planes, so no voxel layer is drawn by two courses, which would count it twice in the
-  // drawn volume and centre of mass. Every course keeps a row of voxel centres, so none draws nothing.
-  local course = 2 * k.grain;
+  // wall in courses one terrace tall keeps the boxes hugging the slope, and the pieces meet on hidden faces.
+  // The cuts lie on the terraces' lattice planes, so no voxel layer or step is drawn by two courses, which would
+  // count it twice in the drawn volume and centre of mass. Every course keeps a row of voxel centres.
+  local course = terrace * k.grain;
   local courses(low, high) =
     local cuts = [
       c
@@ -221,7 +224,7 @@ local taperedShell(t, gunLow, gunHigh) =
     k.clipped(k.yPrism(id, 'paint', [[0, 0], p.base[next], p.base[j]], [low, high]), [
       outerCut(j),
       innerCut(j, point(middle, t.height / 2)),
-    ] + extra);
+    ] + extra) + { terrace: terrace };
   local wall(id, j, low, high) =
     local spans = courses(low, high);
     [face('%s_%d' % [id, i], j, spans[i][0], spans[i][1]) for i in std.range(0, std.length(spans) - 1)];
@@ -239,6 +242,8 @@ local taperedShell(t, gunLow, gunHigh) =
       face('face_front_near', 0, gunLow, gunHigh, [{ normal: [0, 0, -1], offset: -t.mask.across[1] }]),
     ] else []),
     roof: k.clipped(k.yPrism('roof', 'paint', std.reverse(inner(roofLow)), [roofLow, t.height]), [innerCut(j, [0, t.height / 2, 0]) for j in std.range(0, n - 1)]),
+    // Holing the roof rebuilds its pieces without the hint, so it goes on the holed pieces.
+    terraced(pieces): [piece + { terrace: terrace } for piece in pieces],
   };
 
 // The welded shell, roof, gun mask and any barrel jacket, and the racks the smoke launchers stand on.
@@ -264,10 +269,9 @@ local core(name) =
     if !(j == 0 && std.member(gun, i))
   ];
   // The roof plate, open under each hatch's lid.
-  local roof = k.holed(if continuous then tapered.roof else k.yPrism('roof', 'paint', std.reverse(plan(t).roof), [t.height - t.wall, t.height]), [
-    k.hatchHole(h.at[0], h.at[2], h.entry.radius)
-    for h in fittingsDrawn(name, ['hatch'])
-  ]);
+  local holes = [k.hatchHole(h.at[0], h.at[2], h.entry.radius) for h in fittingsDrawn(name, ['hatch'])];
+  local roof = if continuous then tapered.terraced(k.holed(tapered.roof, holes))
+  else k.holed(k.yPrism('roof', 'paint', std.reverse(plan(t).roof), [t.height - t.wall, t.height]), holes);
   // The gun mask spans the gun bands, with a square port round each gun's barrel at the bore height.
   local m = t.mask;
   local back = maskBackOf(name);

@@ -223,6 +223,29 @@ test('core voxels keep a closed shell of about the legacy volume', () => {
   }
 });
 
+test('the sloped walls and roof draw their voxels in terraces two layers tall', () => {
+  const terraced = corePieces.filter((p) => p.terrace !== undefined);
+  assert.deepEqual(
+    [...walls, ...roof].filter((p) => p.terrace !== 2).map((p) => p.id),
+    [],
+    'every wall and roof piece terraces by two layers',
+  );
+  // Only the terraced pieces, so the mask boxes and the jacket, which draw as authored, do not mask a broken step.
+  const [part] = core.parts;
+  const row = { ...core, parts: [{ ...part, params: { ...part.params, pieces: JSON.stringify(terraced) } }] };
+  const [item] = loadCatalogue({ ...settings, items: [row] }).items;
+  const cells = buildItem(item, settings, voxel).drawn.voxels('body').cells;
+  const layers = new Map();
+  for (const key of cells.keys()) {
+    const [x, y, z] = cells.voxelOf(key);
+    layers.set(y, [...(layers.get(y) ?? []), `${x},${z}`]);
+  }
+  // Every step below the roof: the roof plate's own thickness does not span whole steps.
+  for (let y = 0; (y + 2) * grain <= roofLow; y += 2) {
+    assert.deepEqual(layers.get(y + 1)?.sort(), layers.get(y)?.sort(), `layers ${y} and ${y + 1} hold the same cells`);
+  }
+});
+
 test('core collision boxes leave the turret interior about as open as the banded shell did', () => {
   const boxes = exported(coreItem).modelEntry.parts.body.collision;
   const placed = built.report.resolved.placed.get('body');
@@ -246,6 +269,7 @@ test('core collision boxes leave the turret interior about as open as the banded
       }
     }
   }
-  // On this sample the banded shell covered 17.1% of the cavity, full-height sloped plates 43.9%, the courses 20.9%.
-  assert.ok(covered / samples < 0.23, `${((100 * covered) / samples).toFixed(1)}% of the cavity is inside a box`);
+  // On this sample the banded shell covered 17.1% of the cavity, full-height sloped plates 43.9%, the terraced
+  // courses 16.6%.
+  assert.ok(covered / samples < 0.19, `${((100 * covered) / samples).toFixed(1)}% of the cavity is inside a box`);
 });
