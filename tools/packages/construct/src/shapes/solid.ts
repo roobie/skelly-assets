@@ -21,6 +21,12 @@ export interface SolidDisplayHints {
   readonly piece?: string;
   /** Diagnostic role shared by convex cells of one authored component; otherwise its solid id. */
   readonly role?: string;
+  /**
+   * Voxel layers per terrace step of a leaning solid's voxel copy (see `terrace.ts`). A face leaning less than a voxel
+   * per layer otherwise shifts its voxel outline a fraction of a voxel on every layer, which reads as noise rather than
+   * as a slope; whole steps read as the terraced armour the eye expects of a voxel model. The smooth copy ignores it.
+   */
+  readonly terrace?: number;
 }
 
 export interface SolidFinish {

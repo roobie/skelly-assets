@@ -3,7 +3,9 @@ import {
   array,
   check,
   finite,
+  integer,
   minLength,
+  minValue,
   nonEmpty,
   nullable,
   number,
@@ -37,6 +39,8 @@ const Piece = variant('kind', [
     start: coordinate,
     end: coordinate,
     clip: optional(pipe(array(clipPlane), minLength(1))),
+    // Voxel layers per step of the voxel copy's slope (SolidDisplayHints.terrace).
+    terrace: optional(pipe(number(), integer(), minValue(1))),
   }),
   strictObject({
     ...named,
@@ -84,14 +88,19 @@ export const compound = (params: Readonly<Record<string, string>>, defaultSides?
         throw new Error(`Compound prism ${piece.id} needs positive thickness`);
       }
       requireConvex(piece.profile, `Compound prism ${piece.id}`);
+      const display = {
+        // A bevel would round the edges the cut planes make, so a clipped prism is drawn unbevelled.
+        ...(piece.clip ? { bevel: false } : {}),
+        ...(piece.terrace === undefined ? {} : { terrace: piece.terrace }),
+      };
       return {
         id: piece.id,
         kind: 'extruded-polygon',
         axis: piece.axis,
         profile: piece.profile,
         z: [piece.start, piece.end],
-        // A bevel would round the edges the cut planes make, so a clipped prism is drawn unbevelled.
-        ...(piece.clip ? { clip: piece.clip, display: { bevel: false } } : {}),
+        ...(piece.clip ? { clip: piece.clip } : {}),
+        ...(Object.keys(display).length > 0 ? { display } : {}),
         slot: piece.slot,
       };
     }

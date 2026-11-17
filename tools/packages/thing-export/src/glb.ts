@@ -21,8 +21,9 @@ import {
 } from '@skelly/construct/foundation/math.ts';
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
 import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
-import { displayBevel, meshForSolid, meshForSolidGroup } from '@skelly/construct/shapes/mesh.ts';
+import { displayBevel, meshForSolid, meshForSolidGroup, terracedMesh } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { TerraceLattice } from '@skelly/construct/shapes/terrace.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
 import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
 import type {
@@ -119,6 +120,16 @@ export const latticeOrigin = (
   const local = [0, 1, 2].map((i) => -[0, 1, 2].reduce((sum, j) => sum + r[j * 3 + i]! * t[j]! * metresPerUnit, 0));
   return local.map((v) => v - Math.floor(v / grain) * grain) as unknown as Vec3;
 };
+
+/** The layers a part's terracing solids step by: its voxel lattice along its local y, in its units. */
+export const terraceLattice = (
+  placed: { readonly r: Mat3; readonly t: Vec3 },
+  grain: number,
+  metresPerUnit: number,
+): TerraceLattice => ({
+  layer: grain / metresPerUnit,
+  base: latticeOrigin(placed, grain, metresPerUnit)[1] / metresPerUnit,
+});
 
 /** Part-definition tag that asks a voxelized export for the finer `voxelDetailGrain`. */
 export const VOXEL_DETAIL = 'voxel-detail';
@@ -630,13 +641,30 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
   };
   const itemsOf = (part: PartExport): DisplayItem[] =>
     splitMixed(displayItems(part.def.displaySolids ?? part.def.solids), (solid) => appearanceFor(part, solid));
-  /** The part's drawn meshes in part-local metres, one per display item, or none for an empty one. */
+  /** What a part's voxels sample for an item: a terracing solid's steps on the part's lattice, else the item's mesh. */
+  const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undefined) => {
+    if (item.merged) {
+      // A group is welded into one mesh before it is sampled, so its members have no outlines of their own to step.
+      const terracing = item.solids.find((solid) => solid.display?.terrace !== undefined);
+      if (terracing) {
+        throw new Error(`Solid "${terracing.id}" terraces inside merge group "${item.id}"; a merged solid cannot.`);
+      }
+      return meshOf(item);
+    }
+    return (lattice && terracedMesh(item.solids[0]!, lattice)) ?? meshOf(item);
+  };
+  /** The part's voxel sources in part-local metres, one per display item, or none for an empty one. */
   const drawnMeshes = new Map<string, ({ positions: Float32Array; indices: Uint32Array } | undefined)[]>();
   const drawnOf = (part: PartExport) => {
     let drawn = drawnMeshes.get(part.id);
     if (drawn === undefined) {
+      const grain =
+        input.voxelGrain === undefined
+          ? undefined
+          : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
+      const lattice = grain === undefined ? undefined : terraceLattice(part.placed, grain, metresPerUnit);
       drawn = itemsOf(part).map((item) => {
-        const mesh = meshOf(item);
+        const mesh = voxelSourceOf(item, lattice);
         return mesh.triangleCount === 0 || mesh.indices.length === 0
           ? undefined
           : { positions: mesh.positions.map((x) => x * metresPerUnit), indices: mesh.indices };
