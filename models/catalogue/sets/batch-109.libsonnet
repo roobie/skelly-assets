@@ -175,7 +175,7 @@ local splintFinishes(steel) = { canvas: 'cloth-canvas', splint: steel, rivet: st
   // A pair of tempered steel elbow guards laid side by side, convex side up, each 150 mm from top to foot: a domed cup
   // over the elbow, a curved lame above and below, a round wing on the outer side and two buckled leather straps.
   h.compound('hardened_elbow_guards', 0.8, cop('l-', -0.095, 0.75, -1) + cop('r-', 0.095, 0.75, 1), steelFinishes('steel-heat-tint')) + { title: 'Hardened elbow guards' }
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'fabric'], setting: ['medieval'], slot: ['arms'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal', 'leather'], setting: ['medieval'], slot: ['arms'] } } },
 
   // A pair of tempered steel splint greaves laid side by side, open side down, each 380 mm from knee to ankle and
   // 160 mm across at the calf: canvas shells with six riveted steel splints, leather binding and three buckled straps.

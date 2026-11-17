@@ -110,7 +110,7 @@ local carabiner(prefix, cx, cz, y) =
     zone('band-%d' % i, ['yellow', 'blue', 'white'][i % 3], r, cuts[i], cuts[i + 1], 'x', c)
     for i in std.range(0, 5)
   ], { yellow: 'rubber-yellow', blue: 'paint-drum-blue', white: 'plastic-gloss-white' }) + { title: 'Beach volleyball' }
-  + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['rubber'], setting: ['modern'] } } },
+  + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A bowling ball 216 mm across, glossy red, with three finger holes on its front face.
   local r = 0.108, holes = [[-0.024, 0.15, 0.012], [0.024, 0.15, 0.012], [0, 0.1, 0.014]];
