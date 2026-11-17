@@ -1,6 +1,7 @@
 // What a car's wheel arches and greenhouse share across its rows. `s.tumble` is how far the side glass, pillars and roof
 // lean in from waist to roof; `s.archChamfer` is the cut off each top corner of a wheel arch. Prisms extrude straight
-// along z, so a leaning piece is pressed as one band per voxel of lean; both measures stay whole voxels for that reason.
+// along z, so legacy leaning pieces use one band per voxel of lean. `s.continuousCabin` instead clips a prism
+// with sloping planes, keeping the authored lean continuous in both the mesh and its voxelized copy.
 local k = import 'kit.libsonnet';
 local grain = 0.03125;
 local near(a, b) = std.abs(a - b) < 1e-6;
@@ -53,10 +54,28 @@ function(s) {
       for i in std.range(0, steps - 1)
       if std.length(slice(i)) >= 3
     ],
-  // `band` with the near side's z span at the waist, moved in whole.
-  side(id, slot, profile, z): outer.band(id, slot, profile, function(inset) [z[0] - inset, z[1] - inset]),
-  // `band` across the centre line, `half` at the waist.
-  across(id, slot, profile, half): outer.band(id, slot, profile, function(inset) [inset - half, half - inset]),
+  // A straight lean bounded by two planes, not a staircase. The profile bounds x/y; the planes bound z.
+  continuous(id, slot, profile, range):
+    local low = std.foldl(std.min, [p[1] for p in profile], profile[0][1]);
+    local high = std.foldl(std.max, [p[1] for p in profile], profile[0][1]);
+    local at(y) = range(outer.tumble * (y - s.waist) / rise);
+    local a = at(low);
+    local b = at(high);
+    local slope = [(b[i] - a[i]) / (high - low) for i in [0, 1]];
+    [k.clipped(k.prism(id, slot, profile, [std.min(a[0], b[0]), std.max(a[1], b[1])]), [
+      { normal: [0, slope[0], -1], offset: slope[0] * low - a[0] },
+      { normal: [0, -slope[1], 1], offset: a[1] - slope[1] * low },
+    ])],
+  // Near side's z span at the waist, moved in whole.
+  side(id, slot, profile, z):
+    local range(inset) = [z[0] - inset, z[1] - inset];
+    if std.get(s, 'continuousCabin', false) then outer.continuous(id, slot, profile, range)
+    else outer.band(id, slot, profile, range),
+  // Across the centre line, `half` at the waist.
+  across(id, slot, profile, half):
+    local range(inset) = [inset - half, half - inset];
+    if std.get(s, 'continuousCabin', false) then outer.continuous(id, slot, profile, range)
+    else outer.band(id, slot, profile, range),
 
   // The transmission tunnel is a hollow hump over the gearbox and shafts, so a car with an inline gearbox gives
   // `s.tunnel` the space its driveline needs inside it: a half width, a top and how far back it runs. Its outer
