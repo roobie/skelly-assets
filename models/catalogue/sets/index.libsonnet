@@ -224,6 +224,7 @@
   'jerry-can': import 'models/catalogue/sets/jerry-can.libsonnet',
   'lights': import 'models/catalogue/sets/lights.libsonnet',
   'materials': import 'models/catalogue/sets/materials.libsonnet',
+  'medieval-timber': import 'models/catalogue/sets/medieval-timber.libsonnet',
   'notebook': import 'models/catalogue/sets/notebook.libsonnet',
   'packages': import 'models/catalogue/sets/packages.libsonnet',
   'stash-chest': import 'models/catalogue/sets/stash-chest.libsonnet',
