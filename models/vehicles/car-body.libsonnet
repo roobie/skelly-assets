@@ -18,6 +18,17 @@ local pressings(id, title, s) = {
   local shape = carShape(s),
   local lean = shape.tumble,
   local grain = shape.grain,
+  local continuousCabin = std.get(s, 'continuousCabin', false),
+  // A 2 mm glazing assembly clearance, measured along the named x/y/z boundary axes, not a voxel gap.
+  // Keeps pane end faces off exposed frame faces in the continuous copy; well below the 31.25 mm grain.
+  local glazingEdgeGap = if continuousCabin then 0.002 else 0,
+  local glazedTop = s.roof - glazingEdgeGap,
+  local glazedRise = (glazedTop - s.waist) / (s.roof - s.waist),
+  // These glazing quadrilaterals have a horizontal foot at the waist panel's top. Trim that contact too,
+  // interpolating the sloped edges so moving the foot does not change the pane's rake.
+  local clearWaist(profile) = if glazingEdgeGap == 0 then profile else
+    local lift(a, b) = [a[0] + (b[0] - a[0]) * glazingEdgeGap / (b[1] - a[1]), a[1] + glazingEdgeGap];
+    [lift(profile[0], profile[3]), lift(profile[1], profile[2]), profile[2], profile[3]],
   local roofHalf = s.glassOut - 0.09 - lean,
   local hood(x) = s.hoodBack - (x - s.aPost) * s.hoodFall,
   local nose = s.front - 0.075,
@@ -178,7 +189,7 @@ local pressings(id, title, s) = {
       shape.foreCorner('quarter_corner_fore', 'paint', s.rearAxle, [s.skin, s.side]),
     ] else []) + (if std.get(s, 'archLiner', false) then archLiner('front', s.frontAxle) + (if cab then [] else archLiner('rear', s.rearAxle)) else []) + (if twoDoor then [
       box('quarter_door', 'paint', [s.rearDoorArch, s.floor, s.skin], [s.bRear, s.waist, s.side]),
-    ] + shape.side('quarter_light', 'glass', [[s.cWaist, s.waist], [s.bRear, s.waist], [s.bRear, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist), windowTop]], paneZ) else []) + (if cab then [] else if boot then (if open then [] else
+    ] + shape.side('quarter_light', 'glass', clearWaist([[s.cWaist + glazingEdgeGap, s.waist], [s.bRear - glazingEdgeGap, s.waist], [s.bRear - glazingEdgeGap, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist) + glazingEdgeGap, windowTop]]), paneZ) else []) + (if cab then [] else if boot then (if open then [] else
       shape.side('c_pillar', 'paint', [[s.deckFront, s.waist], [s.cWaist, s.waist], [s.cWaist + s.cLean, s.roof], [roofRear, s.roof]], [s.glassIn, s.glassOut])
     ) + [
       box('deck_side', 'paint', [s.rear + 0.1, s.deck - 0.08, loadSide], [s.deckFront, s.deck, s.side]),
@@ -190,16 +201,21 @@ local pressings(id, title, s) = {
       + shape.side('d_pillar', 'paint', [[s.tailWaist, s.waist], [s.tailWaist + 0.08, s.waist], [s.tailWaist + 0.08 + s.dLean, s.roof], [s.tailWaist + s.dLean, s.roof]], [s.hatchSide, s.glassOut])
     )), { pan: 'paint-charcoal', paint: s.paint, carpet: 'plastic-black', headliner: 'cloth-rag', trim: 'plastic-black', glass: sideGlass } + (if stripe == null then {} else { stripe: stripe }) + (if roofPaint == null then {} else { roof_paint: roofPaint })),
     // Side doors hinge on pins at the outer corner of their leading edge, with the handle near the trailing one.
-    local door(suffix, label, massKg, lower, glass) = part(suffix, label, massKg, lower + [
+    local door(suffix, label, massKg, lower, glass, paneProfile=null) = part(suffix, label, massKg, lower + [
       box('trim', 'trim', [glass[0][0] + 0.02, s.floor + 0.02, s.skin - 0.03], [glass[1][0] - 0.02, s.waist - 0.02, s.skin]),
-    ] + shape.side('glass', 'glass', glass, paneZ) + [
+    ] + shape.side('glass', 'glass', clearWaist(if paneProfile == null then glass else paneProfile), paneZ) + [
       box('handle', 'trim', [glass[0][0] + 0.08, s.waist - 0.11, s.side - 0.01], [glass[0][0] + 0.2, s.waist - 0.08, s.side + 0.002]),
     ] + doorPins(glass[1][0]), doorFinish, motion=k.motion.hinge(doorPins(glass[1][0]), 'near', opens.door));
     door('_front_door', 'front door', if twoDoor then 34 else 25, [
       box('skin', 'paint', [s.bFront, s.floor, s.skin], [s.cowl, s.waist, s.side]),
-    ], [[frontGlassBack, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [frontGlassBack, windowTop]]),
+    ], [[frontGlassBack, s.waist], [s.cowl, s.waist], [s.cowl - (windowTop - s.waist) * s.aLean / (s.roof - s.waist), windowTop], [frontGlassBack, windowTop]],
+    // The opening ends at the A-pillar's trailing edge, not at the cowl/hinge line. Keep the latter for trim and pins.
+    paneProfile=if !continuousCabin then null else [
+      [frontGlassBack, s.waist], [pillarBack - glazingEdgeGap, s.waist],
+      [pillarBack - (windowTop - s.waist) * s.aLean / (s.roof - s.waist) - glazingEdgeGap, windowTop], [frontGlassBack, windowTop],
+    ]),
     part('_windscreen', 'windscreen', 12, [
-    ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - s.aLean, s.roof], [s.cowl - s.aLean, s.roof]], s.glassIn - 0.02), { glass: 'glass-clear' }),
+    ] + shape.across('glass', 'glass', [[s.cowl, s.waist], [s.cowl + 0.08, s.waist], [s.cowl + 0.08 - glazedRise * s.aLean, glazedTop], [s.cowl - glazedRise * s.aLean, glazedTop]], s.glassIn - 0.02 - glazingEdgeGap), { glass: 'glass-clear' }),
     // The bonnet hinges on its top rear edge, inboard of the wings: every other point of it then swings forward of the
     // cowl and A-posts as it lifts.
     local bonnetPins = k.hingePins('hinge', 'z', [s.aPost, hood(s.aPost), 0.7 * s.glassIn], [s.aPost, hood(s.aPost), -0.7 * s.glassIn]);
@@ -280,7 +296,7 @@ local pressings(id, title, s) = {
     part('_tailgate', 'tailgate', 18, [
       box('skin', 'paint', [s.rear + 0.05, 0.62 + lift, -s.hatchSide], [s.tailWaist, s.waist, s.hatchSide]),
       box('handle', 'trim', [s.rear + 0.04, s.rearSill + 0.13, -0.12], [s.rear + 0.05, s.rearSill + 0.18, 0.12]),
-    ] + shape.across('glass', 'glass', [[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + s.dLean, s.roof], [s.tailWaist - 0.01 + s.dLean, s.roof]], s.hatchSide - 0.02) + tailgatePins, paint, motion=k.motion.hinge(tailgatePins, 'rear', opens.tailgate)),
+    ] + shape.across('glass', 'glass', clearWaist([[s.tailWaist - 0.01, s.waist], [s.tailWaist + 0.03, s.waist], [s.tailWaist + 0.03 + glazedRise * s.dLean, glazedTop], [s.tailWaist - 0.01 + glazedRise * s.dLean, glazedTop]]), s.hatchSide - 0.02) + tailgatePins, paint, motion=k.motion.hinge(tailgatePins, 'rear', opens.tailgate)),
   ]),
   pressings: rows,
 }.pressings;
