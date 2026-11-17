@@ -283,7 +283,8 @@ node tools/build-all.mjs --out <dir>   # the complete tree, as CI builds it
 The first run installs the tools' npm dependencies and downloads a pinned, checksum-verified go-jsonnet. Builds
 write to `built/`, which git ignores: commit only the source, and CI builds and checks the output. A build reuses
 every model whose source and generator code are unchanged, so a rebuild costs what an edit reaches rather than the
-whole catalogue; see `tools/generation.mjs`, `DEFAULT_CACHE`. More detail is in `tools/README.md`.
+whole catalogue; see `tools/generation.mjs`, `DEFAULT_CACHE`, which `SKELLY_EXPORT_CACHE` can point at a cache
+shared by several worktrees or users. More detail is in `tools/README.md`.
 
 To preview the showcase locally, build the complete tree into `built/`, run `node site/build.mjs` and serve
 `_site/` with any static file server.

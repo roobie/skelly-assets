@@ -5,7 +5,7 @@
 // has judged yet, which every run lists. Both are capped at the depth they were written for, and an entry that no longer
 // applies fails. Why the check is a cached build check is in `docs/decisions/0019-garment-rest-check.md`.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { restClearance } from '../site/clearance.mjs';
@@ -14,7 +14,7 @@ import { dollRig, readRigContent, restMeshes } from './dollRig.mjs';
 import { dollOf, fittedGarments, modelMeshes, modelParts, readDressing, wornPieces, wornSites } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
-import { codeFingerprint } from './packages/thing-export/src/cache.ts';
+import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { workerPool } from './workerPool.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -115,7 +115,6 @@ export async function restPokeResults(
 ) {
   const garments = fittedGarments(models).sort();
   const mine = shard === undefined ? garments : shardUnits(garments, shard);
-  const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
   if (mine.length === 0) return { results: {}, reused: 0, probed: 0 };
   const dressing = readDressing(root);
   const dollIds = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
@@ -129,14 +128,13 @@ export async function restPokeResults(
     const task = garmentTask(garment, shared, files);
     return { garment, task, hash: taskHash(task, checker) };
   });
-  if (folder) mkdirSync(folder, { recursive: true });
-  const fileOf = (hash) => join(folder, `${hash}.json`);
+  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
   const results = {};
   const missing = [];
   for (const entry of tasks) {
-    if (folder && existsSync(fileOf(entry.hash)))
-      results[entry.garment] = JSON.parse(readFileSync(fileOf(entry.hash), 'utf8'));
-    else missing.push(entry);
+    const stored = folder?.get(entry.hash);
+    if (stored === undefined) missing.push(entry);
+    else results[entry.garment] = stored;
   }
   if (missing.length > 0) {
     const pool = workerPool(import.meta.url, 'probeGarment', Math.min(workers, missing.length));
@@ -144,17 +142,14 @@ export async function restPokeResults(
       await Promise.all(
         missing.map(async ({ garment, task, hash }) => {
           results[garment] = await pool.run(task);
-          if (folder) writeFileSync(fileOf(hash), JSON.stringify(results[garment]));
+          folder?.put(hash, results[garment]);
         }),
       );
     } finally {
       await pool.close();
     }
   }
-  if (folder && prune) {
-    const kept = new Set(tasks.map(({ hash }) => `${hash}.json`));
-    for (const name of readdirSync(folder)) if (!kept.has(name)) rmSync(join(folder, name));
-  }
+  if (prune) folder?.prune(new Set(tasks.map(({ hash }) => hash)));
   return { results, reused: tasks.length - missing.length, probed: missing.length };
 }
 

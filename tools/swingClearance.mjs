@@ -12,7 +12,6 @@
 // depth they were written for, a variant shares its parent's, and an entry that no longer applies fails. The reason for
 // the rules and the cost strategy are in `docs/decisions/0016-swing-check.md`.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
@@ -29,7 +28,7 @@ import {
   shiftPiece,
   TOWARD,
 } from './packages/thing-core/src/motion.ts';
-import { codeFingerprint } from './packages/thing-export/src/cache.ts';
+import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { key } from './siteOverlap.mjs';
 import { shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -221,20 +220,19 @@ export async function swingResults(
   { cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
 ) {
   const tasks = sweepTasks(data);
-  const folder = cache === undefined ? undefined : join(resolve(cache), CACHE_FOLDER);
-  if (folder) mkdirSync(folder, { recursive: true });
+  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
   const byHash = new Map();
   for (const [vehicle, task] of Object.entries(tasks)) {
     const hash = taskHash(task, checker);
     byHash.set(hash, { task, vehicles: [...(byHash.get(hash)?.vehicles ?? []), vehicle] });
   }
-  const fileOf = (hash) => join(folder, `${hash}.json`);
   const swept = new Map();
   const missing = [];
   const mine = shard === undefined ? [...byHash] : shardUnits([...byHash], shard);
   for (const [hash, { task }] of mine) {
-    if (folder && existsSync(fileOf(hash))) swept.set(hash, JSON.parse(readFileSync(fileOf(hash), 'utf8')));
-    else missing.push([hash, task]);
+    const stored = folder?.get(hash);
+    if (stored === undefined) missing.push([hash, task]);
+    else swept.set(hash, stored);
   }
   if (missing.length > 0) {
     const pool = workerPool(import.meta.url, 'sweepVehicle', Math.min(workers, missing.length));
@@ -243,16 +241,14 @@ export async function swingResults(
         missing.map(async ([hash, task]) => {
           const result = await pool.run(task);
           swept.set(hash, result);
-          if (folder) writeFileSync(fileOf(hash), JSON.stringify(result));
+          folder?.put(hash, result);
         }),
       );
     } finally {
       await pool.close();
     }
   }
-  if (folder && prune) {
-    for (const name of readdirSync(folder)) if (!byHash.has(name.replace(/\.json$/, ''))) rmSync(join(folder, name));
-  }
+  if (prune) folder?.prune(new Set(byHash.keys()));
   const results = {};
   for (const [hash, { vehicles }] of byHash)
     if (swept.has(hash)) for (const vehicle of vehicles) results[vehicle] = swept.get(hash);
