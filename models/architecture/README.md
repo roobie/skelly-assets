@@ -11,8 +11,10 @@ corresponding smooth copies in `skelly.structures.smooth`. They share 2 m bays, 
 floor datums, but stone uses thicker walls and different infill ends. These are building fabrics, not yet
 a complete castle, village or dungeon collection.
 
-Plain walls, posts/piers and floors now ship optional [building placement metadata](../../docs/building-metadata.md).
-Its kit profiles distinguish timber and stone joins; the other modules still use the placement conventions below.
+All 22 modules ship optional [building placement metadata](../../docs/building-metadata.md): kit profiles,
+shared-node requirements, placement datums, nominal openings and roof/vault/stair layouts. The manifest discovers
+canonical sidecars and kit definitions; voxel and smooth copies share those authored coordinates. The placement
+conventions below remain the human-readable assembly guide.
 
 ## Timber kit
 

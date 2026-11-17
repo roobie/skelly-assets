@@ -9,7 +9,8 @@
 // built/manifest.json over them,
 // the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files), with each pack's
 // dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
-// rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
+// rows, from the roster source or a recipe file, with no pack index, placements or manifest; referenced building-kit
+// definitions still accompany their sidecars, so one model builds
 // without the rest. Each model is written into --out (by default built/)
 // at its pack's path (tools/layout.mjs, outputPath), with its sidecar; a roster-source id outside the roster is written
 // flat, as its GLB alone, for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
@@ -387,7 +388,11 @@ async function main() {
       failed = true;
     }
     for (const file of recipes.files) console.log(`built ${file}`);
-    const kits = exportBuildingKits({ models: [...built.models, ...recipes.models], out });
+    const kits = exportBuildingKits({
+      models: [...built.models, ...recipes.models],
+      out,
+      complete: positionals.length === 0,
+    });
     for (const file of kits.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));

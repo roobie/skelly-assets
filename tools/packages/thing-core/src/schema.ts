@@ -21,7 +21,7 @@ import {
   tuple,
   variant,
 } from 'valibot';
-import { BuildingSchema } from './building.ts';
+import { BuildingReaderSchema } from './building.ts';
 import { ModelPointSchema } from './modelPoint.ts';
 
 export { ModelPointSchema };
@@ -213,8 +213,8 @@ export const NeutralModelSchema = strictObject({
   /** Degrees about +z, the working end, applied to the model before its grip turn. */
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
-  /** Authored building placement semantics, independent of voxel/smooth drawn bounds. */
-  building: optional(BuildingSchema),
+  /** Optional assembly semantics: unknown/invalid blocks disable assembly, not rendering. Producers validate strictly. */
+  building: optional(BuildingReaderSchema),
   /** How the part moves on whatever carries it, the same wherever it is placed. */
   motion: optional(MotionSchema),
   /** The screen of an item that shows something. */

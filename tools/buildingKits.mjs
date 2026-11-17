@@ -27,9 +27,10 @@ export function readBuildingKits(root = repo) {
 }
 
 /** Write only referenced kits, including for targeted builds; a smooth copy shares its base model's sidecar/kit. */
-export function exportBuildingKits({ models, out, root = repo }) {
+export function exportBuildingKits({ models, out, root = repo, complete = true }) {
   const definitions = new Map(readBuildingKits(root).map((entry) => [keyOf(entry.kit), entry]));
   const used = new Map();
+  const modules = new Map();
   for (const model of models) {
     if (!model.building) continue;
     const key = keyOf(model.building.kit);
@@ -43,6 +44,19 @@ export function exportBuildingKits({ models, out, root = repo }) {
     validateBuildingKit(building, definition.kit);
     if (keyOf(building.kit) !== key) throw new Error(`${model.id}: sidecar and manifest kit references differ`);
     used.set(key, definition);
+    modules.set(`${model.pack}/${model.id}`, building);
+  }
+  for (const [model, building] of modules) {
+    if (building.layout.kind !== 'static-insert') continue;
+    const { opening } = building.layout;
+    const pack = model.slice(0, model.indexOf('/'));
+    const target = modules.get(`${pack}/${opening.model}`);
+    if (!target) {
+      if (complete) throw new Error(`${model}: missing insert target ${opening.model}`);
+      continue;
+    }
+    if (keyOf(target.kit) !== keyOf(building.kit) || !target.apertures?.some(({ id }) => id === opening.aperture))
+      throw new Error(`${model}: incompatible insert target aperture`);
   }
   const buildingKits = [];
   const files = [];
