@@ -154,7 +154,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
 
   // A red 10 litre plastic fuel can, 250 mm long, 160 mm deep and 330 mm tall: a sloped shoulder with a
   // capped spout, a carry handle moulded over the top and raised panels on both flanks.
-  h.compound('jerrycan', 1, [
+  h.compound('plastic_fuel_can', 1, [
     h.prism('body', 'plastic', 'z', [[-0.125, 0], [0.125, 0], [0.125, 0.25], [0.085, 0.29], [-0.125, 0.29]], -0.08, 0.08),
     h.prism('panel-front', 'plastic', 'z', [[-0.1, 0.03], [0.1, 0.03], [0.1, 0.23], [-0.1, 0.23]], 0.08, 0.086),
     h.prism('panel-back', 'plastic', 'z', [[-0.1, 0.03], [0.1, 0.03], [0.1, 0.23], [-0.1, 0.23]], -0.086, -0.08),
@@ -163,7 +163,7 @@ local handHoleRing(id, slot, r0, r1, y0, y1, gap, n) =
     box('handle', 'plastic', [-0.11, 0.315, -0.016], [0.02, 0.335, 0.016]),
     disc('neck', 'plastic', 0.02, 0.25, 0.3, 0.095, 0),
     disc('cap', 'cap', 0.025, 0.3, 0.33, 0.095, 0),
-  ], { plastic: 'plastic-red', cap: 'plastic-black' }) + { title: 'Plastic jerry can' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['fuel'] } },
+  ], { plastic: 'plastic-red', cap: 'plastic-black' }) + { title: 'Plastic fuel can' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['fuel'] } },
 
   // A 50 litre aluminium beer keg, 400 mm across and 530 mm tall: a ribbed barrel between a skirt below
   // and a chime above with two hand holes, the spear valve in the middle of the top.

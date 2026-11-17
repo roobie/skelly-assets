@@ -19,7 +19,7 @@ const materials = {
   hardened_elbow_guards: ['metal', 'leather'],
   spider_shell_forge: ['stone'], // Cement; spider shell is not bone, horn or antler.
 };
-const titles = { jerrycan: 'Plastic jerry can', cigarette: 'Cigarette pack' };
+const titles = { plastic_fuel_can: 'Plastic fuel can', cigarette: 'Cigarette pack' };
 const ids = [...Object.keys(materials), ...Object.keys(titles), 'smouldering_ember_carrier', 'forged_shears'];
 
 test('construction-led catalogue metadata survives index and exporting-recipe defaults', () => {
