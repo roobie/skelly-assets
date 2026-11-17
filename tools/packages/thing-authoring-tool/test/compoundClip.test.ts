@@ -21,3 +21,12 @@ it('keeps a prism cut to its planes and draws it unbevelled, as the mesh require
   const [solid] = compound({ pieces: JSON.stringify([{ ...prism, clip }]) });
   expect(solid).toMatchObject({ kind: 'extruded-polygon', clip, display: { bevel: false } });
 });
+
+it('passes a cut prism its voxel terrace, in whole layers', () => {
+  const clip = [{ normal: [1, 1, 0], offset: 2 }];
+  const [solid] = compound({ pieces: JSON.stringify([{ ...prism, clip, terrace: 2 }]) });
+  expect(solid).toMatchObject({ clip, display: { bevel: false, terrace: 2 } });
+  expect(() => compound({ pieces: JSON.stringify([{ ...prism, clip, terrace: 0.5 }]) })).toThrow();
+  const [plain] = compound({ pieces: JSON.stringify([prism]) });
+  expect(plain).not.toHaveProperty('display');
+});
