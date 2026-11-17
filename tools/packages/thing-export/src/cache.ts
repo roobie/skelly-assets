@@ -219,6 +219,28 @@ export const pruneEntries = (dir: string, keep: ReadonlySet<string>, now = Date.
   }
 };
 
+/** The results of a check, as JSON by key, which the check keeps in a folder of the export cache. */
+export interface ResultFolder {
+  readonly get: (key: string) => unknown;
+  readonly put: (key: string, result: unknown) => void;
+  /** As `pruneEntries`, for a check that ran over everything it judges. */
+  readonly prune: (keep: ReadonlySet<string>) => void;
+}
+
+const RESULT = ['json'];
+
+export const resultFolder = (dir: string): ResultFolder => {
+  const folder = entryFolder(dir);
+  return {
+    get: (key) => {
+      const stored = folder.read(key, RESULT);
+      return stored && JSON.parse(String(stored.json));
+    },
+    put: (key, result) => folder.write(key, RESULT, { json: JSON.stringify(result) }),
+    prune: (keep) => pruneEntries(dir, keep),
+  };
+};
+
 /** A row's export, and its entry in the cache when the row declares its inputs. */
 export interface CachedExport {
   readonly model: ModelExport;
