@@ -185,7 +185,8 @@ local gunBands(name) =
 
 // A concentric faceted cone, built from continuous plates instead of level rings. Each wall is a radial
 // wedge clipped between its outer and inner sloping planes; the horizontal inset matches the legacy wall measure.
-// The cap follows those same outer planes, and the walls end at its underside rather than duplicating its top face.
+// The walls run to the top and the cap fills the inner planes between them: a cap reaching the outer planes would
+// draw a rim among the walls' top voxels, and its collision box would then reach down over the whole cavity.
 local taperedShell(t, gunLow, gunHigh) =
   assert std.objectHas(t.shell, 'sides') && t.shell.roofRadius <= t.shell.baseRadius
     : 'continuous turret shells currently require concentric, inward-tapering polygon plans';
@@ -193,35 +194,51 @@ local taperedShell(t, gunLow, gunHigh) =
   local n = std.length(p.base);
   local outer(y) = [[p.base[j][a] + (p.roof[j][a] - p.base[j][a]) * y / t.height for a in [0, 1]] for j in std.range(0, n - 1)];
   local inner(y) = inset(outer(y), t.wall);
-  local point(p, y) = [p[1], y, p[0]];
+  local point(corner, y) = [corner[1], y, corner[0]];
   local roofLow = t.height - t.wall;
+  // Collision boxes each solid, so a full-height sloped wall would box the whole cone's interior. Stacking each
+  // wall in courses two voxel layers tall keeps the boxes hugging the slope, and the pieces meet on hidden faces.
+  // The cuts lie on lattice planes, so no voxel layer is drawn by two courses, which would count it twice in the
+  // drawn volume and centre of mass. Every course keeps a row of voxel centres, so none draws nothing.
+  local course = 2 * k.grain;
+  local courses(low, high) =
+    local cuts = [
+      c
+      for c in [i * course for i in std.range(1, std.floor(high / course))]
+      if c - low >= k.grain / 2 && high - c >= k.grain / 2
+    ];
+    local edges = [low] + cuts + [high];
+    [[edges[i], edges[i + 1]] for i in std.range(0, std.length(edges) - 2)];
   local outerCut(j) =
     local next = (j + 1) % n;
     k.plate(point(p.base[j], 0), point(p.base[next], 0), point(p.roof[j], t.height), [0, t.height / 2, 0]);
+  local innerCut(j, inside) =
+    local next = (j + 1) % n;
+    k.plate(point(inner(0)[j], 0), point(inner(0)[next], 0), point(inner(t.height)[j], t.height), inside);
   local face(id, j, low, high, extra=[]) =
     local next = (j + 1) % n;
-    local a = inner(0);
-    local b = inner(t.height);
     local middle = [(outer(t.height / 2)[j][i] + inner(t.height / 2)[j][i]) / 2 for i in [0, 1]];
     k.clipped(k.yPrism(id, 'paint', [[0, 0], p.base[next], p.base[j]], [low, high]), [
       outerCut(j),
-      k.plate(point(a[j], 0), point(a[next], 0), point(b[j], t.height), point(middle, t.height / 2)),
+      innerCut(j, point(middle, t.height / 2)),
     ] + extra);
+  local wall(id, j, low, high) =
+    local spans = courses(low, high);
+    [face('%s_%d' % [id, i], j, spans[i][0], spans[i][1]) for i in std.range(0, std.length(spans) - 1)];
   local front = outer(gunLow);
   {
-    walls: [face('face_%d' % j, j, 0, roofLow) for j in std.range(1, n - 1)] + [
-      face('face_front_low', 0, 0, gunLow),
-      face('face_front_high', 0, gunHigh, roofLow),
-    ]
+    walls: std.flattenArrays([wall('face_%d' % j, j, 0, t.height) for j in std.range(1, n - 1)]) + wall('face_front_low', 0, 0, gunLow)
+           + wall('face_front_high', 0, gunHigh, t.height)
     // Leave only the mask's rectangular opening, not the entire width of the conical face. A small cheek
     // remains wherever the front face is wider than the mask, so the mask cannot leave daylight at its corners.
+    // The cheeks stay whole: they are a sliver that closes well below the gun band's top, so courses would be empty.
     + (if t.mask.across[0] > front[0][0] then [
       face('face_front_far', 0, gunLow, gunHigh, [{ normal: [0, 0, 1], offset: t.mask.across[0] }]),
     ] else [])
     + (if t.mask.across[1] < front[1][0] then [
       face('face_front_near', 0, gunLow, gunHigh, [{ normal: [0, 0, -1], offset: -t.mask.across[1] }]),
     ] else []),
-    roof: k.clipped(k.yPrism('roof', 'paint', std.reverse(outer(roofLow)), [roofLow, t.height]), [outerCut(j) for j in std.range(0, n - 1)]),
+    roof: k.clipped(k.yPrism('roof', 'paint', std.reverse(inner(roofLow)), [roofLow, t.height]), [innerCut(j, [0, t.height / 2, 0]) for j in std.range(0, n - 1)]),
   };
 
 // The welded shell, roof, gun mask and any barrel jacket, and the racks the smoke launchers stand on.
