@@ -7,7 +7,7 @@
   cWaist: -1.1, cLean: 0.16, cWidth: 0.55, tailWaist: -1.7, dLean: 0.14, rearSill: 0.62,
   hatchSide: 0.58, glassIn: 0.67, glassOut: 0.75, rearFloorFront: -0.87,
   hoodBack: 0.95, hoodFall: 0.14, lampTop: 0.92,
-  bumperTop: 0.5, tumble: 0.125,
+  bumperTop: 0.5, tumble: 0.125, continuousCabin: true,
   slamTop: 0.76, towerTop: 0.76, twoDoor: true, archLiner: true, grilleHalf: 0.3, slamHalf: 0.5, railHalf: 0.45, legOuter: 0.52, towerOuter: 0.5,
   shellMass: 420, paint: 'paint-drum-blue',
 }
