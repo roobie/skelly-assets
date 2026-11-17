@@ -1,6 +1,31 @@
 // Targeted planar face checks, not an exposure/occlusion-aware model validator.
 import { meshForSolid } from '../packages/construct/src/shapes/mesh.ts';
-import { intersectionArea } from './architecture-helpers.mjs';
+
+// Sutherland–Hodgman clipping of convex, counter-clockwise 2D polygons.
+const side2D = ([x, y], [nx, ny], [u, v]) => (nx - x) * (v - y) - (ny - y) * (u - x);
+const intersectionArea = (subject, mask) => {
+  const intersection = mask.reduce((poly, a, i) => {
+    const b = mask[(i + 1) % mask.length];
+    return poly.flatMap((p, j) => {
+      const q = poly[(j + 1) % poly.length];
+      const dp = side2D(a, b, p),
+        dq = side2D(a, b, q);
+      const insideP = dp >= 0,
+        insideQ = dq >= 0;
+      return (insideP ? [p] : []).concat(
+        insideP === insideQ ? [] : [[p[0] + ((q[0] - p[0]) * dp) / (dp - dq), p[1] + ((q[1] - p[1]) * dp) / (dp - dq)]],
+      );
+    });
+  }, subject);
+  return (
+    Math.abs(
+      intersection.reduce((sum, p, i, poly) => {
+        const q = poly[(i + 1) % poly.length];
+        return sum + p[0] * q[1] - p[1] * q[0];
+      }, 0),
+    ) / 2
+  );
+};
 
 const sub = (a, b) => a.map((v, i) => v - b[i]);
 const dot = (a, b) => a.reduce((sum, v, i) => sum + v * b[i], 0);
