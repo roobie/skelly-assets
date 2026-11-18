@@ -6,6 +6,9 @@
       // imports, so each is an entry and its exports are a surface whose consumers knip cannot see.
       "entry": ["*.mjs", "test/**/*.test.mjs"],
       "project": ["*.{mjs,ts}", "jsonnet/**/*.mjs", "test/**/*.mjs"],
+      // tsconfig.json maps three to its types for the showcase, so knip reads the tests' runtime imports of three as
+      // imports of the types.
+      "ignoreDependencies": ["three"],
       "ignoreUnresolved": [
         // The skin check imports the showcase's modules in the browser, from the server that serves `site/`.
         "/clearance.mjs",
