@@ -21,6 +21,9 @@ Shader-drawn surfaces, such as bark and leaves, as GLSL edits a game applies to 
   of a kind compiles nothing and a game warms one program per kind and pass ahead of first draw.
 - Every edit names the three source line it follows, and the tests hold each against three's real sources, so an
   upgrade that moves a line fails here, naming it, and not as a black surface in a game.
+- The browser tests compile every kind on WebGL2 on SwiftShader, the target both consumers have, and draw what each
+  kind promises whatever its look, such as a leaf's coverage or bark's mean colour, so a shader edit that breaks a
+  promise fails here and not as a look gone wrong in a game.
 - What a game knows and the assets cannot, such as where its local player stands, comes in as inputs, kept apart
   from a look so a shared look never carries one player's view, and read in the lit pass alone so the local view
   never moves a shadow.
