@@ -127,6 +127,17 @@ const taskHash = (task, checker) =>
 // as generated. With `shard`, only that shard of the garments is probed, so CI can spread a clean build's probes over
 // runners like its models (tools/build.mjs, fillCacheShard). With `prune`, entries no garment uses any more go, as a
 // full build is the only run that knows them all.
+/**
+ * @param {{ models: readonly { id: string; tags?: unknown }[]; modelOf: (id: string) => Promise<{ glb: Buffer; entry: unknown }> }} generated
+ * @param {{
+ *   root?: string;
+ *   cache?: string | undefined;
+ *   workers?: number;
+ *   prune?: boolean;
+ *   shard?: import('./generation.mjs').Shard | undefined;
+ *   checker?: string;
+ * }} [options]
+ */
 export async function restPokeResults(
   { models, modelOf },
   { root = repo, cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
@@ -238,5 +249,9 @@ export const treeModels = (out, models) => {
 };
 
 // The check over a model set, as `restPokeReport` gives it, with every garment probed or reused from the cache.
+/**
+ * @param {Parameters<typeof restPokeResults>[0]} generated
+ * @param {Parameters<typeof restPokeResults>[1]} [options]
+ */
 export const restPokeCheck = async (generated, { root = repo, ...options } = {}) =>
   restPokeReport((await restPokeResults(generated, { root, ...options })).results, readRestPokes(root));

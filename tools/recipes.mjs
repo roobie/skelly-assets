@@ -1,7 +1,12 @@
+// @ts-check
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// The pack ids the recipe sources declare, from the source files alone (no compiled twin needed).
+/**
+ * The pack ids the recipe sources declare, from the source files alone (no compiled twin needed).
+ * @param {string} [root]
+ * @returns {string[]}
+ */
 export function recipePackIds(root = resolve(import.meta.dirname, '..')) {
   return readdirSync(resolve(root, 'models/recipes'))
     .filter((name) => name.endsWith('.jsonnet'))
@@ -9,10 +14,14 @@ export function recipePackIds(root = resolve(import.meta.dirname, '..')) {
     .map((name) => name.slice(0, -'.jsonnet'.length));
 }
 
+/**
+ * @param {string} [root]
+ * @returns {{ packId: string; value: unknown }[]}
+ */
 export function readRecipes(root = resolve(import.meta.dirname, '..')) {
   const directory = resolve(root, 'models/recipes');
   return recipePackIds(root).map((packId) => ({
     packId,
-    value: JSON.parse(readFileSync(resolve(directory, `${packId}.json`), 'utf8')),
+    value: /** @type {unknown} */ (JSON.parse(readFileSync(resolve(directory, `${packId}.json`), 'utf8'))),
   }));
 }

@@ -64,6 +64,10 @@ export const sourceReport = (models, vocabulary) => {
 // the placements output. The sites are read once for overlaps and swings. `cache` is the export cache folder, whose
 // `overlap` and `swing` folders keep each vehicle's overlaps and sweep, and `prune` drops the entries no vehicle uses,
 // as only a run over every vehicle may.
+/**
+ * @param {string} [root]
+ * @param {{ cache?: string | undefined; prune?: boolean }} [options]
+ */
 export const vehicleReport = async (root = repo, { cache, prune = false } = {}) => {
   await installJsonnetSources();
   const pieces = readSitePieces(root);
