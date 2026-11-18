@@ -21,7 +21,10 @@ export interface EntryFolder {
   readonly prune: (keep: ReadonlySet<string>, now?: number) => void;
 }
 
-/** The folder `kind` of `store`, shared when `store` is setgid and group-writable. */
+/**
+ * The folder `kind` of `store`, shared when `store` is setgid and group-writable. Throws, naming the chmod, when the
+ * store is shared and the folder, made before it was, is not.
+ */
 export function entryFolder(store: string, kind: string): EntryFolder;
 
 export const SHARED_ENTRY_LIFE_MS: number;

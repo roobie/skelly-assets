@@ -73,13 +73,11 @@ test('a shared store refreshes the age of an entry it serves, so a reused entry 
     assert.deepEqual(keysIn(join(store, 'kind')), [KEYS.recent]);
   }, SHARED));
 
-test("sharedness is the store root's, even for a kind folder made before the store was shared", () =>
+test('a kind folder made before its store was shared fails naming the chmod it needs', () =>
   withStore((store) => {
     mkdirSync(join(store, 'kind'), { mode: 0o755 });
     chmodSync(store, SHARED.mode);
-    const { folder, dir } = agedEntries(store);
-    folder.prune(new Set([KEYS.kept]));
-    assert.deepEqual(keysIn(dir), [KEYS.recent, KEYS.kept].sort());
+    assert.throws(() => entryFolder(store, 'kind'), new RegExp(`chmod 2775 ${join(store, 'kind')}$`));
   }));
 
 for (const [name, mode] of [

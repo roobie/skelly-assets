@@ -47,11 +47,15 @@ const makeFolder = (dir) => {
 
 const modified = (path) => statSync(path, { throwIfNoEntry: false })?.mtimeMs;
 
-// Sharedness is the store's, as its owner set it up, so a kind folder made before the store was shared still counts.
+// Sharedness is the store's, as its owner set it up. A kind folder made before the store was shared would refuse the
+// group's writes, so it fails here, naming the fix, rather than at some other user's first write.
 export const entryFolder = (store, kind) => {
   const dir = join(store, kind);
   makeFolder(dir);
   const shared = isShared(store);
+  if (shared && !isShared(dir)) {
+    throw new Error(`${dir} predates sharing ${store}, so its group may not write in it: chmod 2775 ${dir}`);
+  }
   const path = (key, name) => join(dir, `${key}.${name}`);
   const land = (file, data) => {
     const temporary = temporaryOf(file);
