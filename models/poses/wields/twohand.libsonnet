@@ -27,7 +27,9 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
     idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.18, -0.42, 0.18], 20, 25, 80, [-0.74, -0.67, 0], [-0.47, -0.79, -0.39]) },
     guard: guard,
   },
-  walks: { idle: { arms: 'swing' } },
+  // Walked as the idle stands, both hands on the weapon: swung in one hand, a two-hand weapon hangs into the body. It
+  // leans with the body, which keeps the left hand within reach of the handle's end in the crouch walk.
+  walks: { idle: { arms: 'held', lean: 1 } },
   strikes: {
     overhead: heavy {
       windup: guard { body+: { spine: [-10, -5, 0] }, weapon: held([0.2, 0.2, 0], -170, 0, 110, [-0.3, 0.49, 0.82], [0.72, 0.36, 0.6]) },
