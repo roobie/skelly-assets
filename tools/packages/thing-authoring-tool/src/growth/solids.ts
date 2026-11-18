@@ -1,4 +1,4 @@
-// Turns a grown skeleton (grow.ts) into the convex solids the thing exporter draws, voxel and smooth alike: bark as
+// Turns a grown skeleton (grow.ts) into the convex solids the thing exporter draws, voxel and smooth: bark as
 // tapered tubes along the axes, and foliage as flattened clumps over the young shoots. A voxel pipeline has no
 // transparent twig cards, so a clump stands for a card spray: it faces out of the crown's ellipsoid as the article's
 // cards blend their normals toward one, which is what lets a crown read as a volume and not as a heap of balls.
@@ -16,6 +16,8 @@ const FACETS: readonly Vec3[] = [-1, 0, 1].flatMap((x) =>
 /** The octagon's corners lie this far out from its flats. */
 const OCTAGON_REACH = 1 / Math.cos(Math.PI / 8);
 const PLAIN: SolidDisplayHints = { bevel: false };
+/** A crown's core is there for the voxel copy's sake alone (foliageOf), so the smooth copy leaves it out. */
+const CORE: SolidDisplayHints = { ...PLAIN, voxelOnly: true };
 
 /** How a grown skeleton is drawn: the voxel grain its row is exported at, and the internodes thinning cut (thin.ts). */
 export interface Drawing {
@@ -209,7 +211,7 @@ const foliageOf = ({ internodes, seasons }: Skeleton, { foliage }: Species, { gr
             const [x, , z] = mean(column);
             const ys = column.map((p) => p[1]);
             const low: Vec3 = [x - half, Math.max(0, Math.min(...ys)), z - half];
-            return clipped(`leaf-core-${index}`, slot, low, [x + half, Math.max(...ys), z + half], []);
+            return clipped(`leaf-core-${index}`, slot, low, [x + half, Math.max(...ys), z + half], [], CORE);
           })
       : [];
   return [...clumps, ...cores];
