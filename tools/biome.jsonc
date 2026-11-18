@@ -19,7 +19,11 @@
         // `!` is the explicit, reviewed acknowledgement on hot typed-array reads.
         "noNonNullAssertion": "off"
       },
+      "nursery": {
+        "noFloatingPromises": "error"
+      },
       "suspicious": {
+        "noImportCycles": "error",
         // Expression-bodied forEach callbacks are the house idiom for one-line checks; forEach ignores the value.
         "useIterableCallbackReturn": "off"
       }
