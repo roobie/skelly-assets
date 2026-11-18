@@ -23,7 +23,7 @@ local pointLength = 0.09;
 local tipWidth = 0.028;
 // The point's ogive is drawn through one shoulder, a share of the way along the point and of the tip's half-width.
 local pointShoulder = { along: 0.5, across: 0.75 };
-// How far the fuller's rounded end reaches past its run, toward the hilt.
+// How far back from the fuller's end its rounded tip begins, where the groove's walls start to close.
 local fullerNose = 0.012;
 
 local cross = { thickness: 0.012, blockHalfWidth: 0.017, blockHalfThickness: 0.01 };
@@ -88,34 +88,39 @@ local bladeOutline(share, from, tip) =
   side(-1) + [[tip, 0]] + std.reverse(side(1));
 
 // The fuller is a groove down the flats, which a convex prism cannot carve, so the flats stand either side of it
-// along its run and close over it only past its rounded end. The fuller narrows with the blade, so the land beside it
-// is the same share of the blade all along the run.
-local landShare = flatsShare - fullerWidth / baseWidth;
+// along its run and close over it only past its end. The fuller narrows with the blade until its tip, where its walls
+// hold their width and close in a U whose middle reaches furthest toward the point.
+local noseStart = fullerEnd - fullerNose;
+local noseHalf = fullerHalfAt(noseStart);
 local land(s) =
+  local width = flatsShare * halfWidthAt(fullerEnd) - noseHalf;
   // A land under a voxel wide would be drawn into the fuller or lost, and the groove's wall with it.
-  assert landShare * halfWidthAt(fullerEnd) >= grain
-         : 'the flats leave a land of %g m beside the fuller, under a voxel' % (landShare * halfWidthAt(fullerEnd));
+  assert width >= grain : 'the flats leave a land of %g m beside the fuller, under a voxel' % width;
   flats('blade-land-%s' % (if s > 0 then 'a' else 'b'), [
     [bladeStart, s * fullerHalfAt(bladeStart)],
     [bladeStart, s * flatsShare * halfWidthAt(bladeStart)],
     [fullerEnd, s * flatsShare * halfWidthAt(fullerEnd)],
-    [fullerEnd, s * fullerHalfAt(fullerEnd)],
+    [fullerEnd, s * noseHalf],
+    [noseStart, s * noseHalf],
   ]);
+// The flats between the U and the fuller's end, one strip per step of the arc, each running from the arc to the end
+// so it is convex. The strips either side of the U's middle meet the end there and are triangles.
 local noseSteps = 4;
-local fullerNosePiece =
-  local f = fullerHalfAt(fullerEnd);
-  flats('blade-nose', [
-    local t = std.pi * j / noseSteps;
-    [fullerEnd - fullerNose * std.sin(t), -f * std.cos(t)]
-    for j in std.range(0, noseSteps)
-  ]);
+local arc(j) = local t = std.pi * j / noseSteps; [noseStart + fullerNose * std.sin(t), -noseHalf * std.cos(t)];
+local noseStrip(j) =
+  local corners = [arc(j), arc(j + 1), [fullerEnd, arc(j + 1)[1]], [fullerEnd, arc(j)[1]]];
+  local distinct = [
+    corners[i]
+    for i in std.range(0, 3)
+    if std.abs(corners[i][0] - corners[(i + 1) % 4][0]) + std.abs(corners[i][1] - corners[(i + 1) % 4][1]) > 1e-9
+  ];
+  flats('blade-nose-%d' % j, distinct);
 local bladePieces = [
   bevels('blade', bladeOutline(1, bladeStart, bladeLength)),
   land(1),
   land(-1),
   flats('blade-tail', bladeOutline(flatsShare, fullerEnd, bladeLength - ridgeRunout)),
-  fullerNosePiece,
-];
+] + [noseStrip(j) for j in std.range(0, noseSteps - 1)];
 
 // The edge is marked on the taper, where a cut lands and the edge's line across the outer layer is known.
 local edgeShare = 0.6;
