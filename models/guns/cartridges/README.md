@@ -17,4 +17,4 @@ Shotshell presentation may use explicit visual proxies where source data is abse
 
 What a drawn round needs beyond its sources, such as its primer, case wall and projectile nose, is a modelling assumption, so it lives in `models/guns/tables/roundShapes.jsonnet` rather than here, where it would read as a measurement.
 
-A cartridge's sourced `materials` record which cases exist; the one the game draws is a look, chosen apart from them in `models/guns/tables/appearance.jsonnet`, "cartridgeCases", so a look can change without touching sourced data and one row of sources need not pick a single finish.
+A cartridge's sourced `materials` record which cases exist; the one the game draws is a look, chosen apart from them in `models/guns/tables/appearance.jsonnet`, "cartridgeFinishes", so a look can change without touching sourced data and one row of sources need not pick a single finish.

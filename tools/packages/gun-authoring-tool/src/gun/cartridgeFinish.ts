@@ -8,9 +8,9 @@ export type CartridgeFinish = Readonly<Record<string, string>>;
 /** The material each slot of a cartridge's round and case shows, so every drawing of the cartridge looks alike. */
 export const cartridgeFinish = (
   cartridge: Cartridge,
-  ownCases: Readonly<Record<string, string>> = GUN_APPEARANCE.cartridgeCases,
+  ownFinishes: Readonly<Record<string, CartridgeFinish>> = GUN_APPEARANCE.cartridgeFinishes,
 ): CartridgeFinish => ({
   ...GUN_APPEARANCE.cartridgeFinish,
-  ...(Object.hasOwn(ownCases, cartridge.id) ? { case: ownCases[cartridge.id]! } : {}),
+  ...(Object.hasOwn(ownFinishes, cartridge.id) ? ownFinishes[cartridge.id] : {}),
   ...(cartridge.kind === 'shotshell' ? { hull: shotshellHullMaterial(cartridge) } : {}),
 });
