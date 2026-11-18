@@ -14,6 +14,9 @@ const repo = resolve(import.meta.dirname, '..');
 
 export const readRigContent = (root = repo) => JSON.parse(evaluateJsonnet("import 'models/poses/rig.libsonnet'", root));
 
+/** Where a release carries the doll's motions: the pack of its parts, and the rig every motions file of it poses. */
+export const DOLL_MOTIONS = { pack: 'skelly.body', rig: 'motions/doll.rig.json' };
+
 const SUFFIX = { right: 'R', left: 'L' };
 const AXES = ['flex', 'twist', 'abduct'];
 const corners = ({ min, max }) =>

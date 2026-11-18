@@ -28,7 +28,7 @@ import {
   transpose,
 } from '../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../site/poseFile.mjs';
-import { dollRig, readRigContent } from './dollRig.mjs';
+import { DOLL_MOTIONS, dollRig, readRigContent } from './dollRig.mjs';
 import { dollFrom, dollModels, modelMeshes, readDressing } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
@@ -623,8 +623,6 @@ export function wieldProblems(reports) {
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
 const MELEE_DOC =
   "The doll's melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
-/** Where a release carries the doll's motions: the pack of its parts, and the rig every motions file of it poses. */
-export const DOLL_MOTIONS = { pack: 'skelly.body', rig: 'motions/doll.rig.json' };
 const GUNS_DOC =
   "The doll's held gun clips by name, <gun>_stance_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
 /**
