@@ -23,7 +23,10 @@ export {
 } from './glsl.ts';
 export { leafInputs, setLeafInputs } from './leaf.ts';
 
-/** Inserts `replacement` in place of `hook` in `source`, and throws when `source` lacks it, as skelly's `replaceHook`. */
+/**
+ * Inserts `replacement` in place of `hook` in `source`, and throws when `source` lacks it, as
+ * https://github.com/roobie/skelly, `packages/presentation/src/render/materialPatches.ts`, `replaceHook` does.
+ */
 export type ReplaceHook = (source: string, hook: string, replacement: string) => string;
 
 /** The part of three's compile hook argument a surface edits. */
