@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   leafInputs,
   patchSurface,
+  replaceHook,
   SURFACE_EDITS,
   type SurfacePass,
   type SurfaceShader,
@@ -11,7 +12,6 @@ import {
 } from '../src/patch.ts';
 import { SURFACE_KINDS, type Surface } from '../src/schema.ts';
 import { lookOf } from './looks.ts';
-import { throwing } from './replace.ts';
 
 // three 0.186's raw sources, as a compile hook receives them: the lit program and the shadow materials'.
 const PROGRAMS: Record<SurfacePass, { vertexShader: string; fragmentShader: string }> = {
@@ -27,7 +27,7 @@ const shaderOf = (pass: SurfacePass): SurfaceShader => ({ ...PROGRAMS[pass], uni
 const patched = (surface: Surface, pass: SurfacePass, shader = shaderOf(pass)) => {
   patchSurface(shader, surface, {
     pass,
-    replace: throwing,
+    replace: replaceHook,
     uniforms: surfaceUniforms(surface, MODEL),
     inputs: leafInputs(),
   });
@@ -51,7 +51,7 @@ describe.each(SURFACE_KINDS)('the %s kind', (kind) => {
       const shader = shaderOf(pass);
       const source = stage === 'vertex' ? 'vertexShader' : 'fragmentShader';
       shader[source] = shader[source].replaceAll(anchor, '');
-      expect(() => patched(surface, pass, shader)).toThrow(new Error(`no ${anchor}`));
+      expect(() => patched(surface, pass, shader)).toThrow(`three no longer has ${anchor};`);
     }
   });
 
@@ -98,7 +98,7 @@ describe('the leaf kind', () => {
   it('refuses its lit pass without the game inputs', () => {
     const shader = shaderOf('colour');
     expect(() =>
-      patchSurface(shader, leaf, { pass: 'colour', replace: throwing, uniforms: surfaceUniforms(leaf, MODEL) }),
+      patchSurface(shader, leaf, { pass: 'colour', replace: replaceHook, uniforms: surfaceUniforms(leaf, MODEL) }),
     ).toThrow('reads the game');
   });
 });

@@ -1,4 +1,4 @@
-import type { SurfaceModel, SurfacePass, Uniforms } from '@skelly/surfaces/patch';
+import { replaceHook, type SurfaceModel, type SurfacePass, type Uniforms } from '@skelly/surfaces/patch';
 import type { LeafInputs, Surface } from '@skelly/surfaces/schema';
 import {
   Box3,
@@ -11,16 +11,6 @@ import {
 } from 'three';
 import type { Content } from './content.ts';
 import { kinds } from './kinds.ts';
-
-/**
- * Puts `replacement` in place of `hook` and throws when the source lacks it, as skelly's own `replaceHook`
- * (skelly, packages/presentation/src/render/materialPatches.ts) does, so the lab fails on a missing anchor as the game
- * would.
- */
-const replaceHook = (source: string, hook: string, replacement: string) => {
-  if (!source.includes(hook)) throw new Error(`three no longer has ${hook}; a material patch cannot hook it`);
-  return source.replace(hook, () => replacement);
-};
 
 /** A lit material wearing a surface, with the shadow materials that cut as it does. */
 export interface Worn {

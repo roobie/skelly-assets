@@ -29,6 +29,12 @@ export { leafInputs, setLeafInputs } from './leaf.ts';
  */
 export type ReplaceHook = (source: string, hook: string, replacement: string) => string;
 
+/** A {@link ReplaceHook} for consumers without skelly's, so they fail on a missing anchor as the game would. */
+export const replaceHook: ReplaceHook = (source, hook, replacement) => {
+  if (!source.includes(hook)) throw new Error(`three no longer has ${hook}; a material patch cannot hook it`);
+  return source.replace(hook, () => replacement);
+};
+
 /** The part of three's compile hook argument a surface edits. */
 export interface SurfaceShader {
   vertexShader: string;

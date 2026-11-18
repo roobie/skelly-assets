@@ -2,6 +2,7 @@ import type { Material, WebGLRenderer } from 'three';
 import {
   leafInputs,
   patchSurface,
+  replaceHook,
   type SurfacePass,
   type SurfaceShader,
   surfaceKey,
@@ -10,7 +11,6 @@ import {
   type Vec3,
 } from '../../../src/patch.ts';
 import type { Surface } from '../../../src/schema.ts';
-import { throwing } from '../../replace.ts';
 
 /** The page's renderer, and the shader errors it has met since they were last taken. */
 export interface Gpu {
@@ -55,7 +55,7 @@ export const wear = (material: Material, surface: Surface, pass: SurfacePass, we
   const { model, inputs = leafInputs(), edit } = wearing;
   const uniforms = surfaceUniforms(surface, { size: model });
   material.onBeforeCompile = (shader) => {
-    patchSurface(shader, surface, { pass, replace: throwing, uniforms, inputs });
+    patchSurface(shader, surface, { pass, replace: replaceHook, uniforms, inputs });
     edit?.(shader);
   };
   const key = surfaceKey(surface, pass);
