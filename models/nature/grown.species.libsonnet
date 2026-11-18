@@ -29,7 +29,8 @@ local broadleaf = base {
   direction: { previous: 1, light: 0.35, tropism: { leader: 0.15, lateral: 0.05 }, noise: 0.18, flatten: 0.25 },
   foliage+: { age: 3, clump: 0.6, squash: 0.6, crown: 0.6, terrace: 3 },
 };
-// A pine: strong apical control keeps one leader; whorled laterals held near level stack into tiers.
+// A pine: strong apical control keeps one leader; whorled laterals held near level stack into tiers. Its tiers are
+// what it reads by, and a core down each column would fill the gaps between them, so it pays for its crown's inside.
 local conifer = base {
   seasons: 13,
   internode: 0.24,
@@ -40,7 +41,7 @@ local conifer = base {
   shedding: { threshold: 0.01, grace: 4 },
   branching: { angle: 70, phyllotaxis: 'whorl', divergence: 0, whorl: 5, budLife: 2, bole: 1.6 },
   direction: { previous: 1, light: 0.1, tropism: { leader: 0.4, lateral: 0 }, noise: 0.06, flatten: 0.6 },
-  foliage+: { age: 4, clump: 0.45, squash: 0.45, crown: 0.3 },
+  foliage+: { age: 4, clump: 0.45, squash: 0.45, crown: 0.3, core: 0 },
 };
 // A shrub fills a dome of space instead of competing for light: colonization markers in a flattened hemisphere.
 local dome(radius, height, markers) = {
