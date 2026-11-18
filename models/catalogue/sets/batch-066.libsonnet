@@ -73,7 +73,7 @@ local standing(id, slot, stations, x=0, z=0) = turned(id, slot, 'y', [[stations[
     box('popper', 'popper', [0.256, -0.015, -0.002], [0.3, 0.015, 0.002]),
   ], { grip: 'leather-black', shaft: 'plastic-black', popper: 'leather-brown' }) + { title: 'Riding crop' } + h.gripOn('riding_crop', 'grip') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'rubber'] } } },
+  } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'plastic'] } } },
 
   // A closed-cell foam sleeping mat rolled into a cylinder 55 cm long and 16 cm across, the spiral of its layers
   // showing on each end and two webbing straps round it.

@@ -187,5 +187,5 @@ local emberCarrier(id, hole) = h.compound(id, 0.2, [
   ], { stick: 'wood-pine', head: 'brick-buff', tip: 'paint-red' }) + { title: 'Survival match' } + h.gripOn('survival_match', 'stick') + { voxelGrain: 0.002 } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['wood'], setting: ['modern'] } } },
 
   emberCarrier('ember_carrier', 'coal-black') + { title: 'Ember carrier' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['metal'], setting: ['modern'] } } },
-  emberCarrier('smouldering_ember_carrier', 'glow-flame') + { title: 'Smouldering ember carrier' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['metal'], setting: ['modern'], state: ['opened'] } } },
+  emberCarrier('smouldering_ember_carrier', 'glow-flame') + { title: 'Smouldering ember carrier' } + { taxonomy: { category: 'lighting', keywords: ['fire-starting'], tags: { material: ['metal'], setting: ['modern'] } } },
 ]

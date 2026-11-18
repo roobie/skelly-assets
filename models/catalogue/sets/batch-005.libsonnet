@@ -54,7 +54,7 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     box('top', 'top', [-0.028, 0.06, -0.0115], [0.028, 0.086, 0.0115]),
     box('band', 'band', [-0.028, 0.012, -0.0115], [0.028, 0.03, 0.0115]),
     box('foil', 'foil', [-0.01, 0.086, -0.006], [0.01, 0.088, 0.006]),
-  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + { title: 'Cigarette' } + inHand('cigarette', 'pack') + h.label('top', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['tobacco'] } },
+  ], { pack: 'paper-white', top: 'plastic-red', band: 'plastic-black', foil: 'alu-bare' }) + { title: 'Cigarette pack' } + inHand('cigarette', 'pack') + h.label('top', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] }, keywords: ['tobacco'] } },
 
   // One cigar, 150 mm long and 18 mm thick, lying along x with its rounded head at +x and a red paper band.
   h.compound('cigar', 0.014, [

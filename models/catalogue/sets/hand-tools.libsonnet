@@ -46,7 +46,7 @@ local screw(name, z) = turned(name, 'screw', 'x', [[0, 0], [0, 0.0045], [0.003, 
     screw('screw-a', -0.016),
     screw('screw-b', 0),
     screw('screw-c', 0.016),
-  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { title: 'Fastener pack' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
+  ], { box: 'paperboard-tan', lid: 'paint-terracotta', screw: 'steel-grey' }) + { title: 'Fastener pack' } + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'metal'] } } },
   // A pocket torch strapped to a steel plate with two tape bands.
   compound('taped_flashlight_mount', 0.120, [
     box('plate', 'plate', [-0.060, 0, -0.025], [0.065, 0.003, 0.025]),

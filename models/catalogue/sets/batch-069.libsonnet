@@ -95,7 +95,7 @@ local leaf(id, slot, x, z, ht, w, lean) =
   h.compound('forged_shears', 0.43, sheepShears(false),
              { bow: 'iron-dull', handle: 'iron-dull', blade: 'steel-bright' }) + { title: 'Forged shears' } + h.gripOn('forged_shears', 'handle-a') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'tools', keywords: ['metalworking'], tags: { material: ['metal'] } } },
+  } + { taxonomy: { category: 'tools', tags: { material: ['metal'] } } },
 
   // A western saddle 580 mm long and 450 mm across the skirts, with a horn, a raised cantle, a wool pad
   // beneath, stirrups on leathers each side and a bridle with its bit laid coiled on the seat.

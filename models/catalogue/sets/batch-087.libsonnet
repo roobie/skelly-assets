@@ -63,7 +63,7 @@ local molle(id, x0, x1, z0, rows, y) = [
   h.compound('ammo_pouch', 0.13, pouch(0.15, 0.11, 0.05, 0.05, 1) + [
     stud('stud', 'stud', 0, 0.08, 0.028),
   ], { body: 'leather-brown', flap: 'leather-brown', strap: 'leather-black', stud: 'brass' }) + { title: 'Ammo pouch' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['fabric'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { slot: ['waist'], material: ['leather'] } } },
 
   // A canvas satchel 200 mm wide, 150 mm tall and 60 mm deep, sized for one long magazine, with a buckled flap and
   // a waist strap lying coiled round it.
@@ -94,7 +94,7 @@ local molle(id, x0, x1, z0, rows, y) = [
   chestPouch('canvas_chest_pouch', 0.075, 'cloth-canvas', 'cloth-khaki', 'steel-grey') + { title: 'Canvas chest pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['fabric'] } } },
 
   // The same chest pouch in thick leather with a leather harness.
-  chestPouch('leather_chest_pouch', 0.5, 'leather-brown', 'leather-black', 'brass') + { title: 'Leather chest pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather', 'fabric'] } } },
+  chestPouch('leather_chest_pouch', 0.5, 'leather-brown', 'leather-black', 'brass') + { title: 'Leather chest pouch' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { slot: ['torso'], material: ['leather'] } } },
 
   // A canvas chest rig lying flat: four magazine pouches 70 mm wide and 160 mm long in a row 320 mm across, on a
   // back panel, with two shoulder straps crossing behind and a waist strap either side.

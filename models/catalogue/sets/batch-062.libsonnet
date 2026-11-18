@@ -122,7 +122,7 @@ local gasFinishes = {
     h.turned('band', 'band', 'x', [[0, 0], [0, 0.0165], [0.006, 0.0165], [0.006, 0]], [0.03, 0.06, 0]),
   ], { body: 'ceramic-white', nozzle: 'steel-stainless', grip: 'plastic-charcoal', vial: 'plastic-amber', band: 'paint-red' }) + { title: 'Jet injector' } + h.gripOn('jet_injector', 'grip') + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], place: ['hospital'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['ceramic'], place: ['hospital'], setting: ['modern'] } } },
   // A surgical scalpel 130 mm long: a flat 90 mm steel handle with a ribbed grip and a curved 40 mm blade.
   h.compound('scalpel', 0.024, [
     h.box('handle', 'handle', [0, -0.0015, -0.0045], [0.09, 0.0015, 0.0045]),
@@ -197,5 +197,5 @@ local gasFinishes = {
     for i in std.range(0, 2)
   ], { pouch: 'foil-alu', crimp: 'foil-alu', label: 'plastic-yellow', symbol: 'plastic-black' }) + { title: 'Sealed radiation badge' } + {
     voxelGrain: 0.002,
-  } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
+  } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
 ]

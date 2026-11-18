@@ -279,9 +279,9 @@
     "notes": "The jar is hollow glass-clear; the tiles draw it opaque, but it stays see-through in the game. The 3 L jar and the cream jars ride here, though at 3 to 3.85 L they are much larger; the preserved brain would read better with contents drawn in the jar."
   },
   {
-    "id": "jerrycan",
-    "model": "jerrycan",
-    "name": "Plastic jerrycan",
+    "id": "plastic_fuel_can",
+    "model": "plastic_fuel_can",
+    "name": "Plastic fuel can",
     "category": "misc",
     "size": [
       3,
