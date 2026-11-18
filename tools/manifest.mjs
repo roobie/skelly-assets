@@ -26,6 +26,7 @@ import { manifestTaxonomy } from './taxonomy.mjs';
  * @property {{ pack: string; path: string } | undefined} [smooth]
  * @property {unknown} [taxonomy]
  * @property {readonly string[] | undefined} [nodes]
+ * @property {{ path: string; kit: { id: string; revision: number } } | undefined} [building]
  * @property {unknown} [label]
  * @property {object | undefined} [wornOn]
  * @property {readonly string[] | undefined} [covers]
