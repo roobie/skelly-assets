@@ -5,7 +5,7 @@ import { compileJsonnetFile } from '../../../jsonnet/index.mjs';
 const fixture = (name: string) => resolve(import.meta.dirname, 'fixtures', `${name}.jsonnet`);
 const resolved = JSON.parse(compileJsonnetFile(fixture('grain-of'))) as Record<
   'class' | 'plain' | 'own' | 'gun' | 'named',
-  { grain: number; detailGrain?: number }
+  { grain: number; detailGrain?: number; detailThinParts?: boolean }
 >;
 
 describe('a source definition grain', () => {
@@ -16,6 +16,10 @@ describe('a source definition grain', () => {
   it('replaces the class grain with the one the definition names, keeping detail parts nested', () => {
     expect(resolved.own.grain).toBe(0.004);
     expect(Number.isInteger(resolved.own.grain / resolved.own.detailGrain!)).toBe(true);
+  });
+
+  it('keeps the rest of the class, so thin parts still take the detail grain', () => {
+    expect(resolved.own).toEqual({ ...resolved.class, grain: 0.004 });
   });
 
   it.each(['grain-unnested', 'grain-zero'])('refuses %s', (name) => {

@@ -14,7 +14,7 @@ grains.classes + {
       assert !named : '%s names both a voxel class and a voxel grain' % id;
       assert nests(definition.voxelGrain) :
              'voxelGrain %s must be a positive whole multiple of the %s m lattice' % [definition.voxelGrain, detail];
-      { grain: definition.voxelGrain, detailGrain: detail }
+      class + { grain: definition.voxelGrain }
     else if named then
       assert std.objectHas(grains.classes, definition.voxelClass) : '%s names no voxel class %s' % [id, definition.voxelClass];
       grains.classes[definition.voxelClass]
