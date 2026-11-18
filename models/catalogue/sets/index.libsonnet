@@ -227,4 +227,5 @@
   'stash-chest': import 'models/catalogue/sets/stash-chest.libsonnet',
   'supplies': import 'models/catalogue/sets/supplies.libsonnet',
   'warrior-statue': import 'models/catalogue/sets/warrior-statue.libsonnet',
+  'zweihander': import 'models/catalogue/sets/zweihander.libsonnet',
 }
