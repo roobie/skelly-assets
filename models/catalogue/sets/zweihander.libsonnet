@@ -29,6 +29,15 @@ local gripEnd = gripTop - gripLength;
 local swellMid = (gripTop + gripEnd) / 2;
 local pommelEnd = gripEnd - pommelLength;
 
+// The two-hand wield seats the trailing hand on the grip point and the leading hand a set way toward the working end,
+// so the grip point sits that far, and half a palm more, behind the cross's collar: the leading hand then closes just
+// under the cross and both stay on the leather.
+local wield = (import 'models/poses/wields/twohand.libsonnet').weapon;
+local palm = 0.09;
+local foreStart = swellMid + swellLength / 2;
+local foreEnd = gripTop - collarLength;
+local gripPoint = foreEnd - palm / 2 - wield.hands[wield.lead].seat;
+
 // The sharpened blade starts a little inside the ricasso so no seam opens at the shoulder.
 local bladeStart = ricassoLength - 0.01;
 local taperEnd = bladeLength - pointLength;
@@ -109,7 +118,7 @@ local band(id, x0, x1, r) = h.turned(id, 'band', 'x', [[0, 0], [0, r * 0.9], [(x
     + ring('a', 1) + ring('b', -1)
     + [
       band('grip-collar', gripTop - collarLength, gripTop, 0.0175),
-      gripHalf('grip-fore', swellMid + swellLength / 2, gripTop - collarLength, 0.018, 0.015),
+      gripHalf('grip-fore', foreStart, foreEnd, 0.018, 0.015),
       band('grip-swell', swellMid - swellLength / 2, swellMid + swellLength / 2, 0.0205),
       gripHalf('grip-aft', gripEnd + collarLength, swellMid - swellLength / 2, 0.0135, 0.018),
       band('grip-ferrule', gripEnd, gripEnd + collarLength, 0.016),
@@ -118,9 +127,9 @@ local band(id, x0, x1, r) = h.turned(id, 'band', 'x', [[0, 0], [0, r * 0.9], [(x
       h.turned('peen', 'guard', 'x', [[0, 0], [0, 0.004], [peenLength * 0.6, 0.006], [peenLength, 0.006], [peenLength, 0]], [pommelEnd - peenLength, 0, 0]),
     ],
     { blade: 'steel-bright', wrap: 'leather-brown', guard: 'steel-grey', band: 'steel-grey', grip: 'leather-black' })
-  // The handling schema holds one hand, so the grip is the leading hand below the cross; the trailing hand and the
-  // half-sword hand are anchors a consumer can pose from.
+  // The wield class places both hands from the one grip point, so only the half-sword hand needs an anchor of its own.
   + h.gripOn('zweihander', 'grip-fore') + {
+    handling+: { fraction: [(gripPoint - foreStart) / (foreEnd - foreStart), 0.5, 0.5] },
     title: 'Zweihander',
     voxelGrain: 0.002,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
@@ -128,8 +137,6 @@ local band(id, x0, x1, r) = h.turned(id, 'band', 'x', [[0, 0], [0, r * 0.9], [(x
       local at(solid, fraction) = { part: 'zweihander', solid: solid, fraction: fraction },
       strike: at('blade-0', [1, 0.5, 0.5]),
       edge: at('blade-0', edgeFraction(0.4)),
-      ricasso: at('ricasso-wrap', [0.5, 0.5, 0.5]),
-      support: at('grip-aft', [0.5, 0.5, 0.5]),
-    },
+      ricasso: at('ricasso-wrap', [0.5, 0.5, 0.5]),    },
   },
 ]
