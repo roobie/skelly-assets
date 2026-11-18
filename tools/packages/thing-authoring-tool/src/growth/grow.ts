@@ -27,7 +27,7 @@ interface Bud extends Exposed {
 type Slot = { bud: Bud } | { child: number } | { shed: true } | null;
 
 /** One metamer's internode, from `start` to `end`, with the slots at its upper node. */
-export interface Internode {
+interface Internode {
   readonly start: Vec3;
   readonly end: Vec3;
   readonly parent: number;
