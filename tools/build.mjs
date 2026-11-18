@@ -18,8 +18,9 @@
 /** @import { GeneratedModel, WrittenRecipe } from './packages/thing-export/src/files.ts' */
 /** @import { RecipeRow } from './packages/thing-export/src/recipe.ts' */
 /** @import { BaseIssue } from 'valibot' */
-/** @import { RecipeTask, RecipeTool, RecipeToolName } from './recipeTools.mjs' */
+/** @import { generateRow, RecipeTask, RecipeTool, RecipeToolName } from './recipeTools.mjs' */
 /** @import { WieldSets } from './wields.mjs' */
+/** @import { WorkerPool } from './workerPool.mjs' */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -90,6 +91,7 @@ const repo = resolve(here, '..');
 // and the pool records each tool's entries it used, so a complete build can report and keep exactly those.
 /** @param {string} [cache] */
 export const exportPool = (cache) => {
+  /** @type {WorkerPool<typeof generateRow>} */
   const pool = workerPool(new URL('./recipeTools.mjs', import.meta.url), 'generateRow');
   /** @type {Map<string, Set<string>>} */
   const used = new Map();
