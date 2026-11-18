@@ -1,6 +1,6 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
-import type { Domain, Resolved } from '@skelly/construct/assembly/schema.ts';
-import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import type { Domain, PortDef, Resolved } from '@skelly/construct/assembly/schema.ts';
+import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
@@ -111,6 +111,55 @@ describe('datums read off the drawn voxels', () => {
     for (const axis of [1, 2]) {
       expect(face[axis]).toBeGreaterThanOrEqual(drawnLow[axis]!);
       expect(face[axis]).toBeLessThanOrEqual(drawnHigh[axis]!);
+    }
+  });
+
+  // A family may hand every part it builds one shared solids list, as the gun sights do, so two parts of it stacked a
+  // fraction of a voxel apart sample the same solids on two lattices.
+  it('measures each part sharing a definition on its own lattice', () => {
+    const shared = [slab];
+    const port = (id: string, gender: PortDef['gender'], pos: Vec3, normal: Vec3): PortDef => ({
+      id,
+      mount: 'fixture',
+      gender,
+      pos,
+      normal,
+      up: [1, 0, 0],
+    });
+    const domain: Domain = {
+      name: 'fixture',
+      units: { metresPerUnit: 1, grid: 1, bevel: 0 },
+      axisRules: [],
+      families: {
+        shape: {
+          name: 'shape',
+          params: {},
+          build: () => ({
+            family: 'shape',
+            solids: shared,
+            ports: [port('top', 'female', [0, 0.25, 0], [0, 1, 0]), port('base', 'male', [0, 0, 0], [0, -1, 0])],
+            keepOuts: [],
+            axes: [],
+          }),
+        },
+      },
+    };
+    const resolved = resolve(
+      {
+        name: 'fixture',
+        root: 'lower',
+        parts: { lower: { family: 'shape' }, upper: { family: 'shape' } },
+        connections: [{ from: 'lower.top', to: 'upper.base' }],
+      },
+      domain,
+    );
+    expect(resolved.issues).toEqual([]);
+    const drawn = drawnGeometry(resolved, { voxelGrain: GRAIN });
+    for (const part of ['lower', 'upper']) {
+      const { min, max } = drawn.measure(part, slab);
+      for (const corner of [min, max]) {
+        expect(applyPoint(resolved.placed.get(part)!, corner).every(onLattice)).toBe(true);
+      }
     }
   });
 
