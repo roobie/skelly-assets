@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   leafInputs,
   patchSurface,
-  type ReplaceHook,
   SURFACE_EDITS,
   type SurfacePass,
   type SurfaceShader,
@@ -12,17 +11,13 @@ import {
 } from '../src/patch.ts';
 import { SURFACE_KINDS, type Surface } from '../src/schema.ts';
 import { lookOf } from './looks.ts';
+import { throwing } from './replace.ts';
 
 // three 0.186's raw sources, as a compile hook receives them: the lit program and the shadow materials'.
 const PROGRAMS: Record<SurfacePass, { vertexShader: string; fragmentShader: string }> = {
   colour: ShaderLib.physical,
   depth: ShaderLib.depth,
   distance: ShaderLib.distance,
-};
-
-const throwing: ReplaceHook = (source, hook, replacement) => {
-  if (!source.includes(hook)) throw new Error(`no ${hook}`);
-  return source.replace(hook, () => replacement);
 };
 
 const MODEL = { size: [0.4, 2, 0.4] } as const;
