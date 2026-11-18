@@ -21,8 +21,10 @@ import {
   tuple,
   variant,
 } from 'valibot';
+import { ModelPointSchema } from './modelPoint.ts';
 
-export const ModelPointSchema = tuple([pipe(number(), finite()), pipe(number(), finite()), pipe(number(), finite())]);
+export { ModelPointSchema };
+
 const dotOf = (a: readonly number[], b: readonly number[]) => a.reduce((sum, value, axis) => sum + value * b[axis]!, 0);
 const UnitVectorSchema = pipe(
   ModelPointSchema,

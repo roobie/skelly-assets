@@ -17,9 +17,9 @@ import {
   tuple,
   boolean as vBoolean,
 } from 'valibot';
+import { ModelPointSchema as Point } from './modelPoint.ts';
 import { OpticApertureSchema } from './opticAperture.ts';
 import { ReticleSchema } from './reticle.ts';
-import { ModelPointSchema as Point } from './schema.ts';
 
 /** Callers own temporal brands; the firearm contract owns their structure and relations. */
 export interface FirearmPrimitives<
