@@ -14,6 +14,7 @@ import { dollRig, readRigContent, restMeshes } from './dollRig.mjs';
 import { dollOf, fittedGarments, modelMeshes, modelParts, readDressing, wornPieces, wornSites } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { thingEntryFile } from './layout.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { workerPool } from './workerPool.mjs';
 
@@ -204,7 +205,7 @@ export const treeModels = (out, models) => {
       const { pack, path } = byId.get(id);
       return {
         glb: readFileSync(join(out, pack, path)),
-        entry: JSON.parse(readFileSync(join(out, pack, 'things', `${id}.model.json`), 'utf8')),
+        entry: JSON.parse(readFileSync(join(out, thingEntryFile(pack, id)), 'utf8')),
       };
     },
   };

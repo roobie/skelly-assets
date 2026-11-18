@@ -1,6 +1,7 @@
 export function outputPath(packId: string, file: string): string;
 export function readRoster(root?: string): { packId: string; id: string; file: string }[];
-export function rosterFile(packId: string, id: string): string;
+export function sidecarFile(packId: string, directory: string, id: string): string;
+export function thingEntryFile(packId: string, id: string): string;
 export function readMobRows(root?: string): Record<string, unknown>[];
 export const SOUNDS: string;
 export function soundPackIds(root?: string): string[];

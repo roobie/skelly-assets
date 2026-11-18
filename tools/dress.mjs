@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { glbAccessor, glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { thingEntryFile } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -400,7 +401,7 @@ export function readDoll(built, manifest, dressing) {
       names.map((id) => {
         const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
         if (!entry) throw new Error(`doll: the built tree holds no ${id}`);
-        const { anchors } = JSON.parse(readFileSync(join(built, entry.pack, 'things', `${id}.model.json`), 'utf8'));
+        const { anchors } = JSON.parse(readFileSync(join(built, thingEntryFile(entry.pack, id)), 'utf8'));
         return [id, { parts: modelParts(readFileSync(join(built, entry.pack, entry.path))), anchors }];
       }),
     ),

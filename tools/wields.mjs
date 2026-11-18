@@ -31,7 +31,7 @@ import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
-import { outputPath } from './layout.mjs';
+import { outputPath, sidecarFile } from './layout.mjs';
 import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -468,7 +468,7 @@ export function heldItems(built, manifest) {
     );
   const entryOf = (id) => {
     const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, pack, folder, `${id}.model.json`));
+    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, sidecarFile(pack, folder, id)));
     const sidecar = sidecars.find((path) => existsSync(path));
     if (!sidecar) throw new Error(`${id}: no sidecar under ${pack}`);
     return JSON.parse(readFileSync(sidecar, 'utf8'));
