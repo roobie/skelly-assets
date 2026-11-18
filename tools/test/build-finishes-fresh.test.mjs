@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import process from 'node:process';
 import { test } from 'node:test';
 
 // A fresh process, so no module the test runner already loaded hides a read. It reports every module loaded as the

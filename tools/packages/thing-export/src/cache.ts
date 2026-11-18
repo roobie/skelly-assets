@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import process from 'node:process';
 import type { NeutralModel } from '@skelly/thing-core/schema';
+// biome-ignore lint/correctness/noUnresolvedImports: EntryFiles is a JSDoc typedef, which TypeScript exports and Biome does not read.
 import { type EntryFiles, entryFolder } from '../../../entryFolder.mjs';
 import type { ModelExport, ModelPhysical, RecipeExport } from './recipe.ts';
 
