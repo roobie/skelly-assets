@@ -30,7 +30,13 @@ twins over it, not every row again, and one run evaluates the catalogue the reci
 fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
 A fresh worktree is a fresh checkout too, so worktrees and users on one host can share a store the way they share the
 export cache: `JSONNET_TWIN_STORE` names its folder, and a setgid, group-writable folder keeps every entry some
-checkout used within an entry life rather than only the entries of the checkout that refreshed last.
+checkout's refresh used within an entry life rather than only the entries of the checkout that refreshed last. The
+root itself must be `2775`, since its bits decide sharedness for every kind folder in it, and a kind folder made
+before the root was shared needs the same, or the group could not write there; `entryFolder.mjs` fails naming the
+`chmod` rather than at another user's first write. A shared entry is served to every checkout on its inputs, so a
+refresh stores a unit only if its files still hold the content it was keyed by once the compile has read them: the
+compiler reads them again after the refresh took their keys, and an edit in between would otherwise put one content's
+twin under another's key.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
 late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
 library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would
