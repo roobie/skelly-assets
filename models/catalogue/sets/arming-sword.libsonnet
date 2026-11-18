@@ -36,8 +36,10 @@ local wheel = {
 };
 // The tang's end hammered over the pommel, spreading from its foot to its head.
 local peen = { length: 0.003, radius: 0.004, footRadius: 0.0028 };
-// The leather over the wooden core swells a little at its middle; a cord riser under it stands proud at each end.
-local grip = { endRadius: 0.012, bellyRadius: 0.0135, riserRadius: 0.0145, riserLength: 0.006 };
+// The wooden core is split around the flat tang and bound in leather, so its section is an oval, broad across the
+// edges and narrow across the flats, which tells the hand where the edge is. A cord riser under the leather stands a
+// voxel proud at each end. A belly swelling under a voxel would only step, so the grip runs straight.
+local grip = { halfWidth: 0.014, halfThickness: 0.011, riserProud: 0.002, riserLength: 0.006 };
 
 local crossMid = -cross.thickness / 2;
 local gripTop = -cross.thickness;
@@ -142,10 +144,16 @@ local quillonHalf = [
 ];
 local quillonProfile = quillonHalf + [[crossSpan - p[0], p[1]] for p in std.reverse(quillonHalf[:std.length(quillonHalf) - 1])];
 
-local gripCore = gripLength - 2 * grip.riserLength;
-local riser(id, x0) =
-  local l = grip.riserLength, r = grip.riserRadius;
-  h.turned(id, 'grip', 'x', [[0, 0], [0, grip.endRadius], [l / 2, r], [l, grip.endRadius], [l, 0]], [x0, 0, 0]);
+// An oval about the grip's line, its points [y, z] as a prism along x takes them.
+local ovalSteps = 16;
+local oval(halfWidth, halfThickness) = [
+  local t = 2 * std.pi * j / ovalSteps;
+  [halfWidth * std.cos(t), halfThickness * std.sin(t)]
+  for j in std.range(0, ovalSteps - 1)
+];
+local gripSection(id, x0, x1, proud) =
+  h.prism(id, 'grip', 'x', oval(grip.halfWidth + proud, grip.halfThickness + proud), x0, x1);
+local riser(id, x0) = gripSection(id, x0, x0 + grip.riserLength, grip.riserProud);
 
 // A type I wheel: a thick disc whose rim is bevelled down to flat faces, each with a low boss over the tang's line.
 local wheelProfile = [
@@ -171,9 +179,7 @@ local boss(id, side) =
       h.turned('cross', 'guard', 'y', quillonProfile, [crossMid, -crossSpan / 2, 0]) + { sides: 8 },
       h.box('cross-block', 'guard', [gripTop, -cross.blockHalfWidth, -cross.blockHalfThickness], [0, cross.blockHalfWidth, cross.blockHalfThickness]),
       riser('riser-cross', gripTop - grip.riserLength),
-      h.turned('grip', 'grip', 'x',
-               [[0, 0], [0, grip.endRadius], [gripCore / 2, grip.bellyRadius], [gripCore, grip.endRadius], [gripCore, 0]],
-               [gripEnd + grip.riserLength, 0, 0]),
+      gripSection('grip', gripEnd + grip.riserLength, gripTop - grip.riserLength, 0),
       riser('riser-pommel', gripEnd),
       h.turned('pommel', 'guard', 'z', wheelProfile, [wheelCentre, 0, -wheel.thickness / 2]),
       boss('pommel-boss-a', 1),
