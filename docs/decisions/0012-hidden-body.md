@@ -35,9 +35,10 @@ not a hole into the body. The faces this adds lie inside the doll and never show
 
 **Content declares, code verifies.** A shell names what it covers in `covers`, declared once for its row and its game
 entries (`tools/packages/thing-authoring-tool/worn-fit.libsonnet`, `worn`), so the declaration is moddable. A name is
-the doll part the shell is drawn on, which hides all of it, or a region of that part. The showcase build refuses a
-declaration whose hidden surface is not enclosed at rest by the shell and the other pieces drawn on the same part copy
-(`tools/dollRig.mjs`, `coverGaps`), using the clearance probe's test of enclosure. A hem, an armhole or a neckline that
+the doll part the shell is drawn on, which hides all of it, or a region of that part. The build refuses a declaration
+whose hidden surface is not enclosed at rest by the shell and the other pieces drawn on the same part copy
+(`tools/dollRig.mjs`, `coverGaps`), using the clearance probe's test of enclosure; it runs with the rest probe of
+decision 19, which reads the same doll and pieces. A hem, an armhole or a neckline that
 stops short of a hidden region's edge would show the inside of the garment through a gap, so a declaration cannot hide
 skin it leaves showing. Only pieces on the same part copy count, because only they ride the same bone and stay where
 they were at rest in every pose. Shells placed by hand declare nothing: they only flicker, which hiding would not fix

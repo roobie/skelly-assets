@@ -41,6 +41,7 @@ import {
   wieldClips,
   wieldPoses,
   wieldProblems,
+  wieldResults,
   wieldWeapons,
 } from '../wields.mjs';
 import { CLEAN, counted } from './findings.mjs';
@@ -704,9 +705,38 @@ test('in every stance the stock is borne in the shoulder, no part of the gun sun
   }
 });
 
+test('a wield class baked once is read from the cache, and a changed class, mesh or bake bakes it again', () => {
+  const cache = mkdtempSync(join(tmpdir(), 'wields-cache-'));
+  try {
+    const [family] = Object.keys(guns.classes);
+    const one = { ...guns, classes: { [family]: guns.classes[family] } };
+    const bake = (wields, meshOf = itemMesh, code = 'code') =>
+      wieldResults(rig, { guns: { wields, weapons: gunWeapons } }, meshOf, { cache, bake: code });
+    // Compared as the export writes them: JSON keeps no -0, so a clip read back from the cache differs only there.
+    const written = (value) => JSON.stringify(value);
+    const first = bake(one);
+    assert.deepEqual([first.baked, first.reused], [1, 0]);
+    const again = bake(one);
+    assert.deepEqual([again.baked, again.reused], [0, 1]);
+    assert.equal(written(again.results), written(first.results));
+    for (const [name, clip] of Object.entries(first.results.guns.clips))
+      assert.equal(written(clip), written(bakedGuns().clips[name]));
+    const slower = { ...one, framesPerSecond: one.framesPerSecond + 1 };
+    assert.equal(bake(slower).baked, 1);
+    const moved = (id) => {
+      const mesh = itemMesh(id);
+      return { ...mesh, positions: mesh.positions.map((x, i) => (i === 0 ? x + 1e-3 : x)) };
+    };
+    assert.equal(bake(one, moved).baked, 1);
+    assert.equal(bake(one, itemMesh, 'other code').baked, 1);
+  } finally {
+    rmSync(cache, { recursive: true });
+  }
+});
+
 test("the export lists the gun clips' motions entry, a clip with its held seat for every gun and stance", () => {
   // The export reads the doll and the guns from the tree it writes into, so it writes into this test's own.
-  const { files, motions } = exportWields(built, manifest, repo, { guns: WIELD_SETS.guns });
+  const { files, motions } = exportWields(built, manifest, { sets: { guns: WIELD_SETS.guns } });
   const { pack, path } = WIELD_SETS.guns.motions;
   assert.deepEqual(motions, [WIELD_SETS.guns.motions]);
   assert.ok(files.includes(outputPath(pack, path)));

@@ -10,8 +10,11 @@
 // vehicle allows to a lesser depth. All are capped at the depth they were written for, and a variant shares its
 // parent's. An entry that no longer applies is reported, so the lists cannot rot. The reason for the rule is in
 // `docs/decisions/0014-site-overlap.md`.
-import { resolve } from 'node:path';
-import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { shardUnits } from './generation.mjs';
+import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { solid } from './pieceSolid.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -23,51 +26,10 @@ const repo = resolve(import.meta.dirname, '..');
 // ledger, swingContacts, swingUnjudged } } }, where `ledger` is the vehicle's rows of its family's unjudged list. A
 // site whose part is a roster model has no pieces to compare, so it is left out.
 // `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
-// tools/swingClearance.mjs turns into the motion at each site.
-export function readSitePieces(root = repo) {
-  return JSON.parse(
-    evaluateJsonnet(
-      `
-  local k = import 'models/vehicles/kit.libsonnet';
-  local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
-  local placements = import 'models/vehicles/placements.libsonnet';
-  local ledger = import 'models/vehicles/unjudged-overlaps.libsonnet';
-  local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
-  local drawn = { [row.id]: std.parseJson(row.parts[0].params.pieces) for row in rows };
-  local grains = { [row.id]: voxel.of(voxel.vehicle, row).grain for row in rows };
-  local placed(site) = [
-    k.moved(if std.objectHas(site, 'mirror') then k.far(piece) else piece, site.at)
-    for piece in drawn[site.part]
-  ];
-  local moving = [row for row in rows if std.objectHas(row, 'motion')];
-  {
-    grain: voxel.vehicle.grain,
-    motions: { [row.id]: { stages: row.motion.stages, pieces: drawn[row.id] } for row in moving },
-    fits: (import 'models/vehicles/seating.libsonnet').fits,
-    roles: std.set(std.flattenArrays([
-      [site.id for site in placements[vehicle].sites if std.objectHas(drawn, site.part)]
-      for vehicle in std.objectFields(placements)
-      if std.objectHas(placements[vehicle], 'sites')
-    ])),
-    vehicles: {
-      [vehicle]: {
-        parent: std.get(placements[vehicle], 'parent'),
-        forward: placements[vehicle].forward,
-        sites: [site { grain: grains[site.part], pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
-        overlaps: std.get(placements[vehicle], 'overlaps', []),
-        unjudged: std.get(placements[vehicle], 'unjudged', []),
-        ledger: std.get(ledger, vehicle, []),
-        swingContacts: std.get(placements[vehicle], 'swingContacts', []),
-        swingUnjudged: std.get(placements[vehicle], 'swingUnjudged', []),
-      }
-      for vehicle in std.objectFields(placements)
-      if std.objectHas(placements[vehicle], 'sites')
-    },
-  }`,
-      root,
-    ),
-  );
-}
+// tools/swingClearance.mjs turns into the motion at each site. Read from its Jsonnet twin, which installJsonnetSources
+// compiles only when a file it imports has changed, since evaluating every vehicle costs most of a warm build.
+const SITE_PIECES = 'models/vehicles/site-pieces.json';
+export const readSitePieces = (root = repo) => JSON.parse(readFileSync(join(root, SITE_PIECES), 'utf8'));
 
 export const key = (a, b) => [a, b].sort().join('\n');
 
@@ -210,6 +172,48 @@ export function siteOverlaps(sites, grain) {
   }));
 }
 
+const HERE = import.meta.dirname;
+// The code a measure runs. A cached measure is only as good as the code and the runtime that made it.
+const MEASURE_CODE = ['siteOverlap.mjs', 'pieceSolid.mjs'];
+const measureHash = () => codeFingerprint(HERE, MEASURE_CODE);
+const CACHE_FOLDER = 'overlap';
+
+// What `siteOverlaps` reads of a vehicle, so its key changes with nothing else the placements say.
+const measureTask = (sites, grain) => ({
+  grain,
+  sites: sites.map(({ id, part, grain: own, pieces }) => ({ id, part, grain: own, pieces })),
+});
+const taskHash = (task, measure) =>
+  createHash('sha256').update(measure).update(JSON.stringify(task)).digest('hex').slice(0, 32);
+
+// Every vehicle's `siteOverlaps`, by vehicle: from the cache folder when its sites and the measure are as they were,
+// else measured and kept, since measuring every vehicle is most of a warm build's report. Vehicles with the same sites
+// share one measure. `measure` is the fingerprint of the code that measures, which a test may change. With `shard`,
+// only that shard of the distinct measures is made, so CI can spread a clean build's measures over runners like its
+// models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as only a run over every
+// vehicle knows them all.
+export function overlapResults({ grain, vehicles }, { cache, prune = false, shard, measure = measureHash() } = {}) {
+  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const byHash = new Map();
+  for (const [vehicle, { sites }] of Object.entries(vehicles)) {
+    const hash = taskHash(measureTask(sites, grain), measure);
+    byHash.set(hash, { sites, vehicles: [...(byHash.get(hash)?.vehicles ?? []), vehicle] });
+  }
+  const mine = shard === undefined ? [...byHash] : shardUnits([...byHash], shard);
+  let reused = 0;
+  const results = {};
+  for (const [hash, { sites, vehicles: sharing }] of mine) {
+    let overlaps = folder?.get(hash);
+    if (overlaps === undefined) {
+      overlaps = siteOverlaps(sites, grain);
+      folder?.put(hash, overlaps);
+    } else reused++;
+    for (const vehicle of sharing) results[vehicle] = overlaps;
+  }
+  if (prune) folder?.prune(new Set(byHash.keys()));
+  return { results, reused, measured: mine.length - reused };
+}
+
 // A site's role: its id without the side it is on and its number, so every vehicle's wheels share one fit.
 export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').replace(/_\d+(?=_|$)/g, '');
 
@@ -263,19 +267,19 @@ export function fitDepth(fits, roleA, roleB) {
 
 const millimetres = (metres) => Math.round(metres * 1e3);
 
-// The report on every vehicle's overlaps, as { problems, notes } messages. A problem is an overlap that no fit,
-// allowance or `unjudged` entry covers, or covers only to a lesser depth, and an entry that is stale: its pair no
-// longer overlaps, a fit already covers it, or it is listed twice. A note is an overlap marked `unjudged`, said again
-// on every run so nothing is silent. Each message names the vehicle, both parts and their sites. A row of the family
+// The report on every vehicle's overlaps, as { problems, notes } messages, from the overlaps `overlapResults` found
+// by vehicle. A problem is an overlap that no fit, allowance or `unjudged` entry covers, or covers only to a lesser
+// depth, and an entry that is stale: its pair no longer overlaps, a fit already covers it, or it is listed twice. A
+// note is an overlap marked `unjudged`, said again on every run so nothing is silent. Each message names the vehicle, both parts and their sites. A row of the family
 // list may stand over a pair the vehicle allows, since its allowance was sized by an earlier measure, so the row is
 // stale only once the fits or that allowance cover the overlap again.
-export function overlapReport({ grain, fits, roles, vehicles }) {
+export function overlapReport({ grain, fits, roles, vehicles }, results) {
   const problems = seatingProblems(fits, roles);
   const notes = [];
   const measured = new Map();
   const pending = new Set();
-  for (const [vehicle, { parent, sites, overlaps, unjudged, ledger = [] }] of Object.entries(vehicles)) {
-    const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
+  for (const [vehicle, { parent, overlaps, unjudged, ledger = [] }] of Object.entries(vehicles)) {
+    const found = new Map(results[vehicle].map((overlap) => [key(...overlap.sites), overlap]));
     const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
     const from = (name) => vehicles[parent]?.[name] ?? [];
     const allowed = byPair([...from('overlaps'), ...from('unjudged'), ...overlaps, ...unjudged]);

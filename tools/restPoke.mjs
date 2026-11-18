@@ -1,6 +1,7 @@
-// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of the doll poking through it at rest.
-// The showcase's cover check (tools/dollRig.mjs, `coverGaps`) counts a point a piece passes beneath as covered, so only
-// the rest probe (site/clearance.mjs, `restClearance`) can see the skin standing out of the piece meant to cover it. A
+// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of the doll poking through it at rest,
+// and encloses what its pieces declare they cover. The cover check (tools/dollRig.mjs, `coverGaps`) counts a point a
+// piece passes beneath as covered, so only the rest probe (site/clearance.mjs, `restClearance`) can see the skin
+// standing out of the piece meant to cover it. A
 // poke is allowed by models/rest-pokes.libsonnet: `poke` for one that is intended and says why, `unjudged` for one nobody
 // has judged yet, which every run lists. Both are capped at the depth they were written for, and an entry that no longer
 // applies fails. Why the check is a cached build check is in `docs/decisions/0019-garment-rest-check.md`.
@@ -10,8 +11,17 @@ import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { restClearance } from '../site/clearance.mjs';
 import { compareCodeUnits } from './codeUnitOrder.mjs';
-import { dollRig, readRigContent, restMeshes } from './dollRig.mjs';
-import { dollOf, fittedGarments, modelMeshes, modelParts, readDressing, wornPieces, wornSites } from './dress.mjs';
+import { coverGaps, dollRig, readRigContent, restMeshes } from './dollRig.mjs';
+import {
+  dollModels,
+  dollOf,
+  fittedGarments,
+  modelMeshes,
+  modelParts,
+  readDressing,
+  wornPieces,
+  wornSites,
+} from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
@@ -43,8 +53,9 @@ function garmentTask(garment, { models, dressing, rig, doll }, files) {
   return { garment, dressing, rig, doll, pieces };
 }
 
-// The deepest poke of each body part out of each piece of one garment at rest, as [{ bone, piece, depth }]: the unit a
-// worker runs.
+// One garment at rest, the unit a worker runs: `pokes`, the deepest poke of each body part out of each piece, as
+// [{ bone, piece, depth }], and `gaps`, what its pieces declare they cover but do not enclose (tools/dollRig.mjs,
+// `coverGaps`). Both read the same doll and pieces, so they are probed and kept together.
 export function probeGarment({ garment, dressing, rig: content, doll: figure, pieces }) {
   // A Buffer crosses to a worker thread as a plain Uint8Array, and the GLB readers take a Buffer.
   const glbs = new Map(
@@ -61,7 +72,9 @@ export function probeGarment({ garment, dressing, rig: content, doll: figure, pi
   );
   const rig = dollRig(content, doll, dressing);
   const meshes = new Map();
-  const meshesOf = (id) => {
+  // Only whole models are kept: the cover check picks a few primitives of a doll part, once each.
+  const meshesOf = (id, keep) => {
+    if (keep) return modelMeshes(glbs.get(id), keep);
     if (!meshes.has(id)) meshes.set(id, modelMeshes(glbs.get(id)));
     return meshes.get(id);
   };
@@ -75,7 +88,10 @@ export function probeGarment({ garment, dressing, rig: content, doll: figure, pi
     const pair = `${bone}\0${piece}`;
     if (!(deepest.get(pair)?.depth >= depth)) deepest.set(pair, { bone, piece, depth });
   }
-  return [...deepest.values()].sort((a, b) => compareCodeUnits(a.bone, b.bone) || compareCodeUnits(a.piece, b.piece));
+  const pokes = [...deepest.values()].sort(
+    (a, b) => compareCodeUnits(a.bone, b.bone) || compareCodeUnits(a.piece, b.piece),
+  );
+  return { pokes, gaps: coverGaps(rig, sites, meshesOf) };
 }
 
 const HERE = import.meta.dirname;
@@ -105,11 +121,12 @@ const taskHash = (task, checker) =>
     .digest('hex')
     .slice(0, 32);
 
-// The pokes of every fitted garment among `models` ({ id, tags }), by garment: from the cache folder when a garment's
-// inputs and the checker are as they were, else probed on worker threads, one garment each, and kept. `modelOf(id)`
-// gives a model's { glb, entry }, its GLB and model entry, from a built tree or as generated. With `shard`, only that
-// shard of the garments is probed, so CI can spread a clean build's probes over runners like its models (tools/build.mjs,
-// fillCacheShard). With `prune`, entries no garment uses any more go, as a full build is the only run that knows them all.
+// The pokes and cover gaps of every fitted garment among `models` ({ id, tags }), by garment (`probeGarment`): from
+// the cache folder when a garment's inputs and the checker are as they were, else probed on worker threads, one
+// garment each, and kept. `modelOf(id)` gives a model's { glb, entry }, its GLB and model entry, from a built tree or
+// as generated. With `shard`, only that shard of the garments is probed, so CI can spread a clean build's probes over
+// runners like its models (tools/build.mjs, fillCacheShard). With `prune`, entries no garment uses any more go, as a
+// full build is the only run that knows them all.
 export async function restPokeResults(
   { models, modelOf },
   { root = repo, cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
@@ -118,7 +135,7 @@ export async function restPokeResults(
   const mine = shard === undefined ? garments : shardUnits(garments, shard);
   if (mine.length === 0) return { results: {}, reused: 0, probed: 0 };
   const dressing = readDressing(root);
-  const dollIds = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
+  const dollIds = dollModels(dressing);
   const pieceIds = mine.flatMap((garment) => wornPieces(garment, models, dressing).map(({ model }) => model));
   const files = new Map(await Promise.all([...dollIds, ...pieceIds].map(async (id) => [id, await modelOf(id)])));
   const doll = Object.fromEntries(
@@ -154,17 +171,26 @@ export async function restPokeResults(
   return { results, reused: tasks.length - missing.length, probed: missing.length };
 }
 
-// The report on every garment's rest pokes, as { problems, notes }, from the pokes `restPokeResults` returned and the
-// allowances of models/rest-pokes.libsonnet. A problem is a poke that no entry covers to its depth, and an entry that is
-// stale: its garment is no fitted garment or nothing pokes there any more, or it is listed twice or capped above what it
-// measures by more than a millimetre. A note is a poke marked `unjudged`, said again on every run.
+// A declaration a worn piece does not enclose, which a consumer hiding the body by it would open to view.
+const gapProblem = (garment, { piece, side, name, open, at }) =>
+  `${garment}: ${piece} (${side}) covers ${name} but would hide body it does not enclose: ${
+    open === 'nothing' ? 'it names nothing there' : `${open} samples show, one at [${at.map((x) => x.toFixed(3))}]`
+  }`;
+
+// The report on every garment at rest, as { problems, notes }, from what `restPokeResults` returned and the allowances
+// of models/rest-pokes.libsonnet. A problem is a cover gap, which no entry allows, a poke that no entry covers to its
+// depth, and an entry that is stale: its garment is no fitted garment or nothing pokes there any more, or it is listed
+// twice or capped above what it measures by more than a millimetre. A note is a poke marked `unjudged`, said again on
+// every run.
 export function restPokeReport(results, { pokes: judged, unjudged }) {
-  const problems = [];
+  const problems = Object.entries(results).flatMap(([garment, { gaps }]) =>
+    gaps.map((gap) => gapProblem(garment, gap)),
+  );
   const notes = [];
   const pairOf = ({ garment, bone, piece }) => `${garment}\0${bone}\0${piece}`;
   const allowed = new Map([...judged, ...unjudged].map((entry) => [pairOf(entry), entry]));
   const found = new Map();
-  for (const [garment, pokes] of Object.entries(results)) {
+  for (const [garment, { pokes }] of Object.entries(results)) {
     for (const poke of pokes) {
       found.set(pairOf({ garment, ...poke }), poke);
       const cap = allowed.get(pairOf({ garment, ...poke }))?.depth ?? 0;

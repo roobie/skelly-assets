@@ -131,8 +131,8 @@ The row names what it covers because the shell's cut is authored there, and a co
 holds no list of garments. The doll draws each region it may hide as its own piece, so a
 garment that leaves the shoulders bare hides only the trunk, and a boot whose ankle cap
 rises into a shaft hides only the sole. A shell declares only what it encloses at rest, so
-hiding it never opens a hole; the showcase build checks every declaring item for skin left
-outside its shell. The regions, and so the names `covers` may use besides the part, are
+hiding it never opens a hole; the build checks every declaring item for skin left outside
+its shell. The regions, and so the names `covers` may use besides the part, are
 content in `models/dressing.libsonnet`, `regions`. See `src/families/body.ts`, `region`,
 `tools/dollRig.mjs`, `coverGaps`, and `tools/packages/thing-core/src/schema.ts`,
 `NeutralModelSchema`.

@@ -239,10 +239,14 @@ const jsonnetSourcesDigest = () => {
   return hash.digest('hex');
 };
 
+// Every twin made current now, for a long-running process whose sources change under it; a refresh with nothing changed
+// reads no store.
+export const refreshJsonnetSources = () => refreshJsonnetTwins(jsonnetFiles(), installOptions());
+
 // JSONNET_TWIN_STORE names the store folder; CI caches it under the digest that --digest prints.
 export async function installJsonnetSources() {
   if (sourcesInstalled) return;
-  await refreshJsonnetTwins(jsonnetFiles(), installOptions());
+  await refreshJsonnetSources();
   sourcesInstalled = true;
 }
 

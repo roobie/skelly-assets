@@ -24,6 +24,8 @@ models/guns/designs/service-nine.json
 models/guns/references/*.json
 models/guns/tables/*.json
 models/mobs/**/*.json
+models/vehicles/site-pieces.json
+models/vehicles/slot-parts.json
 built/
 look/
 models/sounds/*.json

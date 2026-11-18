@@ -4,6 +4,7 @@
 // weapon's grip is and how it is turned against the chest, so its pose file states world points that would drift from
 // the frame if written by hand, as the press check's do.
 // Usage: node tools/wields.mjs [--built built]
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -27,11 +28,13 @@ import {
   transpose,
 } from '../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../site/poseFile.mjs';
-import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
-import { readDoll, readDressing } from './dress.mjs';
+import { dollRig, readRigContent } from './dollRig.mjs';
+import { dollFrom, dollModels, modelMeshes, readDressing } from './dress.mjs';
+import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
 import { outputPath, sidecarFile } from './layout.mjs';
+import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -317,144 +320,268 @@ const heldSeat = (seat, weapon, lead) => ({
  * and each frame's pose report by clip, for a caller that checks them.
  */
 export function wieldClips(rig, wields, weapons, meshOf) {
+  const baked = Object.entries(wields.classes).map(([name, cls]) =>
+    classClips(rig, wields, name, cls, weapons[name], meshOf),
+  );
+  return {
+    clips: Object.assign({}, ...baked.map(({ clips }) => clips)),
+    reports: Object.assign({}, ...baked.map(({ reports }) => reports)),
+  };
+}
+
+// One class's clips and their frames' reports, as `wieldClips` bakes them. A class reads nothing of another, so each
+// is the unit the bake caches.
+function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
   const clips = {},
     reports = {};
   const header = standing(rig);
-  for (const [name, cls] of Object.entries(wields.classes)) {
-    const { weapon, sockets } = weapons[name];
-    const compileKey = (key) => {
-      const file = poseOf(rig, cls, key, weapon, sockets);
-      const { frame, report, held } = compilePose(rig, file, { meshOf });
-      // Read back within the limits the frame was posed to, past rounding, so a blend of two keys stays inside them.
-      const angles = mapValues(frameAngles(rig, frame), (turn, id) =>
-        clampJointAngles(
-          rig.bones.find((bone) => bone.id === id),
-          turn,
-        ),
-      );
-      return {
-        frame,
-        report,
-        angles,
-        poles: mapValues(file.hold ?? {}, ({ pole }) => pole),
-        item: held[cls.weapon?.lead],
-      };
+  const compileKey = (key) => {
+    const file = poseOf(rig, cls, key, weapon, sockets);
+    const { frame, report, held } = compilePose(rig, file, { meshOf });
+    // Read back within the limits the frame was posed to, past rounding, so a blend of two keys stays inside them.
+    const angles = mapValues(frameAngles(rig, frame), (turn, id) =>
+      clampJointAngles(
+        rig.bones.find((bone) => bone.id === id),
+        turn,
+      ),
+    );
+    return {
+      frame,
+      report,
+      angles,
+      poles: mapValues(file.hold ?? {}, ({ pole }) => pole),
+      item: held[cls.weapon?.lead],
     };
-    const guard = compileKey(cls.stances.guard);
-    const seat = cls.weapon && seatOn(rig, guard.frame, guard.item, cls.weapon.lead);
-    const held = seat ? { held: heldSeat(seat, weapon, cls.weapon.lead) } : {};
-    const others = cls.weapon ? Object.keys(cls.weapon.hands).filter((hand) => hand !== cls.weapon.lead) : [];
-    const regripped = new Set(others.flatMap((hand) => [...armBones(rig, hand)]));
-    // The frame `w` of the way from compiled key `a` to `b`.
-    const between = (a, b, w) => {
-      const ids = [...new Set([...Object.keys(a.angles), ...Object.keys(b.angles)])].filter((id) => !regripped.has(id));
-      const angles = Object.fromEntries(
-        ids.map((id) => [id, lerpV(a.angles[id] ?? [0, 0, 0], b.angles[id] ?? [0, 0, 0], w)]),
+  };
+  const guard = compileKey(cls.stances.guard);
+  const seat = cls.weapon && seatOn(rig, guard.frame, guard.item, cls.weapon.lead);
+  const held = seat ? { held: heldSeat(seat, weapon, cls.weapon.lead) } : {};
+  const others = cls.weapon ? Object.keys(cls.weapon.hands).filter((hand) => hand !== cls.weapon.lead) : [];
+  const regripped = new Set(others.flatMap((hand) => [...armBones(rig, hand)]));
+  // The frame `w` of the way from compiled key `a` to `b`.
+  const between = (a, b, w) => {
+    const ids = [...new Set([...Object.keys(a.angles), ...Object.keys(b.angles)])].filter((id) => !regripped.has(id));
+    const angles = Object.fromEntries(
+      ids.map((id) => [id, lerpV(a.angles[id] ?? [0, 0, 0], b.angles[id] ?? [0, 0, 0], w)]),
+    );
+    const posed = compilePose(rig, { ...header, angles });
+    if (others.length === 0) return posed;
+    const stood = boneTransforms(rig.bones, decodeFrame(posed.frame));
+    const hand = stood.get(cls.weapon.lead);
+    const item = { r: mulMM(hand.r, seat.r), t: add(mulMV(hand.r, seat.t), hand.t) };
+    const hands = Object.fromEntries(others.map((id) => [id, cls.weapon.hands[id].hands]));
+    const gripped = (swing) =>
+      compilePose(
+        rig,
+        {
+          ...header,
+          angles,
+          hands,
+          hold: Object.fromEntries(
+            others.map((id) => {
+              const shoulder = shoulderOf(rig, id);
+              const reach = sub(applyPoint(item, sockets[id].at), applyPoint(stood.get(shoulder.id), shoulder.head));
+              const pole = normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w));
+              return [
+                id,
+                {
+                  model: cls.weapon.model,
+                  at: item.t,
+                  turn: mat3ToQuat(item.r),
+                  pole: mulMV(rotAxis(normalize(reach), swing), pole),
+                  socket: sockets[id],
+                  ...graspOf(cls.weapon.hands[id]),
+                },
+              ];
+            }),
+          ),
+        },
+        { meshOf },
       );
-      const posed = compilePose(rig, { ...header, angles });
-      if (others.length === 0) return posed;
-      const stood = boneTransforms(rig.bones, decodeFrame(posed.frame));
-      const hand = stood.get(cls.weapon.lead);
-      const item = { r: mulMM(hand.r, seat.r), t: add(mulMV(hand.r, seat.t), hand.t) };
-      const hands = Object.fromEntries(others.map((id) => [id, cls.weapon.hands[id].hands]));
-      const gripped = (swing) =>
-        compilePose(
-          rig,
-          {
-            ...header,
-            angles,
-            hands,
-            hold: Object.fromEntries(
-              others.map((id) => {
-                const shoulder = shoulderOf(rig, id);
-                const reach = sub(applyPoint(item, sockets[id].at), applyPoint(stood.get(shoulder.id), shoulder.head));
-                const pole = normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w));
-                return [
-                  id,
-                  {
-                    model: cls.weapon.model,
-                    at: item.t,
-                    turn: mat3ToQuat(item.r),
-                    pole: mulMV(rotAxis(normalize(reach), swing), pole),
-                    socket: sockets[id],
-                    ...graspOf(cls.weapon.hands[id]),
-                  },
-                ];
-              }),
-            ),
-          },
-          { meshOf },
-        );
-      // The keys' poles hold the wrist within its limits at the keys, not always between them: there the elbow swings
-      // about the line from shoulder to grip, the least it must, until the wrist takes the haft within them.
-      const bent = ({ report }) =>
-        report.clamped.reduce(
-          (sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0),
-          0,
-        );
-      let best;
-      for (const swing of SWINGS) {
-        const compiled = gripped(swing);
-        if (bent(compiled) === 0) return compiled;
-        if (!best || bent(compiled) < bent(best)) best = compiled;
-      }
-      return best;
+    // The keys' poles hold the wrist within its limits at the keys, not always between them: there the elbow swings
+    // about the line from shoulder to grip, the least it must, until the wrist takes the haft within them.
+    const bent = ({ report }) =>
+      report.clamped.reduce((sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0), 0);
+    let best;
+    for (const swing of SWINGS) {
+      const compiled = gripped(swing);
+      if (bent(compiled) === 0) return compiled;
+      if (!best || bent(compiled) < bent(best)) best = compiled;
+    }
+    return best;
+  };
+  for (const [stance, key] of Object.entries(cls.stances)) {
+    const { frame, report } = compileKey(key);
+    clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
+    reports[clipName(name, 'stance', stance)] = [report];
+  }
+  for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
+    const clip = clipName(name, 'strike', strike);
+    const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
+    const phases = strikePhases(spec);
+    const eases = easings(wields, spec);
+    const count = Math.max(2, Math.round(spec.seconds * wields.framesPerSecond) + 1);
+    const baked = Array.from({ length: count }, (_, k) => {
+      const at = k / (count - 1);
+      const i = phases.findLastIndex(({ from }) => from <= at);
+      const { from, to } = phases[i];
+      return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
+    });
+    clips[clip] = {
+      kind: 'pose',
+      loop: false,
+      ...strikeTiming(spec),
+      ...held,
+      frames: baked.map(({ frame }) => frame),
     };
-    for (const [stance, key] of Object.entries(cls.stances)) {
-      const { frame, report } = compileKey(key);
-      clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
-      reports[clipName(name, 'stance', stance)] = [report];
-    }
-    for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
-      const clip = clipName(name, 'strike', strike);
-      const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
-      const phases = strikePhases(spec);
-      const eases = easings(wields, spec);
-      const count = Math.max(2, Math.round(spec.seconds * wields.framesPerSecond) + 1);
-      const baked = Array.from({ length: count }, (_, k) => {
-        const at = k / (count - 1);
-        const i = phases.findLastIndex(({ from }) => from <= at);
-        const { from, to } = phases[i];
-        return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
-      });
-      clips[clip] = {
-        kind: 'pose',
-        loop: false,
-        ...strikeTiming(spec),
-        ...held,
-        frames: baked.map(({ frame }) => frame),
-      };
-      reports[clip] = baked.map(({ report }) => report);
-    }
+    reports[clip] = baked.map(({ report }) => report);
   }
   return { clips, reports };
+}
+
+const HERE = import.meta.dirname;
+// The code a bake runs. A cached bake is only as good as the code and the runtime that made it.
+const BAKE_CODE = [
+  'wields.mjs',
+  'keyFrames.mjs',
+  '../site/poseFile.mjs',
+  '../site/fingers.mjs',
+  '../site/clearance.mjs',
+  '../site/hiding.mjs',
+  '../site/kinematics.mjs',
+  '../site/clipFrames.mjs',
+];
+const bakeHash = () => codeFingerprint(HERE, BAKE_CODE);
+const CACHE_FOLDER = 'wields';
+
+// What `classClips` reads, so its key changes with nothing else the wields say. The weapon's solid is its mesh's,
+// which the key holds.
+const bakeTask = (rig, { easing, framesPerSecond }, name, cls, { weapon, sockets }, meshOf) => {
+  const { solid, ...held } = weapon ?? {};
+  return {
+    rig,
+    easing,
+    framesPerSecond,
+    name,
+    cls,
+    weapon: held,
+    sockets,
+    mesh: cls.weapon ? meshOf(cls.weapon.model) : null,
+  };
+};
+const taskHash = (task, bake) =>
+  createHash('sha256').update(bake).update(JSON.stringify(task)).digest('hex').slice(0, 32);
+
+/**
+ * Each of `sets`' clips, as `wieldClips` bakes them, and the `wieldProblems` of their frames, by set: each class from
+ * the cache folder when what it reads and the bake are as they were, else baked and kept, since closing the hands on a
+ * weapon is most of the bake. A class keeps its problems rather than its reports, which the cache could not carry
+ * whole. `bake` is the fingerprint of the code that bakes, which a test may change. With `shard`, only that shard of
+ * the classes is baked, so CI can spread a clean build's bakes over runners like its models (`wieldShard`), and each
+ * set holds only the shard's clips. With `prune`, entries none of `sets` uses any more go, so only a run over every set
+ * may prune.
+ */
+export function wieldResults(rig, sets, meshOf, { cache, prune = false, shard, bake = bakeHash() } = {}) {
+  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const classes = Object.entries(sets).flatMap(([set, { wields, weapons }]) =>
+    Object.entries(wields.classes).map(([name, cls]) => {
+      const inputs = [rig, wields, name, cls, weapons[name], meshOf];
+      return { set, inputs, hash: taskHash(bakeTask(...inputs), bake) };
+    }),
+  );
+  const mine = shard === undefined ? classes : shardUnits(classes, shard);
+  let reused = 0;
+  const made = mine.map(({ set, inputs, hash }) => {
+    const stored = folder?.get(hash);
+    if (stored !== undefined) {
+      reused++;
+      return { set, ...stored };
+    }
+    const { clips, reports } = classClips(...inputs);
+    const result = { clips, problems: wieldProblems(reports) };
+    folder?.put(hash, result);
+    return { set, ...result };
+  });
+  if (prune) folder?.prune(new Set(classes.map(({ hash }) => hash)));
+  const results = mapValues(sets, (_, set) => {
+    const own = made.filter((result) => result.set === set);
+    return {
+      clips: Object.assign({}, ...own.map(({ clips }) => clips)),
+      problems: own.flatMap(({ problems }) => problems),
+    };
+  });
+  return { results, reused, baked: mine.length - reused };
+}
+
+/**
+ * Bakes one shard of every wield class into the cache, from `modelOf(id)`, a model's `{ glb, entry }` as a build
+ * generates it (tools/build.mjs, fillCacheShard), so the classes are baked by the shards rather than by the build that
+ * reads them all back. Every shard reads the doll and every weapon, since each class's key holds the rig and its seat.
+ */
+export async function wieldShard(modelOf, { root = repo, sets = WIELD_SETS, cache, shard }) {
+  // With no set there is nothing to bake, and a root without sets, such as a test's, may have no doll.
+  if (Object.keys(sets).length === 0) return;
+  const weapons = Object.values(sets).flatMap(({ file }) =>
+    Object.values(readWields(root, file).classes).flatMap(({ weapon }) => (weapon ? [weapon.model] : [])),
+  );
+  const ids = new Set([...dollModels(readDressing(root)), ...weapons]);
+  const files = new Map(await Promise.all([...ids].map(async (id) => [id, await modelOf(id)])));
+  const { rig, meshOf, sets: read } = wieldModels((id) => files.get(id), { root, sets });
+  wieldResults(rig, read, meshOf, { cache, shard });
 }
 
 /** The doll's rig and its parts' sites as the built tree holds them, with what the wields need of it. */
 export function readWieldTree(built, root = repo) {
   const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
-  return wieldTree(built, manifest, root);
-}
-
-/** As `readWieldTree`, for a tree whose models `manifest` lists: each of `WIELD_SETS` as `{ wields, weapons }`. */
-export function wieldTree(built, manifest, root = repo) {
-  const dressing = readDressing(root);
-  const doll = readDoll(built, manifest, dressing);
-  const rig = dollRig(readRigContent(root), doll, dressing);
-  const { meshOf, entryOf } = heldItems(built, manifest);
-  const sets = mapValues(WIELD_SETS, ({ file }) => {
-    const wields = readWields(root, file);
-    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
-  });
-  return { rig, doll, meshOf, sets };
+  return wieldModels(treeFiles(built, manifest), { root });
 }
 
 /**
- * What a hand needs of the models a built tree holds: `meshOf(id)`, the model's parts at rest as one mesh, and
- * `entryOf(id)`, its sidecar, from whichever tool's folder under its pack holds it.
+ * The doll's rig and each of `sets` as `{ wields, weapons }`, from `filesOf(id)`, a model's `{ glb, entry }`: its GLB
+ * and its sidecar, as a built tree holds them (`treeFiles`) or a build generates them.
  */
-export function heldItems(built, manifest) {
-  const meshes = treeMeshes(built, manifest);
+export function wieldModels(filesOf, { root = repo, sets = WIELD_SETS } = {}) {
+  const dressing = readDressing(root);
+  const doll = dollFrom(dressing, filesOf);
+  const rig = dollRig(readRigContent(root), doll, dressing);
+  const { meshOf, entryOf } = heldModels(filesOf);
+  const read = mapValues(sets, ({ file }) => {
+    const wields = readWields(root, file);
+    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
+  });
+  return { rig, doll, meshOf, sets: read };
+}
+
+/**
+ * Each model's `{ glb, entry }` in a built tree whose models `manifest` lists: its GLB and its sidecar, from whichever
+ * tool's folder under its pack holds it.
+ */
+export function treeFiles(built, manifest) {
+  return (id) => {
+    const model = manifest.models.find((entry) => entry.id === id && entry.path.endsWith('.glb'));
+    if (!model) throw new Error(`the built tree holds no ${id}`);
+    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) =>
+      join(built, sidecarFile(model.pack, folder, id)),
+    );
+    const sidecar = sidecars.find((path) => existsSync(path));
+    if (!sidecar) throw new Error(`${id}: no sidecar under ${model.pack}`);
+    return { glb: readFileSync(join(built, model.pack, model.path)), entry: JSON.parse(readFileSync(sidecar, 'utf8')) };
+  };
+}
+
+/** What a hand needs of the models a built tree holds, as `heldModels` gives it. */
+export const heldItems = (built, manifest) => heldModels(treeFiles(built, manifest));
+
+/**
+ * What a hand needs of the models `filesOf` gives (`wieldModels`): `meshOf(id)`, the model's parts at rest as one mesh,
+ * and `entryOf(id)`, its sidecar.
+ */
+export function heldModels(filesOf) {
+  const parsed = new Map();
+  const meshes = (id) => {
+    if (!parsed.has(id)) parsed.set(id, modelMeshes(filesOf(id).glb));
+    return parsed.get(id);
+  };
   const meshOf = (id) =>
     meshes(id).reduce(
       (mesh, part) => {
@@ -466,14 +593,7 @@ export function heldItems(built, manifest) {
       },
       { positions: [], indices: [] },
     );
-  const entryOf = (id) => {
-    const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, sidecarFile(pack, folder, id)));
-    const sidecar = sidecars.find((path) => existsSync(path));
-    if (!sidecar) throw new Error(`${id}: no sidecar under ${pack}`);
-    return JSON.parse(readFileSync(sidecar, 'utf8'));
-  };
-  return { meshOf, entryOf };
+  return { meshOf, entryOf: (id) => filesOf(id).entry };
 }
 
 /**
@@ -526,16 +646,12 @@ export const WIELD_SETS = {
  * Writes the doll's rig and each of `sets` of its baked wields (all of `WIELD_SETS` unless given) into the built tree `out`, whose models
  * `manifest` lists, for a game to play: the rig a clip's frames turn, with each part's site on it, and each set's clips
  * by name. Refuses a set whose frames show any `wieldProblems`. Returns the files written, under their packs, and the
- * manifest's motions entries for them.
+ * manifest's motions entries for them. `cache`, `prune` and `bake` are `wieldResults`'.
  */
-export function exportWields(out, manifest, root = repo, sets = WIELD_SETS) {
-  const tree = wieldTree(out, manifest, root);
-  const { rig, doll, meshOf } = tree;
-  const baked = mapValues(sets, (_, name) => {
-    const { wields, weapons } = tree.sets[name];
-    return wieldClips(rig, wields, weapons, meshOf);
-  });
-  const problems = Object.values(baked).flatMap(({ reports }) => wieldProblems(reports));
+export function exportWields(out, manifest, { root = repo, sets = WIELD_SETS, ...options } = {}) {
+  const { rig, doll, meshOf, sets: read } = wieldModels(treeFiles(out, manifest), { root, sets });
+  const { results: baked } = wieldResults(rig, read, meshOf, options);
+  const problems = Object.values(baked).flatMap(({ problems }) => problems);
   if (problems.length > 0) throw new Error(`baked wields: ${problems.join('; ')}`);
   const posing = Object.fromEntries(Object.entries(rig).filter(([key]) => !AUTHORING.has(key)));
   const rigFile = { ...posing, doll: doll.sites };

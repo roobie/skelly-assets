@@ -6,7 +6,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { modelBox } from './dress.mjs';
 import { glbJson } from './glb.mjs';
-import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { outputPath, thingEntryFile } from './layout.mjs';
 import { solid } from './pieceSolid.mjs';
 import { sharedDepth } from './siteOverlap.mjs';
@@ -75,29 +74,10 @@ export function farSlot(slot, lateral) {
 // ---- the slots of a part, in its source frame ----
 
 // Every vehicle row with stowage slots: { id, partCount, ports, pieces }, its first part's slots and pieces in the vehicle
-// frame (models/vehicles/frame.libsonnet). Only rows with slots are manifested, which keeps the evaluation cheap.
-export function readSlotParts(root = repo) {
-  return JSON.parse(
-    evaluateJsonnet(
-      `
-  local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
-  {
-    grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
-    parts: [
-      {
-        id: row.id,
-        partCount: std.length(row.parts),
-        ports: [port for port in row.parts[0].ports if port.mount == '${STOWAGE}'],
-        pieces: std.parseJson(std.get(row.parts[0].params, 'pieces', '[]')),
-      }
-      for row in rows
-      if std.length([port for part in row.parts for port in part.ports if port.mount == '${STOWAGE}']) > 0
-    ],
-  }`,
-      root,
-    ),
-  );
-}
+// frame (models/vehicles/frame.libsonnet). Read from its Jsonnet twin, which installJsonnetSources compiles only when a
+// file it imports has changed, since evaluating every vehicle row is most of the report's cost.
+const SLOT_PARTS = 'models/vehicles/slot-parts.json';
+export const readSlotParts = (root = repo) => JSON.parse(readFileSync(join(root, SLOT_PARTS), 'utf8'));
 
 // A slot port as authored, in the shape the export writes it.
 export const slotOf = ({ id, accepts, envelope, pos, normal, up }) => ({
