@@ -22,6 +22,11 @@ import {
 const scalar = pipe(number(), finite());
 const positive = pipe(scalar, minValue(Number.MIN_VALUE));
 const share = pipe(scalar, minValue(0), maxValue(1));
+/** A share that must keep something. */
+export const positiveShare = pipe(
+  share,
+  check((value) => value > 0, 'must be more than 0'),
+);
 const count = pipe(number(), integer(), minValue(1));
 const angle = pipe(scalar, minValue(0), maxValue(180));
 const point = tuple([scalar, scalar, scalar]);
@@ -102,18 +107,29 @@ export const SpeciesSchema = strictObject({
     /** Consecutive internodes bending less than this are drawn as one straight tube. */
     merge: angle,
   }),
+  /**
+   * The share of its finer branching (thin.ts) a tree keeps, with the leaves on it: 1 draws every twig, lower draws a
+   * sparser tree of the same trunk and limbs. A row may override it, so one species serves a thick and a sparse set.
+   */
+  density: positiveShare,
   foliage: strictObject({
     /** Shoots younger than this many seasons bear leaves. */
     age: count,
     /** A clump's radius; leaves within a clump's cell are gathered into one. */
     clump: positive,
     /** A clump's thickness across its facing, as a share of its radius. */
-    squash: pipe(
-      share,
-      check((value) => value > 0, 'a clump needs thickness'),
-    ),
+    squash: positiveShare,
     /** How far a clump turns from facing up toward facing out of the crown's ellipsoid. */
     crown: share,
+    /** The thinnest a clump is drawn, in voxels, so a flat clump never thins into gaps in its voxel copy. */
+    least: count,
+    /**
+     * The half-width of the solid core that fills each column of two or more clumps, as a share of a clump's radius;
+     * 0 leaves the crown a shell. A shell's inner faces cost a voxel copy as much as its outer ones and are never seen.
+     */
+    core: pipe(scalar, minValue(0)),
+    /** Voxel layers per terrace step of a clump's voxel copy (SolidDisplayHints.terrace); 1 draws it as authored. */
+    terrace: count,
   }),
 });
 

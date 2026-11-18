@@ -3,7 +3,7 @@
 // transparent twig cards, so a clump stands for a card spray: it faces out of the crown's ellipsoid as the article's
 // cards blend their normals toward one, which is what lets a crown read as a volume and not as a heap of balls.
 import { add, cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
-import type { ClipPlane, ExtrudedPolygonSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { ClipPlane, ExtrudedPolygonSolid, SolidDisplayHints, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import type { Skeleton } from './grow.ts';
 import type { Species } from './species.ts';
 
@@ -15,9 +15,23 @@ const FACETS: readonly Vec3[] = [-1, 0, 1].flatMap((x) =>
 );
 /** The octagon's corners lie this far out from its flats. */
 const OCTAGON_REACH = 1 / Math.cos(Math.PI / 8);
+const PLAIN: SolidDisplayHints = { bevel: false };
+
+/** How a grown skeleton is drawn: the voxel grain its row is exported at, and the internodes thinning cut (thin.ts). */
+export interface Drawing {
+  readonly grain: number;
+  readonly cut: ReadonlySet<number>;
+}
 
 /** A solid bounded by `clip` inside the box from `low` to `high`, as the compound family's clipped prisms are. */
-const clipped = (id: string, slot: string, low: Vec3, high: Vec3, clip: readonly ClipPlane[]): ExtrudedPolygonSolid => {
+const clipped = (
+  id: string,
+  slot: string,
+  low: Vec3,
+  high: Vec3,
+  clip: readonly ClipPlane[],
+  display = PLAIN,
+): ExtrudedPolygonSolid => {
   // On the y axis a profile's points are [z, x], counterclockwise.
   const profile: Vec2[] = [
     [low[2], low[0]],
@@ -25,19 +39,11 @@ const clipped = (id: string, slot: string, low: Vec3, high: Vec3, clip: readonly
     [high[2], high[0]],
     [low[2], high[0]],
   ];
-  return {
-    id,
-    slot,
-    kind: 'extruded-polygon',
-    axis: 'y',
-    profile,
-    z: [low[1], high[1]],
-    clip,
-    display: { bevel: false },
-  };
+  return { id, slot, kind: 'extruded-polygon', axis: 'y', profile, z: [low[1], high[1]], clip, display };
 };
 
 const across = (dir: Vec3): Vec3 => normalize(cross(dir, Math.abs(dir[1]) < 0.9 ? UP : [0, 0, 1]));
+const mean = (points: readonly Vec3[]): Vec3 => scale(points.reduce(add), 1 / points.length);
 
 /** An octagonal tube from `a` (radius r0) to `b` (radius r1): two caps and eight flats leaning in with the taper. */
 const tube = (id: string, slot: string, a: Vec3, b: Vec3, r0: number, r1: number): ExtrudedPolygonSolid => {
@@ -71,6 +77,7 @@ const clump = (
   radius: number,
   thickness: number,
   facing: Vec3,
+  display: SolidDisplayHints,
 ): ExtrudedPolygonSolid => {
   const u = across(facing);
   const axes: readonly [Vec3, number][] = [
@@ -82,39 +89,52 @@ const clump = (
   const half = [0, 1, 2].map((i) => support([0, 1, 2].map((j) => (i === j ? 1 : 0)) as unknown as Vec3));
   const low = centre.map((c, i) => c - half[i]!) as unknown as Vec3;
   const high = centre.map((c, i) => c + half[i]!) as unknown as Vec3;
-  return clipped(id, slot, [low[0], Math.max(low[1], 0), low[2]], high, [
-    ...FACETS.map((normal) => ({ normal, offset: support(normal) + dot(normal, centre) })),
-    { normal: [0, -1, 0], offset: 0 },
-  ]);
+  return clipped(
+    id,
+    slot,
+    [low[0], Math.max(low[1], 0), low[2]],
+    high,
+    [
+      ...FACETS.map((normal) => ({ normal, offset: support(normal) + dot(normal, centre) })),
+      { normal: [0, -1, 0], offset: 0 },
+    ],
+    display,
+  );
 };
 
 /**
  * The bark: each axis walked from its foot, its internodes gathered into straight runs while they bend less than
  * `merge`, each run one tube. A run starts a radius back down its axis so a bend leaves no notch, and the trunk's first
- * run flares and sinks below the ground. Axes thinner than `cull` are left to the foliage.
+ * run flares and sinks below the ground. Axes thinner than `cull`, and those thinning cut, are left out.
  */
-const barkOf = ({ internodes, roots, radius, tip }: Skeleton, { bark, pipe }: Species, slot: string) => {
+const barkOf = (
+  { internodes, roots, radius, tip }: Skeleton,
+  { bark, pipe }: Species,
+  { cut }: Drawing,
+  slot: string,
+) => {
   const tubes: ExtrudedPolygonSolid[] = [];
   const mergeCos = Math.cos((bark.merge * Math.PI) / 180);
+  const drawn = (i: number) => internodes[i]!.alive && !cut.has(i);
   const endRadius = (i: number) => {
     const main = internodes[i]!.main;
-    return main && 'child' in main && internodes[main.child]!.alive ? radius[main.child]! : tip;
+    return main && 'child' in main && drawn(main.child) ? radius[main.child]! : tip;
   };
   const axisFeet = [...roots];
   const rootSet = new Set(roots);
   while (axisFeet.length > 0) {
     let i = axisFeet.pop()!;
-    while (i >= 0 && internodes[i]!.alive && radius[i]! >= bark.cull) {
+    while (i >= 0 && drawn(i) && radius[i]! >= bark.cull) {
       const first = internodes[i]!;
       const dir = normalize(sub(first.end, first.start));
       let last = i;
       for (;;) {
         for (const slot of internodes[last]!.laterals) {
-          if (slot && 'child' in slot && internodes[slot.child]!.alive) axisFeet.push(slot.child);
+          if (slot && 'child' in slot && drawn(slot.child)) axisFeet.push(slot.child);
         }
         const main = internodes[last]!.main;
         const next = main && 'child' in main ? main.child : -1;
-        if (next < 0 || !internodes[next]!.alive || radius[next]! < bark.cull) break;
+        if (next < 0 || !drawn(next) || radius[next]! < bark.cull) break;
         const along = normalize(sub(internodes[next]!.end, internodes[next]!.start));
         if (dot(along, dir) < mergeCos) break;
         last = next;
@@ -130,36 +150,73 @@ const barkOf = ({ internodes, roots, radius, tip }: Skeleton, { bark, pipe }: Sp
   return tubes;
 };
 
+/** The ellipsoid that bounds every leafy point, no thinner than a clump on any axis. */
+const crownOf = (points: readonly Vec3[], clumpRadius: number) => {
+  const low = [0, 1, 2].map((i) => Math.min(...points.map((p) => p[i]!)));
+  const high = [0, 1, 2].map((i) => Math.max(...points.map((p) => p[i]!)));
+  return {
+    centre: low.map((l, i) => (l + high[i]!) / 2) as unknown as Vec3,
+    radii: low.map((l, i) => Math.max((high[i]! - l) / 2, clumpRadius)) as unknown as Vec3,
+  };
+};
+
 /**
  * The foliage: the ends of shoots younger than `age`, gathered by cells a clump across into one clump each at their
- * mean, facing between up and out of the ellipsoid that bounds them all by `crown`.
+ * mean, facing between up and out of the crown's ellipsoid by `crown`; then a core box down each column of clumps, so
+ * the crown is solid inside. The crown is measured before thinning, so a sparser tree's clumps face as a thick one's.
  */
-const foliageOf = ({ internodes, seasons }: Skeleton, { foliage }: Species, slot: string) => {
-  const leafy = internodes.filter((node) => node.alive && seasons - node.born < foliage.age).map((node) => node.end);
-  if (leafy.length === 0) return [];
+const foliageOf = ({ internodes, seasons }: Skeleton, { foliage }: Species, { grain, cut }: Drawing, slot: string) => {
+  const young = internodes.flatMap((node, index) =>
+    node.alive && seasons - node.born < foliage.age ? [{ end: node.end, kept: !cut.has(index) }] : [],
+  );
+  if (young.length === 0) return [];
+  const crown = crownOf(
+    young.map(({ end }) => end),
+    foliage.clump,
+  );
   const cell = foliage.clump * 2;
+  const cellOf = (p: Vec3) => p.map((v) => Math.floor(v / cell));
   const cells = new Map<string, Vec3[]>();
-  for (const p of leafy) {
-    const at = p.map((v) => Math.floor(v / cell)).join(',');
-    cells.set(at, [...(cells.get(at) ?? []), p]);
+  for (const { end, kept } of young) {
+    if (!kept) continue;
+    const at = cellOf(end).join(',');
+    cells.set(at, [...(cells.get(at) ?? []), end]);
   }
-  const low = [0, 1, 2].map((i) => Math.min(...leafy.map((p) => p[i]!)));
-  const high = [0, 1, 2].map((i) => Math.max(...leafy.map((p) => p[i]!)));
-  const centre = low.map((l, i) => (l + high[i]!) / 2) as unknown as Vec3;
-  const radii = low.map((l, i) => Math.max((high[i]! - l) / 2, foliage.clump)) as unknown as Vec3;
-  return [...cells.keys()].sort().map((at, index) => {
-    const points = cells.get(at)!;
-    const mean = scale(points.reduce(add), 1 / points.length);
-    const offset = sub(mean, centre);
-    const outward: Vec3 = [offset[0] / radii[0] ** 2, offset[1] / radii[1] ** 2, offset[2] / radii[2] ** 2];
+  const centres = [...cells.keys()].sort().map((at) => mean(cells.get(at)!));
+
+  const thickness = Math.max(foliage.clump * foliage.squash, foliage.least * grain);
+  const radius = Math.max(foliage.clump, thickness);
+  const display: SolidDisplayHints = foliage.terrace > 1 ? { ...PLAIN, terrace: foliage.terrace } : PLAIN;
+  const clumps = centres.map((centre, index) => {
+    const offset = sub(centre, crown.centre);
+    const outward = offset.map((v, i) => v / crown.radii[i]! ** 2) as unknown as Vec3;
     const out = length(outward) > 1e-9 ? normalize(outward) : UP;
     const facing = normalize(add(scale(UP, 1 - foliage.crown), scale(out, foliage.crown)));
-    return clump(`leaf-${index}`, slot, mean, foliage.clump, foliage.clump * foliage.squash, facing);
+    return clump(`leaf-${index}`, slot, centre, radius, thickness, facing, display);
   });
+
+  const columns = new Map<string, Vec3[]>();
+  for (const centre of centres) {
+    const [i, , k] = cellOf(centre);
+    columns.set(`${i},${k}`, [...(columns.get(`${i},${k}`) ?? []), centre]);
+  }
+  const half = foliage.clump * foliage.core;
+  const cores =
+    half > 0
+      ? [...columns.values()]
+          .filter((column) => column.length >= 2)
+          .map((column, index) => {
+            const [x, , z] = mean(column);
+            const ys = column.map((p) => p[1]);
+            const low: Vec3 = [x - half, Math.max(0, Math.min(...ys)), z - half];
+            return clipped(`leaf-core-${index}`, slot, low, [x + half, Math.max(...ys), z + half], []);
+          })
+      : [];
+  return [...clumps, ...cores];
 };
 
 /** The solids a grown skeleton draws as, in two finish slots: `bark` and `leaf`. */
-export const grownSolids = (skeleton: Skeleton, species: Species): ExtrudedPolygonSolid[] => [
-  ...barkOf(skeleton, species, 'bark'),
-  ...foliageOf(skeleton, species, 'leaf'),
+export const grownSolids = (skeleton: Skeleton, species: Species, drawing: Drawing): ExtrudedPolygonSolid[] => [
+  ...barkOf(skeleton, species, drawing, 'bark'),
+  ...foliageOf(skeleton, species, drawing, 'leaf'),
 ];

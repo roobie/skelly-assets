@@ -12,6 +12,35 @@ local base = {
   // its radius is a spray's and the exponent sits at the pipe model's low end.
   pipe: { exponent: 2.2, tip: 0.02, flare: 1.4, sink: 0.08 },
   bark: { cull: 0.02, merge: 10 },
+  density: 1,
+  // A crown of clumps alone is a shell whose inside the voxel copy pays for as much as its outside, so a core fills
+  // each column; two-layer terraces read as a voxel crown's steps and keep its slopes from costing a face per layer.
+  foliage: { least: 2, core: 1.3, terrace: 2 },
+};
+// An oak's crown: weak apical control lets laterals overtake the leader into a broad, rounded dome on a short bole. Its
+// twigs vanish into a crown this dense, so only limbs are barked, and its wide slopes step three layers at a time.
+local broadleaf = base {
+  seasons: 15,
+  internode: 0.32,
+  lambda: 0.47,
+  pipe: base.pipe { tip: 0.014 },
+  bark+: { cull: 0.04 },
+  branching: { angle: 45, phyllotaxis: 'spiral', divergence: 137.5, whorl: 1, budLife: 4, bole: 2.4 },
+  direction: { previous: 1, light: 0.35, tropism: { leader: 0.15, lateral: 0.05 }, noise: 0.18, flatten: 0.25 },
+  foliage+: { age: 3, clump: 0.6, squash: 0.6, crown: 0.6, terrace: 3 },
+};
+// A pine: strong apical control keeps one leader; whorled laterals held near level stack into tiers.
+local conifer = base {
+  seasons: 13,
+  internode: 0.24,
+  shootCap: 3,
+  lambda: 0.56,
+  pipe: base.pipe { tip: 0.012 },
+  // Lower tiers stay in the shade a long while before they go.
+  shedding: { threshold: 0.01, grace: 4 },
+  branching: { angle: 70, phyllotaxis: 'whorl', divergence: 0, whorl: 5, budLife: 2, bole: 1.6 },
+  direction: { previous: 1, light: 0.1, tropism: { leader: 0.4, lateral: 0 }, noise: 0.06, flatten: 0.6 },
+  foliage+: { age: 4, clump: 0.45, squash: 0.45, crown: 0.3 },
 };
 // A shrub fills a dome of space instead of competing for light: colonization markers in a flattened hemisphere.
 local dome(radius, height, markers) = {
@@ -23,39 +52,34 @@ local dome(radius, height, markers) = {
   perception: 90,
 };
 {
-  // An oak's crown: weak apical control lets laterals overtake the leader into a broad, rounded dome on a short bole.
-  broadleaf: base {
-    seasons: 15,
-    internode: 0.32,
-    lambda: 0.47,
-    pipe: base.pipe { tip: 0.014 },
-    branching: { angle: 45, phyllotaxis: 'spiral', divergence: 137.5, whorl: 1, budLife: 4, bole: 2.4 },
-    direction: { previous: 1, light: 0.35, tropism: { leader: 0.15, lateral: 0.05 }, noise: 0.18, flatten: 0.25 },
-    foliage: { age: 3, clump: 0.6, squash: 0.6, crown: 0.6 },
+  broadleaf: broadleaf,
+  // An upright oak: a stronger leader holds its laterals in, so the crown rises taller than it spreads.
+  upright: broadleaf {
+    lambda: 0.53,
+    branching+: { angle: 32, bole: 2.8 },
+    direction+: { tropism: { leader: 0.35, lateral: 0.15 }, flatten: 0.05 },
   },
-  // A pine: strong apical control keeps one leader; whorled laterals held near level stack into tiers.
-  conifer: base {
-    seasons: 13,
-    internode: 0.24,
-    shootCap: 3,
-    lambda: 0.56,
-    pipe: base.pipe { tip: 0.012 },
-    // Lower tiers stay in the shade a long while before they go.
-    shedding: { threshold: 0.01, grace: 4 },
-    branching: { angle: 70, phyllotaxis: 'whorl', divergence: 0, whorl: 5, budLife: 2, bole: 1.6 },
-    direction: { previous: 1, light: 0.1, tropism: { leader: 0.4, lateral: 0 }, noise: 0.06, flatten: 0.6 },
-    foliage: { age: 4, clump: 0.45, squash: 0.45, crown: 0.3 },
+  conifer: conifer,
+  // A spruce: a leader climbing harder still and tiers kept low and never shed, so it stands a dense cone. Its laterals
+  // are held back a little (λ under the pine's): a spruce's tiers never shed, so any more and they outgrow the leader.
+  spruce: conifer {
+    seasons: 15,
+    lambda: 0.53,
+    shedding: null,
+    branching+: { bole: 0.9 },
+    direction+: { tropism: { leader: 0.55, lateral: 0 } },
   },
   // A birch: a slender leader, fine long laterals that hang under negative tropism, and a light, open crown.
   birch: base {
     seasons: 12,
     internode: 0.3,
     lambda: 0.56,
+    bark+: { cull: 0.03 },
     branching: { angle: 35, phyllotaxis: 'spiral', divergence: 137.5, whorl: 1, budLife: 2, bole: 2.5 },
     direction: { previous: 1, light: 0.2, tropism: { leader: 0.4, lateral: -0.55 }, noise: 0.12, flatten: 0 },
     shedding: { threshold: 0.12, grace: 1 },
     pipe: base.pipe { tip: 0.01, flare: 1.25 },
-    foliage: { age: 2, clump: 0.4, squash: 0.5, crown: 0.4 },
+    foliage+: { age: 2, clump: 0.4, squash: 0.5, crown: 0.4 },
   },
   // A hazel: many stems from the ground with laterals favoured, filling a dome a little taller than wide.
   hazel: base {
@@ -69,7 +93,7 @@ local dome(radius, height, markers) = {
     shedding: null,
     pipe: base.pipe { tip: 0.006, flare: 1, sink: 0.04 },
     bark: { cull: 0.008, merge: 12 },
-    foliage: { age: 4, clump: 0.2, squash: 0.6, crown: 0.7 },
+    foliage+: { age: 4, clump: 0.2, squash: 0.6, crown: 0.7 },
   },
   // A low shrub: a mat of short stems under a flat dome.
   low: base {
@@ -83,6 +107,6 @@ local dome(radius, height, markers) = {
     shedding: null,
     pipe: base.pipe { tip: 0.004, flare: 1, sink: 0.03 },
     bark: { cull: 0.006, merge: 12 },
-    foliage: { age: 4, clump: 0.12, squash: 0.6, crown: 0.7 },
+    foliage+: { age: 4, clump: 0.12, squash: 0.6, crown: 0.7 },
   },
 }
