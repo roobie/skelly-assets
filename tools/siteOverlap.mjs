@@ -10,8 +10,10 @@
 // vehicle allows to a lesser depth. All are capped at the depth they were written for, and a variant shares its
 // parent's. An entry that no longer applies is reported, so the lists cannot rot. The reason for the rule is in
 // `docs/decisions/0014-site-overlap.md`.
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { solid } from './pieceSolid.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -169,6 +171,47 @@ export function siteOverlaps(sites, grain) {
   }));
 }
 
+const HERE = import.meta.dirname;
+// The code a measure runs. A cached measure is only as good as the code and the runtime that made it.
+const MEASURE_CODE = ['siteOverlap.mjs', 'pieceSolid.mjs'];
+const measureHash = () => codeFingerprint(HERE, MEASURE_CODE);
+const CACHE_FOLDER = 'overlap';
+
+// What `siteOverlaps` reads of a vehicle, so its key changes with nothing else the placements say.
+const measureTask = (sites, grain) => ({
+  grain,
+  sites: sites.map(({ id, part, grain: own, pieces }) => ({ id, part, grain: own, pieces })),
+});
+const taskHash = (task, measure) =>
+  createHash('sha256').update(measure).update(JSON.stringify(task)).digest('hex').slice(0, 32);
+
+// Every vehicle's `siteOverlaps`, by vehicle: from the cache folder when its sites and the measure are as they were,
+// else measured and kept, since measuring every vehicle is most of a warm build's report. Vehicles with the same sites
+// share one measure. `measure` is the fingerprint of the code that measures, which a test may change. With `prune`,
+// entries no vehicle uses any more go, as only a run over every vehicle knows them all.
+export function overlapResults({ grain, vehicles }, { cache, prune = false, measure = measureHash() } = {}) {
+  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const measured = new Map();
+  let reused = 0;
+  const results = {};
+  for (const [vehicle, { sites }] of Object.entries(vehicles)) {
+    const hash = taskHash(measureTask(sites, grain), measure);
+    if (!measured.has(hash)) {
+      const stored = folder?.get(hash);
+      if (stored === undefined) {
+        measured.set(hash, siteOverlaps(sites, grain));
+        folder?.put(hash, measured.get(hash));
+      } else {
+        measured.set(hash, stored);
+        reused++;
+      }
+    }
+    results[vehicle] = measured.get(hash);
+  }
+  if (prune) folder?.prune(new Set(measured.keys()));
+  return { results, reused, measured: measured.size - reused };
+}
+
 // A site's role: its id without the side it is on and its number, so every vehicle's wheels share one fit.
 export const roleOf = (siteId) => siteId.replace(/_(near|far)(?=_|$)/g, '').replace(/_\d+(?=_|$)/g, '');
 
@@ -222,19 +265,19 @@ export function fitDepth(fits, roleA, roleB) {
 
 const millimetres = (metres) => Math.round(metres * 1e3);
 
-// The report on every vehicle's overlaps, as { problems, notes } messages. A problem is an overlap that no fit,
-// allowance or `unjudged` entry covers, or covers only to a lesser depth, and an entry that is stale: its pair no
-// longer overlaps, a fit already covers it, or it is listed twice. A note is an overlap marked `unjudged`, said again
-// on every run so nothing is silent. Each message names the vehicle, both parts and their sites. A row of the family
+// The report on every vehicle's overlaps, as { problems, notes } messages, from the overlaps `overlapResults` found
+// by vehicle. A problem is an overlap that no fit, allowance or `unjudged` entry covers, or covers only to a lesser
+// depth, and an entry that is stale: its pair no longer overlaps, a fit already covers it, or it is listed twice. A
+// note is an overlap marked `unjudged`, said again on every run so nothing is silent. Each message names the vehicle, both parts and their sites. A row of the family
 // list may stand over a pair the vehicle allows, since its allowance was sized by an earlier measure, so the row is
 // stale only once the fits or that allowance cover the overlap again.
-export function overlapReport({ grain, fits, roles, vehicles }) {
+export function overlapReport({ grain, fits, roles, vehicles }, results) {
   const problems = seatingProblems(fits, roles);
   const notes = [];
   const measured = new Map();
   const pending = new Set();
-  for (const [vehicle, { parent, sites, overlaps, unjudged, ledger = [] }] of Object.entries(vehicles)) {
-    const found = new Map(siteOverlaps(sites, grain).map((overlap) => [key(...overlap.sites), overlap]));
+  for (const [vehicle, { parent, overlaps, unjudged, ledger = [] }] of Object.entries(vehicles)) {
+    const found = new Map(results[vehicle].map((overlap) => [key(...overlap.sites), overlap]));
     const roleDepth = ({ sites: [a, b] }) => fitDepth(fits, roleOf(a), roleOf(b));
     const from = (name) => vehicles[parent]?.[name] ?? [];
     const allowed = byPair([...from('overlaps'), ...from('unjudged'), ...overlaps, ...unjudged]);

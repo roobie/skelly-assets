@@ -6,8 +6,8 @@
 // tools/build.mjs runs the same reports before it builds anything.
 // Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...] [--cache dir | --no-cache]. It exits 1 when any
 // problem remains in the selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the
-// vocabulary does not list yet, are reported, not failed. The vehicles' sweeps are kept in the export cache the build
-// uses (tools/generation.mjs, DEFAULT_CACHE), so a run reuses what a build or an earlier run swept.
+// vocabulary does not list yet, are reported, not failed. The vehicles' overlaps and sweeps are kept in the export cache
+// the build uses (tools/generation.mjs, DEFAULT_CACHE), so a run reuses what a build or an earlier run measured.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
@@ -17,7 +17,7 @@ import { CACHE_OPTIONS, cacheFolder } from './generation.mjs';
 import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
 import { readSeveredParts } from './severedParts.mjs';
-import { overlapReport, readSitePieces } from './siteOverlap.mjs';
+import { overlapReport, overlapResults, readSitePieces } from './siteOverlap.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { stowageReport } from './stowage.mjs';
 import { swingReport, swingResults } from './swingClearance.mjs';
@@ -62,12 +62,12 @@ export const sourceReport = (models, vocabulary) => {
 // The vehicles' site overlaps (tools/siteOverlap.mjs), swings (tools/swingClearance.mjs) and stowage slots
 // (tools/stowage.mjs) as report entries: the problems, the contacts nobody has judged, and each moving site's swing for
 // the placements output. The sites are read once for overlaps and swings. `cache` is the export cache folder, whose
-// `swing` folder keeps each vehicle's sweep, and `prune` drops the entries no vehicle uses, as only a run over every
-// vehicle may.
+// `overlap` and `swing` folders keep each vehicle's overlaps and sweep, and `prune` drops the entries no vehicle uses,
+// as only a run over every vehicle may.
 export const vehicleReport = async (root = repo, { cache, prune = false } = {}) => {
   await installJsonnetSources();
   const pieces = readSitePieces(root);
-  const overlaps = overlapReport(pieces);
+  const overlaps = overlapReport(pieces, overlapResults(pieces, { cache, prune }).results);
   const swings = swingReport(pieces, (await swingResults(pieces, { cache, prune })).results);
   const entries = (messages) => messages.map((message) => ({ message }));
   return {
