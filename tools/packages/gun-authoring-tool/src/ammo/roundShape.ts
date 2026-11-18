@@ -11,8 +11,8 @@ import {
   parse,
   pipe,
   record,
-  string,
   strictObject,
+  string,
 } from 'valibot';
 import content from '../../../../../models/guns/tables/roundShapes.json' with { type: 'json' };
 

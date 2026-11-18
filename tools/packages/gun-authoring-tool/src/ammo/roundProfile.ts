@@ -137,10 +137,7 @@ interface ProjectileStations {
   readonly tip: number;
 }
 
-const projectileStations = (
-  cartridge: MetallicCartridge,
-  projectile: RoundShape['projectile'],
-): ProjectileStations => {
+const projectileStations = (cartridge: MetallicCartridge, projectile: RoundShape['projectile']): ProjectileStations => {
   const radius = required(cartridge.payload.diameter, 'bullet diameter') / 2;
   const tip = required(
     cartridge.overallLength.typical.value === null ? cartridge.overallLength.max : cartridge.overallLength.typical,
