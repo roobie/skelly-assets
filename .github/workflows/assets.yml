@@ -33,9 +33,8 @@ jobs:
   #
   # A clean copy generates every model, which one runner takes minutes over, so each copy's generation is split over
   # shards. A shard uploads only the cache entries it generated, and its copy's build job then reads them all as cache
-  # hits. A PR's copies are seeded and seldom generate much, and every job takes a runner from the account's limited
-  # pool, where a PR's jobs wait longer than they run, so a PR generates each copy in one shard. SHARDS is the length of
-  # the shard list.
+  # hits. Every job takes a runner from the account's limited pool, where a PR's jobs wait longer for a runner than even
+  # one runner takes over a whole copy, so a PR generates each copy in one shard. SHARDS is the length of the shard list.
   generate:
     runs-on: ubuntu-latest
     strategy:
