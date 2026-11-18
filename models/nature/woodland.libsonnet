@@ -146,9 +146,8 @@ local grassBlade(i) =
   ]);
 {
   rows: [
-    grown.row(t.id + look.suffix, t.title + look.title, t.species, t.seed, t.kg, std.get(t, 'grain', s.grownGrain), look.density)
+    grown.row(t.id, t.title, t.species, t.seed, t.kg, std.get(t, 'grain', s.grownGrain), std.get(t, 'density', s.grownDensity))
     for t in s.grown
-    for look in [{ suffix: '', title: '', density: null }] + s.thinned
   ] + [
     row(t.id, t.title, t.kg, scalePieces(if t.form == 'oak' then oak(t.seed) else pine, t.scale), t.grain, ['wood', 'plant'],
       if t.form == 'pine' then { leaf: 'foliage-pine' } else {})

@@ -11,11 +11,6 @@ local site(id, model, x, z, yaw=0) = { site: id, model: 'woodland_' + model, at:
     site('tree-spruce', 'spruce', 10, -7),
     site('tree-pine', 'pine', 16, -7),
   ] + [
-    // Each grown model's thinned twins behind it, so the densities compare at one scale.
-    site(look[0] + '-' + model[0], model[0] + look[1], model[1], look[2])
-    for look in [['sparse', '_sparse', -19], ['sparser', '_sparser', -31]]
-    for model in [['oak_spreading', -20], ['oak_upright', -10], ['birch', -2], ['scots_pine', 4], ['spruce', 10], ['hazel', 16], ['shrub_low', 20]]
-  ] + [
     site('sapling-oak', 'oak_sapling', -10, 2),
     site('sapling-pine', 'pine_sapling', -6, 2),
     site('dead-snag', 'snag', -1, 2),

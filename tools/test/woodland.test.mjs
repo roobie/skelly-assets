@@ -44,12 +44,12 @@ const inRange = (value, [lo, hi], message) =>
   assert.ok(value >= lo - 1e-5 && value <= hi + 1e-5, `${message}: ${value} outside ${lo}..${hi}`);
 
 // Deliberate acceptance budgets, independent of the generators: width and full height including root/rock skirts. A
-// grown tree's budget is its habit's. Its sparse twin may lose the twigs that set its width but never its height; its
-// sparser twin may lose limbs too, which on a crown of overtaking laterals (the spreading oak) cost some height.
-const grownSizes = {
+// grown model's budget is its habit's as the woodland thins it: thinning takes the overtaking laterals a spreading oak
+// spreads by, and a shrub's clumps swell to the grain.
+const sizes = {
   woodland_oak_spreading: [
-    [9.5, 11.5],
-    [7.8, 8.8],
+    [5, 6.5],
+    [7, 8],
   ],
   woodland_oak_upright: [
     [7, 8.5],
@@ -68,28 +68,13 @@ const grownSizes = {
     [9.1, 10.1],
   ],
   woodland_hazel: [
-    [2.1, 2.7],
-    [1.6, 2.1],
+    [2.6, 3.2],
+    [1.9, 2.4],
   ],
   woodland_shrub_low: [
-    [1.3, 1.8],
-    [0.7, 1],
+    [1.8, 2.5],
+    [1.1, 1.5],
   ],
-};
-const THINNED_LOSS = { _sparse: { width: 0.35, height: 0 }, _sparser: { width: 0.5, height: 0.1 } };
-const sizes = {
-  ...grownSizes,
-  ...Object.fromEntries(
-    Object.entries(THINNED_LOSS).flatMap(([suffix, loss]) =>
-      Object.entries(grownSizes).map(([id, [[least, most], [lowest, highest]]]) => [
-        `${id}${suffix}`,
-        [
-          [least * (1 - loss.width), most],
-          [lowest * (1 - loss.height), highest],
-        ],
-      ]),
-    ),
-  ),
   woodland_pine: [
     [4, 4.6],
     [10.2, 10.7],
@@ -195,6 +180,10 @@ for (const { id, voxelGrain } of rows)
           'foliage survives voxelization',
         );
       if (id === 'woodland_boulder_low') assert.ok(used.has('stone-grey') && used.has('moss-woodland'));
+      // A shader tells a grown model's leaves from its wood by material alone, so every primitive is one or the other.
+      const [{ family, finish }] = byId.get(id).parts;
+      if (family === 'grown')
+        assert.deepEqual([...used].sort(), [finish.bark, finish.leaf].sort(), `${id} bark and leaf`);
     }
     for (const side of [0, 1])
       for (const axis of [0, 1, 2])

@@ -6,11 +6,12 @@ nature props (`log`, `large_rock`, `field_stone`, gathered plants and curiositie
 
 The trees and shrubs are grown (`grown.libsonnet`, `grown.species.libsonnet`): a species row names a habit and a
 seed picks one tree of it, so a new tree is a new row rather than new geometry, and its branching reads as grown
-rather than placed. Each grown model also ships thinned twins, one per look in the `thinned` list of
-`woodland.spec.libsonnet`: the same trunk and limbs with fewer fine branches. The `_sparse` twin is for an open woodland
-a player sees through and a scene of many trees that wants a cheaper draw; deadvox's woodland is to use it. The
-`_sparser` twin is on trial, for a crown a player can still hide in and see out of. A species' own `density` sets its
-look elsewhere.
+rather than placed. The woodland ships them thinned (`grownDensity` in `woodland.spec.libsonnet`): a crown a player
+can hide in, though not easily, and that a scene of many trees can afford. Another set can grow the same species
+thicker, since a species' own `density` is a full crown.
+
+Grown wood and leaves are told apart by material alone (`bark`/`bark-birch` and each species' foliage), so a shader can
+draw bark on the wood and let light through the leaves; until it does the wood is plain and the leaves solid.
 
 ## Placement and scale
 
@@ -25,11 +26,11 @@ obvious repetition. Source instances have no extra scale transform.
 
 | Model id | Height | Approximate footprint / form |
 | --- | --- | --- |
-| `woodland_oak_spreading` | 8.5 m | 10.2 × 10.2 m, grown broad dome on a short bole |
-| `woodland_oak_upright` | 12.9 m | 7.7 × 9 m, grown with a stronger leader, taller than it spreads |
-| `woodland_birch` | 11.9 m | 5.8 × 6.2 m, grown slender leader and hanging laterals |
-| `woodland_scots_pine` | 10.1 m | 4.4 × 4.7 m, grown whorled tiers shed below |
-| `woodland_spruce` | 9.9 m | 5 × 6 m, grown dense cone kept to the ground |
+| `woodland_oak_spreading` | 7.5 m | 5.5 × 6.9 m, grown open crown of a few limbs on a short bole |
+| `woodland_oak_upright` | 12.9 m | 7.8 × 9 m, grown with a stronger leader, taller than it spreads |
+| `woodland_birch` | 11.9 m | 5.5 × 5.2 m, grown slender leader and hanging laterals |
+| `woodland_scots_pine` | 10.1 m | 4.5 × 4.7 m, grown whorled tiers shed below |
+| `woodland_spruce` | 9.9 m | 4.6 × 5.2 m, grown dense cone kept to the ground |
 | `woodland_pine` | 10.4 m | 4.3 × 4.3 m, eight drawn tapering foliage tiers |
 | `woodland_oak_sapling` | 3.2 m | 2.3 × 2.1 m |
 | `woodland_pine_sapling` | 3.2 m | 1.4 × 1.4 m |
@@ -37,10 +38,8 @@ obvious repetition. Source instances have no extra scale transform.
 | `woodland_stump_cut` | 0.6 m | 2.1 × 2 m root spread, cut face and growth ring |
 | `woodland_stump_hollow` | 0.8 m | 2.1 × 2 m root spread, open cavity with recessed bed |
 | `woodland_fallen_log` | 1.1 m | 3.8 × 0.8 m, along local x, with a broken branch stub |
-| `woodland_hazel` | 1.8 m | 2.4 × 2.4 m, grown multi-stem tall shrub |
-| `woodland_shrub_low` | 0.9 m | 1.6 × 1.7 m, grown mat of short stems |
-| `woodland_<grown id>_sparse` | as its twin | its twin thinned; width may shrink with the twigs |
-| `woodland_<grown id>_sparser` | up to its twin's | thinned further; limbs go too, so a crown of laterals loses some height |
+| `woodland_hazel` | 2.2 m | 2.9 × 3 m, grown multi-stem tall shrub, clumps swollen to the grain |
+| `woodland_shrub_low` | 1.3 m | 2.2 × 2.3 m, grown mat of short stems, clumps swollen to the grain |
 | `woodland_fern` | 0.54 m | 1.6 × 1.65 m, seven fronds with finite-thickness leaflets |
 | `woodland_grass` | 0.5 m | 0.75 × 0.75 m, twenty finite-thickness blades |
 | `woodland_boulder_broad` | 2 m | 3.4 × 2.6 m |
@@ -54,7 +53,7 @@ opaque crown volumes are not a biomass, structural-strength or canopy-collision 
 ## Sources and examples
 
 - `woodland.spec.libsonnet`: variation measures, roots/rock floors, asset identities, the grown rows' species,
-  seeds and grain, and the thinned looks' densities.
+  seeds, grain and density.
 - `grown.species.libsonnet`: the habits trees and shrubs grow from, and each one's finish; fields are documented in
   `tools/packages/thing-authoring-tool/src/growth/species.ts`.
 - `woodland.libsonnet`: compound geometry and finish selection. Functions stay here; the catalogue set is plain data.

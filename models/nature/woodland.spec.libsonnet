@@ -6,24 +6,20 @@
   mossBase: 0.6,  // Material regions meet on a voxel plane, not halfway through a shared cell.
   // Trees and shrubs grown from a species (grown.species.libsonnet) and a seed; the seed picks one tree of the habit.
   // They voxelize at the world's standard grain, wood and leaves alike, so a crown reads as blocky as the world it
-  // stands in and a tree costs a few thousand triangles; a row's own `grain` overrides it. A shrub's clumps are thinner
-  // than that grain, so at it a shrub swells by half again and a low one doubles in height: they keep a finer one.
+  // stands in and a tree costs a few thousand triangles; a row's own `grain` overrides it. Shrubs take it too, though
+  // their clumps are thinner than a cell and swell to it: a leaf shader's cutout lets a coarse clump read as leaves.
   grownGrain: 0.5,
+  // A sparse crown a player can hide in, though not easily, and that a scene of many trees can afford; a row's own
+  // `density` overrides it.
+  grownDensity: 0.2,
   grown: [
     { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', species: 'broadleaf', seed: 1, kg: 3600 },
     { id: 'woodland_oak_upright', title: 'Upright woodland oak', species: 'upright', seed: 1, kg: 3200 },
     { id: 'woodland_birch', title: 'Woodland birch', species: 'birch', seed: 1, kg: 900 },
     { id: 'woodland_scots_pine', title: 'Woodland Scots pine', species: 'conifer', seed: 1, kg: 1400 },
     { id: 'woodland_spruce', title: 'Woodland spruce', species: 'spruce', seed: 1, kg: 1600 },
-    { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8, grain: 0.04 },
-    { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3, grain: 0.02 },
-  ],
-  // Each grown row also ships thinned to each look's density, as `<id><suffix>`. `_sparse` is an open woodland a game
-  // can see and walk through, and the cheaper draw a scene of many trees wants; deadvox's woodland is to draw these.
-  // `_sparser` is on trial: a crown a player can still hide in, though not easily, and see out of.
-  thinned: [
-    { density: 0.5, suffix: '_sparse', title: ', sparse' },
-    { density: 0.2, suffix: '_sparser', title: ', sparser' },
+    { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8 },
+    { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3 },
   ],
   // Drawn by hand: the cone pine #304 drew stands beside the grown pine as its own variant, and the saplings.
   trees: [
