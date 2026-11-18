@@ -64,6 +64,12 @@ function facetMap(tags) {
 }
 
 /**
+ * The facet map a taxonomy holds; a taxonomy that is not an object holds none.
+ * @param {unknown} taxonomy
+ */
+export const taxonomyTags = (taxonomy) => facetMap(isObject(taxonomy) ? taxonomy.tags : undefined);
+
+/**
  * The terms a taxonomy's tags give `facet`, none if they name none.
  * @param {unknown} tags
  * @param {string} facet
