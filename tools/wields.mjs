@@ -19,6 +19,7 @@ import {
   mulMM,
   mulMV,
   normalize,
+  quatToMat3,
   rotAxis,
   rotX,
   rotY,
@@ -275,19 +276,53 @@ export function wieldSequences(wields) {
   return sequences;
 }
 
-// How far an elbow may swing from its blended pole, in degrees, nearest first.
+// How far an elbow may swing from its pole, in degrees, nearest first.
 const SWINGS = [0, ...Array.from({ length: 6 }, (_, i) => 10 * (i + 1)).flatMap((swing) => [swing, -swing])];
 
 // The first bone of the chain that reaches a hand.
 const shoulderOf = (rig, hand) =>
   rig.bones.find((bone) => bone.id === rig.bones.find((b) => b.id === hand).reach.chain[0]);
 
-// The bones that move a hand to a hold: its arm from the shoulder down, the digits too. Parents come first in the rig.
-const armBones = (rig, hand) => {
-  const ids = new Set([shoulderOf(rig, hand).id]);
+// Bone `id` and every bone below it. Parents come first in the rig.
+const limbFrom = (rig, id) => {
+  const ids = new Set([id]);
   for (const bone of rig.bones) if (ids.has(bone.parent)) ids.add(bone.id);
   return ids;
 };
+
+// The bones that move a hand to a hold: its arm from the shoulder down, the digits too.
+const armBones = (rig, hand) => limbFrom(rig, shoulderOf(rig, hand).id);
+
+/**
+ * The holds of a pose file (`hold`) with each elbow's pole swung `swing` degrees about the line from its shoulder, as
+ * `stood` (bone transforms) stands it, to its socket on the item, which moves the elbow and leaves the hand where it is.
+ */
+const swungHolds = (rig, hold, stood, swing) =>
+  mapValues(hold, (entry, id) => {
+    const shoulder = shoulderOf(rig, id);
+    const item = { r: quatToMat3(entry.turn), t: entry.at };
+    const reach = sub(applyPoint(item, entry.socket.at), applyPoint(stood.get(shoulder.id), shoulder.head));
+    return { ...entry, pole: mulMV(rotAxis(normalize(reach), swing), entry.pole) };
+  });
+
+// How far a compiled pose's joints were asked past their limits, in degrees summed.
+const bent = ({ report }) =>
+  report.clamped.reduce((sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0), 0);
+
+/**
+ * The pose `posedAt(swing)` compiles with its elbows swung by the least of `SWINGS` that holds every joint within its
+ * limits, else the one asking least past them: poles that hold a wrist within its limits in one pose do not in every
+ * pose near it, and swinging the elbow about the line from shoulder to grip turns the wrist without moving the hand.
+ */
+function leastBent(posedAt) {
+  let best;
+  for (const swing of SWINGS) {
+    const compiled = posedAt(swing);
+    if (bent(compiled) === 0) return compiled;
+    if (!best || bent(compiled) < bent(best)) best = compiled;
+  }
+  return best;
+}
 
 /**
  * Where the weapon rides on its leading hand: the transform `{ r, t }` that carries the weapon's file into the hand
@@ -370,45 +405,23 @@ function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
     const hand = stood.get(cls.weapon.lead);
     const item = { r: mulMM(hand.r, seat.r), t: add(mulMV(hand.r, seat.t), hand.t) };
     const hands = Object.fromEntries(others.map((id) => [id, cls.weapon.hands[id].hands]));
-    const gripped = (swing) =>
-      compilePose(
-        rig,
+    const hold = Object.fromEntries(
+      others.map((id) => [
+        id,
         {
-          ...header,
-          angles,
-          hands,
-          hold: Object.fromEntries(
-            others.map((id) => {
-              const shoulder = shoulderOf(rig, id);
-              const reach = sub(applyPoint(item, sockets[id].at), applyPoint(stood.get(shoulder.id), shoulder.head));
-              const pole = normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w));
-              return [
-                id,
-                {
-                  model: cls.weapon.model,
-                  at: item.t,
-                  turn: mat3ToQuat(item.r),
-                  pole: mulMV(rotAxis(normalize(reach), swing), pole),
-                  socket: sockets[id],
-                  ...graspOf(cls.weapon.hands[id]),
-                },
-              ];
-            }),
-          ),
+          model: cls.weapon.model,
+          at: item.t,
+          turn: mat3ToQuat(item.r),
+          pole: normalize(lerpV(normalize(a.poles[id]), normalize(b.poles[id]), w)),
+          socket: sockets[id],
+          ...graspOf(cls.weapon.hands[id]),
         },
-        { meshOf },
-      );
-    // The keys' poles hold the wrist within its limits at the keys, not always between them: there the elbow swings
-    // about the line from shoulder to grip, the least it must, until the wrist takes the haft within them.
-    const bent = ({ report }) =>
-      report.clamped.reduce((sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0), 0);
-    let best;
-    for (const swing of SWINGS) {
-      const compiled = gripped(swing);
-      if (bent(compiled) === 0) return compiled;
-      if (!best || bent(compiled) < bent(best)) best = compiled;
-    }
-    return best;
+      ]),
+    );
+    // The keys' poles hold the wrist within its limits at the keys, not always between them.
+    return leastBent((swing) =>
+      compilePose(rig, { ...header, angles, hands, hold: swungHolds(rig, hold, stood, swing) }, { meshOf }),
+    );
   };
   for (const [stance, key] of Object.entries(cls.stances)) {
     const { frame, report } = compileKey(key);
