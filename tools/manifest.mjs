@@ -1,3 +1,5 @@
+// @ts-check
+/** @import { MobRow, SoundRow } from './layout.mjs' */
 // manifest.json: every produced model by id, kind, pack, logical path, taxonomy, part node names, label, the doll part a
 // wearable sits on (tools/dress.mjs, `wornOnParts`), what a worn shell covers and how far footwear lifts the foot, the authored mass and drawn volume of a model whose tool authors them, and credits, every vehicle's
 // placements file and tags (tools/placements.mjs), every sound row's data and baked files (tools/sounds.mjs), and every
@@ -10,11 +12,59 @@ import { join, resolve } from 'node:path';
 import { outputPath, undeclaredDirectories } from './layout.mjs';
 import { manifestTaxonomy } from './taxonomy.mjs';
 
+/** @typedef {{ path: string[]; 'SPDX-FileCopyrightText': string; 'SPDX-License-Identifier': string }} Annotation */
+/** @typedef {(path: string) => { author: string; licence: string }} Credit A repo path's author and licence. */
+/** @typedef {{ mob: string; bone: string; without: unknown; index: string }} SeveredCut */
+/**
+ * A built model as the manifest lists it; paths are logical under the pack.
+ * @typedef {object} ManifestModel
+ * @property {string} id
+ * @property {unknown} [title]
+ * @property {string} kind
+ * @property {string} pack
+ * @property {string} path
+ * @property {{ pack: string; path: string } | undefined} [smooth]
+ * @property {unknown} [taxonomy]
+ * @property {readonly string[] | undefined} [nodes]
+ * @property {unknown} [label]
+ * @property {object | undefined} [wornOn]
+ * @property {readonly string[] | undefined} [covers]
+ * @property {number | undefined} [soleLift]
+ * @property {number | undefined} [massKg]
+ * @property {number | undefined} [volumeM3]
+ * @property {string | undefined} [clips]
+ * @property {string | undefined} [body]
+ * @property {string | undefined} [genome]
+ * @property {SeveredCut | undefined} [cut]
+ */
+/**
+ * A severed-part plan (tools/severedParts.mjs).
+ * @typedef {object} SeveredPlan
+ * @property {string} mob
+ * @property {string} pack
+ * @property {string} index
+ * @property {readonly { bone: string; without: unknown; id: string; title: unknown; path: string; taxonomy: unknown }[]} parts
+ */
+/** @typedef {ReturnType<typeof soundManifest>['sounds'][number]} ManifestSound */
+/** @typedef {{ id: string; title: unknown; pack: string; path: string; tags: unknown }} ManifestVehicle */
+/** @typedef {{ id: string; pack: string; path: string; rig: string }} ManifestMotion */
+/**
+ * What of a manifest its file list and the tree check read.
+ * @typedef {object} ManifestFiles
+ * @property {Readonly<Record<string, { files: readonly string[] }>>} packs
+ * @property {readonly { pack: string; smooth?: { pack: string } | undefined }[]} models
+ * @property {readonly { pack: string }[]} sounds
+ */
+
 const repo = resolve(import.meta.dirname, '..');
 export const MANIFEST = 'manifest.json';
 export const RENAMES = 'models/renames.json';
+const ANNOTATION_KEYS = /** @type {const} */ (['path', 'SPDX-FileCopyrightText', 'SPDX-License-Identifier']);
 
-// REUSE's path globs: `**` crosses directories, `*` and `?` do not.
+/**
+ * REUSE's path globs: `**` crosses directories, `*` and `?` do not.
+ * @param {string} glob
+ */
 const globPattern = (glob) =>
   new RegExp(
     `^${glob
@@ -29,11 +79,20 @@ const globPattern = (glob) =>
   );
 
 const STRING = /^"((?:[^"\\]|\\.)*)"$/;
+/**
+ * @param {string} text
+ * @param {string} where
+ * @returns {string}
+ */
 const unquote = (text, where) => {
   const match = STRING.exec(text);
   if (!match) throw new Error(`REUSE.toml ${where}: expected a string, read ${text}`);
   return JSON.parse(`"${match[1]}"`);
 };
+/**
+ * @param {string} text
+ * @param {string} where
+ */
 const stringList = (text, where) => {
   if (!text.startsWith('[') || !text.endsWith(']')) throw new Error(`REUSE.toml ${where}: expected a list of strings`);
   return text
@@ -44,9 +103,24 @@ const stringList = (text, where) => {
     .map((item) => unquote(item, where));
 };
 
+/**
+ * An annotation that holds every key, or a thrown error naming the first it lacks.
+ * @param {Partial<Annotation>} annotation
+ * @returns {Annotation}
+ */
+function completeAnnotation(annotation) {
+  const { path, 'SPDX-FileCopyrightText': author, 'SPDX-License-Identifier': licence } = annotation;
+  const missing = ANNOTATION_KEYS.find((key) => !Object.hasOwn(annotation, key));
+  if (missing !== undefined || path === undefined || author === undefined || licence === undefined)
+    throw new Error(`REUSE.toml: an annotation has no ${missing}`);
+  return { ...annotation, path, 'SPDX-FileCopyrightText': author, 'SPDX-License-Identifier': licence };
+}
+
 // The annotations of REUSE.toml, read strictly: a line the reader does not know is an error, never skipped.
 export function readAnnotations(root = repo) {
+  /** @type {Partial<Annotation>[]} */
   const annotations = [];
+  /** @type {Partial<Annotation> | undefined} */
   let current;
   readFileSync(join(root, 'REUSE.toml'), 'utf8')
     .split('\n')
@@ -59,9 +133,8 @@ export function readAnnotations(root = repo) {
         annotations.push(current);
         return;
       }
-      const match = /^([A-Za-z][A-Za-z0-9_-]*)\s*=\s*(.+)$/.exec(line);
-      if (!match) throw new Error(`REUSE.toml ${where}: unknown line ${line}`);
-      const [, key, value] = match;
+      const [, key, value] = /^([A-Za-z][A-Za-z0-9_-]*)\s*=\s*(.+)$/.exec(line) ?? [];
+      if (key === undefined || value === undefined) throw new Error(`REUSE.toml ${where}: unknown line ${line}`);
       if (current === undefined) {
         if (key !== 'version' || value !== '1')
           throw new Error(`REUSE.toml ${where}: only version = 1 precedes the annotations`);
@@ -73,15 +146,16 @@ export function readAnnotations(root = repo) {
         current[key] = unquote(value, where);
       else throw new Error(`REUSE.toml ${where}: unknown key ${key}`);
     });
-  for (const annotation of annotations) {
-    for (const key of ['path', 'SPDX-FileCopyrightText', 'SPDX-License-Identifier']) {
-      if (!Object.hasOwn(annotation, key)) throw new Error(`REUSE.toml: an annotation has no ${key}`);
-    }
-  }
-  return annotations.map((annotation) => ({ ...annotation, patterns: annotation.path.map(globPattern) }));
+  return annotations.map(completeAnnotation).map((annotation) => ({
+    ...annotation,
+    patterns: annotation.path.map(globPattern),
+  }));
 }
 
-// path (relative to the repo) -> { author, licence } of the last annotation that matches it.
+/**
+ * path (relative to the repo) -> { author, licence } of the last annotation that matches it.
+ * @returns {Credit}
+ */
 export function readCredits(root = repo) {
   const annotations = readAnnotations(root);
   return (path) => {
@@ -91,11 +165,18 @@ export function readCredits(root = repo) {
   };
 }
 
-// Retired model id -> the current id that replaces it.
+/**
+ * Retired model id -> the current id that replaces it.
+ * @returns {Readonly<Record<string, string>>}
+ */
 export const readRenames = (root = repo) => JSON.parse(readFileSync(join(root, RENAMES), 'utf8'));
 
-// A consumer moving its pin over several releases maps each id it holds with one lookup, so every target is a current
-// id; a retired id that named a model again would make that lookup ambiguous.
+/**
+ * A consumer moving its pin over several releases maps each id it holds with one lookup, so every target is a current
+ * id; a retired id that named a model again would make that lookup ambiguous.
+ * @param {Readonly<Record<string, string>>} renames
+ * @param {readonly { id: string }[]} models
+ */
 function renameProblems(renames, models) {
   const current = new Set(models.map(({ id }) => id));
   return Object.entries(renames).flatMap(([from, to]) => [
@@ -107,8 +188,14 @@ function renameProblems(renames, models) {
 // Every mob row is an actor model with a body, pose clips and the genome it was built from. Every severed-part plan
 // (tools/severedParts.mjs) adds its pack's index and a model per part, which names the mob type and bone it is cut at
 // and the cut points below already gone.
+/**
+ * @param {readonly MobRow[]} rows
+ * @param {readonly SeveredPlan[]} [severed]
+ */
 export function mobManifest(rows, severed = []) {
+  /** @type {ManifestModel[]} */
   const models = [];
+  /** @type {string[]} */
   const files = [];
   for (const row of rows) {
     models.push({
@@ -133,16 +220,32 @@ export function mobManifest(rows, severed = []) {
   return { models, files };
 }
 
-// Every sound row is its row as data and one audio file per seed, all baked at the one sample rate.
+/**
+ * The id of the object or surface a sound row is the sound of, or a thrown error naming the row.
+ * @param {SoundRow} sound
+ * @param {'object' | 'surface'} field
+ */
+function soundPartId(sound, field) {
+  const value = sound.row[field];
+  const id = typeof value === 'object' && value !== null && 'id' in value ? value.id : undefined;
+  if (typeof id !== 'string') throw new Error(`sound ${sound.id}: its row's ${field} has no id`);
+  return id;
+}
+
+/**
+ * Every sound row is its row as data and one audio file per seed, all baked at the one sample rate.
+ * @param {readonly SoundRow[]} rows
+ * @param {number} sampleRate
+ */
 export function soundManifest(rows, sampleRate) {
-  const sounds = rows.map(({ id, pack, row, data, variants }) => ({
-    id,
-    pack,
-    object: row.object.id,
-    surface: row.surface.id,
+  const sounds = rows.map((sound) => ({
+    id: sound.id,
+    pack: sound.pack,
+    object: soundPartId(sound, 'object'),
+    surface: soundPartId(sound, 'surface'),
     sampleRate,
-    row: data,
-    variants,
+    row: sound.data,
+    variants: sound.variants,
   }));
   const files = rows.flatMap(({ pack, data, variants }) => [
     outputPath(pack, data),
@@ -151,26 +254,24 @@ export function soundManifest(rows, sampleRate) {
   return { sounds, files };
 }
 
-const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
-
-// models: { id, kind, pack, path, smooth?: { pack, path }, title, taxonomy?, nodes?, label?, wornOn?, covers?, soleLift?,
-// clips?, body?, genome?, massKg?, volumeM3? },
-// paths logical under the pack; vehicles: { id, title, pack, path, tags } of each vehicle's placements; motions: { id,
-// pack, path, rig } of each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as
-// <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id; finishes:
-// finish id -> its glTF material; sounds: as soundManifest gives them.
 /**
- * @param {{
- *   models: readonly { id: string; pack: string; path: string }[];
- *   vehicles?: readonly unknown[];
- *   motions?: readonly unknown[];
- *   sounds?: readonly unknown[];
- *   dependsOn?: Readonly<Record<string, readonly string[]>>;
- *   files: readonly string[];
- *   credit: unknown;
- *   renames?: Readonly<Record<string, string>>;
- *   finishes?: Readonly<Record<string, unknown>>;
- * }} manifest
+ * @param {string} a
+ * @param {string} b
+ */
+const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const MODEL_FILES = /** @type {const} */ (['clips', 'body', 'genome']);
+
+/**
+ * @param {object} manifest
+ * @param {readonly ManifestModel[]} manifest.models
+ * @param {readonly ManifestVehicle[]} [manifest.vehicles] each vehicle's placements
+ * @param {readonly ManifestMotion[]} [manifest.motions] each baked clip set
+ * @param {readonly ManifestSound[]} [manifest.sounds] as soundManifest gives them
+ * @param {Readonly<Record<string, readonly string[]>>} [manifest.dependsOn] pack -> the packs it depends on
+ * @param {readonly string[]} manifest.files every produced file as <pack>/<logical path>
+ * @param {Credit} manifest.credit
+ * @param {Readonly<Record<string, string>>} [manifest.renames] retired id -> current id
+ * @param {Readonly<Record<string, unknown>>} [manifest.finishes] finish id -> its glTF material
  */
 export function buildManifest({
   models,
@@ -183,11 +284,12 @@ export function buildManifest({
   renames = {},
   finishes = {},
 }) {
+  /** @type {Record<string, { dependsOn: readonly string[]; files: string[] }>} */
   const packs = {};
   for (const file of [...new Set(files)].sort(byText)) {
-    const [pack, ...rest] = file.split('/');
+    const [pack = '', ...rest] = file.split('/');
     outputPath(pack, rest.join('/'));
-    packs[pack] ??= { dependsOn: Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : [], files: [] };
+    packs[pack] ??= { dependsOn: (Object.hasOwn(dependsOn, pack) ? dependsOn[pack] : undefined) ?? [], files: [] };
     packs[pack].files.push(rest.join('/'));
   }
   for (const [pack, { dependsOn: targets }] of Object.entries(packs)) {
@@ -201,8 +303,9 @@ export function buildManifest({
     .map((model) => {
       const file = outputPath(model.pack, model.path);
       if (!known.has(file)) throw new Error(`${model.id}: ${file} is not a produced file`);
-      for (const role of ['clips', 'body', 'genome']) {
-        if (model[role] !== undefined && !known.has(outputPath(model.pack, model[role])))
+      for (const role of MODEL_FILES) {
+        const path = model[role];
+        if (path !== undefined && !known.has(outputPath(model.pack, path)))
           throw new Error(`${model.id}: its ${role} is not a produced file`);
       }
       if (model.cut !== undefined && !known.has(outputPath(model.pack, model.cut.index)))
@@ -280,9 +383,13 @@ export function buildManifest({
   };
 }
 
+/** @param {object} manifest */
 export const manifestJson = (manifest) => `${JSON.stringify(manifest, null, 2)}\n`;
 
-// Every file a manifest names, as a repo path under built/, the manifest itself included.
+/**
+ * Every file a manifest names, as a repo path under built/, the manifest itself included.
+ * @param {ManifestFiles} manifest
+ */
 export function manifestFiles(manifest) {
   return new Set([
     `built/${MANIFEST}`,
@@ -295,6 +402,12 @@ export function manifestFiles(manifest) {
 // How a fresh tree departs from its manifest and the declared packs (layout.mjs, declaredPacks): nothing flat but the
 // manifest, the manifest names exactly the produced files, every directory is a declared pack, and every declared pack
 // has a model or a sound, so a pack whose rows the production build skips is caught. files: the tree's files under built/.
+/**
+ * @param {object} tree
+ * @param {readonly string[]} tree.files
+ * @param {ManifestFiles} tree.manifest
+ * @param {ReadonlySet<string>} tree.declared
+ */
 export function treeDifferences({ files, manifest, declared }) {
   const produced = new Set(files);
   const named = manifestFiles(manifest);

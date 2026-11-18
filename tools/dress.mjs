@@ -1,78 +1,200 @@
+// @ts-check
 // Dressing a wearable on the doll, the default player avatar, by the rule in models/dressing.libsonnet: the sites the
 // showcase (site/build.mjs) composes into its worn view, which the review sheets draw too. A site is
 // { model, at, mirror?, turn? }: the model mirrored across its own x = 0 plane, then turned by the quaternion `turn`,
 // then moved by `at`, as site/render.mjs places it. A worn piece's site adds the doll part copy it rides
 // { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs). Footwear's site carries the
 // lift its sole stands the figure on { soleLift }.
+/** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
+/** @import { GltfMesh, GltfNode } from './glb.mjs' */
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { glbAccessor, glbJson } from './glb.mjs';
+import { glbAccessor, glbItem, glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
+import { facetTerms } from './taxonomy.mjs';
+
+/** @typedef {[number, number, number, number]} Quaternion */
+/** @typedef {{ min: Vec3; max: Vec3 }} Box */
+
+/**
+ * A place a wearable with no pieces sits by: at a bust anchor, or rested against a doll part.
+ * @typedef {{ slot: string; anchor: string; part?: never; both?: never }} AnchorPlace
+ * @typedef {{ slot: string; anchor?: never; part: string; against: Vec3; sink: number; both?: boolean }} RestPlace
+ * @typedef {AnchorPlace | RestPlace} Place
+ */
+
+/**
+ * models/dressing.libsonnet.
+ * @typedef {object} Dressing
+ * @property {{ bust: string; limbs: { model: string; anchor: string }[]; sides: [string, string]; mirrored: string }} doll
+ * @property {string[]} layers
+ * @property {string[]} lying
+ * @property {string} piece
+ * @property {Place[]} places
+ * @property {Readonly<Record<string, readonly string[]>>} regions
+ * @property {Readonly<Record<string, { part: string; slot: string }>>} slots
+ */
+
+/**
+ * A model as dressing reads it; its tags are whatever its taxonomy holds (tools/taxonomy.mjs, facetTerms).
+ * @typedef {object} DressModel
+ * @property {string} id
+ * @property {unknown} [tags]
+ * @property {readonly string[] | undefined} [covers]
+ * @property {number | undefined} [soleLift]
+ */
+
+/** @typedef {{ part: string; at: Vec3; box: Box }} ModelPart */
+/** @typedef {{ parts: readonly ModelPart[]; anchors: Readonly<Record<string, Vec3>> }} FigureModel */
+/** @typedef {{ model: string; at: Vec3; mirror?: boolean }} DollSite */
+/** @typedef {{ part: string; side: string; site: number; at: Vec3; box: Box; mirror?: boolean }} PartCopy */
+/** @typedef {ReturnType<typeof dollOf>} Doll */
+/** @typedef {{ anchors: Readonly<Record<string, string>>; sided: readonly string[] }} DollParts */
+/** @typedef {{ part: string; both?: boolean; side?: string; anchor?: string }} WornOn */
 
 const repo = resolve(import.meta.dirname, '..');
 
+/** @returns {Dressing} */
 export const readDressing = (root = repo) => JSON.parse(evaluateJsonnet("import 'models/dressing.libsonnet'", root));
 
 // ---- boxes and transforms ----
 
-const AXES = [0, 1, 2];
+/**
+ * @param {(axis: 0 | 1 | 2) => number} f
+ * @returns {Vec3}
+ */
+const perAxis = (f) => [f(0), f(1), f(2)];
+/** @returns {Box} */
 const empty = () => ({ min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] });
+/** @param {readonly Box[]} boxes */
 const union = (boxes) =>
   boxes.reduce(
     (into, { min, max }) => ({
-      min: AXES.map((a) => Math.min(into.min[a], min[a])),
-      max: AXES.map((a) => Math.max(into.max[a], max[a])),
+      min: perAxis((a) => Math.min(into.min[a], min[a])),
+      max: perAxis((a) => Math.max(into.max[a], max[a])),
     }),
     empty(),
   );
-const corners = ({ min, max }) =>
-  [0, 1, 2, 3, 4, 5, 6, 7].map((i) => AXES.map((a) => ((i >> a) & 1 ? max[a] : min[a])));
+/** @param {Box} box */
+const corners = ({ min, max }) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => perAxis((a) => ((i >> a) & 1 ? max[a] : min[a])));
+/** @param {readonly Vec3[]} points */
 const boxOf = (points) => union(points.map((p) => ({ min: p, max: p })));
-const moved = (box, by) => ({ min: box.min.map((x, a) => x + by[a]), max: box.max.map((x, a) => x + by[a]) });
+/**
+ * @param {Box} box
+ * @param {Vec3} by
+ * @returns {Box}
+ */
+const moved = (box, by) => ({ min: perAxis((a) => box.min[a] + by[a]), max: perAxis((a) => box.max[a] + by[a]) });
+/**
+ * @param {Vec3} p
+ * @returns {Vec3}
+ */
 const mirrorX = ([x, y, z]) => [-x, y, z];
+/**
+ * @param {Box} box
+ * @returns {Box}
+ */
 const mirrored = ({ min, max }) => ({ min: [-max[0], min[1], min[2]], max: [-min[0], max[1], max[2]] });
-const sum = (a, b) => a.map((x, i) => x + b[i]);
-const difference = (a, b) => a.map((x, i) => x - b[i]);
-const centre = ({ min, max }) => min.map((x, a) => (x + max[a]) / 2);
+/**
+ * @param {Vec3} a
+ * @param {Vec3} b
+ */
+const sum = (a, b) => perAxis((i) => a[i] + b[i]);
+/**
+ * @param {Vec3} a
+ * @param {Vec3} b
+ */
+const difference = (a, b) => perAxis((i) => a[i] - b[i]);
+/** @param {Box} box */
+const centre = ({ min, max }) => perAxis((a) => (min[a] + max[a]) / 2);
 
+/**
+ * @param {Quaternion} q
+ * @param {Vec3} v
+ */
 const rotate = ([x, y, z, w], v) => {
   // v + 2w(q × v) + 2q × (q × v)
+  /** @type {Vec3} */
   const q = [x, y, z];
+  /**
+   * @param {Vec3} a
+   * @param {Vec3} b
+   * @returns {Vec3}
+   */
   const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  const t = cross(q, v).map((c) => 2 * c);
+  const c = cross(q, v);
+  const t = perAxis((a) => 2 * c[a]);
   return sum(
     sum(
       v,
-      t.map((c) => w * c),
+      perAxis((a) => w * t[a]),
     ),
     cross(q, t),
   );
 };
+/**
+ * @param {Box} box
+ * @param {Quaternion} turn
+ */
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
 
-// A glTF node's transform as a function of a point in its own frame.
+/**
+ * A glTF node's transform as a function of a point in its own frame.
+ * @param {GltfNode} node
+ * @returns {(p: Vec3) => Vec3}
+ */
 const nodeTransform =
   ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale = [1, 1, 1] }) =>
   (p) =>
     sum(
       rotate(
         rotation,
-        p.map((x, a) => x * scale[a]),
+        perAxis((a) => p[a] * scale[a]),
       ),
       translation,
     );
 
+/**
+ * The point of a flat xyz list that starts at `at`.
+ * @param {readonly number[]} list
+ * @param {number} at
+ */
+const pointAt = (list, at) =>
+  perAxis((a) => {
+    const x = list[at + a];
+    if (x === undefined) throw new Error(`a point list of ${list.length} numbers has no point at ${at}`);
+    return x;
+  });
+
 // ---- reading a built model ----
 
-// Each mesh node of a GLB's scene with the part it belongs to (the nearest node marking `extras.part`, as the export
-// does), that part node's origin in the model frame, the node's box in the model frame, its mesh and the transform from
-// the node's frame to the model frame.
+/**
+ * @typedef {object} MeshNode
+ * @property {{ name: string; at: Vec3; turned: boolean } | undefined} part
+ * @property {Box} box
+ * @property {GltfMesh} mesh
+ * @property {(p: Vec3) => Vec3} toModel
+ */
+
+/**
+ * Each mesh node of a GLB's scene with the part it belongs to (the nearest node marking `extras.part`, as the export
+ * does), that part node's origin in the model frame, the node's box in the model frame, its mesh and the transform from
+ * the node's frame to the model frame.
+ * @param {Buffer} buffer
+ */
 function meshNodes(buffer, gltf = glbJson(buffer)) {
+  /** @type {MeshNode[]} */
   const found = [];
+  /**
+   * @param {number} index
+   * @param {(p: Vec3) => Vec3} toModel
+   * @param {MeshNode['part']} part
+   */
   const walk = (index, toModel, part) => {
-    const node = gltf.nodes[index];
+    const node = glbItem(gltf.nodes, index, 'node');
     const local = nodeTransform(node);
+    /** @param {Vec3} p */
     const here = (p) => toModel(local(p));
     const own =
       node.extras?.part === undefined
@@ -80,29 +202,38 @@ function meshNodes(buffer, gltf = glbJson(buffer)) {
         : {
             name: node.extras.part,
             at: here([0, 0, 0]),
-            turned: Boolean(node.rotation) && node.rotation.some((x, i) => x !== (i === 3 ? 1 : 0)),
+            turned: node.rotation?.some((x, i) => x !== (i === 3 ? 1 : 0)) ?? false,
           };
     if (node.mesh !== undefined) {
+      const mesh = glbItem(gltf.meshes, node.mesh, 'mesh');
       const box = union(
-        gltf.meshes[node.mesh].primitives.map(({ attributes }) => {
-          const { min, max } = gltf.accessors[attributes.POSITION];
+        mesh.primitives.map(({ attributes }) => {
+          const { min, max } = glbItem(gltf.accessors, attributes.POSITION, 'accessor');
+          if (!min || !max) throw new Error(`the GLB's position accessor ${attributes.POSITION} has no bounds`);
           return boxOf(corners({ min, max }).map(here));
         }),
       );
-      found.push({ part: own, box, mesh: gltf.meshes[node.mesh], toModel: here });
+      found.push({ part: own, box, mesh, toModel: here });
     }
     for (const child of node.children ?? []) walk(child, here, own);
   };
-  for (const index of gltf.scenes[gltf.scene ?? 0].nodes) walk(index, (p) => p, undefined);
+  for (const index of glbItem(gltf.scenes, gltf.scene ?? 0, 'scene').nodes) walk(index, (p) => p, undefined);
   return found;
 }
 
-// A model's box in its own frame.
+/**
+ * A model's box in its own frame.
+ * @param {Buffer} buffer
+ */
 export const modelBox = (buffer) => union(meshNodes(buffer).map(({ box }) => box));
 
-// Each part of a model: its name, origin and box in the model frame. A doll part's frame is where a worn piece is
-// drawn, so a part turned off the model's axes is refused rather than drawn askew.
+/**
+ * Each part of a model: its name, origin and box in the model frame. A doll part's frame is where a worn piece is
+ * drawn, so a part turned off the model's axes is refused rather than drawn askew.
+ * @param {Buffer} buffer
+ */
 export function modelParts(buffer) {
+  /** @type {Map<string, ModelPart>} */
   const byName = new Map();
   for (const { part, box } of meshNodes(buffer)) {
     if (!part) continue;
@@ -116,11 +247,16 @@ export function modelParts(buffer) {
 
 const TRIANGLES = 4;
 
-// Each part of a model as one triangle mesh in the model frame, { part, positions: xyz triples, indices }, so a check can
-// test points against the part's surface. `keep(part, piece, slot)` picks the primitives, by their part and the piece
-// and material slot the export marks them as, if any; every one by default.
+/**
+ * Each part of a model as one triangle mesh in the model frame, { part, positions: xyz triples, indices }, so a check can
+ * test points against the part's surface. `keep(part, piece, slot)` picks the primitives, by their part and the piece
+ * and material slot the export marks them as, if any; every one by default.
+ * @param {Buffer} buffer
+ * @param {(part: string, piece: string | undefined, slot: string | undefined) => boolean} [keep]
+ */
 export function modelMeshes(buffer, keep = () => true) {
   const gltf = glbJson(buffer);
+  /** @type {Map<string, { part: string; positions: number[]; indices: number[]; pieces: (string | undefined)[] }>} */
   const byName = new Map();
   for (const { part, mesh, toModel } of meshNodes(buffer, gltf)) {
     if (!part) continue;
@@ -132,7 +268,7 @@ export function modelMeshes(buffer, keep = () => true) {
         throw new Error(`part ${part.name} draws a primitive of mode ${mode}; only triangles are read`);
       const base = into.positions.length / 3;
       const positions = glbAccessor(buffer, gltf, attributes.POSITION);
-      for (let i = 0; i < positions.length; i += 3) into.positions.push(...toModel(positions.slice(i, i + 3)));
+      for (let i = 0; i < positions.length; i += 3) into.positions.push(...toModel(pointAt(positions, i)));
       const order =
         indices === undefined
           ? Array.from({ length: positions.length / 3 }, (_, i) => i)
@@ -146,25 +282,39 @@ export function modelMeshes(buffer, keep = () => true) {
 
 // ---- the doll ----
 
-// The doll's sites, for each of its part names the copies of that part in the doll frame as
-// { side, site, at, box, mirror }, in the order of the dressing's sides, where `site` indexes the doll site that draws
-// the copy, and the bust's anchors, which are in the doll frame too. `figure` holds each doll model's `parts`
-// (modelParts) and `anchors` (its things sidecar).
+/**
+ * The doll's sites, for each of its part names the copies of that part in the doll frame as
+ * { side, site, at, box, mirror }, in the order of the dressing's sides, where `site` indexes the doll site that draws
+ * the copy, and the bust's anchors, which are in the doll frame too. `figure` holds each doll model's `parts`
+ * (modelParts) and `anchors` (its things sidecar).
+ * @param {Dressing} dressing
+ * @param {Readonly<Record<string, FigureModel>>} figure
+ */
 export function dollOf(dressing, figure) {
   const { bust, limbs, sides, mirrored: mirroredSide } = dressing.doll;
+  /** @param {string} model */
+  const figureOf = (model) => {
+    const found = figure[model];
+    if (!found) throw new Error(`doll: no parts and anchors of ${model}`);
+    return found;
+  };
+  /** @type {DollSite[]} */
   const sites = [{ model: bust, at: [0, 0, 0] }];
+  /** @type {Map<string, PartCopy[]>} */
   const parts = new Map();
+  /** @param {PartCopy} copy */
   const add = (copy) => parts.set(copy.part, [...(parts.get(copy.part) ?? []), copy]);
-  for (const { part, at, box } of figure[bust].parts) add({ part, side: 'centre', site: 0, at, box });
+  for (const { part, at, box } of figureOf(bust).parts) add({ part, side: 'centre', site: 0, at, box });
   for (const { model, anchor } of limbs) {
-    const own = figure[model].anchors[anchor];
+    const own = figureOf(model).anchors[anchor];
     for (const side of sides) {
-      const hung = figure[bust].anchors[`${anchor}_${side}`];
+      const hung = figureOf(bust).anchors[`${anchor}_${side}`];
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
+      /** @type {(p: Vec3) => Vec3} */
       const flip = mirror ? mirrorX : (p) => p;
       const site = sites.push({ model, at: difference(hung, flip(own)), ...(mirror ? { mirror } : {}) }) - 1;
-      for (const { part, at, box } of figure[model].parts) {
+      for (const { part, at, box } of figureOf(model).parts) {
         const local = moved(box, difference([0, 0, 0], own));
         add({
           part,
@@ -177,24 +327,37 @@ export function dollOf(dressing, figure) {
       }
     }
   }
-  return { sites, parts, anchors: figure[bust].anchors };
+  return { sites, parts, anchors: figureOf(bust).anchors };
 }
 
 // ---- dressing ----
 
-const tagsOf = (model, facet) => model.tags?.[facet] ?? [];
+/**
+ * @param {DressModel} model
+ * @param {string} facet
+ */
+const tagsOf = (model, facet) => facetTerms(model.tags, facet);
 
 // A worn piece's garment and segment, read from its id, `<garment>_worn` or `<garment>_worn_<segment>`; nothing for a
 // model that is no worn piece. Pieces fitted over other clothing are not worn pieces here, so the doll wears each item
 // on its own.
 const PIECE_ID = /^(.+)_worn(?:_([^_]+))?$/;
+/**
+ * @param {DressModel} model
+ * @returns {{ garment: string; segment: string | undefined } | undefined}
+ */
 function pieceOf(model) {
   if (!tagsOf(model, 'fit').includes('worn')) return undefined;
   const match = PIECE_ID.exec(model.id);
-  return match ? { garment: match[1], segment: match[2] } : undefined;
+  return match?.[1] === undefined ? undefined : { garment: match[1], segment: match[2] };
 }
 
-// The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
+/**
+ * The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
+ * @param {string} id
+ * @param {{ segment: string | undefined }} piece
+ * @param {Dressing} dressing
+ */
 function piecePart(id, { segment }, dressing) {
   if (segment === undefined) return dressing.piece;
   const slot = dressing.slots[segment];
@@ -202,8 +365,13 @@ function piecePart(id, { segment }, dressing) {
   return slot.part;
 }
 
-// The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in and what it covers of that
-// part, as its model declares, with the sole lift a foot piece declares.
+/**
+ * The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in and what it covers of that
+ * part, as its model declares, with the sole lift a foot piece declares.
+ * @param {string} id
+ * @param {readonly DressModel[]} models
+ * @param {Dressing} dressing
+ */
 export function wornPieces(id, models, dressing) {
   return models.flatMap((model) => {
     const piece = pieceOf(model);
@@ -216,25 +384,31 @@ export function wornPieces(id, models, dressing) {
   });
 }
 
-// What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
-// regions the dressing cuts that part into, since a consumer hides by those names and no other.
+/**
+ * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
+ * regions the dressing cuts that part into, since a consumer hides by those names and no other.
+ * @param {readonly DressModel[]} models
+ * @param {Dressing} dressing
+ */
 export function coversProblems(models, dressing) {
-  return models
-    .filter(({ covers }) => covers)
-    .flatMap(({ id, covers }) => {
-      const worn = /_worn(?:_([^_]+))?$/.exec(id);
-      if (!worn) return [`${id} declares what it covers but is no worn piece`];
-      const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
-      if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
-      const names = [part, ...(dressing.regions[part] ?? [])];
-      return covers
-        .filter((name) => !names.includes(name))
-        .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
-    });
+  return models.flatMap(({ id, covers }) => {
+    if (!covers) return [];
+    const worn = /_worn(?:_([^_]+))?$/.exec(id);
+    if (!worn) return [`${id} declares what it covers but is no worn piece`];
+    const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
+    if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
+    const names = [part, ...(dressing.regions[part] ?? [])];
+    return covers
+      .filter((name) => !names.includes(name))
+      .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
+  });
 }
 
-// The items any of whose worn pieces declares what it covers, by the pieces' ids, whether or not the tree holds the item
-// itself: a set of worn shells with no ground model is still dressed to check what it declares.
+/**
+ * The items any of whose worn pieces declares what it covers, by the pieces' ids, whether or not the tree holds the item
+ * itself: a set of worn shells with no ground model is still dressed to check what it declares.
+ * @param {readonly DressModel[]} models
+ */
 export const coveringItems = (models) => [
   ...new Set(
     models.flatMap((model) => {
@@ -247,15 +421,26 @@ export const coveringItems = (models) => [
   ),
 ];
 
-// Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
+/**
+ * Whether a model is worn: a loose model, not itself a piece, that names a body slot or has worn pieces.
+ * @param {DressModel} model
+ * @param {readonly DressModel[]} models
+ */
 export const isWearable = (model, models) =>
   tagsOf(model, 'fit').length === 0 &&
   (tagsOf(model, 'slot').length > 0 || models.some((other) => pieceOf(other)?.garment === model.id));
 
-// The wearables drawn as worn pieces, by the pieces' ids, whether or not the models hold the wearable itself.
+/**
+ * The wearables drawn as worn pieces, by the pieces' ids, whether or not the models hold the wearable itself.
+ * @param {readonly DressModel[]} models
+ */
 export const fittedGarments = (models) => [...new Set(models.flatMap((model) => pieceOf(model)?.garment ?? []))];
 
-// The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
+/**
+ * The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
+ * @param {DressModel} model
+ * @param {Dressing} dressing
+ */
 export function placeOf(model, dressing) {
   const slots = tagsOf(model, 'slot');
   const place = dressing.places.find(({ slot }) => slots.includes(slot));
@@ -263,8 +448,12 @@ export function placeOf(model, dressing) {
   return place;
 }
 
-// The `<item>_worn` twin of a piece fitted over other clothing, a fit among the dressing's `layers`, read from its id
-// `<item>_worn_<layer>`; nothing for any other model.
+/**
+ * The `<item>_worn` twin of a piece fitted over other clothing, a fit among the dressing's `layers`, read from its id
+ * `<item>_worn_<layer>`; nothing for any other model.
+ * @param {DressModel} model
+ * @param {Dressing} dressing
+ */
 function layerTwinOf(model, dressing) {
   if (!tagsOf(model, 'fit').some((fit) => dressing.layers.includes(fit))) return undefined;
   const match = PIECE_ID.exec(model.id);
@@ -273,32 +462,46 @@ function layerTwinOf(model, dressing) {
   return `${match[1]}_worn`;
 }
 
-// Each model's `wornOn` by id, the doll part it sits on (tools/manifest.mjs, `buildManifest`): a worn piece's is the
-// part whose frame it is drawn in, and a piece fitted over other clothing has its worn twin's; a wearable with no
-// pieces has its place's part with the copy it sits on (placedOn), from `dollParts` (readDollParts). A wearable with
-// pieces has none: its pieces are what sit on the doll.
+/**
+ * Each model's `wornOn` by id, the doll part it sits on (tools/manifest.mjs, `buildManifest`): a worn piece's is the
+ * part whose frame it is drawn in, and a piece fitted over other clothing has its worn twin's; a wearable with no
+ * pieces has its place's part with the copy it sits on (placedOn), from `dollParts` (readDollParts). A wearable with
+ * pieces has none: its pieces are what sit on the doll.
+ * @param {readonly DressModel[]} models
+ * @param {Dressing} dressing
+ * @param {DollParts} dollParts
+ */
 export function wornOnParts(models, dressing, dollParts) {
   const byId = new Map(models.map((model) => [model.id, model]));
   const garments = new Set(models.map((model) => pieceOf(model)?.garment).filter(Boolean));
+  /** @param {DressModel} model */
   const placed = (model) =>
     tagsOf(model, 'fit').length === 0 && tagsOf(model, 'slot').length > 0 && !garments.has(model.id);
-  const pieceOn = (piece) => ({ part: piecePart(piece.id, pieceOf(piece), dressing) });
+  /** @type {Map<string, WornOn>} */
   const wornOn = new Map();
   for (const model of models) {
     const twinId = layerTwinOf(model, dressing);
-    if (pieceOf(model)) wornOn.set(model.id, pieceOn(model));
+    const piece = pieceOf(model);
+    if (piece) wornOn.set(model.id, { part: piecePart(model.id, piece, dressing) });
     else if (twinId !== undefined) {
       const twin = byId.get(twinId);
-      if (!twin || !pieceOf(twin))
+      const twinPiece = twin && pieceOf(twin);
+      if (!twin || !twinPiece)
         throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
-      wornOn.set(model.id, pieceOn(twin));
+      wornOn.set(model.id, { part: piecePart(twin.id, twinPiece, dressing) });
     } else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, dollParts));
   }
   return wornOn;
 }
 
-// A placed wearable sits on its place's part, or for an anchor place on the part the anchor lies on, and on the copy of
-// the doll's first side when the part is a limb's and the place does not span both copies, as `wornSites` places it.
+/**
+ * A placed wearable sits on its place's part, or for an anchor place on the part the anchor lies on, and on the copy of
+ * the doll's first side when the part is a limb's and the place does not span both copies, as `wornSites` places it.
+ * @param {DressModel} model
+ * @param {Dressing} dressing
+ * @param {DollParts} dollParts
+ * @returns {WornOn}
+ */
 function placedOn(model, dressing, { anchors, sided }) {
   const place = placeOf(model, dressing);
   const part = place.anchor === undefined ? place.part : anchors[place.anchor];
@@ -307,11 +510,16 @@ function placedOn(model, dressing, { anchors, sided }) {
   return { part, ...copy, ...(place.anchor === undefined ? {} : { anchor: place.anchor }) };
 }
 
-// What a manifest's `wornOn` needs of the doll's catalogue rows, since the built sidecars keep only points: the part
-// each bust anchor lies on, `anchors`, and the parts of the limbs, `sided`, which the doll has a copy of on each side.
-// Import only after installJsonnetSources, as the catalogue reads the compiled rows.
+/**
+ * What a manifest's `wornOn` needs of the doll's catalogue rows, since the built sidecars keep only points: the part
+ * each bust anchor lies on, `anchors`, and the parts of the limbs, `sided`, which the doll has a copy of on each side.
+ * Import only after installJsonnetSources, as the catalogue reads the compiled rows.
+ * @param {Dressing} dressing
+ * @returns {Promise<DollParts>}
+ */
 export async function readDollParts(dressing) {
   const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
+  /** @param {string} id */
   const row = (id) => {
     const found = catalogue.items.find((item) => item.id === id);
     if (!found) throw new Error(`doll: the catalogue has no ${id}`);
@@ -326,12 +534,18 @@ export async function readDollParts(dressing) {
 }
 
 // The quarter turn about x that stands a model lying on its back, head end at -z, up with its front at +z.
+/** @type {Quaternion} */
 const STAND = [Math.SQRT1_2, 0, 0, Math.SQRT1_2];
 
-// Where a wearable with no pieces sits by the dressing's `places`: the move that rests its box against the region of
-// doll part copies along `against`, sunk into it by `sink` of its own depth there, and centred on the region across.
+/**
+ * Where a wearable with no pieces sits by the dressing's `places`: the move that rests its box against the region of
+ * doll part copies along `against`, sunk into it by `sink` of its own depth there, and centred on the region across.
+ * @param {Box} box
+ * @param {Box} region
+ * @param {RestPlace} place
+ */
 function rest(box, region, { against, sink }) {
-  return AXES.map((a) => {
+  return perAxis((a) => {
     const depth = box.max[a] - box.min[a];
     if (against[a] > 0) return region.max[a] - box.min[a] - sink * depth;
     if (against[a] < 0) return region.min[a] - box.max[a] + sink * depth;
@@ -339,12 +553,22 @@ function rest(box, region, { against, sink }) {
   });
 }
 
-// The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
-// for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its own anchor of
-// the place's name at the bust anchor (its origin if it has none), or its box rested against the place's part.
-// `boxOf` gives a loose model's box and `anchorsOf` its anchors, both in its own frame.
+/**
+ * The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
+ * for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its own anchor of
+ * the place's name at the bust anchor (its origin if it has none), or its box rested against the place's part.
+ * `boxOf` gives a loose model's box and `anchorsOf` its anchors, both in its own frame.
+ * @param {DressModel} model
+ * @param {object} options
+ * @param {Dressing} options.dressing
+ * @param {Doll} options.doll
+ * @param {readonly DressModel[]} options.models
+ * @param {(id: string) => Box} options.boxOf
+ * @param {(id: string) => Readonly<Record<string, Vec3>>} options.anchorsOf
+ */
 export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, anchorsOf }) {
   const { sites, parts, anchors } = doll;
+  /** @param {string} part */
   const copiesOf = (part) => {
     const copies = parts.get(part);
     if (!copies) throw new Error(`${model.id}: the doll has no part ${part}`);
@@ -370,7 +594,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     ];
   }
   const place = placeOf(model, dressing);
-  if (place.anchor) {
+  if (place.anchor !== undefined) {
     const at = anchors[place.anchor];
     if (!at) throw new Error(`${model.id}: the doll has no anchor ${place.anchor} to place it at`);
     return [...sites, { model: model.id, at: difference(at, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
@@ -392,23 +616,35 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   ];
 }
 
-// The models the doll is made of: its bust and each limb's.
+/**
+ * The models the doll is made of: its bust and each limb's.
+ * @param {Dressing} dressing
+ */
 export const dollModels = (dressing) => [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
 
-// The doll from `filesOf(id)`, each doll model's `{ glb, entry }`: its parts from its GLB and anchors from its things
-// sidecar, as a built tree holds them or a build generates them.
+/**
+ * The doll from `filesOf(id)`, each doll model's `{ glb, entry }`: its parts from its GLB and anchors from its things
+ * sidecar, as a built tree holds them or a build generates them.
+ * @param {Dressing} dressing
+ * @param {(id: string) => { glb: Buffer; entry: { anchors?: Readonly<Record<string, Vec3>> } }} filesOf
+ */
 export const dollFrom = (dressing, filesOf) =>
   dollOf(
     dressing,
     Object.fromEntries(
       dollModels(dressing).map((id) => {
         const { glb, entry } = filesOf(id);
-        return [id, { parts: modelParts(glb), anchors: entry.anchors }];
+        return [id, { parts: modelParts(glb), anchors: entry.anchors ?? {} }];
       }),
     ),
   );
 
-// The doll as the built tree holds it.
+/**
+ * The doll as the built tree holds it.
+ * @param {string} built
+ * @param {{ models: readonly { id: string; pack: string; path: string }[] }} manifest
+ * @param {Dressing} dressing
+ */
 export function readDoll(built, manifest, dressing) {
   return dollFrom(dressing, (id) => {
     const model = manifest.models.find((entry) => entry.id === id && entry.path.endsWith('.glb'));
