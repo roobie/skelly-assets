@@ -12,7 +12,7 @@ local body = import '../wields/body.libsonnet';
 // a fore-end as far ahead as the pump's. A key's yaw turns the bore back past the chest's twist, and its lean tips the
 // chest forward (degrees).
 local bladed(twist, lean=4) = body { spine: [lean, -twist, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] };
-function(model, sockets) {
+function(model, sockets, swayLimitDeg=null) {
   look: [0, 1.4, 4],
   weapon: {
     model: model,
@@ -40,9 +40,12 @@ function(model, sockets) {
     },
   },
   // Carried at low ready the gun swings a little with the stride, the share of the arm's swing ahg3's FigureGait sways a
-  // held gun by (`holds.gun.sway`), so the walk keeps some life; shouldered it does not sway, so the bore stays level.
+  // held gun by (`holds.gun.sway`), so the walk keeps some life, but no further than the family lets the support hand
+  // keep its reach (`swayLimitDeg`); shouldered it does not sway. In both the gun leans with the body: the stance's
+  // stock and arms are set for the standing chest, and a stock held level while the chest leans 25° into a crouch walk
+  // drives into the firing arm.
   walks: {
-    idle: { arms: 'held', sway: 0.35 },
-    guard: { arms: 'held', sway: 0 },
+    idle: { arms: 'held', sway: 0.35, lean: 1 } + (if swayLimitDeg == null then {} else { swayLimitDeg: swayLimitDeg }),
+    guard: { arms: 'held', sway: 0, lean: 1 },
   },
 }

@@ -20,8 +20,11 @@
 // `walks` names the stances a class walks in, each walk of the gait (models/poses/locomotion.libsonnet) baked holding
 // what the class holds, and how its arms carry it: `swing`, the arms swinging as in the empty walk, the weapon riding the
 // leading hand and each hand closed as the stance closes it, a second hand on the weapon letting go, since a swinging arm
-// cannot keep it there; or `held`, the stance's hands kept on the weapon over the walking legs, the weapon swaying by
-// `sway`, that share of the leading arm's swing. Melee classes swing, as ahg3's figure gait carries a melee weapon.
+// cannot keep it there; or `held`, the stance's hands kept on the weapon over the walking legs, the weapon tipped
+// forward by `lean`, that share of the walk's lean, and swaying by `sway`, that share of the leading arm's swing, never
+// more than `swayLimitDeg` either way. A weapon turned with the standing chest stays steady while the walk leans the
+// body under it, but a lean it does not follow at all drives the stock or haft into the body. A class with a hand free
+// for its weapon swings, as ahg3's figure gait carries a melee weapon; one holding it in both hands keeps them on it.
 {
   framesPerSecond: 30,
   easing: { windup: 'minimum-jerk', strike: 'ease-in', follow: 'ease-out', recovery: 'minimum-jerk' },

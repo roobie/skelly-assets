@@ -513,28 +513,33 @@ test("a held walk's palms stay on their sockets of the weapon its held seat stan
   }
 });
 
-test('walking at guard the bore points level and straight ahead', () => {
+test("walking at guard the bore points straight ahead, level but for its stance's share of the walk's lean", () => {
   const guards = armedWalks().filter(({ set, stance }) => set === 'guns' && stance === 'guard');
   assert.ok(guards.length > 0);
-  for (const walking of guards)
+  for (const walking of guards) {
+    const leaning = (walking.carry.lean ?? 0) * gait.walks[walking.walk].leanDeg;
     seatedFrames(walking).forEach(({ seated }, k) => {
       const bore = mulMV(seated.r, [0, 0, 1]);
       const heading = Math.atan2(bore[0], bore[2]) * DEG,
         tip = -Math.asin(bore[1]) * DEG;
       assert.ok(Math.abs(heading) < 10, `${walking.name} frame ${k}: the bore heads ${heading.toFixed(1)}° off ahead`);
-      assert.ok(Math.abs(tip) <= 0.5, `${walking.name} frame ${k}: the bore tips ${tip.toFixed(2)}°`);
+      assert.ok(
+        Math.abs(tip - leaning) <= 0.5,
+        `${walking.name} frame ${k}: the bore tips ${tip.toFixed(2)}°, the lean it follows ${leaning.toFixed(2)}°`,
+      );
     });
+  }
 });
 
-test('a walking gun stands clear of the body, and no weapon reaches below the ground', () => {
+test('a walking gun, or a weapon walked in both hands, stands clear of the body, and none reaches below the ground', () => {
   for (const walking of armedWalks()) {
     const { positions } = itemMesh(walking.cls.weapon.model);
     seatedFrames(walking).forEach(({ posed, seated }, k) => {
       const at = (p) => applyPoint(seated, p);
       const name = `${walking.name} frame ${k}`;
-      if (walking.set === 'guns')
+      if (walking.carry.arms === 'held')
         for (const { bone, depth } of sinking(posed, positions, at))
-          assert.ok(depth <= SINK, `${name}: the gun stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
+          assert.ok(depth <= SINK, `${name}: the weapon stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
       let lowest = Infinity;
       for (let i = 0; i < positions.length; i += 3) lowest = Math.min(lowest, at(positions.slice(i, i + 3))[1]);
       assert.ok(lowest >= 0, `${name}: the weapon reaches ${(-lowest * 1000).toFixed(0)} mm below the ground`);
