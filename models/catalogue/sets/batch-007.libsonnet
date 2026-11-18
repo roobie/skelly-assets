@@ -9,30 +9,7 @@ local bottle(id, massKg, radius, height, neckRadius, capRadius, capHeight, finis
 } + dimensions, finish) + inHand(id, 'body') + { voxelGrain: grain };
 // A cylinder standing on y from `y0` to `y1`.
 local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radius], [y1, radius], [y1, 0]]);
-// A low domed tablet standing on y at `y0`, centred at (x, z).
-local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, radius], [0.002, radius], [0.004, radius * 0.7], [0.004, 0]], [x, y0, z]);
 [
-  // A foil blister strip of ten round heart tablets, 70 mm by 32 mm and lying flat, two rows of five,
-  // with a printed band at one end.
-  h.compound('metoprolol', 0.0055, [
-    box('card', 'foil', [-0.035, 0, -0.016], [0.035, 0.002, 0.016]),
-    box('print', 'print', [-0.035, 0.002, -0.016], [-0.025, 0.0025, 0.016]),
-  ] + [
-    tablet('tablet-%d-%d' % [i, j], 'tablet', 0.0045, 0.002, -0.016 + i * 0.011, [-0.0075, 0.0075][j])
-    for i in std.range(0, 4)
-    for j in std.range(0, 1)
-  ], { foil: 'alu-bare', print: 'plastic-red', tablet: 'plastic-white' }) + { title: 'Metoprolol' } + inHand('metoprolol', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] } } },
-
-  // A small zip bag, 40 mm by 50 mm and lying flat, holding a few cloudy crystal shards.
-  h.compound('meth', 0.0027, [
-    box('bag', 'bag', [-0.02, 0, -0.025], [0.02, 0.002, 0.025]),
-    box('zip', 'zip', [-0.02, 0, -0.025], [0.02, 0.003, -0.02]),
-    box('shard-a', 'crystal', [-0.012, 0.002, -0.006], [-0.002, 0.006, 0.004]),
-    box('shard-b', 'crystal', [0.0, 0.002, 0.002], [0.012, 0.005, 0.01]),
-    box('shard-c', 'crystal', [-0.006, 0.002, 0.008], [0.002, 0.008, 0.016]),
-    box('shard-d', 'crystal', [0.004, 0.002, -0.012], [0.01, 0.004, -0.004]),
-  ], { bag: 'plastic-clear', zip: 'plastic-blue', crystal: 'plastic-frosted' }) + { title: 'Methamphetamine' } + inHand('meth', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'] }, keywords: ['recreational-drug'] } },
-
   // A 50 ml amber glass dropper bottle of homemade herbal oil, 36 mm across and 110 mm tall with its
   // rubber bulb, labelled with a strip of tape.
   h.compound('mugwort_oil', 0.1, [
@@ -52,21 +29,6 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
     turned('cap-right', 'right', 'y', [[0.009, 0], [0.009, 0.0125], [0.017, 0.0125], [0.017, 0]], [0.014, 0, 0]),
   ], { body: 'plastic-white', left: 'plastic-blue', right: 'plastic-green' }) + { title: 'Contact lenses' } + inHand('contact_lenses', 'bridge') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
-  // A 50-tablet bottle of long-lasting painkillers, 40 mm across and 80 mm tall with its cap.
-  bottle('naproxen', 0.05, 0.02, 0.064, 0.015, 0.0175, 0.012,
-         { body: 'plastic-white', label: 'plastic-green', cap: 'plastic-green' }) + { title: 'Naproxen' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
-
-  // A blister card of twelve square pieces of gum, 70 mm by 50 mm and lying flat, three rows of four,
-  // with a mint-green printed band.
-  h.compound('nicotine_gum', 0.01, [
-    box('card', 'foil', [-0.035, 0, -0.025], [0.035, 0.002, 0.025]),
-    box('print', 'print', [-0.035, 0.002, -0.025], [-0.026, 0.0025, 0.025]),
-  ] + [
-    box('piece-%d-%d' % [i, j], 'gum', [-0.022 + i * 0.014, 0.002, -0.02 + j * 0.014], [-0.012 + i * 0.014, 0.006, -0.01 + j * 0.014])
-    for i in std.range(0, 3)
-    for j in std.range(0, 2)
-  ], { foil: 'alu-bare', print: 'plastic-green', gum: 'plastic-white' }) + { title: 'Nicotine gum' } + inHand('nicotine_gum', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'], setting: ['modern'] }, keywords: ['tobacco'] } },
-
   // A round plastic can of nicotine pouches, 68 mm across and 24 mm tall, its snap lid carrying a small
   // compartment on top for used pouches.
   h.compound('nicotine_pouch', 0.026, [
@@ -81,40 +43,11 @@ local tablet(id, slot, radius, y0, x, z) = turned(id, slot, 'y', [[0, 0], [0, ra
          { body: 'plastic-green', label: 'paint-police-blue', cap: 'plastic-white' },
          { shoulderHeight: 0.016, neckHeight: 0.01 }) + { title: 'Night cough syrup' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
-  // A pharmacy prescription vial, 37 mm across and 70 mm tall, amber with a white child-proof cap.
-  bottle('oxycodone', 0.041, 0.0185, 0.058, 0.0185, 0.0195, 0.012,
-         { body: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' },
-         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.03 }) + { title: 'Oxycodone' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
-
   // A single two-tone capsule, 26 mm long and 11 mm across, lying along z, one half apple-red and the
   // other white.
   h.compound('red_capsule', 0.0012, h.capsule(0.026, 0.0055)('capsule', 0, 0, 0),
              { 'capsule-a': 'plastic-clear-red', 'capsule-b': 'plastic-white' }) + { title: 'Red capsule' }
   + inHand('red_capsule', 'capsule-a') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
-
-  // A carton of sleeping tablets, 45 mm wide, 85 mm tall and 18 mm deep, standing, dark blue with a white
-  // band and a yellow moon on the face.
-  h.compound('sleeping_pills', 0.013, [
-    box('carton', 'carton', [-0.0225, 0, -0.009], [0.0225, 0.085, 0.009]),
-    box('band', 'band', [-0.023, 0.012, -0.0095], [0.023, 0.028, 0.0095]),
-    turned('moon', 'moon', 'z', [[0, 0], [0, 0.009], [0.0015, 0.009], [0.0015, 0]], [0, 0.055, 0.009]),
-  ], { carton: 'paint-police-blue', band: 'paper-white', moon: 'plastic-yellow' }) + { title: 'Sleeping pills' } + inHand('sleeping_pills', 'carton') + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['paper'], setting: ['modern'] } } },
-
-  // A small reused glass vial of brown homemade tablets, 20 mm across and 58 mm tall, stoppered with
-  // a cork and labelled with a strip of tape.
-  h.compound('poppy_painkiller', 0.022, [
-    turned('vial', 'glass', 'y', [[0, 0], [0, 0.01], [0.044, 0.01], [0.046, 0.008], [0.048, 0.008], [0.048, 0]]),
-    disc('pills', 'pills', 0.0085, 0.002, 0.026),
-    disc('cork', 'cork', 0.0078, 0.044, 0.058),
-    turned('tape', 'tape', 'y', [[0.014, 0], [0.014, 0.0105], [0.03, 0.0105], [0.03, 0]]),
-  ], { glass: 'glass-clear', pills: 'paperboard-brown', cork: 'cork', tape: 'tape-grey' }) + { title: 'Poppy painkiller' } + inHand('poppy_painkiller', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] } } },
-
-  // A round steel pill tin, 50 mm across and 16 mm tall, its lid labelled with a paper disc.
-  h.compound('poppy_sleeping_tablets', 0.021, [
-    disc('body', 'body', 0.024, 0, 0.011),
-    disc('lid', 'lid', 0.0245, 0.009, 0.016),
-    disc('label', 'label', 0.016, 0.016, 0.017),
-  ], { body: 'steel-grey', lid: 'steel-stainless', label: 'paper-white' }) + { title: 'Poppy sleeping tablets' } + inHand('poppy_sleeping_tablets', 'body') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal'] } } },
 
   // A reused 250 ml glass medicine bottle of dark homemade syrup, 60 mm across and 160 mm tall,
   // stoppered with a cork and labelled with a strip of tape. The body shows the syrup, as through glass.

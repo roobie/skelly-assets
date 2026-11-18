@@ -10,23 +10,6 @@ local bottle(id, massKg, radius, height, neckRadius, capRadius, capHeight, finis
 // A cylinder standing on y from `y0` to `y1`.
 local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radius], [y1, radius], [y1, 0]]);
 [
-  // A pack of five sticks of gum, 76 mm long, 21 mm wide and 13 mm thick, lying flat, with the foil
-  // ends of the sticks showing where the wrapper is torn open.
-  h.compound('caffeine_gum', 0.017, [
-    box('wrap', 'wrap', [-0.038, 0, -0.0105], [0.032, 0.013, 0.0105]),
-    box('band', 'band', [-0.012, -0.0005, -0.011], [0.008, 0.0135, 0.011]),
-    box('foil', 'foil', [0.032, 0.0005, -0.01], [0.038, 0.0125, 0.01]),
-  ], { wrap: 'plastic-black', band: 'plastic-yellow', foil: 'alu-bare' }) + { title: 'Caffeine gum' } + inHand('caffeine_gum', 'wrap') + h.label('band', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
-
-  // A small bottle of caffeine tablets, 35 mm across and 70 mm tall with its cap.
-  bottle('caffeine_pills', 0.034, 0.0175, 0.05, 0.013, 0.015, 0.01,
-         { body: 'plastic-white', label: 'plastic-black', cap: 'plastic-yellow' }) + { title: 'Caffeine pills' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
-
-  // A tall supplement bottle of 200 calcium tablets, 60 mm across and 125 mm tall.
-  bottle('calcium_tablets', 0.15, 0.03, 0.1, 0.022, 0.024, 0.014,
-         { body: 'plastic-white', label: 'paint-police-blue', cap: 'plastic-white' },
-         { shoulderHeight: 0.006, neckHeight: 0.004 }) + { title: 'Calcium tablets' } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
-
   // A reused jam jar of jelly, 68 mm across and 82 mm tall, with a steel screw lid and a strip of tape
   // for a label. The glass is a shell so the jelly shows through it in the game.
   h.compound('cattail_jelly', 0.32, [
@@ -35,13 +18,6 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     disc('lid', 'lid', 0.0315, 0.07, 0.082),
     turned('tape', 'tape', 'y', [[0.025, 0], [0.025, 0.0345], [0.04, 0.0345], [0.04, 0]]),
   ], { glass: 'glass-clear', jelly: 'wax-cream', lid: 'steel-grey', tape: 'tape-grey' }) + { title: 'Cattail jelly' } + inHand('cattail_jelly', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['glass', 'metal'] } } },
-
-  // A round tin of chewing tobacco, 68 mm across and 22 mm tall, with a printed lid.
-  h.compound('chewing_tobacco', 0.052, [
-    disc('body', 'body', 0.033, 0, 0.016),
-    disc('lid', 'lid', 0.034, 0.014, 0.022),
-    disc('print', 'print', 0.024, 0.022, 0.024),
-  ], { body: 'plastic-black', lid: 'steel-grey', print: 'plastic-green' }) + { title: 'Chewing tobacco' } + inHand('chewing_tobacco', 'body') + h.label('print', '+y') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'metal'], setting: ['modern'] } } },
 
   // The brown pharmacy bottle of 3 % hydrogen peroxide, 60 mm across and 140 mm tall with its cap.
   bottle('hydrogen_peroxide', 0.3, 0.03, 0.11, 0.012, 0.0135, 0.016,
@@ -81,14 +57,6 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     turned('cap', 'cap', 'x', [[0, 0], [0, 0.007], [0.015, 0.007], [0.015, 0]], [-0.065, 0.013, 0]),
   ], { tube: 'plastic-white', stripe: 'plastic-red', cap: 'plastic-red' }) + { title: 'Anaesthetic cream' } + inHand('anaesthetic_cream', 'tube') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
 
-  // A small zip bag, 40 mm by 50 mm and lying flat, with a pinch of white powder in its bottom half.
-  h.compound('cocaine', 0.0036, [
-    box('bag', 'bag', [-0.02, 0, -0.025], [0.02, 0.002, 0.025]),
-    box('zip', 'zip', [-0.02, 0, -0.025], [0.02, 0.003, -0.02]),
-    box('powder', 'powder', [-0.014, 0.002, -0.008], [0.014, 0.006, 0.02]),
-    box('heap', 'powder', [-0.008, 0.006, 0], [0.008, 0.008, 0.014]),
-  ], { bag: 'glass-clear', zip: 'plastic-red', powder: 'plastic-white' }) + { title: 'Cocaine' } + inHand('cocaine', 'bag') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['recreational-drug'] } },
-
   // A 250 ml plastic soda bottle of dark homemade cola, 54 mm across and 150 mm tall, with a strip of
   // tape for a label. The body shows the liquid, as through clear plastic.
   h.compound('stimulant_cola', 0.22, [
@@ -98,22 +66,10 @@ local disc(id, slot, radius, y0, y1) = turned(id, slot, 'y', [[y0, 0], [y0, radi
     turned('tape', 'tape', 'y', [[0.035, 0], [0.035, 0.0275], [0.065, 0.0275], [0.065, 0]]),
   ], { liquid: 'paint-oxblood', plastic: 'glass-clear', cap: 'plastic-red', tape: 'tape-grey' }) + { title: 'Stimulant cola' } + inHand('stimulant_cola', 'liquid') + { voxelGrain: 0.004 } + { taxonomy: { category: 'food', tags: { material: ['plastic'] } } },
 
-  // A tiny glass vial of crack, 12 mm across and 32 mm tall, with a coloured push cap.
-  h.compound('crack', 0.0059, [
-    disc('vial', 'glass', 0.006, 0, 0.024),
-    disc('rocks', 'rocks', 0.004, 0.002, 0.012),
-    disc('cap', 'cap', 0.0068, 0.022, 0.032),
-  ], { glass: 'glass-clear', rocks: 'wax-ivory', cap: 'plastic-red' }) + { title: 'Vial of crack' } + inHand('crack', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'] }, keywords: ['recreational-drug'] } },
-
   // A 250 ml bottle of orange cough syrup, 62 mm across and 165 mm tall, with a dosing cup over the cap.
   bottle('cough_syrup', 0.35, 0.031, 0.105, 0.014, 0.022, 0.03,
          { body: 'fuel-amber', label: 'plastic-blue', cap: 'plastic-white' },
          { shoulderHeight: 0.016, neckHeight: 0.01 }) + { title: 'Cough syrup' } + { taxonomy: { category: 'medical', tags: { material: ['glass', 'plastic'], setting: ['modern'] } } },
-
-  // A pharmacy prescription vial, 33 mm across and 62 mm tall, amber with a blue cap.
-  bottle('prescription_sedative', 0.03, 0.016, 0.05, 0.016, 0.0168, 0.011,
-         { body: 'fuel-amber', label: 'paper-white', cap: 'plastic-blue' },
-         { shoulderHeight: 0.001, neckHeight: 0.001, bandHeight: 0.026 }) + { title: 'Prescription sedative' } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'glass'], setting: ['modern'] } } },
 
   // A reused 250 ml glass bottle of homemade antiseptic, 62 mm across and 165 mm tall, stoppered with a
   // cork and labelled with a strip of tape.

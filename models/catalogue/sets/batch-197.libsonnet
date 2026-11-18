@@ -60,20 +60,6 @@ local plates = 8;
     rune: 'crystal-glow-blue',
   }) + { title: 'Spider-shell forge' } + h.gripOn('spider_shell_forge', 'handle-front-grip') + { voxelGrain: 0.004 } + { taxonomy: { category: 'machinery', keywords: ['metalworking'], tags: { material: ['stone'], setting: ['fantasy'] } } },
 
-  // A stiff paper sack 110 mm wide, 70 mm deep and 190 mm tall, its top rolled down twice over about a litre of grey
-  // mortar, with a red band round its middle printed with a pale blue rune.
-  h.compound('fireproof_mortar', 2, [
-    box('sack', 'paper', [-0.055, 0, -0.035], [0.055, 0.16, 0.035]),
-    box('base-fold', 'paper', [-0.057, 0, -0.037], [0.057, 0.012, 0.037]),
-    box('roll-a', 'paper', [-0.056, 0.16, -0.02], [0.056, 0.176, 0.02]),
-    box('roll-b', 'paper', [-0.056, 0.172, -0.012], [0.056, 0.19, 0.016]),
-    box('band', 'band', [-0.0555, 0.06, -0.0355], [0.0555, 0.11, 0.0355]),
-    box('rune-stem', 'rune', [-0.003, 0.068, 0.0355], [0.003, 0.102, 0.038]),
-    box('rune-bar', 'rune', [-0.014, 0.082, 0.0355], [0.014, 0.088, 0.038]),
-    box('rune-hook', 'rune', [0.008, 0.088, 0.0355], [0.014, 0.1, 0.038]),
-    box('spill', 'mortar', [-0.03, 0.19, -0.008], [0.02, 0.193, 0.01]),
-  ], { paper: 'paper-butcher', band: 'cloth-crimson', rune: 'crystal-glow-blue', mortar: 'stone-grey' }) + { title: 'Fireproof mortar' } + h.inHand('fireproof_mortar', 'sack') + h.label('band', '-z') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'], setting: ['fantasy'] } } },
-
   // A loose cluster of crimped wool about 150 mm long, 90 mm wide and 70 mm high, pale and faintly shimmering, its
   // locks ending in lighter tips.
   h.compound('shimmerwool_tuft', 0.01, [
