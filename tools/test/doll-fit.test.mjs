@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { test } from 'node:test';
-import { COINCIDENT, coveredSurface, PITCH, restClearance } from '../../site/clearance.mjs';
+import { COINCIDENT, clearanceProbe, coveredSurface, PITCH, restClearance } from '../../site/clearance.mjs';
+import { decodeFrame } from '../../site/clipFrames.mjs';
 import { hides } from '../../site/hiding.mjs';
-import { dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
+import { boneTransforms, dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
 import { compilePose, soleLift } from '../../site/poseFile.mjs';
-import { CLOTHES, dollTree, shellsOf, WEAR, WORN } from './doll-tree.mjs';
+import { CLOTHES, dollTree, repo, shellsOf, WEAR, WORN } from './doll-tree.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
 const { rig, sitesIn, restIn } = dollTree({ wears: WORN });
@@ -95,6 +98,30 @@ test('a grounded shod doll stands its boots on the ground and its bare feet a so
       `${wear}: the bare feet stand ${(bare * 1000).toFixed(1)} mm up, not on its ${(lift * 1000).toFixed(1)} mm soles`,
     );
   }
+});
+
+test('a torso garment keeps the hips covered when the chest twists off them or the doll walks', () => {
+  // The poses that turn the spine off the pelvis: a twist at the spine's limit and a stride.
+  const poses = ['twist-80', 'walk'].map((name) => ({
+    name,
+    file: JSON.parse(readFileSync(join(repo, 'models/poses', `${name}.json`), 'utf8')),
+  }));
+  const torsos = WORN.filter((wear) => shellsOf(wear).some((id) => id.endsWith('_worn_body')));
+  assert.ok(torsos.length > 0, 'no torso garment among the worn garments, so nothing was checked');
+  const showing = torsos.flatMap((wear) => {
+    const dressed = restIn(wear);
+    // Only the hips' skin is probed, against the whole figure, which still hides what a hanging arm lies over.
+    const hips = { ...dressed, body: dressed.body.filter(({ bone }) => bone === 'pelvis') };
+    const probe = clearanceProbe(rig, dressed, coveredSurface(rig, hips));
+    return poses.flatMap(({ name, file }) => {
+      const { pokes } = probe(boneTransforms(rig.bones, decodeFrame(compilePose(rig, file).frame)));
+      if (pokes.length === 0) return [];
+      const deepest = Math.max(...pokes.map(({ depth }) => depth));
+      const pieces = [...new Set(pokes.map(({ piece }) => piece))].join(', ');
+      return [`${pieces} in ${name}: the pelvis shows through, ${(deepest * 1000).toFixed(0)} mm out`];
+    });
+  });
+  assert.deepEqual(showing, []);
 });
 
 test('a garment that leaves regions of a part bare leaves none of their skin below the top of the regions it covers', () => {
