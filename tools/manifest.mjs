@@ -49,6 +49,7 @@ import { manifestTaxonomy } from './taxonomy.mjs';
 /** @typedef {ReturnType<typeof soundManifest>['sounds'][number]} ManifestSound */
 /** @typedef {{ id: string; title: unknown; pack: string; path: string; tags: unknown }} ManifestVehicle */
 /** @typedef {{ id: string; pack: string; path: string; rig: string }} ManifestMotion */
+/** @typedef {{ id: string; revision: number; pack: string; path: string }} ManifestBuildingKit */
 /**
  * What of a manifest its file list and the tree check read.
  * @typedef {object} ManifestFiles
@@ -265,6 +266,7 @@ const MODEL_FILES = /** @type {const} */ (['clips', 'body', 'genome']);
 /**
  * @param {object} manifest
  * @param {readonly ManifestModel[]} manifest.models
+ * @param {readonly ManifestBuildingKit[]} [manifest.buildingKits] each kit a building module names
  * @param {readonly ManifestVehicle[]} [manifest.vehicles] each vehicle's placements
  * @param {readonly ManifestMotion[]} [manifest.motions] each baked clip set
  * @param {readonly ManifestSound[]} [manifest.sounds] as soundManifest gives them
