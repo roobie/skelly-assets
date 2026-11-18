@@ -1,47 +1,5 @@
 [
   {
-    "id": "metoprolol",
-    "model": "metoprolol",
-    "name": "Blister strip of metoprolol",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical"
-      ],
-      "tiers": [
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A beta blocker. Lowers blood pressure and steadies the heart under stress.",
-    "notes": "Blood pressure and heart rate have no content fields yet."
-  },
-  {
-    "id": "meth",
-    "model": "meth",
-    "name": "Bag of methamphetamine",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Residential"
-      ],
-      "tiers": [
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A powerful stimulant. Keeps sleep away and sharpens focus at a cost to health. Highly addictive.",
-    "notes": "Not skipped as loose powder: it is found in a zip bag, so the model is the bag, as cocaine's is. The high-grade variant shares the model and differs in its effects. The bag is plastic-clear, drawn opaque in the tiles; the frosted shards sit on top of it so they show anyway. Residential stands in for street loot, for which no usage tag exists."
-  },
-  {
     "id": "mugwort_oil",
     "model": "mugwort_oil",
     "name": "Bottle of mugwort oil",
@@ -81,51 +39,6 @@
     "stack": 1,
     "description": "A pair of soft lenses in a twin case of saline. Correct eyesight while worn; thrown away once worn out.",
     "notes": "All the lens kinds (short and long sight, bifocal, light-adjusting, daily and weekly) look the same in their case, so they ride on one model as variants and differ only in stats. The row is a twin lens case. category is medical for want of an eyewear category; vision correction has no content field yet."
-  },
-  {
-    "id": "naproxen",
-    "model": "naproxen",
-    "name": "Bottle of naproxen",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1",
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A long-lasting painkiller. Eases pain and swelling.",
-    "notes": "The green label and cap set it apart from the other white tablet bottles. The analgesic numbers belong to the refactor; it should outlast aspirin and share its group."
-  },
-  {
-    "id": "nicotine_gum",
-    "model": "nicotine_gum",
-    "name": "Blister card of nicotine gum",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1",
-        "Tier2"
-      ]
-    },
-    "description": "Mint gum laced with nicotine. Eases the craving for a smoke.",
-    "notes": "The green print band stands for mint. Nicotine and craving have no content fields yet."
   },
   {
     "id": "nicotine_pouch",
@@ -173,27 +86,6 @@
     "notes": "The id avoids the brand name. The whole bottle is the item, matching the day syrup. plastic-green stands in for green syrup through a clear bottle; no green see-through finish exists. Colds and drowsiness have no content fields yet."
   },
   {
-    "id": "oxycodone",
-    "model": "oxycodone",
-    "name": "Vial of oxycodone",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical"
-      ],
-      "tiers": [
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A strong opioid painkiller. Highly addictive.",
-    "notes": "The white cap sets it apart from the prescription sedative's blue one. Its analgesic numbers belong to the refactor, in the opioid group with codeine but stronger."
-  },
-  {
     "id": "red_capsule",
     "model": "red_capsule",
     "name": "Red capsule",
@@ -213,64 +105,6 @@
     "stack": 4,
     "description": "A thumbnail-sized red gel capsule with something dark shifting inside. Unlabelled and experimental.",
     "notes": "The name describes the thing rather than a brand. A single capsule is what a player picks up, so the model is the capsule itself at the finest 2 mm grain, which leaves it blocky at 11 mm across. The gel is see-through red in the game and shows the dark core. Found in labs; Medical and Tier3 stand in until a lab usage tag exists. Its effect is for the refactor."
-  },
-  {
-    "id": "sleeping_pills",
-    "model": "sleeping_pills",
-    "name": "Carton of sleeping pills",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A tranquilliser for insomnia. Brings on sleep. Habit-forming.",
-    "notes": "The dark blue carton with its yellow moon sets it apart from the tablet bottles. Sleep has no content field yet."
-  },
-  {
-    "id": "poppy_painkiller",
-    "model": "poppy_painkiller",
-    "name": "Vial of poppy painkillers",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [],
-      "tiers": [
-        "Tier1"
-      ]
-    },
-    "description": "Pain tablets refined from poppy. Strong relief without the haze. Habit-forming.",
-    "notes": "Crafted by the player, so usage is empty. The brown tablets inside show only in the game, where the glass is clear; the tape strip marks it as homemade."
-  },
-  {
-    "id": "poppy_sleeping_tablets",
-    "model": "poppy_sleeping_tablets",
-    "name": "Tin of poppy sleeping tablets",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [],
-      "tiers": [
-        "Tier1"
-      ]
-    },
-    "description": "A sleeping draught pressed into tablets from poppy seeds. Brings on sleep. Habit-forming.",
-    "notes": "Crafted by the player, so usage is empty. A tin rather than another vial keeps it apart from the poppy painkiller on the ground."
   },
   {
     "id": "poppy_cough_syrup",

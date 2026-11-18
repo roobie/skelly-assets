@@ -26,28 +26,6 @@
     "notes": "A cement bowl 250 mm across and 200 mm deep inside eight black chitin plates with red seams, 300 mm across the rim and 230 mm tall; a grate and coals inside, an air pipe on +x, handles front and back and three glowing runes on the front. The round body, pipe and handles leave air in the bounding box. Kept as a carried tool rather than a workstation because the forge is portable; if Deadvox makes it a placed station, add `workstation: { id: 'spider_shell_forge', qualities: { smelting: 2, forging: 1 } }`. The coals are glow-flame; a dull coal-black finish would read better than plastic-charcoal."
   },
   {
-    "id": "fireproof_mortar",
-    "model": "fireproof_mortar",
-    "name": "Sack of heatproof mortar",
-    "category": "material",
-    "size": [
-      1,
-      2
-    ],
-    "economy": {
-      "usage": [
-        "Industrial",
-        "Infected"
-      ],
-      "tiers": [
-        "Tier2",
-        "Tier3"
-      ]
-    },
-    "description": "A stiff paper sack of grey mortar with its top rolled shut and a pale blue sign printed on a red band. Mixed and laid, it holds against heat that would crack common brick.",
-    "notes": "Loose powder, modelled in the paper sack a player would pick up: 110 by 70 mm and 190 mm tall with its top rolled twice and a little grey spill on the roll. The paper adds nothing worth counting to the mass."
-  },
-  {
     "id": "shimmerwool_tuft",
     "model": "shimmerwool_tuft",
     "name": "Shimmerwool tuft",

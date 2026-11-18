@@ -124,39 +124,6 @@
     "notes": "The empty bottle. plastic-clear-blue draws the bottle; it stays see-through in the game. Liquid storage has no content field yet. Glass bottles, jugs, a thermos and lab glassware ride on this model for now, though the thermos, beaker, flask and test tubes would read better with their own."
   },
   {
-    "id": "pill_bottle",
-    "model": "pill_bottle",
-    "name": "Pill bottle",
-    "category": "misc",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1"
-      ]
-    },
-    "container": {
-      "rigid": true,
-      "pockets": [
-        {
-          "grid": [
-            1,
-            1
-          ],
-          "handlingSimSeconds": 0.3
-        }
-      ]
-    },
-    "description": "An empty amber pharmacy bottle with a white child-proof cap.",
-    "notes": "The empty bottle. It is larger than batch 9's sedative vial and has a wide ribbed cap, so the empty container reads apart from the medicines drawn in their bottles. plastic-amber draws the bottle; it stays see-through in the game. The container follows the existing ammo can's fields; the pocket grid is a placeholder."
-  },
-  {
     "id": "flattened_large_box",
     "model": "flattened_large_box",
     "name": "Flattened large cardboard box",

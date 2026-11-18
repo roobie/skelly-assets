@@ -92,7 +92,9 @@ whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`
 The item drafts in `models/catalogue/drafts/` are Deadvox gameplay data for the catalogue models: what each
 thing is called, carries, protects and does in play. They wait here until skelly's framework refactor gives item
 content its new layout, and are applied then. Each set's drafts sit in a file named after it, so a draft is found
-beside its model. Several items may share one model when they differ only in colour, grade or size. The values
+beside its model. Several items may share one model when they differ only in colour, grade or size. Solid
+contents share one heap model per form and name the generic holder they are packed in, which wears their label
+finish on its one paintable label, so no content needs a model of its own. The values
 are our own: the catalogue was drawn against another game's item data, whose share-alike licence and database
 rights would follow a copied table, so drafts keep no link to it and leave out the fields that matched it value
 for value until they are derived from our own models. See `tools/test/catalogue-drafts.test.mjs`.

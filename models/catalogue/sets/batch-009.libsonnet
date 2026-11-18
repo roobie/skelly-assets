@@ -7,37 +7,6 @@ local disc(id, slot, radius, y0, y1, x=0, z=0) = turned(id, slot, 'y', [[0, 0], 
 // A drum shell standing on y, `height` tall, its top and bottom edges rolled in by `chime`.
 local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0, radius - chime], [chime, radius], [height - chime, radius], [height, radius - chime], [height, 0]]);
 [
-  // A foil blister card of ten plain white antibiotic tablets, 70 mm by 35 mm and lying flat, two rows of
-  // five, with a green printed band at one end.
-  h.compound('narrow_spectrum_antibiotic', 0.0054, h.blister(0.07, 0.035, 5, 2, h.tablet(0.0045)),
-             { foil: 'alu-bare', print: 'plastic-green', tablet: 'chalk-white' }) + { title: 'Narrow-spectrum antibiotic' }
-  + h.inHand('narrow_spectrum_antibiotic', 'card') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['metal', 'plastic'], setting: ['modern'] } } },
-
-  // A small clear zip bag of dried cannabis buds, 80 mm by 60 mm and lying flat, with a red press seal
-  // along one end. The film is a thin floor and edge welts so the bud clusters, which fill and bulge the
-  // bag, read through it.
-  local bud(name, at, r, tall) = turned(name, 'bud', 'y', [[0, 0], [0, r * 0.7], [tall * 0.45, r], [tall * 0.85, r * 0.6], [tall, 0]], at);
-  local tip(name, at, r) = turned(name, 'tip', 'y', [[0, 0], [0, r], [r * 1.2, r * 0.6], [r * 1.6, 0]], at);
-  h.compound('cannabis', 0.0055, [
-    box('film', 'bag', [-0.04, 0, -0.03], [0.04, 0.0015, 0.03]),
-    box('welt-l', 'bag', [-0.04, 0, -0.03], [-0.037, 0.005, 0.03]),
-    box('welt-f', 'bag', [-0.04, 0, 0.027], [0.03, 0.005, 0.03]),
-    box('welt-b', 'bag', [-0.04, 0, -0.03], [0.03, 0.005, -0.027]),
-    box('zip', 'bag', [0.03, 0, -0.03], [0.04, 0.006, 0.03]),
-    box('seal', 'seal', [0.031, 0.006, -0.029], [0.035, 0.0075, 0.029]),
-    bud('bud-a', [-0.02, 0.001, -0.012], 0.011, 0.018),
-    bud('bud-b', [0.004, 0.001, 0.01], 0.012, 0.02),
-    bud('bud-c', [0.014, 0.001, -0.014], 0.009, 0.015),
-    bud('bud-d', [-0.022, 0.001, 0.013], 0.009, 0.014),
-    bud('bud-e', [-0.004, 0.001, -0.006], 0.008, 0.016),
-    tip('tip-a', [-0.018, 0.015, -0.01], 0.004),
-    tip('tip-b', [0.006, 0.017, 0.008], 0.004),
-    tip('tip-c', [0.015, 0.0125, -0.012], 0.0035),
-    tip('tip-d', [-0.004, 0.0135, -0.006], 0.003),
-    turned('stem', 'stem', 'x', [[0, 0], [0, 0.0012], [0.016, 0.0012], [0.016, 0]], [0.008, 0.0015, 0.022]),
-  ], { bag: 'plastic-bag', seal: 'plastic-red', bud: 'plant-dried', tip: 'leaf-green', stem: 'paperboard-tan' }) + { title: 'Cannabis' }
-  + h.inHand('cannabis', 'film') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic', 'plant'], setting: ['modern'] }, keywords: ['recreational-drug'] } },
-
   // A squat 50 ml jar of wintergreen ointment, 56 mm across and 42 mm tall with its lid: white with a
   // paper label band and a green screw lid.
   h.compound('wintergreen_ointment', 0.05, [
@@ -46,15 +15,6 @@ local shell(id, slot, radius, height, chime) = turned(id, slot, 'y', [[0, 0], [0
     turned('lid', 'lid', 'y', [[0, 0], [0, 0.028], [0.011, 0.028], [0.012, 0.026], [0.012, 0]], [0, 0.03, 0]),
   ], { jar: 'enamel-white', label: 'paper-white', lid: 'plastic-green' }) + { title: 'Wintergreen ointment' }
   + h.inHand('wintergreen_ointment', 'jar') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] }, keywords: ['painkiller'] } },
-
-  // A pharmacy prescription vial of sedative tablets, 28 mm across and 62 mm tall, amber with a white
-  // child-proof cap and a white label.
-  h.compound('fast_acting_sedative', 0.013, [
-    turned('vial', 'vial', 'y', [[0, 0], [0, 0.014], [0.05, 0.014], [0.05, 0]]),
-    turned('label', 'label', 'y', [[0, 0], [0, 0.0144], [0.028, 0.0144], [0.028, 0]], [0, 0.01, 0]),
-    turned('cap', 'cap', 'y', [[0, 0], [0, 0.0155], [0.011, 0.0155], [0.012, 0.0145], [0.012, 0]], [0, 0.05, 0]),
-  ], { vial: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' }) + { title: 'Fast-acting sedative' }
-  + h.inHand('fast_acting_sedative', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['plastic'], setting: ['modern'] } } },
 
   // A red plastic first aid case, 240 mm wide, 170 mm tall and 75 mm deep, standing on its edge with a
   // carry handle on top, a white cross on the front, a lid seam all round and two white latches.

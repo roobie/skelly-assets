@@ -98,17 +98,6 @@ local sidePoint(prefix, slot, r, x0, x1, y, z) =
              { flesh: 'jelly-teal', core: 'verdigris', nub: 'plant-dried', shine: 'crystal-glow-white' }) + { title: 'Jelly fruit' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'food', tags: { material: ['plant'] } } },
 
-  // A small corked glass vial of glittering crystal dust, 16 mm across and 48 mm tall with the cork: the bottom
-  // 14 mm is packed with coloured dust, the rest clear glass with a rolled lip.
-  h.compound('crystal_dust_vial', 0.0085,
-             [
-               h.disc('dust', 'dust', 0.007, 0, 0.014),
-               h.turned('glass', 'glass', 'y', [[0, 0.0058], [0, 0.007], [0.024, 0.007], [0.026, 0.0062], [0.027, 0.0075], [0.029, 0.0075], [0.029, 0.0058], [0, 0.0058]], [0, 0.014, 0]),
-               h.turned('cork', 'cork', 'y', [[0, 0], [0, 0.0055], [0.005, 0.006], [0.009, 0.0068], [0.009, 0]], [0, 0.039, 0]),
-             ],
-             { dust: 'gem-pink', glass: 'glass-clear', cork: 'cork' }) + { title: 'Crystal dust vial' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'medical', tags: { material: ['glass'], setting: ['sci-fi'] } } },
-
   // A tiny round-bellied glass phial of refined crystal powder, 18 mm across and 36 mm tall: the powder fills the
   // belly, the narrow neck is stopped and sealed with a blob of dark wax.
   h.compound('refined_crystal_powder_phial', 0.0047,

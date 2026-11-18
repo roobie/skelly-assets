@@ -1,0 +1,1494 @@
+[
+  {
+    "id": "acetaminophen",
+    "model": "tablet_heap",
+    "name": "Acetaminophen",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-yellow",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 50
+    },
+    "volumeCm3": 0.3,
+    "stack": 50,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Eases mild pain and brings down a fever. Heals nothing.",
+    "notes": "Its analgesic block is left for the refactor, as it should sit with aspirin in the otc group."
+  },
+  {
+    "id": "prescription_stimulant",
+    "model": "tablet_heap",
+    "name": "Prescription stimulants",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paper-white",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.3,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Wards off sleep and dulls hunger. Habit-forming.",
+    "notes": "The id avoids the brand name. Wakefulness and addiction have no content fields yet."
+  },
+  {
+    "id": "antifungal",
+    "model": "tablet_heap",
+    "name": "Antifungal tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Treats fungal infections.",
+    "notes": "Deadvox has no fungal infection to treat yet."
+  },
+  {
+    "id": "antihistamine",
+    "model": "tablet_heap",
+    "name": "Antihistamines",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-clear-red",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Eases allergic reactions. Can cause drowsiness."
+  },
+  {
+    "id": "antiparasitic",
+    "model": "tablet_heap",
+    "name": "Wormer tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-olive",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.3,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Clears worms and other parasites. Made for livestock.",
+    "notes": "Residential stands in for farm and feed-store loot, for which no usage tag exists."
+  },
+  {
+    "id": "caffeine_gum",
+    "model": "gum_heap",
+    "name": "Caffeine gum",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "gum",
+    "labelFinish": "plastic-yellow",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 1,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Residential",
+        "Military"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Chewing gum laced with caffeine. Wards off sleep for a while.",
+    "notes": "Military reflects issue caffeine gum in ration packs. Wakefulness has no content field yet."
+  },
+  {
+    "id": "caffeine_pills",
+    "model": "tablet_heap",
+    "name": "Caffeine pills",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-black",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 60
+    },
+    "volumeCm3": 0.3,
+    "stack": 60,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Wards off sleep for a few hours.",
+    "notes": "Wakefulness has no content field yet."
+  },
+  {
+    "id": "calcium_tablets",
+    "model": "tablet_heap",
+    "name": "Calcium tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-police-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 60
+    },
+    "volumeCm3": 0.3,
+    "stack": 60,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A calcium supplement. Does little on its own.",
+    "notes": "The bone meal variants are crafted from bone rather than bought, so they may want contents of their own."
+  },
+  {
+    "id": "chewing_tobacco",
+    "model": "leaf_heap",
+    "name": "Chewing tobacco",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "leaf",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "small_tin",
+      "count": 25
+    },
+    "volumeCm3": 2,
+    "stack": 25,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Mint-flavoured tobacco to tuck in the cheek. Calms the nerves. Habit-forming.",
+    "notes": "Nicotine and addiction have no content fields yet."
+  },
+  {
+    "id": "cocaine",
+    "model": "powder_heap",
+    "name": "Cocaine",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "plastic-red",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 3
+    },
+    "volumeCm3": 0.5,
+    "stack": 3,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong stimulant. Numbs what it touches. Highly addictive.",
+    "notes": "Residential stands in for street loot, for which no usage tag exists."
+  },
+  {
+    "id": "crack",
+    "model": "crystal_heap",
+    "name": "Crack",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "crystal",
+    "labelFinish": "plastic-red",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 3
+    },
+    "volumeCm3": 0.5,
+    "stack": 3,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Smokable cocaine. A short, intense high. Extremely addictive.",
+    "notes": "Residential stands in for street loot, as for cocaine."
+  },
+  {
+    "id": "prescription_sedative",
+    "model": "tablet_heap",
+    "name": "Prescription sedatives",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.3,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong sedative. Calms panic and eases muscle spasms. Habit-forming.",
+    "notes": "The id avoids the drug's name, as prescription_stimulant does."
+  },
+  {
+    "id": "heroin",
+    "model": "powder_heap",
+    "name": "Heroin",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "paint-red",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 3
+    },
+    "volumeCm3": 0.5,
+    "stack": 3,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong opioid. Kills pain and brings a heavy calm. Overdose is easy. Extremely addictive.",
+    "notes": "Residential stands in for street loot, as for cocaine."
+  },
+  {
+    "id": "sugar_pills",
+    "model": "tablet_heap",
+    "name": "Sugar pills",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 80
+    },
+    "volumeCm3": 0.3,
+    "stack": 80,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Tiny sweet pellets sold as a remedy. Does nothing.",
+    "notes": "The name says what they are; the description stays plain."
+  },
+  {
+    "id": "ibuprofen",
+    "model": "tablet_heap",
+    "name": "Ibuprofen",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-police-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 50
+    },
+    "volumeCm3": 0.3,
+    "stack": 50,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "An anti-inflammatory painkiller. Eases pain and swelling.",
+    "notes": "The generic drug name is not a brand."
+  },
+  {
+    "id": "potassium_iodide",
+    "model": "tablet_heap",
+    "name": "Potassium iodide",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-red",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Military",
+        "Police"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Iodide tablets. Taken before radiation exposure, they shield the thyroid.",
+    "notes": "The item id names the drug. Military and Police reflect emergency stockpiles. Radiation has no content field yet."
+  },
+  {
+    "id": "blotter_tab",
+    "model": "blotter_heap",
+    "name": "Blotter tabs",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "blotter",
+    "labelFinish": "plastic-clear-red",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 20
+    },
+    "volumeCm3": 0.05,
+    "stack": 20,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Small squares of pink paper soaked with a hallucinogen. Brings on visions for hours."
+  },
+  {
+    "id": "melatonin",
+    "model": "tablet_heap",
+    "name": "Melatonin",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-police-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 60
+    },
+    "volumeCm3": 0.3,
+    "stack": 60,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "A sleep supplement. Helps a tired body rest and recover.",
+    "notes": "The antacid tablet is a variant of it. Sleep quality has no content field yet."
+  },
+  {
+    "id": "metoprolol",
+    "model": "tablet_heap",
+    "name": "Metoprolol",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-red",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A beta blocker. Lowers blood pressure and steadies the heart under stress.",
+    "notes": "Blood pressure and heart rate have no content fields yet."
+  },
+  {
+    "id": "meth",
+    "model": "crystal_heap",
+    "name": "Methamphetamine",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "crystal",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 3
+    },
+    "volumeCm3": 0.5,
+    "stack": 3,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A powerful stimulant. Keeps sleep away and sharpens focus at a cost to health. Highly addictive.",
+    "notes": "The high-grade variant differs only in its effects. Residential stands in for street loot, for which no usage tag exists."
+  },
+  {
+    "id": "naproxen",
+    "model": "tablet_heap",
+    "name": "Naproxen",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 50
+    },
+    "volumeCm3": 0.3,
+    "stack": 50,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A long-lasting painkiller. Eases pain and swelling.",
+    "notes": "The analgesic numbers belong to the refactor; it should outlast aspirin and share its group."
+  },
+  {
+    "id": "nicotine_gum",
+    "model": "gum_heap",
+    "name": "Nicotine gum",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "gum",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 1,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Mint gum laced with nicotine. Eases the craving for a smoke.",
+    "notes": "Nicotine and craving have no content fields yet."
+  },
+  {
+    "id": "oxycodone",
+    "model": "tablet_heap",
+    "name": "Oxycodone",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-amber",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.3,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A strong opioid painkiller. Highly addictive.",
+    "notes": "Its analgesic numbers belong to the refactor, in the opioid group with codeine but stronger."
+  },
+  {
+    "id": "sleeping_pills",
+    "model": "tablet_heap",
+    "name": "Sleeping pills",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-police-blue",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A tranquilliser for insomnia. Brings on sleep. Habit-forming.",
+    "notes": "Sleep has no content field yet."
+  },
+  {
+    "id": "poppy_painkiller",
+    "model": "tablet_heap",
+    "name": "Poppy painkillers",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paperboard-brown",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 20
+    },
+    "volumeCm3": 0.3,
+    "stack": 20,
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Pain tablets refined from poppy. Strong relief without the haze. Habit-forming.",
+    "notes": "Crafted by the player, so usage is empty."
+  },
+  {
+    "id": "poppy_sleeping_tablets",
+    "model": "tablet_heap",
+    "name": "Poppy sleeping tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "steel-grey",
+    "packaging": {
+      "holder": "small_tin",
+      "count": 40
+    },
+    "volumeCm3": 0.3,
+    "stack": 40,
+    "economy": {
+      "usage": [],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "A sleeping draught pressed into tablets from poppy seeds. Brings on sleep. Habit-forming.",
+    "notes": "Crafted by the player, so usage is empty."
+  },
+  {
+    "id": "fluoxetine",
+    "model": "capsule_heap",
+    "name": "Fluoxetine",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "capsule",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.5,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "An antidepressant. Lifts mood over days and changes how some other drugs act.",
+    "notes": "The id names the drug instead of a brand. Mood and drug interactions have no content fields yet."
+  },
+  {
+    "id": "prussian_blue",
+    "model": "capsule_heap",
+    "name": "Prussian blue capsules",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "capsule",
+    "labelFinish": "paint-police-blue",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.5,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "An iron dye taken by mouth. Binds radioactive caesium and thallium in the gut so the body sheds them.",
+    "notes": "Radiation has no content field yet."
+  },
+  {
+    "id": "broad_spectrum_antibiotic",
+    "model": "capsule_heap",
+    "name": "Broad-spectrum antibiotics",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "capsule",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.5,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Military"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Strong antibiotic capsules. One dose holds off any bacterial infection for twelve hours. Hard on the body.",
+    "notes": "The id says what 'strong' means. Its treatment should outrank tetracycline's when the refactor applies drafts; the dose duration has no content field yet."
+  },
+  {
+    "id": "chlorpromazine",
+    "model": "tablet_heap",
+    "name": "Chlorpromazine",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-charcoal",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "An antipsychotic. Stops hallucinations and steadies the mind. Makes the taker drowsy.",
+    "notes": "The id names the drug instead of a brand. Hallucination and sedation have no content fields yet."
+  },
+  {
+    "id": "rolling_tobacco",
+    "model": "leaf_heap",
+    "name": "Rolling tobacco",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "leaf",
+    "labelFinish": "paint-oxblood",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 15
+    },
+    "volumeCm3": 2,
+    "stack": 15,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Loose fine-cut tobacco. Rolled into a cigarette with papers or smoked in a pipe. Addictive.",
+    "notes": "The id says what kind of tobacco. Smoking and nicotine have no content fields yet."
+  },
+  {
+    "id": "tramadol",
+    "model": "capsule_heap",
+    "name": "Tramadol",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "capsule",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 30
+    },
+    "volumeCm3": 0.5,
+    "stack": 30,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "A mild opioid painkiller. Eases moderate pain for several hours.",
+    "notes": "The analgesic numbers belong to the refactor; it should sit between aspirin and codeine and share the opioid cap."
+  },
+  {
+    "id": "multivitamin",
+    "model": "tablet_heap",
+    "name": "Multivitamins",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "paint-terracotta",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 60
+    },
+    "volumeCm3": 0.3,
+    "stack": 60,
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Daily tablets of vitamins and minerals. Fills gaps in a poor diet; too many cause illness.",
+    "notes": "Gummy vitamins are a variant of it. Nutrition has no content field yet."
+  },
+  {
+    "id": "vitamin_c",
+    "model": "tablet_heap",
+    "name": "Vitamin C tablets",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-yellow",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 60
+    },
+    "volumeCm3": 0.3,
+    "stack": 60,
+    "economy": {
+      "usage": [
+        "Residential",
+        "Medical"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Large vitamin C tablets. Keep scurvy away.",
+    "notes": "Nutrition has no content field yet."
+  },
+  {
+    "id": "narrow_spectrum_antibiotic",
+    "model": "tablet_heap",
+    "name": "Narrow-spectrum antibiotics",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-green",
+    "packaging": {
+      "holder": "blister_card",
+      "count": 10
+    },
+    "volumeCm3": 0.3,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1",
+        "Tier2"
+      ]
+    },
+    "description": "Mild antibiotic tablets. Helps the body fight off an infection for twelve hours but rarely cures one alone.",
+    "notes": "Infection resistance has no content field yet."
+  },
+  {
+    "id": "cannabis",
+    "model": "leaf_heap",
+    "name": "Cannabis",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "leaf",
+    "labelFinish": "leaf-green",
+    "packaging": {
+      "holder": "zip_bag",
+      "count": 10
+    },
+    "volumeCm3": 2,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Dried cannabis buds. Smoked to ease nausea and pain and lift the mood. Habit-forming.",
+    "notes": "Nausea, appetite, mood and habit have no content fields yet."
+  },
+  {
+    "id": "fast_acting_sedative",
+    "model": "tablet_heap",
+    "name": "Fast-acting sedatives",
+    "category": "medical",
+    "size": [
+      1,
+      1
+    ],
+    "form": "tablet",
+    "labelFinish": "plastic-amber",
+    "packaging": {
+      "holder": "pill_bottle",
+      "count": 20
+    },
+    "volumeCm3": 0.3,
+    "stack": 20,
+    "economy": {
+      "usage": [
+        "Medical",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier2"
+      ]
+    },
+    "description": "Strong anti-anxiety tablets. Calms quickly and brings on sleep, but blurs memory and is badly addictive.",
+    "notes": "The id describes the drug instead of a brand. Sedation, memory loss and addiction have no content fields yet."
+  },
+  {
+    "id": "concrete",
+    "model": "granular_heap",
+    "name": "Concrete mix",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "granular",
+    "labelFinish": "paint-red",
+    "packaging": {
+      "holder": "paper_sack",
+      "count": 10
+    },
+    "volumeCm3": 60,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Residential"
+      ],
+      "tiers": [
+        "Tier1"
+      ]
+    },
+    "description": "Dry cement, sand and gravel, mixed and ready to wet.",
+    "notes": "Mixing with water and pouring need recipes."
+  },
+  {
+    "id": "fireproof_mortar",
+    "model": "granular_heap",
+    "name": "Heatproof mortar",
+    "category": "material",
+    "size": [
+      1,
+      2
+    ],
+    "form": "granular",
+    "labelFinish": "cloth-crimson",
+    "packaging": {
+      "holder": "paper_sack",
+      "count": 10
+    },
+    "volumeCm3": 60,
+    "stack": 10,
+    "economy": {
+      "usage": [
+        "Industrial",
+        "Infected"
+      ],
+      "tiers": [
+        "Tier2",
+        "Tier3"
+      ]
+    },
+    "description": "Dry grey mortar. Mixed and laid, it holds against heat that would crack common brick."
+  },
+  {
+    "id": "glow_dust",
+    "model": "powder_heap",
+    "name": "Glowing dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "gem-peridot",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3"
+      ]
+    },
+    "finishes": {
+      "powder": "gem-peridot"
+    },
+    "description": "Fine pale green dust that gives off a soft light of its own."
+  },
+  {
+    "id": "crystal_dust_pink",
+    "model": "powder_heap",
+    "name": "Pink crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "gem-pink",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "gem-pink"
+    },
+    "description": "A pinch of pink dust that glitters faintly when it is turned.",
+    "notes": "Each colour gets its own draft with a `powder` finish. A glittering or faintly glowing finish would fit better than gem-pink. Usage `Infected` stands for drops from strange creatures until a fitting tag exists."
+  },
+  {
+    "id": "crystal_dust_gray",
+    "model": "powder_heap",
+    "name": "Gray crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "tape-silver",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "tape-silver"
+    },
+    "description": "A pinch of gray dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_cyan",
+    "model": "powder_heap",
+    "name": "Cyan crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "gem-aquamarine",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "gem-aquamarine"
+    },
+    "description": "A pinch of cyan dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_golden",
+    "model": "powder_heap",
+    "name": "Golden crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "metal-gold",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "metal-gold"
+    },
+    "description": "A pinch of golden dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_red",
+    "model": "powder_heap",
+    "name": "Red crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "lacquer-red",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "lacquer-red"
+    },
+    "description": "A pinch of red dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_yellow",
+    "model": "powder_heap",
+    "name": "Yellow crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "gem-citrine",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "gem-citrine"
+    },
+    "description": "A pinch of yellow dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_white",
+    "model": "powder_heap",
+    "name": "White crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "pearl",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "pearl"
+    },
+    "description": "A pinch of white dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_blue",
+    "model": "powder_heap",
+    "name": "Blue crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "plastic-blue",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "plastic-blue"
+    },
+    "description": "A pinch of blue dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_green",
+    "model": "powder_heap",
+    "name": "Green crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "jade-green",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "jade-green"
+    },
+    "description": "A pinch of green dust that glitters faintly when it is turned."
+  },
+  {
+    "id": "crystal_dust_black",
+    "model": "powder_heap",
+    "name": "Black crystal dust",
+    "category": "material",
+    "size": [
+      1,
+      1
+    ],
+    "form": "powder",
+    "labelFinish": "gem-onyx",
+    "packaging": {
+      "holder": "glass_vial",
+      "count": 5
+    },
+    "volumeCm3": 0.5,
+    "stack": 5,
+    "economy": {
+      "usage": [
+        "Infected"
+      ],
+      "tiers": [
+        "Tier3",
+        "Tier4"
+      ]
+    },
+    "finishes": {
+      "powder": "gem-onyx"
+    },
+    "description": "A pinch of dull black dust. It has lost whatever shine it had."
+  }
+]

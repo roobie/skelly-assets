@@ -1,47 +1,5 @@
 [
   {
-    "id": "narrow_spectrum_antibiotic",
-    "model": "narrow_spectrum_antibiotic",
-    "name": "Blister card of narrow-spectrum antibiotics",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1",
-        "Tier2"
-      ]
-    },
-    "description": "Mild antibiotic tablets. Helps the body fight off an infection for twelve hours but rarely cures one alone.",
-    "notes": "Plain white tablets and a green band set it apart from batch 8's red and yellow broad-spectrum capsules. Infection resistance has no content field yet."
-  },
-  {
-    "id": "cannabis",
-    "model": "cannabis",
-    "name": "Bag of cannabis",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1"
-      ]
-    },
-    "description": "Dried cannabis buds in a zip bag. Smoked to ease nausea and pain and lift the mood. Habit-forming.",
-    "notes": "plastic-clear draws the bag; it stays see-through in the game, so the olive buds inside show there, though the look tiles draw the bag opaque. Nausea, appetite, mood and habit have no content fields yet."
-  },
-  {
     "id": "wintergreen_ointment",
     "model": "wintergreen_ointment",
     "name": "Jar of wintergreen ointment",
@@ -61,27 +19,6 @@
     },
     "description": "A jar of ointment smelling of wintergreen. Rubbed into a wound, it dulls the pain and keeps it a little cleaner.",
     "notes": "An ointment, so the item is the whole 50 ml jar, as with the existing antiseptic; the look step allows this as a per-unit figure. Pain relief and mild antisepsis should follow the existing antiseptic's fields when the refactor applies drafts."
-  },
-  {
-    "id": "fast_acting_sedative",
-    "model": "fast_acting_sedative",
-    "name": "Vial of fast-acting sedatives",
-    "category": "medical",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Medical",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier2"
-      ]
-    },
-    "description": "Strong anti-anxiety tablets. Calms quickly and brings on sleep, but blurs memory and is badly addictive.",
-    "notes": "The id describes the drug instead of a brand. A white cap sets the vial apart from batch 8's blue-capped painkillers. plastic-amber draws the vial; it stays see-through in the game. Sedation, memory loss and addiction have no content fields yet."
   },
   {
     "id": "first_aid_box",

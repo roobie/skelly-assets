@@ -193,27 +193,6 @@
     "notes": "About 70 mm across: three brass gears meshing on their arbors, a pinion on the largest, and a loose balance wheel. Use in crafting needs recipes."
   },
   {
-    "id": "concrete",
-    "model": "concrete",
-    "name": "Sack of concrete mix",
-    "category": "material",
-    "size": [
-      1,
-      1
-    ],
-    "economy": {
-      "usage": [
-        "Industrial",
-        "Residential"
-      ],
-      "tiers": [
-        "Tier1"
-      ]
-    },
-    "description": "A small paper sack of dry cement, sand and gravel, mixed and ready to wet.",
-    "notes": "Loose powder, drawn in the small paper sack a player would carry, 80 by 50 mm and 90 mm tall with its top rolled down, a printed band and a little spilled grey mix beside it. Mixing with water and pouring need recipes."
-  },
-  {
     "id": "condensing_unit",
     "model": "condensing_unit",
     "name": "Condensing unit",

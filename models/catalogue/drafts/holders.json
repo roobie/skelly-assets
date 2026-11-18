@@ -1,0 +1,98 @@
+[
+  {
+    "id": "pill_bottle",
+    "model": "pill_bottle",
+    "name": "Pill bottle",
+    "category": "misc",
+    "size": [1, 1],
+    "economy": { "usage": ["Medical", "Residential"], "tiers": ["Tier1"] },
+    "container": {
+      "rigid": true,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.3 }],
+      "maxVolumeCm3": 120,
+      "holds": { "forms": ["tablet", "capsule"], "oneKind": true }
+    },
+    "description": "An amber pharmacy bottle with a white child-proof cap.",
+    "notes": "The tablets and capsules found loose in a cabinet come in it. plastic-amber draws the bottle; it stays see-through in the game. Its label is repainted in its contents' label finish."
+  },
+  {
+    "id": "glass_vial",
+    "model": "glass_vial",
+    "name": "Glass vial",
+    "category": "misc",
+    "size": [1, 1],
+    "economy": { "usage": ["Medical", "Residential"], "tiers": ["Tier1", "Tier2"] },
+    "container": {
+      "rigid": true,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.4 }],
+      "maxVolumeCm3": 5,
+      "holds": { "forms": ["powder", "crystal"], "oneKind": true }
+    },
+    "description": "A small corked glass vial.",
+    "notes": "Holds a few grams of powder or crystal. Its label band is repainted in its contents' label finish."
+  },
+  {
+    "id": "blister_card",
+    "model": "blister_card",
+    "name": "Blister card",
+    "category": "misc",
+    "size": [1, 1],
+    "economy": { "usage": ["Medical", "Residential"], "tiers": ["Tier1"] },
+    "container": {
+      "rigid": true,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.5 }],
+      "maxCount": 10,
+      "holds": { "forms": ["tablet", "capsule", "gum"], "oneKind": true, "refill": false }
+    },
+    "description": "A foil-backed card of ten clear bubbles.",
+    "notes": "A pressed-out bubble does not close again, so nothing goes back in once it is spawned. Its printed band is repainted in its contents' label finish."
+  },
+  {
+    "id": "small_tin",
+    "model": "small_tin",
+    "name": "Small tin",
+    "category": "misc",
+    "size": [1, 1],
+    "economy": { "usage": ["Residential", "Commercial"], "tiers": ["Tier1"] },
+    "container": {
+      "rigid": true,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.4 }],
+      "maxVolumeCm3": 60,
+      "holds": { "forms": ["leaf", "tablet", "gum"], "oneKind": true }
+    },
+    "description": "A round steel tin with a push-on lid.",
+    "notes": "Its lid label is repainted in its contents' label finish."
+  },
+  {
+    "id": "paper_sack",
+    "model": "paper_sack",
+    "name": "Paper sack",
+    "category": "misc",
+    "size": [1, 2],
+    "economy": { "usage": ["Industrial", "Residential"], "tiers": ["Tier1"] },
+    "container": {
+      "rigid": false,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.6 }],
+      "maxVolumeCm3": 700,
+      "holds": { "forms": ["granular", "powder"], "oneKind": true }
+    },
+    "description": "A small kraft paper sack with its top rolled down.",
+    "notes": "Dry mixes come in it. Its printed band is repainted in its contents' label finish."
+  },
+  {
+    "id": "zip_bag",
+    "model": "zip_bag",
+    "name": "Zip bag",
+    "category": "misc",
+    "size": [1, 1],
+    "economy": { "usage": ["Residential"], "tiers": ["Tier1", "Tier2"] },
+    "container": {
+      "rigid": false,
+      "pockets": [{ "layout": "pile", "handlingSimSeconds": 0.4 }],
+      "maxVolumeCm3": 40,
+      "holds": { "forms": ["powder", "crystal", "leaf", "blotter"], "oneKind": true }
+    },
+    "description": "A small clear zip bag with a white panel to write on.",
+    "notes": "Its write-on panel is repainted in its contents' label finish. Residential stands in for street loot, for which no usage tag exists."
+  }
+]
