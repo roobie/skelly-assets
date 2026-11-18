@@ -6,11 +6,13 @@
   "type": "module",
   "scripts": {
     "predev": "node ../../sources.mjs",
-    "dev": "vite",
+    "dev": "node serve.ts",
     "pretypecheck": "node ../../sources.mjs",
     "typecheck": "tsc --noEmit",
     "pretest": "node ../../sources.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "pretest:browser": "node ../../sources.mjs",
+    "test:browser": "node test/browser/lab-smoke.mjs"
   },
   "dependencies": {
     "@skelly/surfaces": "*",
@@ -20,7 +22,6 @@
   "devDependencies": {
     "@types/node": "^26.6.2",
     "@types/three": "^0.186.0",
-    "playwright": "^1.63.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
     "vitest": "^5.0.1"

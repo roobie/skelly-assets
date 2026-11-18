@@ -19,6 +19,10 @@
       // The script of `stress.html`, the Vite build's second page; knip reads only `index.html` for scripts.
       "entry": ["src/viewer/stress.ts"]
     },
+    "packages/shader-lab": {
+      // The dev server imports the lab's server by a computed URL so it reloads on edit; see `vite.config.ts`.
+      "entry": ["server/labServer.ts"]
+    },
     "packages/thing-authoring-tool": {
       // Run by hand to write the skin fixture's exports; see `README.md`.
       "entry": ["test/export-skin-fixture.ts"]
