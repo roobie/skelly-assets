@@ -71,9 +71,7 @@ export async function readSeveredParts(root = repo) {
   const { templateFor } = await import('./mobTemplates.mjs');
   const { build, generate } = await import('./packages/mobgen/src/core/generate.ts');
   const { severed } = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
-  const catalogue = new Set(
-    Object.keys(JSON.parse(readFileSync(join(root, 'tools/packages/thing-core/src/materials.json'), 'utf8'))),
-  );
+  const catalogue = new Set(Object.keys(JSON.parse(readFileSync(join(root, 'models/finishes.json'), 'utf8'))));
   return severedPartPlan(
     severed,
     readMobRows(root),
