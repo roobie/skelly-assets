@@ -2,6 +2,7 @@
 // leading. The guard holds the weapon up before the body; the overhead comes down from over the head, the side swing
 // cuts across from the right, the thrust drives the end straight out. Heavy strikes wind up longer than one hand's.
 local body = import 'body.libsonnet';
+local wield = import 'models/measures/wield.libsonnet';
 local legs = body { pelvis: [0, -10, 0], 'thigh.L': [18, 0, 4], 'thigh.R': [-8, 0, -6], 'shin.L': [12, 0, 0], 'shin.R': [14, 0, 0] };
 local held(at, pitch, yaw, roll=0, right=[-0.6, -1, 0], left=[0.6, -1, 0]) = {
   at: at,
@@ -18,7 +19,7 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
     // A hand's width apart, both thumbs toward the working end.
     hands: {
       'hand.L': { seat: 0, into: [1, 0, 0], hands: 'grip' },
-      'hand.R': { seat: 0.09, into: [1, 0, 0], hands: 'grip' },
+      'hand.R': { seat: wield.twoHand.leadSeat, into: [1, 0, 0], hands: 'grip' },
     },
   },
   stances: {
