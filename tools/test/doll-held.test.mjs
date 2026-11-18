@@ -23,10 +23,11 @@ import {
   wieldResults,
   wieldWeapons,
 } from '../wields.mjs';
-import { dollTree, gunIds, guns, pressCheck, repo, WEAR, wields } from './doll-tree.mjs';
+import { dollTree, heldThings, repo, WEAR } from './doll-tree.mjs';
 
 // One garment dresses the doll, for the body a held gun must stand clear of.
 const { built, manifest, models, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
+const { pressCheck, wields, guns, gunIds } = heldThings();
 const rest = restIn(WEAR);
 
 // A held gun stands clear of the body but for the hands that close on it: no point of its mesh deeper inside any other
