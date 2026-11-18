@@ -68,27 +68,36 @@ const tube = (id: string, slot: string, a: Vec3, b: Vec3, r0: number, r1: number
   ]);
 };
 
-/**
- * An ellipsoid's 26 tangent planes, its short axis along `facing`, cut at the ground. The planes lie at the ellipsoid's
- * support h(n) = |R·diag(r)·Rᵀ n|, so the facets circumscribe it and the box of its three axis supports holds them.
- */
-const clump = (
-  id: string,
-  slot: string,
-  centre: Vec3,
-  radius: number,
-  thickness: number,
-  facing: Vec3,
-  display: SolidDisplayHints,
-): ExtrudedPolygonSolid => {
+const AXES: readonly Vec3[] = [
+  [1, 0, 0],
+  [0, 1, 0],
+  [0, 0, 1],
+];
+
+/** An ellipsoid's support h(n) = |R·diag(r)·Rᵀ n|: how far it reaches along `n`. Its short axis lies along `facing`. */
+type Support = (n: Vec3) => number;
+const ellipsoid = (radius: number, thickness: number, facing: Vec3): Support => {
   const u = across(facing);
   const axes: readonly [Vec3, number][] = [
     [u, radius],
     [cross(facing, u), radius],
     [facing, thickness],
   ];
-  const support = (n: Vec3) => Math.hypot(...axes.map(([axis, r]) => r * dot(axis, n)));
-  const half = [0, 1, 2].map((i) => support([0, 1, 2].map((j) => (i === j ? 1 : 0)) as unknown as Vec3));
+  return (n) => Math.hypot(...axes.map(([axis, r]) => r * dot(axis, n)));
+};
+
+/**
+ * An ellipsoid's 26 tangent planes, cut at the ground. The planes lie at its support, so the facets circumscribe it and
+ * the box of its three axis supports holds them.
+ */
+const clump = (
+  id: string,
+  slot: string,
+  centre: Vec3,
+  support: Support,
+  display: SolidDisplayHints,
+): ExtrudedPolygonSolid => {
+  const half = AXES.map(support);
   const low = centre.map((c, i) => c - half[i]!) as unknown as Vec3;
   const high = centre.map((c, i) => c + half[i]!) as unknown as Vec3;
   return clipped(
@@ -189,29 +198,41 @@ const foliageOf = ({ internodes, seasons }: Skeleton, { foliage }: Species, { gr
   const thickness = Math.max(foliage.clump * foliage.squash, foliage.least * grain);
   const radius = Math.max(foliage.clump, thickness);
   const display: SolidDisplayHints = foliage.terrace > 1 ? { ...PLAIN, terrace: foliage.terrace } : PLAIN;
-  const clumps = centres.map((centre, index) => {
+  const placed = centres.map((centre) => {
     const offset = sub(centre, crown.centre);
     const outward = offset.map((v, i) => v / crown.radii[i]! ** 2) as unknown as Vec3;
     const out = length(outward) > 1e-9 ? normalize(outward) : UP;
     const facing = normalize(add(scale(UP, 1 - foliage.crown), scale(out, foliage.crown)));
-    return clump(`leaf-${index}`, slot, centre, radius, thickness, facing, display);
+    return { centre, support: ellipsoid(radius, thickness, facing) };
   });
+  const clumps = placed.map(({ centre, support }, index) => clump(`leaf-${index}`, slot, centre, support, display));
 
-  const columns = new Map<string, Vec3[]>();
-  for (const centre of centres) {
-    const [i, , k] = cellOf(centre);
-    columns.set(`${i},${k}`, [...(columns.get(`${i},${k}`) ?? []), centre]);
+  const columns = new Map<string, typeof placed>();
+  for (const one of placed) {
+    const [i, , k] = cellOf(one.centre);
+    columns.set(`${i},${k}`, [...(columns.get(`${i},${k}`) ?? []), one]);
   }
   const half = foliage.clump * foliage.core;
+  // A core never reaches past its column's clumps across, so the smooth copy, which leaves it out, keeps the
+  // voxel copy's footprint.
+  const span = (column: typeof placed, axis: 0 | 2): [number, number] => {
+    const middle = mean(column.map(({ centre }) => centre))[axis];
+    const reach = AXES[axis]!;
+    return [
+      Math.max(middle - half, Math.min(...column.map(({ centre, support }) => centre[axis] - support(reach)))),
+      Math.min(middle + half, Math.max(...column.map(({ centre, support }) => centre[axis] + support(reach)))),
+    ];
+  };
   const cores =
     half > 0
       ? [...columns.values()]
           .filter((column) => column.length >= 2)
           .map((column, index) => {
-            const [x, , z] = mean(column);
-            const ys = column.map((p) => p[1]);
-            const low: Vec3 = [x - half, Math.max(0, Math.min(...ys)), z - half];
-            return clipped(`leaf-core-${index}`, slot, low, [x + half, Math.max(...ys), z + half], [], CORE);
+            const [x0, x1] = span(column, 0);
+            const [z0, z1] = span(column, 2);
+            const ys = column.map(({ centre }) => centre[1]);
+            const low: Vec3 = [x0, Math.max(0, Math.min(...ys)), z0];
+            return clipped(`leaf-core-${index}`, slot, low, [x1, Math.max(...ys), z1], [], CORE);
           })
       : [];
   return [...clumps, ...cores];

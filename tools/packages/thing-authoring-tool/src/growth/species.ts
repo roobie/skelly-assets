@@ -126,6 +126,7 @@ export const SpeciesSchema = strictObject({
     /**
      * The half-width of the solid core that fills each column of two or more clumps, as a share of a clump's radius;
      * 0 leaves the crown a shell. A shell's inner faces cost a voxel copy as much as its outer ones and are never seen.
+     * Past its clumps' reach a core is cut back to it (solids.ts, foliageOf).
      */
     core: pipe(scalar, minValue(0)),
     /** Voxel layers per terrace step of a clump's voxel copy (SolidDisplayHints.terrace); 1 draws it as authored. */
