@@ -134,6 +134,8 @@ export interface EntryFolder {
   /** An entry's files, or undefined when its last is missing; a reuse in a shared folder refreshes the entry's age. */
   readonly read: (key: string, names: readonly string[]) => Record<string, Buffer> | undefined;
   readonly write: (key: string, names: readonly string[], files: EntryFiles) => void;
+  /** Where an entry's file lies, for a reader that must name the file rather than read it, such as a link to it. */
+  readonly path: (key: string, name: string) => string;
 }
 
 export const entryFolder = (dir: string): EntryFolder => {
@@ -167,6 +169,7 @@ export const entryFolder = (dir: string): EntryFolder => {
       return files;
     },
     write,
+    path,
   };
 };
 
