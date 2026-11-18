@@ -23,7 +23,6 @@ local pointLength = 0.09;
 local tipWidth = 0.028;
 // The point's ogive is drawn through one shoulder, a share of the way along the point and of the tip's half-width.
 local pointShoulder = { along: 0.5, across: 0.75 };
-local ridgeThickness = 0.006;
 // How far the fuller's rounded end reaches past its run, toward the hilt.
 local fullerNose = 0.012;
 
@@ -59,11 +58,12 @@ local fullerHalfAt(x) = fullerWidth / 2 * halfWidthAt(x) / halfWidthAt(bladeStar
 // Compound prisms are constant sections, so the lens section is stacked from plan outlines, each layer nearer the
 // ridge narrower and thicker. A layer's point stops only a little short of the one below, because a forged point
 // carries its ridge almost to the tip; shortening it by its width's share would leave the last of the blade a flat
-// strip.
-local sectionLayers = 3;
+// strip. Each layer stands one voxel prouder than the one below: the lattice is anchored on the blade's midplane, so a
+// step finer than a grain falls into the same voxels as its neighbour and the fuller's walls vanish with it.
+local sectionLayers = 2;
 local ridgeRunout = 0.01;
 local layerShare(i) = 1 - i / sectionLayers;
-local layerHalfThickness(i) = ridgeThickness / 2 * (i + 1) / sectionLayers;
+local layerHalfThickness(i) = (i + 1) * grain;
 // A layer's outline from `from` to its tip, one side's edge then the other's.
 local layerOutline(i, from) =
   local k = layerShare(i), half = k * tipWidth / 2;
@@ -79,7 +79,7 @@ local layer(id, i, outline) = h.prism(id, 'blade', 'z', outline, -layerHalfThick
 // stand either side of it along its run and close over it only past its rounded end. A layer no wider than the
 // fuller has nothing beside it, and lies only past it. The fuller narrows with the blade, so a layer's land beside it
 // is the same share of the blade all along the run.
-local fullerLayers = 2;
+local fullerLayers = 1;
 local floorLayer = sectionLayers - fullerLayers - 1;
 local landShare(i) = layerShare(i) - fullerWidth / baseWidth;
 local fullerSide(i, s) =
