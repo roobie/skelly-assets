@@ -18,7 +18,15 @@ import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } fr
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
 import { clipIssues, compilePose, encodeFrame, frameAngles, poseFileOf, rigFrame, soleLift } from './poseFile.mjs';
-import { clipSet, frame as frameCamera, loadEntry, makeStage, playable, registerModels, setupRenderer } from './render.mjs';
+import {
+  clipSet,
+  frame as frameCamera,
+  loadEntry,
+  makeStage,
+  playable,
+  registerModels,
+  setupRenderer,
+} from './render.mjs';
 import { addCoveredSkin, skinCheck } from './skin.mjs';
 import { drawEye, drawView, gridCell, groundGrid, makeDrawer, ruleAt, startTile } from './tile.mjs';
 
@@ -28,15 +36,19 @@ const IDENTITY_Q = [0, 0, 0, 1];
 const standing = (rig) => ({ rig: { id: rig.id, revision: rig.revision }, ground: true });
 
 const ready = (async () => {
-  const [{ models }, rig] = await Promise.all([fetch('models.json').then((r) => r.json()), fetch('rig.json').then((r) => r.json())]);
+  const [{ models }, rig] = await Promise.all([
+    fetch('models.json').then((r) => r.json()),
+    fetch('rig.json').then((r) => r.json()),
+  ]);
   registerModels(models);
   return { models: new Map(models.map((model) => [model.id, model])), rig };
 })();
 
-const loadPoseFile = (name) => fetch(`poses/${name}.json`).then((r) => {
-  if (!r.ok) throw new Error(`no pose fixture ${name}`);
-  return r.json();
-});
+const loadPoseFile = (name) =>
+  fetch(`poses/${name}.json`).then((r) => {
+    if (!r.ok) throw new Error(`no pose fixture ${name}`);
+    return r.json();
+  });
 
 // ---- the figure: sites bound to joints ----
 
@@ -62,21 +74,32 @@ function dressedSites({ models, rig }, wear) {
 // The doll part node a bone moves: the node marked with the bind's part in the doll site the bind names.
 function boundPart(bone, groups) {
   const found = [];
-  groups[bone.bind.site].traverse((node) => { if (node.userData.part === bone.bind.part) found.push(node); });
-  if (found.length !== 1) throw new Error(`${bone.id}: ${found.length} ${bone.bind.part} nodes in doll site ${bone.bind.site}; the rig needs one`);
+  groups[bone.bind.site].traverse((node) => {
+    if (node.userData.part === bone.bind.part) found.push(node);
+  });
+  if (found.length !== 1)
+    throw new Error(
+      `${bone.id}: ${found.length} ${bone.bind.part} nodes in doll site ${bone.bind.site}; the rig needs one`,
+    );
   return found[0];
 }
 
 // Every drawn mesh under `object` as one triangle mesh in world axes, each triangle with the region its primitive is
 // marked as; what a worn piece hides (hiding.mjs) is not drawn, so it is neither probed nor counted as showing.
 function worldMesh(object) {
-  const positions = [], indices = [], pieces = [];
+  const positions = [],
+    indices = [],
+    pieces = [];
   const p = new THREE.Vector3();
   object.traverse((o) => {
     if (!o.isMesh || !o.visible) return;
     const base = positions.length / 3;
-    const { attributes: { position }, index } = o.geometry;
-    for (let i = 0; i < position.count; i++) positions.push(...p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).toArray());
+    const {
+      attributes: { position },
+      index,
+    } = o.geometry;
+    for (let i = 0; i < position.count; i++)
+      positions.push(...p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).toArray());
     if (index) for (let i = 0; i < index.count; i++) indices.push(base + index.getX(i));
     else for (let i = 0; i < position.count; i++) indices.push(base + i);
     for (let t = 0; t < (index ?? position).count / 3; t++) pieces.push(o.geometry.userData.piece);
@@ -104,7 +127,9 @@ export async function buildFigure(data, wear) {
   for (const bone of rig.bones) {
     const joint = new THREE.Object3D();
     joint.name = bone.id;
-    joint.position.fromArray(bone.parent === null ? bone.head : sub(bone.head, rig.bones.find(({ id }) => id === bone.parent).head));
+    joint.position.fromArray(
+      bone.parent === null ? bone.head : sub(bone.head, rig.bones.find(({ id }) => id === bone.parent).head),
+    );
     (bone.parent === null ? root : joints.get(bone.parent)).add(joint);
     joints.set(bone.id, joint);
   }
@@ -114,7 +139,9 @@ export async function buildFigure(data, wear) {
     const joint = joints.get(bone.id);
     const part = boundPart(bone, groups);
     joint.attach(part);
-    const pieces = sites.flatMap((site, i) => (site.part === bone.bind.part && site.side === bone.bind.side ? [{ site, group: groups[i] }] : []));
+    const pieces = sites.flatMap((site, i) =>
+      site.part === bone.bind.part && site.side === bone.bind.side ? [{ site, group: groups[i] }] : [],
+    );
     for (const { group } of pieces) joint.attach(group);
     return { bone, joint, part, pieces };
   });
@@ -122,7 +149,8 @@ export async function buildFigure(data, wear) {
   for (const { bone, part, pieces } of bound) {
     const mesh = worldMesh(part);
     if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, part: bone.bind.part, mesh });
-    for (const { site, group } of pieces) rest.pieces.push({ piece: site.model, bone: bone.id, covers: site.covers, mesh: worldMesh(group) });
+    for (const { site, group } of pieces)
+      rest.pieces.push({ piece: site.model, bone: bone.id, covers: site.covers, mesh: worldMesh(group) });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));
   let clearance;
@@ -133,7 +161,17 @@ export async function buildFigure(data, wear) {
     }
     return clearance;
   };
-  return { rig, root, dressed, marks, bones, pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })), clearance: covered, held: new Map(), soles: soleLift(sites) };
+  return {
+    rig,
+    root,
+    dressed,
+    marks,
+    bones,
+    pieces: rest.pieces.map(({ piece, bone }) => ({ piece, bone })),
+    clearance: covered,
+    held: new Map(),
+    soles: soleLift(sites),
+  };
 }
 
 // Poses the figure by a clip frame: a quaternion per bone about its head, the root moved by `frame.root`. What no bone
@@ -157,7 +195,12 @@ function probe(figure, frame) {
     const points = found[kind].flatMap(({ point }) => point);
     if (points.length === 0) continue;
     const geometry = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    figure.marks.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color, size: 0.012, sizeAttenuation: true, depthTest: false })));
+    figure.marks.add(
+      new THREE.Points(
+        geometry,
+        new THREE.PointsMaterial({ color, size: 0.012, sizeAttenuation: true, depthTest: false }),
+      ),
+    );
   }
   return found;
 }
@@ -169,10 +212,13 @@ const bent = (angles) => angles.some((a) => Math.abs(a) > 1e-9);
 const round = (x, places) => Math.round(x * 10 ** places) / 10 ** places;
 
 // A clip frame from a root and the angles of every bone, leaving out the bones at rest.
-const frameOf = (rig, { root, angles }) => encodeFrame({
-  root,
-  rotations: Object.fromEntries(rig.bones.filter((bone) => bent(angles[bone.id])).map((bone) => [bone.id, jointRotation(bone, angles[bone.id])])),
-});
+const frameOf = (rig, { root, angles }) =>
+  encodeFrame({
+    root,
+    rotations: Object.fromEntries(
+      rig.bones.filter((bone) => bent(angles[bone.id])).map((bone) => [bone.id, jointRotation(bone, angles[bone.id])]),
+    ),
+  });
 const anglesOf = (rig, frame) => ({ ...identityAngles(rig), ...frameAngles(rig, frame) });
 
 // A pose file of the frame, rounded for a person to read and edit.
@@ -180,7 +226,11 @@ const readablePose = (rig, frame) => {
   const { angles, root, ...file } = poseFileOf(rig, frame);
   return {
     ...file,
-    angles: Object.fromEntries(Object.entries(angles).filter(([, a]) => bent(a)).map(([id, a]) => [id, a.map((x) => round(x, 2))])),
+    angles: Object.fromEntries(
+      Object.entries(angles)
+        .filter(([, a]) => bent(a))
+        .map(([id, a]) => [id, a.map((x) => round(x, 2))]),
+    ),
     ...(bent(root) ? { root: root.map((x) => round(x, 4)) } : {}),
   };
 };
@@ -188,12 +238,17 @@ const readablePose = (rig, frame) => {
 // The seconds a clip plays over once: a walk by its stride at the pace it was drawn for, or else the actor's walk speed,
 // a loop by its period, a finite clip by its duration. The page has no Sim clock, so Sim seconds play one to one on Real time.
 const spanOf = (clip, walkSpeed) => {
-  if (clip.loop && clip.strideMetres !== undefined) return clip.strideMetres * (clip.cycles ?? 1) / (clip.speedMetresPerSecond ?? walkSpeed);
+  if (clip.loop && clip.strideMetres !== undefined)
+    return (clip.strideMetres * (clip.cycles ?? 1)) / (clip.speedMetresPerSecond ?? walkSpeed);
   return clip.loop ? clip.periodSimSeconds : clipSpanSeconds(clip);
 };
 // A clip of the rig's frames, its span stated the way its loop needs, timed by `timing` (`keyPhases` and `easing`) if given.
 const authoredClip = (frames, loop, seconds, timing) => ({
-  kind: 'pose', loop, ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }), ...timing, frames,
+  kind: 'pose',
+  loop,
+  ...(loop ? { periodSimSeconds: seconds } : { durationSimSeconds: seconds }),
+  ...timing,
+  frames,
 });
 // A clip's own key timing, kept apart from its span, so the span can be changed and the timing scales with it.
 const timingOf = ({ keyPhases, easing }) => ({ ...(keyPhases ? { keyPhases } : {}), ...(easing ? { easing } : {}) });
@@ -208,14 +263,24 @@ function drawTile(obj, size, views, { framed = obj, shown = [obj] } = {}) {
   drawer ??= makeDrawer();
   const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const box = new THREE.Box3().setFromObject(obj);
-  const grid = framed === obj ? groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray()))) : new THREE.Group();
+  const grid =
+    framed === obj
+      ? groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())))
+      : new THREE.Group();
   const { tile, g } = startTile(size, 2, 2);
   const kept = new Set();
   for (const part of shown) part.traverse((o) => kept.add(o));
   const hidden = [];
-  obj.traverse((o) => { if (o.isMesh && !kept.has(o)) { o.visible = false; hidden.push(o); } });
+  obj.traverse((o) => {
+    if (o.isMesh && !kept.has(o)) {
+      o.visible = false;
+      hidden.push(o);
+    }
+  });
   drawer.stage.add(obj);
-  directions.forEach((view, i) => { drawView(drawer, g, framed, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size); });
+  directions.forEach((view, i) => {
+    drawView(drawer, g, framed, grid, view, (i % 2) * size, Math.floor(i / 2) * size, size);
+  });
   drawer.stage.remove(obj);
   for (const o of hidden) o.visible = true;
   ruleAt(g, { x: size }, tile.height);
@@ -243,7 +308,12 @@ function drawEyeTile(obj, size, figure) {
   const grid = groundGrid(box, gridCell(Math.max(...box.getSize(new THREE.Vector3()).toArray())));
   const { tile, g } = startTile(size, 2, 1);
   const hidden = [];
-  head.traverse((o) => { if (o.isMesh) { o.visible = false; hidden.push(o); } });
+  head.traverse((o) => {
+    if (o.isMesh) {
+      o.visible = false;
+      hidden.push(o);
+    }
+  });
   drawer.stage.add(obj, grid);
   drawEye(drawer, g, 'eyes', eye, forward, 0, 0, size);
   for (const o of hidden) o.visible = true;
@@ -256,7 +326,9 @@ function drawEyeTile(obj, size, figure) {
 // The node of `obj` marked as the part `part`; the model needs exactly one.
 function partNode(obj, model, part) {
   const found = [];
-  obj.traverse((node) => { if (node.userData.part === part) found.push(node); });
+  obj.traverse((node) => {
+    if (node.userData.part === part) found.push(node);
+  });
   if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
   return found[0];
 }
@@ -269,17 +341,17 @@ function heldItem(scene, model) {
   const slides = new Map();
   const slideOf = (part) => {
     if (slides.has(part)) return slides.get(part);
-    const found = [];
-    obj.traverse((node) => { if (node.userData.part === part) found.push(node); });
-    if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
-    const [node] = found;
+    const node = partNode(obj, model, part);
     const { motion } = node.userData;
     if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
     let unit;
     for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
     if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
     const rest = node.position.clone();
-    const stroke = new THREE.Vector3(...motion.rearmost).sub(new THREE.Vector3(...motion.rest)).multiplyScalar(unit).applyQuaternion(node.quaternion);
+    const stroke = new THREE.Vector3(...motion.rearmost)
+      .sub(new THREE.Vector3(...motion.rest))
+      .multiplyScalar(unit)
+      .applyQuaternion(node.quaternion);
     const slide = (share) => node.position.copy(rest).addScaledVector(stroke, share);
     slides.set(part, slide);
     return slide;
@@ -294,7 +366,11 @@ function heldItem(scene, model) {
 // Each held model's scene, loaded once at the origin.
 const heldScenes = new Map();
 function heldScene(model) {
-  if (!heldScenes.has(model)) heldScenes.set(model, loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] }).then(({ scene }) => scene));
+  if (!heldScenes.has(model))
+    heldScenes.set(
+      model,
+      loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] }).then(({ scene }) => scene),
+    );
   return heldScenes.get(model);
 }
 
@@ -312,7 +388,8 @@ async function heldMesh(model, moved) {
  * parts moved by `moved`. Each model is carried once, so the figure keeps one copy of it.
  */
 async function carry(figure, carries) {
-  for (const { model } of carries) if (!figure.held.has(model)) figure.held.set(model, heldItem(await heldScene(model), model));
+  for (const { model } of carries)
+    if (!figure.held.has(model)) figure.held.set(model, heldItem(await heldScene(model), model));
   carryLoaded(figure, carries);
 }
 // `carry`, for items the figure has carried before, at once, so a playing clip moves them on the frame it draws.
@@ -354,17 +431,38 @@ function blendCarries(a, b, w) {
  */
 async function holdPose(figure, rig, file) {
   const models = [...new Set(Object.values(file.hold ?? {}).map(({ model }) => model))];
-  const meshes = new Map(await Promise.all(models.map(async (model) => [model, await heldMesh(model, file.moved?.[model])])));
+  const meshes = new Map(
+    await Promise.all(models.map(async (model) => [model, await heldMesh(model, file.moved?.[model])])),
+  );
   const compiled = compilePose(rig, file, { meshOf: (model) => meshes.get(model), soles: figure.soles });
   applyFrame(figure, compiled.frame);
   figure.root.updateMatrixWorld(true);
   const firstHands = new Map();
-  for (const [hand, item] of Object.entries(compiled.held)) if (!firstHands.has(item.model)) firstHands.set(item.model, { hand, item });
+  for (const [hand, item] of Object.entries(compiled.held))
+    if (!firstHands.has(item.model)) firstHands.set(item.model, { hand, item });
   const carries = [...firstHands.values()].map(({ hand, item: { model, r, t } }) => {
-    const inRoot = new THREE.Matrix4().set(r[0], r[1], r[2], t[0], r[3], r[4], r[5], t[1], r[6], r[7], r[8], t[2], 0, 0, 0, 1);
+    const inRoot = new THREE.Matrix4().set(
+      r[0],
+      r[1],
+      r[2],
+      t[0],
+      r[3],
+      r[4],
+      r[5],
+      t[1],
+      r[6],
+      r[7],
+      r[8],
+      t[2],
+      0,
+      0,
+      0,
+      1,
+    );
     const joint = figure.bones.get(hand).joint;
     const inHand = joint.matrixWorld.clone().invert().multiply(figure.root.matrixWorld).multiply(inRoot);
-    const at = new THREE.Vector3(), turn = new THREE.Quaternion();
+    const at = new THREE.Vector3(),
+      turn = new THREE.Quaternion();
     inHand.decompose(at, turn, new THREE.Vector3());
     return { model, hand, at: at.toArray(), turn: turn.toArray(), moved: file.moved?.[model] ?? {} };
   });
@@ -389,15 +487,26 @@ async function keptFigure(data, wear, skin) {
 // drawn as a tile framed on the whole figure or on the bone `focus` and what hangs from it, or from its own eyes when
 // `views` is `eye`, with the pieces that ride its bones, the compile report, the clearance probe's findings and the
 // skin check when asked, and the frame the pose compiled to.
-async function posed({ wear = [], pose, size = 384, views = 'review', probe: probing = false, skin = false, focus } = {}) {
+async function posed({
+  wear = [],
+  pose,
+  size = 384,
+  views = 'review',
+  probe: probing = false,
+  skin = false,
+  focus,
+} = {}) {
   const data = await ready;
   const figure = await keptFigure(data, wear, skin);
-  const file = typeof pose === 'string' ? await loadPoseFile(pose) : pose ?? standing(data.rig);
+  const file = typeof pose === 'string' ? await loadPoseFile(pose) : (pose ?? standing(data.rig));
   const { frame, report, carries } = await holdPose(figure, data.rig, file);
   const found = probing ? probe(figure, frame) : null;
   const framed = focus === undefined ? figure.root : figure.bones.get(focus)?.joint;
   if (!framed) throw new Error(`focus: the rig has no bone ${focus}`);
-  const closeUp = focus === undefined ? {} : { framed, shown: [framed, figure.marks, ...carries.map(({ model }) => figure.held.get(model).obj)] };
+  const closeUp =
+    focus === undefined
+      ? {}
+      : { framed, shown: [framed, figure.marks, ...carries.map(({ model }) => figure.held.get(model).obj)] };
   const png = views === 'eye' ? drawEyeTile(figure.root, size, figure) : drawTile(figure.root, size, views, closeUp);
   // The marks would draw over the skin check's masks.
   figure.marks.clear();
@@ -413,13 +522,22 @@ window.posed = posed;
 
 const $ = (id) => document.getElementById(id);
 const numbers = (ids) => ids.map((id) => Number($(id).value));
-const setNumbers = (ids, values) => ids.forEach((id, i) => { $(id).value = round(values[i], 4); });
+const setNumbers = (ids, values) =>
+  ids.forEach((id, i) => {
+    $(id).value = round(values[i], 4);
+  });
 const format = (x) => (Math.abs(x) < 0.05 ? '0' : x.toFixed(1));
-const describe = ({ clamped, residuals }) => [
-  clamped.length === 0 ? 'no limits held' : `held: ${clamped.map(({ bone, asked, held }) => `${bone} ${asked.map(format).join('/')} -> ${held.map(format).join('/')}`).join('; ')}`,
-  ...Object.entries(residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(1)} mm`),
-].join('\n');
-const countBy = (list, key) => Object.entries(Object.groupBy(list, (item) => item[key])).map(([id, items]) => `${id} ${items.length}`).join(', ');
+const describe = ({ clamped, residuals }) =>
+  [
+    clamped.length === 0
+      ? 'no limits held'
+      : `held: ${clamped.map(({ bone, asked, held }) => `${bone} ${asked.map(format).join('/')} -> ${held.map(format).join('/')}`).join('; ')}`,
+    ...Object.entries(residuals).map(([id, left]) => `${id} reach residual ${(left * 1000).toFixed(1)} mm`),
+  ].join('\n');
+const countBy = (list, key) =>
+  Object.entries(Object.groupBy(list, (item) => item[key]))
+    .map(([id, items]) => `${id} ${items.length}`)
+    .join(', ');
 
 function download(name, object) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(object, null, 1)], { type: 'application/json' }));
@@ -483,11 +601,23 @@ function bonePanel(container, rig, onChange) {
     const fields = ['flex', 'twist', 'abduct'].map((axis) => {
       const [min, max] = bone.limits[axis];
       const label = document.createElement('label');
-      const slider = Object.assign(document.createElement('input'), { type: 'range', min, max, step: 0.5, value: 0, disabled: min === max });
+      const slider = Object.assign(document.createElement('input'), {
+        type: 'range',
+        min,
+        max,
+        step: 0.5,
+        value: 0,
+        disabled: min === max,
+      });
       const output = document.createElement('output');
       label.append(axis, slider, output);
       details.append(label);
-      slider.addEventListener('input', () => onChange(bone.id, fields.map((field) => Number(field.slider.value))));
+      slider.addEventListener('input', () =>
+        onChange(
+          bone.id,
+          fields.map((field) => Number(field.slider.value)),
+        ),
+      );
       return { slider, output };
     });
     container.append(details);
@@ -526,14 +656,19 @@ async function startPage(data, query) {
   const wear = query.get('wear')?.split(',').filter(Boolean) ?? [];
   const state = { root: [0, 0, 0], angles: identityAngles(rig), carries: [] };
   const view = viewport($('view'));
-  const target = new THREE.Mesh(new THREE.SphereGeometry(0.015), new THREE.MeshBasicMaterial({ color: 0xb5532c, depthTest: false }));
+  const target = new THREE.Mesh(
+    new THREE.SphereGeometry(0.015),
+    new THREE.MeshBasicMaterial({ color: 0xb5532c, depthTest: false }),
+  );
   target.visible = false;
   $('wear').value = wear.join(',');
   $('report').textContent = 'loading the figure';
   const figure = await buildFigure(data, wear);
   figure.root.add(target);
 
-  const ROOT = ['root-x', 'root-y', 'root-z'], TARGET = ['ik-tx', 'ik-ty', 'ik-tz'], POLE = ['ik-px', 'ik-py', 'ik-pz'];
+  const ROOT = ['root-x', 'root-y', 'root-z'],
+    TARGET = ['ik-tx', 'ik-ty', 'ik-tz'],
+    POLE = ['ik-px', 'ik-py', 'ik-pz'];
   const bones = bonePanel($('bones'), rig, (id, angles) => {
     state.angles[id] = angles;
     refresh();
@@ -551,7 +686,9 @@ async function startPage(data, query) {
         pokes.length ? `pokes: ${countBy(pokes, 'bone')}` : '',
         flush.length ? `flush: ${countBy(flush, 'bone')}` : '',
         sinks.length ? `sinks: ${countBy(sinks, 'piece')}` : '',
-      ].filter(Boolean).join('\n');
+      ]
+        .filter(Boolean)
+        .join('\n');
     } else {
       figure.marks.clear();
       $('probe-report').textContent = '';
@@ -582,16 +719,27 @@ async function startPage(data, query) {
   });
   $('fixture').append(new Option('(rest)', ''), ...rig.poses.map((name) => new Option(name, name)));
   $('fixture').addEventListener('change', () => show($('fixture').value || standing(rig)));
-  for (const id of ROOT) $(id).addEventListener('change', () => { state.root = numbers(ROOT); refresh(); });
+  for (const id of ROOT)
+    $(id).addEventListener('change', () => {
+      state.root = numbers(ROOT);
+      refresh();
+    });
   $('ground').addEventListener('click', () => {
-    const { frame } = compilePose(rig, { ...poseFileOf(rig, frameOf(rig, state)), root: [state.root[0], 0, state.root[2]], ground: true }, { soles: figure.soles });
+    const { frame } = compilePose(
+      rig,
+      { ...poseFileOf(rig, frameOf(rig, state)), root: [state.root[0], 0, state.root[2]], ground: true },
+      { soles: figure.soles },
+    );
     state.root = frame.root;
     refresh();
   });
-  $('pose-open').addEventListener('change', shownError('report', async () => {
-    const [file] = $('pose-open').files;
-    if (file) await show(JSON.parse(await file.text()));
-  }));
+  $('pose-open').addEventListener(
+    'change',
+    shownError('report', async () => {
+      const [file] = $('pose-open').files;
+      if (file) await show(JSON.parse(await file.text()));
+    }),
+  );
 
   // Reach: two-bone IK places a reach bone's joint by turning the two bones above it.
   const ends = rig.bones.filter((bone) => bone.reach);
@@ -605,11 +753,22 @@ async function startPage(data, query) {
     view.render();
   };
   $('ik-end').addEventListener('change', aimAtEnd);
-  for (const id of TARGET) $(id).addEventListener('input', () => { target.position.fromArray(numbers(TARGET)); target.visible = true; });
+  for (const id of TARGET)
+    $(id).addEventListener('input', () => {
+      target.position.fromArray(numbers(TARGET));
+      target.visible = true;
+    });
   $('ik-solve').addEventListener('click', () => {
     const end = byId.get($('ik-end').value);
     const clamped = [];
-    const { pose: solved, residual } = solveTwoBone(rig, decodeFrame(frameOf(rig, state)), end.reach.chain, numbers(TARGET), numbers(POLE), clamped);
+    const { pose: solved, residual } = solveTwoBone(
+      rig,
+      decodeFrame(frameOf(rig, state)),
+      end.reach.chain,
+      numbers(TARGET),
+      numbers(POLE),
+      clamped,
+    );
     for (const id of end.reach.chain) state.angles[id] = jointAngles(byId.get(id), solved.rotations[id]);
     refresh();
     $('ik-report').textContent = describe({ clamped, residuals: { [end.id]: residual } });
@@ -636,7 +795,10 @@ async function startPage(data, query) {
     }
     take(sampleClip(playing, cursor));
   };
-  const setClip = (frames, { actor = null, carries = null, timing = {}, loop = false, seconds = Number($('clip-seconds').value) } = {}) => {
+  const setClip = (
+    frames,
+    { actor = null, carries = null, timing = {}, loop = false, seconds = Number($('clip-seconds').value) } = {},
+  ) => {
     clip.frames = frames;
     clip.carries = carries;
     clip.timing = timing;
@@ -646,7 +808,10 @@ async function startPage(data, query) {
     $('clip-count').textContent = `${frames.length} frame${frames.length === 1 ? '' : 's'}`;
     $('clip-scrub').disabled = $('clip-play').disabled = frames.length < 2;
   };
-  const stop = () => { clip.playing = false; $('clip-play').textContent = 'Play'; };
+  const stop = () => {
+    clip.playing = false;
+    $('clip-play').textContent = 'Play';
+  };
   const play = () => {
     let last = performance.now();
     const step = (now) => {
@@ -670,7 +835,11 @@ async function startPage(data, query) {
     setClip([...frames, frameOf(rig, state)], { carries: carries && [...carries, state.carries] });
     $('clip-source').value = '';
   });
-  $('clip-clear').addEventListener('click', () => { stop(); setClip([], { carries: [] }); $('clip-source').value = ''; });
+  $('clip-clear').addEventListener('click', () => {
+    stop();
+    setClip([], { carries: [] });
+    $('clip-source').value = '';
+  });
   $('clip-scrub').addEventListener('input', () => seek(Number($('clip-scrub').value)));
   // An actor clip retimed is collected frames; a sequence retimed keeps its carries and its timing, scaled.
   const retimed = () => {
@@ -683,12 +852,22 @@ async function startPage(data, query) {
   // The clip actor's clips (the rig's `clips`), each frame folded onto the doll's bones.
   const actorClips = clipSet(await fetch(`built/${rig.clips.file}`).then((r) => r.json()));
   const named = Object.entries(actorClips).filter(([, c]) => playable(c) && c.frames.length > 1);
-  const sequences = new Map(Object.entries(rig.sequences).map(([name, sequence]) => [`sequence ${name}`, { name, ...sequence }]));
+  const sequences = new Map(
+    Object.entries(rig.sequences).map(([name, sequence]) => [`sequence ${name}`, { name, ...sequence }]),
+  );
   // The doll's baked clips stand it barefoot, so the page stands them on what it wears; an idle's live motion is left out.
-  const baked = new Map((await Promise.all(rig.motions.map(async ({ id, file }) => {
-    const { clips } = await fetch(`built/${file}`).then((r) => r.json());
-    return Object.entries(clips).filter(([, c]) => playable(c)).map(([name, c]) => [`motion ${id} ${name}`, { id, name, clip: c }]);
-  }))).flat());
+  const baked = new Map(
+    (
+      await Promise.all(
+        rig.motions.map(async ({ id, file }) => {
+          const { clips } = await fetch(`built/${file}`).then((r) => r.json());
+          return Object.entries(clips)
+            .filter(([, c]) => playable(c))
+            .map(([name, c]) => [`motion ${id} ${name}`, { id, name, clip: c }]);
+        }),
+      )
+    ).flat(),
+  );
   $('clip-source').append(
     new Option('(authored)', ''),
     ...[...sequences].map(([value, { name }]) => new Option(name, value)),
@@ -698,41 +877,57 @@ async function startPage(data, query) {
   // A sequence's frames and carries, each key's fixture posed with what it holds, at the key's own time.
   const playSequence = async ({ keys, easing }) => {
     const posed = new Map();
-    for (const { fixture } of keys) if (!posed.has(fixture)) posed.set(fixture, await holdPose(figure, rig, await loadPoseFile(fixture)));
+    for (const { fixture } of keys)
+      if (!posed.has(fixture)) posed.set(fixture, await holdPose(figure, rig, await loadPoseFile(fixture)));
     const seconds = keys.at(-1).at;
-    setClip(keys.map(({ fixture }) => posed.get(fixture).frame), {
-      carries: keys.map(({ fixture }) => posed.get(fixture).carries),
-      timing: timingOf({ keyPhases: keys.map(({ at }) => at / seconds), easing }),
-      seconds,
-    });
+    setClip(
+      keys.map(({ fixture }) => posed.get(fixture).frame),
+      {
+        carries: keys.map(({ fixture }) => posed.get(fixture).carries),
+        timing: timingOf({ keyPhases: keys.map(({ at }) => at / seconds), easing }),
+        seconds,
+      },
+    );
     seek(0);
     $('clip-report').textContent = `${posed.size} key frames from ${keys[0].fixture} to ${keys.at(-1).fixture}`;
   };
-  $('clip-source').addEventListener('change', shownError('clip-report', async () => {
-    stop();
-    $('clip-report').textContent = '';
-    const value = $('clip-source').value;
-    if (sequences.has(value)) return playSequence(sequences.get(value));
-    const lifted = ({ root: [x, y, z], rotations }) => ({ root: [x, y + figure.soles, z], rotations });
-    const chosen = baked.has(value) ? baked.get(value).clip : actorClips[value];
-    if (!chosen) return setClip([], { carries: [] });
-    const frames = chosen.frames.map((frame) => (baked.has(value) ? lifted(frame) : rigFrame(rig, frame, figure.soles)));
-    const actor = { ...chosen, frames };
-    setClip(actor.frames, { actor, loop: Boolean(actor.loop), seconds: spanOf(actor, rig.clips.walkSpeed) });
-    seek(0);
-  }));
-  $('clip-open').addEventListener('change', shownError('clip-report', async () => {
-    const [file] = $('clip-open').files;
-    if (!file) return;
-    const opened = JSON.parse(await file.text());
-    const issues = clipIssues(rig, opened);
-    if (issues.length > 0) throw new Error(`clip does not fit rig ${rig.id}: ${issues.join('; ')}`);
-    stop();
-    $('clip-source').value = '';
-    setClip(opened.frames, { timing: timingOf(opened), loop: Boolean(opened.loop), seconds: spanOf(opened, rig.clips.walkSpeed) || Number($('clip-seconds').value) });
-    seek(0);
-    $('clip-report').textContent = `opened ${file.name}`;
-  }));
+  $('clip-source').addEventListener(
+    'change',
+    shownError('clip-report', async () => {
+      stop();
+      $('clip-report').textContent = '';
+      const value = $('clip-source').value;
+      if (sequences.has(value)) return playSequence(sequences.get(value));
+      const lifted = ({ root: [x, y, z], rotations }) => ({ root: [x, y + figure.soles, z], rotations });
+      const chosen = baked.has(value) ? baked.get(value).clip : actorClips[value];
+      if (!chosen) return setClip([], { carries: [] });
+      const frames = chosen.frames.map((frame) =>
+        baked.has(value) ? lifted(frame) : rigFrame(rig, frame, figure.soles),
+      );
+      const actor = { ...chosen, frames };
+      setClip(actor.frames, { actor, loop: Boolean(actor.loop), seconds: spanOf(actor, rig.clips.walkSpeed) });
+      seek(0);
+    }),
+  );
+  $('clip-open').addEventListener(
+    'change',
+    shownError('clip-report', async () => {
+      const [file] = $('clip-open').files;
+      if (!file) return;
+      const opened = JSON.parse(await file.text());
+      const issues = clipIssues(rig, opened);
+      if (issues.length > 0) throw new Error(`clip does not fit rig ${rig.id}: ${issues.join('; ')}`);
+      stop();
+      $('clip-source').value = '';
+      setClip(opened.frames, {
+        timing: timingOf(opened),
+        loop: Boolean(opened.loop),
+        seconds: spanOf(opened, rig.clips.walkSpeed) || Number($('clip-seconds').value),
+      });
+      seek(0);
+      $('clip-report').textContent = `opened ${file.name}`;
+    }),
+  );
   $('download-clip').addEventListener('click', () => download('clip.json', current()));
   $('download-frame').addEventListener('click', () => download('frame.json', frameOf(rig, state)));
   $('download-pose').addEventListener('click', () => download('pose.json', readablePose(rig, frameOf(rig, state))));

@@ -23,8 +23,21 @@
 // A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
 // end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
 // so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.
-import { applyPoint, boneTransforms, clampJointAngles, jointAngles, jointRotation, levelBone, mat3ToQuat, mulMM, quatToMat3, solveTwoBone, IDENTITY_M } from './kinematics.mjs';
+
 import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pinchItem } from './fingers.mjs';
+import {
+  applyPoint,
+  boneTransforms,
+  clampJointAngles,
+  IDENTITY_M,
+  jointAngles,
+  jointRotation,
+  levelBone,
+  mat3ToQuat,
+  mulMM,
+  quatToMat3,
+  solveTwoBone,
+} from './kinematics.mjs';
 
 const KEYS = new Set(['rig', 'angles', 'reach', 'level', 'root', 'ground', 'hands', 'hold', 'moved']);
 const REACH_KEYS = new Set(['target', 'pole', 'twist']);
@@ -38,7 +51,9 @@ export function poseIssues(rig, file) {
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   for (const key of Object.keys(file)) if (!KEYS.has(key)) issues.push(`unknown key ${key}`);
   if (file.rig?.id !== rig.id || file.rig?.revision !== rig.revision) {
-    issues.push(`written for rig ${JSON.stringify(file.rig)}, not ${JSON.stringify({ id: rig.id, revision: rig.revision })}`);
+    issues.push(
+      `written for rig ${JSON.stringify(file.rig)}, not ${JSON.stringify({ id: rig.id, revision: rig.revision })}`,
+    );
   }
   const bonesOf = (key, value, check) => {
     if (value === undefined) return;
@@ -56,18 +71,24 @@ export function poseIssues(rig, file) {
     if (!isObject(goal)) return issues.push(`reach.${id} is { target, pole? }`);
     for (const key of Object.keys(goal)) if (!REACH_KEYS.has(key)) issues.push(`reach.${id}: unknown key ${key}`);
     if (!isVector(goal.target)) issues.push(`reach.${id}.target is a finite point [x, y, z]`);
-    if (goal.pole !== undefined && !isVector(goal.pole)) issues.push(`reach.${id}.pole is a finite direction [x, y, z]`);
+    if (goal.pole !== undefined && !isVector(goal.pole))
+      issues.push(`reach.${id}.pole is a finite direction [x, y, z]`);
     if (goal.twist !== undefined && !Number.isFinite(goal.twist)) issues.push(`reach.${id}.twist is finite degrees`);
   });
   bonesOf('hands', file.hands, (id, hand) => issues.push(...handIssues(rig, id, hand)));
   bonesOf('hold', file.hold, (id, hold) => issues.push(...holdIssues(rig, id, hold)));
   if (file.moved !== undefined) {
     if (!isObject(file.moved)) issues.push('moved maps held models to their moved parts');
-    else for (const [model, parts] of Object.entries(file.moved)) {
-      if (!Object.values(file.hold ?? {}).some((hold) => hold?.model === model)) issues.push(`moved.${model}: no hand holds ${model}`);
-      if (!isObject(parts)) issues.push(`moved.${model} maps part names to shares 0..1`);
-      else for (const [part, share] of Object.entries(parts)) if (!(Number.isFinite(share) && share >= 0 && share <= 1)) issues.push(`moved.${model}.${part} is a share 0..1`);
-    }
+    else
+      for (const [model, parts] of Object.entries(file.moved)) {
+        if (!Object.values(file.hold ?? {}).some((hold) => hold?.model === model))
+          issues.push(`moved.${model}: no hand holds ${model}`);
+        if (!isObject(parts)) issues.push(`moved.${model} maps part names to shares 0..1`);
+        else
+          for (const [part, share] of Object.entries(parts))
+            if (!(Number.isFinite(share) && share >= 0 && share <= 1))
+              issues.push(`moved.${model}.${part} is a share 0..1`);
+      }
   }
   if (file.level !== undefined) {
     if (!Array.isArray(file.level)) issues.push('level lists bone ids');
@@ -78,14 +99,17 @@ export function poseIssues(rig, file) {
   return issues;
 }
 
-const isQuaternion = (q) => Array.isArray(q) && q.length === 4 && q.every(Number.isFinite) && Math.abs(Math.hypot(...q) - 1) < 1e-3;
+const isQuaternion = (q) =>
+  Array.isArray(q) && q.length === 4 && q.every(Number.isFinite) && Math.abs(Math.hypot(...q) - 1) < 1e-3;
 
 /** Every way a pose clip does not fit the rig, as messages: its frames name rig bones with unit quaternions. */
 export function clipIssues(rig, clip) {
-  if (!isObject(clip) || clip.kind !== 'pose' || !Array.isArray(clip.frames) || clip.frames.length === 0) return ['a clip is { kind: "pose", frames: [...] } with one frame or more'];
+  if (!isObject(clip) || clip.kind !== 'pose' || !Array.isArray(clip.frames) || clip.frames.length === 0)
+    return ['a clip is { kind: "pose", frames: [...] } with one frame or more'];
   const bones = new Set(rig.bones.map((bone) => bone.id));
   return clip.frames.flatMap((frame, i) => {
-    if (!isObject(frame) || !isVector(frame.root) || !isObject(frame.rotations)) return [`frame ${i} is { root: [x, y, z], rotations }`];
+    if (!isObject(frame) || !isVector(frame.root) || !isObject(frame.rotations))
+      return [`frame ${i} is { root: [x, y, z], rotations }`];
     return Object.entries(frame.rotations).flatMap(([id, q]) => [
       ...(bones.has(id) ? [] : [`frame ${i}: the rig has no bone ${id}`]),
       ...(isQuaternion(q) ? [] : [`frame ${i}: ${id} is no unit quaternion [x, y, z, w]`]),
@@ -99,7 +123,12 @@ export const posedCorners = (rig, pose) => {
   return rig.bones.flatMap((bone) => {
     const { min, max } = bone.bind.box;
     const t = transforms.get(bone.id);
-    return [0, 1, 2, 3, 4, 5, 6, 7].map((i) => applyPoint(t, [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))));
+    return [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
+      applyPoint(
+        t,
+        [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a])),
+      ),
+    );
   });
 };
 
@@ -132,7 +161,11 @@ export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
   if (issues.length > 0) throw new Error(`pose does not fit rig ${rig.id}: ${issues.join('; ')}`);
   const report = { clamped: [], residuals: {}, grips: {} };
   const rotations = {};
-  const asked = Object.assign({}, ...Object.entries(file.hands ?? {}).map(([id, hand]) => handAngles(rig, id, hand)), file.angles ?? {});
+  const asked = Object.assign(
+    {},
+    ...Object.entries(file.hands ?? {}).map(([id, hand]) => handAngles(rig, id, hand)),
+    file.angles ?? {},
+  );
   for (const bone of rig.bones) {
     const angles = asked[bone.id];
     if (!angles) continue;
@@ -147,7 +180,14 @@ export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
   for (const bone of rig.bones) {
     const goal = file.reach?.[bone.id];
     if (!goal) continue;
-    ({ pose, residual: report.residuals[bone.id] } = solveTwoBone(rig, pose, bone.reach.chain, goal.target, goal.pole ?? bone.reach.pole, report.clamped));
+    ({ pose, residual: report.residuals[bone.id] } = solveTwoBone(
+      rig,
+      pose,
+      bone.reach.chain,
+      goal.target,
+      goal.pole ?? bone.reach.pole,
+      report.clamped,
+    ));
     if (goal.twist !== undefined) pose = twisted(rig, pose, bone.reach.chain[1], goal.twist, report.clamped);
   }
   const held = {};
@@ -158,7 +198,10 @@ export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
     let pinched = {};
     if (hold.pinch) ({ pose, pinched } = pinchItem(rig, pose, id, hold.pinch, item));
     let closed = {};
-    if (hold.close !== false) ({ pose, closed } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item), { keep: Object.keys(pinched) }));
+    if (hold.close !== false)
+      ({ pose, closed } = closeHand(rig, pose, id, heldSolid(meshOf(hold.model), item), {
+        keep: Object.keys(pinched),
+      }));
     if (hold.close !== false || hold.pinch) report.grips[id] = { ...closed, ...pinched };
     held[id] = { model: hold.model, ...item };
   }
@@ -166,13 +209,25 @@ export function compilePose(rig, file, { meshOf, soles = 0 } = {}) {
 }
 
 // A pose of matrices as a clip frame of quaternions; decodeFrame (site/clipFrames.mjs) reads one back.
-export const encodeFrame = (pose) => ({ root: [...pose.root], rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])) });
+export const encodeFrame = (pose) => ({
+  root: [...pose.root],
+  rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, r]) => [id, mat3ToQuat(r)])),
+});
 
 // A frame's angles per bone, as the page's sliders hold them.
-export const frameAngles = (rig, frame) => Object.fromEntries(rig.bones.filter((bone) => frame.rotations[bone.id]).map((bone) => [bone.id, jointAngles(bone, quatToMat3(frame.rotations[bone.id]))]));
+export const frameAngles = (rig, frame) =>
+  Object.fromEntries(
+    rig.bones
+      .filter((bone) => frame.rotations[bone.id])
+      .map((bone) => [bone.id, jointAngles(bone, quatToMat3(frame.rotations[bone.id]))]),
+  );
 
 // A clip frame of this rig as a pose file that compiles back to it, within the limits it already keeps.
-export const poseFileOf = (rig, frame) => ({ rig: { id: rig.id, revision: rig.revision }, root: [...frame.root], angles: frameAngles(rig, frame) });
+export const poseFileOf = (rig, frame) => ({
+  rig: { id: rig.id, revision: rig.revision },
+  root: [...frame.root],
+  angles: frameAngles(rig, frame),
+});
 
 /**
  * A frame of the rig's clip actor (models/mobs.json, the rig's `clips`) as a frame of the rig. Rotations are in rest

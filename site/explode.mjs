@@ -13,8 +13,12 @@ const GAP = 0.02; // the clearance left between exploded parts, as a share of th
 const CENTRED = 1e-6; // a part this close to the centre, as a share of the longest side, has no line of its own
 
 const centreOf = ({ min, max }) => min.map((low, axis) => (low + max[axis]) / 2);
-const moved = ({ min, max }, offset) => ({ min: min.map((x, a) => x + offset[a]), max: max.map((x, a) => x + offset[a]) });
-const overlaps = (a, b, gap) => [0, 1, 2].every((axis) => a.min[axis] < b.max[axis] + gap && b.min[axis] < a.max[axis] + gap);
+const moved = ({ min, max }, offset) => ({
+  min: min.map((x, a) => x + offset[a]),
+  max: max.map((x, a) => x + offset[a]),
+});
+const overlaps = (a, b, gap) =>
+  [0, 1, 2].every((axis) => a.min[axis] < b.max[axis] + gap && b.min[axis] < a.max[axis] + gap);
 
 // How much further a box moving along `direction` must go to clear `other` by `gap`: the least over the axes it moves
 // along, since clearing one axis is enough.
@@ -52,7 +56,10 @@ export function explode(boxes) {
     let travel = SPREAD * part.distance;
     // Each clearing moves the part out past one placed part for good, since it only ever moves further along its line.
     for (;;) {
-      const at = moved(part.box, part.direction.map((d) => d * travel));
+      const at = moved(
+        part.box,
+        part.direction.map((d) => d * travel),
+      );
       // Half the gap counts as clear, so rounding never catches a part just moved to the gap's edge.
       const blocking = placed.find((other) => overlaps(at, other, gap / 2));
       if (!blocking) break;

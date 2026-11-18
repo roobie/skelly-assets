@@ -17,7 +17,7 @@ export const LANDING_COUNT = 10;
 // A filter that matches thousands reveals its matches this many at a time.
 export const PAGE_SIZE = 48;
 
-export const shelfOf = (entry) => (entry.sites ? VEHICLES : entry.category ?? UNCATEGORISED);
+export const shelfOf = (entry) => (entry.sites ? VEHICLES : (entry.category ?? UNCATEGORISED));
 export const termsOf = (entry, dimension) => {
   if (dimension === KEYWORD) return entry.keywords;
   if (dimension === FORM) return [entry.form];
@@ -26,14 +26,16 @@ export const termsOf = (entry, dimension) => {
 
 export const emptyFilter = () => ({ q: '', shelf: ALL, picks: {} });
 
-export const isBrowsing = ({ q, shelf, picks }) => !q.trim() && shelf === ALL && Object.values(picks).every((terms) => terms.length === 0);
+export const isBrowsing = ({ q, shelf, picks }) =>
+  !q.trim() && shelf === ALL && Object.values(picks).every((terms) => terms.length === 0);
 
 // Dimensions combine with AND and the terms picked in one tag facet with OR. Most facets give a model a single term
 // (setting, place, fit), so AND within one would leave nothing after a second pick, where OR widens. Keywords narrow
 // instead: a model has several, and each further one is a refinement.
-const termsMatch = (entry, dimension, terms) => (dimension === KEYWORD
-  ? terms.every((t) => entry.keywords.includes(t))
-  : terms.length === 0 || terms.some((t) => termsOf(entry, dimension).includes(t)));
+const termsMatch = (entry, dimension, terms) =>
+  dimension === KEYWORD
+    ? terms.every((t) => entry.keywords.includes(t))
+    : terms.length === 0 || terms.some((t) => termsOf(entry, dimension).includes(t));
 
 export function matches(entry, { q, shelf, picks }) {
   if (shelf !== ALL && shelfOf(entry) !== shelf) return false;
@@ -41,7 +43,12 @@ export function matches(entry, { q, shelf, picks }) {
   if (text) {
     const id = text.replace(/\s+/g, '_');
     const term = text.replace(/[\s_]+/g, '-');
-    if (!entry.id.includes(id) && !entry.title.toLowerCase().includes(text) && ![...Object.values(entry.tags).flat(), ...entry.keywords].some((t) => t.includes(term))) return false;
+    if (
+      !entry.id.includes(id) &&
+      !entry.title.toLowerCase().includes(text) &&
+      ![...Object.values(entry.tags).flat(), ...entry.keywords].some((t) => t.includes(term))
+    )
+      return false;
   }
   return Object.entries(picks).every(([dimension, terms]) => termsMatch(entry, dimension, terms));
 }
@@ -67,7 +74,14 @@ export function suggestions(entries, filter, dimension) {
 // it: the filter, the landing page's reshuffle count, and the open model with its chosen view, whether its details are
 // unfolded and whether it is drawn smooth. The shape is { filter, reshuffle, model, view, info, smooth }; `model` and
 // `view` are null when nothing is open or chosen.
-export const emptyState = () => ({ filter: emptyFilter(), reshuffle: 0, model: null, view: null, info: false, smooth: false });
+export const emptyState = () => ({
+  filter: emptyFilter(),
+  reshuffle: 0,
+  model: null,
+  view: null,
+  info: false,
+  smooth: false,
+});
 
 export function stateHash({ filter, reshuffle, model, view, info, smooth }) {
   const params = new URLSearchParams();
@@ -96,7 +110,8 @@ export function parseState(hash) {
   const params = new URLSearchParams(hash.replace(/^#/, ''));
   const filter = { ...emptyFilter(), q: params.get('q') ?? '', shelf: params.get('cat') || ALL };
   const pick = (dimension, term) => {
-    const terms = (filter.picks[dimension] ??= []);
+    filter.picks[dimension] ??= [];
+    const terms = filter.picks[dimension];
     if (term && !terms.includes(term)) terms.push(term);
   };
   for (const term of params.getAll('kw')) pick(KEYWORD, term);
@@ -117,14 +132,18 @@ export function parseState(hash) {
 }
 
 // Whether two states draw the same grid: they agree on the filter and the reshuffle, whatever model each has open.
-export const sameGrid = (a, b) => stateHash({ ...emptyState(), filter: a.filter, reshuffle: a.reshuffle }) === stateHash({ ...emptyState(), filter: b.filter, reshuffle: b.reshuffle });
+export const sameGrid = (a, b) =>
+  stateHash({ ...emptyState(), filter: a.filter, reshuffle: a.reshuffle }) ===
+  stateHash({ ...emptyState(), filter: b.filter, reshuffle: b.reshuffle });
 
 // A pick the catalogue does not have would match nothing and could not be removed, so it is dropped.
 export function knownOnly(filter, entries) {
   const known = (dimension, term) => entries.some((entry) => termsOf(entry, dimension).includes(term));
-  const picks = Object.fromEntries(Object.entries(filter.picks)
-    .map(([dimension, terms]) => [dimension, terms.filter((term) => known(dimension, term))])
-    .filter(([, terms]) => terms.length > 0));
+  const picks = Object.fromEntries(
+    Object.entries(filter.picks)
+      .map(([dimension, terms]) => [dimension, terms.filter((term) => known(dimension, term))])
+      .filter(([, terms]) => terms.length > 0),
+  );
   const shelf = filter.shelf === ALL || entries.some((entry) => shelfOf(entry) === filter.shelf) ? filter.shelf : ALL;
   return { ...filter, shelf, picks };
 }
@@ -132,7 +151,8 @@ export function knownOnly(filter, entries) {
 // ---- the landing page ----
 
 // The same day gives the same seed, so a reload does not reshuffle the models under the reader.
-export const dailySeed = (date = new Date()) => date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate();
+export const dailySeed = (date = new Date()) =>
+  date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate();
 
 // The seed of a landing page: the day, mixed with how many times the reader asked for another, so that no reshuffle
 // of one day lands on another day's set.
@@ -164,10 +184,18 @@ function shuffled(items, next) {
 export function landingModels(entries, seed, count = LANDING_COUNT) {
   const next = random(seed);
   const byShelf = Map.groupBy(entries, shelfOf);
-  const firsts = shuffled([...byShelf.keys()], next).slice(0, count).map((shelf) => {
-    const group = byShelf.get(shelf);
-    return group[Math.floor(next() * group.length)];
-  });
+  const firsts = shuffled([...byShelf.keys()], next)
+    .slice(0, count)
+    .map((shelf) => {
+      const group = byShelf.get(shelf);
+      return group[Math.floor(next() * group.length)];
+    });
   const taken = new Set(firsts);
-  return [...firsts, ...shuffled(entries.filter((entry) => !taken.has(entry)), next)].slice(0, count);
+  return [
+    ...firsts,
+    ...shuffled(
+      entries.filter((entry) => !taken.has(entry)),
+      next,
+    ),
+  ].slice(0, count);
 }

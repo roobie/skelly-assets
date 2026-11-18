@@ -44,7 +44,7 @@ export function clipKeys(clip, cursor) {
   if (phases.length !== count || phases[0] !== 0 || phases.some((at, k) => k > 0 && !(at > phases[k - 1]))) {
     throw new RangeError(`clip key phases [${phases}] are not ${count} rising places from 0`);
   }
-  if (!clip.loop && phases[count - 1] !== 1) throw new RangeError('a finite clip\'s last key phase is 1');
+  if (!clip.loop && phases[count - 1] !== 1) throw new RangeError("a finite clip's last key phase is 1");
   const phase = clip.loop ? ((cursor % 1) + 1) % 1 : Math.max(0, Math.min(1, cursor / clipSpanSeconds(clip)));
   const i = phases.findLastIndex((at) => at <= phase);
   if (!clip.loop && i === count - 1) return { i, j: i, w: 0 };
@@ -68,8 +68,10 @@ export function slerp(a, b, weight) {
     bw = -bw;
   }
   if (cos > 0.9995) {
-    const x = a[0] + (bx - a[0]) * weight, y = a[1] + (by - a[1]) * weight;
-    const z = a[2] + (bz - a[2]) * weight, w = a[3] + (bw - a[3]) * weight;
+    const x = a[0] + (bx - a[0]) * weight,
+      y = a[1] + (by - a[1]) * weight;
+    const z = a[2] + (bz - a[2]) * weight,
+      w = a[3] + (bw - a[3]) * weight;
     const n = Math.hypot(x, y, z, w) || 1;
     return [x / n, y / n, z / n, w / n];
   }
@@ -89,7 +91,9 @@ export function sampleClip(clip, cursor, slerpRotation = slerp) {
   const ids = new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)]);
   return {
     root: a.root.map((x, axis) => x + (b.root[axis] - x) * w),
-    rotations: Object.fromEntries([...ids].map((id) => [id, slerpRotation(a.rotations[id] ?? [0, 0, 0, 1], b.rotations[id] ?? [0, 0, 0, 1], w)])),
+    rotations: Object.fromEntries(
+      [...ids].map((id) => [id, slerpRotation(a.rotations[id] ?? [0, 0, 0, 1], b.rotations[id] ?? [0, 0, 0, 1], w)]),
+    ),
   };
 }
 
