@@ -21,7 +21,8 @@
     "fix": "biome check --write ..",
     "pretypecheck": "node sources.mjs",
     "typecheck": "tsc --noEmit",
-    "knip": "knip"
+    "knip": "knip",
+    "workflows:lint": "node actionlint/lint.mjs"
   },
   "dependencies": {
     "three": "^0.186.0",

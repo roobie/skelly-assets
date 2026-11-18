@@ -37,7 +37,7 @@ jobs:
       run:
         working-directory: tools
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The module-graph rules resolve JSON imports, so the lint needs the Jsonnet twins.
       - uses: ./.github/actions/tools
       # The npm script runs the lockfile's @biomejs/biome; `npx biome` could fall back to the unrelated `biome` package.

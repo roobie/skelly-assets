@@ -69,6 +69,7 @@
       "includes": [
         "tools/*.mjs",
         "tools/jsonnet/**",
+        "tools/actionlint/**",
         "tools/testPool.ts",
         "**/test/**",
         "**/src/cli/**",

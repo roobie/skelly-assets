@@ -12,5 +12,5 @@
       "three/addons/*": ["./node_modules/@types/three/examples/jsm/*"]
     }
   },
-  "include": ["*.mjs", "*.ts", "jsonnet/**/*.mjs", "test/**/*.mjs", "../site/**/*.mjs", "../site/**/*.js"]
+  "include": ["*.mjs", "*.ts", "jsonnet/**/*.mjs", "actionlint/**/*.mjs","test/**/*.mjs", "../site/**/*.mjs", "../site/**/*.js"]
 }
