@@ -32,9 +32,10 @@ const local = ({ translation = [0, 0, 0], rotation = [0, 0, 0, 1] }: Node): Matr
 const readComponents = (glb: Uint8Array) => {
   const { json } = readGlb(glb);
   const root = json.nodes[json.scenes[0]!.nodes[0]!]!;
-  const { metresPerUnit } = (root.extras as { gungen: { metresPerUnit: number } }).gungen;
+  const { metresPerUnit, platform } = (root.extras as { gungen: { metresPerUnit: number; platform?: unknown } }).gungen;
   const components = new Map<string, Component>();
   const ports = new Map<string, PortInFile>();
+  const metadata: ExportPortMetadata[] = [];
   for (const index of root.children ?? []) {
     const node = json.nodes[index]!;
     const extras = node.extras as {
@@ -50,6 +51,7 @@ const readComponents = (glb: Uint8Array) => {
     for (const child of node.children ?? []) {
       const portNode = json.nodes[child]!;
       const port = (portNode.extras as { port: ExportPortMetadata }).port;
+      metadata.push(port);
       const world = local(node).multiply(local(portNode));
       const axes = [new Vector3(), new Vector3(), new Vector3()] as const;
       world.extractBasis(...axes);
@@ -61,22 +63,36 @@ const readComponents = (glb: Uint8Array) => {
       });
     }
   }
-  return { components, ports };
+  return { components, ports, metadata, platform };
 };
 
 const slotted = (port: PortInFile, slot = 0): Vector3 => port.at.clone().addScaledVector(port.up, slot * port.pitch);
 
 const exportsOfCorpus = () =>
-  loadDesigns().map(({ label, assembly, items }) => {
-    const result = exportGunGlb(assembly, { id: 'fixture_gun', file: 'assets/models/fixture_gun.glb' }, {}, { items });
+  loadDesigns().map(({ label, assembly, items, platform }) => {
+    const result = exportGunGlb(
+      assembly,
+      { id: 'fixture_gun', file: 'assets/models/fixture_gun.glb' },
+      {},
+      { items, ...(platform === undefined ? {} : { platform }) },
+    );
     if (!result.ok) {
       throw new Error(`${label}: ${JSON.stringify(result.error)}`);
     }
-    return { label, root: assembly.root, glb: result.glb };
+    return { label, root: assembly.root, glb: result.glb, designPlatform: platform };
   });
 
-describe.each(exportsOfCorpus())('$label comes apart into components', ({ root, glb }) => {
-  const { components, ports } = readComponents(glb);
+describe.each(exportsOfCorpus())('$label comes apart into components', ({ root, glb, designPlatform }) => {
+  const { components, ports, metadata, platform } = readComponents(glb);
+
+  it('names its platform and the size class and swap path of every port, so a reader can match parts across designs', () => {
+    expect(platform).toEqual(designPlatform);
+    expect(metadata.length).toBeGreaterThan(0);
+    for (const port of metadata) {
+      expect(port.sizeClass, `${port.id} size class`).toBeTypeOf('string');
+      expect(port.swap?.path, `${port.id} swap path`).toMatch(/^(slot|job)$/);
+    }
+  });
 
   it('mounts every component but the root on a site, and following the mounts from any component reaches the root', () => {
     for (const [part, { mount }] of components) {

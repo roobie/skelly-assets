@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "smg",
+  "platform": { "id": "smg", "sizeClass": "smg" },
   "assembly": {
     "name": "archetype-smg",
     "description": "Submachine gun: battle-rifle layout at small bore, with a short barrel, short stock and long magazine.",

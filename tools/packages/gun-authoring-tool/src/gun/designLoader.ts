@@ -10,11 +10,13 @@ import { PART_CATALOGUE, type PartCatalogue } from './catalogue.ts';
 import { gunDomain } from './domain.ts';
 import { GUN_FINISH_SLOTS, GUN_PALETTE } from './palette.ts';
 import type { PartItems } from './physical.ts';
+import { type PlatformChoice, platformChoiceProblem } from './platforms.ts';
 import { GUN_PREFABS } from './prefabs.ts';
 import { TEMPLATES } from './templates.ts';
 
 interface GunDesignMetadata {
   readonly calibre?: string;
+  readonly platform?: PlatformChoice;
   readonly excludedAttachments?: readonly string[];
   /** The catalogue item each instance names; the loaded assembly holds the instance each item fixes. */
   readonly items?: PartItems;
@@ -36,6 +38,26 @@ const calibreShapeError = (raw: unknown): string | undefined => {
     return `expected a string, got ${describeValue(raw.calibre)}`;
   }
   return raw.calibre.trim() === '' ? 'expected a non-empty cartridge id' : undefined;
+};
+
+type PlatformRead =
+  | { readonly ok: true; readonly platform?: PlatformChoice }
+  | { readonly ok: false; readonly message: string };
+
+const readPlatform = (raw: unknown): PlatformRead => {
+  if (!isRecord(raw) || raw.platform === undefined) {
+    return { ok: true };
+  }
+  const { platform } = raw;
+  if (!(isRecord(platform) && typeof platform.id === 'string' && typeof platform.sizeClass === 'string')) {
+    return { ok: false, message: `expected a platform id and size class, got ${describeValue(platform)}` };
+  }
+  if (Object.keys(platform).length !== 2) {
+    return { ok: false, message: 'a platform names only its id and size class' };
+  }
+  const choice = { id: platform.id, sizeClass: platform.sizeClass };
+  const problem = platformChoiceProblem(choice);
+  return problem === undefined ? { ok: true, platform: choice } : { ok: false, message: problem };
 };
 
 const calibreIssues = (
@@ -226,6 +248,14 @@ export const loadGunDesignValue = (
       error: { code: 'invalid-shape', path: 'calibre', message: shapeError },
     };
   }
+  const platform = readPlatform(raw);
+  if (!platform.ok) {
+    return {
+      ok: false,
+      declaredStatus: loaded.declaredStatus,
+      error: { code: 'invalid-shape', path: 'platform', message: platform.message },
+    };
+  }
   const excludedAttachments = isRecord(raw) ? raw.excludedAttachments : undefined;
   if (!knownAttachmentIds(excludedAttachments)) {
     return {
@@ -241,6 +271,7 @@ export const loadGunDesignValue = (
   const design: GunDesign = {
     ...loaded.design,
     ...(calibre === undefined ? {} : { calibre }),
+    ...(platform.platform === undefined ? {} : { platform: platform.platform }),
     ...(excludedAttachments === undefined ? {} : { excludedAttachments: [...excludedAttachments] }),
     ...(items === undefined ? {} : { items }),
   };

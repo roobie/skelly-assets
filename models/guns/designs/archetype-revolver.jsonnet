@@ -3,6 +3,7 @@ local connect(from, to) = { from: from, to: to };
 {
   format: 1,
   template: 'revolver',
+  platform: { id: 'revolver', sizeClass: 'revolver' },
   calibre: '357-magnum',
   assembly: {
     name: 'archetype-revolver',

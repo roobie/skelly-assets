@@ -1,7 +1,7 @@
 // Inputs and results of the GLB exporter, and the palette it colours with. They sit above the assembly
 // layer because the exporter needs a resolved assembly; the assembly types never import them.
 
-import type { Gender, Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { Gender, Resolved, SwapPath } from '@skelly/construct/assembly/schema.ts';
 import type { Issue } from '@skelly/construct/foundation/issue.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { MaterialDef } from '@skelly/thing-core/materials';
@@ -68,6 +68,10 @@ export interface ExportPortMetadata {
   readonly mount: string;
   readonly gender: Gender;
   readonly size?: string;
+  /** The interchange class a part must share with a site to fit it; see `docs/decisions/0009-component-mounts.md`. */
+  readonly sizeClass?: string;
+  /** How the part met here comes off and goes on. */
+  readonly swap?: SwapPath;
   /** What the interface is built for within its mount type; both sides of a joint declare the same one or neither. */
   readonly standard?: string;
   /** The standards a port that holds whatever is put in it takes; see `docs/decisions/0017-stowage-slots.md`. */
@@ -117,6 +121,8 @@ export interface GlbExportInput {
   readonly generator?: string;
   /** Namespace for construct's root assembly metadata in glTF extras. */
   readonly metadataNamespace?: string;
+  /** The model's own facts, beside the assembly metadata in the root's namespace record. */
+  readonly modelMetadata?: Readonly<Record<string, unknown>>;
   /** Facets of every revolved solid in the file: a level of detail baked in at export. Defaults to the mesh default. */
   readonly revolveFacets?: number;
   /**

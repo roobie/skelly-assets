@@ -7,6 +7,7 @@ import { clearParam, type EditResult, setParam, setSlotPresent } from '@skelly/t
 import { PART_CATALOGUE } from '../gun/catalogue.ts';
 import { type GunDesign, loadGunDesignValue } from '../gun/designLoader.ts';
 import type { PartItems } from '../gun/physical.ts';
+import type { PlatformChoice } from '../gun/platforms.ts';
 import { GUN_PREFABS, type PrefabCatalogue, type PrefabCatalogueEntry } from '../gun/prefabs.ts';
 
 export interface DesignEditorState {
@@ -15,6 +16,7 @@ export interface DesignEditorState {
   readonly locks: DesignLocks;
   readonly status: DesignStatus;
   readonly calibre?: string;
+  readonly platform?: PlatformChoice;
   readonly items?: PartItems;
   readonly excludedAttachments?: readonly string[];
   readonly finish?: Readonly<Record<string, string>>;
@@ -85,6 +87,7 @@ export const editorStateFromDesign = (design: GunDesign, template: Template | un
   locks: design.locks,
   status: design.status,
   ...(design.calibre === undefined ? {} : { calibre: design.calibre }),
+  ...(design.platform === undefined ? {} : { platform: design.platform }),
   ...(design.items ? { items: design.items } : {}),
   ...(design.excludedAttachments === undefined ? {} : { excludedAttachments: design.excludedAttachments }),
   ...(design.finish ? { finish: design.finish } : {}),
@@ -433,6 +436,7 @@ export const saveDesign = (state: DesignEditorState, domain: Domain): SaveDesign
     format: 1,
     template: state.template.name,
     ...(state.calibre === undefined ? {} : { calibre: state.calibre }),
+    ...(state.platform === undefined ? {} : { platform: state.platform }),
     ...(state.excludedAttachments === undefined ? {} : { excludedAttachments: state.excludedAttachments }),
     assembly: chosenAssembly(state, domain),
     ...(Object.keys(selectedItems).length > 0 ? { items: selectedItems } : {}),

@@ -11,6 +11,7 @@ import { type GunDesign, loadGunDesign, loadGunDesignValue } from '../src/gun/de
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { GUN_FINISH_SLOTS } from '../src/gun/palette.ts';
+import { GUN_PLATFORMS } from '../src/gun/platforms.ts';
 import type { PrefabCatalogue } from '../src/gun/prefabs.ts';
 import { ar, TEMPLATES } from '../src/gun/templates.ts';
 import { createEditorState, editorStateFromDesign, saveDesign } from '../src/viewer/designEditor.ts';
@@ -77,6 +78,29 @@ it('refuses a design naming an unknown template instead of loading it under anot
   const result = expectFatal(loadGunDesign(JSON.stringify({ ...makeDesign(), template: 'no-such-template' })));
   expect(result.error).toMatchObject({ code: 'invalid-shape', path: 'template' });
   expect(result.error.message).toContain('no-such-template');
+});
+
+const [someId, somePlatform] = [...GUN_PLATFORMS.platforms][0]!;
+it.each([
+  ['an unknown platform', { id: 'no-such-platform', sizeClass: somePlatform.sizeClasses[0] }],
+  ['a size class its platform lacks', { id: someId, sizeClass: 'no-such-class' }],
+  ['a platform with no size class', { id: someId }],
+])('refuses a design naming %s', (_label, platform) => {
+  const result = expectFatal(load({ ...makeDesign(), platform }));
+  expect(result.error).toMatchObject({ code: 'invalid-shape', path: 'platform' });
+});
+
+it('preserves the platform through design loading and editor saving', () => {
+  const platform = { id: someId, sizeClass: somePlatform.sizeClasses[0]! };
+  const loaded = load(makeDesign({ platform }));
+  if (!loaded.ok) {
+    throw new Error(loaded.error.message);
+  }
+  const saved = saveDesign(editorStateFromDesign(loaded.design, ar), gunDomain);
+  if (!saved.ok) {
+    throw new Error(saved.reason);
+  }
+  expect(saved.design.platform).toEqual(platform);
 });
 
 it('keeps the declared status readable when the template is unknown', () => {

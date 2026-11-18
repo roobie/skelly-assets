@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "ak",
+  "platform": { "id": "ak", "sizeClass": "ak" },
   "calibre": "7.62x39",
   "assembly": {
     "name": "archetype-ak-akm",
