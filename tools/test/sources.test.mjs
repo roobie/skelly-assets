@@ -285,8 +285,13 @@ fixtureTest('an import of a text block fails rather than going untraced', async 
   await assert.rejects(refresh(), /text block/);
 });
 
-test('the twin digest covers this module, the compiler driver and the plain-data check', () => {
+test('the twin digest covers this module, the compiler driver, the plain-data check and the compiler pin', () => {
   const code = compilerCode().map((path) => relative(root, path));
-  for (const driver of ['tools/sources.mjs', 'tools/jsonnet/index.mjs', 'tools/jsonnet/plain-data.libsonnet'])
+  for (const driver of [
+    'tools/sources.mjs',
+    'tools/jsonnet/index.mjs',
+    'tools/jsonnet/plain-data.libsonnet',
+    'tools/jsonnet/runtime.json',
+  ])
     assert.ok(code.includes(driver), driver);
 });

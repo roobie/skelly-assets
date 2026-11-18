@@ -209,12 +209,13 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
 }
 
-// This module and the compiler driver and plain-data check beside it; the compiler binary is pinned by
-// jsonnet/runtime.json, an input.
+// This module and the compiler driver, plain-data check and compiler pin beside it, since a store shared by checkouts
+// on different branches must not serve one compiler's twins under another's keys.
+const COMPILER_FILE = /\.(mjs|libsonnet)$|^runtime\.json$/;
 export const compilerCode = () => [
   fileURLToPath(import.meta.url),
   ...readdirSync(join(here, 'jsonnet'))
-    .filter((name) => /\.(mjs|libsonnet)$/.test(name))
+    .filter((name) => COMPILER_FILE.test(name))
     .sort()
     .map((name) => join(here, 'jsonnet', name)),
 ];
