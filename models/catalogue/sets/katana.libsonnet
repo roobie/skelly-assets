@@ -1,5 +1,6 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
+local wield = import 'models/measures/wield.libsonnet';
 
 local nagasa = 0.70;
 local sori = 0.017;
@@ -51,14 +52,13 @@ local crossing = 0.005;
 local omoteMenuki = 6;
 local uraMenuki = 3;
 local mekugiRadius = 0.003;
-// A two-handed wield seats the rear hand on the grip and the front hand this far toward the blade.
-local twoHandSeat = 0.09;
-// The least gap between a palm and the fuchi or kashira, so neither hand rides a fitting.
-local palmClearance = 0.005;
-// The grip is the rear hand's middle, set so the pair of hands sits centred on the tsuka.
-local rearHand = (tsuka - twoHandSeat) / 2;
-assert rearHand - arm.palmWidth / 2 >= palmClearance : 'the rear palm must clear the kashira';
-assert rearHand + twoHandSeat + arm.palmWidth / 2 <= tsuka - palmClearance : 'the front palm must clear the fuchi';
+local grain = 0.002;
+// The two-hand wield seats the trailing hand on the grip point and the leading hand a set way toward the blade. The
+// pair is centred on the tsuka so each palm keeps the same margin of wrap before it meets the fuchi or kashira.
+local leadSeat = wield.twoHand.leadSeat;
+local rearHand = (tsuka - leadSeat) / 2;
+local palmMargin = rearHand - arm.palmWidth / 2;
+assert palmMargin >= grain : 'the tsuka leaves a palm %g m of wrap, under a voxel' % palmMargin;
 local ovalSteps = 32;
 
 // The blade's curve is a circular arc tangent to the tsuka at the tsuba, of radius set by its sagitta over its length.
@@ -218,7 +218,7 @@ local monouchi = 'hamon-%d' % stationAt(nagasa - monouchiFromTip);
       strike: { part: 'katana', solid: hamonTip, fraction: [1, 1, 0.5] },
       edge: { part: 'katana', solid: monouchi, fraction: [0.5, 0, 0.5] },
     },
-    voxelGrain: 0.002,
+    voxelGrain: grain,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
   },
 ]
