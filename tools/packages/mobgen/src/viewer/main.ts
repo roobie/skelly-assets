@@ -31,6 +31,8 @@ import { acidTemplate } from '../mob/acidTemplate.ts';
 import { ATTACK_CLIPS, type AttackClip, attackClipById, attackClipFor, attackPose } from '../mob/attack.ts';
 import { crawlGaitPose, crawlHitPose, crawlPose } from '../mob/crawl.ts';
 import { severableParts, severedBoneSet } from '../mob/dismember.ts';
+import { FLOATER_CAST, floaterCastPose, floaterDriftPose, floaterIdlePose } from '../mob/floater.ts';
+import { floaterTemplate } from '../mob/floaterTemplate.ts';
 import { fusedMassManifest } from '../mob/fusedMass.ts';
 import { VIEWER_TEMPLATES } from '../mob/fusedMassTemplate.ts';
 import {
@@ -66,6 +68,7 @@ const TEMPLATES: readonly Template[] = [
   skeletonTemplate,
   LEAPER_TEMPLATE,
   WALKER_TEMPLATE,
+  floaterTemplate,
 ];
 
 /** Plans posed by the shared humanoid walk, idle, attack and death. */
@@ -465,6 +468,10 @@ const load = (genome: Genome, realized: Realized, realizeMs: number): void => {
   } else if (template.bodyPlan === 'walker') {
     actor.applyPose(walkerFrame(realized, 'idle', 0).pose);
     severPart.replaceChildren(...severableParts(realized.body.bones).map((part) => new Option(part, part)));
+  } else if (template.bodyPlan === 'floater') {
+    actor.applyPose(floaterIdlePose(realized, genome.params));
+    // The plan declares no wound bones, so there is nothing to sever.
+    severPart.replaceChildren();
   } else if (template.bodyPlan === 'acid') {
     lastAcidPose = acidIdlePose(realized, idleTime);
     actor.applyPose(lastAcidPose);
@@ -732,7 +739,7 @@ const advanceWalk = (dt: number, walking: boolean, speed: number): void => {
     groundGroup.position.z = gridZ;
     return;
   }
-  if (['quadruped', 'acid', 'leaper', 'walker'].includes(current.template.bodyPlan)) {
+  if (['quadruped', 'acid', 'leaper', 'walker', 'floater'].includes(current.template.bodyPlan)) {
     gaitDistance += speed * dt;
     gridZ = (gridZ + speed * dt) % 0.5;
     groundGroup.position.z = gridZ;
@@ -911,6 +918,25 @@ const applyWalkerFrame = (loaded: Loaded, dt: number): void => {
   applyLookAt(loaded, shown.pose, dt);
 };
 
+/** The floater poses with its own plan's functions: the cast over the drift, or the hover when it stands. The
+ * drift's cycle is the genome's `driftCycle` metres of ground, as the export plays it (tools/actorClips.mjs). */
+const applyFloaterFrame = (loaded: Loaded, dt: number): void => {
+  const speed = walkOn.checked ? Number(speedInput.value) : 0;
+  advanceWalk(dt, walkOn.checked, speed);
+  advanceAttack(dt, FLOATER_CAST.duration);
+  const { realized } = loaded;
+  const { params } = loaded.genome;
+  let pose: Pose;
+  if (attackTime !== undefined) {
+    pose = floaterCastPose(realized, params, attackTime);
+  } else if (speed > 0) {
+    pose = floaterDriftPose(realized, params, (gaitDistance / params.driftCycle!) % 1);
+  } else {
+    pose = floaterIdlePose(realized, params);
+  }
+  applyLookAt(loaded, pose, dt);
+};
+
 const applyLiveFrame = (loaded: Loaded, dt: number): void => {
   if (loaded.template.bodyPlan === 'leaper') {
     applyLeaperFrame(loaded, dt);
@@ -918,6 +944,10 @@ const applyLiveFrame = (loaded: Loaded, dt: number): void => {
   }
   if (loaded.template.bodyPlan === 'walker') {
     applyWalkerFrame(loaded, dt);
+    return;
+  }
+  if (loaded.template.bodyPlan === 'floater') {
+    applyFloaterFrame(loaded, dt);
     return;
   }
   if (loaded.template.bodyPlan === 'acid') {
