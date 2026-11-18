@@ -65,6 +65,11 @@ than in consumer-specific builders, so shared shapes have one mesh and collision
 assets catalogue and arpg1 materials, so adopting shared schemas does not discard authored finishes. Parameterised firearm and vehicle
 schemas keep game-owned temporal brands outside the tool pipeline.
 
+### surfaces
+
+`packages/surfaces` is the assets' own. Bark and leaf shaders ship as edits to three's programs, so a game keeps its
+own materials; see its `README.md`.
+
 ### thing-export
 
 `packages/thing-export` originates at the reference commit, with its tests. Neutral export and file writing live
