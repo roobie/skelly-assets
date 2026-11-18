@@ -8,12 +8,25 @@
 // page, and `&views=`, `&sites=a,b` and `&open` ask as the tool does. Its picker writes
 // the ids it picks into `?id=`, and asked nothing the page shows a few of the day's models (lookOptions.mjs, lookedIds).
 import * as THREE from 'three';
-import { facingView } from './explode.mjs';
 import { makeCombobox } from './combobox.mjs';
+import { facingView } from './explode.mjs';
 import { dailySeed, landingSeed } from './filter.mjs';
 import { idSuggestions, keepSites, lookedIds, viewSet } from './lookOptions.mjs';
 import { EXPLODED_VIEWS, FRONT_QUARTER } from './modelFrame.mjs';
-import { comesApart, explodable, isVehicle, isWearable, loadEntry, movers, opens, registerModels, spread, stillInstance, swing, wornEntry } from './render.mjs';
+import {
+  comesApart,
+  explodable,
+  isVehicle,
+  isWearable,
+  loadEntry,
+  movers,
+  opens,
+  registerModels,
+  spread,
+  stillInstance,
+  swing,
+  wornEntry,
+} from './render.mjs';
 import { drawView, gridCell, groundGrid, makeDrawer, metres, ruleAt, startTile } from './tile.mjs';
 
 let drawer;
@@ -23,7 +36,10 @@ const ready = (async () => {
   const { models, vehicles, assemblies } = await fetch('models.json').then((r) => r.json());
   registerModels(models);
   // `landing` is what the showcase's landing page picks from, so a bare page opens on the index's own first models.
-  return { byId: new Map([...models, ...vehicles, ...assemblies].map((entry) => [entry.id, entry])), landing: [...vehicles, ...models] };
+  return {
+    byId: new Map([...models, ...vehicles, ...assemblies].map((entry) => [entry.id, entry])),
+    landing: [...vehicles, ...models],
+  };
 })();
 
 // One entry's tile, `size` pixels a view, as a PNG data URL, with what the sheet prints beside it. `views` names the
@@ -53,7 +69,10 @@ async function look(id, size, { views = 'review', sites = [], open = false } = {
   if (exploded) {
     const parts = explodable(obj, entry);
     spread(parts, 1);
-    const [name, direction] = facingView(parts.map(({ offset }) => offset.toArray()), EXPLODED_VIEWS);
+    const [name, direction] = facingView(
+      parts.map(({ offset }) => offset.toArray()),
+      EXPLODED_VIEWS,
+    );
     // The same cell as the assembled views, so the spread reads against the whole's own size.
     const apart = groundGrid(new THREE.Box3().setFromObject(obj), cell);
     drawView(drawer, g, obj, apart, [name, new THREE.Vector3(...direction)], size * 2, 0, size * 2);
@@ -74,7 +93,7 @@ async function look(id, size, { views = 'review', sites = [], open = false } = {
     png: tile.toDataURL('image/png'),
     sizeM: extent.toArray().map((v) => Math.round(v * 1000) / 1000),
     triangles: Math.round(loaded.triangles),
-    parts: isVehicle(entry) ? entry.sites.length : entry.components?.length ?? 1,
+    parts: isVehicle(entry) ? entry.sites.length : (entry.components?.length ?? 1),
     beside: exploded ? 'exploded' : worn ? 'worn' : null,
     materials: loaded.materials.map((m) => m.userData?.materialId ?? m.name),
     grid: metres(cell),
@@ -86,29 +105,44 @@ window.look = look;
 const SUGGESTION_LIMIT = 40; // ids the picker lists at once; typing narrows them
 
 const query = new URLSearchParams(location.search);
-const options = { views: query.get('views') ?? 'review', sites: query.get('sites')?.split(',') ?? [], open: query.has('open') };
-const hint = Object.assign(document.createElement('p'), { textContent: 'A few of the day\'s models. Pick any to draw them instead.' });
+const options = {
+  views: query.get('views') ?? 'review',
+  sites: query.get('sites')?.split(',') ?? [],
+  open: query.has('open'),
+};
+const hint = Object.assign(document.createElement('p'), {
+  textContent: "A few of the day's models. Pick any to draw them instead.",
+});
 const tiles = document.createElement('div');
 // The page's static container: the deploy's footer follows it in the body, so content appended to the body would land below the footer.
 const content = document.getElementById('content');
 
 function drawTiles(asked, landing) {
   hint.hidden = asked.length > 0;
-  tiles.replaceChildren(...lookedIds(asked, landing, landingSeed(dailySeed(), 0)).map((id) => {
-    const figure = document.createElement('figure');
-    const caption = document.createElement('figcaption');
-    caption.textContent = id;
-    figure.append(caption);
-    look(id, 384, options).then(
-      ({ png, sizeM, triangles, grid, beside }) => {
-        figure.classList.toggle('wide', Boolean(beside));
-        figure.prepend(Object.assign(document.createElement('img'), { src: png, alt: `${id}, four views${beside ? ` and ${beside}` : ''}` }));
-        caption.textContent = `${id} · ${sizeM.join(' × ')} m · ${triangles} triangles · grid ${grid}`;
-      },
-      (error) => { caption.textContent = `${id}: ${error.message}`; },
-    );
-    return figure;
-  }));
+  tiles.replaceChildren(
+    ...lookedIds(asked, landing, landingSeed(dailySeed(), 0)).map((id) => {
+      const figure = document.createElement('figure');
+      const caption = document.createElement('figcaption');
+      caption.textContent = id;
+      figure.append(caption);
+      look(id, 384, options).then(
+        ({ png, sizeM, triangles, grid, beside }) => {
+          figure.classList.toggle('wide', Boolean(beside));
+          figure.prepend(
+            Object.assign(document.createElement('img'), {
+              src: png,
+              alt: `${id}, four views${beside ? ` and ${beside}` : ''}`,
+            }),
+          );
+          caption.textContent = `${id} · ${sizeM.join(' × ')} m · ${triangles} triangles · grid ${grid}`;
+        },
+        (error) => {
+          caption.textContent = `${id}: ${error.message}`;
+        },
+      );
+      return figure;
+    }),
+  );
 }
 
 // The picked ids replace `?id=` in place, so the address is always a link to the tiles the page shows.

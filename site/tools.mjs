@@ -2,6 +2,7 @@
 // viewer, a tool package whose vite build the site serves under the package's name.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { escapeHtml } from './html.mjs';
 
 export const TOOLS = 'site/tools.json';
 const PACKAGES = 'tools/packages';
@@ -9,12 +10,34 @@ const PACKAGES = 'tools/packages';
 export const NAV_MARK = '<!-- tools -->';
 
 // The showcase's own files in site/, which site/build.mjs copies to the served site: its pages and every module they load.
-export const SITE_FILES = ['index.html', 'app.js', 'filter.mjs', 'combobox.mjs', 'render.mjs', 'explode.mjs', 'modelFrame.mjs', 'clipFrames.mjs', 'style.css', 'look.mjs', 'lookOptions.mjs', 'tile.mjs', 'kinematics.mjs', 'poseFile.mjs', 'clearance.mjs', 'fingers.mjs', 'hiding.mjs', 'motionPose.mjs', 'skin.mjs', 'pose.mjs', 'sounds.mjs'];
+export const SITE_FILES = [
+  'index.html',
+  'app.js',
+  'filter.mjs',
+  'combobox.mjs',
+  'render.mjs',
+  'explode.mjs',
+  'modelFrame.mjs',
+  'clipFrames.mjs',
+  'style.css',
+  'look.mjs',
+  'lookOptions.mjs',
+  'tile.mjs',
+  'kinematics.mjs',
+  'poseFile.mjs',
+  'clearance.mjs',
+  'fingers.mjs',
+  'hiding.mjs',
+  'motionPose.mjs',
+  'skin.mjs',
+  'pose.mjs',
+  'sounds.mjs',
+];
 // Modules the site ships from tools/ beside its own. The authoring tools draw the same fabric grain, and its
 // declaration types it from their packages, which resolve only under tools/, so the shader lives there.
 export const TOOLS_FILES = ['fabric.mjs'];
 
-export const viewerDir =(root, viewer) => join(root, PACKAGES, viewer);
+export const viewerDir = (root, viewer) => join(root, PACKAGES, viewer);
 export const viewerDist = (root, viewer) => join(viewerDir(root, viewer), 'dist');
 
 // Every tool, each held to naming a page of the showcase or a tool package, so a misspelt entry fails rather than
@@ -22,8 +45,13 @@ export const viewerDist = (root, viewer) => join(viewerDir(root, viewer), 'dist'
 export function readTools(root) {
   const { tools } = JSON.parse(readFileSync(join(root, TOOLS), 'utf8'));
   for (const tool of tools) {
-    const where = tool.page ? join(root, 'site', tool.page) : tool.viewer ? join(viewerDir(root, tool.viewer), 'package.json') : undefined;
-    if (!tool.label || !where || (tool.page && tool.viewer)) throw new Error(`${TOOLS}: ${JSON.stringify(tool)} needs a label and one page or viewer`);
+    const where = tool.page
+      ? join(root, 'site', tool.page)
+      : tool.viewer
+        ? join(viewerDir(root, tool.viewer), 'package.json')
+        : undefined;
+    if (!tool.label || !where || (tool.page && tool.viewer))
+      throw new Error(`${TOOLS}: ${JSON.stringify(tool)} needs a label and one page or viewer`);
     if (!existsSync(where)) throw new Error(`${TOOLS}: ${tool.label} names ${where}, which does not exist`);
   }
   return tools;
@@ -32,8 +60,8 @@ export function readTools(root) {
 // Relative, so the links hold under a Pages project path and on any local server.
 export const toolHref = ({ page, viewer }) => page ?? `${viewer}/`;
 
-const escape = (text) => text.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-export const toolLinks = (tools) => tools.map((tool) => `<a href="${escape(toolHref(tool))}">${escape(tool.label)}</a>`).join('\n      ');
+export const toolLinks = (tools) =>
+  tools.map((tool) => `<a href="${escapeHtml(toolHref(tool))}">${escapeHtml(tool.label)}</a>`).join('\n      ');
 
 // The tool pages a built site serves that no link names: a page beside the index, or a directory with its own index.
 export function unlinkedTools(out, linked) {

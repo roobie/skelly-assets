@@ -17,8 +17,8 @@
   "scripts": {
     "build": "node build.mjs",
     "prelint": "node sources.mjs && node packages/thing-authoring-tool/test/compile-fixtures.mjs",
-    "lint": "biome ci",
-    "fix": "biome check --write",
+    "lint": "biome ci . ../site",
+    "fix": "biome check --write . ../site",
     "knip": "knip"
   },
   "dependencies": {

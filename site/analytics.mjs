@@ -34,7 +34,8 @@ const FOOTER_ANCHOR = 'https://www.simpleanalytics.com?utm_source';
 export function checkAnalytics(html) {
   const lacks = [];
   if (!html.includes(ANALYTICS_SCRIPT)) lacks.push('the script');
-  if (optsIntoFooter(html) && !(html.includes(FOOTER_ANCHOR) && !html.includes(VERSION_MARK))) lacks.push('the footer it opted into');
+  if (optsIntoFooter(html) && !(html.includes(FOOTER_ANCHOR) && !html.includes(VERSION_MARK)))
+    lacks.push('the footer it opted into');
   return lacks;
 }
 

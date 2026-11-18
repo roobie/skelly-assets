@@ -1,7 +1,8 @@
-// Lint and format config for the authoring tools. Formatting follows the skelly repository's house style, so code
-// moves between the two repositories unchanged. Lint moves toward the house's every-rule-on set one rule group at a
-// time: that set fails thousands of sites written without it, and a lint nobody can pass is one nobody runs. A group
-// set to "error" below is the house's whole group; the rest stay at Biome's recommended set.
+// Lint and format config for the authoring tools and the showcase, `../site/`, which they build, test and render
+// through; the npm scripts name it, since it lies outside this folder. Formatting follows the skelly repository's house
+// style, so code moves between the two repositories unchanged. Lint moves toward the house's every-rule-on set one rule
+// group at a time: that set fails thousands of sites written without it, and a lint nobody can pass is one nobody runs.
+// A group set to "error" below is the house's whole group; the rest stay at Biome's recommended set.
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
@@ -72,9 +73,19 @@
         "**/src/cli/**",
         "**/vite.config.ts",
         "packages/thing-export/src/cache.ts",
-        "packages/thing-export/src/files.ts"
+        "packages/thing-export/src/files.ts",
+        "**/site/analytics.mjs",
+        "**/site/build.mjs",
+        "**/site/build-viewers.mjs",
+        "**/site/tools.mjs",
+        "**/site/version.mjs"
       ],
       "linter": { "rules": { "correctness": { "noNodejsModules": "off" } } }
+    },
+    {
+      // The showcase pages take three.js from a CDN through their import map, so no package.json declares it.
+      "includes": ["**/site/**"],
+      "linter": { "rules": { "correctness": { "noUndeclaredDependencies": "off" } } }
     }
   ]
 }

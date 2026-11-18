@@ -18,7 +18,14 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   let options = [];
   let active = -1;
 
-  const input = element('input', { type: 'text', id: `${id}-input`, className: 'combo-input', placeholder: 'Any', autocomplete: 'off', spellcheck: false });
+  const input = element('input', {
+    type: 'text',
+    id: `${id}-input`,
+    className: 'combo-input',
+    placeholder: 'Any',
+    autocomplete: 'off',
+    spellcheck: false,
+  });
   input.setAttribute('role', 'combobox');
   input.setAttribute('aria-autocomplete', 'list');
   input.setAttribute('aria-expanded', 'false');
@@ -30,7 +37,14 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   status.setAttribute('role', 'status');
   const chips = element('span', { className: 'combo-chips' });
   const caption = element('label', { className: 'combo-label', htmlFor: input.id, textContent: label, title });
-  const root = element('div', { className: 'combo' }, caption, element('div', { className: 'combo-field' }, chips, input), list, status);
+  const root = element(
+    'div',
+    { className: 'combo' },
+    caption,
+    element('div', { className: 'combo-field' }, chips, input),
+    list,
+    status,
+  );
 
   const open = () => !list.hidden;
   const setActive = (i) => {
@@ -50,12 +64,22 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   };
 
   function renderChips() {
-    chips.replaceChildren(...values.map((value) => {
-      const b = element('button', { type: 'button', className: 'combo-chip', title: `Remove ${textOf(value)}` }, textOf(value), element('span', { textContent: '×' }));
-      b.setAttribute('aria-label', `Remove ${label}: ${textOf(value)}`);
-      b.onclick = () => { remove(value); input.focus(); };
-      return b;
-    }));
+    chips.replaceChildren(
+      ...values.map((value) => {
+        const b = element(
+          'button',
+          { type: 'button', className: 'combo-chip', title: `Remove ${textOf(value)}` },
+          textOf(value),
+          element('span', { textContent: '×' }),
+        );
+        b.setAttribute('aria-label', `Remove ${label}: ${textOf(value)}`);
+        b.onclick = () => {
+          remove(value);
+          input.focus();
+        };
+        return b;
+      }),
+    );
   }
 
   function change(next) {
@@ -76,13 +100,20 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   function show(highlight) {
     options = suggest(input.value.trim().toLowerCase());
     status.textContent = options.length ? '' : 'No matches';
-    list.replaceChildren(...options.map((o, i) => {
-      const li = element('li', { id: `${id}-opt-${i}`, className: 'combo-option', title: o.title ?? '' }, o.text, ...(o.detail === undefined ? [] : [element('span', { textContent: o.detail })]));
-      li.setAttribute('role', 'option');
-      li.setAttribute('aria-selected', 'false');
-      li.dataset.index = i;
-      return li;
-    }));
+    list.replaceChildren(
+      ...options.map((o, i) => {
+        const li = element(
+          'li',
+          { id: `${id}-opt-${i}`, className: 'combo-option', title: o.title ?? '' },
+          o.text,
+          ...(o.detail === undefined ? [] : [element('span', { className: 'combo-detail', textContent: o.detail })]),
+        );
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', 'false');
+        li.dataset.index = i;
+        return li;
+      }),
+    );
     list.hidden = options.length === 0;
     input.setAttribute('aria-expanded', String(options.length > 0));
     setActive(highlight && options.length ? 0 : -1);
@@ -100,12 +131,23 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
   input.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
-      if (!open()) { show(true); return; }
-      if (options.length) setActive(e.key === 'ArrowDown' ? (active + 1) % options.length : (active < 0 ? options.length : active) - 1);
+      if (!open()) {
+        show(true);
+        return;
+      }
+      if (options.length)
+        setActive(e.key === 'ArrowDown' ? (active + 1) % options.length : (active < 0 ? options.length : active) - 1);
     } else if (e.key === 'Enter') {
-      if (open() && active >= 0) { e.preventDefault(); pick(active); }
+      if (open() && active >= 0) {
+        e.preventDefault();
+        pick(active);
+      }
     } else if (e.key === 'Escape') {
-      if (open()) { e.preventDefault(); e.stopPropagation(); close(); }
+      if (open()) {
+        e.preventDefault();
+        e.stopPropagation();
+        close();
+      }
     } else if (e.key === 'Backspace' && !input.value && values.length) {
       remove(values.at(-1));
     }

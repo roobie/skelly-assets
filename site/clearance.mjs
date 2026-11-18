@@ -14,7 +14,19 @@
 // where the garment overlaps itself. The skin check (skin.mjs) draws the same covered surface, so what the probe finds and what a camera sees
 // are told of one surface.
 import { hides } from './hiding.mjs';
-import { add, applyPoint, cross, dot, IDENTITY_M, length, mulMV, normalize, scale, sub, transpose } from './kinematics.mjs';
+import {
+  add,
+  applyPoint,
+  cross,
+  dot,
+  IDENTITY_M,
+  length,
+  mulMV,
+  normalize,
+  scale,
+  sub,
+  transpose,
+} from './kinematics.mjs';
 
 // Two surfaces closer than this are one: positions are stored as float32 and pass through a few transforms, which moves
 // them by well under a micrometre at the doll's size, and a pixel of a review sheet spans millimetres, so a face this
@@ -30,21 +42,28 @@ export const PITCH = 0.005;
 const RAY = normalize([0.123, 0.987, 0.345]);
 const EPSILON = 1e-12;
 
-const triangleCorners = ({ positions, indices }, t) => [0, 1, 2].map((k) => {
-  const i = indices[t * 3 + k] * 3;
-  return [positions[i], positions[i + 1], positions[i + 2]];
-});
+const triangleCorners = ({ positions, indices }, t) =>
+  [0, 1, 2].map((k) => {
+    const i = indices[t * 3 + k] * 3;
+    return [positions[i], positions[i + 1], positions[i + 2]];
+  });
 const triangles = (mesh) => Array.from({ length: mesh.indices.length / 3 }, (_, t) => triangleCorners(mesh, t));
 const centroid = ([a, b, c]) => [0, 1, 2].map((k) => (a[k] + b[k] + c[k]) / 3);
 
 function boundsOf(points) {
-  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
-  for (const p of points) for (let a = 0; a < 3; a++) { min[a] = Math.min(min[a], p[a]); max[a] = Math.max(max[a], p[a]); }
+  const min = [Infinity, Infinity, Infinity],
+    max = [-Infinity, -Infinity, -Infinity];
+  for (const p of points)
+    for (let a = 0; a < 3; a++) {
+      min[a] = Math.min(min[a], p[a]);
+      max[a] = Math.max(max[a], p[a]);
+    }
   return { min, max };
 }
 
 // Whether the boxes overlap, the first widened by `margin`.
-const boxesMeet = (a, b, margin) => [0, 1, 2].every((k) => a.min[k] - margin <= b.max[k] && b.min[k] <= a.max[k] + margin);
+const boxesMeet = (a, b, margin) =>
+  [0, 1, 2].every((k) => a.min[k] - margin <= b.max[k] && b.min[k] <= a.max[k] + margin);
 
 // How far `p` lies outside the box, zero inside it.
 function boxDistance({ min, max }, p) {
@@ -90,18 +109,25 @@ export function sampledSurface(mesh, pitch = PITCH) {
   return faces.flatMap((face, t) => {
     const normal = scale(normalize(cross(sub(face[1], face[0]), sub(face[2], face[0]))), outward);
     const region = mesh.pieces?.[t];
-    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({ corners, point: centroid(corners), normal, region }));
+    return subdivided({ positions: face.flat(), indices: [0, 1, 2] }, pitch).map((corners) => ({
+      corners,
+      point: centroid(corners),
+      normal,
+      region,
+    }));
   });
 }
 
 // Möller–Trumbore: how far along the ray from `p` in direction `dir` it meets the triangle, and whether it leaves
 // through the face's outer side (+1) or enters it (-1); null when it misses or meets it behind the point.
 function rayHit(p, dir, [a, b, c]) {
-  const e1 = sub(b, a), e2 = sub(c, a);
+  const e1 = sub(b, a),
+    e2 = sub(c, a);
   const h = cross(dir, e2);
   const det = dot(e1, h);
   if (Math.abs(det) < EPSILON) return null;
-  const s = sub(p, a), u = dot(s, h) / det;
+  const s = sub(p, a),
+    u = dot(s, h) / det;
   if (u < 0 || u > 1) return null;
   const q = cross(s, e1);
   const v = dot(dir, q) / det;
@@ -113,25 +139,55 @@ function rayHit(p, dir, [a, b, c]) {
 
 // The distance from `p` to the nearest point of the triangle (Ericson, Real-Time Collision Detection, 5.1.5).
 function triangleDistance(p, [a, b, c]) {
-  const ab = sub(b, a), ac = sub(c, a), ap = sub(p, a);
-  const d1 = dot(ab, ap), d2 = dot(ac, ap);
+  const ab = sub(b, a),
+    ac = sub(c, a),
+    ap = sub(p, a);
+  const d1 = dot(ab, ap),
+    d2 = dot(ac, ap);
   if (d1 <= 0 && d2 <= 0) return length(ap);
-  const bp = sub(p, b), d3 = dot(ab, bp), d4 = dot(ac, bp);
+  const bp = sub(p, b),
+    d3 = dot(ab, bp),
+    d4 = dot(ac, bp);
   if (d3 >= 0 && d4 <= d3) return length(bp);
   const vc = d1 * d4 - d3 * d2;
-  if (vc <= 0 && d1 >= 0 && d3 <= 0) return length(sub(ap, ab.map((x) => x * (d1 / (d1 - d3)))));
-  const cp = sub(p, c), d5 = dot(ab, cp), d6 = dot(ac, cp);
+  if (vc <= 0 && d1 >= 0 && d3 <= 0)
+    return length(
+      sub(
+        ap,
+        ab.map((x) => x * (d1 / (d1 - d3))),
+      ),
+    );
+  const cp = sub(p, c),
+    d5 = dot(ab, cp),
+    d6 = dot(ac, cp);
   if (d6 >= 0 && d5 <= d6) return length(cp);
   const vb = d5 * d2 - d1 * d6;
-  if (vb <= 0 && d2 >= 0 && d6 <= 0) return length(sub(ap, ac.map((x) => x * (d2 / (d2 - d6)))));
+  if (vb <= 0 && d2 >= 0 && d6 <= 0)
+    return length(
+      sub(
+        ap,
+        ac.map((x) => x * (d2 / (d2 - d6))),
+      ),
+    );
   const va = d3 * d6 - d5 * d4;
   if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) {
-    const w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-    return length(sub(bp, sub(c, b).map((x) => x * w)));
+    const w = (d4 - d3) / (d4 - d3 + (d5 - d6));
+    return length(
+      sub(
+        bp,
+        sub(c, b).map((x) => x * w),
+      ),
+    );
   }
   const denom = 1 / (va + vb + vc);
-  const v = vb * denom, w = vc * denom;
-  return length(sub(ap, [0, 1, 2].map((k) => ab[k] * v + ac[k] * w)));
+  const v = vb * denom,
+    w = vc * denom;
+  return length(
+    sub(
+      ap,
+      [0, 1, 2].map((k) => ab[k] * v + ac[k] * w),
+    ),
+  );
 }
 
 // ---- solids: a tree of boxes over a mesh's triangles, so a point's queries visit only the triangles near it ----
@@ -143,8 +199,14 @@ function boxTree(faces) {
   if (faces.length <= LEAF) return { bounds, faces };
   const centres = faces.map(centroid);
   const spread = boundsOf(centres);
-  const axis = [0, 1, 2].reduce((best, a) => (spread.max[a] - spread.min[a] > spread.max[best] - spread.min[best] ? a : best), 0);
-  const order = faces.map((face, i) => ({ face, at: centres[i][axis] })).sort((a, b) => a.at - b.at).map(({ face }) => face);
+  const axis = [0, 1, 2].reduce(
+    (best, a) => (spread.max[a] - spread.min[a] > spread.max[best] - spread.min[best] ? a : best),
+    0,
+  );
+  const order = faces
+    .map((face, i) => ({ face, at: centres[i][axis] }))
+    .sort((a, b) => a.at - b.at)
+    .map(({ face }) => face);
   const half = order.length >> 1;
   return { bounds, children: [boxTree(order.slice(0, half)), boxTree(order.slice(half))] };
 }
@@ -160,9 +222,11 @@ function nearest(node, p, best) {
 
 // Whether the ray from `p` in direction `dir` can meet the box nearer than `limit` (the slab test).
 function rayMeets({ min, max }, p, dir, limit = Infinity) {
-  let near = 0, far = limit;
+  let near = 0,
+    far = limit;
   for (let a = 0; a < 3; a++) {
-    const t1 = (min[a] - p[a]) / dir[a], t2 = (max[a] - p[a]) / dir[a];
+    const t1 = (min[a] - p[a]) / dir[a],
+      t2 = (max[a] - p[a]) / dir[a];
     near = Math.max(near, Math.min(t1, t2));
     far = Math.min(far, Math.max(t1, t2));
   }
@@ -182,7 +246,11 @@ const winding = (node, p) => {
 // face, if nearer than `best`.
 function firstHit(node, p, dir, best) {
   if (!rayMeets(node.bounds, p, dir, best)) return best;
-  if (node.faces) return node.faces.reduce((least, face) => { const t = rayHit(p, dir, face)?.t ?? Infinity; return t > COINCIDENT && t < least ? t : least; }, best);
+  if (node.faces)
+    return node.faces.reduce((least, face) => {
+      const t = rayHit(p, dir, face)?.t ?? Infinity;
+      return t > COINCIDENT && t < least ? t : least;
+    }, best);
   return firstHit(node.children[1], p, dir, firstHit(node.children[0], p, dir, best));
 }
 
@@ -229,7 +297,10 @@ function isInside({ tree, local }, p) {
 function depthOutside(solids, p) {
   const local = solids.map((solid) => solid.local(p));
   const off = local.map((q, i) => boxDistance(solids[i].tree.bounds, q));
-  const within = solids.findIndex((solid, i) => off[i] === 0 && winding(solid.tree, local[i]) !== 0 && nearest(solid.tree, local[i], COINCIDENT) >= COINCIDENT);
+  const within = solids.findIndex(
+    (solid, i) =>
+      off[i] === 0 && winding(solid.tree, local[i]) !== 0 && nearest(solid.tree, local[i], COINCIDENT) >= COINCIDENT,
+  );
   if (within >= 0) return { depth: -Infinity, index: within };
   let best = { depth: Infinity, index: -1 };
   solids.forEach((solid, index) => {
@@ -246,7 +317,11 @@ function depthOutside(solids, p) {
 export const STEP = 2 * COINCIDENT;
 
 // Whether `p` lies outside every one of the solids.
-const outsideAll = (solids, p) => solids.every(({ tree, local }) => { const q = local(p); return boxDistance(tree.bounds, q) > 0 || winding(tree, q) === 0; });
+const outsideAll = (solids, p) =>
+  solids.every(({ tree, local }) => {
+    const q = local(p);
+    return boxDistance(tree.bounds, q) > 0 || winding(tree, q) === 0;
+  });
 
 // The bones whose parts a piece riding each bone is meant to cover: its own, and the next part up and down the limb across
 // its joints, where a cuff, a collar or a hem reaches over the joint. A part further off only meets the piece by
@@ -266,7 +341,8 @@ function reachOf(bones) {
 // the shells it is built of overlap, to the first beyond which none encloses it.
 function runThrough(node, p, dir) {
   let t = 0;
-  while (t < Infinity && (t === 0 || winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0)) t += firstHit(node, add(p, scale(dir, t)), dir, Infinity);
+  while (t < Infinity && (t === 0 || winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0))
+    t += firstHit(node, add(p, scale(dir, t)), dir, Infinity);
   return t;
 }
 
@@ -298,10 +374,13 @@ export function coverage(rig, rest) {
   const meant = new Map(
     [...bodySolids].map(([id, { tree }]) => [
       id,
-      rest.pieces.flatMap(({ bone }, index) => (reach.get(bone)?.has(id) && boxesMeet(tree.bounds, pieceSolids[index].tree.bounds, COINCIDENT) ? [index] : [])),
+      rest.pieces.flatMap(({ bone }, index) =>
+        reach.get(bone)?.has(id) && boxesMeet(tree.bounds, pieceSolids[index].tree.bounds, COINCIDENT) ? [index] : [],
+      ),
     ]),
   );
-  const declaresBare = ({ bone, covers }, id, region) => bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
+  const declaresBare = ({ bone, covers }, id, region) =>
+    bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
   const beneath = (id, indices, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
@@ -320,7 +399,10 @@ export function coverage(rig, rest) {
   return (id, sample) => {
     const indices = meant.get(id) ?? [];
     if (indices.length === 0) return -1;
-    const { depth, index } = depthOutside(indices.map((i) => pieceSolids[i]), sample.point);
+    const { depth, index } = depthOutside(
+      indices.map((i) => pieceSolids[i]),
+      sample.point,
+    );
     return depth <= COINCIDENT ? indices[index] : beneath(id, indices, sample);
   };
 }
@@ -337,9 +419,16 @@ export function coveredSurface(rig, rest, { whole = false } = {}) {
   const sampled = (bone, sample) => {
     const index = cover(bone, sample);
     if (!whole) return { ...sample, cover: index };
-    return { ...sample, cover: index, whole: index >= 0 && sample.corners.every((point) => cover(bone, { ...sample, point }) >= 0) };
+    return {
+      ...sample,
+      cover: index,
+      whole: index >= 0 && sample.corners.every((point) => cover(bone, { ...sample, point }) >= 0),
+    };
   };
-  return rest.body.map(({ bone, mesh }) => ({ bone, samples: sampledSurface(mesh).map((sample) => sampled(bone, sample)) }));
+  return rest.body.map(({ bone, mesh }) => ({
+    bone,
+    samples: sampledSurface(mesh).map((sample) => sampled(bone, sample)),
+  }));
 }
 
 /**
@@ -357,8 +446,12 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
   const restBody = bodyTrees.map((tree) => carried(tree, STILL));
   // Each piece point with the body parts it is already sunk into at rest.
   const pieces = rest.pieces.map(({ piece, bone, mesh }) => ({
-    piece, bone,
-    points: sampledSurface(mesh).map(({ point }) => ({ point, sunk: new Set(restBody.flatMap((solid, i) => (isInside(solid, point) ? [i] : []))) })),
+    piece,
+    bone,
+    points: sampledSurface(mesh).map(({ point }) => ({
+      point,
+      sunk: new Set(restBody.flatMap((solid, i) => (isInside(solid, point) ? [i] : []))),
+    })),
   }));
   return (transforms) => {
     const at = (id) => {
@@ -375,8 +468,15 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
         const posed = applyPoint(at(bone), point);
         const into = posedBody.findIndex((solid, i) => !sunk.has(i) && isInside(solid, posed));
         if (into < 0) continue;
-        if (depthOutside(others, posed).depth <= COINCIDENT) findings.seams.push({ piece, into: rest.body[into].bone, point: posed });
-        else findings.sinks.push({ piece, into: rest.body[into].bone, point: posed, depth: -signedDepth(posedBody[into], posed) });
+        if (depthOutside(others, posed).depth <= COINCIDENT)
+          findings.seams.push({ piece, into: rest.body[into].bone, point: posed });
+        else
+          findings.sinks.push({
+            piece,
+            into: rest.body[into].bone,
+            point: posed,
+            depth: -signedDepth(posedBody[into], posed),
+          });
       }
     });
     return findings;
@@ -390,11 +490,20 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
  */
 export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
   const solids = (parts) => parts.map(({ mesh }) => carried(solidOf(mesh), STILL));
-  return { ...bareFindings(coveredPoints(rest, surface), solids(rest.pieces), solids(rest.body), () => STILL), sinks: [], seams: [] };
+  return {
+    ...bareFindings(coveredPoints(rest, surface), solids(rest.pieces), solids(rest.body), () => STILL),
+    sinks: [],
+    seams: [],
+  };
 }
 
 // The covered samples of a surface, each with the piece meant to cover it.
-const coveredPoints = (rest, surface) => surface.flatMap(({ bone, samples }) => samples.flatMap(({ point, normal, cover }) => (cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }])));
+const coveredPoints = (rest, surface) =>
+  surface.flatMap(({ bone, samples }) =>
+    samples.flatMap(({ point, normal, cover }) =>
+      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }],
+    ),
+  );
 
 // The pokes and flush points of covered samples against the posed pieces and body.
 function bareFindings(covered, posedPieces, posedBody, at) {

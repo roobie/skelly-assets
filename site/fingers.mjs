@@ -3,8 +3,26 @@
 // a hand placed on an item's grip socket, with named digits pinching points on the item. Why grips close by
 // contact while a pinch reaches fingertip targets, and why the palm is placed before the fingers, is in
 // docs/decisions/0010-pose-tool.md.
-import { applyPoint, boneTransforms, clampJointAngles, cross, jointAngles, jointRotation, length, mulMM, mulMV, normalize, quatToMat3, rotBetween, solveTwoBone, sub, transpose, IDENTITY_M } from './kinematics.mjs';
+
 import { posedSolid, signedDepth } from './clearance.mjs';
+import {
+  applyPoint,
+  boneTransforms,
+  clampJointAngles,
+  cross,
+  IDENTITY_M,
+  jointAngles,
+  jointRotation,
+  length,
+  mulMM,
+  mulMV,
+  normalize,
+  quatToMat3,
+  rotBetween,
+  solveTwoBone,
+  sub,
+  transpose,
+} from './kinematics.mjs';
 
 const HAND_KEYS = new Set(['preset', 'curl', 'spread', 'thumb']);
 const THUMB_KEYS = new Set(['across', 'oppose', 'lift', 'curl']);
@@ -24,7 +42,10 @@ const boneById = (rig) => new Map(rig.bones.map((bone) => [bone.id, bone]));
  */
 export function digitsOf(rig, handId) {
   const bones = boneById(rig);
-  const under = (bone) => { for (let b = bone; b; b = bones.get(b.parent)) if (b.parent === handId) return true; return false; };
+  const under = (bone) => {
+    for (let b = bone; b; b = bones.get(b.parent)) if (b.parent === handId) return true;
+    return false;
+  };
   const digits = new Map();
   for (const bone of rig.bones) {
     if (!bone.digit || !under(bone)) continue;
@@ -43,8 +64,10 @@ const shareOf = (bone, axis, share) => {
 };
 
 // A hand shorthand as written, a preset's name or `{ preset?, curl?, spread?, thumb? }`, over the preset it names.
-const SHAPE = '{ preset?, curl, spread, thumb: { across, oppose, lift, curl } } or the name of one of the rig\'s presets';
-const presetOf = (rig, hand) => (typeof hand === 'string' ? rig.presets?.[hand] : hand.preset !== undefined ? rig.presets?.[hand.preset] : {});
+const SHAPE =
+  "{ preset?, curl, spread, thumb: { across, oppose, lift, curl } } or the name of one of the rig's presets";
+const presetOf = (rig, hand) =>
+  typeof hand === 'string' ? rig.presets?.[hand] : hand.preset !== undefined ? rig.presets?.[hand.preset] : {};
 const resolveHand = (rig, hand) => {
   const preset = presetOf(rig, hand) ?? {};
   const own = typeof hand === 'string' ? {} : hand;
@@ -59,21 +82,25 @@ export function handIssues(rig, handId, hand) {
   const digits = digitsOf(rig, handId);
   if (digits.size === 0) issues.push(`hands.${handId}: ${handId} has no digits`);
   for (const key of Object.keys(hand)) if (!HAND_KEYS.has(key)) issues.push(`hands.${handId}: unknown key ${key}`);
-  if (hand.preset !== undefined && !rig.presets?.[hand.preset]) issues.push(`hands.${handId}: the rig has no preset ${hand.preset}`);
+  if (hand.preset !== undefined && !rig.presets?.[hand.preset])
+    issues.push(`hands.${handId}: the rig has no preset ${hand.preset}`);
   if (hand.curl !== undefined && !isShare(hand.curl)) {
     if (!isObject(hand.curl)) issues.push(`hands.${handId}.curl is a share -1..1 or one per finger`);
-    else for (const [digit, share] of Object.entries(hand.curl)) {
-      if (!digits.has(digit) || digit === 'thumb') issues.push(`hands.${handId}.curl: ${handId} has no finger ${digit}`);
-      if (!isShare(share)) issues.push(`hands.${handId}.curl.${digit} is a share -1..1`);
-    }
+    else
+      for (const [digit, share] of Object.entries(hand.curl)) {
+        if (!digits.has(digit) || digit === 'thumb')
+          issues.push(`hands.${handId}.curl: ${handId} has no finger ${digit}`);
+        if (!isShare(share)) issues.push(`hands.${handId}.curl.${digit} is a share -1..1`);
+      }
   }
   if (hand.spread !== undefined && !isShare(hand.spread)) issues.push(`hands.${handId}.spread is a share -1..1`);
   if (hand.thumb !== undefined) {
     if (!isObject(hand.thumb)) issues.push(`hands.${handId}.thumb is { across, oppose, lift, curl }`);
-    else for (const [key, share] of Object.entries(hand.thumb)) {
-      if (!THUMB_KEYS.has(key)) issues.push(`hands.${handId}.thumb: unknown key ${key}`);
-      else if (!isShare(share)) issues.push(`hands.${handId}.thumb.${key} is a share -1..1`);
-    }
+    else
+      for (const [key, share] of Object.entries(hand.thumb)) {
+        if (!THUMB_KEYS.has(key)) issues.push(`hands.${handId}.thumb: unknown key ${key}`);
+        else if (!isShare(share)) issues.push(`hands.${handId}.thumb.${key} is a share -1..1`);
+      }
   }
   return issues;
 }
@@ -88,7 +115,7 @@ export function handIssues(rig, handId, hand) {
 export function handAngles(rig, handId, asked) {
   const hand = resolveHand(rig, asked);
   const angles = {};
-  const curlOf = (digit) => (isObject(hand.curl) ? hand.curl[digit] ?? 0 : hand.curl ?? 0);
+  const curlOf = (digit) => (isObject(hand.curl) ? (hand.curl[digit] ?? 0) : (hand.curl ?? 0));
   for (const [digit, chain] of digitsOf(rig, handId)) {
     if (digit === 'thumb') {
       const [root, ...rest] = chain;
@@ -99,7 +126,11 @@ export function handAngles(rig, handId, asked) {
       continue;
     }
     chain.forEach((bone, k) => {
-      angles[bone.id] = [shareOf(bone, 'flex', curlOf(digit)), 0, k === 0 ? shareOf(bone, 'abduct', (hand.spread ?? 0) * (bone.spread ?? 0)) : 0];
+      angles[bone.id] = [
+        shareOf(bone, 'flex', curlOf(digit)),
+        0,
+        k === 0 ? shareOf(bone, 'abduct', (hand.spread ?? 0) * (bone.spread ?? 0)) : 0,
+      ];
     });
   }
   return angles;
@@ -114,9 +145,11 @@ const LATTICE = 4;
 const boxPoints = ({ min, max }) => {
   const points = [];
   const at = (a, i) => min[a] + (i / LATTICE) * (max[a] - min[a]);
-  for (let i = 0; i <= LATTICE; i++) for (let j = 0; j <= LATTICE; j++) for (let k = 0; k <= LATTICE; k++) {
-    if ([i, j, k].some((n) => n === 0 || n === LATTICE)) points.push([at(0, i), at(1, j), at(2, k)]);
-  }
+  for (let i = 0; i <= LATTICE; i++)
+    for (let j = 0; j <= LATTICE; j++)
+      for (let k = 0; k <= LATTICE; k++) {
+        if ([i, j, k].some((n) => n === 0 || n === LATTICE)) points.push([at(0, i), at(1, j), at(2, k)]);
+      }
   return points;
 };
 
@@ -133,36 +166,54 @@ const nearest = (rig, pose, bones, solids) => {
   let least = Infinity;
   for (const bone of bones) {
     const t = transforms.get(bone.id);
-    for (const p of boxPoints(bone.bind.box)) for (const solid of solids) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
+    for (const p of boxPoints(bone.bind.box))
+      for (const solid of solids) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
   }
   return least;
 };
 
 // A bone's part box as a posed solid, so a digit can close on another.
-const BOX_FACES = [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]];
-const boxSolid = ({ min, max }, transform) => posedSolid({
-  positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
-  indices: BOX_FACES.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
-}, transform);
+const BOX_FACES = [
+  [0, 1, 3, 2],
+  [4, 6, 7, 5],
+  [0, 4, 5, 1],
+  [2, 3, 7, 6],
+  [0, 2, 6, 4],
+  [1, 5, 7, 3],
+];
+const boxSolid = ({ min, max }, transform) =>
+  posedSolid(
+    {
+      positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
+      indices: BOX_FACES.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
+    },
+    transform,
+  );
 
 // Sweeps an angle from `from` toward `to` for the first angle where `hit` holds, in steps and then halving the step it
 // came in, so a part cannot pass through a thin item to rest beyond it: `met`, that angle, and `short`, the last before
 // it that missed; undefined when it never holds.
 const sweepTo = (from, to, hit) => {
-  let short = from, met;
+  let short = from,
+    met;
   for (let i = 1; i <= SWEEP && met === undefined; i++) {
     const next = from + ((to - from) * i) / SWEEP;
-    if (hit(next)) met = next; else short = next;
+    if (hit(next)) met = next;
+    else short = next;
   }
   if (met === undefined) return undefined;
   for (let i = 0; i < STEPS; i++) {
     const mid = (short + met) / 2;
-    if (hit(mid)) met = mid; else short = mid;
+    if (hit(mid)) met = mid;
+    else short = mid;
   }
   return { short, met };
 };
 
-const withAngles = (pose, bone, angles) => ({ ...pose, rotations: { ...pose.rotations, [bone.id]: jointRotation(bone, angles) } });
+const withAngles = (pose, bone, angles) => ({
+  ...pose,
+  rotations: { ...pose.rotations, [bone.id]: jointRotation(bone, angles) },
+});
 
 /**
  * Closes the digits of `handId` on `solid` (a posed solid, `clearance.mjs`, `posedSolid`), each joint in turn from the
@@ -179,7 +230,8 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
   const digits = [...digitsOf(rig, handId)].sort(([a], [b]) => (a === 'thumb') - (b === 'thumb'));
   for (const [digit, chain] of digits) {
     if (keep.includes(digit)) continue;
-    const fingers = digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
+    const fingers =
+      digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
     const transforms = boneTransforms(rig.bones, pose);
     const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind.box, transforms.get(bone.id)))];
     const apart = (p, moved) => nearest(rig, p, moved, solids) > CONTACT;
@@ -194,7 +246,7 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
       // The ends of the joint's range in the senses that close and open it: a phalanx curls toward the palm, while the
       // thumb's root, which a grip opens wide (lifted off the palm), comes back down onto the item from beyond it.
       const lowers = digit === 'thumb' && k === 0;
-      const [opened, end] = (bone.sense[0] > 0) !== lowers ? bone.limits.flex : [...bone.limits.flex].reverse();
+      const [opened, end] = bone.sense[0] > 0 !== lowers ? bone.limits.flex : [...bone.limits.flex].reverse();
       const gap = nearest(rig, at(flex), moved, solids);
       if (gap < -CONTACT) {
         // Posed sunk into the item: backed out the way the joint opens until it rests on the surface, or as far as it
@@ -204,12 +256,23 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
         if (out) touched = true;
         return;
       }
-      if (gap <= CONTACT) { touched = true; return; }
+      if (gap <= CONTACT) {
+        touched = true;
+        return;
+      }
       const met = sweepTo(flex, end, (f) => !apart(at(f), moved));
       pose = at(met ? met.short : end);
       if (met) touched = true;
     });
-    closed[digit] = { touched, angles: Object.fromEntries(chain.map((bone) => [bone.id, jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10)])) };
+    closed[digit] = {
+      touched,
+      angles: Object.fromEntries(
+        chain.map((bone) => [
+          bone.id,
+          jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10),
+        ]),
+      ),
+    };
   }
   return { pose, closed };
 }
@@ -238,14 +301,22 @@ export function holdIssues(rig, handId, hold) {
   for (const key of Object.keys(hold)) if (!HOLD_KEYS.has(key)) issues.push(`hold.${handId}: unknown key ${key}`);
   if (typeof hold.model !== 'string') issues.push(`hold.${handId}.model names a model`);
   if (hold.at !== undefined && !isVector(hold.at)) issues.push(`hold.${handId}.at is a finite point [x, y, z]`);
-  if (hold.turn !== undefined && !(Array.isArray(hold.turn) && hold.turn.length === 4 && hold.turn.every(Number.isFinite))) issues.push(`hold.${handId}.turn is a quaternion [x, y, z, w]`);
-  if (hold.grip !== undefined && !(hold.grip >= 0 && hold.grip <= 1)) issues.push(`hold.${handId}.grip is a share in [0, 1]`);
+  if (
+    hold.turn !== undefined &&
+    !(Array.isArray(hold.turn) && hold.turn.length === 4 && hold.turn.every(Number.isFinite))
+  )
+    issues.push(`hold.${handId}.turn is a quaternion [x, y, z, w]`);
+  if (hold.grip !== undefined && !(hold.grip >= 0 && hold.grip <= 1))
+    issues.push(`hold.${handId}.grip is a share in [0, 1]`);
   if (hold.slant !== undefined && !isSlant(hold.slant)) issues.push(`hold.${handId}.slant is degrees in [-90, 90]`);
-  if (hold.pole !== undefined && !isVector(hold.pole)) issues.push(`hold.${handId}.pole is a finite direction [x, y, z]`);
+  if (hold.pole !== undefined && !isVector(hold.pole))
+    issues.push(`hold.${handId}.pole is a finite direction [x, y, z]`);
   if (!isObject(hold.socket)) issues.push(`hold.${handId}.socket is { at, into, axis }`);
   else {
-    for (const key of Object.keys(hold.socket)) if (!SOCKET_KEYS.has(key)) issues.push(`hold.${handId}.socket: unknown key ${key}`);
-    for (const key of SOCKET_KEYS) if (!isVector(hold.socket[key])) issues.push(`hold.${handId}.socket.${key} is a finite [x, y, z]`);
+    for (const key of Object.keys(hold.socket))
+      if (!SOCKET_KEYS.has(key)) issues.push(`hold.${handId}.socket: unknown key ${key}`);
+    for (const key of SOCKET_KEYS)
+      if (!isVector(hold.socket[key])) issues.push(`hold.${handId}.socket.${key} is a finite [x, y, z]`);
   }
   if (hold.pinch !== undefined) {
     if (!isObject(hold.pinch)) issues.push(`hold.${handId}.pinch is { <digit>: [x, y, z] }`);
@@ -275,19 +346,24 @@ const triad = (into, axis) => {
 const palmSocket = (hand, grip, slant) => {
   const { min, max } = hand.bind.box;
   const sign = hand.bind.mirror ? -1 : 1;
-  const a = slant * Math.PI / 180;
-  return { at: [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2], into: [sign, 0, 0], axis: [0, -Math.sin(a), Math.cos(a)] };
+  const a = (slant * Math.PI) / 180;
+  return {
+    at: [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2],
+    into: [sign, 0, 0],
+    axis: [0, -Math.sin(a), Math.cos(a)],
+  };
 };
 
 // How far a rotation turns, in degrees.
-const turnOf = (m) => Math.acos(Math.min(1, Math.max(-1, (m[0] + m[4] + m[8] - 1) / 2))) * 180 / Math.PI;
+const turnOf = (m) => (Math.acos(Math.min(1, Math.max(-1, (m[0] + m[4] + m[8] - 1) / 2))) * 180) / Math.PI;
 
 // The joint `bone` set to `angles` in `pose`, each held to its limits, the held ones on `report` when held by more
 // than the twist sweep's last step leaves.
 const HELD_BY = 0.05;
 const setJoint = (pose, bone, angles, report) => {
   const kept = clampJointAngles(bone, angles);
-  if (kept.some((a, i) => Math.abs(a - angles[i]) > HELD_BY)) report?.push({ bone: bone.id, asked: angles, held: kept });
+  if (kept.some((a, i) => Math.abs(a - angles[i]) > HELD_BY))
+    report?.push({ bone: bone.id, asked: angles, held: kept });
   return withAngles(pose, bone, kept);
 };
 
@@ -307,11 +383,17 @@ function turnHand(rig, pose, hand, wanted, report) {
     const twisted = withAngles(pose, parent, clampJointAngles(parent, [parentAngles[0], twist, parentAngles[2]]));
     const local = mulMM(transpose(boneTransforms(rig.bones, twisted).get(parent.id).r), wanted);
     const angles = jointAngles(hand, local);
-    return { twist, angles, short: turnOf(mulMM(transpose(jointRotation(hand, clampJointAngles(hand, angles))), local)) };
+    return {
+      twist,
+      angles,
+      short: turnOf(mulMM(transpose(jointRotation(hand, clampJointAngles(hand, angles))), local)),
+    };
   };
   // The least short wins; among equals, the twist that moves the parent least from where the pose has it.
-  const better = (a, b) => !b || a.short < b.short - 1e-6
-    || (Math.abs(a.short - b.short) <= 1e-6 && Math.abs(a.twist - parentAngles[1]) < Math.abs(b.twist - parentAngles[1]));
+  const better = (a, b) =>
+    !b ||
+    a.short < b.short - 1e-6 ||
+    (Math.abs(a.short - b.short) <= 1e-6 && Math.abs(a.twist - parentAngles[1]) < Math.abs(b.twist - parentAngles[1]));
   const sweep = (from, to, step) => {
     let best;
     for (let twist = from; twist <= to + 1e-9; twist += step) {
@@ -322,7 +404,12 @@ function turnHand(rig, pose, hand, wanted, report) {
   };
   const [min, max] = parent.limits.twist;
   let best = sweep(min, max, TWIST_STEPS[0]);
-  for (let i = 1; i < TWIST_STEPS.length; i++) best = sweep(Math.max(min, best.twist - TWIST_STEPS[i - 1]), Math.min(max, best.twist + TWIST_STEPS[i - 1]), TWIST_STEPS[i]);
+  for (let i = 1; i < TWIST_STEPS.length; i++)
+    best = sweep(
+      Math.max(min, best.twist - TWIST_STEPS[i - 1]),
+      Math.min(max, best.twist + TWIST_STEPS[i - 1]),
+      TWIST_STEPS[i],
+    );
   const twisted = setJoint(pose, parent, [parentAngles[0], best.twist, parentAngles[2]], report);
   return setJoint(twisted, hand, best.angles, report);
 }
@@ -373,7 +460,8 @@ export function solveCCD(rig, pose, chain, target, { end: endAt, iterations = 24
       const turn = rotBetween(normalize(sub(end, joint)), normalize(sub(target, joint)));
       const parent = bone.parent === null ? IDENTITY_M : transforms.get(bone.parent).r;
       const local = mulMM(transpose(parent), mulMM(turn, transforms.get(id).r));
-      const angles = jointAngles(bone, local), kept = clampJointAngles(bone, angles);
+      const angles = jointAngles(bone, local),
+        kept = clampJointAngles(bone, angles);
       if (kept.some((a, k) => Math.abs(a - angles[k]) > 1e-6)) report?.push({ bone: id, asked: angles, held: kept });
       pose = { ...pose, rotations: { ...pose.rotations, [id]: jointRotation(bone, kept) } };
     }
@@ -403,8 +491,22 @@ export function pinchItem(rig, pose, handId, pinch, item) {
   for (const [digit, point] of Object.entries(pinch)) {
     const chain = digits.get(digit);
     let residual;
-    ({ pose, residual } = solveCCD(rig, pose, chain.map((bone) => bone.id), applyPoint(item, point), { end: padOf(chain.at(-1)) }));
-    pinched[digit] = { residual, angles: Object.fromEntries(chain.map((bone) => [bone.id, jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10)])) };
+    ({ pose, residual } = solveCCD(
+      rig,
+      pose,
+      chain.map((bone) => bone.id),
+      applyPoint(item, point),
+      { end: padOf(chain.at(-1)) },
+    ));
+    pinched[digit] = {
+      residual,
+      angles: Object.fromEntries(
+        chain.map((bone) => [
+          bone.id,
+          jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M).map((a) => Math.round(a * 10) / 10),
+        ]),
+      ),
+    };
   }
   return { pose, pinched };
 }
