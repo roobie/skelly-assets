@@ -228,12 +228,14 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
     local y = $.curvedTopAt(outline, y0, thick, r, (a[0] + b[0]) / 2);
     $.prism(id, slot, 'y', [[a[1] + nz + cz, a[0] + nx + cx], [b[1] + nz + cz, b[0] + nx + cx], [b[1] - nz + cz, b[0] - nx + cx], [a[1] - nz + cz, a[0] - nx + cx]], y - 0.003, y + 0.002),
   // A flat crescent between radii r0 and r1 over [a0, a1] degrees (0 points to +z), lying on y from y0 to y1, built
-  // from `steps` convex quads because prisms must be convex. For collars, neck cut-outs and arcs.
-  crescent(prefix, slot, r0, r1, a0, a1, steps, y0, y1, cx=0, cz=0):
+  // from `steps` convex quads because prisms must be convex. For collars, neck cut-outs and arcs. Another `axis` stands
+  // the crescent across it instead, each name here moving on with the axes in their order: about x, 0 points to +y, the
+  // angle turns toward +z, and cz and cx centre it along y and z.
+  crescent(prefix, slot, r0, r1, a0, a1, steps, y0, y1, cx=0, cz=0, axis='y'):
     local ang(i) = (a0 + (a1 - a0) * i / steps) * std.pi / 180;
     local pt(r, i) = [r * std.sin(ang(i)) + cx, r * std.cos(ang(i)) + cz];
     [
-      $.prism('%s-%d' % [prefix, i], slot, 'y', [[q[1], q[0]] for q in [pt(r1, i), pt(r1, i + 1), pt(r0, i + 1), pt(r0, i)]], y0, y1)
+      $.prism('%s-%d' % [prefix, i], slot, axis, [[q[1], q[0]] for q in [pt(r1, i), pt(r1, i + 1), pt(r0, i + 1), pt(r0, i)]], y0, y1)
       for i in std.range(0, steps - 1)
     ],
   // Webbing rows 25 mm wide lying on a flat, upward face at height y, along x from x0 to x1, at each z in zs; for gear
