@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1032 325"><title>AR-15 rifle profile trace, image-pixel coordinates</title><desc>Manual visible-edge trace. No hidden geometry inferred. Calibration and provenance belong to the adjacent trace record.</desc><g fill="none" stroke-width="2" stroke-linejoin="round"><path id="muzzle-brake" stroke="#db2763" d="M903,94 L976,94 L976,114 L903,114 L903,94"/>
+<path id="barrel" stroke="#db2763" d="M857,96 L903,96 M857,112 L903,112"/>
+<path id="handguard" stroke="#ee7400" d="M538,79 L857,79 L857,120 L580,120 L580,127 L545,127 L538,124 L538,79"/>
+<path id="handguard-rail" stroke="#007e87" d="M538,79 L800,79 L800,77 L857,77"/>
+<path id="upper-rail" stroke="#007e87" d="M376,75 L537,75"/>
+<path id="upper-receiver" stroke="#147cf3" d="M376,75 L537,75 L537,124 L376,121 L370,106 L370,86 L376,86 L376,75"/>
+<path id="charging-handle" stroke="#9342bd" d="M375,78 L389,78 L389,87 L375,87 L375,78"/>
+<path id="forward-assist" stroke="#9342bd" d="M443,84 L459,84 L459,94 L443,94 L443,84"/>
+<path id="ejection-port" stroke="#9342bd" d="M459,110 L529,110 L529,121 L459,121 L459,110"/>
+<path id="brass-deflector" stroke="#9342bd" d="M527,85 L535,85 L535,100 L527,100 L527,85"/>
+<path id="lower-receiver" stroke="#147cf3" d="M370,106 L376,121 L526,124 L526,160 L469,170 L467,145 L380,145 L370,132 L370,106"/>
+<path id="takedown-pin" stroke="#007e87" d="M390,118 L396,118 L396,124 L390,124 L390,118"/>
+<path id="pivot-pin" stroke="#007e87" d="M529,118 L535,118 L535,124 L529,124 L529,118"/>
+<path id="magazine-release" stroke="#007e87" d="M462,130 L468,130 L468,136 L462,136 L462,130"/>
+<path id="trigger" stroke="#007e87" d="M440,145 L438,155 L442,167"/>
+<path id="trigger-guard" stroke="#147cf3" d="M422,170 L467,170"/>
+<path id="grip" stroke="#9342bd" d="M380,158 L346,214 L390,232 L391,220 L418,162"/>
+<path id="magazine" stroke="#9342bd" d="M469,170 L475,220 L485,258 L490,262 L540,248 L532,215 L526,162"/>
+<path id="castle-nut" stroke="#ee7400" d="M357,86 L370,86 L370,117 L357,117 L357,86"/>
+<path id="buffer-tube" stroke="#ee7400" d="M284,89 L357,89 L357,113 L284,113 L284,89"/>
+<path id="stock" stroke="#ee7400" d="M128,86 L284,86 L284,121 L270,122 L165,193 L150,200 L138,196 L128,120 L128,86"/>
+</g></svg>
