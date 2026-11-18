@@ -2,6 +2,7 @@ import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/as
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { BuildingSchema } from '@skelly/thing-core/building';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import {
@@ -177,6 +178,7 @@ const ItemSchema = pipe(
     ),
     covers: optional(NeutralModelSchema.entries.covers),
     soleLift: NeutralModelSchema.entries.soleLift,
+    building: optional(BuildingSchema),
     /** Named datums on solids, exported as the model's anchors. */
     anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
     /**
@@ -475,7 +477,17 @@ export const itemMotion = (
   }
 };
 
-/** Builds an item; with a model export's grains its datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
+/** Building datums are authored, not sampled from solids. Reject unsupported source conversions explicitly. */
+export const itemBuilding = (item: ToolItem, settings: CatalogueSettings) => {
+  if (!item.building) return undefined;
+  const forward = item.forward ?? FAMILY_FORWARDS[item.parts[0]!.family] ?? '+z';
+  if (settings.units.metresPerUnit !== 1 || forward !== '+z') {
+    throw new Error(`${item.id}: building metadata requires a metre, +z-forward source frame`);
+  }
+  return item.building;
+};
+
+/** Builds an item; with a model export's grains its solid datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
   const forward = item.forward ?? FAMILY_FORWARDS[first.family] ?? '+z';

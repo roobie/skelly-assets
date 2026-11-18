@@ -88,6 +88,12 @@ exhaust is fused or split along its run into salvageable parts; why is in `docs/
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
+The medieval timber and stone building kits' shared grid, placement origins and source cottage, vaulted passage
+and wall-walk examples are described in `models/architecture/README.md`; modules belong to `skelly.structures`,
+not a whole-building producer. Their optional [building metadata contract](docs/building-metadata.md) exports
+qualified joins, placement datums and nominal openings through model sidecars and a manifest-discovered kit registry.
+The [temperate woodland starter kit](models/nature/README.md) adds outdoor-scale trees, deadwood, understorey
+and boulders to `skelly.nature`, with a source grove and common-scale lineup rather than a terrain generator.
 
 The item drafts in `models/catalogue/drafts/` are Deadvox gameplay data for the catalogue models: what each
 thing is called, carries, protects and does in play. They wait here until skelly's framework refactor gives item
