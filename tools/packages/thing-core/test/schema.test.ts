@@ -57,6 +57,34 @@ describe('motion', () => {
   });
 });
 
+describe('stowage', () => {
+  const frame = { position: [0, 1, 0], normal: [0, 1, 0], up: [1, 0, 0] };
+  const slot = (id: string) => ({
+    id,
+    accepts: ['case'],
+    envelope: { min: [0, -0.1, -0.1], max: [0.3, 0.1, 0.1] },
+    frame,
+  });
+  const withStowage = (stowage: unknown) => safeParse(NeutralModelSchema, { ...model, stowage }).success;
+
+  it('takes slots, seats or both', () => {
+    expect(withStowage({ slots: [slot('left'), slot('right')] })).toBe(true);
+    expect(withStowage({ seats: [{ standard: 'case', frame }] })).toBe(true);
+    expect(withStowage({ slots: [slot('left')], seats: [{ standard: 'case', frame }] })).toBe(true);
+  });
+
+  // A load-out names a slot by its id and fills it by its words and envelope, so a slot short of any cannot be filled.
+  it('refuses stowage that names no port, a slot twice, or a slot without its words or envelope', () => {
+    expect(withStowage({})).toBe(false);
+    expect(withStowage({ slots: [] })).toBe(false);
+    expect(withStowage({ slots: [slot('left'), slot('left')] })).toBe(false);
+    expect(withStowage({ slots: [{ ...slot('left'), accepts: [] }] })).toBe(false);
+    const { envelope: _envelope, ...open } = slot('left');
+    expect(withStowage({ slots: [open] })).toBe(false);
+    expect(withStowage({ slots: [{ ...slot('left'), frame: { ...frame, up: [0, 1, 0] } }] })).toBe(false);
+  });
+});
+
 describe('material table', () => {
   it('requires valid appearance and rejects retired density inputs', () => {
     const material = {
