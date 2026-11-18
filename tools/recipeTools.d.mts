@@ -1,3 +1,4 @@
+export const SIDECAR_DIRECTORIES: { readonly gun: string; readonly thing: string };
 export interface RecipeTool {
   readonly kinds: readonly string[];
   tasks(rows: unknown[]): unknown[] | Promise<unknown[]>;
