@@ -6,6 +6,7 @@
   "workspaces": [
     "packages/construct",
     "packages/motion",
+    "packages/surfaces",
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
