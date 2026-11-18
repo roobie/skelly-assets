@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "node build.mjs",
+    "prelint": "node sources.mjs && node packages/thing-authoring-tool/test/compile-fixtures.mjs",
     "lint": "biome ci",
     "fix": "biome check --write",
     "knip": "knip"
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "@skelly/thing-core": "*",
     "knip": "6.34.0",
     "playwright": "1.64.0",
     "valibot": "^1.5.0"
