@@ -247,6 +247,25 @@ test('a shared store counts the fragments a refresh still names as used, though 
     ),
   ));
 
+// A store set up by another user, where this one may write entries but not the store root, so nothing of a refresh's
+// own, which another user could not prune, may land there.
+test('a refresh compiles into a store whose root it may not write', () =>
+  withSharedStore((store) =>
+    withTwinFixture(
+      async ({ refresh, value }) => {
+        for (const kind of ['rows', 'twins']) mkdirSync(join(store, kind));
+        chmodSync(store, 0o2555);
+        try {
+          await refresh();
+        } finally {
+          chmodSync(store, 0o2775);
+        }
+        assert.deepEqual(value('catalogue'), [{ id: 'a', value: 1 }, { id: 'b' }]);
+      },
+      { store },
+    ),
+  ));
+
 test('checkouts refreshing into one shared store at once each get whole twins and leave no partial entries', () =>
   withSharedStore((store) =>
     withTwinFixture(

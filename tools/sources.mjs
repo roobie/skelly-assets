@@ -5,7 +5,6 @@ import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
-  mkdtempSync,
   readdirSync,
   readFileSync,
   renameSync,
@@ -18,7 +17,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { BUILD_ROOT } from './buildDir.mjs';
+import { BUILD_ROOT, makeBuildDir } from './buildDir.mjs';
 import { entryFolder } from './entryFolder.mjs';
 import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
@@ -157,9 +156,10 @@ const compileFragments = (rows, { root, folders }) =>
   });
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
-// fragments and the twins' compile skips evaluating every row file again.
-const withOverlay = (rows, { root, store, folders }, use) => {
-  const overlay = mkdtempSync(join(store, 'overlay-'));
+// fragments and the twins' compile skips evaluating every row file again. It is the checkout's own, not the store's,
+// so a refresh killed before removing it leaves nothing in a store that other users could not prune.
+const withOverlay = (rows, { root, folders }, use) => {
+  const overlay = makeBuildDir('jsonnet-overlay');
   try {
     for (const { path, key } of rows) {
       const at = join(overlay, relative(root, path));
@@ -181,8 +181,7 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   const stamped = readStamp(stamp);
   const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
   if (stale.length === 0) return;
-  const folder = resolve(store);
-  const options = { root, store: folder, folders: storeFolders(folder) };
+  const options = { root, folders: storeFolders(resolve(store)) };
   const twinByKey = new Map(stale.map(({ key }) => [key, storedJson(options.folders.twins, key)]));
   const unstored = stale.filter(({ key }) => twinByKey.get(key) === undefined);
   if (unstored.length > 0) {
