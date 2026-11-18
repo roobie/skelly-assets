@@ -121,6 +121,7 @@ local band(id, x0, x1, r) = h.turned(id, 'band', 'x', [[0, 0], [0, r * 0.9], [(x
   // The handling schema holds one hand, so the grip is the leading hand below the cross; the trailing hand and the
   // half-sword hand are anchors a consumer can pose from.
   + h.gripOn('zweihander', 'grip-fore') + {
+    title: 'Zweihander',
     voxelGrain: 0.002,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
     anchors: {
@@ -128,7 +129,7 @@ local band(id, x0, x1, r) = h.turned(id, 'band', 'x', [[0, 0], [0, r * 0.9], [(x
       strike: at('blade-0', [1, 0.5, 0.5]),
       edge: at('blade-0', edgeFraction(0.4)),
       ricasso: at('ricasso-wrap', [0.5, 0.5, 0.5]),
-      offhand: at('grip-aft', [0.5, 0.5, 0.5]),
+      support: at('grip-aft', [0.5, 0.5, 0.5]),
     },
   },
 ]
