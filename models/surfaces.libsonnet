@@ -7,8 +7,10 @@ local furrowed = {
   kind: 'bark',
   // A standing trunk's furrows run up it.
   grain: 'up',
-  furrow: { spacing: 0.06, width: 0.18, depth: 0.35, wander: 0.35, wanderLength: 0.6 },
-  plate: { length: 0.22, crack: 0.08, crackDepth: 0.25, spread: 0.12, tilt: 0.25 },
+  // Long plates, wandering furrows and shallow cross cracks: shorter, straighter plates with deeper cracks read as
+  // brickwork in the shader lab.
+  furrow: { spacing: 0.06, width: 0.18, depth: 0.35, wander: 0.55, wanderLength: 0.5 },
+  plate: { length: 0.36, crack: 0.05, crackDepth: 0.15, spread: 0.12, tilt: 0.25 },
   relief: 0.8,
   mottle: { span: 0.8, amount: 0.12 },
   lenticels: noMarks,
@@ -34,14 +36,15 @@ local looks = {
   'bark-furrowed': furrowed,
   // A felled log, stick or pole lies down, so its furrows run along its longest side.
   'bark-log': std.mergePatch(furrowed, { grain: 'main' }),
-  // Smooth pale bark, barely furrowed, with dark lenticels across the grain and sparse dark patches.
+  // Smooth pale bark, barely furrowed, with dark lenticels across the grain and sparse dark patches, both small and
+  // dense enough to read on a hand-sized piece of birch bark as well as on a trunk.
   'bark-birch': std.mergePatch(furrowed, {
     furrow: { spacing: 0.08, width: 0.05, depth: 0.08, wander: 0.2 },
     plate: { length: 0.3, crack: 0.05, crackDepth: 0.05, spread: 0.04, tilt: 0.05 },
     relief: 0.2,
     mottle: { span: 0.5, amount: 0.06 },
-    lenticels: { cellAcross: 0.06, cellAlong: 0.035, across: 0.7, along: 0.12, density: 0.45, depth: 0.6 },
-    patches: { cellAcross: 0.35, cellAlong: 0.3, across: 0.6, along: 0.45, density: 0.2, depth: 0.55 },
+    lenticels: { cellAcross: 0.04, cellAlong: 0.02, across: 0.7, along: 0.14, density: 0.6, depth: 0.65 },
+    patches: { cellAcross: 0.14, cellAlong: 0.12, across: 0.6, along: 0.45, density: 0.25, depth: 0.55 },
   }),
   'leaf-broad': broad,
   'leaf-needle': std.mergePatch(broad, {
