@@ -220,6 +220,7 @@
   'head-gear': import 'models/catalogue/sets/head-gear.libsonnet',
   'jacks': import 'models/catalogue/sets/jacks.libsonnet',
   'jerry-can': import 'models/catalogue/sets/jerry-can.libsonnet',
+  'katana': import 'models/catalogue/sets/katana.libsonnet',
   'lights': import 'models/catalogue/sets/lights.libsonnet',
   'materials': import 'models/catalogue/sets/materials.libsonnet',
   'notebook': import 'models/catalogue/sets/notebook.libsonnet',
