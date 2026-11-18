@@ -6,6 +6,7 @@ import {
   type InferOutput,
   integer,
   minValue,
+  nullable,
   number,
   parse,
   pipe,
@@ -16,6 +17,7 @@ import {
 import content from '../../../../../models/guns/tables/roundShapes.json' with { type: 'json' };
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
+const NonNegative = pipe(number(), finite(), minValue(0));
 
 const RoundShapeSchema = strictObject({
   case: strictObject({ baseChamfer: Positive, wall: Positive, firedFloor: Positive }),
@@ -28,7 +30,12 @@ const RoundShapeSchema = strictObject({
   }),
   projectile: strictObject({
     seatingCalibres: Positive,
-    ogive: strictObject({ calibres: Positive, segments: pipe(number(), integer(), minValue(2)) }),
+    ogive: strictObject({
+      calibres: Positive,
+      meplatCalibres: NonNegative,
+      segments: pipe(number(), integer(), minValue(2)),
+    }),
+    band: nullable(strictObject({ diameter: Positive, width: Positive, fromMouth: NonNegative })),
   }),
 });
 

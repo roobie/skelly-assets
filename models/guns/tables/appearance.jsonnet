@@ -27,9 +27,13 @@ local slots = [['metal', 'steel-parkerized'], ['furniture', 'polymer-black'], ['
 local slotMaterials = { [slot[0]]: slot[1] for slot in slots };
 local roleMaterials = { sight: 'alu-anodized-black', 'tactical-flashlight-mount': 'alu-anodized-black', suppressor: 'steel-stainless' };
 local materials = import 'models/finishes.jsonnet';
+// A shell's projectile is a painted steel body, so its copper driving band reads apart from it.
+local paintedShell = { bullet: 'paint-olive' };
 local cartridgeFinishes = {
   '7.62x39': { case: 'steel-polymer-coated' },
   '7.62x54r': { case: 'steel-polymer-coated' },
+  '40x365r': paintedShell,
+  '120x570': paintedShell,
 };
 assert std.all([std.objectHas(materials, name) for own in std.objectValues(cartridgeFinishes) for name in std.objectValues(own)])
        : 'cartridgeFinishes names a material finishes.jsonnet does not define';
@@ -107,11 +111,11 @@ local familyHex = {
   },
   ammunition: {
     familyColors: { 'cartridge-model': [0.62, 0.56, 0.43] },
-    specialColors: { case: materials.brass.colour, bullet: materials.copper.colour, primer: [0.49, 0.4, 0.23] },
+    specialColors: { case: materials.brass.colour, bullet: materials.copper.colour, band: materials.copper.colour, primer: [0.49, 0.4, 0.23] },
     fallbackColor: [0.62, 0.56, 0.43],
     fallbackFinishMaterial: 'brass',
   },
-  cartridgeFinish: { case: 'brass', bullet: 'copper', primer: 'brass', closure: 'paperboard-brown' },
+  cartridgeFinish: { case: 'brass', bullet: 'copper', band: 'copper', primer: 'brass', closure: 'paperboard-brown' },
   // A cartridge's own slots by its id, where they are not the ones above. This is how the game shows it; the
   // cartridge's sourced `materials` record what cases exist, so they neither limit nor choose its case.
   cartridgeFinishes: cartridgeFinishes,

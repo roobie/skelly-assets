@@ -16,6 +16,7 @@ const metallicSolids = (cartridge: MetallicCartridge): CartridgeSolids => {
       revolvedRound('case', profiles.loadedCase, 'case'),
       revolvedRound('primer', profiles.primer, 'primer'),
       revolvedRound('bullet', profiles.bullet, 'bullet'),
+      ...(profiles.band === undefined ? [] : [revolvedRound('band', profiles.band, 'band')]),
     ],
     case: [revolvedRound('case', profiles.firedCase, 'case'), revolvedRound('primer', profiles.primer, 'primer')],
   };
