@@ -35,6 +35,7 @@ import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
 import { outputPath, sidecarFile } from './layout.mjs';
+import { armSwing, askedClamps, framePhase, readLocomotion, walkAngles, walkLoop } from './locomotion.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
@@ -53,7 +54,7 @@ export const PHASES = ['windup', 'strike', 'follow', 'recovery'];
 // The key frame each phase but the last ends in; the last returns to the guard it began from.
 const ENDS = { windup: 'windup', strike: 'hit', follow: 'follow' };
 
-/** A clip's name: its class, its action (`stance` or `strike`) and which of them. */
+/** A clip's name: its class, its action (`stance`, `strike` or a walk of the gait) and which of them. */
 export const clipName = (cls, action, kind) => `${cls}_${action}_${kind}`;
 const keyName = (clip, key) => `${clip}-${key}`;
 
@@ -171,6 +172,8 @@ const mapValues = (object, f) => Object.fromEntries(Object.entries(object).map((
 
 // How far ahead of a gun's sight the eyes look down it, far enough that the line they look along is the sight's.
 const SIGHT_RANGE = 10;
+// The figure's right, the axis a swing forward turns about (models/poses/wields/wields.libsonnet).
+const RIGHT = [-1, 0, 0];
 
 /**
  * The pose file of key frame `key` of class `cls` (`readWields().classes`), for `rig`, the weapon (`heldWeapon`) and its
@@ -179,25 +182,33 @@ const SIGHT_RANGE = 10;
  * the key's `at`, from the leading hand's shoulder, or, shouldered, with its butt (the class's `butt`, `anchorPoint`)
  * at the key's `pocket`, from the same shoulder. The eyes look at the class's `look`, or down the gun's sight when the
  * key has them `sight` along it, the head carried as `sight` bears it (`lookAt`) to lay the cheek on the stock.
+ *
+ * Walking, the figure stands in `body` rather than the key's own (`walkingBody`) and its points are read off it, so the
+ * weapon rides the walk's lean and bob; but the weapon is turned as the key's own body turns the chest, so leaning into
+ * a run does not tip the bore, and then swung `sway` degrees forward about the leading shoulder, turn and point alike.
  */
-function poseOf(rig, cls, key, weapon, sockets) {
+function poseOf(rig, cls, key, weapon, sockets, { body = key.body, sway = 0 } = {}) {
   const header = standing(rig);
   const chest = posedAt(rig, key.body).get('spine');
-  const inChest = shoulderPoints(rig, key.body);
+  const inChest = shoulderPoints(rig, body);
   const file = {
     ...header,
-    angles: { ...key.body },
+    angles: { ...body },
     hands: {},
     reach: {},
     hold: {},
   };
   let look = cls.look;
   if (cls.weapon) {
+    const { lead } = cls.weapon;
     const { pitch, yaw, roll } = key.weapon.aim;
-    const r = [chest.r, rotY(yaw), rotX(pitch), rotZ(roll), weapon.held].reduce(mulMM);
+    const swing = rotAxis(RIGHT, sway);
+    const shoulder = inChest(lead, [0, 0, 0]);
+    const swung = (p) => add(shoulder, mulMV(swing, sub(p, shoulder)));
+    const r = [swing, chest.r, rotY(yaw), rotX(pitch), rotZ(roll), weapon.held].reduce(mulMM);
     const at = key.weapon.pocket
-      ? sub(inChest(cls.weapon.lead, key.weapon.pocket), mulMV(r, anchorPoint(weapon, cls.weapon.butt)))
-      : sub(inChest(cls.weapon.lead, key.weapon.at), mulMV(r, weapon.at));
+      ? sub(swung(inChest(lead, key.weapon.pocket)), mulMV(r, anchorPoint(weapon, cls.weapon.butt)))
+      : sub(swung(inChest(lead, key.weapon.at)), mulMV(r, weapon.at));
     if (key.sight)
       look = add(add(at, mulMV(r, weapon.sight.eye)), scale(mulMV(r, weapon.sight.direction), SIGHT_RANGE));
     for (const [hand, spec] of Object.entries(cls.weapon.hands)) {
@@ -212,7 +223,7 @@ function poseOf(rig, cls, key, weapon, sockets) {
       };
     }
   }
-  Object.assign(file.angles, lookAt(rig, key.body, look, key.sight));
+  Object.assign(file.angles, lookAt(rig, body, look, key.sight));
   for (const [hand, { hands }] of Object.entries(cls.free ?? {})) {
     const { at, pole, twist = 0, wrist = [0, 0] } = key.free[hand];
     file.hands[hand] = hands;
@@ -293,6 +304,9 @@ const limbFrom = (rig, id) => {
 // The bones that move a hand to a hold: its arm from the shoulder down, the digits too.
 const armBones = (rig, hand) => limbFrom(rig, shoulderOf(rig, hand).id);
 
+// The digits of `hand`: every bone below it.
+const digitsOf = (rig, hand) => [...limbFrom(rig, hand)].filter((id) => id !== hand);
+
 /**
  * The holds of a pose file (`hold`) with each elbow's pole swung `swing` degrees about the line from its shoulder, as
  * `stood` (bone transforms) stands it, to its socket on the item, which moves the elbow and leaves the hand where it is.
@@ -310,18 +324,31 @@ const bent = ({ report }) =>
   report.clamped.reduce((sum, { asked, held }) => sum + asked.reduce((s, x, i) => s + Math.abs(x - held[i]), 0), 0);
 
 /**
- * The pose `posedAt(swing)` compiles with its elbows swung by the least of `SWINGS` that holds every joint within its
+ * The pose `compileAt(swing)` compiles with its elbows swung by the least of `SWINGS` that holds every joint within its
  * limits, else the one asking least past them: poles that hold a wrist within its limits in one pose do not in every
  * pose near it, and swinging the elbow about the line from shoulder to grip turns the wrist without moving the hand.
  */
-function leastBent(posedAt) {
+function leastBent(compileAt) {
   let best;
   for (const swing of SWINGS) {
-    const compiled = posedAt(swing);
+    const compiled = compileAt(swing);
     if (bent(compiled) === 0) return compiled;
     if (!best || bent(compiled) < bent(best)) best = compiled;
   }
   return best;
+}
+
+/**
+ * The body of a key (`key.body`) as frame `step` of a walk (`walkAngles`) carries it: the gait's legs, knees and lean,
+ * the key's trunk turned on top, a bone both turn (the spine) turned by both. The key's legs give way to the gait's, and
+ * the gait's arms are left out for the hands to carry to the weapon; the feet stand level.
+ */
+function walkingBody(gait, body, step) {
+  const { legs, knees, feet, arms, elbows, lean } = gait.bones;
+  const walked = new Set([...legs, ...knees, ...feet, ...arms, ...elbows]);
+  const angles = Object.fromEntries(Object.entries(body).filter(([id]) => !walked.has(id)));
+  for (const id of [...legs, ...knees, ...lean]) angles[id] = add(angles[id] ?? [0, 0, 0], step[id]);
+  return angles;
 }
 
 /**
@@ -351,12 +378,13 @@ const heldSeat = (seat, weapon, lead) => ({
  * Between key frames each joint turns from one key's angles to the next's by its phase's easing, as the pose page blends
  * them, so a swing sweeps an arc and no joint passes its limits. The weapon rides the leading hand; any other hand on it
  * takes it again by its socket in every frame, its elbow swung as far as its wrist needs. A strike carries its phases'
- * ends and its hit in Sim seconds; a weapon class's clips carry the held seat (`heldSeat`). Returns the clips by name
- * and each frame's pose report by clip, for a caller that checks them.
+ * ends and its hit in Sim seconds; a weapon class's clips carry the held seat (`heldSeat`). Each walk of `gait`
+ * (readLocomotion) is baked in each stance its class walks in (`walkClips`). Returns the clips by name and each frame's
+ * pose report by clip, for a caller that checks them. `set` is one of `wieldModels`' sets: `{ wields, weapons, gait }`.
  */
-export function wieldClips(rig, wields, weapons, meshOf) {
+export function wieldClips(rig, { wields, weapons, gait }, meshOf) {
   const baked = Object.entries(wields.classes).map(([name, cls]) =>
-    classClips(rig, wields, name, cls, weapons[name], meshOf),
+    classClips(rig, wields, gait, name, cls, weapons[name], meshOf),
   );
   return {
     clips: Object.assign({}, ...baked.map(({ clips }) => clips)),
@@ -366,7 +394,8 @@ export function wieldClips(rig, wields, weapons, meshOf) {
 
 // One class's clips and their frames' reports, as `wieldClips` bakes them. A class reads nothing of another, so each
 // is the unit the bake caches.
-function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
+function classClips(rig, wields, gait, name, cls, carried, meshOf) {
+  const { weapon, sockets } = carried;
   const clips = {},
     reports = {};
   const header = standing(rig);
@@ -388,7 +417,8 @@ function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
       item: held[cls.weapon?.lead],
     };
   };
-  const guard = compileKey(cls.stances.guard);
+  const stances = mapValues(cls.stances, compileKey);
+  const { guard } = stances;
   const seat = cls.weapon && seatOn(rig, guard.frame, guard.item, cls.weapon.lead);
   const held = seat ? { held: heldSeat(seat, weapon, cls.weapon.lead) } : {};
   const others = cls.weapon ? Object.keys(cls.weapon.hands).filter((hand) => hand !== cls.weapon.lead) : [];
@@ -423,8 +453,7 @@ function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
       compilePose(rig, { ...header, angles, hands, hold: swungHolds(rig, hold, stood, swing) }, { meshOf }),
     );
   };
-  for (const [stance, key] of Object.entries(cls.stances)) {
-    const { frame, report } = compileKey(key);
+  for (const [stance, { frame, report }] of Object.entries(stances)) {
     clips[clipName(name, 'stance', stance)] = { kind: 'pose', loop: false, ...held, frames: [frame] };
     reports[clipName(name, 'stance', stance)] = [report];
   }
@@ -449,6 +478,78 @@ function classClips(rig, wields, name, cls, { weapon, sockets }, meshOf) {
     };
     reports[clip] = baked.map(({ report }) => report);
   }
+  const walks = walkClips(rig, gait, name, cls, carried, stances, held, meshOf);
+  return { clips: { ...clips, ...walks.clips }, reports: { ...reports, ...walks.reports } };
+}
+
+/**
+ * The held walks of class `name`, as `classClips` bakes them: each walk of `gait` in each stance the class walks in
+ * (`cls.walks`), named `<class>_<walk>_<stance>`, shaped as the empty walk (`walkLoop`) with the class's `held` seat, and
+ * their frames' reports. The arms carry as the stance's `arms` says (models/poses/wields/wields.libsonnet). `stances`
+ * are the class's stances compiled. A walk frame stands its feet level, so where a planted foot stops at its ankle's
+ * limit, as the gait means it to, its report leaves the stop out (`askedClamps`).
+ */
+function walkClips(rig, gait, name, cls, { weapon, sockets }, stances, held, meshOf) {
+  const lead = cls.weapon?.lead;
+  // Which of the gait's arms (left then right) is the leading hand's.
+  const leadSide = () => {
+    const side = gait.bones.arms.indexOf(shoulderOf(rig, lead).id);
+    if (side < 0) throw new Error(`${name}: the gait swings no arm of ${lead}`);
+    return side;
+  };
+  const compileStep = (file) => {
+    const { frame, report } = compilePose(rig, file, { meshOf });
+    return { frame, report: { ...report, clamped: askedClamps(file, report.clamped) } };
+  };
+  // The digits of `hands` as the compiled stance angles `closed` stand them, a digit it leaves at rest open.
+  const closedDigits = (hands, closed) =>
+    Object.fromEntries(hands.flatMap((hand) => digitsOf(rig, hand).map((id) => [id, closed[id] ?? [0, 0, 0]])));
+  const carries = {
+    // The stance's hands kept on the weapon over the walking body (`walkingBody`), the weapon placed by the key
+    // (`poseOf`) and swayed by `sway`, that share of the leading arm's swing, each hand taking its socket by reach, its
+    // elbow swung as far as its wrist needs (`leastBent`), the head aimed again. The palms stand on the stance's
+    // sockets, so the digits close as the stance's did rather than closing again by contact, most of a bake's cost.
+    held: (stance, { sway = 0 }, walk, k) => {
+      const key = cls.stances[stance];
+      const body = walkingBody(gait, key.body, walkAngles(rig, gait, walk, k));
+      const swing = lead ? sway * armSwing(walk, framePhase(walk, k), leadSide()) : 0;
+      const { hands = {}, hold, ...file } = poseOf(rig, cls, key, weapon, sockets, { body, sway: swing });
+      file.angles = { ...file.angles, ...closedDigits(Object.keys(hands), stances[stance].angles) };
+      if (!hold) return compileStep(file);
+      const open = mapValues(hold, (entry) => ({ ...entry, close: false }));
+      const stood = posedAt(rig, body);
+      return leastBent((turn) => compileStep({ ...file, hold: swungHolds(rig, open, stood, turn) }));
+    },
+    // The arms swinging as in the empty walk, each hand the class closes (the leading hand, any free hand) turned and
+    // closed as the stance's, the leading forearm twisted as the stance's, so the weapon hangs from the hand as there;
+    // a second hand on the weapon lets go, open.
+    swing: (stance, _carry, walk, k) => {
+      const closed = stances[stance].angles;
+      const angles = walkAngles(rig, gait, walk, k);
+      for (const hand of [lead, ...Object.keys(cls.free ?? {})].filter(Boolean)) {
+        angles[hand] = closed[hand] ?? [0, 0, 0];
+        Object.assign(angles, closedDigits([hand], closed));
+      }
+      if (lead) {
+        const forearm = rig.bones.find((bone) => bone.id === lead).parent;
+        const [flex, , abduct] = angles[forearm];
+        angles[forearm] = [flex, closed[forearm]?.[1] ?? 0, abduct];
+      }
+      return compileStep({ ...standing(rig), angles });
+    },
+  };
+  const clips = {},
+    reports = {};
+  for (const [stance, carry] of Object.entries(cls.walks ?? {})) {
+    const step = carries[carry.arms];
+    if (!step) throw new Error(`${name}: walks ${stance} with its arms ${carry.arms}, not held or swing`);
+    for (const [walkName, walk] of Object.entries(gait.walks)) {
+      const baked = Array.from({ length: walk.frames }, (_, k) => step(stance, carry, walk, k));
+      const clip = clipName(name, walkName, stance);
+      clips[clip] = { ...walkLoop(rig, gait, walk), ...held, frames: baked.map(({ frame }) => frame) };
+      reports[clip] = baked.map(({ report }) => report);
+    }
+  }
   return { clips, reports };
 }
 
@@ -457,6 +558,7 @@ const HERE = import.meta.dirname;
 const BAKE_CODE = [
   'wields.mjs',
   'keyFrames.mjs',
+  'locomotion.mjs',
   '../site/poseFile.mjs',
   '../site/fingers.mjs',
   '../site/clearance.mjs',
@@ -467,14 +569,15 @@ const BAKE_CODE = [
 const bakeHash = () => codeFingerprint(HERE, BAKE_CODE);
 const CACHE_FOLDER = 'wields';
 
-// What `classClips` reads, so its key changes with nothing else the wields say. The weapon's solid is its mesh's,
-// which the key holds.
-const bakeTask = (rig, { easing, framesPerSecond }, name, cls, { weapon, sockets }, meshOf) => {
+// What `classClips` reads, so its key changes with nothing else the wields or the gait say. The weapon's solid is its
+// mesh's, which the key holds.
+const bakeTask = (rig, { easing, framesPerSecond }, { bones, walks }, name, cls, { weapon, sockets }, meshOf) => {
   const { solid, ...held } = weapon ?? {};
   return {
     rig,
     easing,
     framesPerSecond,
+    gait: { bones, walks },
     name,
     cls,
     weapon: held,
@@ -496,9 +599,9 @@ const taskHash = (task, bake) =>
  */
 export function wieldResults(rig, sets, meshOf, { cache, prune = false, shard, bake = bakeHash() } = {}) {
   const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
-  const classes = Object.entries(sets).flatMap(([set, { wields, weapons }]) =>
+  const classes = Object.entries(sets).flatMap(([set, { wields, weapons, gait }]) =>
     Object.entries(wields.classes).map(([name, cls]) => {
-      const inputs = [rig, wields, name, cls, weapons[name], meshOf];
+      const inputs = [rig, wields, gait, name, cls, weapons[name], meshOf];
       return { set, inputs, hash: taskHash(bakeTask(...inputs), bake) };
     }),
   );
@@ -552,8 +655,9 @@ export function readWieldTree(built, root = repo) {
 }
 
 /**
- * The doll's rig and each of `sets` as `{ wields, weapons }`, from `filesOf(id)`, a model's `{ glb, entry }`: its GLB
- * and its sidecar, as a built tree holds them (`treeFiles`) or a build generates them.
+ * The doll's rig and each of `sets` as `{ wields, weapons, gait }`, from `filesOf(id)`, a model's `{ glb, entry }`: its
+ * GLB and its sidecar, as a built tree holds them (`treeFiles`) or a build generates them. `gait` is the doll's
+ * (readLocomotion), whose walks each set's classes walk holding what they hold.
  */
 export function wieldModels(filesOf, { root = repo, sets = WIELD_SETS } = {}) {
   const dressing = readDressing(root);
@@ -562,7 +666,7 @@ export function wieldModels(filesOf, { root = repo, sets = WIELD_SETS } = {}) {
   const { meshOf, entryOf } = heldModels(filesOf);
   const read = mapValues(sets, ({ file }) => {
     const wields = readWields(root, file);
-    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
+    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf), gait: readLocomotion(root) };
   });
   return { rig, doll, meshOf, sets: read };
 }
@@ -635,9 +739,9 @@ export function wieldProblems(reports) {
 // presets a pose file names.
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
 const MELEE_DOC =
-  "The doll's melee clips by name, <class>_<stance|strike>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
+  "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; the arms swing as there, the weapon riding the leading hand and a second hand letting go of it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
 const GUNS_DOC =
-  "The doll's held gun clips by name, <gun>_stance_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
+  "The doll's held gun clips by name, <gun>_stance_<idle|guard> and <gun>_<walk>_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. <gun>_<walk>_<stance>, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk in that stance, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's and both hands on the gun as in the stance; at idle the gun sways a little with the stride, at guard the bore stays level ahead. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
 /**
  * The doll's sets of wields: each one's content file under models/poses, and the motions entry a release carries its
  * baked clips in, in the pack of the doll's parts, so a game that plays only one set loads only its file.

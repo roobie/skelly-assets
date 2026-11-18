@@ -110,13 +110,17 @@ export const walkLoop = (rig, gait, walk) => ({
 });
 
 /**
- * A pose compiled for a clip: its frame, and the joints it asked past the rig's limits. A foot held level (`standing`)
- * stops where its ankle does, as the gait means it to, so only what the pose asked counts.
+ * Of the joints compiling pose file `file` held at the rig's limits (`compilePose`'s `report.clamped`), those the file
+ * asked past them. A foot held level (`standing`) stops where its ankle does, as the gait means it to: the crouch walk's
+ * planted foot lifts at its ankle's limit.
  */
+export const askedClamps = (file, clamped) =>
+  clamped.filter(({ bone }) => !(file.level?.includes(bone) && !file.angles?.[bone]));
+
+/** A pose compiled for a clip: its frame, and the joints it asked past the rig's limits (`askedClamps`). */
 function compiled(rig, file) {
   const { frame, report } = compilePose(rig, file);
-  const levelled = (bone) => file.level?.includes(bone) && !file.angles[bone];
-  return { frame, clamped: report.clamped.filter(({ bone }) => !levelled(bone)) };
+  return { frame, clamped: askedClamps(file, report.clamped) };
 }
 
 /**
