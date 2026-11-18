@@ -155,7 +155,7 @@ local band(id, x0, x1, r) =
     handling+: { fraction: [(gripPoint - foreStart) / (foreEnd - foreStart), 0.5, 0.5], hold: 'forward', roll: 0 },
     title: 'Zweihänder',
     voxelGrain: grain,
-    taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
+    taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] }, keywords: ['sword', 'melee'] },
     anchors: {
       local at(solid, fraction) = { part: 'zweihander', solid: solid, fraction: fraction },
       strike: at('blade-0', [1, 0.5, 0.5]),
