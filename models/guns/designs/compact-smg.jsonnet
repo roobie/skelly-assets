@@ -2,6 +2,7 @@ local base = import 'archetype-smg.json';
 local parts = base.assembly.parts;
 base + {
   template: 'compact-smg',
+  platform: { id: 'compact-smg', sizeClass: 'compact-smg' },
   assembly: base.assembly + {
     name: 'compact-smg',
     description: 'Compact submachine gun with a threaded, suppressor-ready muzzle.',

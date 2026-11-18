@@ -1,6 +1,7 @@
 local base = import 'hunting-rifle.jsonnet';
 base + {
   template: 'pipe-rifle',
+  platform: { id: 'pipe-rifle', sizeClass: 'pipe-rifle' },
   calibre: '9x19',
   finish: { furniture: 'wood-pine', metal: 'scrap-rusted' },
   assembly+: {

@@ -6,6 +6,7 @@ import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
 import { CARTRIDGES, DESIGNS } from '../src/cli/content.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import type { PartItems } from '../src/gun/physical.ts';
+import type { PlatformChoice } from '../src/gun/platforms.ts';
 import type { GltfJson, readGlb } from './glbReader.ts';
 
 const FIXTURES = join(import.meta.dirname, '..', 'fixtures');
@@ -96,6 +97,8 @@ export interface CorpusEntry {
   assembly: Assembly;
   /** The catalogue items a design names; an export needs them where rows alone cannot tell two parts apart. */
   items: PartItems;
+  /** Fixtures belong to no platform. */
+  platform?: PlatformChoice;
 }
 
 /** A design file's loaded assembly, with its item references expanded into the parts they name. */
@@ -153,7 +156,14 @@ export const loadDesigns = (): CorpusEntry[] =>
         throw new Error(`${f}: ${result.error.code}: ${result.error.message}`);
       }
       return result.declaredStatus === 'published' && result.design.status === 'published'
-        ? [{ label: `design ${f}`, assembly: result.design.assembly, items: result.design.items ?? {} }]
+        ? [
+            {
+              label: `design ${f}`,
+              assembly: result.design.assembly,
+              items: result.design.items ?? {},
+              ...(result.design.platform === undefined ? {} : { platform: result.design.platform }),
+            },
+          ]
         : [];
     });
 

@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "ak",
+  "platform": { "id": "ak", "sizeClass": "ak" },
   "assembly": {
     "name": "archetype-ak",
     "description": "AK-pattern rifle with dust cover, exposed gas block and gas cylinder, banana magazine, and block sights.",

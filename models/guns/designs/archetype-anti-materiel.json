@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "anti-materiel",
+  "platform": { "id": "anti-materiel", "sizeClass": "anti-materiel" },
   "calibre": "50-bmg",
   "assembly": {
     "name": "archetype-anti-materiel",

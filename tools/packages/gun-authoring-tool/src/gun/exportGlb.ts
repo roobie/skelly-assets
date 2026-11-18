@@ -49,6 +49,7 @@ import { getOptic } from './optics.ts';
 import { GUN_PALETTE } from './palette.ts';
 import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
+import { type PlatformChoice, withPlatformPorts } from './platforms.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
@@ -157,6 +158,8 @@ interface GunExportOptions extends GunExportMetadata, Partial<VoxelGrains> {
   readonly includeAttachmentCompatibility?: boolean;
   readonly excludedAttachments?: readonly string[];
   readonly items?: PartItems;
+  /** The design's platform, which the file records and which gives each port node its size class and swap path. */
+  readonly platform?: PlatformChoice;
 }
 
 interface GunModelEntryOptions extends GunExportMetadata {
@@ -960,6 +963,7 @@ export const exportGunGlb = (
     includeAttachmentCompatibility = false,
     excludedAttachments = [],
     items = {},
+    platform,
     voxelGrain,
     voxelDetailGrain,
     voxelDetailThinParts,
@@ -970,9 +974,10 @@ export const exportGunGlb = (
   if (message) {
     return { ok: false, error: { code: 'structure-issues', issues: [{ rule: 'structure', message, parts: [] }] } };
   }
-  const resolved = withAttachmentInstanceAppearances(
+  const built = withAttachmentInstanceAppearances(
     resolve(withBoltCalibre(assembly, metadata.cartridge?.id), gunDomain),
   );
+  const resolved = platform === undefined ? built : withPlatformPorts(built, platform);
   // Broken assemblies get the core writer's structure report before anchor selection.
   if (resolved.issues.length > 0 || resolved.placed.size < Object.keys(assembly.parts).length) {
     const probe = exportGlb({ resolved, palette: GUN_PALETTE, appearance, asset });
@@ -995,6 +1000,7 @@ export const exportGunGlb = (
     asset,
     ...grains,
     drawnVoxels: drawn.voxels,
+    ...(platform === undefined ? {} : { modelMetadata: { platform } }),
   });
   if (!result.ok) {
     return result;

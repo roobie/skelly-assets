@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "pump-shotgun",
+  "platform": { "id": "pump-shotgun", "sizeClass": "pump-shotgun" },
   "calibre": "12-gauge-00-buck",
   "assembly": {
     "name": "archetype-pump-shotgun",

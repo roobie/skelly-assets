@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "pistol",
+  "platform": { "id": "pistol", "sizeClass": "pistol" },
   "assembly": {
     "name": "archetype-pistol",
     "description": "Pistol: integral rear grip and frame, hollow slide, internal barrel with a 1u crown.",

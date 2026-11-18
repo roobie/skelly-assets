@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "bolt-rifle-thumbhole",
+  "platform": { "id": "bolt-rifle", "sizeClass": "magnum-action" },
   "finish": {
     "metal": "steel-parkerized",
     "furniture": "polymer-od-green",

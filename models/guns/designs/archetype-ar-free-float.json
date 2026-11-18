@@ -1,6 +1,7 @@
 {
   "format": 1,
   "template": "ar",
+  "platform": { "id": "ar", "sizeClass": "ar-15" },
   "calibre": "5.56x45",
   "assembly": {
     "name": "archetype-ar-free-float",

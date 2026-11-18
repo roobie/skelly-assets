@@ -8,7 +8,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 import { DESIGNS } from '../src/cli/content.ts';
-import { checkDesignFiles } from '../src/cli/designCheck.ts';
+import { checkDesignFiles, designTextProblem } from '../src/cli/designCheck.ts';
 import { AR_FRAMES_BY_CALIBRE } from '../src/gun/arFrames.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -141,6 +141,11 @@ describe('published design corpus', () => {
     const result = checkDesignFiles([join(PUBLISH_CHECK, 'invalid-published.json')]);
     expect(result.exitCode).toBe(1);
     expect(result.lines[0]).toContain('FAIL invalid-published.json');
+  });
+
+  it('the publish check fails a published design that names no platform', () => {
+    const { platform: _platform, ...design } = JSON.parse(readFileSync(join(DESIGNS, designFiles()[0]!), 'utf8'));
+    expect(designTextProblem(JSON.stringify(design)).problem).toContain('platform');
   });
 
   it('the publish check accepts an invalid draft test design', () => {
