@@ -60,55 +60,62 @@ local halfWidthAt(x) = baseWidth / 2 - (baseWidth - tipWidth) / 2 * (x - bladeSt
 local fullerEnd = fullerShare * bladeLength;
 local fullerHalfAt(x) = fullerWidth / 2 * halfWidthAt(x) / halfWidthAt(bladeStart);
 
-// Compound prisms are constant sections, so the lens section is stacked from plan outlines, each layer nearer the
-// ridge narrower and thicker. A layer's point stops only a little short of the one below, because a forged point
-// carries its ridge almost to the tip; shortening it by its width's share would leave the last of the blade a flat
-// strip. Each layer stands one voxel prouder than the one below: the lattice is anchored on the blade's midplane, so a
-// step finer than a grain falls into the same voxels as its neighbour and the fuller's walls vanish with it.
-local sectionLayers = 2;
+// Compound prisms are constant sections, so the lens is stacked from two plan outlines: the bevels, the whole blade's
+// width at its edges' thickness, and the flats over them, a share of the width at the ridge's. The fuller is the
+// floor of bevel steel left between the flats down its run.
+// Each side of the midplane, the flats stand one step proud of the bevels and the bevels one step proud of the
+// midplane. A step finer than a grain falls into its neighbour's voxels and the fuller's walls vanish with it, so at
+// a 2 mm grain the ridge is 8 mm, though the Knight's is 4.9.
+local ridgeThickness = 0.008;
+local sectionStep = ridgeThickness / 4;
+assert sectionStep >= grain && std.abs(sectionStep / grain - std.round(sectionStep / grain)) < 1e-6
+       : 'the section steps %g m, not a whole number of %g m voxels' % [sectionStep, grain];
+// Broad flats leave lands either side of the fuller wide enough to read as a groove, not as ribs either side of one.
+local flatsShare = 0.7;
+local bevels(id, outline) = h.prism(id, 'blade', 'z', outline, -sectionStep, sectionStep);
+local flats(id, outline) = h.prism(id, 'blade', 'z', outline, -2 * sectionStep, 2 * sectionStep);
+// An outline `share` of the blade's width from `from` to its tip at `tip`, one side's edge then the other's. The
+// flats' point stops only a little short of the bevels', because a forged point carries its ridge almost to the tip;
+// shortening it by its width's share would leave the last of the blade a flat strip.
 local ridgeRunout = 0.01;
-local layerShare(i) = 1 - i / sectionLayers;
-local layerHalfThickness(i) = (i + 1) * grain;
-// A layer's outline from `from` to its tip, one side's edge then the other's.
-local layerOutline(i, from) =
-  local k = layerShare(i), half = k * tipWidth / 2;
+local bladeOutline(share, from, tip) =
+  local half = share * tipWidth / 2;
   local side(s) = [
-    [from, s * k * halfWidthAt(from)],
+    [from, s * share * halfWidthAt(from)],
     [taperEnd, s * half],
     [taperEnd + pointShoulder.along * pointLength, s * half * pointShoulder.across],
   ];
-  side(-1) + [[bladeLength - i * ridgeRunout, 0]] + std.reverse(side(1));
-local layer(id, i, outline) = h.prism(id, 'blade', 'z', outline, -layerHalfThickness(i), layerHalfThickness(i));
+  side(-1) + [[tip, 0]] + std.reverse(side(1));
 
-// The fuller is a groove down the flats, which a convex prism cannot carve, so the layers above the fuller's floor
-// stand either side of it along its run and close over it only past its rounded end. A layer no wider than the
-// fuller has nothing beside it, and lies only past it. The fuller narrows with the blade, so a layer's land beside it
+// The fuller is a groove down the flats, which a convex prism cannot carve, so the flats stand either side of it
+// along its run and close over it only past its rounded end. The fuller narrows with the blade, so the land beside it
 // is the same share of the blade all along the run.
-local fullerLayers = 1;
-local floorLayer = sectionLayers - fullerLayers - 1;
-local landShare(i) = layerShare(i) - fullerWidth / baseWidth;
-local fullerSide(i, s) =
-  local k = layerShare(i), land = landShare(i) * halfWidthAt(fullerEnd);
+local landShare = flatsShare - fullerWidth / baseWidth;
+local land(s) =
   // A land under a voxel wide would be drawn into the fuller or lost, and the groove's wall with it.
-  assert land >= grain : 'layer %d leaves a land of %g m beside the fuller, under a voxel' % [i, land];
-  layer('blade-%d-%s' % [i, if s > 0 then 'a' else 'b'], i, [
+  assert landShare * halfWidthAt(fullerEnd) >= grain
+         : 'the flats leave a land of %g m beside the fuller, under a voxel' % (landShare * halfWidthAt(fullerEnd));
+  flats('blade-land-%s' % (if s > 0 then 'a' else 'b'), [
     [bladeStart, s * fullerHalfAt(bladeStart)],
-    [bladeStart, s * k * halfWidthAt(bladeStart)],
-    [fullerEnd, s * k * halfWidthAt(fullerEnd)],
+    [bladeStart, s * flatsShare * halfWidthAt(bladeStart)],
+    [fullerEnd, s * flatsShare * halfWidthAt(fullerEnd)],
     [fullerEnd, s * fullerHalfAt(fullerEnd)],
   ]);
 local noseSteps = 4;
-local fullerNosePiece(i) =
+local fullerNosePiece =
   local f = fullerHalfAt(fullerEnd);
-  layer('blade-%d-nose' % i, i, [
+  flats('blade-nose', [
     local t = std.pi * j / noseSteps;
     [fullerEnd - fullerNose * std.sin(t), -f * std.cos(t)]
     for j in std.range(0, noseSteps)
   ]);
-local bladePieces(i) =
-  if i <= floorLayer then [layer('blade-%d' % i, i, layerOutline(i, bladeStart))]
-  else (if landShare(i) > 0 then [fullerSide(i, 1), fullerSide(i, -1)] else [])
-       + [layer('blade-%d-tail' % i, i, layerOutline(i, fullerEnd)), fullerNosePiece(i)];
+local bladePieces = [
+  bevels('blade', bladeOutline(1, bladeStart, bladeLength)),
+  land(1),
+  land(-1),
+  flats('blade-tail', bladeOutline(flatsShare, fullerEnd, bladeLength - ridgeRunout)),
+  fullerNosePiece,
+];
 
 // The edge is marked on the taper, where a cut lands and the edge's line across the outer layer is known.
 local edgeShare = 0.6;
@@ -152,8 +159,7 @@ local boss(id, side) =
   // A knightly arming sword of the thirteenth century: a lens-section blade tapering evenly to its point with a fuller
   // down its first two-thirds, a straight cross, a leather grip over cord risers and a wheel pommel.
   h.compound('arming_sword', massKg,
-    std.flattenArrays([bladePieces(i) for i in std.range(0, sectionLayers - 1)])
-    + [
+    bladePieces + [
       h.turned('cross', 'guard', 'y', quillonProfile, [crossMid, -crossSpan / 2, 0]) + { sides: 8 },
       h.box('cross-block', 'guard', [gripTop, -cross.blockHalfWidth, -cross.blockHalfThickness], [0, cross.blockHalfWidth, cross.blockHalfThickness]),
       riser('riser-cross', gripTop - grip.riserLength),
@@ -177,8 +183,8 @@ local boss(id, side) =
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] }, keywords: ['sword', 'melee'] },
     anchors: {
       local at(solid, fraction) = { part: 'arming_sword', solid: solid, fraction: fraction },
-      strike: at('blade-0', [1, 0.5, 0.5]),
-      edge: at('blade-0', edgeFraction),
+      strike: at('blade', [1, 0.5, 0.5]),
+      edge: at('blade', edgeFraction),
     },
   },
 ]
