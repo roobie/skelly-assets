@@ -127,7 +127,7 @@ local bladePieces = [
   flats('blade-tail', flatsOutline(fullerEnd)),
 ] + [noseStrip(j) for j in std.range(0, noseSteps - 1)];
 
-// The edge is marked on the taper, where a cut lands and the edge's line across the outer layer is known.
+// The edge is marked on the taper, where a cut lands and the edge's line across the bevels is known.
 local edgeShare = 0.6;
 local edgeAt = bladeStart + edgeShare * (bladeLength - bladeStart);
 assert edgeAt <= taperEnd : 'the edge anchor at %g m lies on the point, past the taper' % edgeAt;
