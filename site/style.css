@@ -48,6 +48,13 @@ h3 {
   line-height: 1.2;
   margin: 0;
 }
+/* A fieldset only groups its chips for assistive tech; min-width lets a chip row scroll rather than grow. */
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 
 .top,
 .controls,

@@ -31,8 +31,8 @@
   <nav class="controls" aria-label="Filter models">
     <input id="search" type="search" placeholder="Search models" aria-label="Search models" autocomplete="off">
     <button id="facets-toggle" class="facets-toggle" type="button" aria-expanded="false" aria-controls="facets">Filters</button>
-    <div id="shelves" class="chips" role="group" aria-label="Category"></div>
-    <div id="facets" class="facets" role="group" aria-label="Filters"></div>
+    <fieldset id="shelves" class="chips" aria-label="Category"></fieldset>
+    <fieldset id="facets" class="facets" aria-label="Filters"></fieldset>
     <span id="count" class="count" aria-live="polite"></span>
   </nav>
 
@@ -45,17 +45,19 @@
     <div class="viewer">
       <div class="stage">
         <canvas id="v-canvas"></canvas>
-        <div id="v-clips" class="clips" role="group" aria-label="Clip"></div>
+        <fieldset id="v-clips" class="clips" aria-label="Clip"></fieldset>
         <p class="hint">Drag to turn, scroll to zoom</p>
       </div>
       <aside class="info">
-        <button id="v-close" class="close" aria-label="Close">×</button>
+        <button id="v-close" class="close" type="button" aria-label="Close">×</button>
         <p id="v-category" class="eyebrow"></p>
+        <!-- biome-ignore lint/a11y/useHeadingContent: app.js names the model here before it opens the dialog. -->
         <h2 id="v-name"></h2>
         <code id="v-id"></code>
         <dl id="v-facts" class="facts"></dl>
         <div class="form-switch">
           <label class="switch" title="Draw the model as its smooth copy instead of its voxels">
+            <!-- biome-ignore lint/a11y/useAriaPropsForRole: a checkbox's own checked state is the switch's; ARIA in HTML bars aria-checked on it. -->
             <input id="v-smooth" type="checkbox" role="switch"> Smooth
           </label>
           <span id="v-smooth-none" class="switch-note" hidden>No smooth copy</span>
@@ -71,10 +73,12 @@
         <h3>Materials</h3>
         <ul id="v-materials" class="materials"></ul>
         <div class="actions">
+          <!-- biome-ignore lint/a11y/useValidAnchor: app.js gives the model's file before it shows the link. -->
           <a id="v-download" class="button" download>Download .glb</a>
+          <!-- biome-ignore lint/a11y/useValidAnchor: app.js gives the posing page's address before it shows the link. -->
           <a id="v-pose" class="button ghost" hidden>Pose worn</a>
-          <button id="v-prev" class="button ghost" aria-label="Previous model">←</button>
-          <button id="v-next" class="button ghost" aria-label="Next model">→</button>
+          <button id="v-prev" class="button ghost" type="button" aria-label="Previous model">←</button>
+          <button id="v-next" class="button ghost" type="button" aria-label="Next model">→</button>
         </div>
       </aside>
     </div>
