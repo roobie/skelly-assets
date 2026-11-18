@@ -2,6 +2,7 @@
 // viewer, a tool package whose vite build the site serves under the package's name.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { escapeHtml } from './html.mjs';
 
 export const TOOLS = 'site/tools.json';
 const PACKAGES = 'tools/packages';
@@ -59,9 +60,8 @@ export function readTools(root) {
 // Relative, so the links hold under a Pages project path and on any local server.
 export const toolHref = ({ page, viewer }) => page ?? `${viewer}/`;
 
-const escape = (text) => text.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 export const toolLinks = (tools) =>
-  tools.map((tool) => `<a href="${escape(toolHref(tool))}">${escape(tool.label)}</a>`).join('\n      ');
+  tools.map((tool) => `<a href="${escapeHtml(toolHref(tool))}">${escapeHtml(tool.label)}</a>`).join('\n      ');
 
 // The tool pages a built site serves that no link names: a page beside the index, or a directory with its own index.
 export function unlinkedTools(out, linked) {
