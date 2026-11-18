@@ -2,11 +2,14 @@
 // nose. These are modelling assumptions, never measurements, so they live apart from the sourced cartridge files
 // (models/guns/cartridges/README.md) and can be tuned without touching a citation.
 
-// The roster-wide switch for the cupped primer, still on trial: false draws every primer as a plain disc.
-local cupped = true;
+// Whether a primer is drawn cupped, a cup inside its anvil ring, or as a plain disc, by scale. On a shell's head the
+// cup reads at a glance. On a small-arms or shotshell head it shows as one faint line even close up, for 32 more
+// triangles a model, so there it stays off until a use for it turns up.
+local cupSmallArms = false;
+local cupShells = true;
 // A primer `diameter` across whose cup, `cup` across and `cupDepth` deep, sinks into its face and leaves a ring
-// round it. The pocket is only as deep as the face needs; nothing behind the head is ever seen.
-local primer(diameter, cup, cupDepth, pocketDepth=0.4, recess=0.1, clearance=0.05, chamfer=0.2) = {
+// round it when `cupped`. The pocket is only as deep as the face needs; nothing behind the head is ever seen.
+local primer(diameter, cup, cupDepth, cupped=cupSmallArms, pocketDepth=0.4, recess=0.1, clearance=0.05, chamfer=0.2) = {
   diameter: diameter, pocketDepth: pocketDepth, recess: recess, clearance: clearance, chamfer: chamfer,
   cup: if cupped then { diameter: cup, depth: cupDepth } else null,
 };
@@ -53,14 +56,14 @@ local shell(case, primer, ogive, band) = smallArms(primer) {
     // A screw-in percussion primer about a third of the head across; the band rides just ahead of the case mouth.
     '40x365r': shell(
       case={ baseChamfer: 1, wall: 0.7, firedFloor: 14 },
-      primer=primer(18, 7, 0.8, pocketDepth=6, recess=0.3, clearance=0.3, chamfer=0.8),
+      primer=primer(18, 7, 0.8, cupped=cupShells, pocketDepth=6, recess=0.3, clearance=0.3, chamfer=0.8),
       ogive={ calibres: 2, meplatCalibres: 0.3 },
       band={ diameter: 41.2, width: 9, fromMouth: 4 },
     ),
     // An electric primer boss; the smoothbore round's band stands for the obturator that seals its bore.
     '120x570': shell(
       case={ baseChamfer: 1.5, wall: 0.9, firedFloor: 24 },
-      primer=primer(26, 10, 1, pocketDepth=8, recess=0.5, clearance=0.5, chamfer=1.2),
+      primer=primer(26, 10, 1, cupped=cupShells, pocketDepth=8, recess=0.5, clearance=0.5, chamfer=1.2),
       ogive={ calibres: 2.4, meplatCalibres: 0.25 },
       band={ diameter: 121.2, width: 16, fromMouth: 8 },
     ),
