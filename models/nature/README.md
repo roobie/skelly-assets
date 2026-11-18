@@ -25,11 +25,11 @@ obvious repetition. Source instances have no extra scale transform.
 
 | Model id | Height | Approximate footprint / form |
 | --- | --- | --- |
-| `woodland_oak_spreading` | 8.3 m | 10.7 × 10 m, grown broad dome on a short bole |
-| `woodland_oak_upright` | 12.8 m | 7.9 × 9 m, grown with a stronger leader, taller than it spreads |
-| `woodland_birch` | 11.5 m | 5.5 × 5.9 m, grown slender leader and hanging laterals |
-| `woodland_scots_pine` | 9.8 m | 4.3 × 4.6 m, grown whorled tiers shed below |
-| `woodland_spruce` | 9.6 m | 5.1 × 6 m, grown dense cone kept to the ground |
+| `woodland_oak_spreading` | 8.5 m | 10.2 × 10.2 m, grown broad dome on a short bole |
+| `woodland_oak_upright` | 12.9 m | 7.7 × 9 m, grown with a stronger leader, taller than it spreads |
+| `woodland_birch` | 11.9 m | 5.8 × 6.2 m, grown slender leader and hanging laterals |
+| `woodland_scots_pine` | 10.1 m | 4.4 × 4.7 m, grown whorled tiers shed below |
+| `woodland_spruce` | 9.9 m | 5 × 6 m, grown dense cone kept to the ground |
 | `woodland_pine` | 10.4 m | 4.3 × 4.3 m, eight drawn tapering foliage tiers |
 | `woodland_oak_sapling` | 3.2 m | 2.3 × 2.1 m |
 | `woodland_pine_sapling` | 3.2 m | 1.4 × 1.4 m |
@@ -53,9 +53,9 @@ opaque crown volumes are not a biomass, structural-strength or canopy-collision 
 
 ## Sources and examples
 
-- `woodland.spec.libsonnet`: variation measures, roots/rock floors, asset identities, the grown rows' species and
-  seeds, and the thinned looks' densities.
-- `grown.species.libsonnet`: the habits trees and shrubs grow from; fields are documented in
+- `woodland.spec.libsonnet`: variation measures, roots/rock floors, asset identities, the grown rows' species,
+  seeds and grain, and the thinned looks' densities.
+- `grown.species.libsonnet`: the habits trees and shrubs grow from, and each one's finish; fields are documented in
   `tools/packages/thing-authoring-tool/src/growth/species.ts`.
 - `woodland.libsonnet`: compound geometry and finish selection. Functions stay here; the catalogue set is plain data.
 - `../catalogue/sets/woodland.libsonnet`: category-based registration into the existing nature production recipe.

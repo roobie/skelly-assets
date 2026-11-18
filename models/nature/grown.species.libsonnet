@@ -17,7 +17,7 @@ local base = {
   density: 1,
   // A crown of clumps alone is a shell whose inside the voxel copy pays for as much as its outside, so a core fills
   // each column; two-layer terraces read as a voxel crown's steps and keep its slopes from costing a face per layer.
-  foliage: { least: 2, core: 1.3, terrace: 2 },
+  foliage: { least: 1, core: 1.3, terrace: 2 },
   finish:: { bark: 'bark', leaf: 'foliage-oak' },
 };
 // An oak's crown: weak apical control lets laterals overtake the leader into a broad, rounded dome on a short bole. Its

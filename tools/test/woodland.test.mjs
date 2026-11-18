@@ -174,9 +174,12 @@ for (const { id, voxelGrain } of rows)
       const box = glbBounds(bytes);
       bounds.push(box);
       const [min, max] = box;
-      inRange(max[0] - min[0], sizes[id][0], `${id} width`);
-      inRange(max[1] - min[1], sizes[id][1], `${id} height`);
-      inRange(min[1], [-0.18, 0.001], `${id} base must contact, not float above, authored ground`);
+      // The voxel copy may round out to whole cells: up to a cell past each side, above the top and under the skirt.
+      const cell = bytes === output.glb ? voxelGrain : 0;
+      const [[least, most], [lowest, highest]] = sizes[id];
+      inRange(max[0] - min[0], [least, most + 2 * cell], `${id} width`);
+      inRange(max[1] - min[1], [lowest, highest + 2 * cell], `${id} height`);
+      inRange(min[1], [-0.18 - cell, 0.001], `${id} base must contact, not float above, authored ground`);
       if (['woodland_fern', 'woodland_grass', 'woodland_fallen_log'].includes(id))
         inRange(min[1], [-1e-5, 1e-5], `${id} exact ground`);
       if (id.includes('boulder')) inRange(min[1], [-0.16001, -0.15999], `${id} buried skirt`);
