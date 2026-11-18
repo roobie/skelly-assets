@@ -9,6 +9,7 @@ read_if:
   - naming a model, or showing its name in a consumer
   - adding or applying the catalogue's item drafts
   - bumping the Node version, or why CI and builds pin one exact version
+  - editing a workflow, or why CI lints workflows with pinned actionlint and shellcheck
   - cutting a release, and where its model-history.json comes from
   - opening a PR or cutting a release, and where its change notes and release notes come from
   - citing skelly's source from a doc or a comment
@@ -305,6 +306,13 @@ would therefore regenerate both of main's copies from scratch, while a pinned ve
 when it is bumped. A floating major also makes every CI job download Node from GitHub's release hosting, whose
 failures and retries can cost a job over a minute; an exact version is restored from the runner's tool cache
 instead. See `.github/actions/node/action.yml`, `Cache Node`.
+
+### Workflow lint
+
+A broken expression or inline shell bug in a workflow shows up only when that workflow runs, often after merge.
+actionlint, with shellcheck for `run:` scripts, catches both statically, so CI runs it whenever a workflow, a local
+action or the linter pin changes. Both tools are pinned and verified by SHA-256, so every clone and CI judge
+workflows the same way. See `tools/actionlint/runtime.json` and `tools/actionlint/setup.mjs`.
 
 ### Showcase idle motion
 

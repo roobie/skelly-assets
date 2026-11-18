@@ -1,0 +1,40 @@
+name: actionlint
+
+# Why this gate exists: `README.md`, "Workflow lint". actionlint reads the local actions' inputs, so they trigger it too.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - 'tools/actionlint/**'
+      - 'tools/pinned-download.mjs'
+      - '.node-version'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - 'tools/actionlint/**'
+      - 'tools/pinned-download.mjs'
+      - '.node-version'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Cache pinned workflow linters
+        uses: actions/cache@v6
+        with:
+          path: tools/actionlint/bin
+          key: actionlint-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/actionlint/runtime.json') }}
+      - uses: ./.github/actions/node
+      # The linters' setup uses only Node built-ins, so the job skips the tools' install.
+      - run: node tools/actionlint/lint.mjs
