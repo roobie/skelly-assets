@@ -74,7 +74,7 @@ const probed = await restPokeResults(generated, { root, cache, workers: 1 });
 
 test('the check finds the body poking out of the piece meant to cover it, by its depth', () => {
   assert.deepEqual(Object.keys(probed.results), ['vest']);
-  const [poke, ...others] = probed.results.vest;
+  const [poke, ...others] = probed.results.vest.pokes;
   assert.deepEqual(others, []);
   assert.equal(`${poke.bone} out of ${poke.piece}`, 'spine out of vest_worn');
   assert.ok(Math.abs(poke.depth - SIDE) < 1e-6, `pokes by ${poke.depth} m, not ${SIDE} m`);
@@ -128,4 +128,17 @@ test('an entry that is stale, doubled or capped loose fails', () => {
   assert.match(problems({ pokes: [entry(0.021), { ...entry(0.01), bone: 'neck' }] }), /neck out of vest_worn is stale/);
   assert.match(problems({ pokes: [entry(0.021)], unjudged: [entry(0.021, { note: 'twice' })] }), /listed twice/);
   assert.match(problems({ pokes: [entry(0.025)] }), /capped at 25\.0 mm, far above the 20\.0 mm it measures/);
+});
+
+test('a piece that declares it covers body it does not enclose fails, whatever the entries allow', async () => {
+  const declaring = {
+    ...generated,
+    modelOf: async (id) => (id === 'vest_worn' ? { ...files.vest_worn, entry: { covers: ['torso'] } } : files[id]),
+  };
+  const { results } = await restPokeResults(declaring, { root, workers: 1 });
+  assert.deepEqual(probed.results.vest.gaps, []);
+  assert.match(
+    restPokeReport(results, { ...none, pokes: [entry(0.021)] }).problems.join('\n'),
+    /^vest: vest_worn \(\w+\) covers torso but would hide body it does not enclose: \d+ samples show/,
+  );
 });

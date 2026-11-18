@@ -20,7 +20,8 @@ was left out of the list silently.
 ## Decision
 
 The build probes every fitted garment on the doll at rest and fails on any body point that pokes out of the piece
-meant to cover it, naming the garment, the doll's bone, the piece and how deep it pokes. See `tools/restPoke.mjs`.
+meant to cover it, naming the garment, the doll's bone, the piece and how deep it pokes, and on any declaration its
+pieces do not enclose. See `tools/restPoke.mjs`.
 
 - A poke is allowed only by an entry in `models/rest-pokes.libsonnet`, so an exception is content a modder or a
   reviewer can see and change: `poke` for one that is intended and says why, `unjudged` for one nobody has judged,
@@ -39,6 +40,11 @@ for a test but a small part of a clean build, and needless when nothing it reads
 by its inputs, as the swing check is (`docs/decisions/0016-swing-check.md`): the doll's and the pieces' GLBs and
 declarations, the dressing, the rig and the checker's code. A key made from what was built rather than from the
 sources' rows holds whatever path built them, and a change to a model's code that leaves its GLB alone costs no probe.
+
+The cover check of decision 12 (`tools/dollRig.mjs`, `coverGaps`) runs in the same probe and is kept in the same
+entry. It reads exactly what the probe reads, so it needs no key of its own, and it was most of the showcase's build,
+run there uncached and on one thread on every build of the site. A declaration ships in the manifest, so the build that
+writes it is where a wrong one should fail.
 
 CI spreads a clean build's probes over the shards like its models. A shard has no built tree, so it generates the doll
 and its garments' pieces through the export cache; a model another shard owns is generated twice, which costs seconds

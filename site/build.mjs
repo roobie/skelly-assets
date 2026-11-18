@@ -19,13 +19,13 @@ import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { ASSEMBLY_SUFFIX, readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
-import { coveringItems, isWearable, modelBox, modelMeshes, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
+import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { farSlot, readStowage, stowedPose } from '../tools/stowage.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { pressCheckClip, readPressCheck } from '../tools/press-check.mjs';
 import { readWields, wieldSequences } from '../tools/wields.mjs';
-import { coverGaps, dollRig, readRigContent } from '../tools/dollRig.mjs';
+import { dollRig, readRigContent } from '../tools/dollRig.mjs';
 import { VOCABULARY } from '../tools/taxonomy.mjs';
 import { addAnalytics } from './analytics.mjs';
 import { MIRRORED_AXIS } from './modelFrame.mjs';
@@ -233,15 +233,6 @@ if (doll) {
   // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
   // names the clip actor's plain clips and its walk speed, which paces its walk; `motions`, the clips baked for the doll.
   const rig = dollRig(readRigContent(root), doll, dressing);
-  // A worn piece hides what it declares it covers, so a declaration it does not enclose would open the body to view.
-  // Every declaring item is dressed, shown or not, since a consumer hides by the declaration wherever it wears it.
-  const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, modelsById.get(id).file)), keep);
-  const gaps = coveringItems(models)
-    .flatMap((id) => coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf, anchorsOf }), meshesOf));
-  if (gaps.length > 0) {
-    const where = ({ piece, side, name, open, at }) => `${piece} (${side}) covers ${name}, but ${open === 'nothing' ? 'it names nothing there' : `${open} samples show, one at [${at.map((x) => x.toFixed(3))}]`}`;
-    throw new Error(`worn pieces would hide body they do not enclose:\n${gaps.map(where).join('\n')}`);
-  }
   const actor = modelsById.get(rig.clips);
   if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
   // The press check and each strike play on the page as clips through their key frames' pose files, each at its own
