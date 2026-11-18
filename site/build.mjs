@@ -259,8 +259,8 @@ for (const model of models) if (model.clips && model.body) {
 }
 const sounds = manifest.sounds.map(({ id, object, surface, pack, variants }) => ({ id, object, surface, takes: variants.map(({ seed, path }) => ({ seed, url: `built/${outputPath(pack, path)}` })) }));
 writeFileSync(join(out, 'sounds.json'), JSON.stringify({ sounds }));
-const { categories, facets } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
-writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `${REPOSITORY}/releases/tag/` } } : {}) }));
+const { categories, facets, dimensions } = JSON.parse(readFileSync(join(root, VOCABULARY), 'utf8'));
+writeFileSync(join(out, 'models.json'), JSON.stringify({ taxonomy: { categories, facets, dimensions }, models: shown, vehicles, assemblies, ...(history ? { release: { version: history.version, url: `${REPOSITORY}/releases/tag/` } } : {}) }));
 // A viewer is served only once its package is built (site/build-viewers.mjs), and linked only when served, so a site
 // built without the viewers links nothing it lacks.
 const listed = readTools(root);

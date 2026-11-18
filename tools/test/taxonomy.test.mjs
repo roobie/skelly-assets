@@ -16,6 +16,10 @@ const FIXTURE = {
     material: { meaning: 'What it is made of.', terms: { metal: 'Metal.', wood: 'Wood.' } },
     setting: { meaning: 'Its era.', terms: { modern: 'Now.' } },
   },
+  dimensions: {
+    keyword: { meaning: 'Also known as.' },
+    form: { meaning: 'Its build.', terms: { atom: 'One piece.' } },
+  },
   keywords: { 'hand-tool': 'A tool held in the hand.' },
 };
 
@@ -108,6 +112,19 @@ test('the vocabulary is refused when a term is not kebab-case, has no meaning, o
   assert.throws(
     () => vocabularyOf({ ...FIXTURE, facets: { material: { meaning: 'x', terms: { metal: '' } } } }),
     /has no meaning/,
+  );
+  assert.throws(
+    () => vocabularyOf({ ...FIXTURE, dimensions: { keyword: { meaning: 'x' } } }),
+    /dimensions must hold exactly/,
+  );
+  assert.throws(
+    () =>
+      vocabularyOf({ ...FIXTURE, dimensions: { ...FIXTURE.dimensions, form: { meaning: 'x', terms: { atom: '' } } } }),
+    /dimension form term atom has no meaning/,
+  );
+  assert.throws(
+    () => vocabularyOf({ ...FIXTURE, dimensions: { ...FIXTURE.dimensions, keyword: { meaning: 'x', terms: {} } } }),
+    /dimension keyword must hold only meaning/,
   );
   assert.throws(() => vocabularyOf({ ...FIXTURE, strict: true }), /unknown key strict/);
   assert.throws(() => vocabularyOf({ ...FIXTURE, keywords: { 'Hand tool': 'A tool.' } }), /not kebab-case/);

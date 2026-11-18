@@ -53,6 +53,12 @@ build, never failed, and the reviewer adds it to the list or asks for a listed s
 fails, because a search can only match the one form. The reported list is how the curated list grows without a single
 owner reconciling every word first.
 
+## Derived dimensions
+
+The showcase also filters by keyword and by form. Form is derived from how a model is built (`tools/components.mjs`,
+`formOf`), never tagged, so it is not a facet a model can name. `models/taxonomy.json` holds the meaning of both
+under `dimensions`, with one meaning per form term, so the showcase's wording is content and not code.
+
 ## Defaults and overrides
 
 A set, kit, recipe or mob sheet can set a default that its rows inherit. Each row can override it. The row's
