@@ -100,14 +100,20 @@ const unitKeys = (root, code) => {
   };
 };
 
-// Row files are the imports of the row indexes; each compiles on its own into a fragment, its manifested JSON.
-const unitPlan = (sources, { root, code, rowIndexes }) => {
+// Each unit of a path as its files are now: its closure and its key.
+const unitsNow = ({ root, code }) => {
   const scanner = importScanner(libraryPaths(compileRoot(root)));
   const keyOf = unitKeys(root, code);
   const unit = (path) => {
     const closure = scanner.closure(path);
     return { path, closure, key: keyOf(closure, path) };
   };
+  return { scanner, unit };
+};
+
+// Row files are the imports of the row indexes; each compiles on its own into a fragment, its manifested JSON.
+const unitPlan = (sources, { root, code, rowIndexes }) => {
+  const { scanner, unit } = unitsNow({ root, code });
   return {
     rows: [...new Set(rowIndexes.flatMap((index) => scanner.importsOf(resolve(index))))].map(unit),
     twins: sources.map(unit),
@@ -135,6 +141,20 @@ const pruneStore = (folders, keys) => {
   for (const [kind, folder] of Object.entries(folders)) folder.prune(new Set(keys[kind]));
 };
 
+// go-jsonnet reads the files again after the plan keyed them, so a file edited meanwhile would put one content's output
+// under another's key, which a shared store would serve to every checkout on the keyed content. The compiled units are
+// keyed afresh, and only those whose key held go into the store; an edit undone within the compile goes unseen. The
+// others are returned: their output still serves this checkout, until the next refresh compiles them again.
+const storeUnchanged = (folder, compiled, options) => {
+  const { unit } = unitsNow(options);
+  const changed = new Set();
+  for (const [compiledUnit, json] of compiled) {
+    if (unit(compiledUnit.path).key === compiledUnit.key) folder.write(compiledUnit.key, ENTRY, { json });
+    else changed.add(compiledUnit);
+  }
+  return changed;
+};
+
 const forEachConcurrently = async (items, work) => {
   let next = 0;
   const worker = async () => {
@@ -148,23 +168,31 @@ const forEachConcurrently = async (items, work) => {
 const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
-const compileFragments = (rows, { root, folders }) =>
-  forEachConcurrently(rows, async ({ path, key }) => {
-    if (existsSync(folders.rows.path(key, ENTRY_FILE))) return;
-    const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
-    folders.rows.write(key, ENTRY, { json: fragment });
-  });
+// The fragments of the rows the store lacks, each by its row.
+const compileFragments = async (rows, { root, folders }) => {
+  const fragments = new Map();
+  await forEachConcurrently(
+    rows.filter(({ key }) => !existsSync(folders.rows.path(key, ENTRY_FILE))),
+    async (row) => {
+      const label = relative(root, row.path);
+      fragments.set(row, await evaluateJsonnetAsync(plainRows(row.path), compileRoot(root), { label }));
+    },
+  );
+  return fragments;
+};
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
-// fragments and the twins' compile skips evaluating every row file again. It is the checkout's own, not the store's,
-// so a refresh killed before removing it leaves nothing in a store that other users could not prune.
-const withOverlay = (rows, { root, folders }, use) => {
+// fragments and the twins' compile skips evaluating every row file again. It links the stored fragments and holds the
+// ones this refresh compiled, which the store may not take. It is the checkout's own, not the store's, so a refresh
+// killed before removing it leaves nothing in a store that other users could not prune.
+const withOverlay = (rows, fragments, { root, folders }, use) => {
   const overlay = makeBuildDir('jsonnet-overlay');
   try {
-    for (const { path, key } of rows) {
-      const at = join(overlay, relative(root, path));
+    for (const row of rows) {
+      const at = join(overlay, relative(root, row.path));
       mkdirSync(dirname(at), { recursive: true });
-      symlinkSync(folders.rows.path(key, ENTRY_FILE), at);
+      if (fragments.has(row)) writeFileSync(at, fragments.get(row));
+      else symlinkSync(folders.rows.path(row.key, ENTRY_FILE), at);
     }
     return use(overlay);
   } finally {
@@ -172,40 +200,47 @@ const withOverlay = (rows, { root, folders }, use) => {
   }
 };
 
+// Compiles `twins` over the fragments of the rows they reach, storing each unit whose files held still. Returns each
+// twin's JSON by its unit, and the twins whose files changed during the compile.
+const compileTwins = async (twins, rows, options) => {
+  if (twins.length === 0) return { compiled: new Map(), changed: new Set() };
+  const reached = new Set(twins.flatMap(({ closure }) => closure));
+  const needed = rows.filter(({ path }) => reached.has(path));
+  const fragments = await compileFragments(needed, options);
+  storeUnchanged(options.folders.rows, fragments, options);
+  const outputs = withOverlay(needed, fragments, options, (overlay) =>
+    compileJsonnetFiles(
+      twins.map(({ path }) => path),
+      compileRoot(options.root),
+      { overlay },
+    ),
+  );
+  const compiled = new Map(twins.map((twin, at) => [twin, outputs[at]]));
+  return { compiled, changed: storeUnchanged(options.folders.twins, compiled, options) };
+};
+
 const readStamp = (stamp) => (existsSync(stamp) ? JSON.parse(readFileSync(stamp, 'utf8')) : {});
 
 // The stamp maps each twin to the key it was written under, so a refresh with nothing changed reads no store. Stale
-// twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once.
+// twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once. A twin
+// whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then.
 export async function refreshJsonnetTwins(sources, { root, stamp, store, code = [], rowIndexes = [] }) {
   const { rows, twins } = unitPlan(sources, { root, code, rowIndexes });
   const stamped = readStamp(stamp);
   const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
   if (stale.length === 0) return;
-  const options = { root, folders: storeFolders(resolve(store)) };
+  const options = { root, code, folders: storeFolders(resolve(store)) };
   const twinByKey = new Map(stale.map(({ key }) => [key, storedJson(options.folders.twins, key)]));
   const unstored = stale.filter(({ key }) => twinByKey.get(key) === undefined);
-  if (unstored.length > 0) {
-    const reached = new Set(unstored.flatMap(({ closure }) => closure));
-    const needed = rows.filter(({ path }) => reached.has(path));
-    await compileFragments(needed, options);
-    const compiled = withOverlay(needed, options, (overlay) =>
-      compileJsonnetFiles(
-        unstored.map(({ path }) => path),
-        compileRoot(root),
-        { overlay },
-      ),
-    );
-    for (const [at, { key }] of unstored.entries()) {
-      options.folders.twins.write(key, ENTRY, { json: compiled[at] });
-      twinByKey.set(key, compiled[at]);
-    }
-  }
+  const { compiled, changed } = await compileTwins(unstored, rows, options);
+  for (const [{ key }, json] of compiled) twinByKey.set(key, json);
   for (const { path, key } of stale) replaceFile(twinOf(path), twinByKey.get(key));
   pruneStore(options.folders, {
     rows: rows.map(({ key }) => key),
     twins: twins.map(({ key }) => key),
   });
-  replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
+  const current = twins.filter((twin) => !changed.has(twin));
+  replaceFile(stamp, JSON.stringify(Object.fromEntries(current.map(({ path, key }) => [relative(root, path), key]))));
 }
 
 // This module and the compiler driver, plain-data check and compiler pin beside it, since a store shared by checkouts

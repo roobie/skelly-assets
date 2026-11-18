@@ -50,10 +50,28 @@ test('no tracked JSON has a Jsonnet twin', () => {
   );
 });
 
+const moduleUrl = (path) => JSON.stringify(pathToFileURL(resolve(import.meta.dirname, path)).href);
+
 // Another process's refresh, as a checkout sharing the store runs it.
 const REFRESH_ELSEWHERE = `
-import { refreshJsonnetTwins } from ${JSON.stringify(pathToFileURL(resolve(import.meta.dirname, '../sources.mjs')).href)};
+import { refreshJsonnetTwins } from ${moduleUrl('../sources.mjs')};
 const { sources, ...options } = JSON.parse(process.argv[1]);
+await refreshJsonnetTwins(sources, options);
+`;
+
+// A refresh whose `compiler`, of the compiler driver's functions, finds `file` saved as `text` just before it reads the
+// files, as an edit landing after the refresh keyed them would.
+const REFRESH_EDITED_MIDWAY = `
+import { writeFileSync } from 'node:fs';
+import { mock } from 'node:test';
+const { compiler, file, text, sources, ...options } = JSON.parse(process.argv[1]);
+const real = await import(${moduleUrl('../jsonnet/index.mjs')});
+const editFirst = (...args) => {
+  writeFileSync(file, text);
+  return real[compiler](...args);
+};
+mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, [compiler]: editFirst } });
+const { refreshJsonnetTwins } = await import(${moduleUrl('../sources.mjs')});
 await refreshJsonnetTwins(sources, options);
 `;
 
@@ -88,6 +106,14 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
         REFRESH_ELSEWHERE,
         JSON.stringify({ sources, ...options([]) }),
       ]);
+    const refreshEditedMidway = (compiler, path, text) =>
+      execFileAsync(process.execPath, [
+        '--experimental-test-module-mocks',
+        '--input-type=module',
+        '-e',
+        REFRESH_EDITED_MIDWAY,
+        JSON.stringify({ compiler, file: join(root, path), text, sources, ...options([]) }),
+      ]);
     const twin = (name) => readFileSync(join(root, `${name}.json`), 'utf8');
     const value = (name) => JSON.parse(twin(name));
     const keep = (name) => writeFileSync(join(root, `${name}.json`), 'kept');
@@ -96,7 +122,20 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
       readdirSync(join(store, kind))
         .map((name) => join(store, kind, name))
         .find((path) => matches(JSON.parse(readFileSync(path, 'utf8'))));
-    await check({ root, write, sources, store, stamp, refresh, refreshElsewhere, twin, value, keep, entry });
+    await check({
+      root,
+      write,
+      sources,
+      store,
+      stamp,
+      refresh,
+      refreshElsewhere,
+      refreshEditedMidway,
+      twin,
+      value,
+      keep,
+      entry,
+    });
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -166,6 +205,25 @@ fixtureTest('a new file that shadows an import recompiles its importer', async (
   await refresh();
   assert.deepEqual(value('pkg/nested'), { value: 3 });
 });
+
+// The refresh keyed the file before the edit, so the edited output must not land under that key, nor the twin be
+// stamped with it, or undoing the edit would leave the edited twin in place.
+const edited = (json) => JSON.stringify(json).includes('"value":2');
+for (const [compiler, path, text, name] of [
+  ['compileJsonnetFiles', 'lib/value.libsonnet', '{ value: 2 }', 'source'],
+  ['evaluateJsonnetAsync', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue'],
+]) {
+  test(`a file edited before ${compiler} reads it serves the checkout but lands nowhere under its old key`, () =>
+    withTwinFixture(async ({ root, write, refresh, refreshEditedMidway, value, entry }) => {
+      const original = readFileSync(join(root, path), 'utf8');
+      await refreshEditedMidway(compiler, path, text);
+      assert.ok(edited(value(name)), 'the checkout gets the output of the files the compile read');
+      for (const kind of ['rows', 'twins']) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
+      write(path, original);
+      await refresh();
+      assert.ok(!edited(value(name)), 'undoing the edit recompiles the twin');
+    }));
+}
 
 fixtureTest(
   'a fresh checkout takes the stored twins of the same inputs',
