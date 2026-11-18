@@ -74,18 +74,21 @@ assert sectionStep >= grain && std.abs(sectionStep / grain - std.round(sectionSt
 local flatsShare = 0.7;
 local bevels(id, outline) = h.prism(id, 'blade', 'z', outline, -sectionStep, sectionStep);
 local flats(id, outline) = h.prism(id, 'blade', 'z', outline, -2 * sectionStep, 2 * sectionStep);
-// An outline `share` of the blade's width from `from` to its tip at `tip`, one side's edge then the other's. The
-// flats' point stops only a little short of the bevels', because a forged point carries its ridge almost to the tip;
-// shortening it by its width's share would leave the last of the blade a flat strip.
-local ridgeRunout = 0.01;
-local bladeOutline(share, from, tip) =
-  local half = share * tipWidth / 2;
+// The blade's plan, one edge then the other, from the cross through the end of the taper and the point's shoulder.
+local bevelOutline =
   local side(s) = [
-    [from, s * share * halfWidthAt(from)],
-    [taperEnd, s * half],
-    [taperEnd + pointShoulder.along * pointLength, s * half * pointShoulder.across],
+    [bladeStart, s * halfWidthAt(bladeStart)],
+    [taperEnd, s * tipWidth / 2],
+    [taperEnd + pointShoulder.along * pointLength, s * tipWidth / 2 * pointShoulder.across],
   ];
-  side(-1) + [[tip, 0]] + std.reverse(side(1));
+  side(-1) + [[bladeLength, 0]] + std.reverse(side(1));
+// A blade thins toward its point as well as narrowing, so the flats close to their own point from the end of the
+// taper, and the last of the point is bevels alone. They reach most of the way into it, so a ridge still runs down
+// the point rather than the blade ending in a flat strip.
+local ridgeReach = 0.75;
+local flatsOutline(from) =
+  local side(s) = [[from, s * flatsShare * halfWidthAt(from)], [taperEnd, s * flatsShare * tipWidth / 2]];
+  side(-1) + [[taperEnd + ridgeReach * pointLength, 0]] + std.reverse(side(1));
 
 // The fuller is a groove down the flats, which a convex prism cannot carve, so the flats stand either side of it
 // along its run and close over it only past its end. The fuller narrows with the blade until its tip, where its walls
@@ -116,10 +119,10 @@ local noseStrip(j) =
   ];
   flats('blade-nose-%d' % j, distinct);
 local bladePieces = [
-  bevels('blade', bladeOutline(1, bladeStart, bladeLength)),
+  bevels('blade', bevelOutline),
   land(1),
   land(-1),
-  flats('blade-tail', bladeOutline(flatsShare, fullerEnd, bladeLength - ridgeRunout)),
+  flats('blade-tail', flatsOutline(fullerEnd)),
 ] + [noseStrip(j) for j in std.range(0, noseSteps - 1)];
 
 // The edge is marked on the taper, where a cut lands and the edge's line across the outer layer is known.
