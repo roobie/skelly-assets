@@ -35,7 +35,8 @@ export type Light = 'none' | 'ambient' | 'directional';
 export interface DrawSpec {
   /** None draws the plain finish, for a patched render to be held against. */
   readonly surface?: Surface;
-  readonly pass: SurfacePass;
+  /** Not the distance pass, whose material three draws only within a point light's shadow map. */
+  readonly pass: Exclude<SurfacePass, 'distance'>;
   readonly colour: Vec3;
   /** The box drawn, centred on the origin and wider than the view, so its front face fills the view. */
   readonly model: Vec3;

@@ -11,7 +11,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:browser": "node --test --test-concurrency=1 test/browser/compile.ts"
+    "test:browser": "node --test --test-concurrency=1 test/browser/compile.ts test/browser/leaf.ts"
   },
   "dependencies": {
     "valibot": "^1.5.0"

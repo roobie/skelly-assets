@@ -7,7 +7,6 @@ import {
   type Material,
   Mesh,
   MeshDepthMaterial,
-  MeshDistanceMaterial,
   MeshStandardMaterial,
   type Object3D,
   OrthographicCamera,
@@ -41,8 +40,6 @@ const materialOf = ({ pass, colour }: DrawSpec): Material => {
       return new MeshStandardMaterial({ color: new Color(...colour), roughness: 1, metalness: 0 });
     case 'depth':
       return new MeshDepthMaterial();
-    case 'distance':
-      return new MeshDistanceMaterial();
   }
 };
 
