@@ -107,7 +107,10 @@ const glbStowage = (glb: Uint8Array) => {
       .map((port) => ({ standard: port.standard, frame: frameOf(port) })),
   };
 };
-const expectSameStowage = ({ glb, modelEntry }: ReturnType<typeof exported>, label: string) => {
+const expectSameStowage = (
+  { glb, modelEntry }: Pick<ReturnType<typeof exported>, 'glb' | 'modelEntry'>,
+  label: string,
+) => {
   const fromGlb = glbStowage(glb);
   expect(fromGlb.slots.length + fromGlb.seats.length, label).toBeGreaterThan(0);
   expect(modelEntry.stowage?.slots ?? [], label).toEqual(fromGlb.slots);
