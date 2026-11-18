@@ -1,9 +1,15 @@
+// @ts-check
 // Draws a fabric finish's grain (a material's extras.fabric, written by the export from the finish's `fabric`) over the
 // loaded material's flat colour: a weave, twill, knit, felt, leather or rubber pattern that tilts the normal and varies
 // the lightness per thread, and folds that darken the cloth. The export carries no texture coordinates, so the pattern
 // is laid in the model's own axes, projected along each face's main axis, which on a voxel face is exact. Grain finer
 // than a pixel fades out rather than shimmer, so the cloth reads close up and stays quiet at the game's distance. Why
 // the grain is drawn rather than baked is in `docs/decisions/0013-fabric-finishes.md`, "Decision".
+/**
+ * @import { FabricDef } from '@skelly/thing-core/materials'
+ * @import { Material, Mesh, Object3D } from 'three'
+ */
+
 const KINDS = ['woven', 'twill', 'knit', 'felt', 'leather', 'rubber'];
 
 const VERTEX_HEAD = /* glsl */ `
@@ -162,11 +168,16 @@ const NORMAL = /* glsl */ `
 }
 `;
 
+/** @param {string} kind */
 const defineOf = (kind) => `FABRIC_${kind.toUpperCase()}`;
 
 // Gives `material` the grain of `fabric`, the extras.fabric of its glTF material, its grain and fold in the units of
 // the mesh's own coordinates: metres in an exported model. The program is shared by every material of the same kind;
 // each keeps its own numbers.
+/**
+ * @param {Material} material
+ * @param {FabricDef} fabric
+ */
 export function wearFabric(material, fabric) {
   if (!KINDS.includes(fabric.kind))
     throw new Error(`${material.name}: no fabric kind ${fabric.kind}; the kinds are ${KINDS.join(', ')}`);
@@ -192,15 +203,26 @@ export function wearFabric(material, fabric) {
   material.needsUpdate = true;
 }
 
+// By its flag rather than its class, so the module imports no three of its own and serves whichever copy drew the model.
+/**
+ * @param {Object3D} object
+ * @returns {object is Mesh}
+ */
+const isMesh = (object) => 'isMesh' in object && object.isMesh === true;
+
 // Every material under `object` whose glTF extras declare a fabric gets its grain.
+/** @param {Object3D} object */
 export function wearFabrics(object) {
+  /** @type {Set<Material>} */
   const seen = new Set();
   object.traverse((o) => {
-    if (!o.isMesh) return;
+    if (!isMesh(o)) return;
     for (const material of [o.material].flat()) {
-      if (seen.has(material) || !material.userData?.fabric) continue;
+      /** @type {FabricDef | undefined} */
+      const fabric = material.userData?.fabric;
+      if (seen.has(material) || !fabric) continue;
       seen.add(material);
-      wearFabric(material, material.userData.fabric);
+      wearFabric(material, fabric);
     }
   });
 }
