@@ -1,6 +1,8 @@
 // Species the growth family (thing-authoring-tool/src/growth) grows trees and shrubs from: every number is a habit,
 // none is a shape. Each species is one temperate habit #304's woodland already draws by hand, so the two read side by
 // side. Fields are documented in growth/species.ts; values the article leaves open come from Palubicki et al. 2009.
+// A species' hidden `finish` is what its wood and leaves are drawn in: the family never sees it, the row takes it.
+// The wood is tagged bark, not drawn as bark: at a coarse grain its furrows and plates are a shader's to draw.
 local base = {
   alpha: 2,
   shootCap: 4,
@@ -16,6 +18,7 @@ local base = {
   // A crown of clumps alone is a shell whose inside the voxel copy pays for as much as its outside, so a core fills
   // each column; two-layer terraces read as a voxel crown's steps and keep its slopes from costing a face per layer.
   foliage: { least: 2, core: 1.3, terrace: 2 },
+  finish:: { bark: 'bark', leaf: 'foliage-oak' },
 };
 // An oak's crown: weak apical control lets laterals overtake the leader into a broad, rounded dome on a short bole. Its
 // twigs vanish into a crown this dense, so only limbs are barked, and its wide slopes step three layers at a time.
@@ -42,6 +45,7 @@ local conifer = base {
   branching: { angle: 70, phyllotaxis: 'whorl', divergence: 0, whorl: 5, budLife: 2, bole: 1.6 },
   direction: { previous: 1, light: 0.1, tropism: { leader: 0.4, lateral: 0 }, noise: 0.06, flatten: 0.6 },
   foliage+: { age: 4, clump: 0.45, squash: 0.45, crown: 0.3, core: 0 },
+  finish:: base.finish { leaf: 'foliage-pine' },
 };
 // A shrub fills a dome of space instead of competing for light: colonization markers in a flattened hemisphere.
 local dome(radius, height, markers) = {
@@ -81,6 +85,7 @@ local dome(radius, height, markers) = {
     shedding: { threshold: 0.12, grace: 1 },
     pipe: base.pipe { tip: 0.01, flare: 1.25 },
     foliage+: { age: 2, clump: 0.4, squash: 0.5, crown: 0.4 },
+    finish:: { bark: 'bark-birch', leaf: 'foliage-birch' },
   },
   // A hazel: many stems from the ground with laterals favoured, filling a dome a little taller than wide.
   hazel: base {
@@ -95,6 +100,7 @@ local dome(radius, height, markers) = {
     pipe: base.pipe { tip: 0.006, flare: 1, sink: 0.04 },
     bark: { cull: 0.008, merge: 12 },
     foliage+: { age: 4, clump: 0.2, squash: 0.6, crown: 0.7 },
+    finish:: base.finish { leaf: 'foliage-understorey' },
   },
   // A low shrub: a mat of short stems under a flat dome.
   low: base {
@@ -109,5 +115,6 @@ local dome(radius, height, markers) = {
     pipe: base.pipe { tip: 0.004, flare: 1, sink: 0.03 },
     bark: { cull: 0.006, merge: 12 },
     foliage+: { age: 4, clump: 0.12, squash: 0.6, crown: 0.7 },
+    finish:: base.finish { leaf: 'foliage-understorey' },
   },
 }

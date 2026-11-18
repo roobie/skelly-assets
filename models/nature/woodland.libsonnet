@@ -146,8 +146,7 @@ local grassBlade(i) =
   ]);
 {
   rows: [
-    grown.row(t.id + look.suffix, t.title + look.title, t.species, t.seed, t.kg, t.grain,
-      { bark: std.get(t, 'bark', 'bark'), leaf: t.leaf }, look.density)
+    grown.row(t.id + look.suffix, t.title + look.title, t.species, t.seed, t.kg, t.grain, look.density)
     for t in s.grown
     for look in [{ suffix: '', title: '', density: null }] + s.thinned
   ] + [

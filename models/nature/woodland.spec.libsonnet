@@ -6,13 +6,13 @@
   mossBase: 0.6,  // Material regions meet on a voxel plane, not halfway through a shared cell.
   // Trees and shrubs grown from a species (grown.species.libsonnet) and a seed; the seed picks one tree of the habit.
   grown: [
-    { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', species: 'broadleaf', seed: 1, kg: 3600, grain: 0.08, leaf: 'foliage-oak' },
-    { id: 'woodland_oak_upright', title: 'Upright woodland oak', species: 'upright', seed: 1, kg: 3200, grain: 0.08, leaf: 'foliage-oak' },
-    { id: 'woodland_birch', title: 'Woodland birch', species: 'birch', seed: 1, kg: 900, grain: 0.06, leaf: 'foliage-birch', bark: 'bark-birch' },
-    { id: 'woodland_scots_pine', title: 'Woodland Scots pine', species: 'conifer', seed: 1, kg: 1400, grain: 0.08, leaf: 'foliage-pine' },
-    { id: 'woodland_spruce', title: 'Woodland spruce', species: 'spruce', seed: 1, kg: 1600, grain: 0.08, leaf: 'foliage-pine' },
-    { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8, grain: 0.04, leaf: 'foliage-understorey' },
-    { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3, grain: 0.02, leaf: 'foliage-understorey' },
+    { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', species: 'broadleaf', seed: 1, kg: 3600, grain: 0.08 },
+    { id: 'woodland_oak_upright', title: 'Upright woodland oak', species: 'upright', seed: 1, kg: 3200, grain: 0.08 },
+    { id: 'woodland_birch', title: 'Woodland birch', species: 'birch', seed: 1, kg: 900, grain: 0.06 },
+    { id: 'woodland_scots_pine', title: 'Woodland Scots pine', species: 'conifer', seed: 1, kg: 1400, grain: 0.08 },
+    { id: 'woodland_spruce', title: 'Woodland spruce', species: 'spruce', seed: 1, kg: 1600, grain: 0.08 },
+    { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8, grain: 0.04 },
+    { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3, grain: 0.02 },
   ],
   // Each grown row also ships thinned to each look's density, as `<id><suffix>`. `_sparse` is an open woodland a game
   // can see and walk through, and the cheaper draw a scene of many trees wants; deadvox's woodland is to draw these.
