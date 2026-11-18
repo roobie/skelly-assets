@@ -28,8 +28,9 @@ import {
   transpose,
 } from '../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../site/poseFile.mjs';
-import { dollRig, readRigContent, treeMeshes } from './dollRig.mjs';
-import { readDoll, readDressing } from './dress.mjs';
+import { dollRig, readRigContent } from './dollRig.mjs';
+import { dollFrom, dollModels, modelMeshes, readDressing } from './dress.mjs';
+import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
 import { outputPath, sidecarFile } from './layout.mjs';
@@ -475,63 +476,112 @@ const taskHash = (task, bake) =>
  * Each of `sets`' clips, as `wieldClips` bakes them, and the `wieldProblems` of their frames, by set: each class from
  * the cache folder when what it reads and the bake are as they were, else baked and kept, since closing the hands on a
  * weapon is most of the bake. A class keeps its problems rather than its reports, which the cache could not carry
- * whole. `bake` is the fingerprint of the code that bakes, which a test may change. With `prune`, entries none of
- * `sets` uses any more go, so only a run over every set may prune.
+ * whole. `bake` is the fingerprint of the code that bakes, which a test may change. With `shard`, only that shard of
+ * the classes is baked, so CI can spread a clean build's bakes over runners like its models (`wieldShard`), and each
+ * set holds only the shard's clips. With `prune`, entries none of `sets` uses any more go, so only a run over every set
+ * may prune.
  */
-export function wieldResults(rig, sets, meshOf, { cache, prune = false, bake = bakeHash() } = {}) {
+export function wieldResults(rig, sets, meshOf, { cache, prune = false, shard, bake = bakeHash() } = {}) {
   const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
-  const used = new Set();
+  const classes = Object.entries(sets).flatMap(([set, { wields, weapons }]) =>
+    Object.entries(wields.classes).map(([name, cls]) => {
+      const inputs = [rig, wields, name, cls, weapons[name], meshOf];
+      return { set, inputs, hash: taskHash(bakeTask(...inputs), bake) };
+    }),
+  );
+  const mine = shard === undefined ? classes : shardUnits(classes, shard);
   let reused = 0;
-  let baked = 0;
-  const results = mapValues(sets, ({ wields, weapons }) => {
-    const classes = Object.entries(wields.classes).map(([name, cls]) => {
-      const hash = taskHash(bakeTask(rig, wields, name, cls, weapons[name], meshOf), bake);
-      used.add(hash);
-      const stored = folder?.get(hash);
-      if (stored !== undefined) {
-        reused++;
-        return stored;
-      }
-      baked++;
-      const { clips, reports } = classClips(rig, wields, name, cls, weapons[name], meshOf);
-      const result = { clips, problems: wieldProblems(reports) };
-      folder?.put(hash, result);
-      return result;
-    });
+  const made = mine.map(({ set, inputs, hash }) => {
+    const stored = folder?.get(hash);
+    if (stored !== undefined) {
+      reused++;
+      return { set, ...stored };
+    }
+    const { clips, reports } = classClips(...inputs);
+    const result = { clips, problems: wieldProblems(reports) };
+    folder?.put(hash, result);
+    return { set, ...result };
+  });
+  if (prune) folder?.prune(new Set(classes.map(({ hash }) => hash)));
+  const results = mapValues(sets, (_, set) => {
+    const own = made.filter((result) => result.set === set);
     return {
-      clips: Object.assign({}, ...classes.map(({ clips }) => clips)),
-      problems: classes.flatMap(({ problems }) => problems),
+      clips: Object.assign({}, ...own.map(({ clips }) => clips)),
+      problems: own.flatMap(({ problems }) => problems),
     };
   });
-  if (prune) folder?.prune(used);
-  return { results, reused, baked };
+  return { results, reused, baked: mine.length - reused };
+}
+
+/**
+ * Bakes one shard of every wield class into the cache, from `modelOf(id)`, a model's `{ glb, entry }` as a build
+ * generates it (tools/build.mjs, fillCacheShard), so the classes are baked by the shards rather than by the build that
+ * reads them all back. Every shard reads the doll and every weapon, since each class's key holds the rig and its seat.
+ */
+export async function wieldShard(modelOf, { root = repo, sets = WIELD_SETS, cache, shard }) {
+  // With no set there is nothing to bake, and a root without sets, such as a test's, may have no doll.
+  if (Object.keys(sets).length === 0) return;
+  const weapons = Object.values(sets).flatMap(({ file }) =>
+    Object.values(readWields(root, file).classes).flatMap(({ weapon }) => (weapon ? [weapon.model] : [])),
+  );
+  const ids = new Set([...dollModels(readDressing(root)), ...weapons]);
+  const files = new Map(await Promise.all([...ids].map(async (id) => [id, await modelOf(id)])));
+  const { rig, meshOf, sets: read } = wieldModels((id) => files.get(id), { root, sets });
+  wieldResults(rig, read, meshOf, { cache, shard });
 }
 
 /** The doll's rig and its parts' sites as the built tree holds them, with what the wields need of it. */
 export function readWieldTree(built, root = repo) {
   const manifest = JSON.parse(readFileSync(join(built, 'manifest.json'), 'utf8'));
-  return wieldTree(built, manifest, root);
-}
-
-/** As `readWieldTree`, for a tree whose models `manifest` lists: each of `WIELD_SETS` as `{ wields, weapons }`. */
-export function wieldTree(built, manifest, root = repo) {
-  const dressing = readDressing(root);
-  const doll = readDoll(built, manifest, dressing);
-  const rig = dollRig(readRigContent(root), doll, dressing);
-  const { meshOf, entryOf } = heldItems(built, manifest);
-  const sets = mapValues(WIELD_SETS, ({ file }) => {
-    const wields = readWields(root, file);
-    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
-  });
-  return { rig, doll, meshOf, sets };
+  return wieldModels(treeFiles(built, manifest), { root });
 }
 
 /**
- * What a hand needs of the models a built tree holds: `meshOf(id)`, the model's parts at rest as one mesh, and
- * `entryOf(id)`, its sidecar, from whichever tool's folder under its pack holds it.
+ * The doll's rig and each of `sets` as `{ wields, weapons }`, from `filesOf(id)`, a model's `{ glb, entry }`: its GLB
+ * and its sidecar, as a built tree holds them (`treeFiles`) or a build generates them.
  */
-export function heldItems(built, manifest) {
-  const meshes = treeMeshes(built, manifest);
+export function wieldModels(filesOf, { root = repo, sets = WIELD_SETS } = {}) {
+  const dressing = readDressing(root);
+  const doll = dollFrom(dressing, filesOf);
+  const rig = dollRig(readRigContent(root), doll, dressing);
+  const { meshOf, entryOf } = heldModels(filesOf);
+  const read = mapValues(sets, ({ file }) => {
+    const wields = readWields(root, file);
+    return { wields, weapons: wieldWeapons(wields, entryOf, meshOf) };
+  });
+  return { rig, doll, meshOf, sets: read };
+}
+
+/**
+ * Each model's `{ glb, entry }` in a built tree whose models `manifest` lists: its GLB and its sidecar, from whichever
+ * tool's folder under its pack holds it.
+ */
+export function treeFiles(built, manifest) {
+  return (id) => {
+    const model = manifest.models.find((entry) => entry.id === id && entry.path.endsWith('.glb'));
+    if (!model) throw new Error(`the built tree holds no ${id}`);
+    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) =>
+      join(built, sidecarFile(model.pack, folder, id)),
+    );
+    const sidecar = sidecars.find((path) => existsSync(path));
+    if (!sidecar) throw new Error(`${id}: no sidecar under ${model.pack}`);
+    return { glb: readFileSync(join(built, model.pack, model.path)), entry: JSON.parse(readFileSync(sidecar, 'utf8')) };
+  };
+}
+
+/** What a hand needs of the models a built tree holds, as `heldModels` gives it. */
+export const heldItems = (built, manifest) => heldModels(treeFiles(built, manifest));
+
+/**
+ * What a hand needs of the models `filesOf` gives (`wieldModels`): `meshOf(id)`, the model's parts at rest as one mesh,
+ * and `entryOf(id)`, its sidecar.
+ */
+export function heldModels(filesOf) {
+  const parsed = new Map();
+  const meshes = (id) => {
+    if (!parsed.has(id)) parsed.set(id, modelMeshes(filesOf(id).glb));
+    return parsed.get(id);
+  };
   const meshOf = (id) =>
     meshes(id).reduce(
       (mesh, part) => {
@@ -543,14 +593,7 @@ export function heldItems(built, manifest) {
       },
       { positions: [], indices: [] },
     );
-  const entryOf = (id) => {
-    const { pack } = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-    const sidecars = Object.values(SIDECAR_DIRECTORIES).map((folder) => join(built, sidecarFile(pack, folder, id)));
-    const sidecar = sidecars.find((path) => existsSync(path));
-    if (!sidecar) throw new Error(`${id}: no sidecar under ${pack}`);
-    return JSON.parse(readFileSync(sidecar, 'utf8'));
-  };
-  return { meshOf, entryOf };
+  return { meshOf, entryOf: (id) => filesOf(id).entry };
 }
 
 /**
@@ -606,14 +649,8 @@ export const WIELD_SETS = {
  * manifest's motions entries for them. `cache`, `prune` and `bake` are `wieldResults`'.
  */
 export function exportWields(out, manifest, { root = repo, sets = WIELD_SETS, ...options } = {}) {
-  const tree = wieldTree(out, manifest, root);
-  const { rig, doll, meshOf } = tree;
-  const { results: baked } = wieldResults(
-    rig,
-    mapValues(sets, (_, name) => tree.sets[name]),
-    meshOf,
-    options,
-  );
+  const { rig, doll, meshOf, sets: read } = wieldModels(treeFiles(out, manifest), { root, sets });
+  const { results: baked } = wieldResults(rig, read, meshOf, options);
   const problems = Object.values(baked).flatMap(({ problems }) => problems);
   if (problems.length > 0) throw new Error(`baked wields: ${problems.join('; ')}`);
   const posing = Object.fromEntries(Object.entries(rig).filter(([key]) => !AUTHORING.has(key)));

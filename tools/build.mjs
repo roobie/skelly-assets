@@ -40,13 +40,13 @@ import { readRecipes } from './recipes.mjs';
 import { recipeTools } from './recipeTools.mjs';
 import { restPokeCheck, restPokeResults, treeModels } from './restPoke.mjs';
 import { readSeveredParts } from './severedParts.mjs';
-import { readSitePieces } from './siteOverlap.mjs';
+import { overlapResults, readSitePieces } from './siteOverlap.mjs';
 import { SOUND_SAMPLE_RATE } from './sounds.mjs';
 import { installJsonnetSources } from './sources.mjs';
 import { loadOutStowage } from './stowage.mjs';
 import { swingResults } from './swingClearance.mjs';
 import { readVocabulary } from './taxonomy.mjs';
-import { exportWields } from './wields.mjs';
+import { exportWields, wieldShard } from './wields.mjs';
 import { workerPool } from './workerPool.mjs';
 
 const here = import.meta.dirname;
@@ -138,7 +138,8 @@ const generatedModels = (units, pool) => {
     models: units.flatMap(({ rows }) => rows.map(({ id, taxonomy }) => ({ id, tags: taxonomy?.tags }))),
     modelOf: async (id) => {
       const { glb, modelEntry } = await pool.run(runs.get(id));
-      return { glb, entry: modelEntry };
+      // A GLB crosses back from a worker thread as a plain Uint8Array, and the GLB readers take a Buffer, as a tree gives.
+      return { glb: Buffer.from(glb.buffer, glb.byteOffset, glb.byteLength), entry: modelEntry };
     },
   };
 };
@@ -296,9 +297,10 @@ async function buildRoster(thing, rows, ids, out, roster, pool, { index }) {
 // Generates one shard of the production build's cacheable rows into the cache and writes no tree. CI spreads a clean
 // build's generation over runners this way, then builds the tree from their merged caches, where every cacheable row
 // is a hit. The tree is the same as an uncached build's: a hit returns the stored GLB and the parse of the stored JSON,
-// which serialises back to the same text. `sitePieces` are the vehicle sites whose swings the shard sweeps, by default
-// the root's (readSitePieces), so a fixture root can name a fleet of its own.
-export async function fillCacheShard({ root = repo, shard, cache, sitePieces }) {
+// which serialises back to the same text. `sitePieces` are the vehicle sites whose overlaps and swings the shard
+// measures, by default the root's (readSitePieces), and `wieldSets` the sets whose classes it bakes, by default
+// WIELD_SETS, so a fixture root can name a fleet and sets of its own.
+export async function fillCacheShard({ root = repo, shard, cache, sitePieces, wieldSets }) {
   await installJsonnetSources();
   const tools = await recipeTools();
   const roster = new Set(readRoster(root).map(({ id }) => id));
@@ -313,9 +315,13 @@ export async function fillCacheShard({ root = repo, shard, cache, sitePieces }) 
   const pool = exportPool(cache);
   try {
     await Promise.all(shardUnits(tasks, shard).map((task) => pool.run(task)));
-    await restPokeResults(generatedModels(units, pool), { root, cache, shard });
+    const generated = generatedModels(units, pool);
+    await restPokeResults(generated, { root, cache, shard });
+    await wieldShard(generated.modelOf, { root, sets: wieldSets, cache, shard });
     console.log(cacheReport(pool.usage()));
-    await swingResults(sitePieces ?? readSitePieces(root), { cache, shard });
+    const pieces = sitePieces ?? readSitePieces(root);
+    overlapResults(pieces, { cache, shard });
+    await swingResults(pieces, { cache, shard });
   } finally {
     await pool.close();
   }

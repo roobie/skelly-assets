@@ -12,7 +12,16 @@ import { join, resolve } from 'node:path';
 import { restClearance } from '../site/clearance.mjs';
 import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { coverGaps, dollRig, readRigContent, restMeshes } from './dollRig.mjs';
-import { dollOf, fittedGarments, modelMeshes, modelParts, readDressing, wornPieces, wornSites } from './dress.mjs';
+import {
+  dollModels,
+  dollOf,
+  fittedGarments,
+  modelMeshes,
+  modelParts,
+  readDressing,
+  wornPieces,
+  wornSites,
+} from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
@@ -126,7 +135,7 @@ export async function restPokeResults(
   const mine = shard === undefined ? garments : shardUnits(garments, shard);
   if (mine.length === 0) return { results: {}, reused: 0, probed: 0 };
   const dressing = readDressing(root);
-  const dollIds = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
+  const dollIds = dollModels(dressing);
   const pieceIds = mine.flatMap((garment) => wornPieces(garment, models, dressing).map(({ model }) => model));
   const files = new Map(await Promise.all([...dollIds, ...pieceIds].map(async (id) => [id, await modelOf(id)])));
   const doll = Object.fromEntries(

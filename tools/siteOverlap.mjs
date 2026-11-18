@@ -13,6 +13,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { shardUnits } from './generation.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { solid } from './pieceSolid.mjs';
 
@@ -187,29 +188,30 @@ const taskHash = (task, measure) =>
 
 // Every vehicle's `siteOverlaps`, by vehicle: from the cache folder when its sites and the measure are as they were,
 // else measured and kept, since measuring every vehicle is most of a warm build's report. Vehicles with the same sites
-// share one measure. `measure` is the fingerprint of the code that measures, which a test may change. With `prune`,
-// entries no vehicle uses any more go, as only a run over every vehicle knows them all.
-export function overlapResults({ grain, vehicles }, { cache, prune = false, measure = measureHash() } = {}) {
+// share one measure. `measure` is the fingerprint of the code that measures, which a test may change. With `shard`,
+// only that shard of the distinct measures is made, so CI can spread a clean build's measures over runners like its
+// models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as only a run over every
+// vehicle knows them all.
+export function overlapResults({ grain, vehicles }, { cache, prune = false, shard, measure = measureHash() } = {}) {
   const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
-  const measured = new Map();
-  let reused = 0;
-  const results = {};
+  const byHash = new Map();
   for (const [vehicle, { sites }] of Object.entries(vehicles)) {
     const hash = taskHash(measureTask(sites, grain), measure);
-    if (!measured.has(hash)) {
-      const stored = folder?.get(hash);
-      if (stored === undefined) {
-        measured.set(hash, siteOverlaps(sites, grain));
-        folder?.put(hash, measured.get(hash));
-      } else {
-        measured.set(hash, stored);
-        reused++;
-      }
-    }
-    results[vehicle] = measured.get(hash);
+    byHash.set(hash, { sites, vehicles: [...(byHash.get(hash)?.vehicles ?? []), vehicle] });
   }
-  if (prune) folder?.prune(new Set(measured.keys()));
-  return { results, reused, measured: measured.size - reused };
+  const mine = shard === undefined ? [...byHash] : shardUnits([...byHash], shard);
+  let reused = 0;
+  const results = {};
+  for (const [hash, { sites, vehicles: sharing }] of mine) {
+    let overlaps = folder?.get(hash);
+    if (overlaps === undefined) {
+      overlaps = siteOverlaps(sites, grain);
+      folder?.put(hash, overlaps);
+    } else reused++;
+    for (const vehicle of sharing) results[vehicle] = overlaps;
+  }
+  if (prune) folder?.prune(new Set(byHash.keys()));
+  return { results, reused, measured: mine.length - reused };
 }
 
 // A site's role: its id without the side it is on and its number, so every vehicle's wheels share one fit.

@@ -392,18 +392,30 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   ];
 }
 
-// The doll as the built tree holds it: each doll model's parts from its GLB and anchors from its things sidecar.
-export function readDoll(built, manifest, dressing) {
-  const names = [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
-  return dollOf(
+// The models the doll is made of: its bust and each limb's.
+export const dollModels = (dressing) => [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
+
+// The doll from `filesOf(id)`, each doll model's `{ glb, entry }`: its parts from its GLB and anchors from its things
+// sidecar, as a built tree holds them or a build generates them.
+export const dollFrom = (dressing, filesOf) =>
+  dollOf(
     dressing,
     Object.fromEntries(
-      names.map((id) => {
-        const entry = manifest.models.find((model) => model.id === id && model.path.endsWith('.glb'));
-        if (!entry) throw new Error(`doll: the built tree holds no ${id}`);
-        const { anchors } = JSON.parse(readFileSync(join(built, thingEntryFile(entry.pack, id)), 'utf8'));
-        return [id, { parts: modelParts(readFileSync(join(built, entry.pack, entry.path))), anchors }];
+      dollModels(dressing).map((id) => {
+        const { glb, entry } = filesOf(id);
+        return [id, { parts: modelParts(glb), anchors: entry.anchors }];
       }),
     ),
   );
+
+// The doll as the built tree holds it.
+export function readDoll(built, manifest, dressing) {
+  return dollFrom(dressing, (id) => {
+    const model = manifest.models.find((entry) => entry.id === id && entry.path.endsWith('.glb'));
+    if (!model) throw new Error(`doll: the built tree holds no ${id}`);
+    return {
+      glb: readFileSync(join(built, model.pack, model.path)),
+      entry: JSON.parse(readFileSync(join(built, thingEntryFile(model.pack, id)), 'utf8')),
+    };
+  });
 }

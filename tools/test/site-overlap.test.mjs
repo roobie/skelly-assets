@@ -232,6 +232,25 @@ test('a vehicle measured once is read from the cache, and a changed piece, site 
   }
 });
 
+// CI measures a clean build's vehicles in shards, and the build then reads every one of them back.
+test("the shards' measures together are every measure a full run reads", () => {
+  const cache = mkdtempSync(join(tmpdir(), 'overlap-shards-'));
+  try {
+    const data = {
+      grain: GRAIN,
+      vehicles: { van: vehicle(bodyAndLamp), cart: vehicle([bodyAndLamp[0], site('lamp', 'van_lamp', shifted(0.25))]) },
+    };
+    for (const index of [1, 2]) {
+      const share = overlapResults(data, { cache, shard: { index, count: 2 } });
+      assert.deepEqual([share.measured, share.reused, Object.keys(share.results).length], [1, 0, 1]);
+    }
+    const full = overlapResults(data, { cache });
+    assert.deepEqual([full.measured, full.reused], [0, 2]);
+  } finally {
+    rmSync(cache, { recursive: true });
+  }
+});
+
 test('a role is a site id without its side and number segments, and a word that only contains a side is kept', () => {
   assert.equal(roleOf('wheel_front_near'), 'wheel_front');
   assert.equal(roleOf('headlamp_3_far'), 'headlamp');
