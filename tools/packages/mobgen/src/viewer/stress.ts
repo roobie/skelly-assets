@@ -783,7 +783,9 @@ const runSweep = async (): Promise<void> => {
 };
 
 sweepBtn.addEventListener('click', () => {
-  runSweep();
+  runSweep().catch((err: unknown) => {
+    sweepStatus.textContent = `sweep failed: ${err instanceof Error ? err.message : String(err)}`;
+  });
 });
 
 // ---- go ----
