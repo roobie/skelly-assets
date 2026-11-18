@@ -33,7 +33,10 @@ export function addCoveredSkin(figure, surface) {
     const shown = samples.filter(({ whole }) => whole);
     if (shown.length === 0) continue;
     const positions = shown.flatMap(({ corners }) => corners.flat());
-    const geometry = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    const geometry = new THREE.BufferGeometry().setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
     const mesh = new THREE.Mesh(geometry, showingMaterial);
     mesh.layers.set(SKIN_LAYER);
     figure.bones.get(bone).joint.attach(mesh);
@@ -77,9 +80,11 @@ function maskView({ renderer, scene, camera }, obj, direction, size) {
   renderer.setRenderTarget(null);
   target.dispose();
   let showing = 0;
-  for (let i = 0; i < pixels.length; i += 4) if (pixels[i] === SHOWING[0] && pixels[i + 1] === SHOWING[1] && pixels[i + 2] === SHOWING[2]) showing++;
+  for (let i = 0; i < pixels.length; i += 4)
+    if (pixels[i] === SHOWING[0] && pixels[i + 1] === SHOWING[1] && pixels[i + 2] === SHOWING[2]) showing++;
   const rows = new Uint8ClampedArray(pixels.length);
-  for (let y = 0; y < size; y++) rows.set(pixels.subarray((size - 1 - y) * size * 4, (size - y) * size * 4), y * size * 4);
+  for (let y = 0; y < size; y++)
+    rows.set(pixels.subarray((size - 1 - y) * size * 4, (size - y) * size * 4), y * size * 4);
   return { rows, showing };
 }
 

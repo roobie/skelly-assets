@@ -20,7 +20,8 @@ export function hideCovered(groups, sites) {
   for (const { covers, bodySite, part } of sites) {
     if (!covers) continue;
     groups[bodySite].traverse((node) => {
-      if (node.isMesh && partOf(node) === part && hides(covers, part, node.geometry.userData.piece)) node.visible = false;
+      if (node.isMesh && partOf(node) === part && hides(covers, part, node.geometry.userData.piece))
+        node.visible = false;
     });
   }
 }

@@ -21,14 +21,24 @@ export function apply(m, [x, y, z], out) {
 
 // a after b: the pose that puts a point through b first.
 export const compose = (a, b) => [
-  ...[0, 3, 6].flatMap((row) => [0, 1, 2].map((col) => a[row] * b[col] + a[row + 1] * b[col + 3] + a[row + 2] * b[col + 6])),
+  ...[0, 3, 6].flatMap((row) =>
+    [0, 1, 2].map((col) => a[row] * b[col] + a[row + 1] * b[col + 3] + a[row + 2] * b[col + 6]),
+  ),
   a[0] * b[9] + a[1] * b[10] + a[2] * b[11] + a[9],
   a[3] * b[9] + a[4] * b[10] + a[5] * b[11] + a[10],
   a[6] * b[9] + a[7] * b[10] + a[8] * b[11] + a[11],
 ];
 
 export const invert = (m) => [
-  m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8],
+  m[0],
+  m[3],
+  m[6],
+  m[1],
+  m[4],
+  m[7],
+  m[2],
+  m[5],
+  m[8],
   -(m[0] * m[9] + m[3] * m[10] + m[6] * m[11]),
   -(m[1] * m[9] + m[4] * m[10] + m[7] * m[11]),
   -(m[2] * m[9] + m[5] * m[10] + m[8] * m[11]),
@@ -46,11 +56,19 @@ function stageMotion(stage, fraction) {
   const turn = (stage.angle * fraction * Math.PI) / 180;
   const [c, s, t] = [Math.cos(turn), Math.sin(turn), 1 - Math.cos(turn)];
   const turned = [
-    c + ux * ux * t, ux * uy * t - uz * s, ux * uz * t + uy * s,
-    uy * ux * t + uz * s, c + uy * uy * t, uy * uz * t - ux * s,
-    uz * ux * t - uy * s, uz * uy * t + ux * s, c + uz * uz * t,
+    c + ux * ux * t,
+    ux * uy * t - uz * s,
+    ux * uz * t + uy * s,
+    uy * ux * t + uz * s,
+    c + uy * uy * t,
+    uy * uz * t - ux * s,
+    uz * ux * t - uy * s,
+    uz * uy * t + ux * s,
+    c + uz * uz * t,
   ];
-  const shift = [0, 1, 2].map((row) => from[row] - (turned[3 * row] * from[0] + turned[3 * row + 1] * from[1] + turned[3 * row + 2] * from[2]));
+  const shift = [0, 1, 2].map(
+    (row) => from[row] - (turned[3 * row] * from[0] + turned[3 * row + 1] * from[1] + turned[3 * row + 2] * from[2]),
+  );
   return [...turned, ...shift];
 }
 
@@ -74,8 +92,14 @@ export const poseAt = (layers, clock, first = 0) =>
 // The stow planes of what a body's `layers` move, one for each stowing slide: what the slide and the stages inside it
 // carry past `stow` along its `direction` is hidden, so it neither meets anything nor is met. The plane stays in the
 // frame just outside the slide, so its pose leaves out the layers and stages outside it.
-export const stowPlanesOf = (layers) => layers.flatMap((motion, k) => motion.flatMap((stage, s) =>
-  stage.kind === 'slide' && stage.stow !== undefined ? [{ layers: layers.slice(k), first: s, direction: stage.direction, stow: stage.stow }] : []));
+export const stowPlanesOf = (layers) =>
+  layers.flatMap((motion, k) =>
+    motion.flatMap((stage, s) =>
+      stage.kind === 'slide' && stage.stow !== undefined
+        ? [{ layers: layers.slice(k), first: s, direction: stage.direction, stow: stage.stow }]
+        : [],
+    ),
+  );
 
 // The planes that hide what a body's `layers` stow at `clock`, as { normal, constant } in the frame the body's pose
 // carries it into: a point `p` there is shown while `normal . p + constant >= 0`.
@@ -94,7 +118,8 @@ export function stowClips(layers, clock) {
 // part itself is, then carried to the site's position. `lateral` is the index of the axis the reflection flips, and is
 // required: the two frames flip different axes, so a default would mirror one of them wrongly without a word.
 export function motionAtSite(motion, { at, mirror }, lateral) {
-  if (lateral !== AUTHORED_LATERAL && lateral !== MODEL_LATERAL) throw new Error(`motionAtSite: lateral must be AUTHORED_LATERAL or MODEL_LATERAL, not ${lateral}`);
+  if (lateral !== AUTHORED_LATERAL && lateral !== MODEL_LATERAL)
+    throw new Error(`motionAtSite: lateral must be AUTHORED_LATERAL or MODEL_LATERAL, not ${lateral}`);
   const reflect = (point) => point.map((value, axis) => (axis === lateral ? 0 - value : value));
   const shift = (point) => [point[0] + at[0], point[1] + at[1], point[2] + at[2]];
   const along = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -122,7 +147,10 @@ export function motionLayers(site, byId, motionOf) {
 // mirror?, rides? } and `motions` maps a model's id to its motion.
 export function movingSites(sites, motions) {
   const byId = new Map(sites.map((site) => [site.site, site]));
-  const motionOf = (site) => (motions.get(site.model) ? motionAtSite(motions.get(site.model), { at: site.at, mirror: site.mirror }, MODEL_LATERAL) : null);
+  const motionOf = (site) =>
+    motions.get(site.model)
+      ? motionAtSite(motions.get(site.model), { at: site.at, mirror: site.mirror }, MODEL_LATERAL)
+      : null;
   return sites.flatMap((site, index) => {
     const layers = motionLayers(site, byId, motionOf);
     return layers.length > 0 ? [{ index, layers }] : [];

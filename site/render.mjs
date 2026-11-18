@@ -1,14 +1,14 @@
 // The showcase's renderer: loading models and assembled vehicles, posing creatures, lighting and framing. The page
 // (app.js) and the review page (look.mjs) both draw through it, so a review image shows what the showcase shows.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
 import { hideCovered } from './hiding.mjs';
-import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
-import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { boneTransforms } from './kinematics.mjs';
+import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
 import { movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
@@ -27,28 +27,31 @@ export function registerModels(models) {
 // A model, its clips (or null) and facts read from the glTF. Every caller gets its own clone of the scene.
 function load(model) {
   if (!cache.has(model.id)) {
-    cache.set(model.id, (async () => {
-      const [gltf, clips, body] = await Promise.all([
-        loader.loadAsync(`built/${model.file}`),
-        model.clips ? fetch(`built/${model.clips}`).then((r) => r.json()) : null,
-        model.body ? fetch(`built/${model.body}`).then((r) => r.json()) : null,
-      ]);
-      let triangles = 0;
-      const materials = new Map();
-      gltf.scene.traverse((o) => {
-        if (!o.isMesh) return;
-        const g = o.geometry;
-        triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
-        // A primitive with no material gets glTF's default, fully metallic; vertex-coloured mobs want a matte one.
-        if (g.attributes.color && o.material.metalness === 1 && o.material.roughness === 1 && !o.material.name) {
-          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0, roughness: 0.85 });
-        }
-        for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
-      });
-      wearFabrics(gltf.scene);
-      if (model.label) gltf.scene.add(printedLabel(model.label));
-      return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
-    })());
+    cache.set(
+      model.id,
+      (async () => {
+        const [gltf, clips, body] = await Promise.all([
+          loader.loadAsync(`built/${model.file}`),
+          model.clips ? fetch(`built/${model.clips}`).then((r) => r.json()) : null,
+          model.body ? fetch(`built/${model.body}`).then((r) => r.json()) : null,
+        ]);
+        let triangles = 0;
+        const materials = new Map();
+        gltf.scene.traverse((o) => {
+          if (!o.isMesh) return;
+          const g = o.geometry;
+          triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
+          // A primitive with no material gets glTF's default, fully metallic; vertex-coloured mobs want a matte one.
+          if (g.attributes.color && o.material.metalness === 1 && o.material.roughness === 1 && !o.material.name) {
+            o.material = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0, roughness: 0.85 });
+          }
+          for (const m of [o.material].flat()) if (m.name) materials.set(m.name, m);
+        });
+        wearFabrics(gltf.scene);
+        if (model.label) gltf.scene.add(printedLabel(model.label));
+        return { scene: gltf.scene, clips, body, triangles, materials: [...materials.values()] };
+      })(),
+    );
   }
   return cache.get(model.id);
 }
@@ -60,29 +63,34 @@ function load(model) {
 // of the doll is not drawn (hiding.mjs).
 function loadSites(entry) {
   if (!cache.has(entry.id)) {
-    cache.set(entry.id, (async () => {
-      const drawn = (model) => (entry.smoothSites ? smoothEntry(model) : model);
-      const parts = await Promise.all(entry.sites.map((site) => load(drawn(modelsById.get(site.model)))));
-      const scene = new THREE.Group();
-      const materials = new Map();
-      let triangles = 0;
-      const motions = new Map(entry.sites.map(({ model }) => [model, modelsById.get(model).motion]).filter(([, motion]) => motion));
-      const moving = movingSites(entry.sites, motions);
-      const carried = new Set(moving.map(({ index }) => index));
-      entry.sites.forEach((site, i) => {
-        const part = parts[i].scene.clone(true);
-        part.name = site.site ?? site.model;
-        part.position.fromArray(site.at);
-        if (site.turn) part.quaternion.fromArray(site.turn);
-        if (site.mirror) part.scale.setComponent(MIRRORED_AXIS, -1);
-        if (site.paint) repaint(part, site.paint);
-        scene.add(siteNode(part, carried.has(i)));
-        triangles += parts[i].triangles;
-        for (const m of parts[i].materials) materials.set(m.name, m);
-      });
-      hideCovered(scene.children, entry.sites);
-      return { scene, clips: null, body: null, triangles, materials: [...materials.values()], moving };
-    })());
+    cache.set(
+      entry.id,
+      (async () => {
+        const drawn = (model) => (entry.smoothSites ? smoothEntry(model) : model);
+        const parts = await Promise.all(entry.sites.map((site) => load(drawn(modelsById.get(site.model)))));
+        const scene = new THREE.Group();
+        const materials = new Map();
+        let triangles = 0;
+        const motions = new Map(
+          entry.sites.map(({ model }) => [model, modelsById.get(model).motion]).filter(([, motion]) => motion),
+        );
+        const moving = movingSites(entry.sites, motions);
+        const carried = new Set(moving.map(({ index }) => index));
+        entry.sites.forEach((site, i) => {
+          const part = parts[i].scene.clone(true);
+          part.name = site.site ?? site.model;
+          part.position.fromArray(site.at);
+          if (site.turn) part.quaternion.fromArray(site.turn);
+          if (site.mirror) part.scale.setComponent(MIRRORED_AXIS, -1);
+          if (site.paint) repaint(part, site.paint);
+          scene.add(siteNode(part, carried.has(i)));
+          triangles += parts[i].triangles;
+          for (const m of parts[i].materials) materials.set(m.name, m);
+        });
+        hideCovered(scene.children, entry.sites);
+        return { scene, clips: null, body: null, triangles, materials: [...materials.values()], moving };
+      })(),
+    );
   }
   return cache.get(entry.id);
 }
@@ -114,7 +122,10 @@ export function movers(obj, loaded) {
     const materials = new Set();
     if (stowPlanesOf(layers).length > 0) {
       carrier.traverse((o) => {
-        if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map((m) => ownCopy(m, materials)) : ownCopy(o.material, materials);
+        if (o.isMesh)
+          o.material = Array.isArray(o.material)
+            ? o.material.map((m) => ownCopy(m, materials))
+            : ownCopy(o.material, materials);
       });
     }
     return { carrier, layers, materials: [...materials] };
@@ -133,7 +144,9 @@ export function swing(moving, clock) {
     const m = poseAt(layers, clock);
     carrier.matrix.set(m[0], m[1], m[2], m[9], m[3], m[4], m[5], m[10], m[6], m[7], m[8], m[11], 0, 0, 0, 1);
     carrier.matrixWorldNeedsUpdate = true;
-    const planes = stowClips(layers, clock).map(({ normal, constant }) => new THREE.Plane(new THREE.Vector3(...normal), constant));
+    const planes = stowClips(layers, clock).map(
+      ({ normal, constant }) => new THREE.Plane(new THREE.Vector3(...normal), constant),
+    );
     for (const material of materials) material.clippingPlanes = planes;
   }
 }
@@ -180,7 +193,7 @@ function piecesOf(obj, entry) {
 // A site stowed `in` another moves with it, so kit stays in its locker rather than coming apart as a part of its own.
 export function explodable(obj, entry) {
   const pieces = piecesOf(obj, entry);
-  const sites = entry.components ? [] : entry.sites ?? [];
+  const sites = entry.components ? [] : (entry.sites ?? []);
   const index = new Map(sites.map(({ site }, i) => [site, i]));
   const mover = pieces.map((piece, i) => index.get(sites[i]?.in) ?? i);
   const boxes = pieces.map(() => new THREE.Box3());
@@ -207,8 +220,13 @@ export const wornEntry = (entry) => ({ id: `${entry.id} worn`, sites: entry.worn
 // An entry drawn smooth rather than in voxels (docs/decisions/0020-smooth-copy.md): a model as its own smooth copy
 // (models.json's `smooth`), and a vehicle or a worn view as every site's model's copy, so one is never shown half
 // smooth. Mobs and severed parts have no copy.
-export const hasSmooth = (entry) => (isVehicle(entry) ? entry.sites.every(({ model }) => Boolean(modelsById.get(model)?.smooth)) : Boolean(entry.smooth));
-export const smoothEntry = (entry) => ({ ...entry, id: `${entry.id} smooth`, ...(isVehicle(entry) ? { smoothSites: true } : entry.smooth) });
+export const hasSmooth = (entry) =>
+  isVehicle(entry) ? entry.sites.every(({ model }) => Boolean(modelsById.get(model)?.smooth)) : Boolean(entry.smooth);
+export const smoothEntry = (entry) => ({
+  ...entry,
+  id: `${entry.id} smooth`,
+  ...(isVehicle(entry) ? { smoothSites: true } : entry.smooth),
+});
 // What the loose view of a wearable is called: folded when it lies folded.
 export const looseName = (entry) => (entry.tags?.state?.includes('folded') ? 'Folded' : 'Loose');
 
@@ -229,11 +247,16 @@ function printedLabel({ text, at, normal, up, size: [width, height] }) {
     g.font = `bold ${px}px sans-serif`;
     lines = words.reduce((rows, word) => {
       const last = rows.at(-1);
-      if (last !== undefined && g.measureText(`${last} ${word}`).width <= canvas.width - 2 * margin) rows[rows.length - 1] = `${last} ${word}`;
+      if (last !== undefined && g.measureText(`${last} ${word}`).width <= canvas.width - 2 * margin)
+        rows[rows.length - 1] = `${last} ${word}`;
       else rows.push(word);
       return rows;
     }, []);
-    if (lines.every((line) => g.measureText(line).width <= canvas.width - 2 * margin) && lines.length * px * 1.15 <= canvas.height - 2 * margin) break;
+    if (
+      lines.every((line) => g.measureText(line).width <= canvas.width - 2 * margin) &&
+      lines.length * px * 1.15 <= canvas.height - 2 * margin
+    )
+      break;
   }
   g.textAlign = 'center';
   g.textBaseline = 'middle';
@@ -251,9 +274,16 @@ function printedLabel({ text, at, normal, up, size: [width, height] }) {
   map.anisotropy = 4;
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
-    new THREE.MeshStandardMaterial({ map, transparent: true, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2 }),
+    new THREE.MeshStandardMaterial({
+      map,
+      transparent: true,
+      roughness: 0.8,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+    }),
   );
-  const n = new THREE.Vector3(...normal), u = new THREE.Vector3(...up);
+  const n = new THREE.Vector3(...normal),
+    u = new THREE.Vector3(...up);
   mesh.matrixAutoUpdate = false;
   mesh.matrix.makeBasis(new THREE.Vector3().crossVectors(u, n), u, n).setPosition(...at);
   return mesh;
@@ -262,7 +292,8 @@ function printedLabel({ text, at, normal, up, size: [width, height] }) {
 export const clipSet = (clips) => clips?.standing ?? clips?.crawling ?? clips;
 export const playable = (clip) => clip?.kind === 'pose';
 export const initialClip = (clips) => clips.idle ?? clips.walk;
-export const canPose = (model, clips, body) => Boolean(model.body && body && clipSet(clips) && Object.values(clipSet(clips)).some(playable));
+export const canPose = (model, clips, body) =>
+  Boolean(model.body && body && clipSet(clips) && Object.values(clipSet(clips)).some(playable));
 
 export function instance(loaded, model) {
   const scene = loaded.scene.clone(true);
@@ -290,16 +321,29 @@ export function stillInstance(loaded, model) {
 
 export function pose(scene, body, clip, time) {
   if (!playable(clip)) return;
-  const posed = boneTransforms(body.bones, decodeFrame(sampleClip(clip, time))), transforms = body.bones.map((bone) => posed.get(bone.id));
+  const posed = boneTransforms(body.bones, decodeFrame(sampleClip(clip, time))),
+    transforms = body.bones.map((bone) => posed.get(bone.id));
   scene.traverse((o) => {
     if (!o.isMesh || !o.geometry.userData.rest) return;
-    const g = o.geometry, bone = g.attributes.uv1.array, rest = g.userData.rest, restN = g.userData.restNormal, pos = g.attributes.position.array, nor = g.attributes.normal.array;
+    const g = o.geometry,
+      bone = g.attributes.uv1.array,
+      rest = g.userData.rest,
+      restN = g.userData.restNormal,
+      pos = g.attributes.position.array,
+      nor = g.attributes.normal.array;
     for (let v = 0; v < pos.length / 3; v++) {
-      const m = transforms[bone[v * 2]], i = v * 3;
-      for (let axis = 0; axis < 3; axis++) { pos[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * rest[i + c], m.t[axis]); nor[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * restN[i + c], 0); }
+      const m = transforms[bone[v * 2]],
+        i = v * 3;
+      for (let axis = 0; axis < 3; axis++) {
+        pos[i + axis] = m.r
+          .slice(axis * 3, axis * 3 + 3)
+          .reduce((sum, value, c) => sum + value * rest[i + c], m.t[axis]);
+        nor[i + axis] = m.r.slice(axis * 3, axis * 3 + 3).reduce((sum, value, c) => sum + value * restN[i + c], 0);
+      }
     }
     g.attributes.position.needsUpdate = g.attributes.normal.needsUpdate = true;
-    g.computeBoundingSphere(); g.computeBoundingBox();
+    g.computeBoundingSphere();
+    g.computeBoundingBox();
   });
 }
 

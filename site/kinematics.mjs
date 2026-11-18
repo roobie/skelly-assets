@@ -17,28 +17,63 @@ export const scale = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
 export const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 export const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 export const length = (a) => Math.hypot(a[0], a[1], a[2]);
-export const normalize = (a) => { const l = length(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+export const normalize = (a) => {
+  const l = length(a) || 1;
+  return [a[0] / l, a[1] / l, a[2] / l];
+};
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
 // ---- 3×3 matrices ----
 
 export const IDENTITY_M = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-export const mulMM = (a, b) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
-export const mulMV = (m, v) => [m[0] * v[0] + m[1] * v[1] + m[2] * v[2], m[3] * v[0] + m[4] * v[1] + m[5] * v[2], m[6] * v[0] + m[7] * v[1] + m[8] * v[2]];
+export const mulMM = (a, b) =>
+  [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => a[r * 3] * b[c] + a[r * 3 + 1] * b[c + 3] + a[r * 3 + 2] * b[c + 6]));
+export const mulMV = (m, v) => [
+  m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+  m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+  m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
+];
 export const transpose = (m) => [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]];
-export const rotX = (deg) => { const c = Math.cos(deg * DEG), s = Math.sin(deg * DEG); return [1, 0, 0, 0, c, -s, 0, s, c]; };
-export const rotY = (deg) => { const c = Math.cos(deg * DEG), s = Math.sin(deg * DEG); return [c, 0, s, 0, 1, 0, -s, 0, c]; };
-export const rotZ = (deg) => { const c = Math.cos(deg * DEG), s = Math.sin(deg * DEG); return [c, -s, 0, s, c, 0, 0, 0, 1]; };
+export const rotX = (deg) => {
+  const c = Math.cos(deg * DEG),
+    s = Math.sin(deg * DEG);
+  return [1, 0, 0, 0, c, -s, 0, s, c];
+};
+export const rotY = (deg) => {
+  const c = Math.cos(deg * DEG),
+    s = Math.sin(deg * DEG);
+  return [c, 0, s, 0, 1, 0, -s, 0, c];
+};
+export const rotZ = (deg) => {
+  const c = Math.cos(deg * DEG),
+    s = Math.sin(deg * DEG);
+  return [c, -s, 0, s, c, 0, 0, 0, 1];
+};
 
 // Rotation by `deg` about the unit axis.
 export const rotAxis = (axis, deg) => {
-  const [x, y, z] = normalize(axis), c = Math.cos(deg * DEG), s = Math.sin(deg * DEG), t = 1 - c;
-  return [t * x * x + c, t * x * y - s * z, t * x * z + s * y, t * x * y + s * z, t * y * y + c, t * y * z - s * x, t * x * z - s * y, t * y * z + s * x, t * z * z + c];
+  const [x, y, z] = normalize(axis),
+    c = Math.cos(deg * DEG),
+    s = Math.sin(deg * DEG),
+    t = 1 - c;
+  return [
+    t * x * x + c,
+    t * x * y - s * z,
+    t * x * z + s * y,
+    t * x * y + s * z,
+    t * y * y + c,
+    t * y * z - s * x,
+    t * x * z - s * y,
+    t * y * z + s * x,
+    t * z * z + c,
+  ];
 };
 
 // The smallest rotation carrying unit vector `from` onto unit vector `to`.
 export const rotBetween = (from, to) => {
-  const axis = cross(from, to), s = length(axis), c = clamp(dot(from, to), -1, 1);
+  const axis = cross(from, to),
+    s = length(axis),
+    c = clamp(dot(from, to), -1, 1);
   if (s < 1e-9) {
     if (c > 0) return IDENTITY_M;
     // Opposite vectors: a half turn about any axis square to `from`.
@@ -51,7 +86,17 @@ export const rotBetween = (from, to) => {
 // Divided by the quaternion's squared length, so one rounded to a file's few decimals still turns without skewing.
 export const quatToMat3 = ([x, y, z, w]) => {
   const s = 2 / (x * x + y * y + z * z + w * w);
-  return [1 - s * (y * y + z * z), s * (x * y - z * w), s * (x * z + y * w), s * (x * y + z * w), 1 - s * (x * x + z * z), s * (y * z - x * w), s * (x * z - y * w), s * (y * z + x * w), 1 - s * (x * x + y * y)];
+  return [
+    1 - s * (y * y + z * z),
+    s * (x * y - z * w),
+    s * (x * z + y * w),
+    s * (x * y + z * w),
+    1 - s * (x * x + z * z),
+    s * (y * z - x * w),
+    s * (x * z - y * w),
+    s * (y * z + x * w),
+    1 - s * (x * x + y * y),
+  ];
 };
 
 export const mat3ToQuat = (m) => {
@@ -87,14 +132,15 @@ const jointFrame = ({ frame, id }) => {
 // the twist rolls the posed bone about its own length, as a forearm turns the hand, instead of carrying the flexed bone
 // round a cone; its flex is the outer turn because the middle one reads back only within a quarter turn either way, and
 // an elbow closes further than that while such a bone barely abducts (models/poses/rig.libsonnet, `pronates`).
-const localRotation = ({ pronates }, [flex, twist, abduct]) => (pronates
-  ? mulMM(rotX(flex), mulMM(rotZ(abduct), rotY(twist)))
-  : mulMM(rotZ(abduct), mulMM(rotY(twist), rotX(flex))));
+const localRotation = ({ pronates }, [flex, twist, abduct]) =>
+  pronates ? mulMM(rotX(flex), mulMM(rotZ(abduct), rotY(twist))) : mulMM(rotZ(abduct), mulMM(rotY(twist), rotX(flex)));
 
 // The angles whose local rotation is `m`, in degrees.
-const localAngles = ({ pronates }, m) => (pronates
-  ? [Math.atan2(m[7], m[4]), Math.atan2(m[2], m[0]), Math.asin(clamp(-m[1], -1, 1))]
-  : [Math.atan2(m[7], m[8]), Math.asin(clamp(-m[6], -1, 1)), Math.atan2(m[3], m[0])]).map((a) => a / DEG);
+const localAngles = ({ pronates }, m) =>
+  (pronates
+    ? [Math.atan2(m[7], m[4]), Math.atan2(m[2], m[0]), Math.asin(clamp(-m[1], -1, 1))]
+    : [Math.atan2(m[7], m[8]), Math.asin(clamp(-m[6], -1, 1)), Math.atan2(m[3], m[0])]
+  ).map((a) => a / DEG);
 
 export const jointRotation = (bone, angles) => {
   const frame = jointFrame(bone);
@@ -130,7 +176,7 @@ export function boneTransforms(bones, pose) {
   const out = new Map();
   for (const bone of bones) {
     const r = pose.rotations[bone.id] ?? IDENTITY_M;
-    let t = sub(bone.head, mulMV(r, bone.head));
+    const t = sub(bone.head, mulMV(r, bone.head));
     if (bone.parent === null) out.set(bone.id, { r, t: add(t, pose.root) });
     else {
       const parent = out.get(bone.parent);
@@ -144,7 +190,8 @@ export function boneTransforms(bones, pose) {
 // ---- inverse kinematics ----
 
 const boneById = (rig) => new Map(rig.bones.map((bone) => [bone.id, bone]));
-const parentWorld = (transforms, bone) => (bone.parent === null ? { r: IDENTITY_M, t: [0, 0, 0] } : transforms.get(bone.parent));
+const parentWorld = (transforms, bone) =>
+  bone.parent === null ? { r: IDENTITY_M, t: [0, 0, 0] } : transforms.get(bone.parent);
 const withRotation = (pose, id, r) => ({ ...pose, rotations: { ...pose.rotations, [id]: r } });
 
 // A bone's local rotation held to its limits; `report` collects the bones that were held.
@@ -178,13 +225,22 @@ const limbJoints = (start, target, l1, l2, pole) => {
  */
 export function solveTwoBone(rig, pose, [upperId, lowerId], target, pole, report) {
   const bones = boneById(rig);
-  const upper = bones.get(upperId), lower = bones.get(lowerId);
+  const upper = bones.get(upperId),
+    lower = bones.get(lowerId);
   const transforms = boneTransforms(rig.bones, pose);
   const parent = parentWorld(transforms, upper);
   const start = applyPoint(transforms.get(upperId), upper.head);
-  const r1 = normalize(sub(upper.tail, upper.head)), r2 = normalize(sub(lower.tail, lower.head));
-  const { middle, end } = limbJoints(start, target, length(sub(upper.tail, upper.head)), length(sub(lower.tail, lower.head)), mulMV(parent.r, pole));
-  const u1 = normalize(sub(middle, start)), u2 = normalize(sub(end, middle));
+  const r1 = normalize(sub(upper.tail, upper.head)),
+    r2 = normalize(sub(lower.tail, lower.head));
+  const { middle, end } = limbJoints(
+    start,
+    target,
+    length(sub(upper.tail, upper.head)),
+    length(sub(lower.tail, lower.head)),
+    mulMV(parent.r, pole),
+  );
+  const u1 = normalize(sub(middle, start)),
+    u2 = normalize(sub(end, middle));
   // Both bones from an upper world orientation, each held to its limits, with the distance the tail stays short.
   const solve = (upperWorld) => {
     const clamps = [];
