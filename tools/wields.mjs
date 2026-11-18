@@ -482,7 +482,7 @@ const taskHash = (task, bake) =>
  * may prune.
  */
 export function wieldResults(rig, sets, meshOf, { cache, prune = false, shard, bake = bakeHash() } = {}) {
-  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
   const classes = Object.entries(sets).flatMap(([set, { wields, weapons }]) =>
     Object.entries(wields.classes).map(([name, cls]) => {
       const inputs = [rig, wields, name, cls, weapons[name], meshOf];

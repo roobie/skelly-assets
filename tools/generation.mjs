@@ -7,7 +7,7 @@ import { BUILD_ROOT } from './buildDir.mjs';
 
 // Under the build root like the Jsonnet twin store, so an author's builds are incremental without asking.
 // SKELLY_EXPORT_CACHE names another folder, as JSONNET_TWIN_STORE does, so worktrees and users on one host can share
-// a store rather than each regenerating every model (packages/thing-export/src/cache.ts, pruneEntries).
+// a store rather than each regenerating every model (entryFolder.mjs, prune).
 export const DEFAULT_CACHE = process.env.SKELLY_EXPORT_CACHE || join(BUILD_ROOT, 'exports');
 
 // The command line options that choose the cache, as node:util parseArgs takes them.

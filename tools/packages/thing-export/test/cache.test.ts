@@ -1,10 +1,10 @@
-import { chmodSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import process from 'node:process';
+import { basename, join } from 'node:path';
 import type { NeutralModel } from '@skelly/thing-core/schema';
 import { afterEach, describe, expect, it } from 'vitest';
-import { codeFingerprint, entryStore, exportCache, pruneEntries, SHARED_ENTRY_LIFE_MS } from '../src/cache.ts';
+import { TEMPORARY_LIFE_MS } from '../../../entryFolder.mjs';
+import { codeFingerprint, entryStore, exportCache } from '../src/cache.ts';
 import type { RecipeExport } from '../src/recipe.ts';
 
 const folders: string[] = [];
@@ -44,9 +44,9 @@ const countedRow = (inputs: unknown, declare = true) => {
 describe('the export cache', () => {
   it('serves an unchanged row the export it stored, without generating it again', () => {
     const dir = folder();
-    const first = exportCache(dir, 'code').export(countedRow({ size: 1, colour: 'red' }));
+    const first = exportCache(dir, 'thing', 'code').export(countedRow({ size: 1, colour: 'red' }));
     const again = countedRow({ colour: 'red', size: 1 });
-    const served = exportCache(dir, 'code').export(again);
+    const served = exportCache(dir, 'thing', 'code').export(again);
     expect(served.model).toEqual({
       ...first.model,
       glb: Buffer.from(first.model.glb),
@@ -62,14 +62,14 @@ describe('the export cache', () => {
     ['the code', { size: 1 }, 'changed code'],
   ])('generates a row again when %s change', (_name, inputs, code) => {
     const dir = folder();
-    exportCache(dir, 'code').export(countedRow({ size: 1 }));
+    exportCache(dir, 'thing', 'code').export(countedRow({ size: 1 }));
     const changed = countedRow(inputs);
-    exportCache(dir, code).export(changed);
+    exportCache(dir, 'thing', code).export(changed);
     expect(changed.runs).toBe(1);
   });
 
   it('always generates a row that declares no inputs, and gives it no entry', () => {
-    const cache = exportCache(folder(), 'code');
+    const cache = exportCache(folder(), 'thing', 'code');
     const row = countedRow(undefined, false);
     expect(cache.export(row).entry).toBeUndefined();
     cache.export(row);
@@ -78,80 +78,29 @@ describe('the export cache', () => {
 
   it('keeps on pruning only the entries named, every file of each', () => {
     const dir = folder();
-    const kept = exportCache(dir, 'code').export(countedRow({ size: 1 })).entry!.key;
-    exportCache(dir, 'code').export(countedRow({ size: 2 }));
-    pruneEntries(dir, new Set([kept]));
-    expect(readdirSync(dir).sort()).toEqual([`${kept}.glb`, `${kept}.json`, `${kept}.smooth.glb`]);
+    const kept = exportCache(dir, 'thing', 'code').export(countedRow({ size: 1 })).entry!.key;
+    exportCache(dir, 'thing', 'code').export(countedRow({ size: 2 }));
+    entryStore(dir, 'thing', 'code').prune(new Set([kept]));
+    expect(readdirSync(join(dir, 'thing')).sort()).toEqual([`${kept}.glb`, `${kept}.json`, `${kept}.smooth.glb`]);
   });
-});
 
-describe('a shared store', () => {
-  // How a store shared by a group is set up: setgid and group-writable.
-  const sharedFolder = () => {
+  it("leaves another export's file in flight to land, and drops a dead export's", () => {
     const dir = folder();
-    chmodSync(dir, 0o2775);
-    return dir;
-  };
-  const DAY_MS = 24 * 60 * 60 * 1000;
-  const age = (dir: string, key: string, days: number) => {
-    const then = new Date(Date.now() - days * DAY_MS);
-    for (const name of readdirSync(dir).filter((file) => file.startsWith(key))) {
-      utimesSync(join(dir, name), then, then);
-    }
-  };
-  const keys = (dir: string) => [...new Set(readdirSync(dir).map((name) => name.split('.')[0]))].sort();
-
-  it('keeps on pruning the entries used within their life, and drops every file of those older', () => {
-    const dir = sharedFolder();
-    const recent = exportCache(dir, 'code').export(countedRow({ size: 1 })).entry!.key;
-    const old = exportCache(dir, 'code').export(countedRow({ size: 2 })).entry!.key;
-    const kept = exportCache(dir, 'code').export(countedRow({ size: 3 })).entry!.key;
-    age(dir, recent, SHARED_ENTRY_LIFE_MS / DAY_MS - 1);
-    age(dir, old, SHARED_ENTRY_LIFE_MS / DAY_MS + 1);
-    age(dir, kept, SHARED_ENTRY_LIFE_MS / DAY_MS + 1);
-    pruneEntries(dir, new Set([kept]));
-    expect(keys(dir)).toEqual([recent, kept].sort());
-  });
-
-  it('refreshes the age of an entry it serves, so a reused entry outlives its life', () => {
-    const dir = sharedFolder();
-    const { key } = exportCache(dir, 'code').export(countedRow({ size: 1 })).entry!;
-    age(dir, key, SHARED_ENTRY_LIFE_MS / DAY_MS - 1);
-    exportCache(dir, 'code').export(countedRow({ size: 1 }));
-    pruneEntries(dir, new Set(), Date.now() + 2 * DAY_MS);
-    expect(keys(dir)).toEqual([key]);
-  });
-
-  it('gives the group what the owner may do with each folder and file it makes, whatever the umask', () => {
-    const dir = sharedFolder();
-    const umask = process.umask(0o022);
-    try {
-      exportCache(join(dir, 'tool', 'inner'), 'code').export(countedRow({ size: 1 }));
-    } finally {
-      process.umask(umask);
-    }
-    const groupOf = (path: string) => statSync(path).mode & 0o070;
-    expect([groupOf(join(dir, 'tool')), groupOf(join(dir, 'tool', 'inner'))]).toEqual([0o070, 0o070]);
-    for (const name of readdirSync(join(dir, 'tool', 'inner'))) {
-      expect(groupOf(join(dir, 'tool', 'inner', name))).toBe(0o060);
-    }
-  });
-
-  it('leaves a private store to the umask', () => {
-    const dir = folder();
-    const umask = process.umask(0o022);
-    try {
-      exportCache(join(dir, 'tool'), 'code').export(countedRow({ size: 1 }));
-    } finally {
-      process.umask(umask);
-    }
-    expect(statSync(join(dir, 'tool')).mode & 0o070).toBe(0o050);
+    exportCache(dir, 'thing', 'code').export(countedRow({ size: 1 }));
+    const inFlight = join(dir, 'thing', `${'a'.repeat(64)}.glb.1.0.tmp`);
+    const dead = join(dir, 'thing', `${'b'.repeat(64)}.glb.2.0.tmp`);
+    writeFileSync(inFlight, 'landing');
+    writeFileSync(dead, 'abandoned');
+    const then = new Date(Date.now() - TEMPORARY_LIFE_MS - 60_000);
+    utimesSync(dead, then, then);
+    entryStore(dir, 'thing', 'code').prune(new Set());
+    expect(readdirSync(join(dir, 'thing'))).toEqual([basename(inFlight)]);
   });
 });
 
 describe('an entry store', () => {
   it('serves every file of an entry as the bytes it stored', () => {
-    const store = entryStore(folder(), 'code');
+    const store = entryStore(folder(), 'thing', 'code');
     const files = { 'body.json': '{"a":1}', glb: new Uint8Array([1, 2, 3]) };
     store.entry(['body.json', 'glb'], { id: 1 }, () => files);
     const served = store.entry(['body.json', 'glb'], { id: 1 }, () => {

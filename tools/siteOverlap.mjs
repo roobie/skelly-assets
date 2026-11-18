@@ -193,7 +193,7 @@ const taskHash = (task, measure) =>
 // models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as only a run over every
 // vehicle knows them all.
 export function overlapResults({ grain, vehicles }, { cache, prune = false, shard, measure = measureHash() } = {}) {
-  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
   const byHash = new Map();
   for (const [vehicle, { sites }] of Object.entries(vehicles)) {
     const hash = taskHash(measureTask(sites, grain), measure);

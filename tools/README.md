@@ -28,6 +28,15 @@ row file, so each row file compiles on its own into a fragment, in parallel, and
 over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
 twins over it, not every row again, and one run evaluates the catalogue the recipes share once. CI jobs start from
 fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
+A fresh worktree is a fresh checkout too, so worktrees and users on one host can share a store the way they share the
+export cache: `JSONNET_TWIN_STORE` names its folder, and a setgid, group-writable folder keeps every entry some
+checkout's refresh used within an entry life rather than only the entries of the checkout that refreshed last. The
+root itself must be `2775`, since its bits decide sharedness for every kind folder in it, and a kind folder made
+before the root was shared needs the same, or the group could not write there; `entryFolder.mjs` fails naming the
+`chmod` rather than at another user's first write. A shared entry is served to every checkout on its inputs, so a
+refresh stores a unit only if its files still hold the content it was keyed by once the compile has read them: the
+compiler reads them again after the refresh took their keys, and an edit in between would otherwise put one content's
+twin under another's key.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
 late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
 library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would
@@ -140,8 +149,9 @@ costs only a miss. A complete build prunes the entries it did not use, so the ca
 reuse rather than an entry for every edit ever built. Worktrees and users on one host can share a cache, since a
 fresh worktree would otherwise regenerate the whole catalogue: `SKELLY_EXPORT_CACHE` names its folder, and a folder
 that is setgid and group-writable is treated as shared. One build there cannot name the entries the other builds
-still reuse, so a shared cache instead drops an entry no build has used for a week, and the cache gives the group
-the access its owner has to whatever it makes, whatever each user's umask; see `cache.ts`, `pruneEntries`. The
+still reuse, so a shared cache instead drops an entry no build has used for an entry life, and the cache gives the
+group the access its owner has to whatever it makes, whatever each user's umask; see `entryFolder.mjs`,
+`SHARED_ENTRY_LIFE_MS` and `prune`. The
 determinism check builds uncached, since a check that read
 the cache could not show the cache was right. A worker exports a
 row from the task its tool hands it, the row with the slice of its sources the export reads, because loading the whole

@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
+import { entryFolder } from './entryFolder.mjs';
 import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows, smoothPack } from './layout.mjs';
 import { exportLocomotion } from './locomotion.mjs';
@@ -74,9 +75,8 @@ export const exportPool = (cache) => {
     usage: () => ({ ...counts }),
     // Every entry of a tool's cache but those this pool used goes; only a build that ran every row may prune.
     prune: async () => {
-      const { pruneEntries } = await import('./packages/thing-export/src/cache.ts');
       for (const [name, tool] of Object.entries(await recipeTools())) {
-        if (tool.code !== undefined) pruneEntries(join(cache, name), used.get(name) ?? new Set());
+        if (tool.code !== undefined) entryFolder(cache, name).prune(used.get(name) ?? new Set());
       }
     },
   };

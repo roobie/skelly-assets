@@ -146,7 +146,7 @@ export async function restPokeResults(
     const task = garmentTask(garment, shared, files);
     return { garment, task, hash: taskHash(task, checker) };
   });
-  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
   const results = {};
   const missing = [];
   for (const entry of tasks) {
