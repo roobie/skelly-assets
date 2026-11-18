@@ -180,6 +180,36 @@ test("riders of one carrier are swept against each other as they move together, 
   assert.ok(reached(crossed, 'flat', 'crossing') > 0);
 });
 
+// Pinned so that a change meant only to make the sweep faster is caught if it changes what any pair measures: a
+// carrier with a still and a moving rider, a body that shares nothing with them and a part at rest cover pairs that
+// share no layers, that share some and move on both sides, and that share some and stand still on one.
+test('a vehicle of several moving bodies sweeps to its pinned result', () => {
+  const tip = fold(1.1, 1);
+  const hatch = flap(0.6, { open: 120, toward: 'down', y: 1.2 });
+  const result = sweep({ lid, tip, hatch }, [
+    lidSite(),
+    riderOf('tip', tip),
+    site('handle', 'handle', [box('grip', [0.4, 0, 0.5], [0.6, GRAIN, 0.7])], { rides: 'lid' }),
+    site('hatch', 'hatch', hatch.pieces),
+    site('post', 'post', [box('post', [-0.6, 1, -0.2], [-0.5, 1.2, 0.2])]),
+  ]);
+  assert.deepEqual(result, {
+    sites: {
+      lid: { clear: 1, extent: { unit: '°', total: 90 }, contacts: [] },
+      tip: {
+        clear: 0.5673723253286928,
+        extent: null,
+        contacts: [
+          { other: 'hatch', depth: 0.01171875, at: 0.5684368137439436, pieces: ['skin', 'skin'] },
+          { other: 'post', depth: 0.01171875, at: 0.9410077590817452, pieces: ['skin', 'post'] },
+        ],
+      },
+      hatch: { clear: 1, extent: { unit: '°', total: 120 }, contacts: [] },
+    },
+    open: [{ sites: ['tip', 'hatch'], depth: 0.01171875, pieces: ['skin', 'skin'] }],
+  });
+});
+
 test('two lids that clear alone but collide once both are open are caught by the all-open pose', () => {
   const low = flap(1, { open: 20 });
   const high = {
