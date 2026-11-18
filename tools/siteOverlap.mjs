@@ -192,6 +192,15 @@ const taskHash = (task, measure) =>
 // only that shard of the distinct measures is made, so CI can spread a clean build's measures over runners like its
 // models (tools/build.mjs, fillCacheShard). With `prune`, entries no vehicle uses any more go, as only a run over every
 // vehicle knows them all.
+/**
+ * @param {ReturnType<typeof readSitePieces>} pieces
+ * @param {{
+ *   cache?: string | undefined;
+ *   prune?: boolean;
+ *   shard?: import('./generation.mjs').Shard | undefined;
+ *   measure?: string;
+ * }} [options]
+ */
 export function overlapResults({ grain, vehicles }, { cache, prune = false, shard, measure = measureHash() } = {}) {
   const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
   const byHash = new Map();

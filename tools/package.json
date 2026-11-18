@@ -19,6 +19,8 @@
     "prelint": "node sources.mjs && node packages/thing-authoring-tool/test/compile-fixtures.mjs",
     "lint": "biome ci . ../site",
     "fix": "biome check --write . ../site",
+    "pretypecheck": "node sources.mjs",
+    "typecheck": "tsc --noEmit",
     "knip": "knip"
   },
   "dependencies": {
@@ -28,8 +30,11 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
     "@skelly/thing-core": "*",
+    "@types/node": "^26.6.2",
+    "@types/three": "^0.186.0",
     "knip": "6.34.0",
     "playwright": "1.64.0",
+    "typescript": "^7.0.2",
     "valibot": "^1.5.0"
   }
 }

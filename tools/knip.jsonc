@@ -4,10 +4,11 @@
     ".": {
       // Every module here is a CLI run by path or a module the showcase (`site/`, outside this package) or skelly
       // imports, so each is an entry and its exports are a surface whose consumers knip cannot see.
-      // A `.d.mts` types its sibling `.mjs` for TypeScript, which pairs them by name, never by an import; it is an entry
-      // so the packages its types come from count as used.
-      "entry": ["*.mjs", "*.d.mts", "jsonnet/**/*.d.mts", "test/**/*.test.mjs"],
-      "project": ["*.{mjs,ts}", "*.d.mts", "jsonnet/**/*.{mjs,d.mts}", "test/**/*.mjs"],
+      "entry": ["*.mjs", "test/**/*.test.mjs"],
+      "project": ["*.{mjs,ts}", "jsonnet/**/*.mjs", "test/**/*.mjs"],
+      // tsconfig.json maps three to its types for the showcase, so knip reads the tests' runtime imports of three as
+      // imports of the types.
+      "ignoreDependencies": ["three"],
       "ignoreUnresolved": [
         // The skin check imports the showcase's modules in the browser, from the server that serves `site/`.
         "/clearance.mjs",

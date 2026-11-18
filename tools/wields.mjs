@@ -517,6 +517,8 @@ export function wieldResults(rig, sets, meshOf, { cache, prune = false, shard, b
  * Bakes one shard of every wield class into the cache, from `modelOf(id)`, a model's `{ glb, entry }` as a build
  * generates it (tools/build.mjs, fillCacheShard), so the classes are baked by the shards rather than by the build that
  * reads them all back. Every shard reads the doll and every weapon, since each class's key holds the rig and its seat.
+ * @param {(id: string) => Promise<{ glb: Buffer; entry: unknown }>} modelOf
+ * @param {{ root?: string; sets?: WieldSets | undefined; cache: string; shard: import('./generation.mjs').Shard }} options
  */
 export async function wieldShard(modelOf, { root = repo, sets = WIELD_SETS, cache, shard }) {
   // With no set there is nothing to bake, and a root without sets, such as a test's, may have no doll.
@@ -641,12 +643,16 @@ export const WIELD_SETS = {
     doc: GUNS_DOC,
   },
 };
+/** @typedef {Readonly<Record<string, (typeof WIELD_SETS)[keyof typeof WIELD_SETS]>>} WieldSets */
 
 /**
  * Writes the doll's rig and each of `sets` of its baked wields (all of `WIELD_SETS` unless given) into the built tree `out`, whose models
  * `manifest` lists, for a game to play: the rig a clip's frames turn, with each part's site on it, and each set's clips
  * by name. Refuses a set whose frames show any `wieldProblems`. Returns the files written, under their packs, and the
  * manifest's motions entries for them. `cache`, `prune` and `bake` are `wieldResults`'.
+ * @param {string} out
+ * @param {Parameters<typeof treeFiles>[1]} manifest
+ * @param {{ root?: string; sets?: WieldSets; cache?: string | undefined; prune?: boolean; bake?: string }} [options]
  */
 export function exportWields(out, manifest, { root = repo, sets = WIELD_SETS, ...options } = {}) {
   const { rig, doll, meshOf, sets: read } = wieldModels(treeFiles(out, manifest), { root, sets });

@@ -23,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/tools
+      - run: npm run typecheck --prefix tools
       - run: node --test tools/test/*.test.mjs
 
   # Two independent builds, so the check can show the build is deterministic rather than assume it. Unchanged models

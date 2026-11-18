@@ -159,6 +159,19 @@ const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 // pack, path, rig } of each baked clip set; dependsOn: pack -> the packs it depends on; files: every produced file as
 // <pack>/<logical path>; credit: a repo path -> { author, licence }; renames: retired id -> current id; finishes:
 // finish id -> its glTF material; sounds: as soundManifest gives them.
+/**
+ * @param {{
+ *   models: readonly { id: string; pack: string; path: string }[];
+ *   vehicles?: readonly unknown[];
+ *   motions?: readonly unknown[];
+ *   sounds?: readonly unknown[];
+ *   dependsOn?: Readonly<Record<string, readonly string[]>>;
+ *   files: readonly string[];
+ *   credit: unknown;
+ *   renames?: Readonly<Record<string, string>>;
+ *   finishes?: Readonly<Record<string, unknown>>;
+ * }} manifest
+ */
 export function buildManifest({
   models,
   vehicles = [],

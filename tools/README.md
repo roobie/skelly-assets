@@ -6,6 +6,7 @@ read_if:
   - changing how a vehicle, a kit assembly or a model built of components comes apart in an exploded view
   - choosing which unreviewed rows to review first
   - adding a tools package, or changing a package's TypeScript compiler options
+  - typing a tools module, test or showcase module, or importing one from TypeScript
 ---
 
 # Model tools
@@ -17,7 +18,9 @@ output so consumers need no authoring environment. Use `build_models.sh` for ros
 
 The Node version in `.node-version` runs TypeScript directly; see `README.md`, "Node". Every package's
 `tsconfig.json` extends `tsconfig.base.json` and adds only what is its own, so a strict check is turned on once for
-every package instead of drifting between copies. Install the locked dependencies with `npm ci` in `tools/`;
+every package instead of drifting between copies. The tools' own JavaScript, their tests and the showcase carry their
+types as JSDoc in the source, checked by `tsconfig.json` here under the same base, because a hand-kept declaration
+file beside a module drifts from it; see that file's header for how a module opts in. Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
 of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the item

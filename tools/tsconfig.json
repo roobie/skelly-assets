@@ -1,0 +1,18 @@
+// The tools' own modules, their tests and the showcase in `site/`, all JavaScript typed by JSDoc.
+// A file is checked once it opens with `// @ts-check`, so each file meets the packages' strict options whole rather
+// than the program relaxing them: a looser program would also re-check the strict package sources these files import,
+// and those type-check only under the options they are written for. Once every file opts in, `checkJs` replaces the
+// comments.
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // The tools run on the Node of `.node-version`, which ships the ES2024 library.
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    // The showcase loads three from its CDN by import map; the lockfile's three types it.
+    "paths": {
+      "three": ["./node_modules/@types/three"],
+      "three/addons/*": ["./node_modules/@types/three/examples/jsm/*"]
+    }
+  },
+  "include": ["*.mjs", "*.ts", "jsonnet/**/*.mjs", "test/**/*.mjs", "../site/**/*.mjs", "../site/**/*.js"]
+}
