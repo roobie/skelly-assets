@@ -191,7 +191,10 @@ function renderShelves() {
       b.type = 'button';
       b.dataset.shelf = name;
       b.title = taxonomy.categories[name] ?? shelfTitles[name] ?? '';
-      b.append(shelfLabel(name), Object.assign(document.createElement('span'), { textContent: counts.get(name) }));
+      b.append(
+        shelfLabel(name),
+        Object.assign(document.createElement('span'), { className: 'chip-count', textContent: counts.get(name) }),
+      );
       b.onclick = () => pickShelf(name);
       return b;
     }),

@@ -131,15 +131,16 @@ h3 {
   color: var(--bg);
   border-color: var(--text);
 }
-.chip span {
+.chip-count {
   color: var(--muted);
   margin-left: 4px;
 }
-.chip[aria-pressed="true"] span {
+.chip[aria-pressed="true"] .chip-count {
   color: inherit;
   opacity: 0.7;
 }
 .facets {
+  flex: 1 1 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -224,14 +225,14 @@ h3 {
   font-size: 13px;
   cursor: pointer;
 }
-.combo-option span {
+.combo-detail {
   color: var(--muted);
 }
 .combo-option[aria-selected="true"] {
   background: var(--accent);
   color: var(--accent-text);
 }
-.combo-option[aria-selected="true"] span {
+.combo-option[aria-selected="true"] .combo-detail {
   color: inherit;
   opacity: 0.8;
 }
@@ -268,9 +269,6 @@ h3 {
 }
 .facets-toggle[aria-expanded="false"] ~ .facets {
   display: none;
-}
-.facets {
-  flex: 1 1 100%;
 }
 
 .grid {
@@ -563,8 +561,8 @@ dialog::backdrop {
   content: "▸";
   color: var(--muted);
 }
-.metadata details[open] > summary::before,
-.metadata[open] > summary::before {
+.metadata[open] > summary::before,
+.metadata details[open] > summary::before {
   content: "▾";
 }
 .parts {

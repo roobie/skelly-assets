@@ -106,7 +106,7 @@ export function makeCombobox({ label, title = '', suggest, textOf, onChange }) {
           'li',
           { id: `${id}-opt-${i}`, className: 'combo-option', title: o.title ?? '' },
           o.text,
-          ...(o.detail === undefined ? [] : [element('span', { textContent: o.detail })]),
+          ...(o.detail === undefined ? [] : [element('span', { className: 'combo-detail', textContent: o.detail })]),
         );
         li.setAttribute('role', 'option');
         li.setAttribute('aria-selected', 'false');
