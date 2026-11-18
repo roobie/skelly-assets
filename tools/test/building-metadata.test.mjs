@@ -527,7 +527,7 @@ test('metadata-only edits change model cache keys without changing either GLB', 
     const row = recipe.find(({ source }) => source === item.id);
     const { items: _items, ...settings } = catalogue;
     const recipeOf = (source) => loadThingRecipe([row], loadCatalogue({ ...settings, items: [source] }))[0];
-    const cache = exportCache(root, 'fixture-code');
+    const cache = exportCache(root, 'thing', 'fixture-code');
     const first = cache.export(recipeOf(item));
     assert.equal(first.entry.reused, false);
     const warm = cache.export(recipeOf(item));
