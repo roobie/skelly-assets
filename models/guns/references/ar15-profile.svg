@@ -2,12 +2,13 @@
 <path id="barrel" stroke="#db2763" d="M857,96 L903,96 M857,112 L903,112"/>
 <path id="handguard" stroke="#ee7400" d="M538,79 L857,79 L857,120 L580,120 L580,127 L545,127 L538,124 L538,79"/>
 <path id="handguard-rail" stroke="#007e87" d="M538,79 L800,79 L800,77 L857,77"/>
-<path id="upper-rail" stroke="#007e87" d="M376,75 L537,75"/>
-<path id="upper-receiver" stroke="#147cf3" d="M376,75 L537,75 L537,124 L376,121 L370,106 L370,86 L376,86 L376,75"/>
+<path id="upper-rail" stroke="#007e87" d="M386,75 L537,75"/>
+<path id="upper-receiver" stroke="#147cf3" d="M386,75 L537,75 L537,124 L376,121 L381,88 L386,88 L386,75"/>
 <path id="charging-handle" stroke="#9342bd" d="M375,78 L389,78 L389,87 L375,87 L375,78"/>
-<path id="forward-assist" stroke="#9342bd" d="M443,84 L459,84 L459,94 L443,94 L443,84"/>
-<path id="ejection-port" stroke="#9342bd" d="M459,110 L529,110 L529,121 L459,121 L459,110"/>
-<path id="brass-deflector" stroke="#9342bd" d="M527,85 L535,85 L535,100 L527,100 L527,85"/>
+<path id="forward-assist" stroke="#9342bd" d="M372,92 L425,93 L435,98 L433,105 L425,107 L372,107 L372,92"/>
+<path id="brass-deflector" stroke="#9342bd" d="M443,97 L443,86 L447,84 L463,84 L467,90 L467,97 L443,97"/>
+<path id="ejection-port-cover" stroke="#9342bd" d="M459,110 L529,110 L529,121 L459,121 L459,110"/>
+<path id="upper-front-boss" stroke="#9342bd" d="M527,85 L535,85 L535,100 L527,100 L527,85"/>
 <path id="lower-receiver" stroke="#147cf3" d="M370,106 L376,121 L526,124 L526,160 L469,170 L467,145 L380,145 L370,132 L370,106"/>
 <path id="takedown-pin" stroke="#007e87" d="M390,118 L396,118 L396,124 L390,124 L390,118"/>
 <path id="pivot-pin" stroke="#007e87" d="M529,118 L535,118 L535,124 L529,124 L529,118"/>

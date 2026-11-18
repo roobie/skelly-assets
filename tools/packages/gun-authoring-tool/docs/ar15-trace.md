@@ -18,13 +18,13 @@ The profile photograph is a catalogue image of a named commercial rifle whose li
 
 The receiver close-up has no published dimensions of its own. The Picatinny slot pitch is a standard dimension that appears many times along the rail, so it calibrates the close-up without depending on the receiver's maker. One pitch is the calibration because the record requires a sourced length; the eleven-pitch span is a comparison that shows how far a single pick strays from the mean.
 
-The takedown-to-pivot pin spacing is compared, not used to calibrate, because its only located source is owner discussion of drawings rather than a published print. Both photographs read a few percent long against it; whether that is perspective, the source or picking is unresolved.
+The takedown-to-pivot pin spacing is compared, not used to calibrate, because its only located source is owner discussion of drawings rather than a published print. Both photographs read about 3% long against it. Picking cannot explain that: the close-up resolves the pin heads to a few pixels and its rail scale holds to 0.05% over eleven pitches. Perspective between the rail and the receiver flats explains under 1%. What remains is the forum figure itself or lens magnification towards the frame edges, where the pins sit; neither can be settled from these photographs, which is why the spacing stays a comparison.
 
 ## Silhouette interpretation
 
 Both photographs show the ejection-port side. Control placement on the other side is not established by either. The close-up's rifle carries optional parts: an extended charging-handle latch, an enlarged trigger guard, an aftermarket grip and ambidextrous controls. These are left untraced because the reference must describe the standard rifle the options attach to; the profile photograph supplies the standard grip, guard and charging handle instead.
 
-The free-float handguard hides the gas block and barrel nut, so gas system length and block position are unknown, not assumed. The upper receiver's rear face against the buffer tower is shadowed in the close-up, so that boundary stays an open path.
+The free-float handguard hides the gas block and barrel nut, so gas system length and block position are unknown, not assumed. The upper receiver's rear face against the buffer tower is hidden by the forward-assist plunger and shadow in the close-up, so that boundary stays an open path. In the profile the charging handle hides the same face, so its position there is carried over from the close-up's proportions rather than picked.
 
 ## Module boundaries
 

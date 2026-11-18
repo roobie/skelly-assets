@@ -1,12 +1,15 @@
 local photo = 'https://www.jakt.se/product-images/XL/anderson-am-15-utility-223-wylde-18-5rd-0.jpg';
 local listing = 'https://www.jakt.se/anderson-am-15-utility-223-wylde-18-5rd';
 local picatinny = 'https://en.wikipedia.org/wiki/Picatinny_rail';
-local pinSpacing = 'https://www.ar15.com/forums/ar-15/Take_Down_Pin_Spacing/118-414464/';
+local pinSource = 'https://www.ar15.com/forums/ar-15/Take_Down_Pin_Spacing/118-414464/';
 local sourced(value, source) = { kind: 'sourced', value: value, source: source };
 local derived(value, reason) = { kind: 'derived', value: value, reason: reason };
 local unknown(reason) = { kind: 'unknown', reason: reason };
 local feature(paths) = { kind: 'derived', paths: paths };
 local railPitch = sourced(10.01, picatinny);
+local handguard = sourced(381, listing);
+local pinSpacing6375 = sourced(161.9, pinSource);
+local pinSpacing6347 = sourced(161.2, pinSource);
 local pinPixels = derived([[393, 121], [532, 121]], 'Takedown and pivot pin heads, each only a few pixels across at this resolution');
 {
   title: 'AR-15 rifle provisional profile',
@@ -14,14 +17,16 @@ local pinPixels = derived([[393, 121], [532, 121]], 'Takedown and pivot pin head
   values: {
     photoWidthPx: sourced(1032, photo),
     photoHeightPx: sourced(325, photo),
-    handguardMm: sourced(381, listing),
+    handguardMm: handguard,
     barrelMm: sourced(457, listing),
     railPitchMm: railPitch,
-    pinSpacingColtMm: sourced(161.9, pinSpacing),
-    pinSpacingLblMm: sourced(161.2, pinSpacing),
+    pinSpacing6375Mm: pinSpacing6375,
+    pinSpacing6347Mm: pinSpacing6347,
     contourAllowancePx: derived(2, 'Manual visible-edge picking on a 1032 px product image'),
     boreYPx: derived(104, 'Barrel and muzzle-brake centreline; the receiver extension centre reads about 101'),
     registrationXPx: derived(538, 'Upper front face meeting the handguard rear skirt'),
+    upperRearXPx: derived(381, 'Charging handle and shadow hide the upper rear face; placed from the receiver close-up, where the rail starts about 12 mm ahead of the handle rear'),
+    portBandAboveCover: unknown('Dark band with a bright detail above the traced port cover; open port or upper flat is not resolved at this resolution'),
     gasBlockPositionMm: unknown('Low-profile adjustable block hidden inside the free-float handguard'),
     gasSystemLengthMm: unknown('Port position not visible; the listing does not state it'),
     barrelBreechPx: unknown('Barrel extension and nut hidden by receiver and handguard, so the sourced barrel length cannot be measured'),
@@ -29,11 +34,11 @@ local pinPixels = derived([[393, 121], [532, 121]], 'Takedown and pivot pin head
     systematicScaleError: unknown('Nominal handguard length may differ from its visible span; product-shot lens perspective is unknown'),
   },
   reference: {
-    id: 'anderson-am15-utility-side-profile',
+    id: 'ar15-whole-rifle-side-profile',
     svg: 'ar15-profile.svg',
     calibration: {
       pixels: derived([[538, 79], [857, 79]], 'Visible handguard rear skirt to front face along its top edge'),
-      lengthMm: sourced(381, listing),
+      lengthMm: handguard,
     },
     allowancePercent: derived(5, 'Registration/perspective authoring allowance at product-image resolution, not a statistical confidence interval'),
     comparisons: {
@@ -41,14 +46,14 @@ local pinPixels = derived([[393, 121], [532, 121]], 'Takedown and pivot pin head
         pixels: derived([[433, 76], [514, 76]], 'Ten upper-rail tooth pitches, each about 8 px wide'),
         lengthMm: derived(10 * railPitch.value, 'Ten sourced Picatinny slot pitches'),
       },
-      pinSpacingColt: { pixels: pinPixels, lengthMm: sourced(161.9, pinSpacing) },
-      pinSpacingLbl: { pixels: pinPixels, lengthMm: sourced(161.2, pinSpacing) },
+      pinSpacing6375: { pixels: pinPixels, lengthMm: pinSpacing6375 },
+      pinSpacing6347: { pixels: pinPixels, lengthMm: pinSpacing6347 },
     },
     landmarks: {
       boreAxis: derived([[284, 104], [976, 104]], 'Provisional bore datum through barrel and brake'),
-      topRailLine: derived([[376, 75], [857, 77]], 'Rail top, upper and handguard; handguard rail sits about 2 px lower except the raised front section'),
+      topRailLine: derived([[386, 75], [857, 77]], 'Rail top, upper and handguard; handguard rail sits about 2 px lower except the raised front section'),
       moduleStockToReceiverExtension: derived([[284, 86], [284, 121]], 'Module boundary: stock front face slides on the receiver extension'),
-      moduleReceiverExtensionToLower: derived([[357, 86], [370, 117]], 'Module boundary: castle nut and end plate against the lower buffer tower'),
+      moduleReceiverExtensionToLower: derived([[370, 86], [370, 117]], 'Module boundary: end plate against the lower buffer tower'),
       moduleUpperLowerParting: derived([[376, 121], [537, 124]], 'Module boundary: upper/lower parting line between the pins'),
       moduleUpperToHandguard: derived([[538, 79], [538, 127]], 'Module boundary: upper front face, barrel nut under the handguard skirt'),
       moduleBarrelToMuzzle: derived([[903, 94], [903, 114]], 'Module boundary: muzzle thread shoulder behind the brake'),
@@ -66,8 +71,9 @@ local pinPixels = derived([[393, 121], [532, 121]], 'Takedown and pivot pin head
       upperReceiver: feature(['upper-receiver']),
       chargingHandle: feature(['charging-handle']),
       forwardAssist: feature(['forward-assist']),
-      ejectionPort: feature(['ejection-port']),
       brassDeflector: feature(['brass-deflector']),
+      ejectionPortCover: feature(['ejection-port-cover']),
+      upperFrontBoss: feature(['upper-front-boss']),
       lowerReceiver: feature(['lower-receiver']),
       takedownPin: feature(['takedown-pin']),
       pivotPin: feature(['pivot-pin']),
