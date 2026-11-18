@@ -89,5 +89,13 @@ leaper's does. It stays standalone like the leaper and
 shares only clip plumbing with it. See `src/mob/walker/plan.ts`, `WALKER_TEMPLATE`;
 `src/mob/walker/motion.ts`, `walkerAngles`; and `src/mob/keyframes.ts`, `groundedFrame`.
 
+The walker's damage shows on the body it is built as. Each part is plate owned by one bone, and each joint's
+drum belongs to the bone below it, so a lost foot is a cut at the foot: the game hides it as it hides any cut
+part, and the tarsus is left as a clean stump. A separate damaged-leg model would carry a second boss mesh for
+one missing bone. The limp sets that stump down on the ground, so the leg solver needs only a lower target
+for it, not a second solver. Which hits rock the walker, and how far, are content in
+`models/mobs/walker/damage.jsonnet`, since a mod tunes them with its weapons. See `src/mob/walker/motion.ts`,
+`walkerStumps`.
+
 Population-quality assertions belong in explicit sweeps because they measure distributions rather than an
 individual body's contract. See `test/sweeps.ts`, `sweepGroup`, and `src/cli/stats.ts`.
