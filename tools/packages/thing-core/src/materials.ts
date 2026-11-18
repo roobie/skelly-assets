@@ -1,3 +1,4 @@
+import { SurfaceSchema } from '@skelly/surfaces/schema';
 import {
   check,
   finite,
@@ -56,6 +57,11 @@ const FinishSchema = pipe(
     sheen: optional(strictObject({ colour: Colour, roughness: Fraction })),
     fabric: optional(FabricSchema),
     /**
+     * A shader-drawn surface, such as bark or leaves, read by a game's renderer from the export's extras. The why is
+     * in `docs/decisions/0022-surface-shaders.md`, "Decision".
+     */
+    surface: optional(SurfaceSchema),
+    /**
      * A clear layer over the paint for renderers that can draw one. `metallic` replaces the finish's own under
      * the coat, because an uncoated finish may fake its gloss with metalness; the finish's own serves the rest.
      */
@@ -65,12 +71,17 @@ const FinishSchema = pipe(
     ({ fabric, metallic, sheen }) => fabric === undefined || (metallic === 0 && sheen !== undefined),
     'a fabric finish is not metallic and has a sheen, since fibres scatter rather than mirror the light',
   ),
+  check(
+    ({ fabric, surface }) => fabric === undefined || surface === undefined,
+    'a finish takes a fabric or a surface, not both, since each draws the whole surface',
+  ),
 );
 export const MaterialSchema = strictObject({ colour: Colour, finish: FinishSchema });
 
 export const MATERIALS = parse(record(string(), MaterialSchema), content);
 export type MaterialDef = InferOutput<typeof MaterialSchema>;
 export type FabricDef = NonNullable<MaterialDef['finish']['fabric']>;
+export type SurfaceDef = NonNullable<MaterialDef['finish']['surface']>;
 
 /**
  * How every renderer draws a finish's see-through, sheen and coat, so a model looks the same in each. A see-through
