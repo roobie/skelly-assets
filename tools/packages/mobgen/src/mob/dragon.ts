@@ -524,7 +524,7 @@ registerBodyPlan('dragon', {
 // ---- Poses ----
 
 /** How the clips move, as data. Harmonics are of a cycle (integers, so a loop closes); angles in degrees, lengths in metres. */
-export const DRAGON_MOTION = {
+const DRAGON_MOTION = {
   stanceShare: 0.58, // the share of a cycle each hind foot spends planted
   tailLagRad: 0.5, // phase lag of each tail segment behind the one above it
   neckLagRad: 0.6, // phase lag of each neck segment's sway behind the one below it
@@ -547,7 +547,7 @@ export const DRAGON_MOTION = {
 } as const;
 
 /** The channels of a pose, degrees unless noted. Absent is 0. */
-export type DragonChannels = Readonly<
+type DragonChannels = Readonly<
   Partial<
     Record<
       | 'rise' // m

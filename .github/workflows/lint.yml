@@ -1,6 +1,6 @@
 name: lint
 
-# Biome over tools/: formatting, lint and import order (see tools/biome.jsonc).
+# Biome over tools/: formatting, lint and import order (see tools/biome.jsonc); then knip, for dead code.
 
 on:
   push:
@@ -37,3 +37,4 @@ jobs:
       - run: npm ci
       # The npm script runs the lockfile's @biomejs/biome; `npx biome` could fall back to the unrelated `biome` package.
       - run: npm run lint -- --reporter=github
+      - run: npm run knip

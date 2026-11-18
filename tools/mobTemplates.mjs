@@ -3,19 +3,19 @@
 import { installJsonnetSources } from './sources.mjs';
 
 await installJsonnetSources();
-const src = (path) => `./packages/mobgen/src/${path}`;
-const { consumableTemplate, registerTemplate } = await import(src('core/template.ts'));
-await import(src('mob/templates.ts'));
-await import(src('mob/acidTemplate.ts'));
-await import(src('mob/fusedMassTemplate.ts'));
-await import(src('mob/quadrupedTemplate.ts'));
-await import(src('mob/critterTemplate.ts'));
-await import(src('mob/insectTemplate.ts'));
-await import(src('mob/floaterTemplate.ts'));
-await import(src('mob/dragonTemplate.ts'));
-await import(src('mob/skeletonTemplate.ts'));
-await import(src('mob/leaper/plan.ts'));
-await import(src('mob/walker/plan.ts'));
+// Literal specifiers, so static analysis such as knip sees which templates a mob row can name.
+const { consumableTemplate, registerTemplate } = await import('./packages/mobgen/src/core/template.ts');
+await import('./packages/mobgen/src/mob/templates.ts');
+await import('./packages/mobgen/src/mob/acidTemplate.ts');
+await import('./packages/mobgen/src/mob/fusedMassTemplate.ts');
+await import('./packages/mobgen/src/mob/quadrupedTemplate.ts');
+await import('./packages/mobgen/src/mob/critterTemplate.ts');
+await import('./packages/mobgen/src/mob/insectTemplate.ts');
+await import('./packages/mobgen/src/mob/floaterTemplate.ts');
+await import('./packages/mobgen/src/mob/dragonTemplate.ts');
+await import('./packages/mobgen/src/mob/skeletonTemplate.ts');
+await import('./packages/mobgen/src/mob/leaper/plan.ts');
+await import('./packages/mobgen/src/mob/walker/plan.ts');
 
 const hex = (colour) =>
   typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour;

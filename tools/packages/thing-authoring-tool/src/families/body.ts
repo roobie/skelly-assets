@@ -47,7 +47,7 @@ interface Oval extends Omit<Footprint, 'chamfer'> {
  * A superellipse of `sides` points, `halfU` along the first profile coordinate and `halfV` along the second, as a
  * convex counterclockwise profile. Body masses are rounded, so a limb or a skull reads as flesh rather than a crate.
  */
-export const ovalProfile = (halfU: number, halfV: number, { power = 2.6, sides = 16, cu = 0, cv = 0 } = {}): Vec2[] =>
+const ovalProfile = (halfU: number, halfV: number, { power = 2.6, sides = 16, cu = 0, cv = 0 } = {}): Vec2[] =>
   Array.from({ length: sides }, (_, i): Vec2 => {
     const a = (2 * Math.PI * i) / sides;
     const shape = (t: number) => Math.sign(t) * Math.abs(t) ** (2 / power);

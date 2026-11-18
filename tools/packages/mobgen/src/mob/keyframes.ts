@@ -10,7 +10,7 @@ import { lerp } from '../core/math.ts';
 import type { EulerDeg, Pose } from '../core/pose.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../core/voxelBounds.ts';
 
-export type Key = readonly [number, EulerDeg];
+type Key = readonly [number, EulerDeg];
 export type Track = readonly Key[];
 export type Angles = Record<string, EulerDeg>;
 /** A scalar over the clip, as [time, value] keys. */
@@ -19,7 +19,7 @@ export type ScalarKeys = readonly (readonly [number, number])[];
 const ease = (t: number): number => t * t * (3 - 2 * t);
 
 /** The eased value of `track` at `u`; a looping track wraps, and its last key should repeat its first. */
-export const sample = (track: Track, u: number): EulerDeg => {
+const sample = (track: Track, u: number): EulerDeg => {
   const first = track[0]!;
   if (u <= first[0]) {
     return first[1];
@@ -48,7 +48,7 @@ export interface Channel {
 }
 
 /** Mirrored sides share flex; twist and abduct change sign, as the rigs' joint frames are built to. */
-export const mirror = ([flex, twist, abduct]: EulerDeg): EulerDeg => [flex, -twist, -abduct];
+const mirror = ([flex, twist, abduct]: EulerDeg): EulerDeg => [flex, -twist, -abduct];
 const SIDE_SWAP: Readonly<Record<string, string>> = { L: 'R', R: 'L' };
 export const otherSide = (id: string): string => {
   const [name, side] = id.split('.');
@@ -103,7 +103,7 @@ export const channelAngles = (clip: ClipDef, u: number, mirrored = false): Angle
   return angles;
 };
 
-export const posed = (bones: readonly Bone[], angles: Angles, root: Pose['root']): Pose => ({
+const posed = (bones: readonly Bone[], angles: Angles, root: Pose['root']): Pose => ({
   root,
   rotations: Object.fromEntries(
     bones.filter((bone) => angles[bone.id]).map((bone) => [bone.id, jointRotation(bone, angles[bone.id]!)]),

@@ -1,13 +1,10 @@
 import type { VehicleBlueprintInput } from '../../src/export.ts';
 
-export const FRAME = 'vat_fx_frame';
+const FRAME = 'vat_fx_frame';
 export const PANEL = 'vat_fx_panel';
-export const FLOOR = 'vat_fx_floor';
-export const CARGO = 'vat_fx_cargo';
-/** The panel model's datum: a nonzero local z, so a mirror cannot pass by negating the vehicle coordinate. */
-export const DATUM = 'mark';
-export const DATUM_LOCAL: readonly [number, number, number] = [0.1, 0.2, 0.3];
-export const MOUNT = 'vat_fx_mount';
+const FLOOR = 'vat_fx_floor';
+const CARGO = 'vat_fx_cargo';
+const MOUNT = 'vat_fx_mount';
 export const serviceFor = (name: string, durationSimSeconds = 30) => ({
   name,
   mount: MOUNT,

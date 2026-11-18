@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "workspaces": {
+    ".": {
+      // Every module here is a CLI run by path or a module the showcase (`site/`, outside this package) or skelly
+      // imports, so each is an entry and its exports are a surface whose consumers knip cannot see.
+      "entry": ["*.mjs", "test/**/*.test.mjs"],
+      // A `.d.mts` types its sibling `.mjs` for TypeScript, which pairs them by name, never by an import.
+      "project": ["*.{mjs,ts}", "jsonnet/**/*.mjs", "test/**/*.mjs"],
+      "ignoreUnresolved": [
+        // The skin check imports the showcase's modules in the browser, from the server that serves `site/`.
+        "/clearance.mjs",
+        "/skin.mjs"
+      ]
+    },
+    "packages/mobgen": {
+      // The script of `stress.html`, the Vite build's second page; knip reads only `index.html` for scripts.
+      "entry": ["src/viewer/stress.ts"]
+    },
+    "packages/thing-authoring-tool": {
+      // Run by hand to write the skin fixture's exports; see `README.md`.
+      "entry": ["test/export-skin-fixture.ts"]
+    },
+    "packages/vehicle-authoring-tool": {
+      // The dev server imports the endpoints by a computed URL; see `vite.config.ts`, `vehicleEndpoints`.
+      "entry": ["server/vehicleApi.mjs"]
+    }
+  }
+}

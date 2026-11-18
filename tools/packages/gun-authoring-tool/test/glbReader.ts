@@ -28,7 +28,7 @@ export interface GltfJson {
   extras?: Record<string, unknown>;
 }
 
-export interface GltfPrimitive {
+interface GltfPrimitive {
   attributes: { POSITION: number; NORMAL: number };
   indices: number;
   material: number;

@@ -1,14 +1,14 @@
 import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 
 /** What the dev server's `/api/vehicles` and `/api/solve` answer: the build checker's verdicts and the proposer's fix. */
-export interface SwingContact {
+interface SwingContact {
   readonly other: string;
   readonly depth: number;
   readonly allowed: boolean;
   readonly message?: string;
 }
 
-export type SwingStatus = 'clear' | 'judged' | 'fails';
+type SwingStatus = 'clear' | 'judged' | 'fails';
 
 export interface SiteVerdict {
   readonly part: string;

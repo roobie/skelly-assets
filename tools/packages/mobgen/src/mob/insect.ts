@@ -77,7 +77,7 @@ export const INSECT_ANT_DEFAULTS = {
 const WAIST_STALK = { radius: 0.2, overlap: 0.15 } as const;
 
 /** Everything is metres only after multiplying by the `height` param; z is negative forward. */
-export const INSECT_LAYOUT = {
+const INSECT_LAYOUT = {
   /** Centre height of the carapace slab, its half thickness and half width (times girth). */
   shellY: 0.74,
   shellHalfThickness: 0.27,
@@ -405,7 +405,7 @@ registerBodyPlan('insect', {
 // ---- Pose, gait, attack and idle ----
 
 /** The walk: the amplitude of a foot's fore-aft sweep and how high a swinging foot lifts, in `height`s, and the body's small waddle (degrees). */
-export const INSECT_GAIT = {
+const INSECT_GAIT = {
   sweepPerHeight: 0.85,
   liftPerHeight: 0.35,
   rollDeg: 2,
@@ -416,7 +416,7 @@ export const INSECT_GAIT = {
 } as const;
 
 /** The idle: how far a feeler flicks (degrees about the vertical, and the rise) and how far the jaws part. */
-export const INSECT_IDLE = { antennaYawDeg: 14, antennaTipYawDeg: 22, antennaRiseDeg: 5, mandibleDeg: 6 } as const;
+const INSECT_IDLE = { antennaYawDeg: 14, antennaTipYawDeg: 22, antennaRiseDeg: 5, mandibleDeg: 6 } as const;
 
 /** Tripods, the legs that step together: front-left, middle-right and hind-left, then the other three. */
 const TRIPOD_A: readonly string[] = ['F.L', 'M.R', 'H.L'];
@@ -442,7 +442,7 @@ const addRotation = (rotations: Record<string, Mat3>, bone: string, delta: Mat3)
 };
 
 /** The rest stance: all six feet down, the feelers forward and up, the jaws a little apart. */
-export const insectPose = (realized: Realized, stance: { readonly mandibleOpen?: number } = {}): Pose => {
+const insectPose = (realized: Realized, stance: { readonly mandibleOpen?: number } = {}): Pose => {
   const rotations: Record<string, Mat3> = {};
   const open = stance.mandibleOpen ?? 0;
   addRotation(rotations, 'mandible.L', rotY(open));

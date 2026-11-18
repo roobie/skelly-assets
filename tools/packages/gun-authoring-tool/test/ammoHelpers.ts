@@ -5,7 +5,7 @@ import { formatCartridgeParseError, parseCartridge, parseCartridgeJson } from '.
 import type { CartridgeIssue } from '../src/ammo/rules.ts';
 import { CARTRIDGES } from '../src/cli/content.ts';
 
-export const CARTRIDGE_FIXTURES = join(import.meta.dirname, 'fixtures', 'cartridges');
+const CARTRIDGE_FIXTURES = join(import.meta.dirname, 'fixtures', 'cartridges');
 
 /** Plain JSON, as read from a file, before the parser has seen it. */
 export type Json = null | boolean | number | string | Json[] | JsonObject;
@@ -217,7 +217,7 @@ const walk = (root: Json, segments: readonly string[]): Json => {
 };
 
 /** Whether `path` leads to a field of `root`, a field holding null included. */
-export const hasPath = (root: JsonObject, path: string): boolean => {
+const hasPath = (root: JsonObject, path: string): boolean => {
   let node: Json = root;
   for (const segment of tokens(path)) {
     if (node === null || typeof node !== 'object' || !(segment in node)) {
