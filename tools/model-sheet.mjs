@@ -5,11 +5,12 @@
 // is the showcase's own: this builds the showcase from the tree and drives its review page (site/look.mjs) in headless
 // Chromium.
 // Usage: node tools/model-sheet.mjs [--built built] [--out look/sheet] [--size 256] [--vehicles] [--assemblies]
-//   [--views review|underside] [--sites prefix,...] [--open] [id ...]
+//   [--views review|underside] [--sites prefix,...] [--open] [--smooth] [id ...]
 // With no ids and no flag it draws everything. A vehicle is assembled from its built placements, and an assembly
 // (tools/assemblies.mjs) from its kit, on its own so its own parts come apart about its own centre. `--views` picks
 // the tile's view set and `--sites` keeps only a vehicle's or an assembly's sites starting with a prefix
-// (site/lookOptions.mjs), so parts a body hides can be drawn on their own, and `--open` draws what opens at its stop.
+// (site/lookOptions.mjs), so parts a body hides can be drawn on their own, `--open` draws what opens at its stop, and
+// `--smooth` draws the smooth copy (docs/decisions/0020-smooth-copy.md), so a model's two forms compare from one camera.
 // Writes <out>/tiles/<id>.png, <out>/sheet.json and <out>/index.html; rows of earlier looks into the same folder with
 // the same options stay.
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
@@ -33,9 +34,15 @@ const { values, positionals } = parseArgs({
     views: { type: 'string', default: 'review' },
     sites: { type: 'string', default: '' },
     open: { type: 'boolean', default: false },
+    smooth: { type: 'boolean', default: false },
   },
 });
-const options = { views: values.views, sites: values.sites.split(',').filter(Boolean), open: values.open };
+const options = {
+  views: values.views,
+  sites: values.sites.split(',').filter(Boolean),
+  open: values.open,
+  smooth: values.smooth,
+};
 const views = viewSet(options.views);
 const look = lookName(options);
 const built = resolve(values.built);
