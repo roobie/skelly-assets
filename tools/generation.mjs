@@ -1,5 +1,6 @@
 // What tools/build.mjs and tools/mobs.mjs share about generating models: the export cache they reuse unchanged models
-// from, and how CI splits a complete build's generation over runners, each filling the cache with its share.
+// from, which tools/check-sources.mjs reuses vehicle sweeps from too, and how CI splits a complete build's generation
+// over runners, each filling the cache with its share.
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { BUILD_ROOT } from './buildDir.mjs';

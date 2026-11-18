@@ -4,14 +4,16 @@
 // every locker's stowage slots clear of each other and of its fit-out (tools/stowage.mjs, stowageReport), and lists the
 // models without a category, for authors and tagging agents.
 // tools/build.mjs runs the same reports before it builds anything.
-// Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...]. It exits 1 when any problem remains in the
-// selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the vocabulary does not list
-// yet, are reported, not failed.
+// Usage: node tools/check-sources.mjs [--json] [--pack <packId> ...] [--cache dir | --no-cache]. It exits 1 when any
+// problem remains in the selected packs; untagged models in packs the vocabulary lists as untagged, and keywords the
+// vocabulary does not list yet, are reported, not failed. The vehicles' sweeps are kept in the export cache the build
+// uses (tools/generation.mjs, DEFAULT_CACHE), so a run reuses what a build or an earlier run swept.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
+import { CACHE_OPTIONS, cacheFolder } from './generation.mjs';
 import { readMobRows, readRoster } from './layout.mjs';
 import { readRecipes } from './recipes.mjs';
 import { readSeveredParts } from './severedParts.mjs';
@@ -89,13 +91,17 @@ function printReport({ untagged, unlisted, unjudged, problems }) {
 
 async function main() {
   const { values } = parseArgs({
-    options: { json: { type: 'boolean', default: false }, pack: { type: 'string', multiple: true, default: [] } },
+    options: {
+      json: { type: 'boolean', default: false },
+      pack: { type: 'string', multiple: true, default: [] },
+      ...CACHE_OPTIONS,
+    },
   });
   const report = sourceReport(await modelSources(repo), readVocabulary(repo));
   const selected = Object.fromEntries(
     Object.entries(report).map(([key, entries]) => [key, entries.filter(inPacks(values.pack))]),
   );
-  const vehicles = await vehicleReport(repo);
+  const vehicles = await vehicleReport(repo, { cache: cacheFolder(values) });
   selected.problems.push(...vehicles.problems);
   selected.unjudged = vehicles.unjudged;
   if (values.json) console.log(JSON.stringify(selected, null, 2));
