@@ -6,8 +6,6 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // The tools run on the Node of `.node-version`, which ships the ES2024 library.
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     // The showcase loads three from its CDN by import map; the lockfile's three types it.
     "paths": {
       "three": ["./node_modules/@types/three"],
