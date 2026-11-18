@@ -96,6 +96,20 @@ local gains = [1, 0.8, 0.6, 0.42, 0.28];
       head: { lowHz: 1100, highHz: 1900, overtone: 0, ms: 35, gain: 0.9 },
       modes: modes(hz, [440, 400, 360, 300, 250], gains),
     },
+
+    // A small vial of hard glass. It reads as glass because its ring is high, short and pure: each mode a single sine
+    // with no beating pair or spin, decays falling roughly as one over pitch, and nearly all energy above 2.5 kHz.
+    glass_vial: {
+      id: 'glass_vial',
+      contactGain: 1,
+      ringGain: 1,
+      hardness: 1,
+      split: null,
+      spin: null,
+      doubleStrike: null,
+      head: null,
+      modes: modes(hz, [250, 180, 120, 80, 50], gains),
+    },
   },
 
   // What a surface is, and how it changes the drop: `drop` and `motion` patch the shared ones, since a soft ground
