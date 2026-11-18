@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { BUILD_ROOT } from './buildDir.mjs';
 import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
+import { entryFolder, pruneEntries } from './packages/thing-export/src/cache.ts';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
 
 const here = import.meta.dirname;
@@ -123,17 +124,14 @@ const replaceFile = (path, contents) => {
 };
 
 // The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
-// foreign store costs a compile, never a wrong twin.
-const storeEntry = (store, kind, key) => join(store, kind, `${key}.json`);
-const STORE_ENTRY = /^[0-9a-f]{64}\.json$/;
-
-const pruneStore = (store, kind, keys) => {
-  const current = new Set(keys.map((key) => `${key}.json`));
-  const folder = join(store, kind);
-  if (!existsSync(folder)) return;
-  for (const name of readdirSync(folder)) {
-    if (STORE_ENTRY.test(name) && !current.has(name)) rmSync(join(folder, name), { force: true });
-  }
+// foreign store costs a compile, never a wrong twin. It keeps its entries as the export cache does, so worktrees and
+// users on one host can share it as they share that cache: a shared store keeps what other checkouts still use.
+const ENTRY = ['json'];
+const KINDS = ['rows', 'twins'];
+const storeFolders = (store) => Object.fromEntries(KINDS.map((kind) => [kind, entryFolder(join(store, kind))]));
+const storedJson = (folder, key) => folder.read(key, ENTRY)?.json;
+const pruneStore = (store, keys) => {
+  for (const kind of KINDS) pruneEntries(join(store, kind), new Set(keys[kind]));
 };
 
 const forEachConcurrently = async (items, work) => {
@@ -149,24 +147,23 @@ const forEachConcurrently = async (items, work) => {
 const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
-const compileFragments = (rows, { root, store }) =>
-  forEachConcurrently(
-    rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))),
-    async ({ path, key }) => {
-      const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
-      replaceFile(storeEntry(store, 'rows', key), fragment);
-    },
-  );
+// A stored fragment is read, not just found, so a shared store counts it as used.
+const compileFragments = (rows, { root, folders }) =>
+  forEachConcurrently(rows, async ({ path, key }) => {
+    if (storedJson(folders.rows, key) !== undefined) return;
+    const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
+    folders.rows.write(key, ENTRY, { json: fragment });
+  });
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
 // fragments and the twins' compile skips evaluating every row file again.
-const withOverlay = (rows, { root, store }, use) => {
+const withOverlay = (rows, { root, store, folders }, use) => {
   const overlay = mkdtempSync(join(store, 'overlay-'));
   try {
     for (const { path, key } of rows) {
       const at = join(overlay, relative(root, path));
       mkdirSync(dirname(at), { recursive: true });
-      symlinkSync(storeEntry(store, 'rows', key), at);
+      symlinkSync(folders.rows.path(key, ENTRY[0]), at);
     }
     return use(overlay);
   } finally {
@@ -179,16 +176,17 @@ const readStamp = (stamp) => (existsSync(stamp) ? JSON.parse(readFileSync(stamp,
 // The stamp maps each twin to the key it was written under, so a refresh with nothing changed reads no store. Stale
 // twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once.
 export async function refreshJsonnetTwins(sources, { root, stamp, store, code = [], rowIndexes = [] }) {
-  const options = { root, store: resolve(store) };
   const { rows, twins } = unitPlan(sources, { root, code, rowIndexes });
   const stamped = readStamp(stamp);
   const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
   if (stale.length === 0) return;
-  const unstored = stale.filter(({ key }) => !existsSync(storeEntry(options.store, 'twins', key)));
+  const folder = resolve(store);
+  const options = { root, store: folder, folders: storeFolders(folder) };
+  const twinByKey = new Map(stale.map(({ key }) => [key, storedJson(options.folders.twins, key)]));
+  const unstored = stale.filter(({ key }) => twinByKey.get(key) === undefined);
   if (unstored.length > 0) {
     const reached = new Set(unstored.flatMap(({ closure }) => closure));
     const needed = rows.filter(({ path }) => reached.has(path));
-    mkdirSync(options.store, { recursive: true });
     await compileFragments(needed, options);
     const compiled = withOverlay(needed, options, (overlay) =>
       compileJsonnetFiles(
@@ -197,19 +195,16 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
         { overlay },
       ),
     );
-    for (const [at, { key }] of unstored.entries()) replaceFile(storeEntry(options.store, 'twins', key), compiled[at]);
+    for (const [at, { key }] of unstored.entries()) {
+      options.folders.twins.write(key, ENTRY, { json: compiled[at] });
+      twinByKey.set(key, compiled[at]);
+    }
   }
-  for (const { path, key } of stale) replaceFile(twinOf(path), readFileSync(storeEntry(options.store, 'twins', key)));
-  pruneStore(
-    options.store,
-    'rows',
-    rows.map(({ key }) => key),
-  );
-  pruneStore(
-    options.store,
-    'twins',
-    twins.map(({ key }) => key),
-  );
+  for (const { path, key } of stale) replaceFile(twinOf(path), twinByKey.get(key));
+  pruneStore(options.store, {
+    rows: rows.map(({ key }) => key),
+    twins: twins.map(({ key }) => key),
+  });
   replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
 }
 

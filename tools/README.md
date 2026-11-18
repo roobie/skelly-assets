@@ -28,6 +28,9 @@ row file, so each row file compiles on its own into a fragment, in parallel, and
 over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
 twins over it, not every row again, and one run evaluates the catalogue the recipes share once. CI jobs start from
 fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
+A fresh worktree is a fresh checkout too, so worktrees and users on one host can share a store the way they share the
+export cache: `JSONNET_TWIN_STORE` names its folder, and a setgid, group-writable folder keeps every entry some
+checkout used in the last week rather than only the entries of the checkout that refreshed last.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
 late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
 library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would

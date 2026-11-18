@@ -1,11 +1,26 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { execFile, execFileSync, spawnSync } from 'node:child_process';
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  utimesSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
+import { pathToFileURL } from 'node:url';
+import { promisify } from 'node:util';
 
+import { SHARED_ENTRY_LIFE_MS } from '../packages/thing-export/src/cache.ts';
 import { compilerCode, jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
+
+const execFileAsync = promisify(execFile);
 
 const root = resolve(import.meta.dirname, '../..');
 const tracked = execFileSync('git', ['-C', root, 'ls-files', '-z', '*.json'], { encoding: 'utf8' })
@@ -34,9 +49,16 @@ test('no tracked JSON has a Jsonnet twin', () => {
   );
 });
 
+// Another process's refresh, as a checkout sharing the store runs it.
+const REFRESH_ELSEWHERE = `
+import { refreshJsonnetTwins } from ${JSON.stringify(pathToFileURL(resolve(import.meta.dirname, '../sources.mjs')).href)};
+const { sources, ...options } = JSON.parse(process.argv[1]);
+await refreshJsonnetTwins(sources, options);
+`;
+
 // A miniature repository: two twins over libraries, one over a row index, and the empty compile root the compiler runs
-// in. The store sits under the root, as the default store does, and never enters a closure.
-const withTwinFixture = async (check) => {
+// in. The store sits under the root, as the default store does, and never enters a closure, unless the test names one.
+const withTwinFixture = async (check, { store: sharedStore } = {}) => {
   const root = mkdtempSync(join(tmpdir(), 'sources-'));
   const write = (path, text) => {
     mkdirSync(dirname(join(root, path)), { recursive: true });
@@ -54,10 +76,17 @@ const withTwinFixture = async (check) => {
     write('pkg/nested.jsonnet', "import 'lib/value.libsonnet'");
     write('catalogue.jsonnet', "std.flattenArrays(std.objectValues(import 'rows/index.libsonnet'))");
     const sources = ['source', 'other', 'pkg/nested', 'catalogue'].map((name) => join(root, `${name}.jsonnet`));
-    const store = join(root, '.build', 'store');
+    const store = sharedStore ?? join(root, '.build', 'store');
     const stamp = join(root, '.build', 'stamp');
-    const refresh = (code = []) =>
-      refreshJsonnetTwins(sources, { root, stamp, store, code, rowIndexes: [join(root, 'rows/index.libsonnet')] });
+    const options = (code) => ({ root, stamp, store, code, rowIndexes: [join(root, 'rows/index.libsonnet')] });
+    const refresh = (code = []) => refreshJsonnetTwins(sources, options(code));
+    const refreshElsewhere = () =>
+      execFileAsync(process.execPath, [
+        '--input-type=module',
+        '-e',
+        REFRESH_ELSEWHERE,
+        JSON.stringify({ sources, ...options([]) }),
+      ]);
     const twin = (name) => readFileSync(join(root, `${name}.json`), 'utf8');
     const value = (name) => JSON.parse(twin(name));
     const keep = (name) => writeFileSync(join(root, `${name}.json`), 'kept');
@@ -66,7 +95,7 @@ const withTwinFixture = async (check) => {
       readdirSync(join(store, kind))
         .map((name) => join(store, kind, name))
         .find((path) => matches(JSON.parse(readFileSync(path, 'utf8'))));
-    await check({ root, write, sources, store, stamp, refresh, twin, value, keep, entry });
+    await check({ root, write, sources, store, stamp, refresh, refreshElsewhere, twin, value, keep, entry });
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -152,7 +181,7 @@ fixtureTest(
 );
 
 fixtureTest(
-  'a store left by other inputs yields their twins never and keeps none of them',
+  'a private store left by other inputs yields their twins never and keeps none of them',
   async ({ root, write, stamp, refresh, value, entry }) => {
     const old = entry('twins', (twin) => twin.value === 1);
     write('lib/value.libsonnet', '{ value: 2 }');
@@ -163,6 +192,64 @@ fixtureTest(
     assert.ok(!existsSync(old), 'the stale entry is pruned');
   },
 );
+
+// A store shared by worktrees and users is setgid and group-writable, as the host's would be.
+const withSharedStore = async (check) => {
+  const store = mkdtempSync(join(tmpdir(), 'twin-store-'));
+  chmodSync(store, 0o2775);
+  try {
+    await check(store);
+  } finally {
+    rmSync(store, { recursive: true, force: true });
+  }
+};
+
+test('a shared store keeps what other checkouts used lately and drops what none used for an entry life', () =>
+  withSharedStore((store) =>
+    withTwinFixture(
+      async ({ write, refresh, value, entry }) => {
+        const recompile = async (text) => {
+          write('lib/value.libsonnet', text);
+          await refresh();
+        };
+        await refresh();
+        const first = entry('twins', (twin) => twin.value === 1);
+        await recompile('{ value: 2 }');
+        assert.ok(existsSync(first), 'an entry another checkout may still use is kept');
+        const second = entry('twins', (twin) => twin.value === 2);
+        const aged = (Date.now() - SHARED_ENTRY_LIFE_MS - 60_000) / 1000;
+        utimesSync(first, aged, aged);
+        await recompile('{ value: 3 }');
+        assert.deepEqual(value('source'), { value: 3 });
+        assert.ok(!existsSync(first), 'an entry unused for its life is dropped');
+        assert.ok(existsSync(second), 'a recently used entry is kept');
+      },
+      { store },
+    ),
+  ));
+
+test('checkouts refreshing into one shared store at once each get whole twins and leave no partial entries', () =>
+  withSharedStore((store) =>
+    withTwinFixture(
+      (one) =>
+        withTwinFixture(
+          async (other) => {
+            await Promise.all([one, other, one, other].map(({ refreshElsewhere }) => refreshElsewhere()));
+            for (const { value } of [one, other]) {
+              assert.deepEqual(value('source'), { value: 1 });
+              assert.deepEqual(value('catalogue'), [{ id: 'a', value: 1 }, { id: 'b' }]);
+            }
+            assert.deepEqual(readdirSync(store).sort(), ['rows', 'twins']);
+            const partial = ['rows', 'twins']
+              .flatMap((kind) => readdirSync(join(store, kind)))
+              .filter((name) => !/^[0-9a-f]{64}\.json$/.test(name));
+            assert.deepEqual(partial, []);
+          },
+          { store },
+        ),
+      { store },
+    ),
+  ));
 
 fixtureTest('a changed compiler file recompiles the twins', async ({ root, refresh, value, keep }) => {
   const compiler = join(root, 'compile.mjs');
