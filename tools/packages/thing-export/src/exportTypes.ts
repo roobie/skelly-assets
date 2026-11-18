@@ -170,6 +170,8 @@ export type GlbExportResult =
       readonly glb: Uint8Array;
       /** The file's part node names, one per part of the resolved assembly (`partNodeName`), sorted by part id. */
       readonly partNodes: readonly string[];
+      /** The metadata each port node carries in its extras, in node order, for a sidecar that repeats some of it. */
+      readonly ports: readonly ExportPortMetadata[];
     }
   | { readonly ok: false; readonly error: GlbExportError };
 

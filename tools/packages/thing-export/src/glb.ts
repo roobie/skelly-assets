@@ -558,6 +558,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
   };
   const nodes: Json[] = [{ name: asset.id, children: [] as number[] }];
   const rootChildren = (nodes[0] as { children: number[] }).children;
+  const ports: ExportPortMetadata[] = [];
   const appearanceFor = (part: PartExport, solid: DisplayItem['solids'][number]) =>
     resolveAppearance(palette, part.def.family, solid.id, {
       context: part.appearance ?? appearanceContext,
@@ -879,10 +880,12 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     const nodeIndex = nodes.length;
     nodes.push(node);
     for (const port of part.def.ports) {
+      const metadata = portMetadata(part.id, port, part.placed);
+      ports.push(metadata);
       const portNode: Json = {
         name: `${part.id}.${port.id}`,
         translation: toMetres(skin ? applyPoint(part.placed, port.pos) : port.pos, metresPerUnit),
-        extras: { port: portMetadata(part.id, port, part.placed) },
+        extras: { port: metadata },
       };
       const frame = (skin ? compose(part.placed, portFrame(port)) : portFrame(port)).r;
       if (!isIdentity(frame)) {
@@ -955,6 +958,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     ok: true,
     glb: glbFile(json, bin.bytes()),
     partNodes: parts.map(({ id, family }) => partNodeName(id, family)),
+    ports,
   };
 };
 

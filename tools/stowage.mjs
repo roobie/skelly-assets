@@ -10,7 +10,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { modelBox } from './dress.mjs';
-import { glbJson } from './glb.mjs';
 import { outputPath, thingEntryFile } from './layout.mjs';
 import { AXES, perAxis } from './packages/construct/src/foundation/math.ts';
 import { solid } from './pieceSolid.mjs';
@@ -40,7 +39,6 @@ import { sharedDepth } from './siteOverlap.mjs';
 /** @typedef {ReturnType<typeof loadOutStowage>} LoadOutStowage */
 
 const repo = resolve(import.meta.dirname, '..');
-export const STOWAGE = 'stowage';
 const EPSILON = 1e-6;
 
 /** @param {(axis: 0 | 1 | 2) => number} f */
@@ -261,8 +259,19 @@ export function stowageReport(root = repo) {
 // ---- load-outs, against the built models ----
 
 /**
- * What the built models say about stowage, for the ids asked: model id -> { slots, seats, bounds }, slots and seats in
- * the model frame as the GLB's port nodes give them, bounds the model's box.
+ * A built thing's model entry, or undefined for a model without one.
+ * @param {string} out
+ * @param {string} pack
+ * @param {string} id
+ */
+const thingEntry = (out, pack, id) => {
+  const sidecar = join(out, thingEntryFile(pack, id));
+  return existsSync(sidecar) ? JSON.parse(readFileSync(sidecar, 'utf8')) : undefined;
+};
+
+/**
+ * What the built models say about stowage, for the ids asked: model id -> { slots, seats, bounds }, slots and seats as
+ * the model entry a consumer reads gives them, bounds the model's box.
  * @param {string} out
  * @param {readonly { id: string; pack: string; path: string }[]} models
  * @param {readonly string[]} ids
@@ -273,23 +282,12 @@ export function readStowage(out, models, ids) {
     [...new Set(ids)].flatMap((id) => {
       const model = byId.get(id);
       if (!model) return [];
-      const buffer = readFileSync(join(out, outputPath(model.pack, model.path)));
-      const ports = glbJson(buffer).nodes.flatMap((node) => {
-        const port = node.extras?.port;
-        return port?.mount === STOWAGE ? [port] : [];
-      });
+      const stowage = thingEntry(out, model.pack, id)?.stowage;
       /** @type {Stowable} */
       const stowable = {
-        slots: ports
-          .filter(({ gender }) => gender === 'female')
-          .map(({ id: portId, accepts, envelope, frame }) => ({
-            id: portId.slice(portId.lastIndexOf('.') + 1),
-            accepts,
-            envelope,
-            frame,
-          })),
-        seats: ports.filter(({ gender }) => gender === 'male').map(({ standard, frame }) => ({ standard, frame })),
-        bounds: modelBox(buffer),
+        slots: stowage?.slots ?? [],
+        seats: stowage?.seats ?? [],
+        bounds: modelBox(readFileSync(join(out, outputPath(model.pack, model.path)))),
       };
       return [/** @type {const} */ ([id, stowable])];
     }),
@@ -321,9 +319,7 @@ export function loadOutStowage(out, models, placements) {
   const moving = new Set(
     [...new Set(closures)].filter((id) => {
       const pack = packOf.get(id);
-      if (pack === undefined) return false;
-      const sidecar = join(out, thingEntryFile(pack, id));
-      return existsSync(sidecar) && JSON.parse(readFileSync(sidecar, 'utf8')).motion?.length > 0;
+      return pack !== undefined && thingEntry(out, pack, id)?.motion?.length > 0;
     }),
   );
   return { items: readStowage(out, models, ids), moving };
