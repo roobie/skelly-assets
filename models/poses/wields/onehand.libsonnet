@@ -26,6 +26,7 @@ local swing = { shares: { windup: 18, strike: 12, follow: 25, recovery: 45 }, se
     },
     guard: guard,
   },
+  walks: { idle: { arms: 'swing' } },
   strikes: {
     forehand: swing {
       windup: guard { body+: { spine: [4, -30, 0] }, weapon: held([-0.15, 0.01, 0.14], -60, -110, 100, [-1, -0.3, 0]) },

@@ -22,6 +22,7 @@ local guard = {
     },
     guard: guard,
   },
+  walks: { idle: { arms: 'swing' } },
   strikes: {
     jab: {
       shares: { windup: 20, strike: 25, follow: 17, recovery: 38 },

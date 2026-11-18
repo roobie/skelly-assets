@@ -16,6 +16,12 @@
 // back to guard. The hit falls where the strike phase ends, so a game scales the clip to its own cooldown and keeps the
 // hit where it lands. A blow speeds up from the wind-up into the hit and slows after it, so the strike eases in and the
 // follow-through eases out, meeting at speed; the wind-up and recovery move from rest to rest.
+//
+// `walks` names the stances a class walks in, each walk of the gait (models/poses/locomotion.libsonnet) baked holding
+// what the class holds, and how its arms carry it: `swing`, the arms swinging as in the empty walk, the weapon riding the
+// leading hand and each hand closed as the stance closes it, a second hand on the weapon letting go, since a swinging arm
+// cannot keep it there; or `held`, the stance's hands kept on the weapon over the walking legs, the weapon swaying by
+// `sway`, that share of the leading arm's swing. Melee classes swing, as ahg3's figure gait carries a melee weapon.
 {
   framesPerSecond: 30,
   easing: { windup: 'minimum-jerk', strike: 'ease-in', follow: 'ease-out', recovery: 'minimum-jerk' },

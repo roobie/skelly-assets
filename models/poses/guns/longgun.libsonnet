@@ -5,6 +5,8 @@
 // the chest's frame, so a longer stock reaches no deeper into the body. `aim` turns the bore from the chest's ahead
 // (degrees), `poles` point each elbow, and `sight` turns the eyes down the gun's sight. The right hand takes the grip
 // and the left the fore-end wherever the gun is, as a melee second hand takes its seat, so no key places a hand.
+// `walks` names the stances the doll walks in, as the melee classes' do (models/poses/wields/wields.libsonnet): a gun
+// is `held`, both hands on it, since a gun swung in one hand points anywhere.
 local body = import '../wields/body.libsonnet';
 // Bladed, the left shoulder forward and leaning in, as the press check stands: it brings the left hand within reach of
 // a fore-end as far ahead as the pump's. A key's yaw turns the bore back past the chest's twist, and its lean tips the
@@ -36,5 +38,11 @@ function(model, sockets) {
       weapon: { pocket: [0.0275, -0.03, 0.085], aim: { pitch: -7.7, yaw: 40, roll: 0 }, poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
       sight: { tilt: 30, jut: 15, lean: 10 },
     },
+  },
+  // Carried at low ready the gun swings a little with the stride, the share of the arm's swing ahg3's FigureGait sways a
+  // held gun by (`holds.gun.sway`), so the walk keeps some life; shouldered it does not sway, so the bore stays level.
+  walks: {
+    idle: { arms: 'held', sway: 0.35 },
+    guard: { arms: 'held', sway: 0 },
   },
 }
