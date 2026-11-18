@@ -1,4 +1,5 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
 
 local nagasa = 0.70;
 local sori = 0.017;
@@ -50,9 +51,14 @@ local crossing = 0.005;
 local omoteMenuki = 6;
 local uraMenuki = 3;
 local mekugiRadius = 0.003;
-// The leading hand's middle, back from the fuchi, and the rear hand's, forward of the kashira.
-local leadingHand = 0.05;
-local rearHand = 0.045;
+// A two-handed wield seats the rear hand on the grip and the front hand this far toward the blade.
+local twoHandSeat = 0.09;
+// The least gap between a palm and the fuchi or kashira, so neither hand rides a fitting.
+local palmClearance = 0.005;
+// The grip is the rear hand's middle, set so the pair of hands sits centred on the tsuka.
+local rearHand = (tsuka - twoHandSeat) / 2;
+assert rearHand - arm.palmWidth / 2 >= palmClearance : 'the rear palm must clear the kashira';
+assert rearHand + twoHandSeat + arm.palmWidth / 2 <= tsuka - palmClearance : 'the front palm must clear the fuchi';
 local ovalSteps = 32;
 
 // The blade's curve is a circular arc tangent to the tsuka at the tsuba, of radius set by its sagitta over its length.
@@ -188,7 +194,6 @@ local wrap = menuki('menuki-omote', omoteMenuki, 1) + menuki('menuki-ura', uraMe
 
 local hamonTip = 'hamon-%d' % (last - 1);
 local monouchi = 'hamon-%d' % stationAt(nagasa - monouchiFromTip);
-local along(x) = (x - wrapBack) / tsuka;
 [
   // A katana: a curved shinogi-zukuri blade with a wavy hamon, mounted with a habaki, an oval iron tsuba between seppa,
   // and a two-handed tsuka of ray skin under black silk ito with gold menuki.
@@ -205,16 +210,13 @@ local along(x) = (x - wrapBack) / tsuka;
     ito: 'satin-black',
     menuki: 'metal-gold',
     mekugi: 'wood-birch',
-  }) + h.gripOn('katana', 'same') + {
+  }) + { title: 'Katana' } + h.gripOn('katana', 'same') + {
     // Held point ahead with the edge down, as the other blades are: gripOn's raised hold and quarter roll suit a tool
     // and would turn the edge to one side.
-    handling+: { fraction: [along(wrapFront - leadingHand), 0.5, 0.5], hold: 'forward', roll: 0 },
+    handling+: { fraction: [rearHand / tsuka, 0.5, 0.5], hold: 'forward', roll: 0 },
     anchors: {
       strike: { part: 'katana', solid: hamonTip, fraction: [1, 1, 0.5] },
       edge: { part: 'katana', solid: monouchi, fraction: [0.5, 0, 0.5] },
-      // The rear hand, on the tsuka's underside as the guns put their support hand under the forend, so a consumer
-      // seats a second hand the same way on either.
-      support: { part: 'katana', solid: 'ito-cap-edge', fraction: [along(wrapBack + rearHand), 0, 0.5] },
     },
     voxelGrain: 0.002,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
