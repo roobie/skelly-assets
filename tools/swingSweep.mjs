@@ -94,9 +94,10 @@ export function sweptBounds(shape, layers, pace) {
   const max = [-Infinity, -Infinity, -Infinity];
   const margin = pace / SWEPT_CLOCKS;
   const out = [0, 0, 0];
+  const corners = cornersOf(shape);
   for (let i = 0; i <= SWEPT_CLOCKS; i++) {
     const pose = poseAt(layers, i / SWEPT_CLOCKS);
-    for (const corner of cornersOf(shape)) {
+    for (const corner of corners) {
       apply(pose, corner, out);
       for (let axis = 0; axis < 3; axis++) {
         min[axis] = Math.min(min[axis], out[axis] - margin);
@@ -214,6 +215,25 @@ const sharedLayers = (layers, other) => {
   return shared;
 };
 
+// How an entry of a sweep, a mover or an obstacle, moves beyond its first `shared` layers: { layers, pace, bounds }, its
+// pace (`paceOf`) and the box it sweeps (`sweptBounds`), or its rest bounds when nothing beyond moves it. Every pair an
+// entry is in that shares as many layers reads the same, so each is found once: finding them per pair was most of a
+// large vehicle's sweep. Handing every pair the same `layers` also lets the poses read on them be shared.
+const motionsBeyond = () => {
+  const known = new Map();
+  return (entry, layers, shared) => {
+    if (!known.has(entry)) known.set(entry, new Map());
+    const byShared = known.get(entry);
+    if (!byShared.has(shared)) {
+      const beyond = layers.slice(shared);
+      const pace = beyond.length > 0 ? paceOf(beyond, entry.shape) : 0;
+      const bounds = beyond.length > 0 ? sweptBounds(entry.shape, beyond, pace) : entry.shape;
+      byShared.set(shared, { layers: beyond, pace, bounds });
+    }
+    return byShared.get(shared);
+  };
+};
+
 // Sweeps the pieces of one moving body (a part and what rides it, moved by its `layers` of motion) from rest to its stop
 // against `obstacles`, the shapes it must clear. Movers and obstacles are { site, shape }; an obstacle also has the
 // `layers` that move it, none when it stands still. What both are carried by is the same in the layers of each, so it
@@ -227,21 +247,27 @@ const sharedLayers = (layers, other) => {
 // in contact (1 when none ever was), each contact the deepest the sweep measured and the clock it first was.
 export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
   const pairs = [];
+  const beyond = motionsBeyond();
   for (const mover of movers) {
     for (const obstacle of obstacles) {
       const shared = sharedLayers(layers, obstacle.layers ?? []);
-      const [own, other] = [layers.slice(shared), (obstacle.layers ?? []).slice(shared)];
-      if (own.length === 0) continue;
-      const paces = [paceOf(own, mover.shape), other.length > 0 ? paceOf(other, obstacle.shape) : 0];
-      const bounds = sweptBounds(mover.shape, own, paces[0]);
-      if (!boundsMeet(bounds, other.length > 0 ? sweptBounds(obstacle.shape, other, paces[1]) : obstacle.shape))
-        continue;
+      if (shared === layers.length) continue;
+      const [own, other] = [beyond(mover, layers, shared), beyond(obstacle, obstacle.layers ?? [], shared)];
+      if (!boundsMeet(own.bounds, other.bounds)) continue;
       const planes = [stowPlanesOf(layers), stowPlanesOf(obstacle.layers ?? [])];
       const rest = restDepth(mover.shape, obstacle.shape, step, ...planes);
       const paced = (list, shape) =>
         list.map((plane) => ({ ...plane, pace: paceOf(plane.layers, shape, plane.first) }));
       const stows = [paced(planes[0], mover.shape), paced(planes[1], obstacle.shape)];
-      pairs.push({ mover, obstacle, own, other, stows, pace: paces[0] + paces[1], floor: rest + tolerance });
+      pairs.push({
+        mover,
+        obstacle,
+        own: own.layers,
+        other: other.layers,
+        stows,
+        pace: own.pace + other.pace,
+        floor: rest + tolerance,
+      });
     }
   }
   const contacts = new Map();
