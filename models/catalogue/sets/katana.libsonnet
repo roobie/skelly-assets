@@ -27,7 +27,7 @@ local kashira = 0.014;
 // The tsuka's oval section, spine to edge and across, with the ito wrap's thickness over it.
 local tsukaHeight = 0.032;
 local tsukaWidth = 0.024;
-local tsukaChamfer = 0.004;
+local tsukaChamfer = 0.003;
 local ito = 0.002;
 local diamonds = 10;
 // Width of the ito where two turns cross between diamonds.
@@ -92,7 +92,7 @@ local halfY = tsukaHeight / 2, halfZ = tsukaWidth / 2, flat = halfY - tsukaChamf
 local pitch = tsuka / diamonds;
 local diamondAt(k) = wrapBack + pitch * (k + 0.5);
 local halfLong = pitch / 2 - crossing / 2;
-local halfTall = flat * 0.7;
+local halfTall = flat * 0.9;
 // The ito on one side face between diamond k - 1 and diamond k, split at the tsuka's middle line because prisms must
 // be convex; the open diamonds between show the same and what lies under the wrap.
 local sideIto(k, sign, z0, z1) =
@@ -106,9 +106,16 @@ local cap(sign) = [
   [sign * (flat + ito), halfZ + ito], [sign * flat, halfZ + ito],
 ];
 local knot(id, x, y, z, half) = h.box(id, 'ito', [x - half[0], y - half[1], z - half[2]], [x + half[0], y + half[1], z + half[2]]);
-local menuki(id, k, z0, z1) =
-  local x = diamondAt(k), l = pitch * 0.7, t = halfTall * 0.6;
-  h.prism(id, 'menuki', 'z', [[x - l, 0], [x - l * 0.6, -t], [x + l * 0.6, -t], [x + l, 0], [x + l * 0.6, t], [x - l * 0.6, t]], z0, z1);
+// A menuki lies under the ito across diamond k, its boss standing proud in the open diamond.
+local menuki(id, k, sign) =
+  local x = diamondAt(k), l = pitch * 0.7, t = halfTall * 0.5, bl = halfLong * 0.6, bt = halfTall * 0.45;
+  local outline(a, b) = [[x - a, 0], [x - a * 0.6, -b], [x + a * 0.6, -b], [x + a, 0], [x + a * 0.6, b], [x - a * 0.6, b]];
+  local span(z0, z1) = if sign > 0 then [z0, z1] else [-z1, -z0];
+  local base = span(halfZ - ito, halfZ + ito / 2), boss = span(halfZ, halfZ + ito * 1.5);
+  [
+    h.prism(id, 'menuki', 'z', outline(l, t), base[0], base[1]),
+    h.prism(id + '-boss', 'menuki', 'z', outline(bl, bt), boss[0], boss[1]),
+  ];
 local mekugiAt = diamonds - 1;
 local tsubaPlate = tsubaThickness / 3;
 
@@ -129,9 +136,7 @@ local mounts = [
   ], tsubaBack, -seppa)
   for i in std.range(0, 31)
 ];
-local wrap = [
-  menuki('menuki-omote', 6, halfZ - ito, halfZ + ito * 1.5),
-  menuki('menuki-ura', 3, -halfZ - ito * 1.5, -halfZ + ito),
+local wrap = menuki('menuki-omote', 6, 1) + menuki('menuki-ura', 3, -1) + [
   { id: 'mekugi', slot: 'mekugi', kind: 'turned', axis: 'z', profile: [[0, 0], [0, 0.003], [tsukaWidth + ito, 0.003], [tsukaWidth + ito, 0]], origin: [diamondAt(mekugiAt), 0, -halfZ - ito / 2] },
 ] + [
   sideIto(k, sign, side[0], side[1])
