@@ -41,7 +41,6 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
   };
   const skin = inModel('skin');
   const motion = modelEntry.motion!;
-  expect(modelEntry.anchors?.hinge_a).toBeUndefined();
   expect(motion).toHaveLength(1);
   const hinge = motion[0]!;
   expect(hinge.kind).toBe('hinge');

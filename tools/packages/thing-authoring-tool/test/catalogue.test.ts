@@ -493,13 +493,15 @@ it('exports the player bust with joint anchors that seat the limbs symmetrically
   expect(anchors.hip_left![0]).toBeCloseTo(-anchors.hip_right![0]);
 });
 
-it('refuses a row that carries both a motion and hinge anchors', () => {
+it.each([
+  ['with', { motion: { part: 'lower', stages: [{ kind: 'hinge', pins: ['pin'], toward: 'up', open: 30 }] } }],
+  ['without', {}],
+])('refuses a hinge anchor on a row %s a motion, naming the row', (_case, motion) => {
   const input = fixture();
+  const item = { ...input.items[0]!, ...motion };
   const hinge = { part: 'lower', solid: 'body', fraction: [0, 0, 0] };
-  const motion = { part: 'lower', stages: [{ kind: 'hinge', pins: ['pin'], toward: 'up', open: 30 }] };
-  const item = { ...input.items[0], motion };
   expect(() => loadCatalogue({ ...input, items: [item] })).not.toThrow();
-  expect(() => loadCatalogue({ ...input, items: [{ ...item, anchors: { hinge_a: hinge } }] })).toThrow(
-    /hinge_a or hinge_b/,
+  expect(() => loadCatalogue({ ...input, items: [{ ...item, anchors: { hinge_b: hinge } }] })).toThrow(
+    `${item.id} carries a hinge_a or hinge_b anchor`,
   );
 });
