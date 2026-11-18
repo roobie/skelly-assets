@@ -59,6 +59,7 @@ import {
   CROWD_BEGIN_VERTEX,
   CROWD_BEGINNORMAL_VERTEX,
   CROWD_COLOR_FRAGMENT,
+  CROWD_EMISSIVE_FRAGMENT,
   CROWD_FRAGMENT_DECLARATIONS,
   CROWD_VERTEX_DECLARATIONS,
   type CrowdPlacement,
@@ -519,10 +520,9 @@ export const buildCrowdRender = (
     shader.vertexShader = `${CROWD_VERTEX_DECLARATIONS}\n${shader.vertexShader}`
       .replace('#include <begin_vertex>', CROWD_BEGIN_VERTEX)
       .replace('#include <beginnormal_vertex>', CROWD_BEGINNORMAL_VERTEX);
-    shader.fragmentShader = `${CROWD_FRAGMENT_DECLARATIONS}\n${shader.fragmentShader}`.replace(
-      '#include <color_fragment>',
-      `#include <color_fragment>\n${CROWD_COLOR_FRAGMENT}`,
-    );
+    shader.fragmentShader = `${CROWD_FRAGMENT_DECLARATIONS}\n${shader.fragmentShader}`
+      .replace('#include <color_fragment>', `#include <color_fragment>\n${CROWD_COLOR_FRAGMENT}`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>\n${CROWD_EMISSIVE_FRAGMENT}`);
   };
 
   const byVariant = new Map<number, number[]>();
