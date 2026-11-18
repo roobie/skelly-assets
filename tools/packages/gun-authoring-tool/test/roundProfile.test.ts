@@ -1,7 +1,8 @@
 import { meshForRevolved } from '@skelly/construct/shapes/revolve.ts';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
-import { ASSUMED_BULLET_SEATING_DEPTH_CALIBRES, CASE_WALL_MM, roundProfiles } from '../src/ammo/roundProfile.ts';
+import { roundProfiles } from '../src/ammo/roundProfile.ts';
+import { roundShape } from '../src/ammo/roundShape.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 
 const cartridge = loadCartridgeFile('7.62x39.json') as MetallicCartridge;
@@ -45,7 +46,8 @@ describe('5.56x45 round profile estimate', () => {
     };
     const profile = roundProfiles(fixture);
     const assumedBase =
-      natoCartridge.case.length.value! - ASSUMED_BULLET_SEATING_DEPTH_CALIBRES * natoCartridge.payload.diameter.value!;
+      natoCartridge.case.length.value! -
+      roundShape(natoCartridge.id).projectile.seatingCalibres * natoCartridge.payload.diameter.value!;
     expect(maximum(profile.bullet, 0)).toBeCloseTo(natoCartridge.overallLength.typical.value!, 6);
     expect(Math.min(...profile.bullet.map(([axial]) => axial))).toBeCloseTo(assumedBase, 6);
   });
@@ -63,7 +65,7 @@ describe('7.62x39 round profiles', () => {
     const mouth = profiles.firedCase.filter(([axial]) => axial === cartridge.case.length.value);
     const { body } = cartridge.case;
     const radius = (body.type === 'bottleneck' ? body.neck.diameterAtMouth.value! : body.diameterAtMouth.value!) / 2;
-    expect(mouth.map(([, value]) => value)).toEqual([radius, radius - CASE_WALL_MM]);
+    expect(mouth.map(([, value]) => value)).toEqual([radius, radius - roundShape(cartridge.id).case.wall]);
     expect(profiles.firedCase.at(-1)![1]).toBe(0);
   });
 

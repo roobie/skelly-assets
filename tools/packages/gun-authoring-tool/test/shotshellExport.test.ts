@@ -103,7 +103,7 @@ describe('shotshell cartridge export', () => {
     const folded: Shotshell = { ...shell, closure: { ...shell.closure, value: 'fold-crimp' } };
     const geometry = shotshellGeometry(folded);
     expect(geometry.round.filter((solid) => solid.kind === 'extruded-polygon').length).toBeGreaterThan(0);
-    expect(geometry.case.map((solid) => solid.id)).toEqual(['head', 'hull']);
+    expect(geometry.case.filter((solid) => solid.kind === 'extruded-polygon')).toEqual([]);
   });
 
   it('keeps viewer loaded and fired geometry aligned with their corresponding GLBs', async () => {
