@@ -404,7 +404,7 @@ async function main() {
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);
-      const wields = exportWields(out, { models });
+      const wields = exportWields(out, { models }, { cache, prune: true });
       for (const file of wields.files) console.log(`built ${file}`);
       const locomotion = exportLocomotion(out, { models });
       for (const file of locomotion.files) console.log(`built ${file}`);
