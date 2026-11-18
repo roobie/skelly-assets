@@ -27,10 +27,15 @@ local pointShoulder = { along: 0.5, across: 0.75 };
 local fullerNose = 0.012;
 
 local cross = { thickness: 0.012, blockHalfWidth: 0.017, blockHalfThickness: 0.01 };
-// A straight bar of octagonal section, thinning from the block to just short of the ends, which swell a little.
-local quillon = { root: 0.006, waist: 0.0048, end: 0.0058, endLength: 0.01 };
-local wheel = { thickness: 0.026, rimThickness: 0.009, faceRadius: 0.015, bossRadius: 0.009, bossProud: 0.002 };
-local peen = { length: 0.003, radius: 0.004 };
+// A straight bar of octagonal section, thinning from the block to just short of the ends, which swell a little and are
+// chamfered down to a flat end face.
+local quillon = { waist: 0.0048, end: 0.0058, endLength: 0.01, endChamfer: 0.002, endFaceRadius: 0.0046 };
+local wheel = {
+  thickness: 0.026, rimThickness: 0.009, faceRadius: 0.015,
+  bossRadius: 0.009, bossCrownRadius: 0.0072, bossProud: 0.002,
+};
+// The tang's end hammered over the pommel, spreading from its foot to its head.
+local peen = { length: 0.003, radius: 0.004, footRadius: 0.0028 };
 // The leather over the wooden core swells a little at its middle; a cord riser under it stands proud at each end.
 local grip = { endRadius: 0.012, bellyRadius: 0.0135, riserRadius: 0.0145, riserLength: 0.006 };
 
@@ -111,13 +116,14 @@ local edgeAt = bladeStart + edgeShare * (bladeLength - bladeStart);
 assert edgeAt <= taperEnd : 'the edge anchor at %g m lies on the point, past the taper' % edgeAt;
 local edgeFraction = [edgeShare, 0.5 + halfWidthAt(edgeAt) / baseWidth, 0.5];
 
-// The cross is turned as one bar, so one quillon's radii from its end in to the block are mirrored.
+// The cross is turned as one bar, so one quillon's radii from its end in to the block are mirrored. At the block the
+// bar is as thick as the cross.
 local quillonHalf = [
   [0, 0],
-  [0, quillon.end * 0.8],
-  [0.002, quillon.end],
+  [0, quillon.endFaceRadius],
+  [quillon.endChamfer, quillon.end],
   [quillon.endLength, quillon.waist],
-  [crossSpan / 2 - cross.blockHalfWidth, quillon.root],
+  [crossSpan / 2 - cross.blockHalfWidth, cross.thickness / 2],
 ];
 local quillonProfile = quillonHalf + [[crossSpan - p[0], p[1]] for p in std.reverse(quillonHalf[:std.length(quillonHalf) - 1])];
 
@@ -137,7 +143,7 @@ local wheelProfile = [
 ];
 // A boss on the face toward `side` along z, eased from its foot on the face to its crown.
 local boss(id, side) =
-  local foot = wheel.bossRadius, crown = wheel.bossRadius * 0.8;
+  local foot = wheel.bossRadius, crown = wheel.bossCrownRadius;
   local radii = if side > 0 then [foot, crown] else [crown, foot];
   h.turned(id, 'guard', 'z', [[0, 0], [0, radii[0]], [wheel.bossProud, radii[1]], [wheel.bossProud, 0]],
            [wheelCentre, 0, if side > 0 then wheel.thickness / 2 else -wheel.thickness / 2 - wheel.bossProud]);
@@ -158,7 +164,7 @@ local boss(id, side) =
       h.turned('pommel', 'guard', 'z', wheelProfile, [wheelCentre, 0, -wheel.thickness / 2]),
       boss('pommel-boss-a', 1),
       boss('pommel-boss-b', -1),
-      h.turned('peen', 'guard', 'x', [[0, 0], [0, peen.radius * 0.7], [peen.length, peen.radius], [peen.length, 0]], [pommelEnd - peen.length, 0, 0]),
+      h.turned('peen', 'guard', 'x', [[0, 0], [0, peen.footRadius], [peen.length, peen.radius], [peen.length, 0]], [pommelEnd - peen.length, 0, 0]),
     ],
     { blade: 'steel-bright', guard: 'steel-grey', grip: 'leather-brown' })
   + h.gripOn('arming_sword', 'grip') + {
