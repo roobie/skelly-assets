@@ -7,24 +7,40 @@ local turned = h.turned;
 local loose(category, materials=[]) = { voxelGrain: 0.002, taxonomy: { category: category } + (if materials == [] then {} else { tags: { material: materials } }) };
 // A low cone of loose stuff, `radius` across its foot and `height` tall.
 local cone(id, slot, radius, height) = turned(id, slot, 'y', [[0, 0], [0, radius], [height * 0.3, radius * 0.7], [height * 0.7, radius * 0.35], [height, 0]]);
+// Pieces rounded all over keep their authored mesh; see `tools/packages/thing-export/README.md`, "Voxelized export".
+local smooth = { parts: [part + { smooth: true } for part in super.parts] };
+// Quarter ellipses for round outlines: one rising `rise` from height `at` out to `radius`, one falling `fall` from
+// `radius` at height `at` back to the axis, leaving out its first point, which the outline before it ends on.
+local quarter = [std.pi / 12 * step for step in std.range(0, 6)];
+local rising(radius, rise, at) = [[at + rise * (1 - std.cos(angle)), radius * std.sin(angle)] for angle in quarter];
+local falling(radius, fall, at) = [[at + fall * std.sin(angle), radius * std.cos(angle)] for angle in quarter[1:]];
+// A round piece standing on its face, `radius` across, its faces domed `dome` high about a straight band `band` tall.
+local lens(id, slot, radius, dome, band, x, z, y0) =
+  turned(id, slot, 'y', rising(radius, dome, 0) + (if band > 0 then [[dome + band, radius]] else []) + falling(radius, dome, dome + band), [x, y0, z])
+  + { sides: null };
+// A two-tone capsule lying along z, `length` long with round ends, slots capsule-a and capsule-b.
+local capsule(id, length, radius, x, z) = [
+  turned(id + '-a', 'capsule-a', 'z', rising(radius, radius, 0) + [[length / 2, radius], [length / 2, 0]], [x, radius, z - length / 2]) + { sides: null },
+  turned(id + '-b', 'capsule-b', 'z', [[0, 0], [0, radius], [length / 2 - radius, radius]] + falling(radius, radius, length / 2 - radius), [x, radius, z]) + { sides: null },
+];
 [
-  // Four round tablets, 10 mm across, one leaning on another.
-  local tablet = h.tablet(0.005);
-  h.compound('tablet_heap', 0.0012, tablet('tablet-a', 0, 0, 0) + tablet('tablet-b', 0.011, 0.003, 0) + tablet('tablet-c', -0.006, 0.009, 0)
-                                     + tablet('tablet-d', 0.004, -0.011, 0) + tablet('tablet-e', 0.005, 0.002, 0.003),
-             { tablet: 'plastic-white' }) + { title: 'Loose tablets' } + loose('medical'),
+  // Five round tablets, 10 mm across and 3.6 mm thick, one lying over two others.
+  local tablet(id, x, z, y0=0) = lens(id, 'tablet', 0.005, 0.0012, 0.0012, x, z, y0);
+  h.compound('tablet_heap', 0.0012, [tablet('tablet-a', 0, 0), tablet('tablet-b', 0.011, 0.003), tablet('tablet-c', -0.006, 0.009),
+                                     tablet('tablet-d', 0.004, -0.011), tablet('tablet-e', 0.005, 0.002, 0.0036)],
+             { tablet: 'plastic-white' }) + { title: 'Loose tablets' } + loose('medical') + smooth,
 
-  // Three two-tone capsules, 18 mm long, side by side and askew.
-  local capsule = h.capsule(0.018, 0.0035);
-  h.compound('capsule_heap', 0.0015, capsule('capsule-a', -0.009, 0, 0) + capsule('capsule-b', 0, 0.004, 0) + capsule('capsule-c', 0.009, -0.003, 0),
-             { 'capsule-a': 'plastic-red', 'capsule-b': 'plastic-white' }) + { title: 'Loose capsules' } + loose('medical'),
+  // Three two-tone capsules, 18 mm long and 7 mm thick, side by side and staggered.
+  h.compound('capsule_heap', 0.0015, capsule('capsule-a', 0.018, 0.0035, -0.009, 0) + capsule('capsule-b', 0.018, 0.0035, 0, 0.004)
+                                     + capsule('capsule-c', 0.018, 0.0035, 0.009, -0.003),
+             { 'capsule-a': 'plastic-red', 'capsule-b': 'plastic-white' }) + { title: 'Loose capsules' } + loose('medical') + smooth,
 
-  // Three pellets of coated gum, 15 by 10 mm and 6 mm thick.
+  // Three pellets of coated gum, 12 mm across and 6 mm thick, rounded all over.
   h.compound('gum_heap', 0.0045, [
-    box('pellet-a', 'gum', [-0.016, 0, -0.005], [-0.001, 0.006, 0.005]),
-    box('pellet-b', 'gum', [0.001, 0, -0.008], [0.011, 0.006, 0.007]),
-    box('pellet-c', 'gum', [-0.009, 0.006, -0.004], [0.006, 0.012, 0.006]),
-  ], { gum: 'plastic-white' }) + { title: 'Loose gum' } + loose('medical'),
+    lens('pellet-a', 'gum', 0.006, 0.003, 0, -0.008, -0.002, 0),
+    lens('pellet-b', 'gum', 0.006, 0.003, 0, 0.005, 0.004, 0),
+    lens('pellet-c', 'gum', 0.006, 0.003, 0, 0, -0.011, 0),
+  ], { gum: 'plastic-white' }) + { title: 'Loose gum' } + loose('medical') + smooth,
 
   // A pinch of fine powder, 40 mm across and 8 mm tall.
   h.compound('powder_heap', 0.002, [cone('powder', 'powder', 0.02, 0.008)], { powder: 'chalk-white' })
@@ -37,13 +53,14 @@ local cone(id, slot, radius, height) = turned(id, slot, 'y', [[0, 0], [0, radius
     h.taperedBlock('shard-c', 'crystal', [-0.004, 0, 0.004], [0.002, 0.004, 0.01], 0.001, [0.001, 0.001, 0.001], 0.001),
   ], { crystal: 'plastic-frosted' }) + { title: 'Crystal heap' } + loose('medical'),
 
-  // A tuft of dried leaf and buds, 40 mm across and 14 mm tall.
+  // A tuft of dried leaf and buds, 40 mm across and 14 mm tall, with two woody stalks poking out of it.
   h.compound('leaf_heap', 0.003, [
     cone('tuft', 'leaf', 0.016, 0.01),
     h.taperedBlock('bud-a', 'leaf', [0.006, 0, -0.012], [0.018, 0.012, 0], 0.003, [0.003, 0.003, 0.003], 0.002),
     h.taperedBlock('bud-b', 'leaf', [-0.02, 0, 0.002], [-0.008, 0.009, 0.014], 0.003, [0.003, 0.003, 0.003], 0.002),
-    box('stem', 'stem', [-0.006, 0.008, -0.001], [0.012, 0.01, 0.001]),
-  ], { leaf: 'plant-dried', stem: 'paperboard-tan' }) + { title: 'Leaf heap' } + loose('medical', ['plant']),
+    h.rod('stalk-a', 'stem', 0.0015, -0.026, -0.006, 0.003),
+    turned('stalk-b', 'stem', 'z', [[0, 0], [0, 0.0015], [0.012, 0.0015], [0.012, 0]], [0.002, 0.003, 0.012]),
+  ], { leaf: 'plant-dried', stem: 'wood-walnut' }) + { title: 'Leaf heap' } + loose('medical', ['plant']),
 
   // A spill of dry grit, 60 mm across and 18 mm tall, with a few coarse grains beside it.
   h.compound('granular_heap', 0.04, [

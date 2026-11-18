@@ -26,7 +26,7 @@ import {
 import { singlePart } from '@skelly/thing-core/single-part';
 import { drawnGeometry } from '@skelly/thing-export/drawn.ts';
 import type { Palette, VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
-import { hex } from '@skelly/thing-export/glb.ts';
+import { hex, SMOOTH } from '@skelly/thing-export/glb.ts';
 import { TitleSchema } from '@skelly/thing-export/title.ts';
 import {
   array,
@@ -145,6 +145,8 @@ const PartSchema = strictObject({
     ),
   ),
   ports: array(PortSchema),
+  /** Keeps the part's authored mesh in the voxel file; see `tools/packages/thing-export/README.md`, "Voxelized export". */
+  smooth: optional(literal(true)),
 });
 const ItemSchema = pipe(
   strictObject({
@@ -362,7 +364,14 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
       throw new Error(`${part.id}: paintable slot ${slot} colours no solid`);
     }
   }
-  return { family: part.family, solids, ports: part.ports, axes: [], keepOuts: [] };
+  return {
+    family: part.family,
+    solids,
+    ports: part.ports,
+    axes: [],
+    keepOuts: [],
+    ...(part.smooth ? { tags: [SMOOTH] } : {}),
+  };
 };
 export const loadCatalogue = (value: unknown): Catalogue => {
   const data = parse(CatalogueSchema, value);

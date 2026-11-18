@@ -84,6 +84,11 @@ revisited if it bothers players. A cartridge is drawn as a faceted lathe with th
 count of the other round things beside the guns. The rule is keyed by the part's type, so
 every gun's sights follow it without a per-gun choice. See `src/glb.ts`, `SMOOTH`, and
 `packages/gun-authoring-tool/src/gun/tooSmallToVoxelize.ts`, `TOO_SMALL_TO_VOXELIZE`.
+Loose pills, capsules and gum are such parts too: a few millimetres across and rounded all
+over, they read as cubes at any grain, so their catalogue rows mark the part `smooth`. Loose
+stuff whose real pieces are jagged or fine, such as crystal, powder, grit or dried leaf, stays
+voxelized, since the lattice's steps read as its grain. See
+`packages/thing-authoring-tool/src/catalogue.ts`, `PartSchema`.
 
 A smooth part's datums lie on its authored solids, which is what the file draws. The voxel
 part it mounts on snaps its face to the grid, so the boxes it stands on reach one grain into
