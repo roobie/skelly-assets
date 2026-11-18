@@ -90,6 +90,7 @@ import { workerPool } from './workerPool.mjs';
  * @typedef {SwingExport & { part: string | undefined; status: 'clear' | 'judged' | 'fails'; contacts: Touch[] }} Verdict
  */
 /** @typedef {{ vehicle: string; sites: readonly [string, string]; message: string }} EntryProblem */
+/** @typedef {ReturnType<typeof swingReport>} SwingReport */
 
 const EPSILON = 1e-9;
 const LOOSE = 1; // grains a cap may exceed the depth it was measured at
