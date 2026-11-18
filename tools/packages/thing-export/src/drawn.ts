@@ -98,6 +98,11 @@ interface Region {
   readonly drawn: () => SolidMeasure;
 }
 
+interface Sampled {
+  readonly fill: VoxelFill;
+  readonly measures: Map<Solid, SolidMeasure | undefined>;
+}
+
 const sizeOf = ([min, max]: readonly [Vec3, Vec3]): number => (max[0] - min[0]) * (max[1] - min[1]) * (max[2] - min[2]);
 
 const distanceTo = ([min, max]: readonly [Vec3, Vec3], point: Vec3): number =>
@@ -132,13 +137,17 @@ export const drawnGeometry = (
     }
     return grains.get(def);
   };
-  /** Per list of solids sampled together, their fill and each solid's drawn measure, undefined where it draws none. */
-  const sampled = new Map<
-    readonly Solid[],
-    { readonly fill: VoxelFill; readonly measures: Map<Solid, SolidMeasure | undefined> }
-  >();
-  const sampledOf = (siblings: readonly Solid[], grain: number, placed: Transform) => {
-    const known = sampled.get(siblings);
+  /**
+   * Per list of solids sampled together and per lattice they are sampled on, their fill and each solid's drawn measure,
+   * undefined where it draws none. Parts built from one definition share its solids list but not their placement.
+   */
+  const sampled = new Map<readonly Solid[], Map<string, Sampled>>();
+  const sampledOf = (siblings: readonly Solid[], grain: number, placed: Transform): Sampled => {
+    const origin = latticeOrigin(placed, grain, unit);
+    const lattices = sampled.get(siblings) ?? new Map<string, Sampled>();
+    sampled.set(siblings, lattices);
+    const key = [grain, ...origin].join(' ');
+    const known = lattices.get(key);
     if (known) {
       return known;
     }
@@ -152,7 +161,7 @@ export const drawnGeometry = (
         : { positions: mesh.positions.map((x) => x * unit), indices: mesh.indices };
     });
     const inUnits = (v: readonly number[]): Vec3 => [v[0]! / unit, v[1]! / unit, v[2]! / unit];
-    const fill = fillVoxels(sources, grain, latticeOrigin(placed, grain, unit));
+    const fill = fillVoxels(sources, grain, origin);
     const measures = new Map(
       siblings.map((solid, index) => {
         const own = fill.measures[index];
@@ -168,7 +177,7 @@ export const drawnGeometry = (
       }),
     );
     const entry = { fill, measures };
-    sampled.set(siblings, entry);
+    lattices.set(key, entry);
     return entry;
   };
   const placedPart = (partId: string) => {
