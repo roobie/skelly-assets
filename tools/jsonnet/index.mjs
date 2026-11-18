@@ -1,3 +1,4 @@
+// @ts-check
 import { execFile, execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -6,8 +7,15 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+/**
+ * @typedef {object} OverlayOptions
+ * @property {string} [overlay] A folder searched before the repository for root-relative imports.
+ */
+
+/** @type {string} */
 export const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TOOLS_DIR = fileURLToPath(new URL('./', import.meta.url));
+/** @type {{ version: string }} */
 const RUNTIME_PIN = JSON.parse(readFileSync(resolve(TOOLS_DIR, 'runtime.json'), 'utf8'));
 const JSONNET_NAME = process.platform === 'win32' ? 'jsonnet.exe' : 'jsonnet';
 const JSONNET_EXECUTABLE = resolve(TOOLS_DIR, 'bin', RUNTIME_PIN.version, JSONNET_NAME);
@@ -27,20 +35,42 @@ function jsonnetExecutable() {
   return JSONNET_EXECUTABLE;
 }
 
-// The library folders in the order go-jsonnet searches them: it takes `-J` paths right to left.
+/**
+ * The library folders in the order go-jsonnet searches them: it takes `-J` paths right to left.
+ * @param {string} [repositoryRoot]
+ * @returns {string[]}
+ */
 export const libraryPaths = (repositoryRoot = REPOSITORY_ROOT) => [resolve(repositoryRoot, '..'), repositoryRoot];
 
-// The overlay comes last, so it is searched first.
+/**
+ * The overlay comes last, so it is searched first.
+ * @param {string} repositoryRoot
+ * @param {string} [overlay]
+ */
 const libraryArgs = (repositoryRoot, overlay) =>
   [...libraryPaths(repositoryRoot).toReversed(), ...(overlay ? [overlay] : [])].flatMap((path) => ['-J', path]);
 
+/**
+ * @param {string} repositoryRoot
+ * @returns {import('node:child_process').ExecFileSyncOptionsWithStringEncoding}
+ */
 const runOptions = (repositoryRoot) => ({ cwd: repositoryRoot, encoding: 'utf8', maxBuffer: Number.POSITIVE_INFINITY });
 
+/**
+ * @param {unknown} error
+ * @param {string} label
+ */
 const compileError = (error, label) => {
   const detail = error instanceof Error && 'stderr' in error ? String(error.stderr).trim() : String(error);
   return new Error(`Jsonnet compilation failed for ${label}: ${detail}`, { cause: error });
 };
 
+/**
+ * @param {string[]} args
+ * @param {string} repositoryRoot
+ * @param {string} label
+ * @returns {string}
+ */
 function runJsonnet(args, repositoryRoot, label) {
   const executable = jsonnetExecutable();
   try {
@@ -50,6 +80,12 @@ function runJsonnet(args, repositoryRoot, label) {
   }
 }
 
+/**
+ * @param {string[]} args
+ * @param {string} repositoryRoot
+ * @param {string} label
+ * @returns {Promise<string>}
+ */
 async function runJsonnetAsync(args, repositoryRoot, label) {
   const executable = jsonnetExecutable();
   try {
@@ -59,6 +95,12 @@ async function runJsonnetAsync(args, repositoryRoot, label) {
   }
 }
 
+/**
+ * @param {string} sourcePath
+ * @param {string} repositoryRoot
+ * @param {string | undefined} overlay
+ * @returns {[string[], string, string]}
+ */
 const fileArgs = (sourcePath, repositoryRoot, overlay) => {
   const absoluteSource = resolve(repositoryRoot, sourcePath);
   return [
@@ -68,26 +110,49 @@ const fileArgs = (sourcePath, repositoryRoot, overlay) => {
   ];
 };
 
-// An `overlay` folder is searched before the repository for root-relative imports, so a caller can swap
-// one library file without touching the tracked one.
+/**
+ * An `overlay` folder is searched before the repository for root-relative imports, so a caller can swap
+ * one library file without touching the tracked one.
+ * @param {string} sourcePath
+ * @param {string} [repositoryRoot]
+ * @param {OverlayOptions} [options]
+ * @returns {string}
+ */
 export function compileJsonnetFile(sourcePath, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
   return runJsonnet(...fileArgs(sourcePath, repositoryRoot, overlay));
 }
 
-// Evaluates a Jsonnet expression with the repository's library paths. Jsonnet is lazy, so an expression that keeps
-// only a few fields of a large source evaluates just those fields.
+/**
+ * Evaluates a Jsonnet expression with the repository's library paths. Jsonnet is lazy, so an expression that keeps
+ * only a few fields of a large source evaluates just those fields.
+ * @param {string} expression
+ * @param {string} [repositoryRoot]
+ * @returns {string}
+ */
 export function evaluateJsonnet(expression, repositoryRoot = REPOSITORY_ROOT) {
   return runJsonnet([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, expression);
 }
 
-// evaluateJsonnet in a child process that leaves the caller free, so many expressions evaluate at once; `label` names
-// the expression in a failure.
+/**
+ * evaluateJsonnet in a child process that leaves the caller free, so many expressions evaluate at once; `label` names
+ * the expression in a failure.
+ * @param {string} expression
+ * @param {string} [repositoryRoot]
+ * @param {{ label?: string }} [options]
+ * @returns {Promise<string>}
+ */
 export function evaluateJsonnetAsync(expression, repositoryRoot = REPOSITORY_ROOT, { label = expression } = {}) {
   return runJsonnetAsync([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, label);
 }
 
-// Compiles many sources in one go-jsonnet run, each to the text compileJsonnetFile gives it. One run evaluates a file
-// the sources share, such as the item catalogue every recipe imports, once rather than once per source.
+/**
+ * Compiles many sources in one go-jsonnet run, each to the text compileJsonnetFile gives it. One run evaluates a file
+ * the sources share, such as the item catalogue every recipe imports, once rather than once per source.
+ * @param {readonly string[]} sourcePaths
+ * @param {string} [repositoryRoot]
+ * @param {OverlayOptions} [options]
+ * @returns {string[]}
+ */
 export function compileJsonnetFiles(sourcePaths, repositoryRoot = REPOSITORY_ROOT, { overlay } = {}) {
   const out = mkdtempSync(join(tmpdir(), 'jsonnet-'));
   try {
