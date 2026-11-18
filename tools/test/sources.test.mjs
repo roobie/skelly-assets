@@ -305,9 +305,9 @@ test('a shared store counts the fragments a refresh still names as used, though 
     ),
   ));
 
-// A store set up by another user, where this one may write entries but not the store root, so nothing of a refresh's
-// own, which another user could not prune, may land there.
-test('a refresh compiles into a store whose root it may not write', () =>
+// A store root no refresh may write, with kind folders it may: anything of a refresh's own landing in the root, which
+// another user could not prune, would fail the refresh.
+test('a refresh lands nothing in the store root, only in its kind folders', () =>
   withSharedStore((store) =>
     withTwinFixture(
       async ({ refresh, value }) => {
@@ -324,7 +324,7 @@ test('a refresh compiles into a store whose root it may not write', () =>
     ),
   ));
 
-test('checkouts refreshing into one shared store at once each get whole twins and leave no partial entries', () =>
+test('checkouts refreshing into one shared store at once each get whole twins from one whole entry per unit', () =>
   withSharedStore((store) =>
     withTwinFixture(
       (one) =>
@@ -340,6 +340,9 @@ test('checkouts refreshing into one shared store at once each get whole twins an
               .flatMap((kind) => readdirSync(join(store, kind)))
               .filter((name) => !/^[0-9a-f]{64}\.json$/.test(name));
             assert.deepEqual(partial, []);
+            // One entry per unit, whichever checkout compiled it: a key that named the checkout would give two.
+            assert.equal(readdirSync(join(store, 'rows')).length, 2, 'a fragment per row file');
+            assert.equal(readdirSync(join(store, 'twins')).length, 4, 'a twin per source');
           },
           { store },
         ),
