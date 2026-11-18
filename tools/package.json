@@ -18,6 +18,8 @@
     "build": "node build.mjs",
     "lint": "biome ci",
     "fix": "biome check --write",
+    "pretypecheck": "node sources.mjs",
+    "typecheck": "tsc --noEmit",
     "knip": "knip"
   },
   "dependencies": {
@@ -26,8 +28,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "@types/node": "^26.6.2",
     "knip": "6.34.0",
     "playwright": "1.64.0",
+    "typescript": "^7.0.2",
     "valibot": "^1.5.0"
   }
 }

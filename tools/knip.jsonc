@@ -5,7 +5,6 @@
       // Every module here is a CLI run by path or a module the showcase (`site/`, outside this package) or skelly
       // imports, so each is an entry and its exports are a surface whose consumers knip cannot see.
       "entry": ["*.mjs", "test/**/*.test.mjs"],
-      // A `.d.mts` types its sibling `.mjs` for TypeScript, which pairs them by name, never by an import.
       "project": ["*.{mjs,ts}", "jsonnet/**/*.mjs", "test/**/*.mjs"],
       "ignoreUnresolved": [
         // The skin check imports the showcase's modules in the browser, from the server that serves `site/`.
