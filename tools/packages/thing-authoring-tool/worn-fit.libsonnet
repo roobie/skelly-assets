@@ -110,9 +110,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       yoke: { y: [chestTop - 0.13, chestTop + g], width: 2 * (deltoidOuter + g), depth: bust.shoulderDepth + 2 * g, chamfer: 0.03 + round },
     },
 
-  // A jacket, shirt, hoodie or coat: a body shell over the bust and, unless `sleeves` is 'none', upper and fore
-  // sleeves. `sleeveLayer`, by default the body's, lets a loose body keep close sleeves, so a hanging arm's sleeve
-  // stays clear of the hips. `round` softens every corner, for a garment of soft cloth. `hood` lays a hood `hood` deep on the back.
+  // A jacket, shirt, hoodie or coat: a body shell over the bust, a hips shell when `hem` falls below the waist and,
+  // unless `sleeves` is 'none', upper and fore sleeves. `sleeveLayer`, by default the body's, lets a loose body keep
+  // close sleeves, so a hanging arm's sleeve stays clear of the hips. `round` softens every corner, for a garment of soft cloth. `hood` lays a hood `hood` deep on the back.
   // `pockets` are 'welt' slits at the hips, a 'patch' pocket either side of the closure, a 'kangaroo' pocket across
   // the belly, or 'none'. `top` 'yoke' covers the shoulders under a yoke and collar; 'straps' cuts the body off at a
   // neckline between the trunk's top and the shoulders, held up by a strap over each trapezius, for a tank top, and
@@ -127,6 +127,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local sl = s.slots;
     local l = self.torsoLevels(s.layer, s.round);
     local hem = hems[s.hem];
+    // A hem below the waist's foot hangs over the hips, which ride the pelvis while the body shell rides the spine, so
+    // that stretch is a hips shell of its own, as the robe's is: on the body shell a twisted chest would turn it across
+    // the hips, which are wider than they are deep. The two overlap where they meet, so a bending trunk opens no slit.
+    local hips = hem < l.pelvis.y[1];
+    local bodyFoot = if hips then l.waist.y[0] - 0.01 else hem;
     local chestTop = l.ribs.y[1] + bust.chestHeight;
     local neckline = l.ribs.y[1] + 0.65 * bust.chestHeight;
     local bodyTop = if straps then neckline else l.chest.y[1];
@@ -168,8 +173,15 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
         h.box('strap-top-' + name, sl.trim, [x0, strapTop - strapT, -strapFace], [x1, strapTop, strapFace]),
         h.box('strap-back-' + name, sl.trim, [x0, neckline - 0.01, -strapFace], [x1, strapTop, -strapFace + strapT]),
       ];
+    local zip(name, y0, y1) = h.box('zip-' + name, sl.fastener, [s.zipX - 0.005, y0, front(y0)], [s.zipX + 0.005, y1, front(y0) + 0.004]);
+    local belt = if s.belt then [
+      oct('belt', sl.body, hem, hem + 0.035, l.waist.width + 0.008, l.waist.depth + 0.008, l.waist.chamfer),
+      h.box('buckle', sl.fastener, [0.1, hem + 0.002, lowFront + 0.004], [0.135, hem + 0.033, lowFront + 0.008]),
+    ] else [];
+    local hipsShell = [level('hips', l.pelvis, hem, l.pelvis.y[1] + 0.01)]
+                      + (if s.zipX == null then [] else [zip('hips', hem, l.pelvis.y[1] + 0.01)]) + belt;
     local body = [
-      level('low', l.waist, hem, l.waist.y[1]),
+      level('low', l.waist, bodyFoot, l.waist.y[1]),
       level('ribs', l.ribs, l.ribs.y[0] - 0.01, l.ribs.y[1]),
       level('chest', chest, l.chest.y[0] - 0.01, if straps then armpit else bodyTop),
     ] + (if straps then [panel('front', 1), panel('back', -1)] + strap('l', -1) + strap('r', 1) else [
@@ -182,12 +194,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for side in [-1, 1]
     ] else []) + (if s.zipX == null then [] else [
       // The closure runs down each level's front face.
-      h.box('zip-' + v[0], sl.fastener, [s.zipX - 0.005, v[1], front(v[1])], [s.zipX + 0.005, v[2], front(v[1]) + 0.004])
-      for v in [['low', hem, l.waist.y[1]], ['ribs', l.ribs.y[0], l.ribs.y[1]], ['chest', l.chest.y[0], bodyTop - 0.02]]
-    ]) + pockets[s.pockets] + (if s.belt then [
-      oct('belt', sl.body, hem, hem + 0.035, l.waist.width + 0.008, l.waist.depth + 0.008, l.waist.chamfer),
-      h.box('buckle', sl.fastener, [0.1, hem + 0.002, lowFront + 0.004], [0.135, hem + 0.033, lowFront + 0.008]),
-    ] else []) + (if s.hood == null then [] else hood(sl.hood, sl.lining, chestTop, l.chest.depth, s.hood));
+      zip(v[0], v[1], v[2])
+      for v in [['low', bodyFoot, l.waist.y[1]], ['ribs', l.ribs.y[0], l.ribs.y[1]], ['chest', l.chest.y[0], bodyTop - 0.02]]
+    ]) + pockets[s.pockets] + (if hips then [] else belt)
+      + (if s.hood == null then [] else hood(sl.hood, sl.lining, chestTop, l.chest.depth, s.hood));
     // The sleeve's head covers the deltoid, so its depth follows the shoulder's rather than the arm's.
     local gs = layers[s.sleeveLayer];
     local upper = [oct('sleeve', sl.body, -arm.upperLength - arm.seamOverlap, 0.03, arm.upperWidth + 2 * gs + 0.01, bust.shoulderDepth + 2 * gs, 0.02 + s.round)];
@@ -196,7 +206,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
       oct('cuff', sl.trim, -arm.foreLength - 0.004, -arm.foreLength + 0.03, arm.foreWidth + 2 * gs + 0.012, arm.upperDepth + 2 * gs + 0.008, 0.02 + s.round),
     ];
+    // The hips shell stops at the hem, so it encloses the pelvis only when the hem falls below the hips' bottom.
     fitted([shell(id + '_worn_body', 'clothing_body', body, finish, if straps then ['trunk'] else ['torso'], title=named(title, 'body'))]
+           + (if hips then [shell(id + '_worn_pelvis', 'clothing_body', hipsShell, finish, if hem <= 0 then ['pelvis'] else [], title=named(title, 'hips'))] else [])
            + (if s.sleeves == 'none' then [] else [
                 paired(id + '_worn_upper', 'sleeve', upper, finish, [], ['upper'], title=named(title, 'upper sleeve')),
                 paired(id + '_worn_fore', 'cuff', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
