@@ -3,11 +3,16 @@
 // the feet are and how far the hull sinks, and the solver finds the hinge angles that put them there. A
 // machine that weighs tonnes must plant its feet: keyed legs slide on the ground as the body moves, and
 // the eye reads a sliding foot on a heavy walker at once.
+//
+// The damage clips' keys are content (models/mobs/walker/damage.jsonnet), since which hits count as heavy
+// and how far one rocks the hull are tuning a mod changes; the keys below predate that file.
 
+import damage from '../../../../../../models/mobs/walker/damage.json' with { type: 'json' };
 import type { Bone } from '../../core/body.ts';
 import type { Realized } from '../../core/generate.ts';
 import { clamp } from '../../core/math.ts';
 import type { EulerDeg } from '../../core/pose.ts';
+import { posedVoxelSurfaceBoundsForBones } from '../../core/voxelBounds.ts';
 import { severedBoneSet } from '../dismember.ts';
 import {
   type Angles,
@@ -38,6 +43,9 @@ interface WalkerClipDef extends ClipDef {
   /** How far the hull sinks below the guard stance, in metres, as keys; the legs fold to carry it. */
   readonly drop?: ScalarKeys;
   readonly stride?: Stride;
+  /** A clip keyed for a body with the left leg lost from the heel down (the right plays it mirrored): how
+   * its stump steps, and its phase after the sound leg's, whose cycle starts as its foot lands. */
+  readonly stump?: { readonly stride: Stride; readonly shift: number };
 }
 
 const rest: EulerDeg = [0, 0, 0];
@@ -63,7 +71,7 @@ const AIM: EulerDeg = [-7, 0, -10];
 /** Each shot kicks the pods up, not off their bearing. */
 const KICK: EulerDeg = [3, 0, -10];
 
-const CLIPS = {
+const KEYED = {
   /** On guard: the hull holds still while servos hunt in short, discrete moves; the sensor head snaps from
    * bearing to bearing, a pod corrects its aim, and the legs settle a notch and recover. */
   idle: {
@@ -218,6 +226,18 @@ const CLIPS = {
   },
 } as const satisfies Record<string, WalkerClipDef>;
 
+/** The damage tuning a game reads beside the clips: the rounds whose hit plays the flinch, and the band its
+ * tilt must stay inside, in degrees. */
+export const WALKER_DAMAGE = {
+  heavyRounds: damage.heavyRounds as readonly string[],
+  tiltBounds: damage.tiltBounds as { readonly min: number; readonly max: number },
+};
+
+const CLIPS = {
+  ...KEYED,
+  ...(damage.clips as unknown as Readonly<Record<'limp' | 'flinch', WalkerClipDef>>),
+};
+
 export type WalkerClip = keyof typeof CLIPS;
 export const WALKER_CLIPS = Object.keys(CLIPS) as readonly WalkerClip[];
 
@@ -354,11 +374,20 @@ const strideTarget = (leg: Leg, stride: Stride, travel: ScalarKeys, u: number, q
 /** The phase offset of each leg's stride: the right foot steps half a cycle after the left. */
 const LEG_SHIFT: Readonly<Record<string, number>> = { L: 0, R: 0.5 };
 
+/** The legs lost from the heel down, by side: how far the stump's lowest point stands above the sole it
+ * lost, in metres, in the guard stance. */
+export type Stumps = Readonly<Partial<Record<string, number>>>;
+
 /** Joint angles of a clip at normalized time `u` (0..1) on this body, keyed by bone id: its keyed
- * channels, with every leg solved to stand where the clip puts its foot. */
-export const walkerAngles = (bones: readonly Bone[], name: string, u: number): Angles => {
+ * channels, with every leg solved to stand where the clip puts its foot. A stump is set down that much
+ * lower, so it bears on the ground where its heel stood. */
+export const walkerAngles = (bones: readonly Bone[], name: string, u: number, stumps: Stumps = {}): Angles => {
   const clip = walkerClip(name);
-  const angles = channelAngles(clip, u);
+  const stumped = Object.keys(stumps);
+  if (clip.stump && stumped.length !== 1) {
+    throw new Error(`walker clip "${name}" is keyed for one stump, not ${stumped.length}`);
+  }
+  const angles = channelAngles(clip, u, clip.stump !== undefined && stumped[0] === 'R');
   const hull = bones.find((bone) => bone.id === 'hull');
   if (!hull) {
     throw new Error('walker hull bone is missing');
@@ -367,15 +396,37 @@ export const walkerAngles = (bones: readonly Bone[], name: string, u: number): A
   const sink = clip.drop ? scalar(clip.drop, u) : 0;
   for (const side of Object.keys(LEG_SHIFT)) {
     const leg = legOf(bones, side);
-    const q = (((u + LEG_SHIFT[side]!) % 1) + 1) % 1;
+    const depth = stumps[side] ?? 0;
+    const lame = Object.hasOwn(stumps, side) ? clip.stump : undefined;
+    const shift = clip.stump ? (lame?.shift ?? 0) : LEG_SHIFT[side]!;
+    const stride = lame?.stride ?? clip.stride;
+    const q = (((u + shift) % 1) + 1) % 1;
     const target: FootTarget =
-      clip.stride && clip.travel
-        ? strideTarget(leg, clip.stride, clip.travel, u, q, sink)
+      stride && clip.travel
+        ? strideTarget(leg, stride, clip.travel, u, q, sink)
         : { ball: [leg.ball[0] + sink, leg.ball[1]], tuck: 0, tilt: 0 };
-    Object.assign(angles, solveLeg(leg, planar(hull), hullPitch, target));
+    const set: FootTarget = { ...target, ball: [target.ball[0] - depth, target.ball[1]] };
+    Object.assign(angles, solveLeg(leg, planar(hull), hullPitch, set));
   }
   return angles;
 };
+
+/** Each leg the cuts took from the heel down, with its stump's depth (Stumps). The rest pose holds the
+ * tarsus at the heading every planted stance gives it, so the depth found there holds for every step. */
+export const walkerStumps = (realized: Pick<Realized, 'body' | 'voxels'>, cuts: readonly string[]): Stumps => {
+  const hidden = severedBoneSet(realized.body.bones, cuts);
+  const rest = { root: [0, 0, 0] as const, rotations: {} };
+  const lost = Object.keys(LEG_SHIFT).filter((side) => hidden.has(`foot.${side}`) && !hidden.has(`tarsus.${side}`));
+  return Object.fromEntries(
+    lost.map((side) => {
+      const lowest = posedVoxelSurfaceBoundsForBones(realized, rest, [`tarsus.${side}`, `foot.${side}`]);
+      return [side, lowest.get(`tarsus.${side}`)! - lowest.get(`foot.${side}`)!];
+    }),
+  );
+};
+
+/** The walk a body plays: the limp on one stump, else the stomp. */
+export const walkerGaitFor = (stumps: Stumps): WalkerClip => (Object.keys(stumps).length === 1 ? 'limp' : 'stomp');
 
 export interface FrameOptions {
   /** Cut points already severed (mob/dismember.ts, severedBoneSet). */
@@ -393,5 +444,6 @@ export const walkerFrame = (
   const { bones } = realized.body;
   const hidden = severedBoneSet(bones, cuts);
   const visible = bones.filter((bone) => !hidden.has(bone.id)).map((bone) => bone.id);
-  return groundedFrame(realized, clip, (at) => walkerAngles(bones, name, at), u, visible);
+  const stumps = walkerStumps(realized, cuts);
+  return groundedFrame(realized, clip, (at) => walkerAngles(bones, name, at, stumps), u, visible);
 };

@@ -315,7 +315,9 @@ const buildLeg = (rig: Rig, side: string, x: number, { at, r, p }: Limb): void =
     { id: thigh, parent: 'hull', head: hip, tail: knee, disposition: 'sever' },
     { id: shin, parent: thigh, head: knee, tail: hock },
     { id: tarsus, parent: shin, head: hock, tail: ball },
-    { id: foot, parent: tarsus, head: ball, tail: toe },
+    // The foot is a cut point of its own, so a leg can be lost from the heel down and the walker limp on
+    // the stump (motion.ts, the limp clip).
+    { id: foot, parent: tarsus, head: ball, tail: toe, disposition: 'sever' },
   );
 
   // The thigh carries the body, so it is the heaviest plate: an armoured cowl over the actuator on its outer

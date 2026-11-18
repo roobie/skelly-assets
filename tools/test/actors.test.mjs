@@ -1262,20 +1262,23 @@ test('leaper pose clips reproduce its live frames at every stored cursor, whole 
   assert(clips.standing.pounce.takeoffAtSimSeconds < clips.standing.pounce.hitAtSimSeconds);
 });
 
-test('walker pose clips reproduce its live frames and state the stride and hit its clips author', async () => {
+test('walker pose clips reproduce its live frames, whole and on a stump, and state what its clips author', async () => {
   const { generateValid } = await import('../packages/mobgen/src/core/generate.ts');
   const { consumableTemplate } = await import('../packages/mobgen/src/core/template.ts');
   const { figureFor } = await import('../actorFigure.mjs');
-  const { walkerClip, walkerFrame } = await import('../packages/mobgen/src/mob/walker/motion.ts');
+  const { WALKER_DAMAGE, walkerClip, walkerFrame } = await import('../packages/mobgen/src/mob/walker/motion.ts');
   const template = consumableTemplate('security-walker');
   const { realized } = figureFor(generateValid(template, 1, { maxAttempts: 1 }), template, 1);
-  const { clips } = await bakeFixture('security-walker');
+  const { body, clips } = await bakeFixture('security-walker');
   await assertTrackClipsMatchLive(
     [
-      [clips.standing.idle, 'idle'],
-      [clips.standing.walk, 'stomp'],
-      [clips.standing.attack, 'fire'],
-    ].map(([clip, name]) => [clip, name, (u) => walkerFrame(realized, name, u)]),
+      [clips.standing.idle, 'idle', {}],
+      [clips.standing.walk, 'stomp', {}],
+      [clips.standing.attack, 'fire', {}],
+      [clips.standing.flinch, 'flinch', {}],
+      [clips.limping.walk.left, 'limp', { cuts: ['foot.L'] }],
+      [clips.limping.walk.right, 'limp', { cuts: ['foot.R'] }],
+    ].map(([clip, name, cut]) => [clip, name, (u) => walkerFrame(realized, name, u, cut)]),
   );
   const fire = clips.standing.attack;
   fire.frames.forEach((frame, i) =>
@@ -1283,6 +1286,33 @@ test('walker pose clips reproduce its live frames and state the stride and hit i
   );
   assert.equal(clips.standing.walk.strideMetres, walkerClip('stomp').travel.at(-1)[1]);
   assert.equal(clips.standing.attack.hitAtSimSeconds, walkerClip('fire').hit * walkerClip('fire').seconds);
+  // The limp is a walk loop like the stomp, and the flinch a finite reaction that names the rounds that play it.
+  for (const side of ['left', 'right']) {
+    const limp = clips.limping.walk[side];
+    assert.equal(limp.loop, true);
+    assert.equal(limp.cycles, 1);
+    assert.equal(limp.strideMetres, walkerClip('limp').travel.at(-1)[1]);
+  }
+  const flinch = clips.standing.flinch;
+  assert.equal(flinch.loop, false);
+  assert.equal(flinch.durationSimSeconds, walkerClip('flinch').seconds);
+  assert.equal(flinch.peakAtSimSeconds, walkerClip('flinch').peak * walkerClip('flinch').seconds);
+  assert.deepEqual(flinch.heavyRounds, WALKER_DAMAGE.heavyRounds);
+  // A game can cut each foot the limp is keyed for.
+  assert(['foot.L', 'foot.R'].every((foot) => Object.values(body.severableParts).flat().includes(foot)));
+});
+
+test("the walker's flinch plays on heavy rounds the gun pack exports", async () => {
+  const { WALKER_DAMAGE } = await import('../packages/mobgen/src/mob/walker/motion.ts');
+  const { readFileSync } = await import('node:fs');
+  const exported = JSON.parse(
+    readFileSync(new URL('../packages/gun-authoring-tool/exports/deadvox.json', import.meta.url), 'utf8'),
+  );
+  const rounds = new Set(
+    exported.filter((row) => row.kind === 'cartridge' && row.options.component === 'round').map((row) => row.id),
+  );
+  assert(WALKER_DAMAGE.heavyRounds.length > 0);
+  for (const id of WALKER_DAMAGE.heavyRounds) assert(rounds.has(id), `${id} is an exported round`);
 });
 
 test('a keyed-rig mob row paces its walk at the speed its walk clip travels', async () => {
