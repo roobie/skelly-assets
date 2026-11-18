@@ -15,7 +15,7 @@ import { readSeveredParts, SEVERED_INDEX } from './severedParts.mjs';
 const here = import.meta.dirname;
 const repo = resolve(here, '..');
 const { templateFor } = await import('./mobTemplates.mjs');
-const { codeFingerprint, entryStore, pruneEntries } = await import('./packages/thing-export/src/cache.ts');
+const { codeFingerprint, entryStore } = await import('./packages/thing-export/src/cache.ts');
 const { generate, generateValid, realize, realizeLod, strayParams } = await import(
   './packages/mobgen/src/core/generate.ts'
 );
@@ -85,7 +85,8 @@ const mobInputs = (row, severed) => ({
 export const mobStore = (cache) => {
   const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
   return entryStore(
-    join(cache, 'mob'),
+    cache,
+    'mob',
     codeFingerprint(
       here,
       ['package-lock.json', 'packages/mobgen/src', ...tools],
@@ -170,7 +171,7 @@ async function main() {
   // Only a run over every row may prune, so the store keeps exactly what the next complete build reuses, or index the
   // severed parts, since an index of some types would hide the others.
   if (positionals.length === 0 && !failed) {
-    if (store) pruneEntries(join(cache, 'mob'), used);
+    if (store) store.prune(used);
     for (const [file, json] of severedIndexFiles(plans.values(), cutsByMob)) writeOut(out, file, json);
   }
   reportCache(reused, wanted.length);

@@ -19,8 +19,8 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { BUILD_ROOT } from './buildDir.mjs';
+import { entryFolder } from './entryFolder.mjs';
 import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
-import { entryFolder, pruneEntries } from './packages/thing-export/src/cache.ts';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
 
 const here = import.meta.dirname;
@@ -125,13 +125,15 @@ const replaceFile = (path, contents) => {
 
 // The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
 // foreign store costs a compile, never a wrong twin. It keeps its entries as the export cache does, so worktrees and
-// users on one host can share it as they share that cache: a shared store keeps what other checkouts still use.
-const ENTRY = ['json'];
-const KINDS = ['rows', 'twins'];
-const storeFolders = (store) => Object.fromEntries(KINDS.map((kind) => [kind, entryFolder(join(store, kind))]));
+// users on one host can share it as they share that cache: a shared store keeps what other checkouts still use. A
+// refresh's prune names every current fragment and twin, which counts them as used even when no compile read them, so
+// a checkout's fragments outlive a stretch of refreshes its stored twins all served.
+const ENTRY_FILE = 'json';
+const ENTRY = [ENTRY_FILE];
+const storeFolders = (store) => ({ rows: entryFolder(store, 'rows'), twins: entryFolder(store, 'twins') });
 const storedJson = (folder, key) => folder.read(key, ENTRY)?.json;
-const pruneStore = (store, keys) => {
-  for (const kind of KINDS) pruneEntries(join(store, kind), new Set(keys[kind]));
+const pruneStore = (folders, keys) => {
+  for (const [kind, folder] of Object.entries(folders)) folder.prune(new Set(keys[kind]));
 };
 
 const forEachConcurrently = async (items, work) => {
@@ -147,10 +149,9 @@ const forEachConcurrently = async (items, work) => {
 const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
-// A stored fragment is read, not just found, so a shared store counts it as used.
 const compileFragments = (rows, { root, folders }) =>
   forEachConcurrently(rows, async ({ path, key }) => {
-    if (storedJson(folders.rows, key) !== undefined) return;
+    if (existsSync(folders.rows.path(key, ENTRY_FILE))) return;
     const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
     folders.rows.write(key, ENTRY, { json: fragment });
   });
@@ -163,7 +164,7 @@ const withOverlay = (rows, { root, store, folders }, use) => {
     for (const { path, key } of rows) {
       const at = join(overlay, relative(root, path));
       mkdirSync(dirname(at), { recursive: true });
-      symlinkSync(folders.rows.path(key, ENTRY[0]), at);
+      symlinkSync(folders.rows.path(key, ENTRY_FILE), at);
     }
     return use(overlay);
   } finally {
@@ -201,7 +202,7 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
     }
   }
   for (const { path, key } of stale) replaceFile(twinOf(path), twinByKey.get(key));
-  pruneStore(options.store, {
+  pruneStore(options.folders, {
     rows: rows.map(({ key }) => key),
     twins: twins.map(({ key }) => key),
   });

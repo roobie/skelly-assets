@@ -61,7 +61,7 @@ const caches = new Map();
 const cacheOf = async (folder, name, { code, data }) => {
   const { codeFingerprint, exportCache } = await import('./packages/thing-export/src/cache.ts');
   const dir = join(folder, name);
-  if (!caches.has(dir)) caches.set(dir, exportCache(dir, codeFingerprint(here, code, data)));
+  if (!caches.has(dir)) caches.set(dir, exportCache(folder, name, codeFingerprint(here, code, data)));
   return caches.get(dir);
 };
 

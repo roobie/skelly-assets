@@ -13,7 +13,7 @@
 // the rules and the cost strategy are in `docs/decisions/0016-swing-check.md`.
 import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
-import { join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { shardUnits } from './generation.mjs';
 import { dot } from './packages/construct/src/foundation/math.ts';
@@ -220,7 +220,7 @@ export async function swingResults(
   { cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
 ) {
   const tasks = sweepTasks(data);
-  const folder = cache === undefined ? undefined : resultFolder(join(resolve(cache), CACHE_FOLDER));
+  const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
   const byHash = new Map();
   for (const [vehicle, task] of Object.entries(tasks)) {
     const hash = taskHash(task, checker);

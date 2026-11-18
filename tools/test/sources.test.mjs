@@ -8,6 +8,7 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
+  statSync,
   utimesSync,
   writeFileSync,
 } from 'node:fs';
@@ -17,7 +18,7 @@ import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 
-import { SHARED_ENTRY_LIFE_MS } from '../packages/thing-export/src/cache.ts';
+import { SHARED_ENTRY_LIFE_MS } from '../entryFolder.mjs';
 import { compilerCode, jsonnetFiles, refreshJsonnetTwins } from '../sources.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -223,6 +224,24 @@ test('a shared store keeps what other checkouts used lately and drops what none 
         assert.deepEqual(value('source'), { value: 3 });
         assert.ok(!existsSync(first), 'an entry unused for its life is dropped');
         assert.ok(existsSync(second), 'a recently used entry is kept');
+      },
+      { store },
+    ),
+  ));
+
+test('a shared store counts the fragments a refresh still names as used, though its stored twins served it all', () =>
+  withSharedStore((store) =>
+    withTwinFixture(
+      async ({ root, stamp, refresh }) => {
+        await refresh();
+        const fragments = readdirSync(join(store, 'rows')).map((name) => join(store, 'rows', name));
+        const aged = (Date.now() - SHARED_ENTRY_LIFE_MS - 60_000) / 1000;
+        for (const fragment of fragments) utimesSync(fragment, aged, aged);
+        rmSync(join(root, 'catalogue.json'));
+        rmSync(stamp);
+        await refresh();
+        for (const fragment of fragments)
+          assert.ok(statSync(fragment).mtimeMs > Date.now() - SHARED_ENTRY_LIFE_MS, `${fragment} is in use`);
       },
       { store },
     ),
