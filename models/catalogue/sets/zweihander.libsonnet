@@ -150,7 +150,9 @@ local band(id, x0, x1, r) =
     ],
     { blade: 'steel-bright', wrap: 'leather-brown', guard: 'steel-grey', band: 'steel-grey', grip: 'leather-black' })
   + h.gripOn('zweihander', 'grip-fore') + {
-    handling+: { fraction: [(gripPoint - foreStart) / (foreEnd - foreStart), 0.5, 0.5] },
+    // A tool's quarter roll would turn the edges sideways, and a blade threatens with its point, so it holds as the
+    // other blades do: unrolled, its edges up and down, its point ahead.
+    handling+: { fraction: [(gripPoint - foreStart) / (foreEnd - foreStart), 0.5, 0.5], hold: 'forward', roll: 0 },
     title: 'Zweihänder',
     voxelGrain: grain,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
