@@ -12,6 +12,7 @@ import { join, resolve } from 'node:path';
 import { glbAccessor, glbItem, glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
+import { perAxis } from './packages/construct/src/foundation/math.ts';
 import { facetTerms } from './taxonomy.mjs';
 
 /** @typedef {[number, number, number, number]} Quaternion */
@@ -60,11 +61,6 @@ export const readDressing = (root = repo) => JSON.parse(evaluateJsonnet("import 
 
 // ---- boxes and transforms ----
 
-/**
- * @param {(axis: 0 | 1 | 2) => number} f
- * @returns {Vec3}
- */
-const perAxis = (f) => [f(0), f(1), f(2)];
 /** @returns {Box} */
 const empty = () => ({ min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] });
 /** @param {readonly Box[]} boxes */

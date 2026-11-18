@@ -44,7 +44,7 @@ type Index = 0 | 1 | 2;
 const ALONG: Readonly<Record<Axis, readonly [Index, Index, Index]>> = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] };
 const UNIT: Readonly<Record<Axis, Vec3>> = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
 
-interface Bounds {
+export interface Bounds {
   readonly min: Vec3;
   readonly max: Vec3;
 }

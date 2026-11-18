@@ -91,17 +91,20 @@ export const entryStore = (store: string, kind: string, code: string): EntryStor
   };
 };
 
-/** The results of a check, as JSON by key, which the check keeps in a folder of the export cache. */
-export interface ResultFolder {
-  readonly get: (key: string) => unknown;
-  readonly put: (key: string, result: unknown) => void;
+/**
+ * The results of a check, as JSON by key, which the check keeps in a folder of the export cache. `Result` is what the
+ * check puts, which its keys hash the code of, so what it gets back is what that code put.
+ */
+export interface ResultFolder<Result = unknown> {
+  readonly get: (key: string) => Result | undefined;
+  readonly put: (key: string, result: Result) => void;
   /** As the entry folder's, for a check that ran over everything it judges. */
   readonly prune: (keep: ReadonlySet<string>) => void;
 }
 
 const RESULT = ['json'];
 
-export const resultFolder = (store: string, kind: string): ResultFolder => {
+export const resultFolder = <Result = unknown>(store: string, kind: string): ResultFolder<Result> => {
   const folder = entryFolder(store, kind);
   return {
     get: (key) => {

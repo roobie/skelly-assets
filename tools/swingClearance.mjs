@@ -1,3 +1,4 @@
+// @ts-check
 // Proves that the parts of a vehicle that open swing clear of the rest of it. Each site whose part has a motion sweeps
 // from rest to its stop against every other site's pieces and the ground, and every such site opens at once for a final
 // pose that catches doors meeting each other. Contact is judged relative to rest: a pair counts only when it sinks a
@@ -11,12 +12,22 @@
 // intended and says why, `swingUnjudged` for one nobody has judged yet, which every run lists. Both are capped at the
 // depth they were written for, a variant shares its parent's, and an entry that no longer applies fails. The reason for
 // the rules and the cost strategy are in `docs/decisions/0016-swing-check.md`.
+/** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
+/** @import { Forward } from './packages/thing-core/src/frame.ts' */
+/** @import { StageMove } from './packages/thing-core/src/motion.ts' */
+/** @import { Motion } from './packages/thing-core/src/schema.ts' */
+/** @import { ResultFolder } from './packages/thing-export/src/cache.ts' */
+/** @import { Shard } from './generation.mjs' */
+/** @import { Piece } from './pieceSolid.mjs' */
+/** @import { PartMotion, SitePieces, SiteVehicle } from './siteOverlap.mjs' */
+/** @import { OpenBody, OpenContact, Shape, SweepContact, SweepEntry } from './swingSweep.mjs' */
+/** @import { WorkerPool } from './workerPool.mjs' */
 import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
 import { resolve } from 'node:path';
 import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { shardUnits } from './generation.mjs';
-import { dot } from './packages/construct/src/foundation/math.ts';
+import { column, dot, perAxis } from './packages/construct/src/foundation/math.ts';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import {
   centreOf,
@@ -33,12 +44,61 @@ import { key } from './siteOverlap.mjs';
 import { shapeOf, sweepBody, sweepOpenPose } from './swingSweep.mjs';
 import { workerPool } from './workerPool.mjs';
 
+/**
+ * The change `adjustedMotion` tries on a part: its pins drawn `offset` further, its whole way scaled to `scale`.
+ * @typedef {{ readonly offset?: Vec3; readonly scale?: number }} Adjust
+ */
+/**
+ * A site as a sweep reads it.
+ * @typedef {object} SweepSite
+ * @property {string} id
+ * @property {string} part
+ * @property {Vec3} at
+ * @property {boolean | undefined} [mirror]
+ * @property {string | undefined} [rides]
+ * @property {readonly Piece[]} pieces
+ */
+/**
+ * One vehicle's sweep task. `adjust` maps a part id to the `adjustedMotion` change to try on it, for every site that
+ * places it. With `only`, just that site's body is swept, with no all-open pose.
+ * @typedef {object} SweepTask
+ * @property {number} grain
+ * @property {Forward} forward
+ * @property {Readonly<Record<string, PartMotion>>} motions
+ * @property {readonly SweepSite[]} sites
+ * @property {Readonly<Record<string, Adjust>>} [adjust]
+ * @property {string | undefined} [only]
+ */
+/** @typedef {{ unit: 'mm' | '°'; total: number } | null} Extent How far a body opens, for a message. */
+/** @typedef {SweepContact & { other: string }} SiteContact A moving site's contact with the `other` site. */
+/**
+ * A moving site's sweep: the clock it opens to before it touches anything, and each contact it makes.
+ * @typedef {{ clear: number; extent: Extent; contacts: SiteContact[] }} SiteSweep
+ */
+/** @typedef {{ sites: Record<string, SiteSweep>; open: OpenContact[] }} SweepResult One vehicle's sweep. */
+/**
+ * A pair of sites that touch in a vehicle's sweep, as its moving site opens (`sweep`) or with both open.
+ * @typedef {(OpenContact & { sweep: false }) | (OpenContact & { at: number; extent: Extent; sweep: true })} FoundContact
+ */
+/**
+ * What a moving site touches, judged against its pair's entry: `message` is the problem when no entry covers it.
+ * @typedef {{ other: string; depth: number; at: number | undefined; allowed: boolean; message?: string }} Touch
+ */
+/** @typedef {{ clear: number; stop?: string }} SwingExport A moving site's swing for the placements output. */
+/**
+ * A moving site's swing with its status and all it touches.
+ * @typedef {SwingExport & { part: string | undefined; status: 'clear' | 'judged' | 'fails'; contacts: Touch[] }} Verdict
+ */
+/** @typedef {{ vehicle: string; sites: readonly [string, string]; message: string }} EntryProblem */
+/** @typedef {ReturnType<typeof swingReport>} SwingReport */
+
 const EPSILON = 1e-9;
 const LOOSE = 1; // grains a cap may exceed the depth it was measured at
 export const GROUND = 'ground';
+/** @param {number} metres */
 const millimetres = (metres) => Math.round(metres * 1e3);
 
-// The ground as a shape: a slab below y = 0, deep as far as any part reaches.
+/** @type {Shape} The ground: a slab below y = 0, deep as far as any part reaches. */
 const ground = {
   id: GROUND,
   min: [-1e4, -1e3, -1e4],
@@ -46,15 +106,22 @@ const ground = {
   distance: (p) => Math.max(-1e4 - p[0], p[0] - 1e4, -1e3 - p[1], p[1], -1e4 - p[2], p[2] - 1e4),
 };
 
-// A direction of the model frame, in the vehicle's authored frame.
-const fromModelFrame = (forward, [x, y, z]) => {
-  const m = FRONT_TURNS[forward];
-  return [0, 1, 2].map((j) => m[j] * x + m[3 + j] * y + m[6 + j] * z);
-};
+/**
+ * A direction of the model frame, in the vehicle's authored frame.
+ * @param {Forward} forward
+ * @param {Vec3} direction
+ */
+const fromModelFrame = (forward, direction) => perAxis((j) => dot(column(FRONT_TURNS[forward], j), direction));
 
-// A part's motion as authored, with its pins, resolved in the vehicle frame for the part at its own origin: the same
-// derivation the build exports, so the swing proven is the swing played (docs/decisions/0015-motion-as-content.md). A
-// stowing slide's plane is the leading face of the part's rest bounds, as the solids the check measures draw it.
+/**
+ * A part's motion as authored, with its pins, resolved in the vehicle frame for the part at its own origin: the same
+ * derivation the build exports, so the swing proven is the swing played (docs/decisions/0015-motion-as-content.md). A
+ * stowing slide's plane is the leading face of the part's rest bounds, as the solids the check measures draw it.
+ * @param {PartMotion} part
+ * @param {Forward} forward
+ * @param {number} grain
+ * @returns {Motion}
+ */
 export function resolveMotion({ stages, pieces }, forward, grain) {
   const bounds = piecesBounds(pieces);
   const centre = toModelFrame(forward, centreOf(bounds));
@@ -62,9 +129,15 @@ export function resolveMotion({ stages, pieces }, forward, grain) {
     if (stage.kind === 'slide') {
       const direction = fromModelFrame(forward, TOWARD[stage.toward]);
       const stow = stage.stow ? { stow: Math.max(...cornersOf(bounds).map((corner) => dot(corner, direction))) } : {};
-      return { kind: 'slide', direction, travel: stage.travel, ...stow };
+      /** @type {StageMove} */
+      const slide = { kind: 'slide', direction, travel: stage.travel, ...stow };
+      return slide;
     }
-    const pins = stage.pins.map((id) => pieces.find((piece) => piece.id === id));
+    const pins = stage.pins.map((id) => {
+      const pin = pieces.find((piece) => piece.id === id);
+      if (pin === undefined) throw new Error(`hinge pin ${id} is no piece of its part`);
+      return pin;
+    });
     const axis = pinAxis(pins, grain);
     const sense = hingeSense(
       { from: toModelFrame(forward, axis.from), to: toModelFrame(forward, axis.to) },
@@ -72,26 +145,39 @@ export function resolveMotion({ stages, pieces }, forward, grain) {
       stage.toward,
       grain,
     );
-    return { kind: 'hinge', axis, angle: sense * stage.open };
+    /** @type {StageMove} */
+    const hinge = { kind: 'hinge', axis, angle: sense * stage.open };
+    return hinge;
   });
   return shareStages(moves, cornersOf(bounds));
 }
 
-// How far a body's motion opens, for a message: its degrees or millimetres when it is one stage, else null.
+/**
+ * How far a body's motion opens, for a message: its degrees or millimetres when it is one stage, else null.
+ * @param {readonly Motion[]} layers
+ * @returns {Extent}
+ */
 const extentOf = (layers) => {
-  if (layers.length !== 1 || layers[0].length !== 1) return null;
-  const [[stage]] = layers;
+  const stage = layers.length === 1 && layers[0]?.length === 1 ? layers[0][0] : undefined;
+  if (stage === undefined) return null;
   return stage.kind === 'slide'
     ? { unit: 'mm', total: millimetres(stage.travel) }
     : { unit: '°', total: Math.round(Math.abs(stage.angle)) };
 };
 
-// A part's motion as a proposed fix would give it (tools/swingPropose.mjs): its pins drawn `offset` further in the part's
-// own frame and the motion resolved again from them, so the sense is the one the build would derive, then its whole way
-// scaled to `scale` of the authored stop. A pin line that no longer carries the part clearly toward its hint throws, as
-// the build does.
+/**
+ * A part's motion as a proposed fix would give it (tools/swingPropose.mjs): its pins drawn `offset` further in the
+ * part's own frame and the motion resolved again from them, so the sense is the one the build would derive, then its
+ * whole way scaled to `scale` of the authored stop. A pin line that no longer carries the part clearly toward its hint
+ * throws, as the build does.
+ * @param {PartMotion} part
+ * @param {Adjust} adjust
+ * @param {Forward} forward
+ * @param {number} grain
+ * @returns {Motion}
+ */
 export function adjustedMotion(part, { offset, scale = 1 }, forward, grain) {
-  const pins = new Set(part.stages.flatMap((stage) => stage.pins ?? []));
+  const pins = new Set(part.stages.flatMap((stage) => (stage.kind === 'hinge' ? stage.pins : [])));
   const moved = offset
     ? { ...part, pieces: part.pieces.map((piece) => (pins.has(piece.id) ? shiftPiece(piece, offset) : piece)) }
     : part;
@@ -100,26 +186,49 @@ export function adjustedMotion(part, { offset, scale = 1 }, forward, grain) {
   );
 }
 
-// One vehicle's sweep: for every moving site, how far it opens before it touches anything and each contact it makes, and
-// the pairs of moving sites that touch with all of them open. It reads only its task, so a worker can run it and a
-// cache can keep it. The task is { grain, forward, motions, sites, adjust?, only? }; a site is { id, part, at, mirror?,
-// rides?, pieces }. `adjust` maps a part id to the `adjustedMotion` change to try on it, for every site that places it. With `only`, just that site's
-// body is swept, with no all-open pose, which is what a search over adjustments can afford.
+/**
+ * One vehicle's sweep: for every moving site, how far it opens before it touches anything and each contact it makes,
+ * and the pairs of moving sites that touch with all of them open. It reads only its task, so a worker can run it and a
+ * cache can keep it. With `only`, just that site's body is swept, with no all-open pose, which is what a search over
+ * adjustments can afford.
+ * @param {SweepTask} task
+ * @returns {SweepResult}
+ */
 export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only }) {
+  /** @type {Map<string, Motion>} */
   const resolved = new Map();
+  /** @param {SweepSite} site */
   const motionOf = (site) => {
-    if (!motions[site.part]) return null;
-    if (!resolved.has(site.part))
-      resolved.set(site.part, adjustedMotion(motions[site.part], adjust[site.part] ?? {}, forward, grain));
-    return motionAtSite(resolved.get(site.part), site, AUTHORED_LATERAL);
+    const part = motions[site.part];
+    if (!part) return null;
+    let motion = resolved.get(site.part);
+    if (motion === undefined) {
+      motion = adjustedMotion(part, adjust[site.part] ?? {}, forward, grain);
+      resolved.set(site.part, motion);
+    }
+    return motionAtSite(motion, site, AUTHORED_LATERAL);
   };
   const byId = new Map(sites.map((site) => [site.id, site]));
   const own = new Map(sites.map((site) => [site.id, motionOf(site)]));
-  // The chain of carriers a site rides, nearest first.
-  const carriersOf = (site) => (site.rides ? [byId.get(site.rides), ...carriersOf(byId.get(site.rides))] : []);
-  // The site whose own motion moves this one: itself, or the nearest carrier that has one.
+  /**
+   * The chain of carriers a site rides, nearest first.
+   * @param {SweepSite} site
+   * @returns {SweepSite[]}
+   */
+  const carriersOf = (site) => {
+    if (!site.rides) return [];
+    const carrier = byId.get(site.rides);
+    if (carrier === undefined) throw new Error(`${site.id} rides ${site.rides}, which is no site with pieces`);
+    return [carrier, ...carriersOf(carrier)];
+  };
+  /**
+   * The site whose own motion moves this one: itself, or the nearest carrier that has one.
+   * @param {SweepSite} site
+   */
   const anchorOf = (site) => [site, ...carriersOf(site)].find(({ id }) => own.get(id)) ?? null;
   const shapes = new Map(sites.map((site) => [site.id, site.pieces.map(shapeOf)]));
+  /** @param {string} id */
+  const shapesOf = (id) => shapes.get(id) ?? [];
   const anchors = sites.filter((site) => own.get(site.id));
   const bodies = anchors.map((anchor) => {
     const carriers = carriersOf(anchor).filter(({ id }) => own.get(id));
@@ -132,20 +241,20 @@ export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only
     };
   });
   const step = grain / 4;
+  /** @type {SweepResult} */
   const result = { sites: {}, open: [] };
   const bodyOf = new Map(bodies.flatMap((body) => body.members.map((id) => [id, body])));
   for (const body of only === undefined ? bodies : bodies.filter(({ site }) => site === only)) {
     const members = new Set(body.members);
-    const movers = body.members.flatMap((id) => shapes.get(id).map((shape) => ({ site: id, shape })));
+    const movers = body.members.flatMap((id) => shapesOf(id).map((shape) => ({ site: id, shape })));
     // What shares a carrier with this body moves with it on the one clock; what shares none stands at rest.
+    /** @type {SweepEntry[]} */
     const obstacles = [
       ...sites
         .filter(({ id }) => !members.has(id))
         .flatMap(({ id }) => {
           const layers = bodyOf.get(id)?.layers ?? [];
-          return shapes
-            .get(id)
-            .map((shape) => ({ site: id, shape, layers: layers[0] === body.layers[0] ? layers : [] }));
+          return shapesOf(id).map((shape) => ({ site: id, shape, layers: layers[0] === body.layers[0] ? layers : [] }));
         }),
       { site: GROUND, shape: ground, layers: [] },
     ];
@@ -162,17 +271,22 @@ export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only
     carriers,
     pose: poseAt(layers, 1),
     planes: stowPlanesOf(layers),
-    shapes: members.flatMap((id) => shapes.get(id)),
+    shapes: members.flatMap(shapesOf),
     members,
   }));
+  /** @type {(a: OpenBody & { carriers: readonly string[] }, b: OpenBody & { carriers: readonly string[] }) => boolean} */
   const related = (a, b) => a.carriers.includes(b.site) || b.carriers.includes(a.site);
   const open = sweepOpenPose({ bodies: posed, step, tolerance: step, key, related });
   result.open = [...open.values()];
   return result;
 }
 
-// What a swept vehicle's report is about: the moving sites of each vehicle with their parts' motions. Every site of a
-// vehicle goes in, because a moving part meets them all.
+/**
+ * What a swept vehicle's report is about: the moving sites of each vehicle with their parts' motions. Every site of a
+ * vehicle goes in, because a moving part meets them all.
+ * @param {Pick<SitePieces, 'grain' | 'motions' | 'vehicles'>} pieces
+ * @returns {Record<string, SweepTask>}
+ */
 export function sweepTasks({ grain, motions, vehicles }) {
   return Object.fromEntries(
     Object.entries(vehicles)
@@ -206,6 +320,10 @@ const CHECKER_CODE = [
 ];
 const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
 
+/**
+ * @param {SweepTask} task
+ * @param {string} checker
+ */
 const taskHash = (task, checker) =>
   createHash('sha256').update(checker).update(JSON.stringify(task)).digest('hex').slice(0, 32);
 const CACHE_FOLDER = 'swing';
@@ -216,12 +334,12 @@ const CACHE_FOLDER = 'swing';
 // distinct sweeps is made, so CI can spread a clean build's sweeps over runners like its models (tools/build.mjs,
 // fillCacheShard). With `prune`, entries no vehicle uses any more go, as a full build is the only run that knows them all.
 /**
- * @param {ReturnType<typeof import('./siteOverlap.mjs').readSitePieces>} data
+ * @param {Pick<SitePieces, 'grain' | 'motions' | 'vehicles'>} data
  * @param {{
  *   cache?: string | undefined;
  *   workers?: number;
  *   prune?: boolean;
- *   shard?: import('./generation.mjs').Shard | undefined;
+ *   shard?: Shard | undefined;
  *   checker?: string;
  * }} [options]
  */
@@ -230,13 +348,17 @@ export async function swingResults(
   { cache, workers = availableParallelism(), prune = false, shard, checker = checkerHash() } = {},
 ) {
   const tasks = sweepTasks(data);
+  /** @type {ResultFolder<SweepResult> | undefined} */
   const folder = cache === undefined ? undefined : resultFolder(resolve(cache), CACHE_FOLDER);
+  /** @type {Map<string, { task: SweepTask; vehicles: string[] }>} */
   const byHash = new Map();
   for (const [vehicle, task] of Object.entries(tasks)) {
     const hash = taskHash(task, checker);
     byHash.set(hash, { task, vehicles: [...(byHash.get(hash)?.vehicles ?? []), vehicle] });
   }
+  /** @type {Map<string, SweepResult>} */
   const swept = new Map();
+  /** @type {[string, SweepTask][]} */
   const missing = [];
   const mine = shard === undefined ? [...byHash] : shardUnits([...byHash], shard);
   for (const [hash, { task }] of mine) {
@@ -245,6 +367,7 @@ export async function swingResults(
     else swept.set(hash, stored);
   }
   if (missing.length > 0) {
+    /** @type {WorkerPool<typeof sweepVehicle>} */
     const pool = workerPool(import.meta.url, 'sweepVehicle', Math.min(workers, missing.length));
     try {
       await Promise.all(
@@ -259,16 +382,24 @@ export async function swingResults(
     }
   }
   if (prune) folder?.prune(new Set(byHash.keys()));
+  /** @type {Record<string, SweepResult>} */
   const results = {};
-  for (const [hash, { vehicles }] of byHash)
-    if (swept.has(hash)) for (const vehicle of vehicles) results[vehicle] = swept.get(hash);
+  for (const [hash, { vehicles }] of byHash) {
+    const result = swept.get(hash);
+    if (result !== undefined) for (const vehicle of vehicles) results[vehicle] = result;
+  }
   return { results, reused: mine.length - missing.length, swept: missing.length };
 }
 
-// Every pair of sites that touch in a vehicle's sweep, as Map(pair key -> { sites, depth, pieces, at?, extent?, sweep }):
-// the deepest the pair reaches whether one opens against the other or both are open, `at` the clock at which the
-// first of its sites, the one whose sweep reaches deepest, touches the other, and `sweep` whether that is the case.
+/**
+ * Every pair of sites that touch in a vehicle's sweep, by pair key: the deepest the pair reaches whether one opens
+ * against the other or both are open, `at` the clock at which the first of its sites, the one whose sweep reaches
+ * deepest, touches the other, and `sweep` whether that is the case.
+ * @param {SweepResult} result
+ * @returns {Map<string, FoundContact>}
+ */
 export function foundContacts(result) {
+  /** @type {Map<string, FoundContact>} */
   const found = new Map();
   for (const [site, { contacts, extent }] of Object.entries(result.sites)) {
     for (const contact of contacts) {
@@ -295,45 +426,76 @@ export function foundContacts(result) {
   return found;
 }
 
-// The first contact a sweep found, as [other site, contact], or null.
-const firstContact = ({ contacts }) =>
-  contacts.reduce((first, contact) => (first === null || contact.at < first.at ? contact : first), null);
+/**
+ * The first contact a sweep found, or null.
+ * @param {{ contacts: readonly SiteContact[] }} sweep
+ */
+const firstContact = ({ contacts }) => {
+  /** @type {SiteContact | null} */
+  let first = null;
+  for (const contact of contacts) if (first === null || contact.at < first.at) first = contact;
+  return first;
+};
 
-// What a vehicle with no moving part is swept as: nothing moves and nothing touches, so the entries and riders it lists
-// are still held to that.
+/**
+ * What a vehicle with no moving part is swept as: nothing moves and nothing touches, so the entries and riders it lists
+ * are still held to that.
+ * @type {SweepResult}
+ */
 const NO_SWEEP = { sites: {}, open: [] };
 
-// The report on every vehicle's swings, as { problems, notes, exports, verdicts }, from the sweeps `swingResults` returned. A
-// problem is a contact that no `swingContact` or `swingUnjudged` entry covers to its depth, and an entry that is stale:
-// nothing touches there any more, or it is listed twice or capped far above what it measures. A note is a contact
-// marked `swingUnjudged`, said again on every run. `exports` is each moving site's `{ clear, stop? }`, the part of its
-// stop it opens before the first contact and what it touches there, for the placements output. `verdicts` is the same
-// per moving site with its `status` (`clear`, `judged` when every contact is allowed, `fails`) and all it touches, each
-// with the problem message when no entry covers it, for a tool that shows them (the vehicle authoring tool).
-// `entryProblems` is the part of `problems` that is an entry gone stale or capped far above its contact, with its
-// vehicle and the entry's sites, for a tool that moves a motion and so wears entries out.
+/**
+ * The report on every vehicle's swings, from the sweeps `swingResults` returned. A problem is a contact that no
+ * `swingContact` or `swingUnjudged` entry covers to its depth, and an entry that is stale: nothing touches there any
+ * more, or it is listed twice or capped far above what it measures. A note is a contact marked `swingUnjudged`, said
+ * again on every run. `exports` is each moving site's swing, the part of its stop it opens before the first contact
+ * and what it touches there, for the placements output. `verdicts` is the same per moving site with its `status`
+ * (`clear`, `judged` when every contact is allowed, `fails`) and all it touches, each with the problem message when no
+ * entry covers it, for a tool that shows them (the vehicle authoring tool). `entryProblems` is the part of `problems`
+ * that is an entry gone stale or capped far above its contact, with its vehicle and the entry's sites, for a tool that
+ * moves a motion and so wears entries out.
+ * @param {Pick<SitePieces, 'grain' | 'vehicles'>} pieces
+ * @param {Readonly<Record<string, SweepResult>>} results
+ */
 export function swingReport({ grain, vehicles }, results) {
+  /** @type {string[]} */
   const problems = [];
+  /** @type {EntryProblem[]} */
   const entryProblems = [];
+  /** @type {string[]} */
   const notes = [];
+  /** @type {Record<string, Record<string, SwingExport>>} */
   const exports = {};
+  /** @type {Record<string, Record<string, Verdict>>} */
   const verdicts = {};
   for (const [vehicle, { parent, sites, swingContacts, swingUnjudged }] of Object.entries(vehicles)) {
     const result = results[vehicle] ?? NO_SWEEP;
     const partOf = new Map(sites.map(({ id, part }) => [id, part]));
     partOf.set(GROUND, 'the ground');
-    const carrierOf = new Map(sites.filter((site) => site.rides).map(({ id, rides }) => [id, rides]));
+    /** @type {Map<string, string>} */
+    const carrierOf = new Map(sites.flatMap(({ id, rides }) => (rides ? [[id, rides]] : [])));
     for (const [rider, carrier] of carrierOf) {
       let moves = false;
-      for (let at = rider; at !== undefined; at = carrierOf.get(at)) moves ||= Boolean(result.sites[at]);
+      /** @type {string | undefined} */
+      let at = rider;
+      while (at !== undefined) {
+        moves ||= Boolean(result.sites[at]);
+        at = carrierOf.get(at);
+      }
       if (!moves) problems.push(`${vehicle}: ${rider} rides ${carrier}, and neither is a part that moves`);
     }
     const found = foundContacts(result);
-    const inherited = [...(vehicles[parent]?.swingContacts ?? []), ...(vehicles[parent]?.swingUnjudged ?? [])];
+    /** @type {SiteVehicle | undefined} */
+    const family = parent === null ? undefined : vehicles[parent];
+    const inherited = [...(family?.swingContacts ?? []), ...(family?.swingUnjudged ?? [])];
     const entries = [...swingContacts, ...swingUnjudged];
     const allowed = new Map([...inherited, ...entries].map((entry) => [key(...entry.sites), entry]));
     const inheritedPairs = new Set(inherited.map((entry) => key(...entry.sites)));
-    // A contact as the problem it is when no entry covers it to its depth, else undefined.
+    /**
+     * A contact as the problem it is when no entry covers it to its depth, else undefined.
+     * @param {FoundContact} contact
+     * @param {number} cap
+     */
     const problemOf = (contact, cap) => {
       if (contact.depth <= cap + EPSILON) return undefined;
       const [a, b] = contact.sites;
@@ -346,13 +508,16 @@ export function swingReport({ grain, vehicles }, results) {
         : `${Math.round(contact.at * 100)}% of its way`;
       return `${vehicle}: ${partOf.get(a)} at ${a} swings into ${partOf.get(b)} at ${b} from ${opened}, reaching ${depth} by its stop${limit}`;
     };
+    /** @param {readonly [string, string]} sites */
     const capOf = (sites) => allowed.get(key(...sites))?.depth ?? 0;
     for (const contact of found.values()) {
       const message = problemOf(contact, capOf(contact.sites));
       if (message) problems.push(message);
     }
     // What each moving site touches, from its own sweep and from the all-open pose, each judged against its pair's entry.
+    /** @type {Map<string, Touch[]>} */
     const touches = new Map();
+    /** @param {FoundContact} contact */
     const touched = (contact) => {
       const [site, other] = contact.sites;
       const message = problemOf(contact, capOf(contact.sites));
@@ -361,7 +526,7 @@ export function swingReport({ grain, vehicles }, results) {
         {
           other,
           depth: Math.round(contact.depth * 1e4) / 1e4,
-          at: contact.at,
+          at: contact.sweep ? contact.at : undefined,
           allowed: message === undefined,
           ...(message ? { message } : {}),
         },
@@ -375,12 +540,14 @@ export function swingReport({ grain, vehicles }, results) {
       touched({ ...touch, sweep: false });
       touched({ ...touch, sites: [b, a], sweep: false });
     }
+    /** @type {Set<string>} */
     const seen = new Set();
     for (const entry of entries) {
       const pair = key(...entry.sites);
       const [a, b] = entry.sites;
       const where = `${vehicle}: allowed swing contact of ${a} and ${b}`;
       const contact = found.get(pair);
+      /** @param {string} message */
       const worn = (message) => {
         problems.push(message);
         entryProblems.push({ vehicle, sites: entry.sites, message });
@@ -399,6 +566,7 @@ export function swingReport({ grain, vehicles }, results) {
       }
     }
     if (!results[vehicle]) continue;
+    /** @type {[string, SwingExport][]} */
     const moving = Object.entries(result.sites).map(([site, { clear, contacts }]) => {
       const first = firstContact({ contacts });
       return [site, { clear: Math.round(clear * 1e4) / 1e4, ...(first ? { stop: first.other } : {}) }];

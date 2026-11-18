@@ -5,12 +5,14 @@
 // `standard` is its word. The why is in docs/decisions/0017-stowage-slots.md.
 /** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
 /** @import { Box } from './dress.mjs' */
+/** @import { Piece } from './pieceSolid.mjs' */
 /** @import { Placements, PlacementSite } from './placements.mjs' */
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { modelBox } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { outputPath, thingEntryFile } from './layout.mjs';
+import { AXES, perAxis } from './packages/construct/src/foundation/math.ts';
 import { solid } from './pieceSolid.mjs';
 import { sharedDepth } from './siteOverlap.mjs';
 
@@ -27,8 +29,7 @@ import { sharedDepth } from './siteOverlap.mjs';
  * A slot port as models/vehicles/slot-parts.json holds it.
  * @typedef {{ id: string; accepts?: readonly string[]; envelope?: Box; pos: Vec3; normal: Vec3; up: Vec3 }} SlotPort
  */
-/** @typedef {{ id: string; kind: string } & Readonly<Record<string, unknown>>} FitOutPiece A piece of a part's fit-out. */
-/** @typedef {{ id: string; partCount: number; ports: readonly SlotPort[]; pieces: readonly FitOutPiece[] }} SlotPart */
+/** @typedef {{ id: string; partCount: number; ports: readonly SlotPort[]; pieces: readonly Piece[] }} SlotPart */
 /**
  * What a built model says about stowage.
  * @typedef {object} Stowable
@@ -40,14 +41,8 @@ import { sharedDepth } from './siteOverlap.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 export const STOWAGE = 'stowage';
-const AXES = /** @type {const} */ ([0, 1, 2]);
 const EPSILON = 1e-6;
 
-/**
- * @param {(axis: 0 | 1 | 2) => number} f
- * @returns {Vec3}
- */
-const perAxis = (f) => [f(0), f(1), f(2)];
 /** @param {(axis: 0 | 1 | 2) => number} f */
 const sumAxes = (f) => AXES.reduce((/** @type {number} */ sum, axis) => sum + f(axis), 0);
 /**
@@ -193,7 +188,7 @@ const envelopeBox = (envelope, frame) => boxOf(corners(envelope).map((p) => outO
  * Why a part's slots cannot hold kit apart and clear of its fit-out, as messages. The part is given in the vehicle
  * frame, `length` being the axis along the vehicle. An envelope may touch another or a piece but not reach into it,
  * since kit filling it would then stand in the other's; pieces are sampled `grain` apart for their depth.
- * @param {{ id: string; slots: readonly Slot[]; pieces: readonly FitOutPiece[] }} part
+ * @param {{ id: string; slots: readonly Slot[]; pieces: readonly Piece[] }} part
  * @param {number} grain
  * @param {0 | 1 | 2} [length]
  */

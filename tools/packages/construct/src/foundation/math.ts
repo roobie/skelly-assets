@@ -3,6 +3,10 @@
 
 export type Vec3 = readonly [number, number, number];
 export type ExtrusionAxis = 'x' | 'y' | 'z';
+export type AxisIndex = 0 | 1 | 2;
+export const AXES = [0, 1, 2] as const satisfies readonly AxisIndex[];
+/** The vector whose component on each axis `f` gives. */
+export const perAxis = (f: (axis: AxisIndex) => number): Vec3 => [f(0), f(1), f(2)];
 
 /** Map right-handed profile coordinates and an axial coordinate into local XYZ. */
 export const extrusionPoint = (
