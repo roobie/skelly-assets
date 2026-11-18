@@ -4,6 +4,7 @@
 // shows. It proposes and writes nothing: the author hand-merges a proposal, as with Save (see the README).
 import { DEFAULT_CACHE } from '../../../generation.mjs';
 import { readSitePieces } from '../../../siteOverlap.mjs';
+import { refreshJsonnetSources } from '../../../sources.mjs';
 import { swingReport, swingResults } from '../../../swingClearance.mjs';
 import { workerPool } from '../../../workerPool.mjs';
 
@@ -13,6 +14,7 @@ export function vehicleApi({ root, cache = DEFAULT_CACHE }) {
   let loaded;
   const load = () => {
     loaded ??= (async () => {
+      await refreshJsonnetSources();
       const pieces = readSitePieces(root);
       const { results } = await swingResults(pieces, { cache });
       return { pieces, report: swingReport(pieces, results) };

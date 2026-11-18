@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
-import { fitDepth, overlapReport, roleOf, seatingProblems, siteOverlaps } from '../siteOverlap.mjs';
+import { fitDepth, overlapReport, overlapResults, roleOf, seatingProblems, siteOverlaps } from '../siteOverlap.mjs';
 
 const GRAIN = 0.03125;
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
@@ -13,7 +16,10 @@ const vehicle = (sites, { overlaps = [], unjudged = [], ledger = [], parent = nu
   ledger,
 });
 const fit = (...pairs) => ({ why: 'seated', pairs });
-const report = (vehicles, fits = [], roles = []) => overlapReport({ grain: GRAIN, fits, roles, vehicles });
+const report = (vehicles, fits = [], roles = []) => {
+  const data = { grain: GRAIN, fits, roles, vehicles };
+  return overlapReport(data, overlapResults(data).results);
+};
 const unit = box('block', [0, 0, 0], [1, 1, 1]);
 const shifted = (by) => box('block', [by, 0, 0], [1 + by, 1, 1]);
 const bodyAndLamp = [site('body', 'van_body', unit), site('lamp', 'van_lamp', shifted(0.5))];
@@ -207,6 +213,42 @@ test('a pair or entry capped far above the overlap it covers is reported, one ca
   const capped = report({ van: vehicle(bodyAndLamp, { overlaps: [entry(0.5 + 1.5 * GRAIN)] }) });
   assert.match(capped.problems.join(), /far above/);
   assert.deepEqual(report({ van: vehicle(bodyAndLamp, { overlaps: [entry(0.5 + GRAIN / 2)] }) }).problems, []);
+});
+
+test('a vehicle measured once is read from the cache, and a changed piece, site or measure measures it again', () => {
+  const cache = mkdtempSync(join(tmpdir(), 'overlap-cache-'));
+  try {
+    const data = (sites) => ({ grain: GRAIN, vehicles: { van: vehicle(sites), twin: vehicle(sites) } });
+    const measured = (sites, measure = 'code') => overlapResults(data(sites), { cache, measure });
+    const first = measured(bodyAndLamp);
+    assert.deepEqual([first.measured, first.reused], [1, 0]);
+    const again = measured(bodyAndLamp);
+    assert.deepEqual([again.measured, again.reused, again.results], [0, 1, first.results]);
+    assert.equal(measured([bodyAndLamp[0], site('lamp', 'van_lamp', shifted(0.25))]).measured, 1);
+    assert.equal(measured([bodyAndLamp[0], site('lamp', 'other_lamp', shifted(0.5))]).measured, 1);
+    assert.equal(measured(bodyAndLamp, 'other code').measured, 1);
+  } finally {
+    rmSync(cache, { recursive: true });
+  }
+});
+
+// CI measures a clean build's vehicles in shards, and the build then reads every one of them back.
+test("the shards' measures together are every measure a full run reads", () => {
+  const cache = mkdtempSync(join(tmpdir(), 'overlap-shards-'));
+  try {
+    const data = {
+      grain: GRAIN,
+      vehicles: { van: vehicle(bodyAndLamp), cart: vehicle([bodyAndLamp[0], site('lamp', 'van_lamp', shifted(0.25))]) },
+    };
+    for (const index of [1, 2]) {
+      const share = overlapResults(data, { cache, shard: { index, count: 2 } });
+      assert.deepEqual([share.measured, share.reused, Object.keys(share.results).length], [1, 0, 1]);
+    }
+    const full = overlapResults(data, { cache });
+    assert.deepEqual([full.measured, full.reused], [0, 2]);
+  } finally {
+    rmSync(cache, { recursive: true });
+  }
 });
 
 test('a role is a site id without its side and number segments, and a word that only contains a side is kept', () => {

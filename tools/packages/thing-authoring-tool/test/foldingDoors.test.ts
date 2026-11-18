@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { add, applyPoint, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { add, applyPoint, fromColumns, sub, type Transform, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { toModelFrame } from '@skelly/thing-core/frame';
 import { posePoint } from '@skelly/thing-core/motion';
 import type { Motion } from '@skelly/thing-core/schema';
@@ -71,17 +71,25 @@ const panels = new Map(
   }),
 );
 
-// Where a point of a site's panel lies at `clock`: moved by the panel's own motion, then by each carrier's in turn.
+// Where a site's panel lies at `clock`, as the transform that carries a point of the panel there: moved by the panel's
+// own motion, then by each carrier's in turn.
 const poser = (sites: readonly Site[]) => {
   const byId = new Map(sites.map((site) => [site.id, site]));
   const origin = (site: Site): Vec3 => toModelFrame(panels.get(site.part)!.forward, site.at);
   const motion = (site: Site): Motion => panels.get(site.part)!.motion;
-  return (site: Site, point: Vec3, clock: number): Vec3 => {
+  const posed = (site: Site, point: Vec3, clock: number): Vec3 => {
     let at = add(origin(site), posePoint(motion(site), point, clock));
     for (let carrier = byId.get(site.rides ?? ''); carrier; carrier = byId.get(carrier.rides ?? '')) {
       at = add(origin(carrier), posePoint(motion(carrier), sub(at, origin(carrier)), clock));
     }
     return at;
+  };
+  // Every stage is rigid, so where the panel's origin and unit axes land fixes the whole pose: each corner then costs
+  // one transform rather than a walk through every stage of every carrier.
+  return (site: Site, clock: number): Transform => {
+    const t = posed(site, [0, 0, 0], clock);
+    const axis = (unit: Vec3) => sub(posed(site, unit, clock), t);
+    return { r: fromColumns(axis([1, 0, 0]), axis([0, 1, 0]), axis([0, 0, 1])), t };
   };
 };
 
@@ -133,8 +141,9 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
   const leaves = new Map<string, Site[]>();
   for (const site of sites) leaves.set(leafOf(site), [...(leaves.get(leafOf(site)) ?? []), site]);
   const drawOutlines = (leaf: string, clock: number): Outline[] =>
-    leaves.get(leaf)!.flatMap((site) =>
-      panels.get(site.part)!.boxes.map(({ min, max }) => {
+    leaves.get(leaf)!.flatMap((site) => {
+      const at = pose(site, clock);
+      return panels.get(site.part)!.boxes.map(({ min, max }) => {
         const corners = (
           [
             [min[0], min[2]],
@@ -143,16 +152,16 @@ const leavesOf = (vehicle: string, sites: readonly Site[]) => {
             [min[0], max[2]],
           ] as const
         ).map(([x, z]) => {
-          const [px, , pz] = pose(site, [x, min[1], z], clock);
+          const [px, , pz] = applyPoint(at, [x, min[1], z]);
           return [px, pz] as const;
         });
         const span = (axis: 0 | 1) => {
           const along = corners.map((corner) => corner[axis]);
           return [Math.min(...along), Math.max(...along)] as const;
         };
-        return { corners, x: span(0), z: span(1), low: pose(site, min, clock)[1], high: pose(site, max, clock)[1] };
-      }),
-    );
+        return { corners, x: span(0), z: span(1), low: applyPoint(at, min)[1], high: applyPoint(at, max)[1] };
+      });
+    });
   const posed = new Map<string, Outline[]>();
   const outlines = (leaf: string, clock: number): Outline[] => {
     const key = `${leaf}@${clock}`;
