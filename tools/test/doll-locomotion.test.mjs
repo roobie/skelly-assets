@@ -1,38 +1,15 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import process from 'node:process';
-import { after, test } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { test } from 'node:test';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { applyPoint, boneTransforms } from '../../site/kinematics.mjs';
 import { clipIssues, posedCorners } from '../../site/poseFile.mjs';
-import { dollRig, readRigContent } from '../dollRig.mjs';
-import { readDoll, readDressing } from '../dress.mjs';
 import { exportLocomotion, gaitAngles, locomotionClips, locomotionProblems, readLocomotion } from '../locomotion.mjs';
+import { dollTree, repo } from './doll-tree.mjs';
 
-// The doll alone, built from the repo's own content, so the gait is checked on the legs it ships with.
-const repo = resolve(import.meta.dirname, '../..');
-const built = mkdtempSync(join(tmpdir(), 'doll-locomotion-'));
-after(() => rmSync(built, { recursive: true, force: true }));
-execFileSync(
-  process.execPath,
-  [join(repo, 'tools/build.mjs'), '--no-cache', '--out', built, 'player_bust', 'player_arm', 'player_leg'],
-  { cwd: repo, stdio: 'pipe' },
-);
-// A build of named ids writes no manifest, so the models it built are listed here as the manifest would list them.
-const manifest = {
-  models: readdirSync(built).flatMap((pack) =>
-    readdirSync(join(built, pack, 'assets/models')).map((file) => ({
-      id: file.slice(0, -'.glb'.length),
-      pack,
-      path: `assets/models/${file}`,
-    })),
-  ),
-};
-const dressing = readDressing(repo);
-const rig = dollRig(readRigContent(repo), readDoll(built, manifest, dressing), dressing);
+// The doll alone, so the gait is checked on the legs it ships with.
+const { built, manifest, rig } = dollTree({});
 const gait = readLocomotion(repo);
 const { clips, reports } = locomotionClips(rig, gait);
 const posed = (frame) => boneTransforms(rig.bones, decodeFrame(frame));

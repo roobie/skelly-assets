@@ -17,7 +17,9 @@ text.
 ## Who may do what
 
 - An agent may prepare a release: the branch, its changelog section and a draft PR.
-- BR, the repository owner, picks the version and decides when to release.
+- BR, the repository owner, decides when to release.
+- The version is the next minor. Releases stay in the 0-series for a long time, so neither a breaking note nor its
+  absence changes the number, and the version needs no call of its own.
 - Merging the release PR needs BR's go-ahead.
 - Tagging publishes to every consumer and cannot be taken back, so an agent tags only on BR's word for that version.
 

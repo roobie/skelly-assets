@@ -38,8 +38,10 @@ after(async () => {
 const showing = (width) =>
   page.evaluate(async (sleeveWidth) => {
     const THREE = await import('three');
+    // biome-ignore-start lint/correctness/noUnresolvedImports: these run in the page, where they are the served site's URLs.
     const { coveredSurface } = await import('/clearance.mjs');
     const { addCoveredSkin, skinCheck } = await import('/skin.mjs');
+    // biome-ignore-end lint/correctness/noUnresolvedImports: the page's own imports end here.
     const boxMesh = ([w, h, d], centre) => {
       const positions = [];
       for (const z of [-d / 2, d / 2])

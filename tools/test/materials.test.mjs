@@ -56,7 +56,7 @@ test('editing a material an item names misses that item in the export cache', ()
           return row.generate();
         },
       };
-      const cache = exportCache(folder, 'code');
+      const cache = exportCache(folder, 'thing', 'code');
       cache.export(counted);
       MATERIALS[chosen].colour = colour.map((channel) => 1 - channel);
       cache.export(counted);

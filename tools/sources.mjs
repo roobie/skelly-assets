@@ -5,7 +5,6 @@ import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
-  mkdtempSync,
   readdirSync,
   readFileSync,
   renameSync,
@@ -18,7 +17,8 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { BUILD_ROOT } from './buildDir.mjs';
+import { BUILD_ROOT, makeBuildDir } from './buildDir.mjs';
+import { entryFolder } from './entryFolder.mjs';
 import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { INDEX, ROW_DIRS } from './row-index.mjs';
 
@@ -100,14 +100,20 @@ const unitKeys = (root, code) => {
   };
 };
 
-// Row files are the imports of the row indexes; each compiles on its own into a fragment, its manifested JSON.
-const unitPlan = (sources, { root, code, rowIndexes }) => {
+// Each unit of a path as its files are now: its closure and its key.
+const unitsNow = ({ root, code }) => {
   const scanner = importScanner(libraryPaths(compileRoot(root)));
   const keyOf = unitKeys(root, code);
   const unit = (path) => {
     const closure = scanner.closure(path);
     return { path, closure, key: keyOf(closure, path) };
   };
+  return { scanner, unit };
+};
+
+// Row files are the imports of the row indexes; each compiles on its own into a fragment, its manifested JSON.
+const unitPlan = (sources, { root, code, rowIndexes }) => {
+  const { scanner, unit } = unitsNow({ root, code });
   return {
     rows: [...new Set(rowIndexes.flatMap((index) => scanner.importsOf(resolve(index))))].map(unit),
     twins: sources.map(unit),
@@ -123,17 +129,30 @@ const replaceFile = (path, contents) => {
 };
 
 // The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
-// foreign store costs a compile, never a wrong twin.
-const storeEntry = (store, kind, key) => join(store, kind, `${key}.json`);
-const STORE_ENTRY = /^[0-9a-f]{64}\.json$/;
+// foreign store costs a compile, never a wrong twin. It keeps its entries as the export cache does, so worktrees and
+// users on one host can share it as they share that cache: a shared store keeps what other checkouts still use. A
+// refresh's prune names every current fragment and twin, which counts them as used even when no compile read them, so
+// a checkout's fragments outlive a stretch of refreshes its stored twins all served.
+const ENTRY_FILE = 'json';
+const ENTRY = [ENTRY_FILE];
+const storeFolders = (store) => ({ rows: entryFolder(store, 'rows'), twins: entryFolder(store, 'twins') });
+const storedJson = (folder, key) => folder.read(key, ENTRY)?.json;
+const pruneStore = (folders, keys) => {
+  for (const [kind, folder] of Object.entries(folders)) folder.prune(new Set(keys[kind]));
+};
 
-const pruneStore = (store, kind, keys) => {
-  const current = new Set(keys.map((key) => `${key}.json`));
-  const folder = join(store, kind);
-  if (!existsSync(folder)) return;
-  for (const name of readdirSync(folder)) {
-    if (STORE_ENTRY.test(name) && !current.has(name)) rmSync(join(folder, name), { force: true });
+// go-jsonnet reads the files again after the plan keyed them, so a file edited meanwhile would put one content's output
+// under another's key, which a shared store would serve to every checkout on the keyed content. The compiled units are
+// keyed afresh, and only those whose key held go into the store; an edit undone within the compile goes unseen. The
+// others are returned: their output still serves this checkout, until the next refresh compiles them again.
+const storeUnchanged = (folder, compiled, options) => {
+  const { unit } = unitsNow(options);
+  const changed = new Set();
+  for (const [compiledUnit, json] of compiled) {
+    if (unit(compiledUnit.path).key === compiledUnit.key) folder.write(compiledUnit.key, ENTRY, { json });
+    else changed.add(compiledUnit);
   }
+  return changed;
 };
 
 const forEachConcurrently = async (items, work) => {
@@ -149,24 +168,31 @@ const forEachConcurrently = async (items, work) => {
 const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
-const compileFragments = (rows, { root, store }) =>
-  forEachConcurrently(
-    rows.filter(({ key }) => !existsSync(storeEntry(store, 'rows', key))),
-    async ({ path, key }) => {
-      const fragment = await evaluateJsonnetAsync(plainRows(path), compileRoot(root), { label: relative(root, path) });
-      replaceFile(storeEntry(store, 'rows', key), fragment);
+// The fragments of the rows the store lacks, each by its row.
+const compileFragments = async (rows, { root, folders }) => {
+  const fragments = new Map();
+  await forEachConcurrently(
+    rows.filter(({ key }) => !existsSync(folders.rows.path(key, ENTRY_FILE))),
+    async (row) => {
+      const label = relative(root, row.path);
+      fragments.set(row, await evaluateJsonnetAsync(plainRows(row.path), compileRoot(root), { label }));
     },
   );
+  return fragments;
+};
 
 // The overlay mirrors each row file's root-relative path onto its fragment, so the row indexes' imports read the
-// fragments and the twins' compile skips evaluating every row file again.
-const withOverlay = (rows, { root, store }, use) => {
-  const overlay = mkdtempSync(join(store, 'overlay-'));
+// fragments and the twins' compile skips evaluating every row file again. It links the stored fragments and holds the
+// ones this refresh compiled, which the store may not take. It is the checkout's own, not the store's, so a refresh
+// killed before removing it leaves nothing in a store that other users could not prune.
+const withOverlay = (rows, fragments, { root, folders }, use) => {
+  const overlay = makeBuildDir('jsonnet-overlay');
   try {
-    for (const { path, key } of rows) {
-      const at = join(overlay, relative(root, path));
+    for (const row of rows) {
+      const at = join(overlay, relative(root, row.path));
       mkdirSync(dirname(at), { recursive: true });
-      symlinkSync(storeEntry(store, 'rows', key), at);
+      if (fragments.has(row)) writeFileSync(at, fragments.get(row));
+      else symlinkSync(folders.rows.path(row.key, ENTRY_FILE), at);
     }
     return use(overlay);
   } finally {
@@ -174,51 +200,56 @@ const withOverlay = (rows, { root, store }, use) => {
   }
 };
 
+// Compiles `twins` over the fragments of the rows they reach, storing each unit whose files held still. Returns each
+// twin's JSON by its unit, and the twins whose files changed during the compile.
+const compileTwins = async (twins, rows, options) => {
+  if (twins.length === 0) return { compiled: new Map(), changed: new Set() };
+  const reached = new Set(twins.flatMap(({ closure }) => closure));
+  const needed = rows.filter(({ path }) => reached.has(path));
+  const fragments = await compileFragments(needed, options);
+  storeUnchanged(options.folders.rows, fragments, options);
+  const outputs = withOverlay(needed, fragments, options, (overlay) =>
+    compileJsonnetFiles(
+      twins.map(({ path }) => path),
+      compileRoot(options.root),
+      { overlay },
+    ),
+  );
+  const compiled = new Map(twins.map((twin, at) => [twin, outputs[at]]));
+  return { compiled, changed: storeUnchanged(options.folders.twins, compiled, options) };
+};
+
 const readStamp = (stamp) => (existsSync(stamp) ? JSON.parse(readFileSync(stamp, 'utf8')) : {});
 
 // The stamp maps each twin to the key it was written under, so a refresh with nothing changed reads no store. Stale
-// twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once.
+// twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once. A twin
+// whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then.
 export async function refreshJsonnetTwins(sources, { root, stamp, store, code = [], rowIndexes = [] }) {
-  const options = { root, store: resolve(store) };
   const { rows, twins } = unitPlan(sources, { root, code, rowIndexes });
   const stamped = readStamp(stamp);
   const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
   if (stale.length === 0) return;
-  const unstored = stale.filter(({ key }) => !existsSync(storeEntry(options.store, 'twins', key)));
-  if (unstored.length > 0) {
-    const reached = new Set(unstored.flatMap(({ closure }) => closure));
-    const needed = rows.filter(({ path }) => reached.has(path));
-    mkdirSync(options.store, { recursive: true });
-    await compileFragments(needed, options);
-    const compiled = withOverlay(needed, options, (overlay) =>
-      compileJsonnetFiles(
-        unstored.map(({ path }) => path),
-        compileRoot(root),
-        { overlay },
-      ),
-    );
-    for (const [at, { key }] of unstored.entries()) replaceFile(storeEntry(options.store, 'twins', key), compiled[at]);
-  }
-  for (const { path, key } of stale) replaceFile(twinOf(path), readFileSync(storeEntry(options.store, 'twins', key)));
-  pruneStore(
-    options.store,
-    'rows',
-    rows.map(({ key }) => key),
-  );
-  pruneStore(
-    options.store,
-    'twins',
-    twins.map(({ key }) => key),
-  );
-  replaceFile(stamp, JSON.stringify(Object.fromEntries(twins.map(({ path, key }) => [relative(root, path), key]))));
+  const options = { root, code, folders: storeFolders(resolve(store)) };
+  const twinByKey = new Map(stale.map(({ key }) => [key, storedJson(options.folders.twins, key)]));
+  const unstored = stale.filter(({ key }) => twinByKey.get(key) === undefined);
+  const { compiled, changed } = await compileTwins(unstored, rows, options);
+  for (const [{ key }, json] of compiled) twinByKey.set(key, json);
+  for (const { path, key } of stale) replaceFile(twinOf(path), twinByKey.get(key));
+  pruneStore(options.folders, {
+    rows: rows.map(({ key }) => key),
+    twins: twins.map(({ key }) => key),
+  });
+  const current = twins.filter((twin) => !changed.has(twin));
+  replaceFile(stamp, JSON.stringify(Object.fromEntries(current.map(({ path, key }) => [relative(root, path), key]))));
 }
 
-// This module and the compiler driver and plain-data check beside it; the compiler binary is pinned by
-// jsonnet/runtime.json, an input.
+// This module and the compiler driver, plain-data check and compiler pin beside it, since a store shared by checkouts
+// on different branches must not serve one compiler's twins under another's keys.
+const COMPILER_FILE = /\.(mjs|libsonnet)$|^runtime\.json$/;
 export const compilerCode = () => [
   fileURLToPath(import.meta.url),
   ...readdirSync(join(here, 'jsonnet'))
-    .filter((name) => /\.(mjs|libsonnet)$/.test(name))
+    .filter((name) => COMPILER_FILE.test(name))
     .sort()
     .map((name) => join(here, 'jsonnet', name)),
 ];

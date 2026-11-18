@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import process from 'node:process';
 import { writeRecipeExports } from '@skelly/thing-export/files.ts';
 import { loadCatalogue } from '../src/catalogue.ts';
 import { exportItem } from '../src/exports.ts';

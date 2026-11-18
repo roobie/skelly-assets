@@ -1,5 +1,6 @@
 // Which assets version a built site renders, for the footer: from the build's own git state, never written by hand.
 import { execFileSync } from 'node:child_process';
+import process from 'node:process';
 import { escapeHtml } from './html.mjs';
 
 export const REPOSITORY = 'https://github.com/roobie/skelly-assets';
