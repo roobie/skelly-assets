@@ -67,12 +67,14 @@ local dome(radius, height, markers) = {
   conifer: conifer,
   // A spruce: a leader climbing harder still and tiers kept low and never shed, so it stands a dense cone. Its laterals
   // are held back a little (λ under the pine's): a spruce's tiers never shed, so any more and they outgrow the leader.
+  // A dense cone has no gaps between its tiers to keep, so unlike the pine it takes a core to fill them.
   spruce: conifer {
     seasons: 15,
     lambda: 0.53,
     shedding: null,
     branching+: { bole: 0.9 },
     direction+: { tropism: { leader: 0.55, lateral: 0 } },
+    foliage+: { core: 1.3 },
   },
   // A birch: a slender leader, fine long laterals that hang under negative tropism, and a light, open crown.
   birch: base {
