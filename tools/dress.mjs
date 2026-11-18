@@ -77,8 +77,7 @@ const union = (boxes) =>
     empty(),
   );
 /** @param {Box} box */
-const corners = ({ min, max }) =>
-  [0, 1, 2, 3, 4, 5, 6, 7].map((i) => perAxis((a) => ((i >> a) & 1 ? max[a] : min[a])));
+const corners = ({ min, max }) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => perAxis((a) => ((i >> a) & 1 ? max[a] : min[a])));
 /** @param {readonly Vec3[]} points */
 const boxOf = (points) => union(points.map((p) => ({ min: p, max: p })));
 /**
@@ -487,7 +486,8 @@ export function wornOnParts(models, dressing, dollParts) {
     else if (twinId !== undefined) {
       const twin = byId.get(twinId);
       const twinPiece = twin && pieceOf(twin);
-      if (!twin || !twinPiece) throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
+      if (!twin || !twinPiece)
+        throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
       wornOn.set(model.id, { part: piecePart(twin.id, twinPiece, dressing) });
     } else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, dollParts));
   }
