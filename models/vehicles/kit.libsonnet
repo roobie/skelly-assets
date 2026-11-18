@@ -6,10 +6,11 @@ local paintable(dimensions, finish) =
   local pieces = std.get(dimensions, 'pieces', []);
   if std.objectHas(finish, 'paint') && std.any([std.get(p, 'slot') == 'paint' && !std.objectHas(p, 'material') for p in pieces])
   then { paintable: ['paint'] } else {};
-// A part that moves turns on its drawn pins, so it carries no hinge anchors; docs/decisions/0015-motion-as-content.md.
+// A part that moves turns on the pins its motion names, so a hinge anchor would be a second, unchecked claim about
+// where it turns; docs/decisions/0015-motion-as-content.md.
 local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', motion=null) =
-  assert motion == null || !std.objectHas(anchors, 'hinge_a') && !std.objectHas(anchors, 'hinge_b')
-         : id + ' has a motion, so its pins replace its hinge anchors';
+  assert !std.objectHas(anchors, 'hinge_a') && !std.objectHas(anchors, 'hinge_b')
+         : id + ' carries a hinge_a or hinge_b anchor; a moving part turns on its motion\'s pins instead';
   {
     id: id,
     exportMass: exportMass,

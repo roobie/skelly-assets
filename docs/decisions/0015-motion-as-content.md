@@ -65,8 +65,8 @@ own.
   site, nest a rider's in its carrier's and pose it through one module, so the pose the check proves clear is the pose
   the viewer shows; see `site/motionPose.mjs`, `motionLayers`.
 
-Pivots are not attach points, so a part with a motion has no hinge anchors. A part row has hinge anchors or a motion,
-never both; a row that declares no motion keeps whatever hinge anchors it has.
+Pivots are not attach points, so no part row has hinge anchors, with a motion or without one. A part that does not
+move declares no motion and has no pivot to name.
 
 ## Consequences
 

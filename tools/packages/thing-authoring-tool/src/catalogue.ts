@@ -234,10 +234,11 @@ const ItemSchema = pipe(
     /** The model's shelf and facet tags; the repository build holds them to its vocabulary, so this tool only carries them. */
     taxonomy: optional(unknown()),
   }),
-  // Pivots are not attach points: a part that moves turns on its pins, never on hinge anchors.
+  // Pivots are not attach points: a part that moves turns on the pins its motion names, so a hinge anchor would be a
+  // second, unchecked claim about where it turns.
   check(
-    ({ motion, anchors = {} }) => !motion || !('hinge_a' in anchors || 'hinge_b' in anchors),
-    'a row with a motion carries no hinge_a or hinge_b anchor',
+    ({ anchors = {} }) => !('hinge_a' in anchors || 'hinge_b' in anchors),
+    ({ input }) => `${input.id} carries a hinge_a or hinge_b anchor; a moving part turns on its motion's pins instead`,
   ),
 );
 const CatalogueSchema = strictObject({
