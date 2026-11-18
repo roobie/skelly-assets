@@ -65,6 +65,7 @@ export const sourceReport = (models, vocabulary) => {
 // `swing` folder keeps each vehicle's sweep, and `prune` drops the entries no vehicle uses, as only a run over every
 // vehicle may.
 export const vehicleReport = async (root = repo, { cache, prune = false } = {}) => {
+  await installJsonnetSources();
   const pieces = readSitePieces(root);
   const overlaps = overlapReport(pieces);
   const swings = swingReport(pieces, (await swingResults(pieces, { cache, prune })).results);

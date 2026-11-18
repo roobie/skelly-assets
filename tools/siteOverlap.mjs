@@ -10,8 +10,8 @@
 // vehicle allows to a lesser depth. All are capped at the depth they were written for, and a variant shares its
 // parent's. An entry that no longer applies is reported, so the lists cannot rot. The reason for the rule is in
 // `docs/decisions/0014-site-overlap.md`.
-import { resolve } from 'node:path';
-import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { solid } from './pieceSolid.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -23,51 +23,10 @@ const repo = resolve(import.meta.dirname, '..');
 // ledger, swingContacts, swingUnjudged } } }, where `ledger` is the vehicle's rows of its family's unjudged list. A
 // site whose part is a roster model has no pieces to compare, so it is left out.
 // `motions` gives each part that moves its authored stages and its pieces as drawn, before any site moves them, which
-// tools/swingClearance.mjs turns into the motion at each site.
-export function readSitePieces(root = repo) {
-  return JSON.parse(
-    evaluateJsonnet(
-      `
-  local k = import 'models/vehicles/kit.libsonnet';
-  local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
-  local placements = import 'models/vehicles/placements.libsonnet';
-  local ledger = import 'models/vehicles/unjudged-overlaps.libsonnet';
-  local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
-  local drawn = { [row.id]: std.parseJson(row.parts[0].params.pieces) for row in rows };
-  local grains = { [row.id]: voxel.of(voxel.vehicle, row).grain for row in rows };
-  local placed(site) = [
-    k.moved(if std.objectHas(site, 'mirror') then k.far(piece) else piece, site.at)
-    for piece in drawn[site.part]
-  ];
-  local moving = [row for row in rows if std.objectHas(row, 'motion')];
-  {
-    grain: voxel.vehicle.grain,
-    motions: { [row.id]: { stages: row.motion.stages, pieces: drawn[row.id] } for row in moving },
-    fits: (import 'models/vehicles/seating.libsonnet').fits,
-    roles: std.set(std.flattenArrays([
-      [site.id for site in placements[vehicle].sites if std.objectHas(drawn, site.part)]
-      for vehicle in std.objectFields(placements)
-      if std.objectHas(placements[vehicle], 'sites')
-    ])),
-    vehicles: {
-      [vehicle]: {
-        parent: std.get(placements[vehicle], 'parent'),
-        forward: placements[vehicle].forward,
-        sites: [site { grain: grains[site.part], pieces: placed(site) } for site in placements[vehicle].sites if std.objectHas(drawn, site.part)],
-        overlaps: std.get(placements[vehicle], 'overlaps', []),
-        unjudged: std.get(placements[vehicle], 'unjudged', []),
-        ledger: std.get(ledger, vehicle, []),
-        swingContacts: std.get(placements[vehicle], 'swingContacts', []),
-        swingUnjudged: std.get(placements[vehicle], 'swingUnjudged', []),
-      }
-      for vehicle in std.objectFields(placements)
-      if std.objectHas(placements[vehicle], 'sites')
-    },
-  }`,
-      root,
-    ),
-  );
-}
+// tools/swingClearance.mjs turns into the motion at each site. Read from its Jsonnet twin, which installJsonnetSources
+// compiles only when a file it imports has changed, since evaluating every vehicle costs most of a warm build.
+const SITE_PIECES = 'models/vehicles/site-pieces.json';
+export const readSitePieces = (root = repo) => JSON.parse(readFileSync(join(root, SITE_PIECES), 'utf8'));
 
 export const key = (a, b) => [a, b].sort().join('\n');
 

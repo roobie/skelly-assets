@@ -23,6 +23,7 @@ local word(name) =
   assert std.objectHas(words, name) : 'stowage word %s is not one of %s' % [name, std.join(' ', std.objectFields(words))];
   name;
 {
+  mount:: mount,
   words:: words,
   // The male port an item stows by, at `pos` in its source frame.
   seat(name, pos, normal, up): { id: 'stow', mount: mount, gender: 'male', standard: word(name), pos: pos, normal: normal, up: up, required: false },
