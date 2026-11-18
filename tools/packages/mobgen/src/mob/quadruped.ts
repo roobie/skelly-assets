@@ -473,7 +473,7 @@ export interface QuadrupedStance {
 /** How the standing dog places its legs, degrees at the shoulder/hip: every leg splays outward (rotZ) so the paws
  * stand wider than the body's own rest columns, and the legs stagger fore-aft (rotX) with one fore and its
  * diagonal hind leg forward, the other pair back. */
-export const DOG_REST_STANCE = {
+const DOG_REST_STANCE = {
   splayDeg: { fore: 10, hind: 11 },
   staggerDeg: { fore: 9, hind: 10 },
 } as const;

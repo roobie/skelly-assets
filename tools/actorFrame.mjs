@@ -8,9 +8,9 @@ const AXES = { x: 0, y: 1, z: 2 };
 
 export const turnPoint = (p) => p.map((v, a) => v * S[a]);
 /** Angles about the generator's axes, in any order: the turn scales each one as it scales its axis. */
-export const turnAngles = turnPoint;
-export const turnQuat = ([x, y, z, w]) => [x * S[0], y * S[1], z * S[2], w];
-export const turnExtent = ({ min, max, ...rest }) => ({
+const turnAngles = turnPoint;
+const turnQuat = ([x, y, z, w]) => [x * S[0], y * S[1], z * S[2], w];
+const turnExtent = ({ min, max, ...rest }) => ({
   ...rest,
   min: min.map((v, a) => (S[a] < 0 ? -max[a] : v)),
   max: max.map((v, a) => (S[a] < 0 ? -min[a] : v)),

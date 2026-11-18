@@ -126,7 +126,7 @@ export async function downloadWithRetry(
   throw new Error(`go-jsonnet download failed: ${url} (last ${lastFailure})`);
 }
 
-export async function ensureJsonnet() {
+async function ensureJsonnet() {
   const { platformKey, archiveName, executable } = executablePath();
   if (existingBinaryIsPinnedVersion(executable)) {
     return executable;

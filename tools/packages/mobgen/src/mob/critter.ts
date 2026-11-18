@@ -37,7 +37,7 @@ interface DeathKey {
   readonly rotations: Readonly<Record<string, number>>;
 }
 
-export interface CritterMotion {
+interface CritterMotion {
   readonly tail: readonly string[];
   readonly tailSway: {
     readonly walkDeg: number;

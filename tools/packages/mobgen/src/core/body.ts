@@ -56,7 +56,7 @@ export interface Feature {
   readonly onto?: readonly Material[];
 }
 
-export interface BodyAnchor {
+interface BodyAnchor {
   readonly bone: string;
   /** Rest-pose world coordinates; apply the owning bone's posed transform. */
   readonly position: Vec3;

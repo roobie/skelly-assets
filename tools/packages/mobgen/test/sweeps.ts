@@ -4,5 +4,5 @@ import { describe } from 'vitest';
 
 // Population and seed sweeps run only under MOBGEN_SWEEPS, in the manual slow-test workflow;
 // https://github.com/roobie/skelly, `AGENTS.md`, "Tests" says why. Default tests exercise representative properties.
-export const runSweeps = process.env.MOBGEN_SWEEPS === '1';
+const runSweeps = process.env.MOBGEN_SWEEPS === '1';
 export const sweepGroup = describe.runIf(runSweeps);

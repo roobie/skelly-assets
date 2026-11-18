@@ -7,7 +7,7 @@ export interface TemplatePartMassProperties extends MassProperties {
 }
 
 /** A part already cut away from below the part being weighed: its id and its bones. */
-export interface GonePart {
+interface GonePart {
   readonly part: string;
   readonly boneIndices: Iterable<number>;
 }

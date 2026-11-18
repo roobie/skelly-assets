@@ -3,7 +3,7 @@ import { finite, integer, maxValue, minValue, number, parse, pipe, safeParse } f
 
 const nonNegative = pipe(number(), finite(), minValue(0));
 const positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
-export const plain = {
+const plain = {
   simSeconds: nonNegative,
   positiveSimSeconds: positive,
   simPerMinute: positive,

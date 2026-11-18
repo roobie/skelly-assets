@@ -356,7 +356,7 @@ export interface FloaterMotion {
 }
 
 /** How the clips move, as data: harmonics of a cycle (integers, so a loop closes) and per-segment phase lags. */
-export const FLOATER_MOTION = {
+const FLOATER_MOTION = {
   tailLagRad: 0.55, // phase lag of each tail segment behind the one above it
   tailLiftShare: 0.35, // the x-sway as a fraction of the z-sway, so the tail wags in an ellipse
   bobHarmonic: 2,
@@ -373,7 +373,7 @@ const matOf = (v: Vec3 | undefined, mirror: number): Mat3 =>
   v ? mulMM(rotZ(v[2] * mirror), mulMM(rotY(v[1] * mirror), rotX(v[0]))) : IDENTITY_M;
 
 /** The pose of a motion over the rest body, lifted by `hover`. */
-export const floaterPose = (realized: Realized, p: FloaterParams, m: FloaterMotion = {}): Pose => {
+const floaterPose = (realized: Realized, p: FloaterParams, m: FloaterMotion = {}): Pose => {
   const rotations: Record<string, Mat3> = {};
   const segments = Math.round(p.tailSegments);
   const flicker = m.flicker;
@@ -403,7 +403,7 @@ export const floaterPose = (realized: Realized, p: FloaterParams, m: FloaterMoti
 };
 
 /** The hovering rest: the tail curled, the tongues a little restless. */
-export const floaterIdleMotion = (p: FloaterParams): FloaterMotion => ({
+const floaterIdleMotion = (p: FloaterParams): FloaterMotion => ({
   tail: [0, p.tailCurl],
   flicker: { amp: p.flicker * FLOATER_MOTION.restFlickerShare, phase: 0 },
 });
