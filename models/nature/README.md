@@ -6,10 +6,11 @@ nature props (`log`, `large_rock`, `field_stone`, gathered plants and curiositie
 
 The trees and shrubs are grown (`grown.libsonnet`, `grown.species.libsonnet`): a species row names a habit and a
 seed picks one tree of it, so a new tree is a new row rather than new geometry, and its branching reads as grown
-rather than placed. Each grown model also ships a `_sparse` twin thinned to the `sparse.density` of
-`woodland.spec.libsonnet`: the same trunk and limbs with fewer fine branches, for an open woodland a player sees
-through and a scene of many trees that wants a cheaper draw. Deadvox's woodland is to use the sparse twins. A species'
-own `density` sets its look elsewhere.
+rather than placed. Each grown model also ships thinned twins, one per look in the `thinned` list of
+`woodland.spec.libsonnet`: the same trunk and limbs with fewer fine branches. The `_sparse` twin is for an open woodland
+a player sees through and a scene of many trees that wants a cheaper draw; deadvox's woodland is to use it. The
+`_sparser` twin is on trial, for a crown a player can still hide in and see out of. A species' own `density` sets its
+look elsewhere.
 
 ## Placement and scale
 
@@ -39,6 +40,7 @@ obvious repetition. Source instances have no extra scale transform.
 | `woodland_hazel` | 1.8 m | 2.4 × 2.4 m, grown multi-stem tall shrub |
 | `woodland_shrub_low` | 0.9 m | 1.6 × 1.7 m, grown mat of short stems |
 | `woodland_<grown id>_sparse` | as its twin | its twin thinned; width may shrink with the twigs |
+| `woodland_<grown id>_sparser` | up to its twin's | thinned further; limbs go too, so a crown of laterals loses some height |
 | `woodland_fern` | 0.54 m | 1.6 × 1.65 m, seven fronds with finite-thickness leaflets |
 | `woodland_grass` | 0.5 m | 0.75 × 0.75 m, twenty finite-thickness blades |
 | `woodland_boulder_broad` | 2 m | 3.4 × 2.6 m |
@@ -52,7 +54,7 @@ opaque crown volumes are not a biomass, structural-strength or canopy-collision 
 ## Sources and examples
 
 - `woodland.spec.libsonnet`: variation measures, roots/rock floors, asset identities, the grown rows' species and
-  seeds, and the sparse density.
+  seeds, and the thinned looks' densities.
 - `grown.species.libsonnet`: the habits trees and shrubs grow from; fields are documented in
   `tools/packages/thing-authoring-tool/src/growth/species.ts`.
 - `woodland.libsonnet`: compound geometry and finish selection. Functions stay here; the catalogue set is plain data.

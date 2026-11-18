@@ -14,9 +14,13 @@
     { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8, grain: 0.04, leaf: 'foliage-understorey' },
     { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3, grain: 0.02, leaf: 'foliage-understorey' },
   ],
-  // Each grown row also ships thinned to this density as `<id>_sparse`: an open woodland a game can see and walk
-  // through, and the cheaper draw a scene of many trees wants. Deadvox's woodland is to draw these.
-  sparse: { density: 0.5, suffix: '_sparse', title: ', sparse' },
+  // Each grown row also ships thinned to each look's density, as `<id><suffix>`. `_sparse` is an open woodland a game
+  // can see and walk through, and the cheaper draw a scene of many trees wants; deadvox's woodland is to draw these.
+  // `_sparser` is on trial: a crown a player can still hide in, though not easily, and see out of.
+  thinned: [
+    { density: 0.5, suffix: '_sparse', title: ', sparse' },
+    { density: 0.2, suffix: '_sparser', title: ', sparser' },
+  ],
   // Drawn by hand: the cone pine #304 drew stands beside the grown pine as its own variant, and the saplings.
   trees: [
     { id: 'woodland_pine', title: 'Woodland pine', form: 'pine', scale: [1, 1, 1], seed: 0, kg: 1400, grain: 0.08 },
