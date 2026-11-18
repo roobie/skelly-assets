@@ -5,7 +5,8 @@
 //
 // The shell rises in `bands` from its base to its roof, each band stepping in toward the roof: a cone of `sides` faces,
 // or a plan of corners as (z, x) at the base and the roof, listed from the front face's far corner round the near side,
-// so the first face looks forward. The shell's front face is open where the guns pass, for the gun mask. Each fitting is
+// so the first face looks forward. `continuousShell` replaces the bands with sloping plates on a concentric cone;
+// its `bands` still locate the existing gun-mask opening. The shell's front face is open where the guns pass, for the gun mask. Each fitting is
 // its site, its class entry and where its origin sits; the guns' origins stand on the mask's back, where their
 // receivers abut it. The roof is cut open under each roof hatch. Each smoke rack
 // stands its launchers in a row `along` x or z through `at`, and reaches into the shell to `reach` across that row.
@@ -20,6 +21,7 @@
     massKg: 480,
     paint: 'paint-olive',
     shell: { sides: 12, baseRadius: 0.66, roofRadius: 0.48 },
+    continuousShell: true,
     bands: 7,
     height: height,
     // Drawn thicker than the armour is, so the shell stays closed on the vehicle voxel grid.

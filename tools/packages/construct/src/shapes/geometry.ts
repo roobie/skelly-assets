@@ -307,8 +307,24 @@ const polyhedronFromFaces = (
     : undefined;
 };
 
+/**
+ * The same half-space with a unit normal. A plate authored by its corners carries a cross product's length, and the
+ * clipper's distances and cap basis are only true for a unit normal.
+ */
+const unitPlane = ({ normal, offset }: ClipPlane): ClipPlane => {
+  const size = length(normal);
+  if (!(size > 0)) {
+    throw new Error('A clip plane needs a non-zero normal');
+  }
+  return { normal: scale(normal, 1 / size), offset: offset / size };
+};
+
 /** Intersect a convex polyhedron with one kept half-space, adding an outward-facing cap. */
-export const clipConvexPolyhedron = (polyhedron: ConvexPolyhedron, plane: ClipPlane): ConvexPolyhedron | undefined => {
+export const clipConvexPolyhedron = (
+  polyhedron: ConvexPolyhedron,
+  authored: ClipPlane,
+): ConvexPolyhedron | undefined => {
+  const plane = unitPlane(authored);
   const bounds = ([0, 1, 2] as const).map((axis) => {
     const coordinates = polyhedron.vertices.map((point) => point[axis]);
     return [Math.min(...coordinates), Math.max(...coordinates)] as const;
@@ -316,7 +332,7 @@ export const clipConvexPolyhedron = (polyhedron: ConvexPolyhedron, plane: ClipPl
   const extent = Math.max(...bounds.map(([min, max]) => max - min));
   const coordinateScale = Math.max(1, ...bounds.flatMap(([min, max]) => [Math.abs(min), Math.abs(max)]));
   const pointTolerance = Math.max(extent * 1e-10, Number.EPSILON * coordinateScale * 8);
-  const distanceTolerance = pointTolerance * length(plane.normal);
+  const distanceTolerance = pointTolerance;
   const areaTolerance = Math.max(extent * extent * 1e-12, pointTolerance * pointTolerance);
   const volumeTolerance = Math.max(extent * extent * extent * 1e-12, pointTolerance ** 3);
   const distance = (point: Vec3): number => dot(plane.normal, point) - plane.offset;
