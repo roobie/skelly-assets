@@ -1,12 +1,13 @@
 name: lint
 
-# Biome over tools/ and site/: formatting, lint and import order (see tools/biome.jsonc); then knip over tools/, for
+# Biome over tools/ and site/: formatting, lint and import order (see biome.jsonc); then knip over tools/, for
 # dead code.
 
 on:
   push:
     branches: [main]
     paths:
+      - 'biome.jsonc'
       - 'tools/**'
       - 'site/**'
       - '.node-version'
@@ -16,6 +17,7 @@ on:
       - '!**/*.md'
   pull_request:
     paths:
+      - 'biome.jsonc'
       - 'tools/**'
       - 'site/**'
       - '.node-version'
