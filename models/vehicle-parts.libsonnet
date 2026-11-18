@@ -22,7 +22,7 @@ local reflect(piece) = piece + { id: piece.id + '_far' } + (
 local bothSides(pieces) = [piece + { id: piece.id + '_near' } for piece in pieces] + [reflect(piece) for piece in pieces];
 
 // The compact five-door's reference dimensions, in its frame
-// (https://github.com/roobie/skelly, `packages/deadvox/docs/vehicle-spike.md`, "Proportions"). Its own panels are pressed for this body, so they are authored where they sit on it and
+// (https://github.com/roobie/skelly, `packages/deadvox/docs/vehicles.md`, "Proportions"). Its own panels are pressed for this body, so they are authored where they sit on it and
 // fit at the vehicle origin; shared parts have their own frames and the blueprint places them.
 local hb = {
   rear: -2.075,
