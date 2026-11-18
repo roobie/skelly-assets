@@ -49,7 +49,7 @@ import {
   quadrupedStrideLength,
 } from './packages/mobgen/src/mob/quadruped.ts';
 import { flinchClipFor, HIT_FLINCH } from './packages/mobgen/src/mob/reactions.ts';
-import { walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
+import { WALKER_DAMAGE, walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
 
 /** Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs). */
 export const poseFrame = (pose) => ({
@@ -340,11 +340,20 @@ export function leaperClips(figure, _template, row) {
   };
 }
 
-/** The walker's clips: a boss that stomps and fires, with no limping or dragging sets because its legs are solved
- * to the ground rather than lost. */
+/** The walker's clips: a boss that stomps and fires, and flinches only when a heavy round hits it, so its flinch
+ * names those rounds. A leg lost from the heel down leaves a stump it limps on, so `limping.walk` is keyed by the side
+ * that lost its foot; a leg lost whole leaves it nothing to walk on, so it has no dragging set. */
 export function walkerClips(figure, _template, row) {
   const bake = trackClipBaker(figure, row, 'walker', walkerClip, walkerFrame);
-  return { standing: { idle: bake('idle'), walk: bake('stomp'), attack: bake('fire') } };
+  return {
+    standing: {
+      idle: bake('idle'),
+      walk: bake('stomp'),
+      attack: bake('fire'),
+      flinch: { ...bake('flinch'), heavyRounds: [...WALKER_DAMAGE.heavyRounds] },
+    },
+    limping: { walk: { left: bake('limp', { cuts: ['foot.L'] }), right: bake('limp', { cuts: ['foot.R'] }) } },
+  };
 }
 
 /**
