@@ -4,6 +4,8 @@ import type { ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construc
 import { MATERIALS } from '@skelly/thing-core/materials';
 import appearance from '../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import type { Measure, Shotshell } from '../ammo/cartridge.ts';
+import { primerPocket, primerProfile } from '../ammo/roundProfile.ts';
+import { SHOTSHELL_PRIMER } from '../ammo/roundShape.ts';
 import { revolvedRound } from './revolvedRound.ts';
 
 type ShotshellSolid = RevolvedSolid | ExtrudedPolygonSolid;
@@ -31,7 +33,10 @@ export interface ShotshellGeometry {
   readonly case: readonly ShotshellSolid[];
 }
 
-/** The same profiles feed viewer and common cartridge GLB exporter. No primer size is invented. */
+/**
+ * The same profiles feed viewer and common cartridge GLB exporter. The primer is drawn to a modelling assumption
+ * (`SHOTSHELL_PRIMER`), so the shell's sourced primer stays unknown.
+ */
 export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
   const radius = required(shell.hull.outerDiameter, 'hull diameter') / 2;
   const rim = required(shell.head.rimDiameter, 'rim diameter') / 2;
@@ -41,10 +46,12 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
   const fired = required(shell.length.nominal, 'fired length');
   const inner = radius - SHOTSHELL_WALL_MM;
   const edge = SHOTSHELL_EDGE_MM;
+  const pocket: Vec2[] = SHOTSHELL_PRIMER === null ? [[0, 0]] : primerPocket(SHOTSHELL_PRIMER);
+  const primer = SHOTSHELL_PRIMER === null ? [] : [revolvedRound('primer', primerProfile(SHOTSHELL_PRIMER), 'primer')];
   const head = revolvedRound(
     'head',
     [
-      [0, 0],
+      ...pocket,
       [0, rim - edge],
       [edge, rim],
       [rimThickness - edge, rim],
@@ -52,7 +59,7 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
       [rimThickness, radius],
       [headHeight, radius],
       [headHeight, 0],
-      [0, 0],
+      pocket[0]!,
     ],
     'case',
   );
@@ -115,8 +122,8 @@ export const shotshellGeometry = (shell: Shotshell): ShotshellGeometry => {
     }
   }
   return {
-    round: [head, revolvedRound('hull', loadedHull, 'hull'), card, ...leaves],
-    case: [head, revolvedRound('hull', tube(fired), 'hull')],
+    round: [head, ...primer, revolvedRound('hull', loadedHull, 'hull'), card, ...leaves],
+    case: [head, ...primer, revolvedRound('hull', tube(fired), 'hull')],
   };
 };
 

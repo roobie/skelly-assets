@@ -2,7 +2,7 @@
 // What the data does not give, the round's modelling assumptions do; see roundShape.ts.
 
 import type { Measure, MetallicCartridge } from './cartridge.ts';
-import { type RoundShape, roundShape } from './roundShape.ts';
+import { type PrimerShape, type RoundShape, roundShape } from './roundShape.ts';
 
 type ProfilePoint = readonly [axialMm: number, radiusMm: number];
 
@@ -74,11 +74,21 @@ const radiusAt = (outline: readonly ProfilePoint[], axial: number): number => {
   throw new Error(`no case wall at axial position ${axial} mm`);
 };
 
-/** Primer pocket floor, pocket wall, head face, then the external outline. */
-const caseBase = (outline: readonly ProfilePoint[], primer: RoundShape['primer']): ProfilePoint[] => {
+/** A head's primer pocket, from its floor on the axis out to the head face: where a head profile starts. */
+export const primerPocket = (primer: PrimerShape): ProfilePoint[] => {
   const pocketRadius = primer.diameter / 2 + primer.clearance;
-  return [[primer.pocketDepth, 0], [primer.pocketDepth, pocketRadius], [0, pocketRadius], ...outline];
+  return [
+    [primer.pocketDepth, 0],
+    [primer.pocketDepth, pocketRadius],
+    [0, pocketRadius],
+  ];
 };
+
+/** Primer pocket, then the external outline. */
+const caseBase = (outline: readonly ProfilePoint[], primer: PrimerShape): ProfilePoint[] => [
+  ...primerPocket(primer),
+  ...outline,
+];
 
 const loadedCaseProfile = (outline: readonly ProfilePoint[], mouth: number, shape: RoundShape): ProfilePoint[] => [
   ...caseBase(outline, shape.primer),
@@ -181,16 +191,29 @@ const bandProfile = (
   ];
 };
 
-const primerProfile = (primer: RoundShape['primer']): ProfilePoint[] => {
+/**
+ * The primer seated in its pocket, its face `recess` below the head face. A cupped primer sinks its cup into that
+ * face, leaving the ring around it standing, so the primer reads as a cup in a ring rather than a flat disc.
+ */
+export const primerProfile = (primer: PrimerShape): ProfilePoint[] => {
   const radius = primer.diameter / 2;
-  const { recess: face, chamfer, pocketDepth } = primer;
-  return [
-    [face, 0],
-    [face, radius - chamfer],
-    [face + chamfer, radius],
-    [pocketDepth, radius],
-    [pocketDepth, 0],
-  ];
+  const { recess: face, chamfer, pocketDepth, cup } = primer;
+  if (face + chamfer >= pocketDepth) {
+    throw new Error('primer face and chamfer leave it no depth in its pocket');
+  }
+  const centre: ProfilePoint[] = [];
+  if (cup !== null) {
+    if (cup.diameter / 2 >= radius - chamfer) {
+      throw new Error('primer cup leaves no ring around it');
+    }
+    if (face + cup.depth >= pocketDepth) {
+      throw new Error('primer cup is as deep as its pocket');
+    }
+    centre.push([face + cup.depth, 0], [face + cup.depth, cup.diameter / 2], [face, cup.diameter / 2]);
+  } else {
+    centre.push([face, 0]);
+  }
+  return [...centre, [face, radius - chamfer], [face + chamfer, radius], [pocketDepth, radius], [pocketDepth, 0]];
 };
 
 /** Build sourced outer profiles plus the round's modelling assumptions, all in millimetres. */
@@ -203,6 +226,17 @@ export const roundProfiles = (
   const stations = projectileStations(cartridge, shape.projectile);
   if (mouthRadius <= stations.radius) {
     throw new Error('bullet is as wide as the case mouth');
+  }
+  const { pocketDepth } = shape.primer;
+  if (pocketDepth >= shape.case.firedFloor) {
+    throw new Error('primer pocket reaches through the fired case floor');
+  }
+  const headRadius = Math.min(
+    radiusAt(outline, pocketDepth),
+    ...outline.filter(([axial]) => axial <= pocketDepth).map(([, radius]) => radius),
+  );
+  if (primerPocket(shape.primer)[1]![1] >= headRadius) {
+    throw new Error('primer pocket is as wide as the case head');
   }
   const { band } = shape.projectile;
   return {

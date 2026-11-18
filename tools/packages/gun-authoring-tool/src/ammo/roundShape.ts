@@ -19,15 +19,18 @@ import content from '../../../../../models/guns/tables/roundShapes.json' with { 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
 const NonNegative = pipe(number(), finite(), minValue(0));
 
+const PrimerShapeSchema = strictObject({
+  diameter: Positive,
+  pocketDepth: Positive,
+  recess: Positive,
+  clearance: Positive,
+  chamfer: Positive,
+  cup: nullable(strictObject({ diameter: Positive, depth: Positive })),
+});
+
 const RoundShapeSchema = strictObject({
   case: strictObject({ baseChamfer: Positive, wall: Positive, firedFloor: Positive }),
-  primer: strictObject({
-    diameter: Positive,
-    pocketDepth: Positive,
-    recess: Positive,
-    clearance: Positive,
-    chamfer: Positive,
-  }),
+  primer: PrimerShapeSchema,
   projectile: strictObject({
     seatingCalibres: Positive,
     ogive: strictObject({
@@ -39,10 +42,21 @@ const RoundShapeSchema = strictObject({
   }),
 });
 
+export type PrimerShape = InferOutput<typeof PrimerShapeSchema>;
 export type RoundShape = InferOutput<typeof RoundShapeSchema>;
 
-const shapes = parse(strictObject({ default: RoundShapeSchema, cartridges: record(string(), RoundShapeSchema) }), content);
+const shapes = parse(
+  strictObject({
+    default: RoundShapeSchema,
+    cartridges: record(string(), RoundShapeSchema),
+    shotshellPrimer: nullable(PrimerShapeSchema),
+  }),
+  content,
+);
 
-/** The shape a cartridge's round is drawn with: its own entry, or the default. */
+/** The shape a metallic cartridge's round is drawn with: its own entry, or the default. */
 export const roundShape = (cartridgeId: string): RoundShape =>
   Object.hasOwn(shapes.cartridges, cartridgeId) ? shapes.cartridges[cartridgeId]! : shapes.default;
+
+/** The primer every shotshell's head is drawn with, or null to draw the head without one. */
+export const SHOTSHELL_PRIMER: PrimerShape | null = shapes.shotshellPrimer;
