@@ -232,6 +232,10 @@ A vehicle site's `finish` names an entry of the release's `finishes.json`, the m
 material a painted surface in that finish carries. Why the library ships and how a copy takes it is in
 `docs/decisions/0003-vehicle-paint.md`.
 
+A thing's model entry repeats its stowage ports as `stowage`, the slots a locker part holds kit in and the seat a
+stowable item stows by, so a game can open a locker as a container from the entry alone, without parsing the GLB's
+port nodes; what a slot and a seat are is in `docs/decisions/0017-stowage-slots.md`.
+
 The `.glb` files load in any engine or tool that reads glTF 2.0. Engine-specific sidecar files, such as Godot's
 `*.import`, are ignored here, so each game generates its own.
 
