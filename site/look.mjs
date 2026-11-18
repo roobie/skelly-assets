@@ -153,7 +153,7 @@ function writeQuery(ids) {
   history.replaceState(null, '', search ? `?${search}` : location.pathname);
 }
 
-ready.then(({ byId, landing }) => {
+void ready.then(({ byId, landing }) => {
   const ids = [...byId.keys()].sort();
   let picked = query.get('id')?.split(',').filter(Boolean) ?? [];
   const picker = makeCombobox({

@@ -1,0 +1,95 @@
+// Lint and format config for the authoring tools and the showcase, `site/`, which they build, test and render
+// through. It sits at the repository root so that Biome run here, run from `tools/`, and every editor find this one
+// config instead of an enclosing checkout's. Biome itself is a `tools/` dependency. Formatting follows the skelly
+// repository's house style, so code moves between the two repositories unchanged. Lint moves toward the house's
+// every-rule-on set one rule group at a time: that set fails thousands of sites written without it, and a lint nobody
+// can pass is one nobody runs. A group set to "error" below is the house's whole group; the rest stay at Biome's
+// recommended set.
+{
+  "$schema": "./tools/node_modules/@biomejs/biome/configuration_schema.json",
+  // A skelly checkout embeds this repository as a submodule; this config is the root of this repository's checks.
+  "root": true,
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  // The model sources' JSON is content, which the content checks own.
+  "files": { "includes": ["tools/**", "site/**", "!**/dist", "!tools/.build", "!**/package-lock.json"] },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "arrowParentheses": "always" }
+  },
+  // JSON here is content, and the tools that write it (the gun designer's save among them) own its layout.
+  "json": { "formatter": { "enabled": false } },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "linter": {
+    "rules": {
+      "correctness": "error",
+      "nursery": {
+        "noFloatingPromises": "error"
+      }
+    },
+    "domains": {
+      // Module-graph rules (unresolved imports, import cycles…). They resolve JSON imports, so the lint first writes the
+      // Jsonnet twins; see `tools/package.json`, `prelint`.
+      "project": "all",
+      // Frameworks we don't use: their rules only misfire.
+      "astro": "none",
+      "drizzle": "none",
+      "next": "none",
+      "playwright": "none",
+      "qwik": "none",
+      "react": "none",
+      "reactNative": "none",
+      "solid": "none",
+      "svelte": "none",
+      "tailwind": "none",
+      "vue": "none"
+    }
+  },
+  "overrides": [
+    {
+      // Opt-outs and options. A group set to "error" above can't also list rules, so they live here.
+      "includes": ["**"],
+      "linter": {
+        "rules": {
+          "style": {
+            // tsconfig's noUncheckedIndexedAccess makes every index read `T | undefined`;
+            // `!` is the explicit, reviewed acknowledgement on hot typed-array reads.
+            "noNonNullAssertion": "off"
+          },
+          "suspicious": {
+            "noImportCycles": "error",
+            // Expression-bodied forEach callbacks are the house idiom for one-line checks; forEach ignores the value.
+            "useIterableCallbackReturn": "off"
+          }
+        }
+      }
+    },
+    {
+      // Node runs the build scripts at the tools root, the CLIs, the file-writing adapters, the tests and the build
+      // config; the packages' other sources stay browser-pure, because the viewers and the games load them.
+      "includes": [
+        "tools/*.mjs",
+        "tools/jsonnet/**",
+        "tools/testPool.ts",
+        "**/test/**",
+        "**/src/cli/**",
+        "**/vite.config.ts",
+        "tools/packages/thing-export/src/cache.ts",
+        "tools/packages/thing-export/src/files.ts",
+        "site/analytics.mjs",
+        "site/build.mjs",
+        "site/build-viewers.mjs",
+        "site/tools.mjs",
+        "site/version.mjs"
+      ],
+      "linter": { "rules": { "correctness": { "noNodejsModules": "off" } } }
+    },
+    {
+      // The showcase pages take three.js from a CDN through their import map, so no package.json declares it and
+      // nothing on disk resolves it; Biome's rule takes no list of specifiers to accept.
+      "includes": ["site/**"],
+      "linter": {
+        "rules": { "correctness": { "noUndeclaredDependencies": "off", "noUnresolvedImports": "off" } }
+      }
+    }
+  ]
+}
