@@ -219,6 +219,6 @@ local monouchi = 'hamon-%d' % stationAt(nagasa - monouchiFromTip);
       edge: { part: 'katana', solid: monouchi, fraction: [0.5, 0, 0.5] },
     },
     voxelGrain: grain,
-    taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] } },
+    taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'], setting: ['medieval'] }, keywords: ['sword', 'melee'] },
   },
 ]
