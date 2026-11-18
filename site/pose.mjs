@@ -941,4 +941,4 @@ async function startPage(data, query) {
   window.showPose = show;
 }
 
-startPage(await ready, new URLSearchParams(location.search));
+void startPage(await ready, new URLSearchParams(location.search));

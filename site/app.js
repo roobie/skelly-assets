@@ -144,7 +144,7 @@ const seen = new IntersectionObserver(
       seen.unobserve(e.target);
       queue.push({ model: e.target._model, canvas: e.target });
     }
-    drainThumbs();
+    void drainThumbs();
   },
   { rootMargin: '400px' },
 );
@@ -339,8 +339,8 @@ function restore(state) {
   }
   const model = byId.get(state.model);
   if (model) {
-    if (model.id !== was.model || state.view !== was.view || state.info !== was.info) openViewer(model, state);
-    else if (state.smooth !== was.smooth) drawSmooth(state.smooth);
+    if (model.id !== was.model || state.view !== was.view || state.info !== was.info) void openViewer(model, state);
+    else if (state.smooth !== was.smooth) void drawSmooth(state.smooth);
   } else if ($('viewer').open) {
     closedByHash = true;
     $('viewer').close();
@@ -416,7 +416,7 @@ function initViewer() {
   });
   $('v-meta').addEventListener('toggle', () => {
     if ($('v-meta').open) $('v-meta').scrollIntoView({ block: 'start', behavior: 'smooth' });
-    showMeta();
+    void showMeta();
     writeHash();
   });
   $('v-smooth').addEventListener('change', () => drawSmooth($('v-smooth').checked));
@@ -521,7 +521,7 @@ function markSmooth() {
 function step(d) {
   const list = shown.some((m) => m.id === viewer.model?.id) ? shown : entries;
   const i = list.findIndex((m) => m.id === viewer.model?.id);
-  openViewer(list[(i + d + list.length) % list.length]);
+  void openViewer(list[(i + d + list.length) % list.length]);
 }
 
 // `restored` is the state to show when a link or history brought the model: its view, whether its details are open and
@@ -546,7 +546,7 @@ async function openViewer(model, restored = null) {
   $('v-facts').replaceChildren();
   $('v-materials').replaceChildren();
   $('v-smooth').disabled = true; // until the model is drawn
-  showMeta();
+  void showMeta();
   $('v-clips').replaceChildren();
   $('v-clips').setAttribute('aria-label', comesApart(model) || isWearable(model) ? 'View' : 'Clip');
 
@@ -610,7 +610,7 @@ async function openViewer(model, restored = null) {
         (view) => wear(view === 'worn'),
       ),
     );
-  if (isWearable(model) && restored?.view === 'worn') wear(true);
+  if (isWearable(model) && restored?.view === 'worn') await wear(true);
 }
 
 // The model in the form the switch picks, once that form has loaded.
@@ -740,7 +740,7 @@ function modelRef(id) {
   a.append(breakable(id));
   a.onclick = (e) => {
     e.preventDefault();
-    openViewer(target);
+    void openViewer(target);
   };
   return a;
 }
@@ -874,4 +874,4 @@ async function main() {
   });
 }
 
-main();
+void main();
