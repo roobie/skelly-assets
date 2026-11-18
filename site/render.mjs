@@ -195,7 +195,7 @@ export function explodable(obj, entry) {
   const pieces = piecesOf(obj, entry);
   const sites = entry.components ? [] : (entry.sites ?? []);
   const index = new Map(sites.map(({ site }, i) => [site, i]));
-  const mover = pieces.map((piece, i) => index.get(sites[i]?.in) ?? i);
+  const mover = pieces.map((_, i) => index.get(sites[i]?.in) ?? i);
   const boxes = pieces.map(() => new THREE.Box3());
   pieces.forEach((piece, i) => boxes[mover[i]].expandByObject(piece));
   const moving = [...new Set(mover)];

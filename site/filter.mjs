@@ -110,7 +110,8 @@ export function parseState(hash) {
   const params = new URLSearchParams(hash.replace(/^#/, ''));
   const filter = { ...emptyFilter(), q: params.get('q') ?? '', shelf: params.get('cat') || ALL };
   const pick = (dimension, term) => {
-    const terms = (filter.picks[dimension] ??= []);
+    filter.picks[dimension] ??= [];
+    const terms = filter.picks[dimension];
     if (term && !terms.includes(term)) terms.push(term);
   };
   for (const term of params.getAll('kw')) pick(KEYWORD, term);

@@ -341,12 +341,7 @@ function heldItem(scene, model) {
   const slides = new Map();
   const slideOf = (part) => {
     if (slides.has(part)) return slides.get(part);
-    const found = [];
-    obj.traverse((node) => {
-      if (node.userData.part === part) found.push(node);
-    });
-    if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
-    const [node] = found;
+    const node = partNode(obj, model, part);
     const { motion } = node.userData;
     if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
     let unit;
