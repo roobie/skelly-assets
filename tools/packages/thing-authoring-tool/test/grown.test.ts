@@ -100,7 +100,8 @@ describe('grown family', () => {
     for (const root of skeleton.roots) expect(cuts.at(-1)!.has(root)).toBe(false);
   });
 
-  it('draws no more clumps, tubes or triangles as it is drawn sparser', () => {
+  // Eight trees grown in full: a second on an idle host, past the default timeout on a loaded one.
+  it('draws no more clumps, tubes or triangles as it is drawn sparser', { timeout: 20_000 }, () => {
     for (const species of [tree, shrub]) {
       const drawn = DENSITIES.map((density) => grown(params(species, 2, density)));
       drawn.slice(1).forEach((sparser, i) => {
@@ -109,8 +110,8 @@ describe('grown family', () => {
         expect(inSlot(sparser, 'bark').length).toBeLessThanOrEqual(inSlot(thicker, 'bark').length);
         expect(triangles(sparser)).toBeLessThanOrEqual(triangles(thicker));
       });
+      if (species === tree) expect(drawn.at(-1)!.length).toBeLessThan(drawn[0]!.length);
     }
-    expect(grown(params(tree, 2, 0.25)).length).toBeLessThan(grown(params(tree, 2, 1)).length);
   });
 
   it('draws a clump no thinner than its least voxels, however flat its species', () => {
