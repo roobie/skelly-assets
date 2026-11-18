@@ -1,5 +1,7 @@
-// A bounded woodland kit, using the existing compound primitives rather than a vegetation generator or leaf-card shader.
+// A bounded woodland kit. Its trees and shrubs grow from species (grown.libsonnet); the cone pine, saplings, deadwood,
+// ground cover and rocks are drawn from the compound primitives.
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local grown = import 'grown.libsonnet';
 local s = import 'woodland.spec.libsonnet';
 local add(a, b) = [a[i] + b[i] for i in [0, 1, 2]];
 local mul(a, k) = [v * k for v in a];
@@ -74,27 +76,6 @@ local oak(seed) = roots() + [
   ]
   for i in std.range(0, 5)
 ]);
-local birch = roots(0.2, 0.55) + [
-  branch('bole-base', 'trunk', [0, -0.08, 0], [0.04, 2, 0.06], 0.18, 0.15),
-  branch('bole-mid', 'trunk', [0.04, 2, 0.06], [0.22, 4.8, 0.02], 0.15, 0.1),
-  branch('bole-upper', 'trunk', [0.22, 4.8, 0.02], [0.45, 7.6, 0.1], 0.1, 0.055),
-  branch('leader', 'bark', [0.45, 7.6, 0.1], [0.8, 10.2, 0.2], 0.055, 0.025),
-] + std.flattenArrays([
-  local angle = 0.3 + i * 2.4;
-  local end = add([0.3, 0, 0.05], polar(1.2 - i * 0.09, angle, 6 + i * 0.75));
-  [
-    branch('limb-%d' % i, 'bark', [0.16, 4.2 + i * 0.7, 0.03], end, 0.07, 0.025),
-    lump('crown-%d' % i, 'leaf', add(end, [0, 0.7, 0]), [1.05 - i * 0.025, 1.45, 0.9], i),
-  ]
-  for i in std.range(0, 4)
-]) + [
-  // Shallow, uneven bark scars; not dark rings around the entire bole.
-  local y = 0.8 + i * 0.66;
-  local x = if y < 2 then 0.04 * y / 2 else 0.04 + (y - 2) * 0.18 / 2.8;
-  local radius = if y < 2 then 0.18 - 0.03 * y / 2 else 0.15 - (y - 2) * 0.05 / 2.8;
-  h.box('scar-%d' % i, 'bark', [x - 0.055, y, radius + 0.015], [x + 0.08, y + 0.07, radius + 0.05])
-  for i in std.range(0, 5)
-];
 local pine = roots(0.27, 0.75) + [
   branch('bole', 'trunk', [0, -0.08, 0], [0.06, 9.9, 0.03], 0.27, 0.025),
 ] + std.flattenArrays([
@@ -120,13 +101,6 @@ local stump(hollow) = roots(0.55, 1.1) + (if hollow then [
   h.turned('bole', 'trunk', 'y', [[-0.08, 0], [-0.08, 0.6], [0.18, 0.5], [0.56, 0.46], [0.56, 0]], [0, 0, 0]) + { sides: 12 },
   h.turned('cut-face', 'cut', 'y', [[0.56, 0], [0.56, 0.41], [0.6, 0.41], [0.6, 0]], [0, 0, 0]) + { sides: 12 },
   h.turned('growth-ring', 'trunk', 'y', [[0.6, 0.24], [0.62, 0.24], [0.62, 0.21], [0.6, 0.21], [0.6, 0.24]], [0, 0, 0]) + { sides: 12 },
-]);
-local shrub(low) = std.flattenArrays([
-  local a = i * 2.4;
-  local end = polar(if low then 0.4 else 0.65, a, if low then 0.35 + i * 0.025 else 1.05 + i * 0.09);
-  [branch('stem-%d' % i, 'trunk', [0, -0.04, 0], end, if low then 0.035 else 0.055, 0.02)]
-  + [lump('leaf-%d' % i, 'leaf', end, if low then [0.4, 0.3, 0.4] else [0.6, 0.55, 0.52], i)]
-  for i in std.range(0, 4)
 ]);
 local fern = [lump('crown', 'trunk', [0, 0.06, 0], [0.08, 0.1, 0.08], 0, 0)] + std.flattenArrays([
   local a = i * 2 * std.pi / 7;
@@ -172,8 +146,13 @@ local grassBlade(i) =
   ]);
 {
   rows: [
-    row(t.id, t.title, t.kg, scalePieces(if t.form == 'oak' then oak(t.seed) else if t.form == 'birch' then birch else pine, t.scale), t.grain, ['wood', 'plant'],
-      if t.form == 'birch' then { trunk: 'bark-birch', leaf: 'foliage-birch' } else if t.form == 'pine' then { leaf: 'foliage-pine' } else {})
+    grown.row(t.id + look.suffix, t.title + look.title, t.species, t.seed, t.kg, t.grain,
+      { bark: std.get(t, 'bark', 'bark'), leaf: t.leaf }, look.density)
+    for t in s.grown
+    for look in [{ suffix: '', title: '', density: null }, s.sparse]
+  ] + [
+    row(t.id, t.title, t.kg, scalePieces(if t.form == 'oak' then oak(t.seed) else pine, t.scale), t.grain, ['wood', 'plant'],
+      if t.form == 'pine' then { leaf: 'foliage-pine' } else {})
     for t in s.trees
   ] + [
     row('woodland_snag', 'Broken woodland snag', 1100, roots() + [
@@ -193,8 +172,6 @@ local grassBlade(i) =
       branch('branch-stub', 'trunk', [-0.25, 0.5, 0.1], [0.2, 1, 0.4], 0.12, 0.07, 0),
       branch('broken-stub', 'cut', [0.2, 1, 0.4], [0.22, 1.025, 0.415], 0.07, 0.06, 0),
     ], 0.04, ['wood']),
-    row('woodland_hazel', 'Woodland hazel shrub', 8, shrub(false), 0.04, ['wood', 'plant'], { leaf: 'foliage-understorey' }),
-    row('woodland_shrub_low', 'Low woodland shrub', 3, shrub(true), 0.02, ['wood', 'plant'], { leaf: 'foliage-understorey' }),
     row('woodland_fern', 'Woodland fern clump', 0.7, fern, 0.02, ['plant'], { leaf: 'foliage-understorey' }),
     row('woodland_grass', 'Woodland grass tuft', 0.3, [grassBlade(i) for i in std.range(0, 19)], 0.02, ['plant'], { leaf: 'grass-woodland' }),
   ] + [

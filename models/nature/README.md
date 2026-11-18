@@ -1,9 +1,15 @@
 # Temperate woodland starter kit
 
-Seventeen static scenery models in `skelly.nature`, with the same authored shapes in
-`skelly.nature.smooth`. Existing small nature props (`log`, `large_rock`, `field_stone`, gathered plants and
-curiosities) keep their ids and geometry. The new `woodland_` ids provide outdoor-scale silhouettes and a
-matching understorey, not a replacement inventory catalogue.
+Static scenery models in `skelly.nature`, with the same authored shapes in `skelly.nature.smooth`. Existing small
+nature props (`log`, `large_rock`, `field_stone`, gathered plants and curiosities) keep their ids and geometry. The
+`woodland_` ids provide outdoor-scale silhouettes and a matching understorey, not a replacement inventory catalogue.
+
+The trees and shrubs are grown (`grown.libsonnet`, `grown.species.libsonnet`): a species row names a habit and a
+seed picks one tree of it, so a new tree is a new row rather than new geometry, and its branching reads as grown
+rather than placed. Each grown model also ships a `_sparse` twin thinned to the `sparse.density` of
+`woodland.spec.libsonnet`: the same trunk and limbs with fewer fine branches, for an open woodland a player sees
+through and a scene of many trees that wants a cheaper draw. Deadvox's woodland is to use the sparse twins. A species'
+own `density` sets its look elsewhere.
 
 ## Placement and scale
 
@@ -18,18 +24,21 @@ obvious repetition. Source instances have no extra scale transform.
 
 | Model id | Height | Approximate footprint / form |
 | --- | --- | --- |
-| `woodland_oak_spreading` | 9 m | 7.5 × 6.8 m, broad forked crown |
-| `woodland_oak_upright` | 10.3 m | 5.5 × 5 m, narrower taller oak variation |
-| `woodland_birch` | 11.2 m | 4.2 × 3.6 m, slender pale bole, dark scars and airy crown |
-| `woodland_pine` | 10.4 m | 4.3 × 4.3 m, eight tapering foliage tiers |
+| `woodland_oak_spreading` | 8.3 m | 10.7 × 10 m, grown broad dome on a short bole |
+| `woodland_oak_upright` | 12.8 m | 7.9 × 9 m, grown with a stronger leader, taller than it spreads |
+| `woodland_birch` | 11.5 m | 5.5 × 5.9 m, grown slender leader and hanging laterals |
+| `woodland_scots_pine` | 9.8 m | 4.3 × 4.6 m, grown whorled tiers shed below |
+| `woodland_spruce` | 9.6 m | 5.1 × 6 m, grown dense cone kept to the ground |
+| `woodland_pine` | 10.4 m | 4.3 × 4.3 m, eight drawn tapering foliage tiers |
 | `woodland_oak_sapling` | 3.2 m | 2.3 × 2.1 m |
 | `woodland_pine_sapling` | 3.2 m | 1.4 × 1.4 m |
 | `woodland_snag` | 5.9 m | 2.7 × 1.9 m, broken leader and bare limbs |
 | `woodland_stump_cut` | 0.6 m | 2.1 × 2 m root spread, cut face and growth ring |
 | `woodland_stump_hollow` | 0.8 m | 2.1 × 2 m root spread, open cavity with recessed bed |
 | `woodland_fallen_log` | 1.1 m | 3.8 × 0.8 m, along local x, with a broken branch stub |
-| `woodland_hazel` | 2 m | 2.4 × 2.2 m, multi-stem tall shrub |
-| `woodland_shrub_low` | 0.8 m | 1.6 × 1.5 m |
+| `woodland_hazel` | 1.8 m | 2.4 × 2.4 m, grown multi-stem tall shrub |
+| `woodland_shrub_low` | 0.9 m | 1.6 × 1.7 m, grown mat of short stems |
+| `woodland_<grown id>_sparse` | as its twin | its twin thinned; width may shrink with the twigs |
 | `woodland_fern` | 0.54 m | 1.6 × 1.65 m, seven fronds with finite-thickness leaflets |
 | `woodland_grass` | 0.5 m | 0.75 × 0.75 m, twenty finite-thickness blades |
 | `woodland_boulder_broad` | 2 m | 3.4 × 2.6 m |
@@ -42,10 +51,13 @@ opaque crown volumes are not a biomass, structural-strength or canopy-collision 
 
 ## Sources and examples
 
-- `woodland.spec.libsonnet`: variation measures, roots/rock floors and asset identities.
+- `woodland.spec.libsonnet`: variation measures, roots/rock floors, asset identities, the grown rows' species and
+  seeds, and the sparse density.
+- `grown.species.libsonnet`: the habits trees and shrubs grow from; fields are documented in
+  `tools/packages/thing-authoring-tool/src/growth/species.ts`.
 - `woodland.libsonnet`: compound geometry and finish selection. Functions stay here; the catalogue set is plain data.
 - `../catalogue/sets/woodland.libsonnet`: category-based registration into the existing nature production recipe.
-- `woodland-edge.example.jsonnet`: every asset type in a small grove, with repeated ground cover and a central
+- `woodland-edge.example.jsonnet`: the asset types in a small grove, with repeated ground cover and a central
   corridor free of scenery in the tested sample points below two metres. This demonstrates negative space,
   **not** certified actor clearance or walkability.
 - `woodland-lineup.example.jsonnet`: every model at the same metre scale. Tree and understorey groupings make

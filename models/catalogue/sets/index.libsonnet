@@ -216,7 +216,6 @@
   'flesh-chunks': import 'models/catalogue/sets/flesh-chunks.libsonnet',
   'food-medical': import 'models/catalogue/sets/food-medical.libsonnet',
   'galvanised-trashcan': import 'models/catalogue/sets/galvanised-trashcan.libsonnet',
-  'grown-woodland': import 'models/catalogue/sets/grown-woodland.libsonnet',
   'gym': import 'models/catalogue/sets/gym.libsonnet',
   'hand-tools': import 'models/catalogue/sets/hand-tools.libsonnet',
   'handhelds': import 'models/catalogue/sets/handhelds.libsonnet',

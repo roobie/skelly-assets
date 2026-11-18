@@ -4,10 +4,21 @@
   rockFloor: -0.16,
   rockGrain: 0.04,
   mossBase: 0.6,  // Material regions meet on a voxel plane, not halfway through a shared cell.
+  // Trees and shrubs grown from a species (grown.species.libsonnet) and a seed; the seed picks one tree of the habit.
+  grown: [
+    { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', species: 'broadleaf', seed: 1, kg: 3600, grain: 0.08, leaf: 'foliage-oak' },
+    { id: 'woodland_oak_upright', title: 'Upright woodland oak', species: 'upright', seed: 1, kg: 3200, grain: 0.08, leaf: 'foliage-oak' },
+    { id: 'woodland_birch', title: 'Woodland birch', species: 'birch', seed: 1, kg: 900, grain: 0.06, leaf: 'foliage-birch', bark: 'bark-birch' },
+    { id: 'woodland_scots_pine', title: 'Woodland Scots pine', species: 'conifer', seed: 1, kg: 1400, grain: 0.08, leaf: 'foliage-pine' },
+    { id: 'woodland_spruce', title: 'Woodland spruce', species: 'spruce', seed: 1, kg: 1600, grain: 0.08, leaf: 'foliage-pine' },
+    { id: 'woodland_hazel', title: 'Woodland hazel shrub', species: 'hazel', seed: 1, kg: 8, grain: 0.04, leaf: 'foliage-understorey' },
+    { id: 'woodland_shrub_low', title: 'Low woodland shrub', species: 'low', seed: 1, kg: 3, grain: 0.02, leaf: 'foliage-understorey' },
+  ],
+  // Each grown row also ships thinned to this density as `<id>_sparse`: an open woodland a game can see and walk
+  // through, and the cheaper draw a scene of many trees wants. Deadvox's woodland is to draw these.
+  sparse: { density: 0.5, suffix: '_sparse', title: ', sparse' },
+  // Drawn by hand: the cone pine #304 drew stands beside the grown pine as its own variant, and the saplings.
   trees: [
-    { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', form: 'oak', scale: [1, 1, 1], seed: 0, kg: 3600, grain: 0.08 },
-    { id: 'woodland_oak_upright', title: 'Upright woodland oak', form: 'oak', scale: [0.7, 1.15, 0.73], seed: 0.7, kg: 3200, grain: 0.08 },
-    { id: 'woodland_birch', title: 'Woodland birch', form: 'birch', scale: [1, 1, 1], seed: 0, kg: 900, grain: 0.06 },
     { id: 'woodland_pine', title: 'Woodland pine', form: 'pine', scale: [1, 1, 1], seed: 0, kg: 1400, grain: 0.08 },
     { id: 'woodland_oak_sapling', title: 'Woodland oak sapling', form: 'oak', scale: [0.3, 0.36, 0.3], seed: 1.3, kg: 45, grain: 0.04 },
     { id: 'woodland_pine_sapling', title: 'Woodland pine sapling', form: 'pine', scale: [0.32, 0.31, 0.32], seed: 0, kg: 30, grain: 0.04 },
