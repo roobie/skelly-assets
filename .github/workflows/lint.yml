@@ -1,12 +1,14 @@
 name: lint
 
-# Biome over tools/: formatting, lint and import order (see tools/biome.jsonc); then knip, for dead code.
+# Biome over tools/ and site/: formatting, lint and import order (see tools/biome.jsonc); then knip over tools/, for
+# dead code.
 
 on:
   push:
     branches: [main]
     paths:
       - 'tools/**'
+      - 'site/**'
       - '.node-version'
       - '.github/actions/node/**'
       - '.github/workflows/lint.yml'
@@ -14,6 +16,7 @@ on:
   pull_request:
     paths:
       - 'tools/**'
+      - 'site/**'
       - '.node-version'
       - '.github/actions/node/**'
       - '.github/workflows/lint.yml'

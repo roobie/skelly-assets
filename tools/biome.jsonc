@@ -1,4 +1,5 @@
-// Lint and format config for the authoring tools. Formatting follows the skelly repository's house style, so code
+// Lint and format config for the authoring tools and the showcase, `../site/`, which they build, test and render
+// through; the npm scripts name it, since it lies outside this folder. Formatting follows the skelly repository's house style, so code
 // moves between the two repositories unchanged. Lint is Biome's recommended set: the house's every-rule-on set would
 // fail thousands of sites written without it, and a lint nobody can pass is one nobody runs.
 {

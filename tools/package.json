@@ -16,8 +16,8 @@
   ],
   "scripts": {
     "build": "node build.mjs",
-    "lint": "biome ci",
-    "fix": "biome check --write",
+    "lint": "biome ci . ../site",
+    "fix": "biome check --write . ../site",
     "knip": "knip"
   },
   "dependencies": {
