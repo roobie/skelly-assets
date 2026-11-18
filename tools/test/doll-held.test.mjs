@@ -7,12 +7,15 @@ import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { add, applyPoint, boneTransforms, length, mulMM, mulMV, quatToMat3, sub } from '../../site/kinematics.mjs';
+import { holdItem } from '../../site/fingers.mjs';
 import { compilePose } from '../../site/poseFile.mjs';
 import { poseJson } from '../keyFrames.mjs';
 import { outputPath } from '../layout.mjs';
+import { locomotionClips, readLocomotion, walkLoop } from '../locomotion.mjs';
 import { partStrokes, pressCheckPoses, pressCheckSockets } from '../press-check.mjs';
 import {
   exportWields,
+  graspOf,
   heldWeapon,
   strikePhases,
   strikeTiming,
@@ -95,6 +98,13 @@ test('through the press check the rifle points ahead, level or down, its stock b
 });
 
 const weapons = wieldWeapons(wields, thingOf, itemMesh);
+const gait = readLocomotion(repo);
+// A set of wields with no class walking, for the tests of what a class does standing and striking; the held walks are
+// baked and checked on their own (below).
+const stillsOf = (set) => ({
+  ...set,
+  classes: Object.fromEntries(Object.entries(set.classes).map(([name, c]) => [name, { ...c, walks: {} }])),
+});
 // Baking every wield takes most of a minute, so the default run bakes one strike of a class whose second hand takes the
 // weapon again in every frame, the path a one-hand strike never walks; ASSETS_SWEEPS=1 bakes them all, as the build
 // does when it refuses any frame `wieldProblems` finds.
@@ -103,15 +113,20 @@ const [twoHanded, cls] = Object.entries(wields.classes).find(
 );
 const [strike] = Object.keys(cls.strikes);
 const baking = process.env.ASSETS_SWEEPS
-  ? wields
+  ? stillsOf(wields)
   : {
       ...wields,
       classes: {
-        [twoHanded]: { ...cls, stances: { guard: cls.stances.guard }, strikes: { [strike]: cls.strikes[strike] } },
+        [twoHanded]: {
+          ...cls,
+          stances: { guard: cls.stances.guard },
+          strikes: { [strike]: cls.strikes[strike] },
+          walks: {},
+        },
       },
     };
 let baked;
-const bakedWields = () => (baked ??= wieldClips(rig, baking, weapons, itemMesh));
+const bakedWields = () => (baked ??= wieldClips(rig, { wields: baking, weapons, gait }, itemMesh));
 const strikes = () => Object.entries(bakedWields().clips).filter(([, clip]) => clip.phases);
 // The weapon of class `kind` as a clip's held seat stands it on the leading hand in `posed`: its file carried into the
 // root frame, turned to its held axes, then by the seat's turn.
@@ -297,7 +312,7 @@ test('a bare-handed strike lands its fist ahead of the shoulders, between them a
 const gunWeapons = wieldWeapons(guns, thingOf, itemMesh);
 const gunPoses = wieldPoses(rig, guns, gunWeapons);
 let gunBake;
-const bakedGuns = () => (gunBake ??= wieldClips(rig, guns, gunWeapons, itemMesh));
+const bakedGuns = () => (gunBake ??= wieldClips(rig, { wields: stillsOf(guns), weapons: gunWeapons, gait }, itemMesh));
 const DEG = 180 / Math.PI;
 // A gun stance's pose file compiled: the figure posed round the gun, and the gun's points where the pose holds it.
 const gunStance = (name) => {
@@ -381,13 +396,13 @@ test('in every stance the stock is borne in the shoulder, no part of the gun sun
   }
 });
 
-test('a wield class baked once is read from the cache, and a changed class, mesh or bake bakes it again', () => {
+test('a wield class baked once is read from the cache, and a changed class, gait, mesh or bake bakes it again', () => {
   const cache = mkdtempSync(join(tmpdir(), 'wields-cache-'));
   try {
     const [family] = Object.keys(guns.classes);
-    const one = { ...guns, classes: { [family]: guns.classes[family] } };
-    const bake = (wields, meshOf = itemMesh, code = 'code') =>
-      wieldResults(rig, { guns: { wields, weapons: gunWeapons } }, meshOf, { cache, bake: code });
+    const one = stillsOf({ ...guns, classes: { [family]: guns.classes[family] } });
+    const bake = (wields, meshOf = itemMesh, code = 'code', walking = gait) =>
+      wieldResults(rig, { guns: { wields, weapons: gunWeapons, gait: walking } }, meshOf, { cache, bake: code });
     // Compared as the export writes them: JSON keeps no -0, so a clip read back from the cache differs only there.
     const written = (value) => JSON.stringify(value);
     const first = bake(one);
@@ -405,8 +420,125 @@ test('a wield class baked once is read from the cache, and a changed class, mesh
     };
     assert.equal(bake(one, moved).baked, 1);
     assert.equal(bake(one, itemMesh, 'other code').baked, 1);
+    const [walk] = Object.keys(gait.walks);
+    const longer = { ...gait, walks: { ...gait.walks, [walk]: { ...gait.walks[walk], swingDeg: 1 } } };
+    assert.equal(bake(one, itemMesh, 'code', longer).baked, 1);
   } finally {
     rmSync(cache, { recursive: true });
+  }
+});
+
+// The held walks: by default one gun and one melee class in one walk, every stance each walks in, since every walk
+// takes the same path through the bake; ASSETS_SWEEPS=1 bakes every class in every walk.
+const walkSets = {
+  melee: { wields, weapons, classes: [twoHanded] },
+  guns: { wields: guns, weapons: gunWeapons, classes: ['rifle_pipe'] },
+};
+const emptyWalks = locomotionClips(rig, gait).clips;
+let walkBake;
+// Each held walk baked: its set, class, walk and stance, the clip, its reports and the class's weapon and sockets.
+const heldWalks = () =>
+  (walkBake ??= Object.entries(walkSets).flatMap(([setName, set]) => {
+    const names = process.env.ASSETS_SWEEPS ? Object.keys(set.wields.classes) : set.classes;
+    const walks = process.env.ASSETS_SWEEPS ? gait.walks : { walk: gait.walks.walk };
+    const classes = Object.fromEntries(names.map((name) => [name, { ...set.wields.classes[name], strikes: {} }]));
+    const { clips, reports } = wieldClips(
+      rig,
+      { wields: { ...set.wields, classes }, weapons: set.weapons, gait: { ...gait, walks } },
+      itemMesh,
+    );
+    return Object.entries(classes).flatMap(([kind, cls]) =>
+      Object.keys(walks).flatMap((walk) =>
+        Object.entries(cls.walks).map(([stance, carry]) => {
+          const name = `${kind}_${walk}_${stance}`;
+          const baked = { clip: clips[name], reports: reports[name] };
+          return { name, set: setName, kind, cls, walk, stance, carry, ...baked, ...set.weapons[kind] };
+        }),
+      ),
+    );
+  }));
+const armedWalks = () => heldWalks().filter(({ cls }) => cls.weapon);
+// The weapon as a clip's held seat stands it on the leading hand in `posed`, as seatedWeapon does.
+const seatOn = (clip, weapon, posed) => {
+  const hand = posed.get(clip.held.bone),
+    turn = quatToMat3(clip.held.turn);
+  return {
+    r: [hand.r, turn, weapon.held].reduce(mulMM),
+    t: add(hand.t, mulMV(hand.r, sub(clip.held.at, mulMV(mulMM(turn, weapon.held), weapon.at)))),
+  };
+};
+// Each frame of an armed held walk: its pose, its posed bones and its weapon as the held seat stands it.
+const seatedFrames = ({ clip, weapon }) =>
+  clip.frames.map((frame) => {
+    const pose = decodeFrame(frame);
+    const posed = boneTransforms(rig.bones, pose);
+    return { pose, posed, seated: seatOn(clip, weapon, posed) };
+  });
+
+test('every held walk is baked, each frame within its limits and each hand on its grip', () => {
+  assert.ok(armedWalks().length > 0);
+  for (const { name, clip, reports } of heldWalks()) {
+    assert.ok(clip, name);
+    assert.deepEqual(wieldProblems({ [name]: reports }), [], name);
+  }
+});
+
+test('a held walk is played as its empty walk is: its header, and its legs frame for frame', () => {
+  const { legs, knees } = gait.bones;
+  for (const { name, walk, clip } of heldWalks()) {
+    const { frames, ...header } = clip;
+    const { held, ...shape } = header;
+    assert.deepEqual(shape, walkLoop(rig, gait, gait.walks[walk]), name);
+    const empty = emptyWalks[walk].frames;
+    assert.equal(frames.length, empty.length, name);
+    frames.forEach((frame, k) => {
+      for (const id of [...legs, ...knees])
+        assert.deepEqual(frame.rotations[id], empty[k].rotations[id], `${name} frame ${k}: ${id}`);
+    });
+  }
+});
+
+test("a held walk's palms stay on their sockets of the weapon its held seat stands", () => {
+  for (const walking of armedWalks()) {
+    const { name, cls, carry, sockets, clip } = walking;
+    const hands = carry.arms === 'held' ? Object.keys(cls.weapon.hands) : [cls.weapon.lead];
+    seatedFrames(walking).forEach(({ pose, seated }, k) => {
+      for (const id of hands) {
+        const { item } = holdItem(rig, pose, id, { socket: sockets[id], ...graspOf(cls.weapon.hands[id]) });
+        const off = length(sub(applyPoint(item, sockets[id].at), applyPoint(seated, sockets[id].at)));
+        assert.ok(off < 1e-3, `${name} frame ${k}: ${id} stands ${(off * 1000).toFixed(1)} mm off its socket`);
+      }
+    });
+    assert.ok(clip.held, name);
+  }
+});
+
+test('walking at guard the bore points level and straight ahead', () => {
+  const guards = armedWalks().filter(({ set, stance }) => set === 'guns' && stance === 'guard');
+  assert.ok(guards.length > 0);
+  for (const walking of guards)
+    seatedFrames(walking).forEach(({ seated }, k) => {
+      const bore = mulMV(seated.r, [0, 0, 1]);
+      const heading = Math.atan2(bore[0], bore[2]) * DEG,
+        tip = -Math.asin(bore[1]) * DEG;
+      assert.ok(Math.abs(heading) < 10, `${walking.name} frame ${k}: the bore heads ${heading.toFixed(1)}° off ahead`);
+      assert.ok(Math.abs(tip) <= 0.5, `${walking.name} frame ${k}: the bore tips ${tip.toFixed(2)}°`);
+    });
+});
+
+test('a walking gun stands clear of the body, and no weapon reaches below the ground', () => {
+  for (const walking of armedWalks()) {
+    const { positions } = itemMesh(walking.cls.weapon.model);
+    seatedFrames(walking).forEach(({ posed, seated }, k) => {
+      const at = (p) => applyPoint(seated, p);
+      const name = `${walking.name} frame ${k}`;
+      if (walking.set === 'guns')
+        for (const { bone, depth } of sinking(posed, positions, at))
+          assert.ok(depth <= SINK, `${name}: the gun stands ${(depth * 1000).toFixed(0)} mm into the ${bone}`);
+      let lowest = Infinity;
+      for (let i = 0; i < positions.length; i += 3) lowest = Math.min(lowest, at(positions.slice(i, i + 3))[1]);
+      assert.ok(lowest >= 0, `${name}: the weapon reaches ${(-lowest * 1000).toFixed(0)} mm below the ground`);
+    });
   }
 });
 
@@ -418,5 +550,24 @@ test("the export lists the gun clips' motions entry, a clip with its held seat f
   assert.ok(files.includes(outputPath(pack, path)));
   const { clips } = JSON.parse(readFileSync(join(built, outputPath(pack, path)), 'utf8'));
   for (const id of gunIds)
-    for (const stance of ['idle', 'guard']) assert.ok(clips[`${id}_stance_${stance}`]?.held, `${id}_stance_${stance}`);
+    for (const stance of ['idle', 'guard']) {
+      assert.ok(clips[`${id}_stance_${stance}`]?.held, `${id}_stance_${stance}`);
+      for (const walk of Object.keys(gait.walks))
+        assert.ok(clips[`${id}_${walk}_${stance}`]?.held, `${id}_${walk}_${stance}`);
+    }
+});
+
+// Every melee strike bakes in this export, so it runs only on demand.
+const sweep = process.env.ASSETS_SWEEPS ? false : 'bakes every strike: set ASSETS_SWEEPS=1';
+test('the export lists every melee class in every walk, held on a class with a weapon', { skip: sweep }, () => {
+  const { pack, path } = WIELD_SETS.melee.motions;
+  exportWields(built, manifest, { sets: { melee: WIELD_SETS.melee } });
+  const { clips } = JSON.parse(readFileSync(join(built, outputPath(pack, path)), 'utf8'));
+  for (const [kind, cls] of Object.entries(wields.classes))
+    for (const walk of Object.keys(gait.walks))
+      for (const stance of Object.keys(cls.walks)) {
+        const name = `${kind}_${walk}_${stance}`;
+        assert.ok(clips[name], name);
+        assert.equal(Boolean(clips[name].held), Boolean(cls.weapon), `${name}: held`);
+      }
 });
