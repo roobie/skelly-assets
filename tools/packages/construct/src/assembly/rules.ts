@@ -12,7 +12,7 @@ import {
   worldSolid,
 } from '../shapes/geometry.ts';
 import { connectionMismatch } from './resolve.ts';
-import type { KeepOut, PartDef, Resolved, Rule } from './schema.ts';
+import type { KeepOut, PartDef, PortDef, Resolved, Rule } from './schema.ts';
 
 const TRAILING_ZEROS = /\.?0+$/;
 const fmt = (n: number): string => n.toFixed(2).replace(TRAILING_ZEROS, '');
@@ -22,7 +22,32 @@ const label = (r: Resolved, part: string): string => {
   return family === part ? part : `${part} (${family})`;
 };
 
-/** Mount type, gender, size and standard agree; each port (or slot) is used at most once. */
+/**
+ * Why two ports cannot meet, named `names` in the messages: their mount types, genders, sizes, size classes and
+ * standards must agree. Empty when they can.
+ */
+export const portMismatches = (a: PortDef, b: PortDef, [nameA, nameB]: readonly [string, string]): string[] => {
+  const mismatches: string[] = [];
+  if (a.mount !== b.mount) {
+    mismatches.push(`${nameA} is a ${a.mount} mount but ${nameB} is a ${b.mount} mount.`);
+  } else if (a.gender === b.gender) {
+    mismatches.push(`${nameA} and ${nameB} are both ${a.gender} ${a.mount} mounts.`);
+  }
+  if (a.size !== undefined && b.size !== undefined && a.size !== b.size) {
+    mismatches.push(`Size mismatch: ${nameA} is size ${a.size} but ${nameB} is size ${b.size}.`);
+  }
+  if (a.sizeClass !== undefined && b.sizeClass !== undefined && a.sizeClass !== b.sizeClass) {
+    mismatches.push(`Size class mismatch: ${nameA} is ${a.sizeClass} but ${nameB} is ${b.sizeClass}.`);
+  }
+  if (a.standard !== b.standard) {
+    mismatches.push(
+      `Standard mismatch: ${nameA} is ${a.standard ?? 'unstated'} but ${nameB} is ${b.standard ?? 'unstated'}.`,
+    );
+  }
+  return mismatches;
+};
+
+/** Each connection's ports can meet (see `portMismatches`); each port (or slot) is used at most once. */
 export const portCompat: Rule = {
   id: 'port-compat',
   title: 'Ports are compatible',
@@ -31,40 +56,10 @@ export const portCompat: Rule = {
     const used = new Map<string, number>();
     for (const rc of r.connections) {
       const { from, to } = rc;
-      const a = from.port;
-      const b = to.port;
       const ports = [rc.conn.from, rc.conn.to];
       const parts = [from.part, to.part];
-      if (a.mount !== b.mount) {
-        issues.push({
-          rule: 'port-compat',
-          message: `${rc.conn.from} is a ${a.mount} mount but ${rc.conn.to} is a ${b.mount} mount.`,
-          parts,
-          ports,
-        });
-      } else if (a.gender === b.gender) {
-        issues.push({
-          rule: 'port-compat',
-          message: `${rc.conn.from} and ${rc.conn.to} are both ${a.gender} ${a.mount} mounts.`,
-          parts,
-          ports,
-        });
-      }
-      if (a.size !== undefined && b.size !== undefined && a.size !== b.size) {
-        issues.push({
-          rule: 'port-compat',
-          message: `Size mismatch: ${rc.conn.from} is size ${a.size} but ${rc.conn.to} is size ${b.size}.`,
-          parts,
-          ports,
-        });
-      }
-      if (a.standard !== b.standard) {
-        issues.push({
-          rule: 'port-compat',
-          message: `Standard mismatch: ${rc.conn.from} is ${a.standard ?? 'unstated'} but ${rc.conn.to} is ${b.standard ?? 'unstated'}.`,
-          parts,
-          ports,
-        });
+      for (const message of portMismatches(from.port, to.port, [rc.conn.from, rc.conn.to])) {
+        issues.push({ rule: 'port-compat', message, parts, ports });
       }
       const keys = [rc.conn.slot === undefined ? rc.conn.from : `${rc.conn.from}[${rc.conn.slot}]`, rc.conn.to];
       for (const key of keys) {

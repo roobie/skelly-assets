@@ -8,6 +8,9 @@ import type { Box, DomainUnits, Solid, Vec2 } from '../shapes/solid.ts';
 
 export type Gender = 'male' | 'female';
 
+/** How the part met at a port comes off and goes on: in a slot by hand, or as a job of a kind the domain names. */
+export type SwapPath = { readonly path: 'slot' } | { readonly path: 'job'; readonly job: string };
+
 /**
  * A connection point. Its frame is: origin `pos`, local X = `normal`
  * (pointing out of the part), local Y = `up` (the roll reference, which must
@@ -17,8 +20,14 @@ export interface PortDef {
   readonly id: string;
   readonly mount: string;
   readonly gender: Gender;
-  /** Size class. When both sides of a connection have one, they must match. */
+  /** The interface's own size, which its builder derives from its params. When both sides have one, they must match. */
   readonly size?: string;
+  /**
+   * The interchange class domain content gives the port, so a part of one design can be matched to a site of another.
+   * When both sides have one, they must match.
+   */
+  readonly sizeClass?: string;
+  readonly swap?: SwapPath;
   /**
    * What the interface is built for within its mount type, such as a thread cut. Both sides of a connection declare
    * the same standard or neither does, so fit is a property of both parts rather than of whichever side declares it.

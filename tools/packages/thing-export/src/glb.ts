@@ -311,6 +311,8 @@ const portMetadata = (partId: string, port: PortDef, placed: Transform): ExportP
     mount: port.mount,
     gender: port.gender,
     ...(port.size === undefined ? {} : { size: port.size }),
+    ...(port.sizeClass === undefined ? {} : { sizeClass: port.sizeClass }),
+    ...(port.swap === undefined ? {} : { swap: port.swap }),
     ...(port.standard === undefined ? {} : { standard: port.standard }),
     ...(port.accepts === undefined ? {} : { accepts: port.accepts }),
     ...(port.envelope === undefined ? {} : { envelope: port.envelope }),
@@ -927,6 +929,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       metresPerUnit,
       portFrameUnit: 'u',
       materialCount: materials.length,
+      ...input.modelMetadata,
     },
   };
 
