@@ -27,6 +27,7 @@ test('the ten timber kit modules are selected once by the production structures 
     assert.equal(selected[0].source, row.id);
     assert.equal(selected[0].taxonomy.category, 'structures');
     assert.ok(selected[0].taxonomy.tags.setting.includes('medieval'));
+    assert.deepEqual(selected[0].taxonomy.keywords, ['building']);
     assert.ok(row.title);
   }
 });

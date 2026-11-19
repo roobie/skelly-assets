@@ -7,7 +7,7 @@ local shade(i, j=0) = if std.modulo(i + 3 * j, 5) == 0 then 'pale' else 'stone';
 local row(id, title, kg, pieces) = h.compound('medieval_stone_' + id, kg, pieces, finish) + {
   title: 'Medieval stone ' + title,
   voxelGrain: s.grain,
-  taxonomy: { category: 'structures', tags: { setting: ['medieval'], material: ['stone'] } },
+  taxonomy: { category: 'structures', tags: { setting: ['medieval'], material: ['stone'] }, keywords: ['building', 'castle'] },
   building: metadata['medieval_stone_' + id],
 };
 local rect(x0, y0, x1, y1) = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];

@@ -60,6 +60,7 @@ test('the twelve stone modules have unique titles and production structures sele
     assert.equal(selected[0].taxonomy.category, 'structures');
     assert.ok(selected[0].taxonomy.tags.setting.includes('medieval'));
     assert.ok(selected[0].taxonomy.tags.material.includes('stone'));
+    assert.deepEqual(selected[0].taxonomy.keywords, ['building', 'castle']);
   }
 });
 
