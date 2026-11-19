@@ -142,6 +142,8 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
       innerHalfWidth: dim(magazine.width / 2 + wellClearance, 'derived: the magazine body width and 0.5 mm clearance each side'),
       outerHalfWidth: dim(magazine.width / 2 + wellClearance + detailFeature, 'derived: the side wall outside the clearance'),
     },
+    // The magazine standard the well is cut for.
+    magazine: 'ar15-magazine',
     magazineSeat: {
       x: dim(wellInnerFrontX - wellClearance - magazine.depth / 2, 'derived: the magazine body centred in the well'),
       y: dim(partingY - 1 - magazine.topAboveSeat, 'derived: the magazine top 1 mm under the upper'),

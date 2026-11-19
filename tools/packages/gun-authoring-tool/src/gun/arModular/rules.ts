@@ -6,7 +6,6 @@ import type { Issue } from '@skelly/construct/foundation/issue.ts';
 import { applyDir, applyPoint, dot, sub } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { X } from '../antiMateriel/common.ts';
-import { MAGAZINE_FRAME_WELLS } from '../magazineProfiles.ts';
 import { type SightRole, sightAxisOf, sightRoleOf } from '../sightAxis.ts';
 import { uToMm } from '../units.ts';
 import { barrelGas } from './barrel.ts';
@@ -191,37 +190,6 @@ const rearSightPresent = (frame: ArFrame): Rule => {
   };
 };
 
-/** The frame's magazine well is cut for one family of magazines. */
-const magazineWell = (frame: ArFrame): Rule => {
-  const id = `${frame.name}-magazine-well`;
-  const accepted = MAGAZINE_FRAME_WELLS[frame.name];
-  if (accepted === undefined) {
-    throw new Error(`${frame.name}: no magazine well in the magazine content`);
-  }
-  return {
-    id,
-    title: `The magazine fits the ${frame.title} magazine well`,
-    check: (r) =>
-      placedOf(r, familyName(frame, 'lower')).flatMap((lower) =>
-        r.connections.flatMap((rc) => {
-          const ends = endsOf(rc, lower);
-          if (ends?.own.port.id !== 'magazine' || !r.placed.has(ends.other.part)) {
-            return [];
-          }
-          const profile = paramOf(r, ends.other.part, 'profile');
-          return profile === undefined || accepted.includes(profile)
-            ? []
-            : [
-                issue(id, `${profile} magazine does not fit the ${frame.title} magazine well`, [
-                  ends.other.part,
-                  lower,
-                ]),
-              ];
-        }),
-      ),
-  };
-};
-
 /** The coupling rules of a frame's modules. */
 export const arModularRules = (frame: ArFrame): Rule[] => [
   dropInGas(frame),
@@ -230,5 +198,4 @@ export const arModularRules = (frame: ArFrame): Rule[] => [
   carryHandleRail(frame),
   sightHeight(frame),
   rearSightPresent(frame),
-  magazineWell(frame),
 ];

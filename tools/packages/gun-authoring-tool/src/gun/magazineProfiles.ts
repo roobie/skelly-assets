@@ -28,7 +28,7 @@ const ProfileSchema = strictObject({
 const ContentSchema = strictObject({
   well: strictObject({ heightU: Units, clearanceU: Units }),
   stanag30: strictObject({ depthU: Units, widthU: Units }),
-  frameWells: record(Text, pipe(array(Text), nonEmpty())),
+  wellStandards: record(Text, pipe(array(Text), nonEmpty())),
   profiles: record(Text, ProfileSchema),
 });
 
@@ -53,8 +53,9 @@ export const MAGAZINE_WELL = MAGAZINE_CONTENT.well;
 /** The 30-round STANAG magazine's body section. */
 export const STANAG30_BODY = MAGAZINE_CONTENT.stanag30;
 
-/** The magazine profiles each modular AR frame's well takes, by frame name. */
-export const MAGAZINE_FRAME_WELLS = MAGAZINE_CONTENT.frameWells;
+/** The magazine standard a profile is cut for, if it is cut for one. */
+export const magazineStandardOf = (profile: string): string | undefined =>
+  Object.entries(MAGAZINE_CONTENT.wellStandards).find(([, profiles]) => profiles.includes(profile))?.[0];
 
 /** Photo-measured straight box magazines, by profile name. */
 export const MAGAZINE_PROFILES = MAGAZINE_CONTENT.profiles;

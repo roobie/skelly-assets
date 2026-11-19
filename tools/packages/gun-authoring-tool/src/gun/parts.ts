@@ -76,7 +76,13 @@ import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
-import { MAGAZINE_PROFILES, MAGAZINE_WELL, magazineProfileContent, STANAG30_BODY } from './magazineProfiles.ts';
+import {
+  MAGAZINE_PROFILES,
+  MAGAZINE_WELL,
+  magazineProfileContent,
+  magazineStandardOf,
+  STANAG30_BODY,
+} from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
@@ -2963,9 +2969,12 @@ const lower: PartFamily = {
       } else if (params.magazineWell === 'recessed') {
         portY = RECESSED_MAGAZINE_PORT_Y;
       }
+      // This lower's well is cut to the magazine it takes, so it is cut for that magazine's standard.
+      const standard = magazineStandardOf(magazineProfile);
       const port: PortDef = {
         id: 'magazine',
         mount: 'magazine',
+        ...(standard === undefined ? {} : { standard }),
         gender: 'female',
         pos: [x, portY, 0],
         normal: [Math.sin(tilt), -Math.cos(tilt), 0],
@@ -5416,6 +5425,7 @@ export const magazine: PartFamily = {
     } else if (params.profile === 'stanag-curved') {
       curveProfile = CURVED_MAGAZINE_PROFILES.stanag30;
     }
+    const standard = magazineStandardOf(profile);
     const insertion = params.profile === 'pistol' ? PISTOL_MAGAZINE_INSERTION : MAGAZINE_INSERTION;
     const resolvedInsertion = curveProfile?.seat === 'face' ? 0 : insertion;
     const shape: MagazineShape = {
@@ -5455,6 +5465,7 @@ export const magazine: PartFamily = {
         gunPort({
           id: 'top',
           mount: 'magazine',
+          ...(standard === undefined ? {} : { standard }),
           gender: 'male',
           pos: [0, 0, 0],
           normal: Y,

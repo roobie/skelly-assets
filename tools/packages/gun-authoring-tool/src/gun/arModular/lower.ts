@@ -179,6 +179,7 @@ export const arLower = (frame: ArFrame): PartFamily => ({
       {
         id: 'magazine',
         mount: 'magazine',
+        standard: L.magazine,
         gender: 'female',
         pos: [seat.x, seat.y, 0],
         normal: NEG_Y,

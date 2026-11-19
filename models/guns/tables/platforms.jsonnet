@@ -24,7 +24,8 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
   // muzzle devices and add-ons) swap by hand; parts held by pins or screws need a tool; parts fitted, pressed or
   // timed into the gun need a bench. A mount type's `standards` are the only ones its ports may declare.
   mounts: {
-    magazine: { swap: slot },
+    // A well is cut for one family of magazines, so a magazine that fits it by size alone is still refused.
+    magazine: { swap: slot, standards: { 'ar15-magazine': standard() } },
     // A stock slides on the receiver extension, so the extension's outside diameter defines its standard.
     stock: {
       swap: slot,

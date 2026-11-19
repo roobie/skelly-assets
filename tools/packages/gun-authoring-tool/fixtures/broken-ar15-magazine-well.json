@@ -1,7 +1,7 @@
 {
   "name": "broken-ar15-magazine-well",
   "description": "An A2 rifle with an SR-25 magazine, which is cut for the AR-10's larger well.",
-  "expect": ["ar15-magazine-well"],
+  "expect": ["port-compat"],
   "root": "lower",
   "parts": {
     "lower": { "family": "ar15-lower" },

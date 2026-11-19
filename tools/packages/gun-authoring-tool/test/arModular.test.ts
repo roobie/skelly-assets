@@ -171,8 +171,8 @@ describe('modular AR', () => {
         'free-float handguard (381 mm) runs past the front sight base at 218 mm; fit a low-profile gas block',
       ],
       'broken-ar15-magazine-well': [
-        'ar15-magazine-well',
-        'sr25-straight magazine does not fit the AR-15 magazine well',
+        'port-compat',
+        'Standard mismatch: lower.magazine is ar15-magazine but magazine.top is unstated.',
       ],
       'broken-ar15-rear-sight': [
         'ar15-rear-sight',
