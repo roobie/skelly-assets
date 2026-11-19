@@ -96,11 +96,20 @@ describe('modular AR', () => {
   });
 
   it("keeps the receiver's roof over the charging handle's channel at least upper.roof thick", () => {
-    const { shaft } = AR15.chargingHandle;
-    const channelTopY = shaft.bottomY.mm + shaft.depth.mm + shaft.clearance.mm;
-    expect(AR15.upper.topY.mm - channelTopY).toBeGreaterThanOrEqual(AR15.upper.roof.mm - 1e-9);
-    const thinned = { ...AR15, upper: { ...AR15.upper, topY: { ...AR15.upper.topY, mm: channelTopY + 0.5 } } };
+    const channelTopY = arActionLayout(AR15_FRAME).channel.y[1];
+    expect(u(AR15.upper.topY) - channelTopY).toBeGreaterThanOrEqual(u(AR15.upper.roof) - 1e-9);
+    const thinnedMm = AR15.upper.topY.mm - AR15.upper.roof.mm / 2;
+    const thinned = { ...AR15, upper: { ...AR15.upper, topY: { ...AR15.upper.topY, mm: thinnedMm } } };
     expect(() => arActionLayout({ ...AR15_FRAME, table: thinned })).toThrow(/ar15\.upper\.topY: the receiver's roof/);
+  });
+
+  it('refuses an ejection port whose front is off the bolt face', () => {
+    const port = AR15.upper.ejectionPort;
+    const shifted = { ...port, frontX: { ...port.frontX, mm: port.frontX.mm - 1 } };
+    const table = { ...AR15, upper: { ...AR15.upper, ejectionPort: shifted } };
+    expect(() => arUpper({ ...AR15_FRAME, table }).build({ top: 'flat-top' })).toThrow(
+      /ar15\.upper\.ejectionPort: the port's front is off the bolt face/,
+    );
   });
 
   it('refuses the AR-15 table with a pick it pins left out or turned into a measurement', () => {
