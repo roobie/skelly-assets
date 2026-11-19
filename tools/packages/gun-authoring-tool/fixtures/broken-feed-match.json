@@ -19,6 +19,6 @@
     { "from": "handguard.front", "to": "barrel.clamp" },
     { "from": "lower.grip", "to": "grip.top" },
     { "from": "receiver.stock", "to": "stock.front" },
-    { "from": "receiver.rail", "slot": 3, "to": "sight.base" }
+    { "from": "receiver.rail", "slot": 7, "to": "sight.base" }
   ]
 }

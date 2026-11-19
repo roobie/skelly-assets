@@ -124,7 +124,7 @@ export const scopedArDesign = (type = 'lpvo-1-6x'): MutableAssembly => {
   const assembly = loadDesignAssembly('archetype-ar');
   removeRearSight(assembly);
   assembly.parts.sight = { family: 'sight', params: { type } };
-  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 3 });
+  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 7 });
   return assembly;
 };
 
@@ -135,7 +135,7 @@ export const scopedArDesign = (type = 'lpvo-1-6x'): MutableAssembly => {
 export const fitAntiMaterielScope = (assembly: MutableAssembly, type = 'high-mag-5-25x'): void => {
   removeRearSight(assembly);
   assembly.parts.sight = { family: 'sight', params: { type } };
-  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 5 });
+  assembly.connections.push({ from: 'receiver.rail', to: 'sight.base', slot: 11 });
 };
 
 /** The published anti-materiel rifle with a scope on its receiver rail. */

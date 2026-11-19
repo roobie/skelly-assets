@@ -33,7 +33,7 @@ const huntingAssembly: Assembly = loadedHunting.design.assembly;
 const scoped: Assembly = {
   ...huntingAssembly,
   parts: { ...huntingAssembly.parts, sight: { family: 'sight', params: { type: 'hunting-3-9x' } } },
-  connections: [...huntingAssembly.connections, { from: 'receiver.rail', to: 'sight.base', slot: 3 }],
+  connections: [...huntingAssembly.connections, { from: 'receiver.rail', to: 'sight.base', slot: 7 }],
 };
 
 it('exports every bolt pattern as a hand-only action with a shared bore-parallel turn', () => {

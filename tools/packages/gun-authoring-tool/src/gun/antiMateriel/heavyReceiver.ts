@@ -2,6 +2,7 @@ import type { KeepOut, PartDef, PartFamily, PortDef } from '@skelly/construct/as
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { EJECTION_PORT_MARGIN_U } from '../ejectionPort.ts';
+import { railSlots } from '../mounts.ts';
 import { box, choice, NEG_X, NEG_Y, X, Y } from './common.ts';
 import {
   HEAVY_CARRIER_ENVELOPE,
@@ -53,10 +54,9 @@ const HALF_HEIGHT = 2.5;
 const HALF_WIDTH = 2;
 const INNER_HALF_HEIGHT = HALF_HEIGHT - WALL;
 const INNER_HALF_WIDTH = HALF_WIDTH - WALL;
-const RAIL_SLOT_PITCH = 2;
-/** The rail keeps the 11 slots it had when the receiver was shorter, at x = -22 ... -2 (the front 22u). */
+/** The rail keeps the span it had when the receiver was shorter, from x = -22 to just past -2 (it ends at -1.98). */
 const RAIL_START_X = -22;
-const RAIL_SLOTS = (-2 - RAIL_START_X) / RAIL_SLOT_PITCH + 1;
+const RAIL_SLOTS = railSlots(-2 - RAIL_START_X);
 /** Clearance around the moving handle stick; its swept opening is kept narrow in y and in the receiver side wall. */
 const HANDLE_SLOT_CLEARANCE = 0.25;
 // The mating carrier frame reverses X and Z, so its local rear root sits forward in receiver coordinates.
@@ -168,7 +168,7 @@ export const heavyReceiver: PartFamily = {
         pos: [RAIL_START_X, HALF_HEIGHT, 0],
         normal: Y,
         up: X,
-        slots: { count: RAIL_SLOTS, pitch: RAIL_SLOT_PITCH },
+        slots: RAIL_SLOTS,
       },
     ];
     const keepOuts: KeepOut[] = [

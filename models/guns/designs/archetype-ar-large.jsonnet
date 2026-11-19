@@ -16,9 +16,9 @@ base + {
       grip: { item: 'grip_ar_long' },
       stock: { item: 'stock_m4_long' },
     },
-    // The traced rail's front sight stands 32u ahead of the receiver, slot 15 of its 2u-pitch rail.
+    // The traced rail's front sight stands 31.6u ahead of the receiver, slot 34 of its rail.
     connections: [
-      if c.to == 'rail-front-sight.base' then c + { slot: 15 } else c
+      if c.to == 'rail-front-sight.base' then c + { slot: 34 } else c
       for c in base.assembly.connections
       if c.to != 'sight.base'
     ],

@@ -765,7 +765,7 @@ const checkOpticMountFit = (r: Resolved, focusSight?: string): Issue[] => {
     if (!mountCanAccept(port, optic.mount, slot) || supportError) {
       issues.push({
         rule: 'optic-mount-fit',
-        message: `${sight} (${optic.id}) needs ${optic.mount.kind} with ${optic.mount.contactLengthU}u contact length, ${optic.mount.contactWidthU}u width, and ${optic.mount.minimumSlots} slots; ${host.part}.${port.id} offers ${port.mount} with ${span}u span at slot ${slot}.${supportError ? ` ${supportError}.` : ''}`,
+        message: `${sight} (${optic.id}) needs ${optic.mount.kind} with ${optic.mount.contactLengthU}u contact length and ${optic.mount.contactWidthU}u width; ${host.part}.${port.id} offers ${port.mount} with ${span}u span at slot ${slot}.${supportError ? ` ${supportError}.` : ''}`,
         parts: [sight, host.part],
       });
     }

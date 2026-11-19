@@ -1,6 +1,7 @@
 import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
 import type { SizeClass } from '@skelly/construct/foundation/conventions.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { railSlots } from '../mounts.ts';
 import { SHROUD_FRONT_SIGHT_SETBACK_U } from '../shroudFrontSight.ts';
 import { box, cls, NEG_X, NEG_Y, NEG_Z, RUBBER, sizeParam, X, Y } from './common.ts';
 
@@ -29,6 +30,9 @@ const BULKHEAD_OPENING = 1.5;
 const BIPOD_SETBACK = 3;
 /** Where the carry handle's trunnion block bolts to the left wall, measured forward from the shroud's rear end. */
 export const TRUNNION_SETBACK = 2.5;
+
+/** The top rail starts and ends this far inside the shroud. */
+const RAIL_END_MARGIN = 2;
 
 const HOLE_ROWS = [-0.75, 0.75] as const;
 const HOLE_PITCH = 2;
@@ -87,10 +91,10 @@ export const barrelShroud: PartFamily = {
         id: 'rail',
         mount: 'rail',
         gender: 'female',
-        pos: [2, SHROUD_HALF_HEIGHT, 0],
+        pos: [RAIL_END_MARGIN, SHROUD_HALF_HEIGHT, 0],
         normal: Y,
         up: X,
-        slots: { count: (length - 4) / 2 + 1, pitch: 2 },
+        slots: railSlots(length - 2 * RAIL_END_MARGIN),
       },
       {
         id: 'front-sight',

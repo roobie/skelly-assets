@@ -95,12 +95,12 @@
     {
       "from": "receiver.rail",
       "to": "sight.base",
-      "slot": 3
+      "slot": 7
     },
     {
       "from": "handguard.rail",
       "to": "rail-front-sight.base",
-      "slot": 10
+      "slot": 23
     }
   ]
 }

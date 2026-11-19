@@ -61,7 +61,7 @@ import {
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
-import type { MuzzleBore } from './mounts.ts';
+import { type MuzzleBore, railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import { gunPort } from './portData.ts';
@@ -118,6 +118,26 @@ const sportingStockParams = SPORTER_PROPORTIONS.stock;
 const sportingFrontSightParams = SPORTER_PROPORTIONS.frontSight;
 
 export const EJECTION_PORT_MARGIN_U = SHARED_EJECTION_PORT_MARGIN_U;
+
+/** The slotted run of the receiver rail asked for, from its rear end forward; its slots round it up to a whole pitch. */
+const RECEIVER_RAIL_SPAN_U = 12;
+const RECEIVER_RAIL_SLOTS = railSlots(RECEIVER_RAIL_SPAN_U);
+/** The physical rail's length: it reaches the last slot, on the grid. */
+const RECEIVER_RAIL_RUN_U = Math.ceil(((RECEIVER_RAIL_SLOTS.count - 1) * RECEIVER_RAIL_SLOTS.pitch) / GRID) * GRID;
+/**
+ * Where the receiver rail's rear slot sits. The AR and pump rails start a quarter unit further back than the round
+ * -12, so an optic seated on slot 7 (a slot's pitch is not a whole unit) keeps its front foot on the receiver top.
+ */
+const receiverRailStartX = (params: Readonly<Record<string, string>>): number =>
+  params.section === 'ar' || params.section === 'pump' ? -12.25 : -14;
+/**
+ * The slotted run of the pistol slide rail; 5u, not the 4u it was, so a slot can centre the 3.5u optic foot on it
+ * (slot 3, from the rail's rear end at -6.5, sits at about -4).
+ */
+const PISTOL_RAIL_SPAN_U = 5;
+const PISTOL_RAIL_START_X = -6.5;
+/** A handguard's rail starts and ends this far inside the handguard. */
+const HANDGUARD_RAIL_END_MARGIN_U = 2;
 
 const size: ParamSpec = { values: SIZE_CLASSES, default: 'M' };
 const choice = (...values: string[]): ParamSpec => ({ values, default: values[0]! });
@@ -1538,14 +1558,10 @@ const receiverPorts = (context: ReceiverContext): PortDef[] => {
       mount: 'rail-top',
       gender: 'female',
       // AR scope feet stay on the upper, but the ocular starts ahead of rear charging-handle travel.
-      pos: [
-        params.section === 'ar' || params.section === 'pump' ? -12 : -14,
-        receiverTop + boltRailLift(params, carrierY, receiverTop),
-        0,
-      ],
+      pos: [receiverRailStartX(params), receiverTop + boltRailLift(params, carrierY, receiverTop), 0],
       normal: Y,
       up: X,
-      slots: { count: 7, pitch: 2 },
+      slots: RECEIVER_RAIL_SLOTS,
     });
   }
   if (params.feed === 'tube') {
@@ -1802,11 +1818,11 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
   if (params.rail !== 'none') {
     if (params.feed === 'top') {
       railCap('receiver-optic-rail-rear-base', -14, -4 - carrierTravelLength(params));
-      railCap('receiver-optic-rail-front-base', -4, -2);
+      railCap('receiver-optic-rail-front-base', -4, -14 + RECEIVER_RAIL_RUN_U);
     } else {
       // Keep the pump's flat rail in the full-height section, ahead of its rear slope.
-      const start = params.section === 'ar' || params.section === 'pump' ? -12 : -14;
-      railCap('receiver-optic-rail', start, start + 12);
+      const start = receiverRailStartX(params);
+      railCap('receiver-optic-rail', start, start + RECEIVER_RAIL_RUN_U);
     }
   }
   // Sectioned shells already have a real front mounting wall; the old box-shell
@@ -4406,28 +4422,32 @@ const handguard: PartFamily = {
                 id: 'rail',
                 mount: 'rail-top',
                 gender: 'female' as const,
-                pos: [2, topY, 0] as Vec3,
+                pos: [HANDGUARD_RAIL_END_MARGIN_U, topY, 0] as Vec3,
                 normal: Y,
                 up: X,
-                slots: { count: (len - 4) / 2 + 1, pitch: 2 },
+                slots: railSlots(len - HANDGUARD_RAIL_END_MARGIN_U * 2),
               },
               {
                 id: 'rail-bottom',
                 mount: 'rail-bottom',
                 gender: 'female' as const,
-                pos: [2, akLayout ? AK_PROPORTIONS.handguard.lowerBottomU : snapGrid(-outerY), 0] as Vec3,
+                pos: [
+                  HANDGUARD_RAIL_END_MARGIN_U,
+                  akLayout ? AK_PROPORTIONS.handguard.lowerBottomU : snapGrid(-outerY),
+                  0,
+                ] as Vec3,
                 normal: NEG_Y,
                 up: X,
-                slots: { count: (len - 4) / 2 + 1, pitch: 2 },
+                slots: railSlots(len - HANDGUARD_RAIL_END_MARGIN_U * 2),
               },
               {
                 id: 'rail-side',
                 mount: 'rail-side',
                 gender: 'female' as const,
-                pos: [2, 0, snapGrid(outerZ)] as Vec3,
+                pos: [HANDGUARD_RAIL_END_MARGIN_U, 0, snapGrid(outerZ)] as Vec3,
                 normal: [0, 0, 1] as Vec3,
                 up: X,
-                slots: { count: (len - 4) / 2 + 1, pitch: 2 },
+                slots: railSlots(len - HANDGUARD_RAIL_END_MARGIN_U * 2),
               },
             ]),
         ...(cockingTube === undefined
@@ -5029,10 +5049,10 @@ const pistolSlide: PartFamily = {
           id: 'rail',
           mount: 'rail-top',
           gender: 'female',
-          pos: [-6, 3, 0],
+          pos: [PISTOL_RAIL_START_X, 3, 0],
           normal: Y,
           up: X,
-          slots: { count: 3, pitch: 2 },
+          slots: railSlots(PISTOL_RAIL_SPAN_U),
         },
       ],
       keepOuts: [keepOut('ejection', [-3, 1, channelHalfWidth], [-1, 2, slideHalfWidth + 4], 'frame')],

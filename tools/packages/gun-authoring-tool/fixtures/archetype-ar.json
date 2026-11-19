@@ -101,7 +101,7 @@
     {
       "from": "receiver.rail",
       "to": "rear-sight.base",
-      "slot": 0
+      "slot": 1
     }
   ]
 }

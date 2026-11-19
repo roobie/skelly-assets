@@ -103,7 +103,7 @@
       {
         "from": "receiver.rail",
         "to": "sight.base",
-        "slot": 3
+        "slot": 7
       }
     ]
   },

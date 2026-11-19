@@ -231,14 +231,12 @@ const makeEntry = (
 const railMount = ({
   contactLengthU,
   contactWidthU,
-  minimumSlots,
   description,
   clearanceU,
   ringSpanU,
 }: {
   readonly contactLengthU: number;
   readonly contactWidthU: number;
-  readonly minimumSlots: number;
   readonly description: string;
   readonly clearanceU: MountRequirement['clearanceU'];
   readonly ringSpanU?: number;
@@ -246,7 +244,6 @@ const railMount = ({
   kind: 'rail-top',
   contactLengthU,
   contactWidthU,
-  minimumSlots,
   ...(ringSpanU === undefined ? {} : { ringSpanU }),
   clearanceU,
   description,
@@ -293,7 +290,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 3.5,
       contactWidthU: 1.5,
-      minimumSlots: 2,
       description: 'single compact foot',
       clearanceU: { forward: 0.25, rearward: 0.25, lateral: 0.25 },
     }),
@@ -380,7 +376,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 4,
       contactWidthU: 1.5,
-      minimumSlots: 3,
       description: 'low direct foot',
       clearanceU: { forward: 0.5, rearward: 0.5, lateral: 0.35 },
     }),
@@ -408,7 +403,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 5.5,
       contactWidthU: 1.7,
-      minimumSlots: 4,
       description: 'integral low rail foot',
       clearanceU: { forward: 0.5, rearward: 0.5, lateral: 0.5 },
     }),
@@ -526,7 +520,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 12,
       contactWidthU: 1.75,
-      minimumSlots: 7,
       description: 'paired receiver rings',
       clearanceU: { forward: 1, rearward: 1, lateral: 0.75 },
       ringSpanU: 12,
@@ -565,7 +558,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 12,
       contactWidthU: 1.75,
-      minimumSlots: 7,
       description: 'paired hunting-scope rings',
       clearanceU: { forward: 1, rearward: 1, lateral: 0.75 },
       ringSpanU: 12,
@@ -612,7 +604,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 12,
       contactWidthU: 1.75,
-      minimumSlots: 7,
       description: 'separated 34 mm rings',
       clearanceU: { forward: 1.25, rearward: 1.25, lateral: 1 },
       ringSpanU: 12,
@@ -651,7 +642,6 @@ export const OPTIC_CATALOG: Readonly<Record<OpticTypeId, OpticCatalogEntry>> = {
     mount: railMount({
       contactLengthU: 12,
       contactWidthU: 1.75,
-      minimumSlots: 7,
       description: 'paired receiver rings',
       clearanceU: { forward: 1.25, rearward: 1.25, lateral: 1 },
       ringSpanU: 12,

@@ -78,7 +78,7 @@ export const battleRifle: Template = {
     { from: 'lower.magazine', to: 'magazine.top' },
     { from: 'receiver.stock', to: 'stock.front' },
     // A shared station keeps swaps mounted on the receiver without rewiring.
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
   ],
 };
 
@@ -160,7 +160,7 @@ export const ar: Template = {
     { from: 'lower.grip', to: 'grip.top' },
     { from: 'lower.magazine', to: 'magazine.top' },
     { from: 'receiver.stock', to: 'stock.front' },
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
     { from: 'receiver.charging-handle', to: 'charging-handle.mount' },
     {
       from: 'barrel.front-sight',
@@ -169,25 +169,25 @@ export const ar: Template = {
     },
     {
       from: 'receiver.rail',
-      slot: 0,
+      slot: 1,
       to: 'rear-sight.base',
       when: { part: 'handguard', param: 'mount', equals: 'clamped' },
     },
     {
       from: 'handguard.rail',
-      slot: 7,
+      slot: 16,
       to: 'rail-front-sight.base',
       when: { part: 'barrel', param: 'length', equals: 'S' },
     },
     {
       from: 'handguard.rail',
-      slot: 10,
+      slot: 23,
       to: 'rail-front-sight.base',
       when: { part: 'barrel', param: 'length', equals: 'M' },
     },
     {
       from: 'handguard.rail',
-      slot: 13,
+      slot: 30,
       to: 'rail-front-sight.base',
       when: { part: 'barrel', param: 'length', equals: 'L' },
     },
@@ -255,7 +255,7 @@ export const pistol: Template = {
     { from: 'slide.barrel', to: 'barrel.rear' },
     { from: 'frame.barrel', to: 'barrel.frame' },
     { from: 'frame.magazine', to: 'magazine.top' },
-    { from: 'slide.rail', slot: 1, to: 'sight.base' },
+    { from: 'slide.rail', slot: 3, to: 'sight.base' },
   ],
 };
 
@@ -329,7 +329,7 @@ export const smg: Template = {
     { from: 'receiver.bolt-carrier', to: 'bolt-carrier.mount' },
     { from: 'handguard.smg-handle', to: 'smg-handle.mount' },
     { from: 'barrel.front-sight', to: 'front-sight.base' },
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
   ],
 };
 
@@ -382,7 +382,7 @@ export const boltRifle: Template = {
     { from: 'bolt-carrier.handle', to: 'bolt-handle-arm.base' },
     { from: 'bolt-handle-arm.tip', to: 'bolt-handle-knob.base' },
     // Paired bases sit fore and aft of the loading opening; the scope bridges it.
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
   ],
 };
 
@@ -505,7 +505,7 @@ export const boltRifleBox: Template = {
     { from: 'receiver.bolt-carrier', to: 'bolt-carrier.mount' },
     { from: 'bolt-carrier.handle', to: 'bolt-handle-arm.base' },
     { from: 'bolt-handle-arm.tip', to: 'bolt-handle-knob.base' },
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
   ],
 };
 
@@ -630,7 +630,7 @@ export const pumpShotgun: Template = {
       when: { part: 'lower', param: 'layout', equals: 'trigger' },
     },
     { from: 'lower.grip', to: 'grip.top', when: { part: 'lower', param: 'layout', equals: 'trigger' } },
-    { from: 'receiver.rail', to: 'sight.base', slot: 3 },
+    { from: 'receiver.rail', to: 'sight.base', slot: 7 },
   ],
 };
 
@@ -673,10 +673,10 @@ export const antiMateriel: Template = {
     { from: 'lower.grip', to: 'grip.top' },
     { from: 'lower.magazine', to: 'magazine.top' },
     { from: 'receiver.stock', to: 'stock.front' },
-    // The sight sits on the receiver rail (slots x = -14, -12). The carry handle's trunnion bolts to the shroud's left
+    // The sight sits on the receiver rail (slots x = -14.17, -12.43). The carry handle's trunnion bolts to the shroud's left
     // wall, and its strut and bar stand to the left, clear of a full-size scope mounted where the sight is.
-    { from: 'receiver.rail', to: 'sight.base', slot: [4, 5] },
-    { from: 'receiver.rail', slot: 0, to: 'rear-sight.base' },
+    { from: 'receiver.rail', to: 'sight.base', slot: [9, 11] },
+    { from: 'receiver.rail', slot: 1, to: 'rear-sight.base' },
     { from: 'shroud.front-sight', to: 'front-sight.base' },
     { from: 'shroud.trunnion', to: 'trunnion.base' },
     { from: 'trunnion.strut', to: 'strut.base' },
