@@ -5,6 +5,8 @@ local jacket = import 'measures/jacket.libsonnet';
 local wornFit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local bags = import 'measures/bags.libsonnet';
 local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
+// The ground rows these shells reuse the titles of.
+local ground = import 'models/catalogue/sets/clothing-bags.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local box(id, slot, min, max) = { id: id, kind: 'box', slot: slot, min: min, max: max };
 local mirrored(id, slot, xs, ys, zs) = [
@@ -141,7 +143,7 @@ local backpack(id, massKg, bottom) =
   local panel = -(torso.chest.hz + fit.packStrap[1] + d.strapWidth / 2);
   {
     id: id + '_worn' + suffix,
-    title: variantTitle(worn.groundTitle(id)),
+    title: variantTitle(worn.groundTitle(ground, id)),
     exportMass: 'parts',
     voxelGrain: grain,
     taxonomy: tag('containers', 'back', 'fabric'),
@@ -162,7 +164,7 @@ local fannyPack =
   local beltOuter = torso.pelvis.hz + fit.belt[1];
   {
     id: 'fanny_pack_worn' + suffix,
-    title: variantTitle(worn.groundTitle('fanny_pack')),
+    title: variantTitle(worn.groundTitle(ground, 'fanny_pack')),
     exportMass: 'parts',
     voxelGrain: grain,
     taxonomy: tag('containers', 'waist', 'fabric'),

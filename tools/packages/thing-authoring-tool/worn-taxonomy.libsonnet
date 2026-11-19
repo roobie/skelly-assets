@@ -13,12 +13,15 @@ local slots = import 'models/worn-slots.libsonnet';
 local unmapped = std.setDiff(std.set(segments), std.set(std.objectFields(slots)));
 local unknown = std.setDiff(std.set(std.objectFields(slots)), std.set(segments));
 assert unmapped == [] && unknown == [] : 'worn slot map: segments with no slot %s, keys that are no segment %s' % [unmapped, unknown];
-local groundRows = std.flattenArrays(std.objectValues(import 'models/catalogue/sets/index.libsonnet'));
 local segmentOf(id) = std.reverse(std.split(id, '_'))[0];
 {
-  // The ground row of the garment a worn family is fitted for, whose authored title and finish the shells reuse.
-  groundRow(id):: [row for row in groundRows if row.id == id][0],
-  groundTitle(id):: self.groundRow(id).title,
+  // The ground row of the garment a worn family is fitted for, whose authored title and finish the shells reuse, found
+  // among the rows of the set file `rows` the kit names, so a kit's key holds that one set and not every set.
+  groundRow(rows, id)::
+    local found = [row for row in rows if row.id == id];
+    assert std.length(found) == 1 : 'the set file the worn kit names holds no ground row `%s`' % id;
+    found[0],
+  groundTitle(rows, id):: self.groundRow(rows, id).title,
   // `own` is the taxonomy of the garment the shells belong to; each shell adds its slot and fit.
   shells(own, rows):: [
     row + { taxonomy: taxonomy.over(own, { tags: { slot: [slots[segmentOf(row.id)].slot], fit: ['worn'] } }) }
