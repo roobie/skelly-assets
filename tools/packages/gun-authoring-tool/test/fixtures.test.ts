@@ -48,9 +48,10 @@ describe('fixtures', () => {
     });
   }
 
-  // Resolves every fixture and checks all of its parts.
+  // Resolves every fixture and checks all of its parts. A fixture broken in structure names a port its part lacks, so
+  // what hangs from that port cannot be placed.
   it('places every part of every fixture', () => {
-    for (const fixture of fixtures) {
+    for (const fixture of fixtures.filter((f) => !f.expect?.includes('structure'))) {
       const { resolved } = validate(fixture, gunDomain);
       expect([...resolved.placed.keys()].sort()).toEqual(Object.keys(fixture.parts).sort());
     }
