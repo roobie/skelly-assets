@@ -216,7 +216,7 @@ local stockMount = [tubeEndX, 0];
     bottomY: dim(-yOf(86), 'derived: the body is centred on the tube'),
     tubeClearance: dim(1, 'derived: a sliding fit on the tube'),
     halfWidth: dim(20, 'derived: a body a little wider than the tube it wraps'),
-    toe: tracedOutline([[284, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock'),
+    toe: tracedOutline([[270, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock'),
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
   },
 
