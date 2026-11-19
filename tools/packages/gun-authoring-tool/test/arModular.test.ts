@@ -4,6 +4,7 @@ import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
@@ -261,9 +262,13 @@ describe('modular AR', () => {
         along(post[0] - u(AR15.frontSightBase.postWidth) / 2 - LINE_HALF_THICKNESS),
         LINE_HALF_THICKNESS,
       );
+      // The rail rear sight's aperture is a ring, which penetration sees as its convex hull, hole and all, and the line
+      // starts in that hole; so that one ring is left out. Every other solid, the A2's aperture plates included, is
+      // tested.
+      const isApertureRing = (id: string, solid: Solid) => id === rearPart && solid.kind === 'revolved';
       for (const [id, part] of resolved.defs) {
         const placed = resolved.placed.get(id)!;
-        for (const solid of part.solids.filter(({ kind }) => kind !== 'revolved')) {
+        for (const solid of part.solids.filter((solid) => !isApertureRing(id, solid))) {
           expect(penetrationWorld(line, worldSolid(placed, solid)), `${id}.${solid.id}`).toBeLessThanOrEqual(0);
         }
       }
