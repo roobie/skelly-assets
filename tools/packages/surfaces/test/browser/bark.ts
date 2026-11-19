@@ -1,9 +1,9 @@
 // Bark, drawn and read back: it shades its finish without recolouring it, fades what a pixel cannot hold, and runs
 // its furrows along its grain.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { finite, looseObject, number, parse, pipe, record, string, tuple } from 'valibot';
+import { evaluateJsonnet } from '../../../../jsonnet/index.mjs';
 import type { Vec3 } from '../../src/patch.ts';
 import type { BarkSurface } from '../../src/schema.ts';
 import { LOOKS } from '../looks.ts';
@@ -15,7 +15,7 @@ const call = await openSurfaceTest();
 const Channel = pipe(number(), finite());
 const FINISHES = parse(
   record(string(), looseObject({ colour: tuple([Channel, Channel, Channel]) })),
-  JSON.parse(readFileSync(new URL('../../../../../models/finishes.json', import.meta.url), 'utf8')),
+  JSON.parse(evaluateJsonnet("import 'models/finishes.jsonnet'")),
 );
 
 const barkLook = (name: string) => {
