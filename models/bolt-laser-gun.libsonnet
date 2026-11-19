@@ -5,7 +5,8 @@ local box = h.box;
 // The bolt carbine's laser gun: the family's grip and stock kept, a battery pack for its feed, and the receiver itself
 // carried on forward as one chunky block instead of a barrel, its sides cut with slits the beam's light leaks from,
 // coolant canisters piped up its flanks and fins along its top, ending in a squared emitter with a glowing lens. Slot
-// `glow` is the model's own light: crystal-glow-blue is a stand-in colour, the game decides what colour the glow is.
+// `glow` is the model's own light, red so the laser reads apart from the plasma caster's blue; the game may still
+// recolour it.
 // About 0.95 m long, a little longer than the plasma caster. Laid out with the muzzle at +x, the axis `gripOn` names,
 // so the built model's muzzle faces +z.
 // Hand-guard point (the off hand's hold): under the emitter's head, midway along it. The canisters, their straps and
@@ -140,5 +141,5 @@ local canisterPart(id, slot, x, length, r, z) =
     ]
     for s in std.objectFields(sides)
   ])
-  + batteryPieces + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
+  + batteryPieces + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-red' }) + { title: 'Basic laser gun' },
 ]

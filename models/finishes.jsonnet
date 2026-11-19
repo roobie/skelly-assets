@@ -266,6 +266,7 @@ local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
   'scale-dragon': material([0.12, 0.22, 0.16]) + { finish: { metallic: 0.3, roughness: 0.25 } },
   'crystal-glow-blue': material([0.45, 0.75, 1.0]) + { finish: { metallic: 0, roughness: 0.1 } },
   'crystal-glow-violet': material([0.70, 0.45, 1.0]) + { finish: { metallic: 0, roughness: 0.1 } },
+  'crystal-glow-red': material([1.0, 0.28, 0.22]) + { finish: { metallic: 0, roughness: 0.1 } },
   'lycra-black': fabric([0.10, 0.10, 0.12], 'lycra'),
   'rubber-tread': fabric([0.20, 0.19, 0.18], 'rubber', { roughness: 0.95 }),
   'rubber-offblack': fabric([0.16, 0.16, 0.15], 'rubber', { roughness: 0.7 }),
