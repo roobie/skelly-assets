@@ -6,9 +6,7 @@ import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { check, finite, type InferOutput, minValue, number, parse, pipe, strictObject, tuple } from 'valibot';
 import content from '../../../../../models/guns/tables/falFoldingStock.json' with { type: 'json' };
-
-/** The stop of a folding stock where it stands out behind the receiver. */
-export const EXTENDED_STOP = 'extended';
+import { EXTENDED_STOP } from './stockStops.ts';
 
 /** The stop of a folding stock where it lies along the receiver's right side. */
 export const FOLDED_STOP = 'folded';

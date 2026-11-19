@@ -9,6 +9,7 @@ import {
   octagonalSectionChamfered,
   octagonalTubeWalls,
 } from '../octagon.ts';
+import { EXTENDED_STOP } from '../stockStops.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
 
@@ -94,9 +95,6 @@ const stockSleeve = (
     features: [{ name: 'sleeve-wall', size: Math.min(...flats) - bore, disposition: { kind: 'detail' } }],
   };
 };
-
-/** The collapsible stock's stop at full length, where it is traced. */
-const EXTENDED_STOP = 'extended';
 
 /** The collapsible stock's stop at its shortest. */
 const COLLAPSED_STOP = 'collapsed';

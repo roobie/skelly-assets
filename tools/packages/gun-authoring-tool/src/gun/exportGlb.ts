@@ -60,21 +60,18 @@ import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
 export type DeadvoxModelFile = `assets/models/${string}.glb`;
 
-interface ActionPartMetadata {
-  /** Exact glTF node name; the existing part node carries its geometry as a separate mesh. */
+/** A part that moves, by its node, and how it moves through its named stops in the model file's frame and metres. */
+interface MovingPartMetadata {
+  /** Exact glTF node name of the part; it carries its geometry as a separate mesh. */
   readonly node: string;
-  readonly handGrip?: Vec3;
-  /** Shared timelines this node follows; other modes leave it at home. */
-  readonly modes: readonly CycleMode[];
-  /** What the timelines play of the part, in the model file's frame and metres. */
   readonly motion: Motion;
 }
 
-interface MovingPartMetadata {
-  /** Exact glTF node name of the part. */
-  readonly node: string;
-  /** How the part moves through its named stops, in the model file's frame and metres. */
-  readonly motion: Motion;
+/** A part that moves with the action, which the shared timelines play its motion for. */
+interface ActionPartMetadata extends MovingPartMetadata {
+  readonly handGrip?: Vec3;
+  /** Shared timelines this node follows; other modes leave it at home. */
+  readonly modes: readonly CycleMode[];
 }
 
 interface CycleMetadata {
