@@ -213,7 +213,7 @@ describe('resolve: structure issues', () => {
       structure((a) => {
         a.connections[7] = { from: 'receiver.rail', slot: 15, to: 'sight.base' };
       }),
-    ).toEqual(['Connection #7: slot 15 is outside receiver.rail (0–14).']);
+    ).toEqual(['Connection #7: slot 15 is outside receiver.rail (0–14, or -15–-1 from its end).']);
     expect(
       structure((a) => {
         a.connections[7] = { from: 'receiver.rail', slot: 1, to: 'sight.base', roll: 45 };
