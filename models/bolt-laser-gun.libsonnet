@@ -8,7 +8,7 @@ local box = h.box;
 // triangular emitter with a glowing lens. The shroud stands apex up so its underside stays flat for the off hand and
 // its ridge carries the fins on from the receiver's own. Slot `glow` is the model's own light, red so the laser reads
 // apart from the plasma caster's blue; the game may still recolour it.
-// About 0.95 m long, a little longer than the plasma caster. Laid out with the muzzle at +x, the axis `gripOn` names,
+// About 1 m long, a little longer than the plasma caster. Laid out with the muzzle at +x, the axis `gripOn` names,
 // so the built model's muzzle faces +z.
 // Hand-guard point (the off hand's hold): under the emitter's head, midway along it. The canisters, their straps and
 // pipes all end behind the shroud's front band, so the hand there is clear of them.
@@ -16,9 +16,7 @@ local box = h.box;
 local w = 0.07;  // half the receiver's width, and of the shroud's foot
 local underside = 0.14;
 local top = 0.35;  // the receiver's top, where the shroud's ridge is cut flat
-local shroudFront = 0.44;  // where the shroud ends and the emitter begins
 local bandLength = 0.03;  // the brass bands round either end of the shroud
-local muzzleX = 0.56;
 // A section along x with a flat foot at `base` and sides sloping in to an `apex` above, the apex cut flat at `clip` and
 // the foot's corners cut by `chamfer`; `half` is its foot's half width and `zAt(y)` how far its sides stand out at `y`.
 local triangle(base, apex, half, clip, chamfer) = {
@@ -67,15 +65,17 @@ local battery = {
 };
 // The clearance kept between the shroud's fittings and what they stand beside, so each reads as its own part.
 local gap = 0.02;
-// The receiver stays square only as far as the battery it holds, a gap past it, where its brass collar hands on to the
-// shroud.
-local receiverFront = battery.front + gap;
+// The receiver stays square only as far as the battery it holds, where its brass collar hands on to the shroud; the
+// collar stands a gap clear of the battery's contact plate, so the two read apart.
+local receiverFront = battery.front + bolt.bandProud + gap + bandLength;
 // The shroud and the emitter's head and lens share one profile, each smaller in turn, so the front reads as one shape.
-local shroud = triangle(underside, 0.41, w, top, 0.01);
-local emitter = triangle(underside + 0.015, 0.375, 0.056, top - 0.03, 0.008);
-local lens = triangle(underside + 0.045, 0.33, 0.035, 0.3, 0.006);
+// The shroud is long enough to carry the canisters and fins; the lens sinks `depth - proud` into the head.
+local shroud = triangle(underside, 0.41, w, top, 0.01) + { back: receiverFront, front: self.back + 0.234 };
+local emitter = triangle(underside + 0.015, 0.375, 0.056, top - 0.03, 0.008) + { length: 0.12 };
+local lens = triangle(underside + 0.045, 0.33, 0.035, 0.3, 0.006) + { depth: 0.01, proud: 0.006 };
+local muzzleX = shroud.front + emitter.length;
 // The shroud's length that carries the fittings: from the collar to its front band.
-local section = { back: receiverFront, front: shroudFront - bandLength };
+local section = { back: shroud.back, front: shroud.front - bandLength };
 // A coolant canister low along each of the shroud's sides, half sunk into it, its brass end caps `cap` long, the back
 // one against the collar; `z` is how far its axis stands out. Its coolant line, `pipe` wide, rises up the side a gap
 // behind the section's front to below the fins, and both the line's foot and its riser stand `reach` out from the side.
@@ -145,13 +145,13 @@ local finOutline = grown([[fins.y, -shroud.zAt(fins.y)], [fins.y, shroud.zAt(fin
   bolt.gun('bolt_laser_gun', 12.5, 'energy', bolt.receiver(receiverFront, underside, top, w, { front: receiverFront - bandLength, top: 0.37, halfWidth: 0.045 }) + [
     // The collar closing the receiver, its front face the step down to the shroud.
     bolt.band('collar', 'trim', receiverFront - bandLength, receiverFront, underside, top, w, 0.018, 0.012),
-    h.prism('shroud', 'body', 'x', shroud.outline, receiverFront, shroudFront),
-    h.prism('front-band', 'trim', 'x', grown(shroud.outline, bolt.bandProud), shroudFront - bandLength, shroudFront),
+    h.prism('shroud', 'body', 'x', shroud.outline, shroud.back, shroud.front),
+    h.prism('front-band', 'trim', 'x', grown(shroud.outline, bolt.bandProud), shroud.front - bandLength, shroud.front),
     // The emitter: a steel head with two dark cooling grooves, and the lens.
-    h.prism('emitter', 'metal', 'x', emitter.outline, shroudFront, muzzleX - 0.006),
-    h.prism('lens', 'glow', 'x', lens.outline, muzzleX - 0.01, muzzleX),
+    h.prism('emitter', 'metal', 'x', emitter.outline, shroud.front, muzzleX - lens.proud),
+    h.prism('lens', 'glow', 'x', lens.outline, muzzleX - lens.depth, muzzleX),
   ] + [
-    local x = shroudFront + grooves.inset + i * grooves.pitch;
+    local x = shroud.front + grooves.inset + i * grooves.pitch;
     h.prism('emitter-groove-%d' % i, 'vent', 'x', grown(emitter.outline, bolt.bandProud), x, x + grooves.width)
     for i in std.range(0, grooves.count - 1)
   ] + [
