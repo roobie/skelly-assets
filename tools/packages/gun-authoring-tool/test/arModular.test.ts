@@ -48,21 +48,24 @@ describe('modular AR', () => {
   });
 
   it('refuses a frame table with an unsourced measurement', () => {
-    expect(() => checkFrameTable('t', { a: { mm: 1, source: 'sourced: x' } })).not.toThrow();
-    expect(() => checkFrameTable('t', { a: { mm: 1 } })).toThrow(/t\.a/);
-    expect(() => checkFrameTable('t', { a: { mm: 1, source: 'a guess' } })).toThrow();
-    expect(() => checkFrameTable('t', { a: 1 })).toThrow(/t\.a/);
-    expect(() => checkFrameTable('t', { a: 'rifle' })).toThrow(/t\.a/);
-    // A pick names the group it picks from, which must hold it.
-    const picks = { kinds: { rifle: { mm: 1, source: 'sourced: x' } } };
-    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle', of: 'kinds' } })).not.toThrow();
-    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rilfe', of: 'kinds' } })).toThrow(/t\.a/);
-    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle', of: 'sorts' } })).toThrow(/t\.a/);
-    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle' } })).toThrow();
+    const check = (table: unknown) => () => checkFrameTable('t', table, { 'a.*': 'kinds' });
+    expect(check({ a: { mm: 1, source: 'sourced: x' } })).not.toThrow();
+    expect(check({ a: { mm: 1 } })).toThrow(/t\.a/);
+    expect(check({ a: { mm: 1, source: 'a guess' } })).toThrow();
+    expect(check({ a: 1 })).toThrow(/t\.a/);
+    expect(check({ a: 'rifle' })).toThrow(/t\.a/);
+    // A pick names the group its place pins, which must hold it.
+    const kinds = { rifle: { mm: 1, source: 'sourced: x' } };
+    expect(check({ kinds, a: { b: { choice: 'rifle', of: 'kinds' } } })).not.toThrow();
+    expect(check({ kinds, a: { b: { choice: 'rilfe', of: 'kinds' } } })).toThrow(/t\.a\.b/);
+    expect(check({ kinds, a: { b: { choice: 'rifle', of: 'sorts' } } })).toThrow(/t\.a\.b/);
+    expect(check({ kinds, sorts: kinds, a: { b: { choice: 'rifle', of: 'sorts' } } })).toThrow(/not the kinds/);
+    expect(check({ kinds, b: { choice: 'rifle', of: 'kinds' } })).toThrow(/t\.b: no pick belongs here/);
+    expect(check({ kinds, a: { b: { choice: 'rifle' } } })).toThrow();
     // A standard must be one its mount lists.
-    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
-    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
-    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
+    expect(check({ a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
+    expect(check({ a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
+    expect(check({ a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
   });
 
   it('reads a pick from the group the pick names', () => {

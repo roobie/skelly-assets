@@ -27,11 +27,33 @@ const groupAt = (table: unknown, path: string): Readonly<Record<string, unknown>
 };
 
 /**
- * Every leaf of the table is a measurement with its source, a pick among one of the table's own groups of named
- * choices, or a port standard its mount lists; every other node only groups them. A pick names what it picks from, so
- * a misspelt one is a load error rather than a lookup that fails in whichever family reads it first.
+ * Where a table holds its picks, by dot path with `*` for any one key, and the group each pick there must name: the
+ * families read a pick as a choice of that group, so a pick naming another is wrong even when that group holds it.
  */
-const checkLeaves = (node: unknown, path: string, table: unknown, platforms: GunPlatforms): void => {
+type PickGroups = Readonly<Record<string, string>>;
+
+/** The group a pick at `keys` must name, if a pick belongs there. */
+const pinnedGroup = (picks: PickGroups, keys: readonly string[]): string | undefined =>
+  Object.entries(picks).find(([pattern]) => {
+    const segments = pattern.split('.');
+    return segments.length === keys.length && segments.every((segment, i) => segment === '*' || segment === keys[i]);
+  })?.[1];
+
+interface TableCheck {
+  readonly name: string;
+  readonly table: unknown;
+  readonly picks: PickGroups;
+  readonly platforms: GunPlatforms;
+}
+
+/**
+ * Every leaf of the table is a measurement with its source, a pick among one of the table's own groups of named
+ * choices where the table holds picks, or a port standard its mount lists; every other node only groups them. A pick
+ * names what it picks from, so a misspelt one is a load error rather than a lookup that fails in whichever family
+ * reads it first.
+ */
+const checkLeaves = (node: unknown, keys: readonly string[], check: TableCheck): void => {
+  const path = [check.name, ...keys].join('.');
   if (!isGroup(node)) {
     throw new Error(`${path}: expected a measurement, a choice, a standard or a group of them`);
   }
@@ -41,26 +63,40 @@ const checkLeaves = (node: unknown, path: string, table: unknown, platforms: Gun
   }
   if (Object.hasOwn(node, 'choice')) {
     const { choice, of } = parse(ChoiceSchema, node);
-    if (!Object.hasOwn(groupAt(table, of) ?? {}, choice)) {
+    const pinned = pinnedGroup(check.picks, keys);
+    if (pinned !== of) {
+      throw new Error(
+        pinned === undefined ? `${path}: no pick belongs here` : `${path}: picks from ${of}, not the ${pinned} it must`,
+      );
+    }
+    if (!Object.hasOwn(groupAt(check.table, of) ?? {}, choice)) {
       throw new Error(`${path}: '${choice}' is not a choice of ${of}`);
     }
     return;
   }
   if (Object.hasOwn(node, 'standard')) {
     const { standard, mount } = parse(StandardSchema, node);
-    if (!platforms.standards.get(mount)?.has(standard)) {
+    if (!check.platforms.standards.get(mount)?.has(standard)) {
       throw new Error(`${path}: the ${mount} mount lists no standard '${standard}'`);
     }
     return;
   }
   for (const [key, child] of Object.entries(node)) {
-    checkLeaves(child, `${path}.${key}`, table, platforms);
+    checkLeaves(child, [...keys, key], check);
   }
 };
 
-/** A table as loaded, checked leaf by leaf; `name` heads the path a failure reports. */
-export const checkFrameTable = <T>(name: string, raw: T, platforms: GunPlatforms = GUN_PLATFORMS): T => {
-  checkLeaves(raw, name, raw, platforms);
+/**
+ * A table as loaded, checked leaf by leaf, with its picks only where `picks` places them; `name` heads the path a
+ * failure reports.
+ */
+export const checkFrameTable = <T>(
+  name: string,
+  raw: T,
+  picks: PickGroups,
+  platforms: GunPlatforms = GUN_PLATFORMS,
+): T => {
+  checkLeaves(raw, [], { name, table: raw, picks, platforms });
   return raw;
 };
 
@@ -77,8 +113,19 @@ interface TablePick<Of extends string> {
   readonly of: Of;
 }
 
+/** Where every frame table holds its picks, and the group each picks from, which also types each pick. */
+const FRAME_PICKS = {
+  'barrel.journal': 'gasBlock.journals',
+  'barrel.lengths.*.gas': 'barrel.gasPorts',
+  'stock.buffer': 'receiverExtension.buffers',
+  'stockA2.buffer': 'receiverExtension.buffers',
+} as const satisfies PickGroups;
+
+/** The pick the frame table holds at a pinned path. */
+type FramePick<Path extends keyof typeof FRAME_PICKS> = TablePick<(typeof FRAME_PICKS)[Path]>;
+
 type BarrelLength = Omit<Ar15Table['barrel']['lengths']['16-mid'], 'gas'> & {
-  readonly gas: TablePick<'barrel.gasPorts'>;
+  readonly gas: FramePick<'barrel.lengths.*.gas'>;
 };
 
 /**
@@ -93,10 +140,10 @@ export type ArFrameTable = Omit<
   readonly barrel: Omit<Ar15Table['barrel'], 'gasPorts' | 'lengths' | 'journal'> & {
     readonly gasPorts: Readonly<Record<string, Measure>>;
     readonly lengths: Readonly<Record<string, BarrelLength>>;
-    readonly journal: TablePick<'gasBlock.journals'>;
+    readonly journal: FramePick<'barrel.journal'>;
   };
-  readonly stock: Omit<Ar15Table['stock'], 'buffer'> & { readonly buffer: TablePick<'receiverExtension.buffers'> };
-  readonly stockA2: Omit<Ar15Table['stockA2'], 'buffer'> & { readonly buffer: TablePick<'receiverExtension.buffers'> };
+  readonly stock: Omit<Ar15Table['stock'], 'buffer'> & { readonly buffer: FramePick<'stock.buffer'> };
+  readonly stockA2: Omit<Ar15Table['stockA2'], 'buffer'> & { readonly buffer: FramePick<'stockA2.buffer'> };
   readonly gasBlock: Omit<Ar15Table['gasBlock'], 'journals'> & {
     readonly journals: Readonly<Record<string, Measure>>;
   };
@@ -122,12 +169,12 @@ export interface ArFrame {
   readonly table: ArFrameTable;
 }
 
-// The load check holds each pick to a choice of the group its path names, which is the group `pick` reads, so a pick is
-// typed by the group at its path.
+// The JSON import types every pick's group as any string. The load check holds each pick to the group FRAME_PICKS pins
+// at its path, which is the group ArFrameTable types it by, and to a choice of that group.
 export const AR15_FRAME: ArFrame = {
   name: 'ar15',
   title: 'AR-15',
-  table: checkFrameTable('ar15', ar15Table) as ArFrameTable,
+  table: checkFrameTable('ar15', ar15Table, FRAME_PICKS) as ArFrameTable,
 };
 
 /** The registry name of a frame's family for one role, such as `ar15-lower`. */
@@ -159,7 +206,13 @@ type Picked<Of extends string> = GroupAt<Of>[keyof GroupAt<Of>];
  * pick to that group guards exactly what the build uses.
  */
 export const pick = <Of extends string>(frame: ArFrame, ref: TablePick<Of>): Picked<Of> =>
-  chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, ref.choice);
+  chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, pickedName(ref));
+
+/**
+ * The name of the choice a pick picks, which the load check holds to a key of the group at `Of`, for a part's standard
+ * or param that names that choice.
+ */
+export const pickedName = <Of extends string>(ref: TablePick<Of>): string => ref.choice;
 
 /** A length or position of the table in u. */
 export const u = (dimension: { readonly mm: number }): number => mmToU(dimension.mm);

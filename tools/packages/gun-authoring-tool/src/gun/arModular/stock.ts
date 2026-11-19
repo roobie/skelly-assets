@@ -2,7 +2,7 @@ import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/sc
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, pickedName, u } from './frame.ts';
 import { boxSleeve, roundBar } from './shapes.ts';
 
 /** The stock standard of an extension that takes the named buffer. */
@@ -58,11 +58,11 @@ export const arReceiverExtension = (frame: ArFrame): PartFamily => ({
 /** The outside radius of the extension a stock slides onto, by its pick of the buffer that extension takes. */
 const tubeRadius = (frame: ArFrame, buffer: ArFrameTable['stock']['buffer']): number => u(pick(frame, buffer).radius);
 
-/** The port a stock slides onto its extension by, at its frame: the end of the extension. */
-const stockPort = (buffer: string): PortDef => ({
+/** The port a stock slides onto its extension by, at its frame: the end of the extension its buffer pick takes. */
+const stockPort = (buffer: ArFrameTable['stock']['buffer']): PortDef => ({
   id: 'front',
   mount: 'stock',
-  standard: tubeStandard(buffer),
+  standard: tubeStandard(pickedName(buffer)),
   gender: 'male',
   pos: [0, 0, 0],
   normal: X,
@@ -107,7 +107,7 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
       ...sleeve.solids,
       { id: 'toe', kind: 'extruded-polygon', profile: outlineU(s.toe), z: [-toeHalf, toeHalf] },
     ],
-    ports: [stockPort(s.buffer.choice)],
+    ports: [stockPort(s.buffer)],
     keepOuts: [],
     axes: [],
     tags: sleeve.tags,
@@ -157,7 +157,7 @@ const a2Stock = (frame: ArFrame): PartDef => {
   return {
     family: 'stock',
     solids: [...outlineSolids, ...sleeve.solids],
-    ports: [stockPort(s.buffer.choice)],
+    ports: [stockPort(s.buffer)],
     keepOuts: [],
     axes: [],
     tags: sleeve.tags,

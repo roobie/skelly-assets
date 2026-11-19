@@ -3,7 +3,7 @@ import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { box, choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { sightAxis } from '../sightAxis.ts';
 import { TOO_SMALL_TO_VOXELIZE } from '../tooSmallToVoxelize.ts';
-import { barrelJournalRadius, journalStandard } from './barrel.ts';
+import { barrelJournalRadius, barrelJournalStandard } from './barrel.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, u } from './frame.ts';
 import { journalClamp } from './shapes.ts';
 
@@ -119,7 +119,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
         {
           id: 'barrel',
           mount: 'gas-block',
-          standard: journalStandard(frame.table.barrel.journal.choice),
+          standard: barrelJournalStandard(frame),
           gender: 'male',
           pos: [0, 0, 0],
           normal: NEG_Y,
