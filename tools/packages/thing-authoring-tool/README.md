@@ -73,6 +73,14 @@ The preview draws the same construct report the exporter consumes, so visual ins
 not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui/src/scene.ts`,
 `buildLayers`. The page is `index.html`.
 
+Authoring a row is a loop of edit and look, so the dev server (`npm run dev`, which listens on the LAN so another
+machine's browser can watch) recompiles the twins when a Jsonnet source is saved and the page redraws the row in
+place: the camera is what the author has just set, and a reload would throw it away. The row is in the address
+(`?item=`) for the cases a reload happens anyway. The verdict of the compile travels as data apart from the twins,
+since a failed compile writes no twin and the page would otherwise go on drawing the old model unannounced. A row no
+recipe exports yet is drawn too, since a row is authored before it is exported. See `vite.config.ts`,
+`server/liveSources.ts` and `src/main.ts`.
+
 Pack-owned recipes make consumption explicit rather than inferring targets from item
 relationships. Shared validation and file writing prevent parallel formats. See
 `tools/recipes.mjs`, `readRecipes`, `src/exports.ts`, `loadThingRecipe`, and

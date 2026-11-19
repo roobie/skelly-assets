@@ -5,6 +5,7 @@
   "license": "EUPL-1.2",
   "type": "module",
   "scripts": {
+    "predev": "node ../../sources.mjs",
     "dev": "vite --host 0.0.0.0",
     "pretypecheck": "node ../../sources.mjs && node test/compile-fixtures.mjs",
     "pretest": "node ../../sources.mjs && node test/compile-fixtures.mjs",
