@@ -32,6 +32,8 @@ local aboutMount(pixels, mount) = [[xOf(p[0]) - mount[0], yOf(p[1]) - mount[1]] 
 local tracedOutline(pixels, mount, key) = outline(aboutMount(pixels, mount), traced(key));
 
 local picatinny = 'sourced: https://en.wikipedia.org/wiki/Picatinny_rail';
+// The Daniel Defense rail-mounted fixed front sight, the fixed post a free-float handguard commonly carries.
+local ddFixedFront = 'https://ar15.build/products/front-sight/306521/daniel-defense-rail-mounted-fixed-front-sight-comma-black-hardcoat-dd-rail-mounted-fixed-front-sight';
 // The parts with thin features export at the detail grain; the thinnest feature it carries evenly is this many mm. An
 // authored wall is drawn at least this thick, so the export never drops a voxel from one side of it.
 local grains = import 'models/voxel-grains.libsonnet';
@@ -519,6 +521,14 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   // The fixed post a free-float handguard carries at the front of its rail, its tip on the same sight plane.
   railFrontSight: {
     postAboveRail: dim(sightPlane.mm - $.handguard.railTopY.mm, "derived: the flat-top sight plane over the handguard's top rail"),
+    clamp: {
+      length: dim(25.4, 'sourced: 1.00 in, ' + ddFixedFront),
+      width: dim(31.5, 'sourced: 1.24 in, ' + ddFixedFront),
+      // The post's protective ears are left undrawn, so only the clamp stands under the post.
+      height: dim(5.75, "derived: half a gun unit, the generic rail sight's clamp, as the maker states no clamp height"),
+    },
+    // Square in section, as an A2 post is.
+    postWidth: dim(1.78, 'sourced: 0.070 in, ' + ddFixedFront),
   },
 
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.

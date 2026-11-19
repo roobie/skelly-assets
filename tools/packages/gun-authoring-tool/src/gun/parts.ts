@@ -102,7 +102,7 @@ import {
   PUMP_LOADING_PORT_X,
   PUMP_SHELL_LOADED_LENGTH_U,
 } from './pumpShell.ts';
-import { RAIL_FRONT_SIGHT_REFERENCE_U, railFrontSightSolids } from './railFrontSight.ts';
+import { GENERIC_RAIL_FRONT_SIGHT, RAIL_FRONT_SIGHT_REFERENCE_U, railFrontSightSolids } from './railFrontSight.ts';
 import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import {
@@ -4008,7 +4008,7 @@ const railFrontSight: PartFamily = {
     const sightAxisY = RECEIVER_FRONT_HALF_HEIGHT + 1 - handguardTop;
     return {
       family: 'rail-front-sight',
-      solids: railFrontSightSolids(sightAxisY),
+      solids: railFrontSightSolids(GENERIC_RAIL_FRONT_SIGHT, sightAxisY),
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [

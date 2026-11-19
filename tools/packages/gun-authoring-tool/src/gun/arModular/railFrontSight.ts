@@ -14,10 +14,15 @@ export const arRailFrontSight = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'rail-front-sight'),
   params: {},
   build(): PartDef {
-    const postU = u(frame.table.railFrontSight.postAboveRail);
+    const { postAboveRail, clamp, postWidth } = frame.table.railFrontSight;
+    const postU = u(postAboveRail);
+    const shape = {
+      base: { halfLengthU: u(clamp.length) / 2, heightU: u(clamp.height), halfWidthU: u(clamp.width) / 2 },
+      post: { halfLengthU: u(postWidth) / 2, halfWidthU: u(postWidth) / 2 },
+    };
     return {
       family: 'rail-front-sight',
-      solids: railFrontSightSolids(postU),
+      solids: railFrontSightSolids(shape, postU),
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [sightAxis('front', { origin: [0, postU, 0], dir: X, referenceDistanceU: RAIL_FRONT_SIGHT_REFERENCE_U })],
