@@ -97,12 +97,20 @@ export const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number =
   return (Math.abs(stage.angle) * Math.PI * radius) / 180;
 };
 
-/** Why `stops` cannot name places on one clock, if they cannot: every name is its own and the clocks strictly increase. */
+/**
+ * Why `stops` cannot name places on one clock, if they cannot: every name is its own, the clocks strictly increase and
+ * they run from the rest at 0 to the end of travel at 1.
+ */
 export const stopsError = (stops: readonly Stop[]): string | undefined => {
   if (new Set(stops.map(({ name }) => name)).size !== stops.length) {
     return 'two stops of one name';
   }
-  return stops.some(({ clock }, i) => i > 0 && clock <= stops[i - 1]!.clock) ? 'clocks must increase' : undefined;
+  if (stops.some(({ clock }, i) => i > 0 && clock <= stops[i - 1]!.clock)) {
+    return 'clocks must increase';
+  }
+  return stops[0]?.clock === 0 && stops.at(-1)?.clock === 1
+    ? undefined
+    : 'stops run from the rest at 0 to the end of travel at 1';
 };
 
 /** The clock of the stop `name` of `motion`, which has to have it. */

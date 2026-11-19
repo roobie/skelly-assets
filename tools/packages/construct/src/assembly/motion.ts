@@ -64,14 +64,12 @@ export const resolveMotion = (
     throw new MotionError(error instanceof Error ? error.message : String(error));
   }
   const stops = (authored.stops ?? defaultStops(stages.length)).map((stop) => resolveStop(stop, stages));
-  const error = stopsError(stops) ?? (stops[0]?.clock === 0 && stops.at(-1)?.clock === 1 ? undefined : endsError);
+  const error = stopsError(stops);
   if (error !== undefined) {
     throw new MotionError(error);
   }
   return { stages, stops };
 };
-
-const endsError = 'stops run from the rest to the end of the last stage';
 
 /** Every motion's stops unless it names its own: the rest, and open at the end of the last stage. */
 const defaultStops = (stageCount: number): PartStop[] => [

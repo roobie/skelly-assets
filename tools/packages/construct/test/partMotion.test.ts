@@ -83,7 +83,7 @@ describe('resolveMotion', () => {
     ['a stop behind the rest', [REST, { name: 'back', stage: 0, at: -10 }, { name: 'open', stage: 1 }], 'back'],
     ['stops out of order', [REST, { name: 'open', stage: 1 }, { name: 'unlocked', stage: 0 }], 'increase'],
     ['two stops of one name', [REST, { name: 'rest', stage: 0, at: 45 }, { name: 'open', stage: 1 }], 'one name'],
-    ['stops that leave the end of travel out', [REST, { name: 'unlocked', stage: 0 }], 'end of the last stage'],
+    ['stops that leave the end of travel out', [REST, { name: 'unlocked', stage: 0 }], 'end of travel at 1'],
     [
       'stops that start past the rest',
       [
