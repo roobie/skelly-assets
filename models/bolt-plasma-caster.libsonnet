@@ -36,6 +36,5 @@ local railOuter = 0.08;
     box('fin-%d' % i, 'metal', [0.21 + i * 0.08, 0.325, -0.02], [0.225 + i * 0.08, 0.37, 0.02])
     for i in [0, 1, 2]
   ]
-  // The energy cell, hung from just ahead of the trigger guard.
-  + bolt.cell(bolt.guard.front + 0.01, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
+  + bolt.cell(bolt.feedBack, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
 ]

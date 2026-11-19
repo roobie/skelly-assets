@@ -60,6 +60,5 @@ local onFlank(id, slot, s, min, max, out0, out1) =
     ]
     for s in std.objectFields(sides)
   ])
-  // The energy cell, hung from just ahead of the trigger guard.
-  + bolt.cell(bolt.guard.front + 0.01, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
+  + bolt.cell(bolt.feedBack, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
 ]

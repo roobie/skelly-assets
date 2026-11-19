@@ -14,16 +14,17 @@ local barrelY = 0.245;
 local sightTop = 0.375;  // the height both sights' tops share
 
 // The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
-// back keeps a hand's gap ahead of the trigger guard.
+// magwell starts where the family's feeds do.
 local roundLength = 0.11;
 local wall = 0.011;
-local magBack = bolt.guard.front + 0.012;
+local collar = 0.006;  // the magwell's lip behind and ahead of the magazine
+local magBack = bolt.feedBack + collar;
 local magFront = magBack + roundLength + 2 * wall;
 local magTop = underside;
 
 // The metal magwell collar either magazine seats in.
 local magwell = h.prism('magwell', 'metal', 'z', [
-  [magBack - 0.006, magTop], [magBack - 0.006, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + 0.006, 0.136], [magFront + 0.006, magTop],
+  [magBack - collar, magTop], [magBack - collar, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + collar, 0.136], [magFront + collar, magTop],
 ], -0.049, 0.049);
 
 // A straight box magazine square to the bore, with a bevelled brass base plate and a narrow slot cut into its right

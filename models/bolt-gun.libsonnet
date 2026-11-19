@@ -13,6 +13,9 @@ local box = h.box;
   // ahead of the grip, leaning its `sweep` forward down its `length`, so the finger has the guard's length ahead of it.
   guard: { front: 0.02, opening: 0.06, bar: 0.012, halfWidth: 0.011 },
   trigger: { gap: 0.012, width: 0.02, length: 0.045, sweep: 0.006, halfWidth: 0.007 },
+  // The x at which a feed hung under the receiver, a magazine's well or a cell's cap, starts: a small clearance ahead
+  // of the guard, so the two read as separate parts while the feed stays close behind the grip.
+  feedBack: $.guard.front + 0.006,
 
   // A section from `y0` to `y1`, `w` its half width, its top edges cut back by `top` and its bottom edges by
   // `bottom`, as the [y, z] outline of a prism along x. Cut edges keep the chunky slabs from reading as raw boxes.
@@ -49,10 +52,11 @@ local box = h.box;
       ], -t.halfWidth, t.halfWidth),
     ],
 
-  // The energy guns' power cell, hung under the receiver from `back` to `front` and seated up into it at `top`, an
-  // octagonal block on a brass foot with a glowing window down each side. Slot `glow` must be in the gun's finish.
-  cell(back, front, top):
-    local half = 0.055, foot = 0.02, windows = [0.05, 0.12];
+  // The energy guns' power cell, hung under the receiver with its brass foot from `capBack` and its body to `front`,
+  // seated up into the receiver at `top`: an octagonal block with a glowing window down each side. Slot `glow` must be
+  // in the gun's finish.
+  cell(capBack, front, top):
+    local half = 0.055, foot = 0.02, windows = [0.05, 0.12], lip = 0.005, back = capBack + lip;
     // The cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
     // is [z, x].
     local plan(half, x0, x1, cut) = [
@@ -61,7 +65,7 @@ local box = h.box;
     ];
     [
       h.prism('cell', 'body', 'y', plan(half, back, front, 0.012), foot, top),
-      h.prism('cell-cap', 'trim', 'y', plan(half + 0.003, back - 0.005, front + 0.005, 0.014), foot - 0.01, foot + 0.01),
+      h.prism('cell-cap', 'trim', 'y', plan(half + 0.003, capBack, front + lip, 0.014), foot - 0.01, foot + 0.01),
       box('cell-window-l', 'glow', [back + 0.02, windows[0], -half - 0.0025], [front - 0.02, windows[1], -half]),
       box('cell-window-r', 'glow', [back + 0.02, windows[0], half], [front - 0.02, windows[1], half + 0.0025]),
     ],
