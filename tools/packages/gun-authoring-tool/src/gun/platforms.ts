@@ -1,5 +1,20 @@
 import type { PortDef, Resolved, SwapPath } from '@skelly/construct/assembly/schema.ts';
-import { array, literal, nonEmpty, optional, parse, pipe, record, strictObject, string, variant } from 'valibot';
+import {
+  array,
+  gtValue,
+  type InferOutput,
+  literal,
+  nonEmpty,
+  number,
+  optional,
+  parse,
+  pipe,
+  record,
+  regex,
+  strictObject,
+  string,
+  variant,
+} from 'valibot';
 import content from '../../../../../models/guns/tables/platforms.json' with { type: 'json' };
 
 const Id = pipe(string(), nonEmpty());
@@ -7,10 +22,20 @@ const SwapSchema = variant('path', [
   strictObject({ path: literal('slot') }),
   strictObject({ path: literal('job'), job: Id }),
 ]);
+const SOURCE_KIND = /^(traced|sourced|derived): \S/;
+const DimensionSchema = strictObject({
+  mm: pipe(number(), gtValue(0)),
+  source: pipe(
+    string(),
+    regex(SOURCE_KIND, "a source reads 'traced: <trace key>', 'sourced: <URL>' or 'derived: <reason>'"),
+  ),
+});
+const StandardSchema = strictObject({ dimensions: record(Id, DimensionSchema) });
+const MountSchema = strictObject({ swap: SwapSchema, standards: optional(record(Id, StandardSchema)) });
 const PlatformSchema = strictObject({ sizeClasses: pipe(array(Id), nonEmpty()), shared: optional(record(Id, Id)) });
 const PlatformsSchema = strictObject({
   jobs: array(Id),
-  mounts: record(Id, strictObject({ swap: SwapSchema })),
+  mounts: record(Id, MountSchema),
   platforms: record(Id, PlatformSchema),
 });
 
@@ -20,7 +45,12 @@ interface Platform {
   readonly shared: Readonly<Record<string, string>>;
 }
 
+/** A port standard of a mount type and the dimensions, in millimetres, that define it, each with its source. */
+type PortStandard = InferOutput<typeof StandardSchema>;
+
 export interface GunPlatforms {
+  /** The standards each mount type lists; its ports may declare no others, and a mount type absent here lists none. */
+  readonly standards: ReadonlyMap<string, ReadonlyMap<string, PortStandard>>;
   readonly swaps: ReadonlyMap<string, SwapPath>;
   readonly platforms: ReadonlyMap<string, Platform>;
 }
@@ -50,6 +80,11 @@ const loadGunPlatforms = (raw: unknown): GunPlatforms => {
     throw new Error(problems.join('; '));
   }
   return {
+    standards: new Map(
+      Object.entries(parsed.mounts).flatMap(([mount, { standards }]) =>
+        standards === undefined ? [] : [[mount, new Map(Object.entries(standards))] as const],
+      ),
+    ),
     swaps: new Map(Object.entries(parsed.mounts).map(([mount, { swap }]) => [mount, swap])),
     platforms: new Map(
       Object.entries(parsed.platforms).map(([id, { sizeClasses, shared = {} }]) => [id, { sizeClasses, shared }]),
@@ -75,6 +110,19 @@ export const unswappableMounts = (resolved: Resolved, table: GunPlatforms = GUN_
   const mounts = [...resolved.defs.values()].flatMap(({ ports }) => ports.map(({ mount }) => mount));
   return [...new Set(mounts)].filter((mount) => !table.swaps.has(mount)).sort();
 };
+
+/** Why ports of a resolved gun declare or accept a standard their mount type does not list; empty when all are. */
+export const unlistedStandards = (resolved: Resolved, table: GunPlatforms = GUN_PLATFORMS): string[] =>
+  [...resolved.defs].flatMap(([part, { ports }]) =>
+    ports.flatMap(({ id, mount, standard, accepts = [] }) =>
+      [
+        ...(standard === undefined ? [] : [{ name: standard, verb: 'declares' }]),
+        ...accepts.map((name) => ({ name, verb: 'accepts' })),
+      ]
+        .filter(({ name }) => !table.standards.get(mount)?.has(name))
+        .map(({ name, verb }) => `${part}.${id} ${verb} standard ${name}, which ${mount} mounts do not list`),
+    ),
+  );
 
 /** Gives every port of a resolved gun the size class and swap path its design's platform assigns its mount type. */
 export const withPlatformPorts = (

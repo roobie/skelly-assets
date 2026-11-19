@@ -10,7 +10,7 @@ import { PART_CATALOGUE, type PartCatalogue } from './catalogue.ts';
 import { gunDomain } from './domain.ts';
 import { GUN_FINISH_SLOTS, GUN_PALETTE } from './palette.ts';
 import type { PartItems } from './physical.ts';
-import { type PlatformChoice, platformChoiceProblem } from './platforms.ts';
+import { GUN_PLATFORMS, type GunPlatforms, type PlatformChoice, platformChoiceProblem } from './platforms.ts';
 import { GUN_PREFABS } from './prefabs.ts';
 import { TEMPLATES } from './templates.ts';
 
@@ -44,7 +44,7 @@ type PlatformRead =
   | { readonly ok: true; readonly platform?: PlatformChoice }
   | { readonly ok: false; readonly message: string };
 
-const readPlatform = (raw: unknown): PlatformRead => {
+const readPlatform = (raw: unknown, table: GunPlatforms): PlatformRead => {
   if (!isRecord(raw) || raw.platform === undefined) {
     return { ok: true };
   }
@@ -56,7 +56,7 @@ const readPlatform = (raw: unknown): PlatformRead => {
     return { ok: false, message: 'a platform names only its id and size class' };
   }
   const choice = { id: platform.id, sizeClass: platform.sizeClass };
-  const problem = platformChoiceProblem(choice);
+  const problem = platformChoiceProblem(choice, table);
   return problem === undefined ? { ok: true, platform: choice } : { ok: false, message: problem };
 };
 
@@ -219,6 +219,7 @@ export const loadGunDesignValue = (
     prefabs: GUN_PREFABS,
   },
   catalogue: PartCatalogue = PART_CATALOGUE,
+  platforms: GunPlatforms = GUN_PLATFORMS,
 ): GunDesignLoadResult => {
   const expanded = withCatalogueItems(authored, catalogue);
   if (!expanded.ok) {
@@ -248,7 +249,7 @@ export const loadGunDesignValue = (
       error: { code: 'invalid-shape', path: 'calibre', message: shapeError },
     };
   }
-  const platform = readPlatform(raw);
+  const platform = readPlatform(raw, platforms);
   if (!platform.ok) {
     return {
       ok: false,
@@ -281,7 +282,7 @@ export const loadGunDesignValue = (
 };
 
 /** Loads a firearm design with its template and current prefab catalogue. */
-export const loadGunDesign = (text: string): GunDesignLoadResult => {
+export const loadGunDesign = (text: string, platforms: GunPlatforms = GUN_PLATFORMS): GunDesignLoadResult => {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
@@ -305,5 +306,5 @@ export const loadGunDesign = (text: string): GunDesignLoadResult => {
     }
     template = found;
   }
-  return loadGunDesignValue(raw, { domain: gunDomain, template, prefabs: GUN_PREFABS });
+  return loadGunDesignValue(raw, { domain: gunDomain, template, prefabs: GUN_PREFABS }, PART_CATALOGUE, platforms);
 };

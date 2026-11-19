@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { type GunDesign, loadGunDesign } from '../gun/designLoader.ts';
 import { gunDomain } from '../gun/domain.ts';
-import { unswappableMounts } from '../gun/platforms.ts';
+import { GUN_PLATFORMS, type GunPlatforms, unlistedStandards, unswappableMounts } from '../gun/platforms.ts';
 
 export interface DesignCheckResult {
   readonly exitCode: 0 | 1;
@@ -11,20 +11,29 @@ export interface DesignCheckResult {
 }
 
 /**
- * A published design must name its platform, so its parts can be matched to the other designs', and every mount site
- * must have a swap path. Drafts the viewer seeds from a template have no platform until one is chosen.
+ * A published design must name its platform, so its parts can be matched to the other designs', every mount site must
+ * have a swap path, and every standard a port declares must be one its mount type lists. Drafts the viewer seeds from a
+ * template have no platform until one is chosen.
  */
-const publishedPlatformProblem = (design: GunDesign): string | undefined => {
+const publishedPlatformProblem = (design: GunDesign, table: GunPlatforms): string | undefined => {
   if (design.platform === undefined) {
     return 'published design names no platform';
   }
-  const unswappable = unswappableMounts(resolve(design.assembly, gunDomain));
-  return unswappable.length === 0 ? undefined : `no swap path for mount type(s) ${unswappable.join(', ')}`;
+  const resolved = resolve(design.assembly, gunDomain);
+  const unswappable = unswappableMounts(resolved, table);
+  const problems = [
+    ...(unswappable.length === 0 ? [] : [`no swap path for mount type(s) ${unswappable.join(', ')}`]),
+    ...unlistedStandards(resolved, table),
+  ];
+  return problems.length === 0 ? undefined : problems.join('; ');
 };
 
 /** Why a design file's text fails the publish check; undefined when it passes, with any draft issues counted. */
-export const designTextProblem = (text: string): { readonly problem?: string; readonly draftIssues: number } => {
-  const result = loadGunDesign(text);
+export const designTextProblem = (
+  text: string,
+  table: GunPlatforms = GUN_PLATFORMS,
+): { readonly problem?: string; readonly draftIssues: number } => {
+  const result = loadGunDesign(text, table);
   if (!result.ok) {
     return { problem: `${result.error.code}: ${result.error.message}`, draftIssues: 0 };
   }
@@ -37,7 +46,7 @@ export const designTextProblem = (text: string): { readonly problem?: string; re
       draftIssues: 0,
     };
   }
-  const problem = publishedPlatformProblem(result.design);
+  const problem = publishedPlatformProblem(result.design, table);
   return problem === undefined ? { draftIssues: 0 } : { problem, draftIssues: 0 };
 };
 

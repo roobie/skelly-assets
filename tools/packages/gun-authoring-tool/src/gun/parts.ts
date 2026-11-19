@@ -61,7 +61,7 @@ import {
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
-import { type MuzzleBore, railSlots } from './mounts.ts';
+import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import { gunPort } from './portData.ts';
@@ -3747,7 +3747,7 @@ const barrel: PartFamily = {
         : [];
     const gasPortX = params.section === 'ak' ? akGasStationX(lengthClass) : gasStationX(lengthClass);
     // Only the pump section is smoothbore; #649's automatic-shotgun section must not inherit the rifled default.
-    const muzzleBore: MuzzleBore = params.section === 'pump' ? 'smoothbore' : 'rifled';
+    const muzzleBore = params.section === 'pump' ? 'smoothbore' : 'rifled';
     return {
       family: 'barrel',
       solids: [...extension, tube, ...compactSmgSights],
