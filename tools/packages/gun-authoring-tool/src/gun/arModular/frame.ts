@@ -307,6 +307,7 @@ type Picked<Of extends string> = GroupAt<Of>[keyof GroupAt<Of>];
  * pick to that group guards exactly what the build uses.
  */
 export const pick = <Of extends string>(frame: ArFrame, ref: TablePick<Of>): Picked<Of> =>
+  // A dot path walked at run time has no type, so its group is cast to the one GroupAt reads off the same path.
   chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, ref.choice);
 
 /** A length or position of the table in u. */
