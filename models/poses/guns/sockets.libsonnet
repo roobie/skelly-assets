@@ -20,7 +20,7 @@ local forend = { from: 'support', into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0
   // The press check's proven hold (models/poses/press-check.libsonnet).
   rifle_assault: {
     grip: pistol { offset: [-0.016, -0.006, -0.005] },
-    support: forend { offset: [0.013, 0, -0.078] },
+    support: forend { offset: [0.013, 0, -0.175] },
   },
   rifle_pipe: { grip: pistol, support: forend },
   // The support anchor stands on the pump's lower right edge; the palm cradles its middle. The pump's long, dropped

@@ -5,10 +5,12 @@
 // tipped down while rolled, so the muzzle never sweeps across the body; the rifle rolls about its own bore to show the
 // port, as a shooter rolls it rather than turning it away.
 //
-// Points and sockets are in the rifle's frame (its bore along +z, the port side -x). A frame's `carry` turns the rifle
-// (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the rifle point the eyes turn to and
-// `tilt` leans the head toward the figure's right. The left hand `hold`s a socket, may `pinch` named rifle points
-// (moved with the charging handle's draw) and, with `close: false`, rests there open instead of gripping.
+// A point of the rifle is one its export names (`from`: one of its anchors, or `grip`), moved by `offset` in the
+// rifle's frame (its bore along +z, up +y, the port side -x), so a reshaped rifle carries the hands and eyes with it.
+// A frame's `carry` turns the rifle (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the
+// rifle point the eyes turn to and `tilt` leans the head toward the figure's right. The left hand `hold`s a socket,
+// may `pinch` named rifle points (moved with the charging handle's draw) and, with `close: false`, rests there open
+// instead of gripping.
 // The pose page plays the frames as a clip in their names' numbered order, so a frame's number is its place in the check.
 //
 // A frame's `into` is the seconds the move into it takes from the frame before, and `hold` the seconds it stays before
@@ -28,13 +30,14 @@ local crease = { grip: sockets.support.grip, slant: sockets.support.slant };
 // `beneath` keeps the support hand below the bore however the rifle rolls, as a supporting hand stays under the
 // handguard while the other hand rolls the rifle.
 local support = { hold: crease { socket: 'support', beneath: true, pole: [0, -1, 0] }, hands: sockets.support.hands };
-// The thumb pad on the rear face of the T's left wing and the index pad on the latch's front face, the palm beside and
-// behind the T; the other fingers close on the rifle by contact.
+// The thumb pad on the T's rear face left of the middle and the index pad on its left end, the palm beside and behind
+// the T; the other fingers close on the rifle by contact. The T's anchor is the middle of its rear face.
+local handle(offset) = { from: 'charging_handle', offset: offset };
 local pinch(drawn) = {
   hold: crease {
-    socket: { at: [0.062, 0.002, -0.161], into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
+    socket: { at: handle([0.051, -0.02, 0.03]), into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
     pole: [0.483, -0.866, -0.129],
-    pinch: { thumb: [0.02, 0.022, -0.196], index: [0.024, 0.022, -0.18] },
+    pinch: { thumb: handle([0.009, 0, -0.005]), index: handle([0.0195, 0, 0.003]) },
   },
   hands: 'pinch',
   drawn: drawn,
@@ -43,21 +46,25 @@ local pinch(drawn) = {
 // sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit; the
 // check starts and ends where a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right
 // elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the rifle.
-local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, 0], look: [0, 0, 3], left: support };
-local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: [-0.03, 0.005, -0.1], tilt: 20 };
+// The ejection port's anchor is the middle of the port's opening.
+local port(offset) = { from: 'ejection', offset: offset };
+local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, 0], look: { from: 'muzzle', offset: [0, 0, 3] }, left: support };
+local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: port([-0.01, 0.01, 0]), tilt: 20 };
 // A press check draws the carrier only far enough to show the case head in the chamber, a short pull, not the full
-// stroke a rack takes, so the round stays in the chamber.
+// stroke a rack takes, so the round stays in the chamber. The carrier's first movement springs the port cover open,
+// and it stays open until the hand shuts it.
 local pull = 0.3;
-local retracted = { moved: { 'charging-handle': pull, 'bolt-carrier': pull } };
+local coverOpen = { 'port-cover': 1 };
+local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
   rifle: 'rifle_assault',
   // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
-  stance: { spine: [4, -15, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
+  stance: { spine: [4, -20, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
   // The butt pad's middle and the pocket it stands in: a point in the torso's frame, from the right shoulder joint. The
   // pocket is ahead of the shoulder joint, on the flat of the chest just inside the arm, so the stock bears on the chest
   // by its inner edge however the rifle rolls, rather than lying along the slope where the chest turns toward the arm.
-  butt: [0, -0.02, -0.38],
-  pocket: [0.03, -0.11, 0.07],
+  butt: { from: 'butt' },
+  pocket: [0.015, -0.11, 0.07],
   // The right palm on the pistol grip, each frame giving the elbow's pole.
   sockets: sockets,
   easing: 'minimum-jerk',
@@ -71,18 +78,19 @@ local retracted = { moved: { 'charging-handle': pull, 'bolt-carrier': pull } };
     // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
     'press-6-released': turned {
       into: 0.12,
+      moved: coverOpen,
       left: {
-        hold: crease { socket: { at: [0.07, 0, -0.07], into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
+        hold: crease { socket: { at: port([0.078, 0.009, -0.021]), into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },
-    // The left hand over the receiver's right side, its index pad pushing the port cover up shut; the cover is part of
-    // the receiver mesh, so it has no motion.
+    // The left hand over the receiver's right side, its index pad on the cover's outer face below the port's middle,
+    // pushing the cover up shut.
     'press-7-cover': turned {
       into: 0.35,
       hold: 0.1,
       left: {
-        hold: crease { socket: { at: [-0.022, 0.039, -0.07], into: [0.5, -0.866, 0], axis: [0, 0, -1] }, pole: [0.5, -0.87, 0], pinch: { index: [-0.026, -0.012, -0.1] } },
+        hold: crease { socket: { at: port([-0.002, 0.045, -0.004]), into: [0.5, -0.866, 0], axis: [-0.224, -0.129, -0.966] }, pole: [0.5, -0.87, 0], pinch: { index: port([-0.006, -0.006, -0.03]) } },
         hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
       },
     },
