@@ -40,6 +40,7 @@ import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { getOptic } from '../src/gun/optics.ts';
 import { GUN_PALETTE, resolveAppearance } from '../src/gun/palette.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
+import type { PartItems } from '../src/gun/physical.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { type ReadGlb, readGlb } from './glbReader.ts';
@@ -67,8 +68,15 @@ const ASSET: GlbAssetIdentity = { id: 'rifle_test', file: 'assets/models/rifle_t
 const S = METRES_PER_UNIT;
 const CARRIER_ENDPOINT_PREFIX = /^bolt-carrier\./;
 const AK_CARTRIDGE = loadCartridgeFile('7.62x39.json') as MetallicCartridge;
-const exported = (assembly: Assembly, asset: GlbAssetIdentity = ASSET, variantName?: string) => {
-  const result = exportGunGlb(assembly, asset, { appearanceProfile: variantName ?? 'ar' });
+const exported = (
+  assembly: Assembly,
+  {
+    asset = ASSET,
+    variantName = 'ar',
+    items = {},
+  }: { readonly asset?: GlbAssetIdentity; readonly variantName?: string; readonly items?: PartItems } = {},
+) => {
+  const result = exportGunGlb(assembly, asset, { appearanceProfile: variantName }, { items });
   if (!result.ok) {
     throw new Error(`export failed: ${JSON.stringify(result.error)}`);
   }
@@ -80,7 +88,7 @@ const toGungenAxes = (v: Vec3): Vec3 => mulMV(transpose(FILE_FROM_GUNGEN), v);
 
 type ExportedGun = ReturnType<typeof exported>;
 // These read-only groups share one identical AR export; determinism keeps independent exports below.
-const arBaseline = exported(design('archetype-ar'), ASSET, 'ar');
+const arBaseline = exported(design('archetype-ar'));
 
 it('exports physical collision bounds for every firearm body part so cover checks use drawn geometry', () => {
   const parts = Object.values(arBaseline.modelEntry.parts);
@@ -485,7 +493,7 @@ describe('glb export: meshes', () => {
     { designName: 'archetype-ak', group: 'receiver-ak' },
     { designName: 'archetype-pump-shotgun', group: 'receiver-pump' },
   ])('exports the $group receiver as the same closed merged mesh', ({ designName, group }) => {
-    const model = exported(design(designName), ASSET, designName.replace('archetype-', ''));
+    const model = exported(design(designName), { variantName: designName.replace('archetype-', '') });
     const def = model.resolved.defs.get('receiver')!;
     const solids = (def.displaySolids ?? def.solids).filter((solid) => solid.display?.mergeGroup === group);
     const expectedMesh = meshForSolidGroup(solids);
@@ -606,8 +614,8 @@ describe('glb export: meshes', () => {
 
   it('exports butt-pad and floorplate primitive extras in their source accent slots', () => {
     const models = [
-      [exported(design('archetype-pump-shotgun'), ASSET, 'pump-shotgun'), 'butt-pad'],
-      [exported(design('archetype-bolt-rifle-box'), ASSET, 'bolt-rifle-box'), 'floorplate'],
+      [exported(design('archetype-pump-shotgun'), { variantName: 'pump-shotgun' }), 'butt-pad'],
+      [exported(design('archetype-bolt-rifle-box'), { variantName: 'bolt-rifle-box' }), 'floorplate'],
     ] as const;
     for (const [model, solidId] of models) {
       const source = [...model.resolved.defs.values()]
@@ -794,8 +802,8 @@ describe('glb export: deadvox model entry', () => {
     it('keeps every exported sight line clear of other solids', () => {
       // Sightless designs have no line to check; the sight-metadata corpus test ties metadata to sight parts.
       let checked = 0;
-      for (const { label, assembly } of loadCorpus()) {
-        const out = exported(assembly);
+      for (const { label, assembly, items } of loadCorpus()) {
+        const out = exported(assembly, { items });
         if (out.modelEntry.gun.sight) {
           expectSightLineClear(out, label);
           checked += 1;
@@ -992,7 +1000,7 @@ describe('glb export: deadvox model entry', () => {
   it('exports the magazine replacement slot for a dedicated family that plays the magazine role', () => {
     const assembly = design('archetype-anti-materiel');
     expect(assembly.parts.magazine?.family).not.toBe('magazine');
-    const { glb, modelEntry } = exported(assembly, ASSET, 'anti-materiel');
+    const { glb, modelEntry } = exported(assembly, { variantName: 'anti-materiel' });
     const slot = modelEntry.gun.slots?.magazine;
     expect(slot).toBeDefined();
     expect(readGlb(glb).json.nodes.map(({ name }) => name)).toContain(slot?.node);
