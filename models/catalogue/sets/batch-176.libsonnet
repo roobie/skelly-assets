@@ -118,11 +118,11 @@ local sharkSuit(bonds=false) =
        box('clip', 'clip', [0.34, 0, 0.21], [0.38, 0.016, 0.27]),
      ] else []);
 
+local finFoot = { l: 0.27, w: 0.1, t: 0.012, layers: 4, ankle: 0.07, top: 0, rx: 0.04, rz: 0.05, collar: 0 };
 // A swim fin lying flat, toe to +z: a closed rubber foot pocket and a blade running on from it, ribbed at the edges
 // with a channel down the middle. Slots: sole, upper, blade, rail.
 local fin(p, cx) =
-  local b = { l: 0.27, w: 0.1, t: 0.012, layers: 4, ankle: 0.07, top: 0, rx: 0.04, rz: 0.05, collar: 0 };
-  f.boot(p, b, cx)
+  f.boot(p, finFoot, cx)
   + [
     h.prism(p + 'blade', 'blade', 'y', [[0.05, cx - 0.052], [0.05, cx + 0.052], [0.5, cx + 0.1], [0.53, cx + 0.06], [0.54, cx], [0.53, cx - 0.06], [0.5, cx - 0.1]], 0.003, 0.009),
     g.strip(p + 'rail-l', 'rail', [cx - 0.052, 0.05], [cx - 0.098, 0.5], 0.009, 0.01, 0.006),
@@ -223,7 +223,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
 
   // Swim fins lying flat as a pair, each 600 mm long: a closed foot pocket and a blade 200 mm wide at the tip.
   h.compound('swim_fins', 1.6, fin('l-', -0.115) + fin('r-', 0.115),
-             { sole: 'rubber-black', upper: 'rubber-black', blade: 'rubber-yellow', rail: 'rubber-black' }) + { title: 'Swim fins' }
+             { sole: 'rubber-black', upper: 'rubber-black', blade: 'rubber-yellow', rail: 'rubber-black' }) + { title: 'Swim fins', soleLift: f.soleLift(finFoot) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving', 'swimming'], tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Swimming trunks folded on a shelf, 300 mm by 280 mm and 45 mm tall: an elastic waistband with a tied drawcord, a
@@ -276,7 +276,7 @@ local diveBoot = { l: 0.29, w: 0.105, t: 0.022, layers: 5, ankle: 0.085, top: 0.
                  g.sbox(p + 'zip', 'zip', [cx + s * diveBoot.rx, diveBoot.t + 0.01, f.shaftZ(diveBoot) - 0.006], [cx + s * (diveBoot.rx + 0.004), diveBoot.top - diveBoot.collar, f.shaftZ(diveBoot) + 0.006]),
                  f.band(p + 'strap', 'strap', diveBoot, cx, 0.1, 0.12, 0.004),
                ]),
-             { sole: 'rubber-black', upper: 'neoprene-black', shaft: 'neoprene-black', collar: 'cloth-blue', lining: 'cloth-charcoal', toecap: 'rubber-black', zip: 'plastic-matte-black', strap: 'rubber-black' }) + { title: 'Thick wetsuit booties' }
+             { sole: 'rubber-black', upper: 'neoprene-black', shaft: 'neoprene-black', collar: 'cloth-blue', lining: 'cloth-charcoal', toecap: 'rubber-black', zip: 'plastic-matte-black', strap: 'rubber-black' }) + { title: 'Thick wetsuit booties', soleLift: f.soleLift(diveBoot) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['diving'], tags: { material: ['rubber'], slot: ['feet'], setting: ['modern'] } } },
 
   // Neoprene dive gloves lying flat as a pair, backs up, each 250 mm long with a bound cuff.

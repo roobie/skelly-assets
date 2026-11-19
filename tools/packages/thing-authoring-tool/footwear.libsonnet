@@ -57,6 +57,9 @@ local boot(p, b, cx) =
          h.prism(p + 'collar', 'collar', 'y', place(ellipse(b.rx + std.get(b, 'collarOut', 0.003), b.rz + std.get(b, 'collarOut', 0.003)), cx, sc), b.top - b.collar, b.top),
          h.prism(p + 'opening', 'lining', 'y', place(ellipse(b.rx * 0.72, b.rz * 0.72), cx, sc), b.top, b.top + 0.002),
        ] else []);
+// How far the boot stands the bare foot off the ground: the heel stands on the heel block inside the boot, so the foot
+// rises by the sole and the heel.
+local soleLift(b) = b.t + std.get(b, 'heel', 0);
 // The shaft's middle along z and its front face, for laces, straps and trim.
 local shaftZ(b) = -b.l / 2 + b.rz + 0.008;
 // Laces up the shaft's front from y0 to y1: a tongue strip with crossed lace bars every `pitch`. Slots: tongue, lace.
@@ -80,6 +83,7 @@ local pair(b, gap, extra=function(p, cx) []) = std.flattenArrays([
   place: place,
   ellipse: ellipse,
   boot: boot,
+  soleLift: soleLift,
   shaftZ: shaftZ,
   laces: laces,
   band: band,

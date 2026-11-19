@@ -49,6 +49,9 @@ local boot(p, b, cx) =
          h.prism(p + 'collar', 'collar', 'y', place(ellipse(b.rx + std.get(b, 'collarOut', 0.003), b.rz + std.get(b, 'collarOut', 0.003)), cx, shaftZ(b)), b.top - b.collar, b.top),
          h.prism(p + 'opening', 'lining', 'y', place(ellipse(b.rx * 0.72, b.rz * 0.72), cx, shaftZ(b)), b.top, b.top + 0.002),
        ] else []);
+// How far the boot stands the bare foot off the ground: the heel stands on the heel block inside the boot, so the foot
+// rises by the sole and the heel.
+local soleLift(b) = b.t + std.get(b, 'heel', 0);
 // Laces up a boot shaft's front from y0 to y1: a tongue strip with lace bars every `pitch`. Slots: tongue, lace.
 local laces(p, b, cx, y0, y1, pitch=0.016) =
   local zf = shaftZ(b) + b.rz;
@@ -160,7 +163,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for i in std.range(0, 2)
       for y in [0.12 + i * 0.07]
     ])
-  ), { sole: 'rubber-black', upper: 'cloth-black', shaft: 'cloth-black', toe: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', plate: 'plastic-charcoal', slider: 'steel-grey', strap: 'webbing-black', buckle: 'steel' }) + { title: 'Motorcycle boots' }
+  ), { sole: 'rubber-black', upper: 'cloth-black', shaft: 'cloth-black', toe: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', plate: 'plastic-charcoal', slider: 'steel-grey', strap: 'webbing-black', buckle: 'steel' }) + { title: 'Motorcycle boots', soleLift: soleLift(motorcycle) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric', 'plastic'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of flame-resistant socks laid flat, one across the other, each 290 mm from cuff to heel and 240 mm from
@@ -179,7 +182,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
   // A single tempered steel sabaton, 280 mm long and 100 mm tall: seven overlapping lames stepping down from the ankle
   // over the instep to a rounded toe cap, open behind, held on by a strap under the arch and a buckled heel strap.
   h.compound('tempered_sabaton', 1.4, boot('', sabaton(0.28), 0) + sabatonStraps('', sabaton(0.28), 0),
-    { sole: 'leather-black', plate: 'steel-heat-tint', edge: 'steel', strap: 'leather-black', buckle: 'steel-grey', lining: 'paint-charcoal' }) + { title: 'Tempered sabaton' }
+    { sole: 'leather-black', plate: 'steel-heat-tint', edge: 'steel', strap: 'leather-black', buckle: 'steel-grey', lining: 'paint-charcoal' }) + { title: 'Tempered sabaton', soleLift: soleLift(sabaton(0.28)) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of inline skates, 290 mm long and 340 mm tall: a hard plastic shell boot with a padded liner showing at
@@ -201,7 +204,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for i in std.range(0, 3)
     ])
     for s in [-1, 1]
-  ]), { sole: 'plastic-charcoal', upper: 'plastic-charcoal', shell: 'plastic-black', shaft: 'cloth-black', collar: 'plastic-black', lining: 'paint-charcoal', strap: 'plastic-black', buckle: 'alu-bare', frame: 'alu-bare', wheel: 'plastic-clear-blue', hub: 'plastic-white' }) + { title: 'Inline skates', soleLift: deck + skate.t }
+  ]), { sole: 'plastic-charcoal', upper: 'plastic-charcoal', shell: 'plastic-black', shaft: 'cloth-black', collar: 'plastic-black', lining: 'paint-charcoal', strap: 'plastic-black', buckle: 'alu-bare', frame: 'alu-bare', wheel: 'plastic-clear-blue', hub: 'plastic-white' }) + { title: 'Inline skates', soleLift: deck + soleLift(skate) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of sneakers with a wheel tucked into each heel, 280 mm long and 90 mm tall: black uppers with white laces
@@ -211,7 +214,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       h.turned(p + 'wheel-cap', 'hub', 'z', [[0, 0], [0, 0.015], [0.004, 0.015], [0.004, 0]], [cx, 0.016, -0.149]),
       box(p + 'stripe', 'stripe', [cx - sneaker.w * 0.5, 0.034, -0.08], [cx + sneaker.w * 0.5, 0.044, 0.06]),
     ]
-  ), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', hub: 'plastic-grey', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers', soleLift: sneaker.t }
+  ), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', hub: 'plastic-grey', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers', soleLift: soleLift(sneaker) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same sneakers with the heel wheels pushed out, each a 40 mm wheel standing below the sole so the toes lift.
@@ -222,13 +225,12 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       box(p + 'stripe', 'stripe', [cx - sneaker.w * 0.5, 0.034, -0.08], [cx + sneaker.w * 0.5, 0.044, 0.06]),
     ], tilt) + wheel(p + 'wheel', cx, -0.1, 0.02, 0.022)
     for s in [-1, 1]
-  ]), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', wheel: 'plastic-grey', hub: 'steel', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers, wheels out', soleLift: tilt + sneaker.t }
+  ]), { sole: 'plastic-white', upper: 'cloth-black', shaft: 'cloth-black', collar: 'cloth-black', lining: 'paint-charcoal', tongue: 'cloth-black', lace: 'cloth-white', wheel: 'plastic-grey', hub: 'steel', stripe: 'cloth-red' }) + { title: 'Heel-wheel sneakers, wheels out', soleLift: tilt + soleLift(sneaker) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['plastic', 'fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of old-fashioned roller skates, 270 mm long and 260 mm tall: laced brown leather boots bolted to steel
   // plates, each on two axles with a pair of 56 mm steel wheels and a rubber toe stop.
-  // The skate boot's underside, on its plate. The boot's heel block lies inside it, so the bare heel stands on it.
-  local plate = 0.068;
+  local plate = 0.068;  // The skate boot's underside, on its plate.
   h.compound('roller_skates', 3, std.flattenArrays([
     local cx = s * 0.075, p = if s < 0 then 'l-' else 'r-';
     lift(boot(p, quad, cx) + laces(p, quad, cx, 0.07, 0.18), plate) + [
@@ -242,7 +244,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for k in [0, 1]
     ])
     for s in [-1, 1]
-  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates', soleLift: plate + quad.t + quad.heel }
+  ]), { sole: 'leather-brown', upper: 'leather-brown', shaft: 'leather-brown', collar: 'leather-black', lining: 'paint-charcoal', tongue: 'leather-brown', lace: 'paint-cream', frame: 'steel', wheel: 'steel-grey', hub: 'steel', stop: 'rubber-black' }) + { title: 'Roller skates', soleLift: plate + soleLift(quad) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'metal'], slot: ['feet'] } } },
 
   // A pair of sheet metal sabatons, 300 mm long and 95 mm tall: three bent plates riveted over the front of each foot,
@@ -253,7 +255,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       for i in [0, 1, 2, 3]
       for s in [if i < 2 then -1 else 1]
     ]
-  ), { sole: 'leather-brown', plate: 'steel', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel', rivet: 'steel-galvanised', lining: 'paint-charcoal' }) + { title: 'Sheet metal sabatons' }
+  ), { sole: 'leather-brown', plate: 'steel', edge: 'steel-grey', strap: 'leather-brown', buckle: 'steel', rivet: 'steel-galvanised', lining: 'paint-charcoal' }) + { title: 'Sheet metal sabatons', soleLift: soleLift(sheet) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], slot: ['feet'] } } },
 
   // A pair of low shoes plaited from strips of birch bark, 270 mm long and 75 mm tall, the strips crossing over the
@@ -263,33 +265,34 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
       box('%sstrip-%d' % [p, i], 'strip', [cx - bark.w * 0.4 + i * bark.w * 0.2, 0.01, -0.02], [cx - bark.w * 0.4 + i * bark.w * 0.2 + 0.014, 0.072, 0.1])
       for i in std.range(0, 4)
     ]
-  ), { sole: 'bark', upper: 'bark-birch', weave: 'paperboard-tan', strip: 'bark-birch', shaft: 'bark-birch', collar: 'paperboard-tan', lining: 'bark' }) + { title: 'Birch bark shoes' }
+  ), { sole: 'bark', upper: 'bark-birch', weave: 'paperboard-tan', strip: 'bark-birch', shaft: 'bark-birch', collar: 'paperboard-tan', lining: 'bark' }) + { title: 'Birch bark shoes', soleLift: soleLift(bark) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], setting: ['prehistoric'], slot: ['feet'] } } },
 
   // A pair of bowling shoes, 280 mm long and 80 mm tall: cream leather with a red toe and heel, white laces and a thin
   // smooth leather sole.
   h.compound('bowling_shoes', 0.99, pair(lowShoe + { toeSlot: 'toe' }, 0.03, function(p, cx)
     instepLaces(p, lowShoe, cx, 4)
-  ), { sole: 'leather-brown', upper: 'paint-cream', toe: 'paint-oxblood', shaft: 'paint-oxblood', collar: 'paint-oxblood', lining: 'paint-charcoal', tongue: 'paint-cream', lace: 'cloth-white' }) + { title: 'Bowling shoes' }
+  ), { sole: 'leather-brown', upper: 'paint-cream', toe: 'paint-oxblood', shaft: 'paint-oxblood', collar: 'paint-oxblood', lining: 'paint-charcoal', tongue: 'paint-cream', lace: 'cloth-white' }) + { title: 'Bowling shoes', soleLift: soleLift(lowShoe) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of denim sneakers, 280 mm long and 90 mm tall: denim uppers and tongue, a white rubber sole wrapping the
   // toe, and white laces.
   h.compound('denim_sneakers', 0.8, pair(sneaker + { toeSlot: 'toe' }, 0.03, function(p, cx)
     instepLaces(p, sneaker, cx, 4)
-  ), { sole: 'plastic-white', upper: 'cloth-denim', toe: 'plastic-white', shaft: 'cloth-denim', collar: 'cloth-denim', lining: 'paint-charcoal', tongue: 'cloth-denim', lace: 'cloth-white' }) + { title: 'Denim sneakers' }
+  ), { sole: 'plastic-white', upper: 'cloth-denim', toe: 'plastic-white', shaft: 'cloth-denim', collar: 'cloth-denim', lining: 'paint-charcoal', tongue: 'cloth-denim', lace: 'cloth-white' }) + { title: 'Denim sneakers', soleLift: soleLift(sneaker) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of soft slippers, 270 mm long and 65 mm tall: navy cotton uppers on a thin grey felt sole, with a plush
   // grey trim round the opening.
-  h.compound('slippers', 0.35, pair(slipper, 0.03), { sole: 'felt-grey', upper: 'cloth-navy', shaft: 'cloth-navy', collar: 'felt-grey', lining: 'wool-grey' }) + { title: 'Slippers' }
+  h.compound('slippers', 0.35, pair(slipper, 0.03), { sole: 'felt-grey', upper: 'cloth-navy', shaft: 'cloth-navy', collar: 'felt-grey', lining: 'wool-grey' }) + { title: 'Slippers', soleLift: soleLift(slipper) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['fabric'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of steel-toed sneakers, 254 mm long and 90 mm tall: black leather uppers with a swollen charcoal cap over
   // the toe, a grey sole, and black laces.
-  h.compound('steel_toe_sneakers', 1.4, pair(sneaker + { l: 0.254, toeSlot: 'toe' }, 0.03, function(p, cx)
-    instepLaces(p, sneaker + { l: 0.254 }, cx, 4)
-  ), { sole: 'plastic-grey', upper: 'leather-black', toe: 'plastic-charcoal', shaft: 'leather-black', collar: 'plastic-charcoal', lining: 'paint-charcoal', tongue: 'leather-black', lace: 'webbing-black' }) + { title: 'Steel toe sneakers' }
+  local steelToe = sneaker + { l: 0.254 };
+  h.compound('steel_toe_sneakers', 1.4, pair(steelToe + { toeSlot: 'toe' }, 0.03, function(p, cx)
+    instepLaces(p, steelToe, cx, 4)
+  ), { sole: 'plastic-grey', upper: 'leather-black', toe: 'plastic-charcoal', shaft: 'leather-black', collar: 'plastic-charcoal', lining: 'paint-charcoal', tongue: 'leather-black', lace: 'webbing-black' }) + { title: 'Steel toe sneakers', soleLift: soleLift(steelToe) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', keywords: ['safety-gear'], tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of plain white cotton socks laid flat, one across the other, each 290 mm from cuff to heel and 240 mm from
