@@ -130,8 +130,11 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
     box('rail', 'rail', [deckRear + 0.05, deckTop, 0.3], [deckFront - 0.08, deckTop + 0.06, 0.36]),
     box('stop', 'rail', [deckFront - 0.08, deckTop, 0.24], [deckFront - 0.04, deckTop + 0.1, 0.38]),
   ]), { wall: 'plastic-black', rail: 'steel-stainless' }) + { title: 'Hearse partition' },
-  k.compound('hearse_brightwork', 3, k.bothSides([
+  k.compound('hearse_brightwork', 2, k.bothSides([
     box('rear_belt', 'bright', [s.rear + 0.12, s.waist - 0.03, s.side - 0.02], [s.bRear, s.waist, s.side + 0.03]),
-    box('front_belt', 'bright', [s.bFront, s.waist - 0.03, s.side - 0.02], [s.cowl, s.waist, s.side + 0.03]),
   ]), { bright: 'steel-bright' }) + { title: 'Hearse brightwork' },
+  // The front belt lies along the door's skin, so it rides the door.
+  k.compound('hearse_front_door_brightwork', 1, [
+    box('belt', 'bright', [s.bFront, s.waist - 0.03, s.side - 0.02], [s.cowl, s.waist, s.side + 0.03]),
+  ], { bright: 'steel-bright' }) + { title: 'Hearse front door brightwork' },
 ])
