@@ -122,8 +122,8 @@ local m4Lengths = { extended: 838.2, collapsed: 755.65 };
 // The carrier's gas key, which the charging handle draws it back by, and the room the handle has behind it, from the
 // technical data package figures a gas key patent quotes.
 local gasKeyPatent = 'https://patents.google.com/patent/US10982916B1/en';
-// A mil-spec-size billet dust cover as a shop lists it, 3.13 in long and 0.885 in high; Brownells lists the Luth-AR
-// cover at 3.133 in by 0.882 in.
+// A mil-spec-size billet dust cover as a shop lists it: 3.13 in long and 0.885 in wide, the width read as the cover's
+// height across the port.
 local fortisDustCover = 'https://armsagora.com/fortis-manufacturing-billet-dust-cover-for-850015927034';
 
 // The A2 parts are traced off the M16A4 side photos, each scaled by the rifle's published overall length. The side
@@ -283,7 +283,12 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     // The flat-top's rail is only its teeth, standing on the receiver with its slots cut to the receiver's top.
     rail: {
       rearX: tracedX(386, 'upperRail'),
-      topY: dim($.upper.topY.mm + drawnSlotDepth.mm, 'derived: its teeth on the receiver; sourced at ' + railHeightSource),
+      topY: dim(
+        $.upper.topY.mm + drawnSlotDepth.mm,
+        'derived: its teeth on the receiver, %.2f mm above the sourced height so the charging handle\'s channel keeps its roof; sourced at '
+        % ($.upper.topY.mm + drawnSlotDepth.mm - sourcedRailTopY)
+        + railHeightSource,
+      ),
     },
     // The fixed A2 carry handle as convex side outlines: the rear sight housing with its sloped back, the aperture ears
     // over it and the block ahead of them, the bar falling to the front over the hand hole, and the front leg with its
@@ -413,7 +418,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   // until its outer face comes to rest on the magazine well's top outer edge, which stands out past the upper's side.
   portCover: {
     length: dim(79.502, 'sourced: 3.13 in, ' + fortisDustCover),
-    height: dim(22.479, 'sourced: 0.885 in, ' + fortisDustCover),
+    height: dim(22.479, 'sourced: 0.885 in, listed as its width and read as its height across the port, ' + fortisDustCover),
     thickness: dim(1, 'derived: a stamped steel sheet'),
     drawnThickness: dim(detailFeature, 'derived: two detail voxels, drawn inward of the outer face into the port'),
     rodDrop: dim(0.75, "derived: the rod's centre under the port's bottom edge, in the upper's hinge lugs"),
