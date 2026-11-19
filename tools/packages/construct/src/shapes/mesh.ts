@@ -329,6 +329,13 @@ export const meshForSolid = (
   return orientExtrusion(chamferedPrism(solid.profile, solid.z, bevel), solid.axis);
 };
 
+/**
+ * The mesh a solid's voxels are sampled from: the solid as authored, with no display bevel. A bevel is cosmetic, and at a
+ * voxel's size its chamfers would notch every edge two solids share and shave box corners, leaving see-through lines.
+ */
+export const meshForSampling = (solid: Solid, revolveFacets?: number): TriangleMesh =>
+  meshForSolid(solid, 0, revolveFacets);
+
 const meshForPolyhedra = (polyhedra: readonly ConvexPolyhedron[]): TriangleMesh => {
   const builder = new MeshBuilder();
   for (const polyhedron of polyhedra) {
