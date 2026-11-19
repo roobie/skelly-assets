@@ -32,7 +32,7 @@ local onFlank(id, slot, s, min, max, out0, out1) =
 [
   bolt.gun('bolt_laser_gun', 12.5, 'energy', bolt.receiver(bodyFront, underside, top, w, { front: 0.14, top: 0.37, halfWidth: 0.045 }) + [
     // The emitter: a brass band closing the block, a squared steel head with two dark cooling grooves, and the lens.
-    h.prism('front-band', 'trim', 'x', bolt.bevel(underside - 0.004, top + 0.004, w + 0.004, 0.018, 0.012), bodyFront - 0.03, bodyFront),
+    bolt.band('front-band', 'trim', bodyFront - 0.03, bodyFront, underside, top, w, 0.018, 0.012),
     h.prism('emitter', 'metal', 'x', bolt.bevel(beamY - emitter.half, beamY + emitter.half, emitter.half, 0.02), bodyFront, muzzleX - 0.006),
     h.prism('lens', 'glow', 'x', bolt.bevel(beamY - emitter.lens, beamY + emitter.lens, emitter.lens, 0.012), muzzleX - 0.01, muzzleX),
   ] + [
@@ -60,5 +60,5 @@ local onFlank(id, slot, s, min, max, out0, out1) =
     ]
     for s in std.objectFields(sides)
   ])
-  + bolt.cell(bolt.feedBack, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
+  + bolt.cell(0.15, underside) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
 ]

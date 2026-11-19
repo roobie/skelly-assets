@@ -3,7 +3,8 @@ local box = h.box;
 
 // The body the bolt guns share: a bevelled slab receiver, the pistol grip and trigger group, the skeleton stock, the
 // energy guns' power cell, the paints and the row around them. One source keeps the guns one family, so a change to
-// the shared body reaches all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x, the axis `gripOn` names.
+// the shared body reaches all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x,
+// the axis `gripOn` names.
 {
   // Where the receiver's back meets the stock.
   joint: -0.18,
@@ -14,8 +15,10 @@ local box = h.box;
   guard: { front: 0.02, opening: 0.06, bar: 0.012, halfWidth: 0.011 },
   trigger: { gap: 0.012, width: 0.02, length: 0.045, sweep: 0.006, halfWidth: 0.007 },
   // The x at which a feed hung under the receiver, a magazine's well or a cell's cap, starts: a small clearance ahead
-  // of the guard, so the two read as separate parts while the feed stays close behind the grip.
+  // of the guard, so the two read as separate parts while the feed stays close ahead of the grip.
   feedBack: $.guard.front + 0.006,
+  // How far a band stands proud of the section it wraps: one voxel at the guns' grain, so it always reads.
+  bandProud: 0.004,
 
   // A section from `y0` to `y1`, `w` its half width, its top edges cut back by `top` and its bottom edges by
   // `bottom`, as the [y, z] outline of a prism along x. Cut edges keep the chunky slabs from reading as raw boxes.
@@ -24,26 +27,39 @@ local box = h.box;
     [y1, w - top], [y1, -w + top], [y1 - top, -w], [y0 + bottom, -w],
   ],
 
+  // A band from `x0` to `x1` round the section `y0` to `y1`, `w` its half width: the section grown by `bandProud` all
+  // round, its edges cut back by `top` and `bottom`.
+  band(id, slot, x0, x1, y0, y1, w, top, bottom=top):
+    h.prism(id, slot, 'x', $.bevel(y0 - $.bandProud, y1 + $.bandProud, w + $.bandProud, top, bottom), x0, x1),
+
   // The receiver from the stock joint to `front`, `y0` to `y1`, `w` its half width, with a top ridge running to
   // `ridge.front`, rising to `ridge.top`, `ridge.halfWidth` its half width, and a painted band round it.
   receiver(front, y0, y1, w, ridge): [
     h.prism('receiver', 'body', 'x', $.bevel(y0, y1, w, 0.016, 0.01), $.joint, front),
     h.prism('ridge', 'body', 'x', [[y1, -ridge.halfWidth], [y1, ridge.halfWidth], [ridge.top, ridge.halfWidth - 0.008], [ridge.top, -ridge.halfWidth + 0.008]], -0.16, ridge.front),
-    h.prism('receiver-band', 'accent', 'x', $.bevel(y0 - 0.003, y1 + 0.003, w + 0.003, 0.018, 0.012), -0.04, 0.0),
+    $.band('receiver-band', 'accent', -0.04, 0.0, y0, y1, w, 0.018, 0.012),
   ],
 
   // The pistol grip with a flared cap, trigger guard and trigger, hung from height `top`, at or just inside the
   // receiver's underside.
   grip(top):
     local front = -0.07, g = $.guard, t = $.trigger;
-    // The front corner of the grip's foot, which its front rakes back to.
-    local foot = { x: -0.10, y: 0.03 };
+    // The grip's foot, from its `back` corner to its `front` one, which the grip's front rakes back to.
+    local foot = { back: -0.155, front: -0.10, y: 0.03 };
     // The x of the grip's front at height `y`.
-    local frontAt(y) = foot.x + (front - foot.x) * (y - foot.y) / (top - foot.y);
+    local frontAt(y) = foot.front + (front - foot.front) * (y - foot.y) / (top - foot.y);
+    // The cap's outline from its top down, each row's height against the foot's and how far it stands out past the
+    // foot's back and front corners: it flares widest across its middle.
+    local capRows = [
+      { y: 0.004, back: 0.005, front: 0.004 },
+      { y: -0.006, back: 0.009, front: 0.007 },
+      { y: -0.014, back: 0.003, front: 0 },
+    ];
+    local capPoint(row, end) = if end == 'back' then [foot.back - row.back, foot.y + row.y] else [foot.front + row.front, foot.y + row.y];
     local floor = top - g.opening, bottom = floor - g.bar, blade = front + t.gap;
     [
-      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [foot.x, foot.y], [-0.155, foot.y]], -0.026, 0.026),
-      h.prism('grip-cap', 'body', 'z', [[-0.16, 0.034], [-0.096, 0.034], [-0.093, 0.024], [-0.1, 0.016], [-0.158, 0.016], [-0.164, 0.024]], -0.03, 0.03),
+      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [foot.front, foot.y], [foot.back, foot.y]], -0.026, 0.026),
+      h.prism('grip-cap', 'body', 'z', [capPoint(r, 'front') for r in capRows] + [capPoint(r, 'back') for r in std.reverse(capRows)], -0.03, 0.03),
       // The guard's bottom bar runs back into the grip, so it reads as one with it.
       box('guard', 'metal', [frontAt(bottom) - g.bar, bottom, -g.halfWidth], [g.front, floor, g.halfWidth]),
       box('guard-front', 'metal', [g.front - g.bar, floor, -g.halfWidth], [g.front, top, g.halfWidth]),
@@ -52,11 +68,13 @@ local box = h.box;
       ], -t.halfWidth, t.halfWidth),
     ],
 
-  // The energy guns' power cell, hung under the receiver with its brass foot from `capBack` and its body to `front`,
-  // seated up into the receiver at `top`: an octagonal block with a glowing window down each side. Slot `glow` must be
-  // in the gun's finish.
-  cell(capBack, front, top):
-    local half = 0.055, foot = 0.02, windows = [0.05, 0.12], lip = 0.005, back = capBack + lip;
+  // The energy guns' power cell, hung under a receiver whose underside is at `underside`, with its brass foot from
+  // `capBack` and its body to `front`, seated a little up into the receiver so no seam shows: an octagonal block with a
+  // glowing window down each side. Slot `glow` must be in the gun's finish.
+  cell(front, underside, capBack=$.feedBack):
+    local half = 0.055, foot = 0.02, top = underside + 0.01, lip = 0.005, back = capBack + lip;
+    // The windows keep an even margin of the cell's body above and below them.
+    local margin = 0.03, windows = [foot + margin, top - margin];
     // The cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
     // is [z, x].
     local plan(half, x0, x1, cut) = [

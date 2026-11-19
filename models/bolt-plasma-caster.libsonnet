@@ -44,5 +44,5 @@ local railEnd = emitterX + emitterFlare;
     box('fin-%d' % i, 'metal', [0.21 + i * 0.08, coreY + railOuter, -0.02], [0.225 + i * 0.08, 0.37, 0.02])
     for i in [0, 1, 2]
   ]
-  + bolt.cell(bolt.feedBack, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
+  + bolt.cell(0.15, 0.14) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
 ]
