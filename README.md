@@ -58,8 +58,8 @@ and thing exports without giving a model two producers. The recipe schema and to
 
 A thing recipe or roster row selects a catalogue row, not a second model source. Author thing sources in the
 row files, the lists of finished rows in `models/catalogue/sets/`, `models/kits/` and `models/vehicles/`, which the
-generated `models/index.libsonnet` gathers into the catalogue; `tools/packages/thing-authoring-tool/items.jsonnet` joins
-it to the shared settings for the thing tool. Rows and every value an author tunes, such as masses, measures and finishes,
+generated `models/index.libsonnet` gathers into the catalogue; the thing tool reads it as one file per row beside the shared
+settings. Rows and every value an author tunes, such as masses, measures and finishes,
 live under `models/` because that tree carries the content licence (`REUSE.toml`); `tools/` keeps only the builder
 functions, which are code. The roster filters that catalogue through
 `tools/packages/thing-authoring-tool/exports/deadvox.jsonnet`, `roster`, using `models/export.json` as the
