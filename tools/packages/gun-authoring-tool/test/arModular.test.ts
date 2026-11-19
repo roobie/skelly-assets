@@ -57,7 +57,9 @@ describe('modular AR', () => {
         checkFrameTable('t', { kinds, picks, ...extra }, { 'picks.*': 'kinds' });
     expect(check({ a: { mm: 1, source: 'sourced: x' } })).not.toThrow();
     expect(check({ a: { mm: 1 } })).toThrow(/t\.a/);
-    expect(check({ a: { mm: 1, source: 'a guess' } })).toThrow();
+    expect(check({ a: { mm: 1, source: 'a guess' } })).toThrow(/^t\.a: /);
+    // A leaf its schema refuses is reported at its place, which valibot's own message does not name.
+    expect(check({ a: { choice: 'rifle', of: 'kinds', mm: 1, source: 'sourced: x' } })).toThrow(/^t\.a: /);
     expect(check({ a: 1 })).toThrow(/t\.a/);
     expect(check({ a: 'rifle' })).toThrow(/t\.a/);
     // A pick names the group its place pins, which must hold it.
@@ -65,7 +67,7 @@ describe('modular AR', () => {
     expect(check({}, { b: { choice: 'rifle', of: 'sorts' } })).toThrow(/t\.picks\.b/);
     expect(check({ sorts: kinds }, { b: { choice: 'rifle', of: 'sorts' } })).toThrow(/not the kinds/);
     expect(check({ b: rifle })).toThrow(/t\.b: no pick belongs here/);
-    expect(check({}, { b: { choice: 'rifle' } })).toThrow();
+    expect(check({}, { b: { choice: 'rifle' } })).toThrow(/^t\.picks\.b: /);
     // A place the pins name holds a pick, and a pin names some place.
     expect(check({}, { b: rifle, c: { mm: 1, source: 'sourced: x' } })).toThrow(
       /t\.picks\.c: expected a pick from kinds/,

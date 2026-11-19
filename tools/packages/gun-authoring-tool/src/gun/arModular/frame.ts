@@ -2,7 +2,21 @@
 // A table is checked once at load, so a number without a source is a build error rather than a quiet guess.
 
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, gtValue, minLength, number, parse, pipe, strictObject, string, tuple, union } from 'valibot';
+import {
+  array,
+  type GenericSchema,
+  gtValue,
+  type InferOutput,
+  minLength,
+  number,
+  pipe,
+  safeParse,
+  strictObject,
+  string,
+  summarize,
+  tuple,
+  union,
+} from 'valibot';
 import ar15Table from '../../../../../../models/guns/tables/ar15.json' with { type: 'json' };
 import { GUN_PLATFORMS, type GunPlatforms, SourceSchema } from '../platforms.ts';
 import { mmToU } from '../units.ts';
@@ -39,6 +53,15 @@ const pinnedGroup = (picks: PickGroups, keys: readonly string[]): string | undef
     return segments.length === keys.length && segments.every((segment, i) => segment === '*' || segment === keys[i]);
   })?.[1];
 
+/** A leaf parsed by its schema, a failure naming the leaf's place in the table, which valibot alone does not. */
+const parseLeaf = <Schema extends GenericSchema>(schema: Schema, node: unknown, path: string): InferOutput<Schema> => {
+  const result = safeParse(schema, node);
+  if (!result.success) {
+    throw new Error(`${path}: ${summarize(result.issues)}`);
+  }
+  return result.output;
+};
+
 interface TableCheck {
   readonly name: string;
   readonly table: unknown;
@@ -58,11 +81,11 @@ const checkLeaves = (node: unknown, keys: readonly string[], check: TableCheck):
     throw new Error(`${path}: expected a measurement, a choice, a standard or a group of them`);
   }
   if (Object.hasOwn(node, 'source')) {
-    parse(MeasuredSchema, node);
+    parseLeaf(MeasuredSchema, node, path);
     return;
   }
   if (Object.hasOwn(node, 'choice')) {
-    const { choice, of } = parse(ChoiceSchema, node);
+    const { choice, of } = parseLeaf(ChoiceSchema, node, path);
     const pinned = pinnedGroup(check.picks, keys);
     if (pinned !== of) {
       throw new Error(
@@ -75,7 +98,7 @@ const checkLeaves = (node: unknown, keys: readonly string[], check: TableCheck):
     return;
   }
   if (Object.hasOwn(node, 'standard')) {
-    const { standard, mount } = parse(StandardSchema, node);
+    const { standard, mount } = parseLeaf(StandardSchema, node, path);
     if (!check.platforms.standards.get(mount)?.has(standard)) {
       throw new Error(`${path}: the ${mount} mount lists no standard '${standard}'`);
     }
