@@ -2,7 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseAssemblyOrThrow } from '@skelly/construct/assembly/parseAssembly.ts';
 import type { Assembly, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { cross, fromColumns, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { worldBox } from '@skelly/construct/shapes/geometry.ts';
 import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
 import type { Motion } from '@skelly/motion/motion';
 import { CARTRIDGES, DESIGNS } from '../src/cli/content.ts';
@@ -74,6 +75,22 @@ export const expectWatertightMesh = (mesh: TriangleMesh, label = 'mesh'): number
     throw new Error(`${label}: non-positive signed volume`);
   }
   return signedVolume;
+};
+
+/** How thick a sight line is drawn to test what stands in its way. */
+export const LINE_HALF_THICKNESS = 0.05;
+
+/** A thin box along the segment from `from` to `to`, turned onto the segment's direction. */
+export const segmentBox = (from: Vec3, to: Vec3, halfThickness: number) => {
+  const run = sub(to, from);
+  const along = normalize(run);
+  const side = normalize(cross(along, [0, 1, 0]));
+  const up = cross(side, along);
+  const centre: Vec3 = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2, (from[2] + to[2]) / 2];
+  return worldBox(
+    { r: fromColumns(along, up, side), t: centre },
+    { center: [0, 0, 0], half: [Math.hypot(...run) / 2, halfThickness, halfThickness] },
+  );
 };
 
 export const loadFixtures = (): Assembly[] =>

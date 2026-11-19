@@ -4,14 +4,11 @@ import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import {
   applyPoint,
-  cross,
   eulerXyzDegrees,
-  fromColumns,
   IDENTITY,
   type Mat3,
   mulMM,
   mulMV,
-  normalize,
   rotX,
   rotY,
   rotZ,
@@ -46,7 +43,15 @@ import { FAMILIES } from '../src/gun/parts.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { type ReadGlb, readGlb } from './glbReader.ts';
-import { expectWatertightMesh, loadCorpus, motionOf, partTriangles, variant } from './helpers.ts';
+import {
+  expectWatertightMesh,
+  LINE_HALF_THICKNESS,
+  loadCorpus,
+  motionOf,
+  partTriangles,
+  segmentBox,
+  variant,
+} from './helpers.ts';
 import { sweepGroup } from './sweeps.ts';
 
 const design = (name: string): Assembly => {
@@ -231,21 +236,6 @@ const drawnUpTop = (
     throw new Error(`${partId} draws no upward face there`);
   }
   return top;
-};
-
-const LINE_HALF_THICKNESS = 0.05;
-
-/** A thin box along the segment from `from` to `to`, turned onto the segment's direction. */
-const segmentBox = (from: Vec3, to: Vec3, halfThickness: number) => {
-  const run = sub(to, from);
-  const along = normalize(run);
-  const side = normalize(cross(along, [0, 1, 0]));
-  const up = cross(side, along);
-  const centre: Vec3 = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2, (from[2] + to[2]) / 2];
-  return worldBox(
-    { r: fromColumns(along, up, side), t: centre },
-    { center: [0, 0, 0], half: [Math.hypot(...run) / 2, halfThickness, halfThickness] },
-  );
 };
 
 /**
