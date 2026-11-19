@@ -81,7 +81,7 @@ export const magazineStandardOf = (profile: string): string | undefined =>
   Object.hasOwn(MAGAZINE_CONTENT.standards, profile) ? MAGAZINE_CONTENT.standards[profile] : undefined;
 
 /** Photo-measured straight box magazines, by profile name. */
-export const MAGAZINE_PROFILES = MAGAZINE_CONTENT.profiles;
+const MAGAZINE_PROFILES = MAGAZINE_CONTENT.profiles;
 
 /** Every magazine profile, drawn or traced. */
 export const MAGAZINE_PROFILE_NAMES: readonly string[] = [
