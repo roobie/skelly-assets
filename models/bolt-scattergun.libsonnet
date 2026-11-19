@@ -5,7 +5,7 @@ local box = h.box;
 // The bolt carbine's trench scattergun: the family's grip and stock kept, a shorter taller receiver, a long slim barrel
 // housed in a vented shroud with a magazine tube beneath it, and a ribbed brass pump handle wrapped round the tube.
 // About 1.4 m long. Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's muzzle faces +z.
-// Hand-guard point (the off hand's hold on the pump handle), in this layout's metres: [0.48, 0.18, 0].
+// Hand-guard point (the off hand's hold): the pump handle's middle, on the magazine tube's axis.
 
 local w = 0.06;  // half the receiver's width
 local top = 0.34;  // the receiver's top
@@ -16,10 +16,14 @@ local barrelY = 0.29;
 local shroudBottom = 2 * barrelY - top;
 local shroudAt(grow) = bolt.bevel(shroudBottom - grow, top + grow, w + grow, 0.016);
 local mouth = 0.955;  // where the shroud ends and the muzzle stands out
+local band = 0.03;  // the length of the brass band at either end of the shroud
+// The vents down each side of the shroud, each centred in an equal share of the shroud between its bands.
+local vents = { count: 7, length: 0.04, x0: front + band, pitch: (mouth - band - self.x0) / self.count };
 local muzzleX = 0.98;
 local ridgeTop = 0.36;  // the top ridge's crest, the rear of the sight line
 local sightTop = 0.375;  // the front post's tip, standing on the ridge
 local tubeY = 0.18;  // the magazine tube's axis, low enough that the pump clears the shroud
+local tubeEnd = 0.80;  // where the magazine tube meets its cap
 local pump = { x0: 0.39, x1: 0.57, half: 0.042, ribs: 5, ribPitch: 0.032, ribLength: 0.012 };
 local ribStart = pump.x0 + (pump.x1 - pump.x0 - (pump.ribs - 1) * pump.ribPitch - pump.ribLength) / 2;
 [
@@ -29,20 +33,22 @@ local ribStart = pump.x0 + (pump.x1 - pump.x0 - (pump.ribs - 1) * pump.ribPitch 
     // The barrel housed from the receiver's face to its mouth in one shroud, vented down both sides, with a brass band
     // at either end; only the muzzle stands out of it.
     h.prism('shroud', 'body', 'x', shroudAt(0), front, mouth),
-    h.prism('breech-band', 'trim', 'x', shroudAt(0.004), front, front + 0.03),
-    h.prism('shroud-band', 'trim', 'x', shroudAt(0.004), mouth - 0.03, mouth),
+    h.prism('breech-band', 'trim', 'x', shroudAt(0.004), front, front + band),
+    h.prism('shroud-band', 'trim', 'x', shroudAt(0.004), mouth - band, mouth),
   ] + [
-    box('vent-%d-%s' % [i, s], 'vent', [0.20 + i * 0.1, barrelY - 0.02, if s == 'r' then w - 0.001 else -w - 0.002], [0.24 + i * 0.1, barrelY + 0.02, if s == 'r' then w + 0.002 else -w + 0.001])
-    for i in [0, 1, 2, 3, 4, 5, 6]
+    local x = vents.x0 + i * vents.pitch + (vents.pitch - vents.length) / 2;
+    box('vent-%d-%s' % [i, s], 'vent', [x, barrelY - 0.02, if s == 'r' then w - 0.001 else -w - 0.002], [x + vents.length, barrelY + 0.02, if s == 'r' then w + 0.002 else -w + 0.001])
+    for i in std.range(0, vents.count - 1)
     for s in ['l', 'r']
   ] + [
     h.prism('muzzle', 'metal', 'x', bolt.bevel(barrelY - 0.03, barrelY + 0.03, 0.03, 0.008), mouth - 0.01, muzzleX),
     box('bore', 'vent', [muzzleX, barrelY - 0.02, -0.02], [muzzleX + 0.002, barrelY + 0.02, 0.02]),
     box('front-post', 'metal', [mouth - 0.025, ridgeTop, -0.006], [mouth - 0.01, sightTop, 0.006]),
-    // The magazine tube beneath, ending in a brass cap, and a clamp tying it up to the shroud.
-    h.prism('tube', 'metal', 'x', bolt.bevel(tubeY - 0.022, tubeY + 0.022, 0.022, 0.006), front, 0.80),
-    h.prism('tube-cap', 'trim', 'x', bolt.bevel(tubeY - 0.028, tubeY + 0.028, 0.028, 0.008), 0.80, 0.83),
-    box('clamp', 'trim', [0.84, tubeY - 0.03, -0.035], [0.865, shroudBottom + 0.005, 0.035]),
+    // The magazine tube beneath, ending in a brass cap, and a clamp round the tube just behind the cap tying it up to
+    // the shroud.
+    h.prism('tube', 'metal', 'x', bolt.bevel(tubeY - 0.022, tubeY + 0.022, 0.022, 0.006), front, tubeEnd),
+    h.prism('tube-cap', 'trim', 'x', bolt.bevel(tubeY - 0.028, tubeY + 0.028, 0.028, 0.008), tubeEnd, tubeEnd + 0.03),
+    box('clamp', 'trim', [tubeEnd - 0.025, tubeY - 0.03, -0.035], [tubeEnd, shroudBottom + 0.005, 0.035]),
     // The pump handle: a brass fore-end sleeve wrapped round the magazine tube, with dark grip ribs.
     h.prism('pump', 'trim', 'x', bolt.bevel(tubeY - pump.half, tubeY + pump.half, pump.half, 0.012), pump.x0, pump.x1),
   ] + [
