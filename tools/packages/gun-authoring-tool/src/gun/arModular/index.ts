@@ -1,5 +1,6 @@
 // The modular AR family (AR-15 first): families built from the millimetre frame table models/guns/tables/ar15.jsonnet.
-// parts.ts, domain.ts and templates.ts each register this folder with one line, so the rest of the work stays here.
+// parts.ts, domain.ts, templates.ts and anchorData.ts each register this folder with one line, so the rest of the work
+// stays here.
 // Nothing here may import the first AR (arLayout.ts, arFrames.ts or the `ar` template); test/arModular.test.ts holds
 // that line.
 
@@ -25,4 +26,5 @@ export const AR_MODULAR_FAMILIES: Readonly<Record<string, PartFamily>> = {
 
 export const AR_MODULAR_RULES: readonly Rule[] = [];
 
+export { AR_MODULAR_ANCHORS } from './anchors.ts';
 export { arModular } from './template.ts';
