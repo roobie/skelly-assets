@@ -6,7 +6,7 @@ import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@
 import { stopClock } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
-import { EXTENDED_STOP, FAL_FOLDING_STOCK, FOLDED_STOP } from '../src/gun/falFoldingStock.ts';
+import { EXTENDED_STOP, FAL_FOLDING_STOCK, FOLDED_STOP, parseFalFoldingStock } from '../src/gun/falFoldingStock.ts';
 import { sweepStops } from '../src/gun/stopSweep.ts';
 import { loadFixture } from './helpers.ts';
 
@@ -49,6 +49,15 @@ describe('the FAL folding stock', () => {
     expect(folded[0]).toBeCloseTo(2 * rearFace - extended[0], 9);
     expect(folded[2]).toBeCloseTo(2 * FAL_FOLDING_STOCK.hingeZU - extended[2], 9);
     expect(folded[1]).toBeCloseTo(extended[1], 9);
+  });
+
+  it('refuses a measure whose range does not rise', () => {
+    expect(() => parseFalFoldingStock(FAL_FOLDING_STOCK)).not.toThrow();
+    const { block } = FAL_FOLDING_STOCK;
+    expect(() =>
+      parseFalFoldingStock({ ...FAL_FOLDING_STOCK, block: { ...block, yU: [block.yU[1], block.yU[0]] } }),
+    ).toThrow(/rise/);
+    expect(() => parseFalFoldingStock({ ...FAL_FOLDING_STOCK, block: { ...block, yU: [1, 1] } })).toThrow(/rise/);
   });
 
   it('clears the rest of the rifle and its keep-outs at both stops and on the way between them', () => {

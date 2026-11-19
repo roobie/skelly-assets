@@ -4,7 +4,7 @@
 import type { PartMotion } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
-import { check, finite, minValue, number, parse, pipe, strictObject, tuple } from 'valibot';
+import { check, finite, type InferOutput, minValue, number, parse, pipe, strictObject, tuple } from 'valibot';
 import content from '../../../../../models/guns/tables/falFoldingStock.json' with { type: 'json' };
 
 /** The stop of a folding stock where it stands out behind the receiver. */
@@ -14,22 +14,24 @@ export const EXTENDED_STOP = 'extended';
 export const FOLDED_STOP = 'folded';
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
-const Range = pipe(
+const RangeSchema = pipe(
   tuple([pipe(number(), finite()), pipe(number(), finite())]),
   check(([low, high]) => low < high, 'a range must rise from its low end to its high end'),
 );
-type Range = readonly [number, number];
+type Range = Readonly<InferOutput<typeof RangeSchema>>;
 
-export const FAL_FOLDING_STOCK = parse(
-  strictObject({
-    hingeZU: Positive,
-    block: strictObject({ depthU: Positive, yU: Range, halfWidthU: Positive }),
-    arm: strictObject({ depthU: Positive, pastPinU: Positive }),
-    tube: strictObject({ halfWidthU: Positive, upperYU: Range, lowerYU: Range }),
-    buttplate: strictObject({ thicknessU: Positive, yU: Range, halfWidthU: Positive }),
-  }),
-  content,
-);
+const FalFoldingStockSchema = strictObject({
+  hingeZU: Positive,
+  block: strictObject({ depthU: Positive, yU: RangeSchema, halfWidthU: Positive }),
+  arm: strictObject({ depthU: Positive, pastPinU: Positive }),
+  tube: strictObject({ halfWidthU: Positive, upperYU: RangeSchema, lowerYU: RangeSchema }),
+  buttplate: strictObject({ thicknessU: Positive, yU: RangeSchema, halfWidthU: Positive }),
+});
+
+/** The folding stock's measures, checked: each is finite and positive, each range rises. */
+export const parseFalFoldingStock = (table: unknown) => parse(FalFoldingStockSchema, table);
+
+export const FAL_FOLDING_STOCK = parseFalFoldingStock(content);
 
 const box = (id: string, [x0, x1]: Range, [y0, y1]: Range, [z0, z1]: Range): Solid => ({
   id,
