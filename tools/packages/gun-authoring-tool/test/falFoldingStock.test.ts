@@ -1,7 +1,8 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
+import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import { applyPoint } from '@skelly/construct/foundation/math.ts';
-import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
+import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { stopClock } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -30,10 +31,16 @@ describe('the FAL folding stock', () => {
     expect(motion.stops.map(({ name }) => name)).toEqual([EXTENDED_STOP, FOLDED_STOP]);
   });
 
-  it('sits flush against the receiver rear face', () => {
-    const reach = solids.map((solid) => localSolidBounds(solid)[1][0]);
-    expect(Math.max(...reach)).toBe(0);
-    expect(folding.placed.get('stock')!.t[0]).toBe(rearFace);
+  it('stands extended flush against the receiver without entering it', () => {
+    const world = (part: string) =>
+      folding.defs.get(part)!.solids.map((solid) => worldSolid(folding.placed.get(part)!, solid));
+    const pairs = world('stock').flatMap((stock) => world('receiver').map((receiver) => [stock, receiver] as const));
+    expect(Math.min(...pairs.map(([stock, receiver]) => distanceWorld(stock, receiver)))).toBeLessThanOrEqual(
+      TOLERANCE.contact,
+    );
+    expect(Math.max(...pairs.map(([stock, receiver]) => penetrationWorld(stock, receiver)))).toBeLessThanOrEqual(
+      TOLERANCE.contact,
+    );
   });
 
   it('turns the butt about the pin to the far side of it, forward of the rear face', () => {

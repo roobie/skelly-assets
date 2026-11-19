@@ -4,7 +4,7 @@
 import type { PartMotion } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
-import { finite, minValue, number, parse, pipe, strictObject, tuple } from 'valibot';
+import { check, finite, minValue, number, parse, pipe, strictObject, tuple } from 'valibot';
 import content from '../../../../../models/guns/tables/falFoldingStock.json' with { type: 'json' };
 
 /** The stop of a folding stock where it stands out behind the receiver. */
@@ -14,7 +14,11 @@ export const EXTENDED_STOP = 'extended';
 export const FOLDED_STOP = 'folded';
 
 const Positive = pipe(number(), finite(), minValue(Number.MIN_VALUE));
-const Range = tuple([pipe(number(), finite()), pipe(number(), finite())]);
+const Range = pipe(
+  tuple([pipe(number(), finite()), pipe(number(), finite())]),
+  check(([low, high]) => low < high, 'a range must rise from its low end to its high end'),
+);
+type Range = readonly [number, number];
 
 export const FAL_FOLDING_STOCK = parse(
   strictObject({
@@ -27,15 +31,10 @@ export const FAL_FOLDING_STOCK = parse(
   content,
 );
 
-const box = (
-  id: string,
-  [x0, x1]: readonly number[],
-  [y0, y1]: readonly number[],
-  [z0, z1]: readonly number[],
-): Solid => ({
+const box = (id: string, [x0, x1]: Range, [y0, y1]: Range, [z0, z1]: Range): Solid => ({
   id,
   kind: 'box',
-  box: boxFromMinMax([x0!, y0!, z0!], [x1!, y1!, z1!]),
+  box: boxFromMinMax([x0, y0, z0], [x1, y1, z1]),
 });
 
 /**
@@ -44,12 +43,12 @@ const box = (
  */
 export const falFoldingStockSolids = (length: number): Solid[] => {
   const { hingeZU, block, arm, tube, buttplate } = FAL_FOLDING_STOCK;
-  const blockX = [-block.depthU, 0];
+  const blockX: Range = [-block.depthU, 0];
   return [
     box('hinge-block', blockX, block.yU, [-block.halfWidthU, block.halfWidthU]),
     box('hinge-arm', [-arm.depthU, 0], block.yU, [block.halfWidthU, hingeZU + arm.pastPinU]),
-    box('tube-upper', [-length, blockX[0]!], tube.upperYU, [-tube.halfWidthU, tube.halfWidthU]),
-    box('tube-lower', [-length, blockX[0]!], tube.lowerYU, [-tube.halfWidthU, tube.halfWidthU]),
+    box('tube-upper', [-length, blockX[0]], tube.upperYU, [-tube.halfWidthU, tube.halfWidthU]),
+    box('tube-lower', [-length, blockX[0]], tube.lowerYU, [-tube.halfWidthU, tube.halfWidthU]),
     box('buttplate', [-length - buttplate.thicknessU, -length], buttplate.yU, [
       -buttplate.halfWidthU,
       buttplate.halfWidthU,
