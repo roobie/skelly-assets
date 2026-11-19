@@ -161,9 +161,31 @@ export const SMOOTH = 'smooth';
 /** Whether a voxelized export keeps the solid's authored mesh inside its voxelized part; see `SolidDisplayHints`. */
 export const isSmoothPiece = (solid: Solid): boolean => solid.display?.smooth !== undefined;
 
-/** The drawn solids a voxelized part samples at its grain: all but its smooth pieces. */
-export const voxelizedSolids = (solids: readonly Solid[]): readonly Solid[] =>
-  solids.some(isSmoothPiece) ? solids.filter((solid) => !isSmoothPiece(solid)) : solids;
+/**
+ * The drawn solids a voxelized part samples at its grain: all but its smooth pieces. A solid cannot be both a smooth
+ * piece and voxel-only fill, nor can one mesh be half voxels and half authored, so either is refused.
+ */
+export const voxelizedSolids = (solids: readonly Solid[]): readonly Solid[] => {
+  if (!solids.some(isSmoothPiece)) {
+    return solids;
+  }
+  const groups = new Map<string, Set<boolean>>();
+  for (const solid of solids) {
+    if (isSmoothPiece(solid) && solid.display?.voxelOnly) {
+      throw new Error(`Solid ${solid.id} is both a smooth piece and voxel-only`);
+    }
+    const group = solid.display?.mergeGroup;
+    if (group !== undefined) {
+      const kinds = groups.get(group) ?? new Set<boolean>();
+      groups.set(group, kinds.add(isSmoothPiece(solid)));
+    }
+  }
+  const mixed = [...groups].find(([, kinds]) => kinds.size > 1);
+  if (mixed) {
+    throw new Error(`Merge group ${mixed[0]} mixes smooth pieces with voxelized solids`);
+  }
+  return solids.filter((solid) => !isSmoothPiece(solid));
+};
 
 /**
  * Whether the part's voxelized solids, taken together, are too thin on some axis to read at the grain. The part is
@@ -219,7 +241,11 @@ const reachedThrough = (solid: Solid, normal: Vec3, depth: number): Solid => {
   }
   const sign = normal[axis]!;
   if (solid.kind === 'box') {
-    const grow = (v: Vec3, by: number): Vec3 => v.map((x, i) => (i === axis ? x + by : x)) as unknown as Vec3;
+    const grow = ([x, y, z]: Vec3, by: number): Vec3 => [
+      axis === 0 ? x + by : x,
+      axis === 1 ? y + by : y,
+      axis === 2 ? z + by : z,
+    ];
     const { center, half } = solid.box;
     return { ...solid, box: { center: grow(center, (sign * depth) / 2), half: grow(half, depth / 2) } };
   }
@@ -232,9 +258,14 @@ const reachedThrough = (solid: Solid, normal: Vec3, depth: number): Solid => {
     const coordinate = extrusionPoint(solid.axis, [1, 0], 0)[axis] === 1 ? 0 : 1;
     const values = solid.profile.map((corner) => corner[coordinate]);
     const face = sign > 0 ? Math.max(...values) : Math.min(...values);
+    const onFace = (corner: Vec2): boolean => Math.abs(corner[coordinate] - face) <= 1e-9;
+    // A lone extreme corner is an edge, not a face; moving it alone would draw a spike.
+    if (solid.profile.filter(onFace).length < 2) {
+      throw new Error(`Solid ${solid.id} has no face along [${normal.join(', ')}] to reach through, only a corner`);
+    }
     const profile = solid.profile.map(
       (corner): Vec2 =>
-        Math.abs(corner[coordinate] - face) > 1e-9
+        !onFace(corner)
           ? corner
           : coordinate === 0
             ? [corner[0] + sign * depth, corner[1]]

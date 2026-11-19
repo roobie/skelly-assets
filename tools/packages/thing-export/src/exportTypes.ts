@@ -139,9 +139,9 @@ export interface GlbExportInput {
   /** Also gives `voxelDetailGrain` to every part too thin for `voxelGrain`; see `glb.ts`, `partVoxelGrain`. */
   readonly voxelDetailThinParts?: boolean;
   /**
-   * Fills a part's drawn solids were already sampled into, one source per display item, so the voxels a caller read
-   * datums off are the ones the file meshes rather than a second sampling of the same solids; see `drawn.ts`,
-   * `DrawnGeometry`, `voxels`. A part without one is sampled here.
+   * Fills a part's voxelized solids (see `glb.ts`, `voxelizedSolids`) were already sampled into, one source per
+   * display item, so the voxels a caller read datums off are the ones the file meshes rather than a second sampling of
+   * the same solids; see `drawn.ts`, `DrawnGeometry`, `voxels`. A part without one is sampled here.
    */
   readonly drawnVoxels?: (part: string) => VoxelFill | undefined;
   /**

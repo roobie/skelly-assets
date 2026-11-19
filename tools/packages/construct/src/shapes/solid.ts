@@ -9,7 +9,7 @@ export interface Box {
   readonly half: Vec3;
 }
 
-/** Rendering-only hints ignored by collision and rule logic; omitted options retain the viewer's bevel and outline defaults. */
+/** How a solid is drawn, which collision ignores; omitted options retain the viewer's bevel and outline defaults. */
 export interface SolidDisplayHints {
   readonly bevel?: boolean;
   readonly outline?: boolean;

@@ -1,60 +1,56 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
-import type { Domain, PartDef } from '@skelly/construct/assembly/schema.ts';
+import type { Domain, PartDef, Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { expect, it } from 'vitest';
 import { drawnGeometry } from '../src/drawn.ts';
 import { exportGlb } from '../src/glb.ts';
 
 const GRAIN = 0.1;
 
-/** A voxel body with a smooth cap standing on its top face and a smooth prism hanging from its bottom face. */
-const host: PartDef = {
-  family: 'host',
-  ports: [],
-  keepOuts: [],
-  axes: [],
-  solids: [
-    { id: 'body', kind: 'box', box: { center: [0, 0, 0], half: [0.5, 0.5, 0.5] } },
-    {
-      id: 'cap',
-      kind: 'box',
-      box: { center: [0, 0.7, 0], half: [0.1, 0.2, 0.1] },
-      display: { smooth: { seat: [0, -1, 0] } },
-    },
-    {
-      id: 'hang',
-      kind: 'extruded-polygon',
-      profile: [
-        [-0.1, -0.9],
-        [0.1, -0.9],
-        [0.1, -0.5],
-        [-0.1, -0.5],
-      ],
-      z: [-0.1, 0.1],
-      display: { smooth: { seat: [0, 1, 0] } },
-    },
+const body: Solid = { id: 'body', kind: 'box', box: { center: [0, 0, 0], half: [0.5, 0.5, 0.5] } };
+/** Stands on the body's top face and reaches up to 0.93, off the grain, so its voxels could not keep its top. */
+const cap: Solid = {
+  id: 'cap',
+  kind: 'box',
+  box: { center: [0, 0.715, 0], half: [0.1, 0.215, 0.1] },
+  display: { smooth: { seat: [0, -1, 0] } },
+};
+/** Hangs from the body's bottom face. */
+const hang: Solid = {
+  id: 'hang',
+  kind: 'extruded-polygon',
+  profile: [
+    [-0.1, -0.9],
+    [0.1, -0.9],
+    [0.1, -0.5],
+    [-0.1, -0.5],
   ],
+  z: [-0.1, 0.1],
+  display: { smooth: { seat: [0, 1, 0] } },
 };
 
-const domain: Domain = {
-  name: 'fixture',
-  units: { metresPerUnit: 1, grid: 1, bevel: 0 },
-  axisRules: [],
-  families: { host: { name: 'host', params: {}, build: () => host } },
+/** A part built of `solids`, alone in its assembly. */
+const resolvedOf = (solids: readonly Solid[]): Resolved => {
+  const host: PartDef = { family: 'host', ports: [], keepOuts: [], axes: [], solids };
+  const domain: Domain = {
+    name: 'fixture',
+    units: { metresPerUnit: 1, grid: 1, bevel: 0 },
+    axisRules: [],
+    families: { host: { name: 'host', params: {}, build: () => host } },
+  };
+  return resolve({ name: 'fixture', root: 'host', parts: { host: { family: 'host' } }, connections: [] }, domain);
 };
 
-const resolved = resolve(
-  { name: 'fixture', root: 'host', parts: { host: { family: 'host' } }, connections: [] },
-  domain,
-);
+const resolved = resolvedOf([body, cap, hang]);
 
 type Primitive = {
   attributes: { POSITION: number };
   extras: { solid?: string; solids?: string[]; voxelGrain?: number };
 };
 
-const exported = (drawnVoxels?: ReturnType<typeof drawnGeometry>['voxels']) => {
+const exported = (of: Resolved = resolved, drawnVoxels?: ReturnType<typeof drawnGeometry>['voxels']) => {
   const result = exportGlb({
-    resolved,
+    resolved: of,
     voxelGrain: GRAIN,
     ...(drawnVoxels ? { drawnVoxels } : {}),
     asset: { id: 'fixture', file: 'assets/models/fixture.glb' },
@@ -96,15 +92,36 @@ it('seats each smooth piece one grain into its part through the face it stands o
   const { primitives, bounds } = exported();
   const pieceOf = (id: string) => bounds(primitives.find(({ extras }) => extras.solid === id)!);
   expect(pieceOf('cap').min[1]).toBeCloseTo(0.5 - GRAIN, 6);
-  expect(pieceOf('cap').max[1]).toBeCloseTo(0.9, 6);
+  expect(pieceOf('cap').max[1]).toBeCloseTo(0.93, 6);
   expect(pieceOf('hang').max[1]).toBeCloseTo(-0.5 + GRAIN, 6);
   expect(pieceOf('hang').min[1]).toBeCloseTo(-0.9, 6);
 });
 
 it('reads datums off the voxels the file draws, and a smooth piece off its authored solid', () => {
   const drawn = drawnGeometry(resolved, { voxelGrain: GRAIN });
-  expect(exported(drawn.voxels).primitives).toEqual(exported().primitives);
-  const cap = host.solids[1]!;
+  expect(exported(resolved, drawn.voxels).primitives).toEqual(exported().primitives);
   expectNear(drawn.measure('host', cap).min, [-0.1, 0.5, -0.1]);
-  expectNear(drawn.measure('host', cap).max, [0.1, 0.9, 0.1]);
+  expectNear(drawn.measure('host', cap).max, [0.1, 0.93, 0.1]);
+});
+
+it('refuses to seat a prism through a lone corner, which would draw a spike', () => {
+  const point: Solid = {
+    ...hang,
+    profile: [
+      [-0.1, -0.9],
+      [0.1, -0.9],
+      [0, -0.5],
+    ],
+  };
+  expect(() => exported(resolvedOf([body, point]))).toThrow(/hang has no face along \[0, 1, 0\]/);
+});
+
+it('refuses a solid that is both a smooth piece and voxel-only', () => {
+  const both: Solid = { ...cap, display: { smooth: {}, voxelOnly: true } };
+  expect(() => exported(resolvedOf([body, both]))).toThrow(/cap is both a smooth piece and voxel-only/);
+});
+
+it('refuses a merge group of smooth pieces and voxelized solids', () => {
+  const merged = (solid: Solid): Solid => ({ ...solid, display: { ...solid.display, mergeGroup: 'joined' } });
+  expect(() => exported(resolvedOf([merged(body), merged(cap)]))).toThrow(/joined mixes smooth pieces/);
 });
