@@ -432,7 +432,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     lengths: {
       '15': dim(calibration.lengthMm.value, 'sourced: https://www.jakt.se/anderson-am-15-utility-223-wylde-18-5rd'),
     },
-    railTopY: tracedY(79, 'handguardRail'),
+    railTopY: dim(railTopY.mm, "derived: flush with the upper's rail, so an optic may span the joint"),
     bottomY: tracedY(120, 'handguard'),
     wall: detailWall('an aluminium tube'),
     outerTopY: dim(
