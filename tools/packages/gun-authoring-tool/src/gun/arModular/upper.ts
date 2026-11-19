@@ -1,6 +1,6 @@
 import type { KeepOut, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
-import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { type ArFrame, type ArFrameTable, familyName, u } from './frame.ts';
@@ -30,12 +30,6 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
     const halfWidth = u(upper.halfWidth);
     const topY = u(upper.topY);
     const partingY = u(lower.partingY);
-    const body: Vec2[] = [
-      [u(upper.rearX), partingY],
-      [0, partingY],
-      [0, topY],
-      [u(upper.shoulderX), topY],
-    ];
     const rail = picatinnyRail(railTable, u(upper.rail.rearX), 0, topY, u(upper.rail.topY));
     const port = upper.ejectionPort;
     // A spent case leaves the port to the right; nothing may stand in its way.
@@ -50,7 +44,7 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
     return {
       family: 'receiver',
       solids: [
-        { id: 'receiver-body', kind: 'extruded-polygon', profile: body, z: [-halfWidth, halfWidth] },
+        box('receiver-body', [u(upper.rearX), partingY, -halfWidth], [0, topY, halfWidth]),
         ...rail.solids,
         rightSideBoss('forward-assist', upper.forwardAssist, halfWidth),
         rightSideBoss('brass-deflector', upper.brassDeflector, halfWidth),

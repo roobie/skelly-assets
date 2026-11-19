@@ -13,6 +13,7 @@ const lowerLayout = (L: LowerTable) => ({
   partingY: u(L.partingY),
   halfWidth: u(L.halfWidth),
   towerRearX: u(L.towerRearX),
+  towerFrontX: u(L.towerFrontX),
   bodyRearX: u(L.bodyRearX),
   bodyBottomY: u(L.bodyBottomY),
   well: {
@@ -48,7 +49,7 @@ const frameSolids = (L: LowerTable, at: LowerLayout): Solid[] => {
   const grip = at.gripMount;
   const floorY = bodyBottomY + bar;
   return [
-    box('tower', [at.towerRearX, u(L.towerBottomY), -towerHalf], [at.bodyRearX, u(L.towerTopY), towerHalf]),
+    box('tower', [at.towerRearX, u(L.towerBottomY), -towerHalf], [at.towerFrontX, u(L.towerTopY), towerHalf]),
     { id: 'body', kind: 'extruded-polygon', profile: body, z: [-halfWidth, halfWidth] },
     box('body-over-guard', [guardRearX, floorY, -halfWidth], [at.well.rearX, at.partingY, halfWidth]),
     box('body-over-guard-right', [guardRearX, bodyBottomY, guardHalf], [at.well.rearX, floorY, halfWidth]),

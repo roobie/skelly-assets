@@ -76,6 +76,9 @@ local bladeHang = [xOf(440), guardTopY];
 local breechSetback = profile.values.barrelMm.value - xOf(903);
 local tubeLength = 181;
 local tubeEndX = xOf(370) - tubeLength;
+// The close-up shows the upper's rear face upright where it meets the buffer tower; the profile's outline slants down
+// to the parting line only because the forward assist and its shadow hide that face.
+local upperRearX = dim(xOf(profile.values.upperRearXPx.value), traced('upperRearXPx'));
 local stockMount = [tubeEndX, 0];
 
 {
@@ -92,6 +95,7 @@ local stockMount = [tubeEndX, 0];
     pivotPinX: tracedX(532, 'pivotPin'),
     // The buffer tower the receiver extension threads into, and the body under the upper.
     towerRearX: tracedX(370, 'moduleReceiverExtensionToLower'),
+    towerFrontX: dim(upperRearX.mm, "derived: closed against the upper's rear face"),
     bodyRearX: tracedX(376, 'lowerReceiver'),
     towerBottomY: tracedY(132, 'lowerReceiver'),
     towerTopY: dim(tubeRadius + towerWall, 'derived: a %g mm wall over the receiver extension thread' % towerWall),
@@ -145,8 +149,7 @@ local stockMount = [tubeEndX, 0];
   },
 
   upper: {
-    rearX: tracedX(376, 'upperReceiver'),
-    shoulderX: tracedX(381, 'upperReceiver'),
+    rearX: upperRearX,
     topY: tracedY(88, 'upperReceiver'),
     halfWidth: dim(14.5, 'derived: wider than the rail it carries'),
     rail: {
