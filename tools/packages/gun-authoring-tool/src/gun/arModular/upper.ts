@@ -1,6 +1,7 @@
 import type { KeepOut, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { AR15, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
@@ -77,6 +78,11 @@ export const ar15Upper: PartFamily = {
       ],
       keepOuts: [ejection],
       axes: [],
+      tags: [VOXEL_DETAIL],
+      features: [
+        ...rail.features,
+        { name: 'brass-deflector', size: u(U.brassDeflector.stand), disposition: { kind: 'detail' } },
+      ],
     };
   },
 };

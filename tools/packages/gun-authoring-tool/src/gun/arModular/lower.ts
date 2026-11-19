@@ -1,6 +1,7 @@
 import type { KeepOut, PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { triggerBlade } from '../roundedTriggerGuard.ts';
 import { TRIGGER_BLADE } from '../triggerGuards.ts';
@@ -133,6 +134,11 @@ export const ar15Lower: PartFamily = {
       ports,
       keepOuts: [guard.finger, magazinePath],
       axes: [],
+      tags: [VOXEL_DETAIL],
+      features: [
+        { name: 'well-wall', size: u(L.well.wall), disposition: { kind: 'detail' } },
+        { name: 'trigger-guard-bar', size: u(L.triggerGuard.bar), disposition: { kind: 'detail' } },
+      ],
     };
   },
 };

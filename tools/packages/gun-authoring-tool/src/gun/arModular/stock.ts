@@ -1,4 +1,5 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_X, X, Y } from '../antiMateriel/common.ts';
 import { AR15, outlineU, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
@@ -82,6 +83,14 @@ export const ar15Stock: PartFamily = {
       ],
       keepOuts: [],
       axes: [],
+      tags: [VOXEL_DETAIL],
+      features: [
+        {
+          name: 'sleeve-wall',
+          size: Math.min(topY - bore, half - bore, -bore - bottomY),
+          disposition: { kind: 'detail' },
+        },
+      ],
     };
   },
 };

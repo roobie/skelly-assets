@@ -21,6 +21,11 @@ local tracedY(px, key) = dim(yOf(px), traced(key));
 local tracedOutline(pixels, mount, key) = outline([[xOf(p[0]) - mount[0], yOf(p[1]) - mount[1]] for p in pixels], traced(key));
 
 local picatinny = 'sourced: https://en.wikipedia.org/wiki/Picatinny_rail';
+// The parts with thin features export at the detail grain; the thinnest feature it carries evenly is this many mm. An
+// authored wall is drawn at least this thick, so the export never drops a voxel from one side of it.
+local grains = import 'models/voxel-grains.libsonnet';
+local detailFeature = grains.featureVoxels * grains.detailGrain * 1000;
+local detailWall(what) = dim(detailFeature, 'derived: ' + what + ' wall two detail voxels thick');
 local mounts = (import 'platforms.jsonnet').mounts;
 local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.outerDiameter;
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
@@ -37,7 +42,14 @@ local magazine = {
 };
 local wellClearance = 0.5;
 local wellFrontX = xOf(526);
-local wellInnerFrontX = wellFrontX - 3.1;
+local wellInnerFrontX = wellFrontX - detailFeature;
+local wellInnerRearX = wellInnerFrontX - magazine.depth - 2 * wellClearance;
+// The traced rear (467 px) leaves room for two walls of only 3.1 mm, so the rear wall stands past it.
+local wellRearX = wellInnerRearX - detailFeature;
+local gasBlockWall = 4;
+local journalRadius = journalDiameter.mm / 2;
+// The handguard tube clears the gas block by this much above it and at each side.
+local handguardClearance = { top: 2, side: 2.5 };
 // The grip seats level on the lower: its top is taken at the traced front corner, the 4 px rise behind it being tilt.
 local gripMount = [xOf(418), yOf(162)];
 local guardTopY = yOf(145);
@@ -53,6 +65,7 @@ local stockMount = [tubeEndX, 0];
     pitch: dim(10.01, picatinny),
     slotWidth: dim(5.23, picatinny),
     slotDepth: dim(3.0, picatinny),
+    drawnSlotDepth: dim(detailFeature, 'derived: the slot depth exaggerated to two detail voxels, so every slot cuts evenly'),
     topWidth: dim(21.21, 'sourced: https://www.shootingillustrated.com/content/is-your-rail-truly-mil-spec'),
   },
 
@@ -70,13 +83,14 @@ local stockMount = [tubeEndX, 0];
     well: {
       clearance: dim(wellClearance, 'derived: a sliding fit around the magazine body'),
       frontX: dim(wellFrontX, traced('lowerReceiver')),
-      innerFrontX: dim(wellInnerFrontX, 'derived: a 3.1 mm front wall'),
-      rearX: tracedX(467, 'lowerReceiver'),
-      innerRearX: dim(wellInnerFrontX - magazine.depth - 2 * wellClearance, 'derived: the magazine body depth and 0.5 mm clearance each side'),
+      wall: detailWall('a well'),
+      innerFrontX: dim(wellInnerFrontX, 'derived: the front wall behind the traced front'),
+      rearX: dim(wellRearX, 'derived: the rear wall behind the magazine body'),
+      innerRearX: dim(wellInnerRearX, 'derived: the magazine body depth and 0.5 mm clearance each side'),
       frontBottomY: tracedY(160, 'lowerReceiver'),
       rearBottomY: tracedY(170, 'moduleMagazineWell'),
       innerHalfWidth: dim(magazine.width / 2 + wellClearance, 'derived: the magazine body width and 0.5 mm clearance each side'),
-      outerHalfWidth: dim(magazine.width / 2 + wellClearance + 3, 'derived: a 3 mm side wall'),
+      outerHalfWidth: dim(magazine.width / 2 + wellClearance + detailFeature, 'derived: the side wall outside the clearance'),
     },
     magazineSeat: {
       x: dim(wellInnerFrontX - wellClearance - magazine.depth / 2, 'derived: the magazine body centred in the well'),
@@ -84,7 +98,7 @@ local stockMount = [tubeEndX, 0];
     },
     triggerGuard: {
       rearX: dim(gripMount[0], 'derived: closed against the traced grip front'),
-      frontX: tracedX(467, 'triggerGuard'),
+      frontX: dim(wellRearX, 'derived: closed against the magazine well rear wall'),
       bottomY: tracedY(170, 'triggerGuard'),
       topY: dim(guardTopY, traced('lowerReceiver')),
       bar: dim(4.5, 'derived: a forged guard bar'),
@@ -144,9 +158,9 @@ local stockMount = [tubeEndX, 0];
   },
 
   gasBlock: {
-    journalRadius: dim(journalDiameter.mm / 2, 'derived: the ar-journal-750 journal the block clamps'),
+    journalRadius: dim(journalRadius, 'derived: the ar-journal-750 journal the block clamps'),
     length: dim(22, 'derived: a low-profile block about as long as its two set screws need'),
-    wall: dim(4, 'derived: a steel wall around the journal, room for the set screws'),
+    wall: dim(gasBlockWall, 'derived: a steel wall around the journal, room for the set screws'),
   },
 
   handguard: {
@@ -155,9 +169,15 @@ local stockMount = [tubeEndX, 0];
     },
     railTopY: tracedY(79, 'handguardRail'),
     bottomY: tracedY(120, 'handguard'),
-    wall: dim(3, 'derived: an aluminium tube wall'),
-    outerTopY: dim(18.5, 'derived: the inner top 2 mm over the gas block'),
-    halfWidth: dim(19, 'derived: the inner side 2.5 mm out from the gas block'),
+    wall: detailWall('an aluminium tube'),
+    outerTopY: dim(
+      journalRadius + gasBlockWall + handguardClearance.top + detailFeature,
+      'derived: the inner top %g mm over the gas block' % handguardClearance.top,
+    ),
+    halfWidth: dim(
+      journalRadius + gasBlockWall + handguardClearance.side + detailFeature,
+      'derived: the inner side %g mm out from the gas block' % handguardClearance.side,
+    ),
     skirt: outline(
       [[xOf(538), yOf(124)], [xOf(545), yOf(127)], [xOf(580), yOf(127)], [xOf(580), yOf(120)], [xOf(538), yOf(120)]],
       traced('handguard'),

@@ -1,4 +1,5 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, Y } from '../antiMateriel/common.ts';
 import { AR15, outlineU, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
@@ -41,6 +42,8 @@ export const ar15Handguard: PartFamily = {
       ],
       keepOuts: [],
       axes: [],
+      tags: [VOXEL_DETAIL],
+      features: [...rail.features, { name: 'tube-wall', size: wall, disposition: { kind: 'detail' } }],
     };
   },
 };

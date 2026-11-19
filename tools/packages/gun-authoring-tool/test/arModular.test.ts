@@ -1,10 +1,12 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
+import { validate } from '@skelly/construct/assembly/validate.ts';
 import { distanceWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { AR15, u } from '../src/gun/arModular/frame.ts';
+import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { loadDesignAssembly } from './helpers.ts';
 
@@ -26,6 +28,25 @@ describe('modular AR', () => {
       expect(massKg, id).toBe(mass.kg);
       expect(mass.source, id).toMatch(/^(sourced|derived): /);
     }
+  });
+
+  it('carries its thin features only at the detail grain', () => {
+    const coarse: typeof gunDomain = {
+      ...gunDomain,
+      families: Object.fromEntries(
+        Object.entries(gunDomain.families).map(([name, family]) => [
+          name,
+          Object.hasOwn(AR_MODULAR_FAMILIES, name)
+            ? { ...family, build: (params) => ({ ...family.build(params), tags: [] }) }
+            : family,
+        ]),
+      ),
+    };
+    expect(validate(loadDesignAssembly('ar15-carbine-free-float'), gunDomain).issues).toEqual([]);
+    const issues = validate(loadDesignAssembly('ar15-carbine-free-float'), coarse).issues;
+    expect(new Set(issues.filter(({ rule }) => rule === 'min-feature').flatMap(({ parts }) => parts))).toEqual(
+      new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock']),
+    );
   });
 
   it('seats the STANAG magazine in its well without touching the walls', () => {

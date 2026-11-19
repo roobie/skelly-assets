@@ -1,4 +1,5 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
+import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { AR15, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
@@ -69,6 +70,8 @@ export const ar15GasBlock: PartFamily = {
       ],
       keepOuts: [],
       axes: [],
+      tags: [VOXEL_DETAIL],
+      features: [{ name: 'wall', size: wall, disposition: { kind: 'detail' } }],
     };
   },
 };
