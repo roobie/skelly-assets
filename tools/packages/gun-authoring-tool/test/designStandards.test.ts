@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DESIGNS } from '../src/cli/content.ts';
 import { designTextProblem } from '../src/cli/designCheck.ts';
+import { gunDomain } from '../src/gun/domain.ts';
 import { GUN_PLATFORMS } from '../src/gun/platforms.ts';
 
 const design = (name: string) => JSON.parse(readFileSync(join(DESIGNS, `${name}.json`), 'utf8'));
@@ -16,10 +17,21 @@ describe('the publish check on a design whose ports declare standards', () => {
     expect(problem).toContain('Standard mismatch: barrel.muzzle is smoothbore but suppressor.base is rifled');
   });
 
-  it('passes a STANAG magazine in a well that reshapes to its magazine, which accepts every standard', () => {
+  it('cuts a well that reshapes to its magazine for that magazine standard, or none for a magazine of none', () => {
+    const wellStandard = (magazineProfile: string) =>
+      gunDomain.families
+        .lower!.build({ layout: 'conventional', magazineWell: 'recessed', magazineProfile })
+        .ports.find((port) => port.id === 'magazine')?.standard;
+    expect(wellStandard('stanag-curved')).toBe('ar15-magazine');
+    expect(wellStandard('ak-curved')).toBeUndefined();
+  });
+
+  it('fails a STANAG magazine in a fixed well sized by no magazine, which is cut for no standard', () => {
     const rifle = design('archetype-battle-rifle');
     rifle.assembly.parts.magazine.params = { ...rifle.assembly.parts.magazine.params, profile: 'stanag-curved' };
-    expect(designTextProblem(JSON.stringify(rifle)).problem).toBeUndefined();
+    expect(designTextProblem(JSON.stringify(rifle)).problem).toContain(
+      'Standard mismatch: lower.magazine is unstated but magazine.top is ar15-magazine.',
+    );
   });
 
   it('fails a magazine of another family in the large AR frame well, which is cut for SR-25 magazines', () => {
