@@ -1,25 +1,25 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { AR15, u } from './frame.ts';
+import { type ArFrame, chosen, familyName, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
 
 /**
- * The AR-15 barrel, by its length and gas system. Only the part ahead of the upper is built: the chamber and barrel
+ * The barrel, by its length and gas system. Only the part ahead of the upper is built: the chamber and barrel
  * extension sit inside the upper, so they never show. Lengths and the gas port are measured from the bolt face, which
  * lies the breech setback behind the upper's front face.
  */
-export const ar15Barrel: PartFamily = {
-  name: 'ar15-barrel',
-  params: { length: choice(...Object.keys(AR15.barrel.lengths)) },
+export const arBarrel = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'barrel'),
+  params: { length: choice(...Object.keys(frame.table.barrel.lengths)) },
   build(params): PartDef {
-    const choiceOf = AR15.barrel.lengths[params.length as keyof typeof AR15.barrel.lengths];
-    const setback = u(AR15.barrel.breechSetback);
+    const { barrel, gasBlock } = frame.table;
+    const choiceOf = chosen(barrel.lengths, params.length);
+    const setback = u(barrel.breechSetback);
     const muzzleX = u(choiceOf.length) - setback;
-    const journalRadius = u(AR15.gasBlock.journalRadius);
     return {
       family: 'barrel',
-      solids: [roundBar('barrel', 0, muzzleX, u(AR15.barrel.radius))],
+      solids: [roundBar('barrel', 0, muzzleX, u(barrel.radius))],
       ports: [
         { id: 'rear', mount: 'barrel', gender: 'male', pos: [0, 0, 0], normal: NEG_X, up: Y, required: true },
         {
@@ -27,7 +27,7 @@ export const ar15Barrel: PartFamily = {
           mount: 'gas-block',
           standard: 'ar-journal-750',
           gender: 'female',
-          pos: [u(choiceOf.gasPort) - setback, journalRadius, 0],
+          pos: [u(choiceOf.gasPort) - setback, u(gasBlock.journalRadius), 0],
           normal: Y,
           up: X,
         },
@@ -37,16 +37,17 @@ export const ar15Barrel: PartFamily = {
       axes: [{ kind: 'bore', origin: [0, 0, 0], dir: X }],
     };
   },
-};
+});
 
 /** A low-profile gas block clamped on the barrel's journal over the gas port; its frame sits on top of the journal. */
-export const ar15GasBlock: PartFamily = {
-  name: 'ar15-gas-block',
+export const arGasBlock = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'gas-block'),
   params: {},
   build(): PartDef {
-    const radius = u(AR15.gasBlock.journalRadius);
-    const wall = u(AR15.gasBlock.wall);
-    const half = u(AR15.gasBlock.length) / 2;
+    const { gasBlock } = frame.table;
+    const radius = u(gasBlock.journalRadius);
+    const wall = u(gasBlock.wall);
+    const half = u(gasBlock.length) / 2;
     const outer = radius + wall;
     return {
       family: 'gas-block',
@@ -74,17 +75,18 @@ export const ar15GasBlock: PartFamily = {
       features: [{ name: 'wall', size: wall, disposition: { kind: 'detail' } }],
     };
   },
-};
+});
 
 /** The A2 birdcage flash hider, threaded on the muzzle; the gun's muzzle moves to its front. */
-export const ar15FlashHider: PartFamily = {
-  name: 'ar15-flash-hider',
+export const arFlashHider = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'flash-hider'),
   params: {},
   build(): PartDef {
-    const length = u(AR15.flashHider.length);
+    const { flashHider } = frame.table;
+    const length = u(flashHider.length);
     return {
       family: 'muzzle-device',
-      solids: [roundBar('body', 0, length, u(AR15.flashHider.radius))],
+      solids: [roundBar('body', 0, length, u(flashHider.radius))],
       ports: [
         {
           id: 'base',
@@ -102,4 +104,4 @@ export const ar15FlashHider: PartFamily = {
       axes: [{ kind: 'bore', origin: [0, 0, 0], dir: X }],
     };
   },
-};
+});

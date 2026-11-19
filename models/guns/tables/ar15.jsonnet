@@ -31,6 +31,7 @@ local mounts = (import 'platforms.jsonnet').mounts;
 local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.outerDiameter;
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
 local tubeRadius = tubeOuterDiameter.mm / 2;
+local towerWall = 3;
 
 // The parting line is built level at the mean of its traced ends, since the forging's parting line runs parallel to the
 // bore; its 3 px fall across the receiver is read as trace error, as the rail line above it falls only 2 px over three
@@ -79,7 +80,8 @@ local stockMount = [tubeEndX, 0];
     towerRearX: tracedX(370, 'moduleReceiverExtensionToLower'),
     bodyRearX: tracedX(376, 'lowerReceiver'),
     towerBottomY: tracedY(132, 'lowerReceiver'),
-    towerTopY: dim(tubeRadius + 3, 'derived: a 3 mm wall over the receiver extension thread'),
+    towerTopY: dim(tubeRadius + towerWall, 'derived: a %g mm wall over the receiver extension thread' % towerWall),
+    towerHalfWidth: dim(tubeRadius + towerWall, 'derived: a %g mm wall beside the receiver extension thread' % towerWall),
     bodyChamferX: tracedX(380, 'lowerReceiver'),
     bodyBottomY: tracedY(145, 'lowerReceiver'),
     halfWidth: dim(11, 'derived: narrower than the magazine well, as on the forging'),

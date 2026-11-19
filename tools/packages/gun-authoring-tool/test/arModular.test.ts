@@ -5,12 +5,13 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { distanceWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { AR15, u } from '../src/gun/arModular/frame.ts';
+import { AR15_FRAME, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { loadDesignAssembly } from './helpers.ts';
 
 const FOLDER = join(import.meta.dirname, '../src/gun/arModular');
+const AR15 = AR15_FRAME.table;
 
 describe('modular AR', () => {
   it('imports nothing from the first AR', () => {
@@ -24,9 +25,9 @@ describe('modular AR', () => {
     const items = catalogue.parts.filter((entry) => entry.id.startsWith('ar15_'));
     expect(items.map(({ id }) => id).sort()).toEqual(Object.keys(AR15.masses).sort());
     for (const { id, massKg } of items) {
-      const mass = AR15.masses[id as keyof typeof AR15.masses];
-      expect(massKg, id).toBe(mass.kg);
-      expect(mass.source, id).toMatch(/^(sourced|derived): /);
+      const mass = AR15.masses[id];
+      expect(massKg, id).toBe(mass?.kg);
+      expect(mass?.source, id).toMatch(/^(sourced|derived): /);
     }
   });
 

@@ -5,64 +5,70 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { triggerBlade } from '../roundedTriggerGuard.ts';
 import { TRIGGER_BLADE } from '../triggerGuards.ts';
-import { AR15, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, familyName, u } from './frame.ts';
 
-const L = AR15.lower;
-const PARTING_Y = u(L.partingY);
-const HALF_WIDTH = u(L.halfWidth);
-const TOWER_REAR_X = u(L.towerRearX);
-const BODY_REAR_X = u(L.bodyRearX);
-const BODY_BOTTOM_Y = u(L.bodyBottomY);
-const WELL = {
-  frontX: u(L.well.frontX),
-  innerFrontX: u(L.well.innerFrontX),
-  rearX: u(L.well.rearX),
-  innerRearX: u(L.well.innerRearX),
-  frontBottomY: u(L.well.frontBottomY),
-  rearBottomY: u(L.well.rearBottomY),
-  innerHalfWidth: u(L.well.innerHalfWidth),
-  outerHalfWidth: u(L.well.outerHalfWidth),
-};
-const GRIP_MOUNT = { x: u(L.gripMount.x), y: u(L.gripMount.y), bossRearX: u(L.gripMount.bossRearX) };
+type LowerTable = ArFrameTable['lower'];
+
+/** The lower's outline in u: where its body, well and grip boss stand. */
+const lowerLayout = (L: LowerTable) => ({
+  partingY: u(L.partingY),
+  halfWidth: u(L.halfWidth),
+  towerRearX: u(L.towerRearX),
+  bodyRearX: u(L.bodyRearX),
+  bodyBottomY: u(L.bodyBottomY),
+  well: {
+    frontX: u(L.well.frontX),
+    innerFrontX: u(L.well.innerFrontX),
+    rearX: u(L.well.rearX),
+    innerRearX: u(L.well.innerRearX),
+    frontBottomY: u(L.well.frontBottomY),
+    rearBottomY: u(L.well.rearBottomY),
+    innerHalfWidth: u(L.well.innerHalfWidth),
+    outerHalfWidth: u(L.well.outerHalfWidth),
+  },
+  gripMount: { x: u(L.gripMount.x), y: u(L.gripMount.y), bossRearX: u(L.gripMount.bossRearX) },
+});
+type LowerLayout = ReturnType<typeof lowerLayout>;
 
 /** The buffer tower and the body behind the magazine well, under the upper's parting line. */
-const frameSolids = (): Solid[] => {
-  const towerHalf = u(L.towerTopY);
+const frameSolids = (L: LowerTable, at: LowerLayout): Solid[] => {
+  const towerHalf = u(L.towerHalfWidth);
   const body: Vec2[] = [
-    [BODY_REAR_X, u(L.towerBottomY)],
-    [u(L.bodyChamferX), BODY_BOTTOM_Y],
-    [WELL.rearX, BODY_BOTTOM_Y],
-    [WELL.rearX, PARTING_Y],
-    [BODY_REAR_X, PARTING_Y],
+    [at.bodyRearX, u(L.towerBottomY)],
+    [u(L.bodyChamferX), at.bodyBottomY],
+    [at.well.rearX, at.bodyBottomY],
+    [at.well.rearX, at.partingY],
+    [at.bodyRearX, at.partingY],
   ];
+  const grip = at.gripMount;
   return [
-    box('tower', [TOWER_REAR_X, u(L.towerBottomY), -towerHalf], [BODY_REAR_X, towerHalf, towerHalf]),
-    { id: 'body', kind: 'extruded-polygon', profile: body, z: [-HALF_WIDTH, HALF_WIDTH] },
+    box('tower', [at.towerRearX, u(L.towerBottomY), -towerHalf], [at.bodyRearX, u(L.towerTopY), towerHalf]),
+    { id: 'body', kind: 'extruded-polygon', profile: body, z: [-at.halfWidth, at.halfWidth] },
     // The grip screws into this boss, level with the grip's top.
-    box('grip-boss', [GRIP_MOUNT.bossRearX, GRIP_MOUNT.y, -HALF_WIDTH], [GRIP_MOUNT.x, BODY_BOTTOM_Y, HALF_WIDTH]),
+    box('grip-boss', [grip.bossRearX, grip.y, -at.halfWidth], [grip.x, at.bodyBottomY, at.halfWidth]),
   ];
 };
 
 /** The well's walls: its flared mouth falls from the rear wall to the front, as the forging's does. */
-const wellSolids = (): Solid[] => {
+const wellSolids = (at: LowerLayout): Solid[] => {
+  const { well, partingY } = at;
   const side: Vec2[] = [
-    [WELL.rearX, WELL.rearBottomY],
-    [WELL.frontX, WELL.frontBottomY],
-    [WELL.frontX, PARTING_Y],
-    [WELL.rearX, PARTING_Y],
+    [well.rearX, well.rearBottomY],
+    [well.frontX, well.frontBottomY],
+    [well.frontX, partingY],
+    [well.rearX, partingY],
   ];
-  const { innerHalfWidth: inner, outerHalfWidth: outer } = WELL;
+  const { innerHalfWidth: inner, outerHalfWidth: outer } = well;
   return [
-    box('well-rear', [WELL.rearX, WELL.rearBottomY, -inner], [WELL.innerRearX, PARTING_Y, inner]),
-    box('well-front', [WELL.innerFrontX, WELL.frontBottomY, -inner], [WELL.frontX, PARTING_Y, inner]),
+    box('well-rear', [well.rearX, well.rearBottomY, -inner], [well.innerRearX, partingY, inner]),
+    box('well-front', [well.innerFrontX, well.frontBottomY, -inner], [well.frontX, partingY, inner]),
     { id: 'well-right', kind: 'extruded-polygon', profile: side, z: [inner, outer] },
     { id: 'well-left', kind: 'extruded-polygon', profile: side, z: [-outer, -inner] },
   ];
 };
 
 /** The finger's room inside the guard, and the four bars around it in the shape `trigger-guard` (gun/rules.ts) measures. */
-const triggerGuard = (): { readonly finger: KeepOut; readonly solids: Solid[] } => {
-  const g = L.triggerGuard;
+const triggerGuard = (g: LowerTable['triggerGuard']): { readonly finger: KeepOut; readonly solids: Solid[] } => {
   const [rearX, frontX, bottomY, topY] = [u(g.rearX), u(g.frontX), u(g.bottomY), u(g.topY)];
   const [bar, clearance, half, fingerHalf] = [u(g.bar), u(g.fingerClearance), u(g.halfWidth), u(g.fingerHalfWidth)];
   const finger: KeepOut = {
@@ -87,27 +93,36 @@ const triggerGuard = (): { readonly finger: KeepOut; readonly solids: Solid[] } 
 };
 
 /**
- * The AR-15 lower receiver, the root every other module hangs from: the buffer tower the receiver extension threads
- * into, the magazine well, the trigger guard and the grip boss. Its frame is the gun's.
+ * The lower receiver, the root every other module hangs from: the buffer tower the receiver extension threads into,
+ * the magazine well, the trigger guard and the grip boss. Its frame is the gun's.
  */
-export const ar15Lower: PartFamily = {
-  name: 'ar15-lower',
+export const arLower = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'lower'),
   params: {},
   build(): PartDef {
-    const guard = triggerGuard();
+    const L = frame.table.lower;
+    const at = lowerLayout(L);
+    const guard = triggerGuard(L.triggerGuard);
     const seat = { x: u(L.magazineSeat.x), y: u(L.magazineSeat.y) };
     const ports: PortDef[] = [
-      { id: 'ar-upper', mount: 'ar-upper', gender: 'female', pos: [u(L.pivotPinX), PARTING_Y, 0], normal: Y, up: X },
+      { id: 'ar-upper', mount: 'ar-upper', gender: 'female', pos: [u(L.pivotPinX), at.partingY, 0], normal: Y, up: X },
       {
         id: 'receiver-extension',
         mount: 'receiver-extension',
         standard: 'ar-tube-thread',
         gender: 'female',
-        pos: [TOWER_REAR_X, 0, 0],
+        pos: [at.towerRearX, 0, 0],
         normal: NEG_X,
         up: Y,
       },
-      { id: 'grip', mount: 'grip', gender: 'female', pos: [GRIP_MOUNT.x, GRIP_MOUNT.y, 0], normal: NEG_Y, up: X },
+      {
+        id: 'grip',
+        mount: 'grip',
+        gender: 'female',
+        pos: [at.gripMount.x, at.gripMount.y, 0],
+        normal: NEG_Y,
+        up: X,
+      },
       {
         id: 'magazine',
         mount: 'magazine',
@@ -123,14 +138,14 @@ export const ar15Lower: PartFamily = {
       id: 'magazine-path',
       kind: 'magazine-path',
       box: boxFromMinMax(
-        [WELL.innerRearX, WELL.rearBottomY, -WELL.innerHalfWidth],
-        [WELL.innerFrontX, PARTING_Y, WELL.innerHalfWidth],
+        [at.well.innerRearX, at.well.rearBottomY, -at.well.innerHalfWidth],
+        [at.well.innerFrontX, at.partingY, at.well.innerHalfWidth],
       ),
       allowPort: 'magazine',
     };
     return {
       family: 'lower',
-      solids: [...frameSolids(), ...wellSolids(), ...guard.solids],
+      solids: [...frameSolids(L, at), ...wellSolids(at), ...guard.solids],
       ports,
       keepOuts: [guard.finger, magazinePath],
       axes: [],
@@ -141,4 +156,4 @@ export const ar15Lower: PartFamily = {
       ],
     };
   },
-};
+});

@@ -1,18 +1,18 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_X, X, Y } from '../antiMateriel/common.ts';
-import { AR15, outlineU, u } from './frame.ts';
+import { type ArFrame, familyName, outlineU, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
 
 /**
  * The carbine receiver extension: the buffer tube threaded into the lower's tower and locked by its castle nut. Its
  * frame is the tower's rear face, and it runs back from there on the bore line.
  */
-export const ar15ReceiverExtension: PartFamily = {
-  name: 'ar15-receiver-extension',
+export const arReceiverExtension = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'receiver-extension'),
   params: {},
   build(): PartDef {
-    const tube = AR15.receiverExtension;
+    const tube = frame.table.receiverExtension;
     const length = u(tube.length);
     return {
       family: 'receiver-extension',
@@ -45,19 +45,19 @@ export const ar15ReceiverExtension: PartFamily = {
       axes: [],
     };
   },
-};
+});
 
 /**
  * The collapsible carbine stock at its traced position on the tube. Its frame is the tube's end: the body's rear block
  * closes behind it, four walls wrap the tube ahead of it with a sliding fit, and the toe hangs under both.
  */
-export const ar15Stock: PartFamily = {
-  name: 'ar15-stock',
+export const arStock = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'stock'),
   params: {},
   build(): PartDef {
-    const s = AR15.stock;
+    const s = frame.table.stock;
     const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
-    const bore = u(AR15.receiverExtension.radius) + u(s.tubeClearance);
+    const bore = u(frame.table.receiverExtension.radius) + u(s.tubeClearance);
     const toeHalf = u(s.toeHalfWidth);
     return {
       family: 'stock',
@@ -93,4 +93,4 @@ export const ar15Stock: PartFamily = {
       ],
     };
   },
-};
+});

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "template": "ar-modular",
+  "template": "ar15-modular",
   "platform": { "id": "ar", "sizeClass": "ar-15" },
   "calibre": "5.56x45",
   "assembly": {

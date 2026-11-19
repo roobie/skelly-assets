@@ -3,71 +3,64 @@ import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { AR15, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, familyName, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
 
-const U = AR15.upper;
-const HALF_WIDTH = u(U.halfWidth);
-const TOP_Y = u(U.topY);
+/** A housing's traced side outline and how far it stands out of the receiver's side. */
+type SideOutline = ArFrameTable['upper']['forwardAssist'];
 
-type Mm = { readonly mm: number };
-interface SideOutline {
-  readonly rearX: Mm;
-  readonly frontX: Mm;
-  readonly bottomY: Mm;
-  readonly topY: Mm;
-  readonly stand: Mm;
-}
-
-/** A housing standing out of the right side of the receiver, by its traced side outline. */
-const rightSideBoss = (id: string, outline: SideOutline): Solid =>
+/** A housing standing out of the right side of the receiver, whose side is `halfWidth` off the bore. */
+const rightSideBoss = (id: string, outline: SideOutline, halfWidth: number): Solid =>
   box(
     id,
-    [u(outline.rearX), u(outline.bottomY), HALF_WIDTH],
-    [u(outline.frontX), u(outline.topY), HALF_WIDTH + u(outline.stand)],
+    [u(outline.rearX), u(outline.bottomY), halfWidth],
+    [u(outline.frontX), u(outline.topY), halfWidth + u(outline.stand)],
   );
 
 /**
- * The flat-top AR-15 upper receiver: the body over the lower, its top rail, the forward assist and brass deflector on
- * the right, and the ejection port between them. Its frame is the gun's; the barrel and the handguard's barrel nut
- * meet it at its front face, on the bore.
+ * The flat-top upper receiver: the body over the lower, its top rail, the forward assist and brass deflector on the
+ * right, and the ejection port between them. Its frame is the gun's; the barrel and the handguard's barrel nut meet it
+ * at its front face, on the bore.
  */
-export const ar15Upper: PartFamily = {
-  name: 'ar15-upper',
+export const arUpper = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'upper'),
   params: {},
   build(): PartDef {
-    const partingY = u(AR15.lower.partingY);
+    const { upper, lower, rail: railTable } = frame.table;
+    const halfWidth = u(upper.halfWidth);
+    const topY = u(upper.topY);
+    const partingY = u(lower.partingY);
     const body: Vec2[] = [
-      [u(U.rearX), partingY],
+      [u(upper.rearX), partingY],
       [0, partingY],
-      [0, TOP_Y],
-      [u(U.shoulderX), TOP_Y],
+      [0, topY],
+      [u(upper.shoulderX), topY],
     ];
-    const rail = picatinnyRail(u(U.rail.rearX), 0, TOP_Y, u(U.rail.topY));
-    const port = U.ejectionPort;
+    const rail = picatinnyRail(railTable, u(upper.rail.rearX), 0, topY, u(upper.rail.topY));
+    const port = upper.ejectionPort;
     // A spent case leaves the port to the right; nothing may stand in its way.
     const ejection: KeepOut = {
       id: 'ejection',
       kind: 'ejection',
       box: boxFromMinMax(
-        [u(port.rearX), u(port.bottomY), HALF_WIDTH],
-        [u(port.frontX), u(port.topY), HALF_WIDTH + u(port.lane)],
+        [u(port.rearX), u(port.bottomY), halfWidth],
+        [u(port.frontX), u(port.topY), halfWidth + u(port.lane)],
       ),
     };
     return {
       family: 'receiver',
       solids: [
-        { id: 'receiver-body', kind: 'extruded-polygon', profile: body, z: [-HALF_WIDTH, HALF_WIDTH] },
+        { id: 'receiver-body', kind: 'extruded-polygon', profile: body, z: [-halfWidth, halfWidth] },
         ...rail.solids,
-        rightSideBoss('forward-assist', U.forwardAssist),
-        rightSideBoss('brass-deflector', U.brassDeflector),
+        rightSideBoss('forward-assist', upper.forwardAssist, halfWidth),
+        rightSideBoss('brass-deflector', upper.brassDeflector, halfWidth),
       ],
       ports: [
         {
           id: 'ar-upper',
           mount: 'ar-upper',
           gender: 'male',
-          pos: [u(AR15.lower.pivotPinX), partingY, 0],
+          pos: [u(lower.pivotPinX), partingY, 0],
           normal: NEG_Y,
           up: X,
           required: true,
@@ -81,8 +74,8 @@ export const ar15Upper: PartFamily = {
       tags: [VOXEL_DETAIL],
       features: [
         ...rail.features,
-        { name: 'brass-deflector', size: u(U.brassDeflector.stand), disposition: { kind: 'detail' } },
+        { name: 'brass-deflector', size: u(upper.brassDeflector.stand), disposition: { kind: 'detail' } },
       ],
     };
   },
-};
+});

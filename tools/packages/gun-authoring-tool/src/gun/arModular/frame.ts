@@ -1,9 +1,9 @@
-// The AR-15 frame table (models/guns/tables/ar15.jsonnet) in the units the parts are built in. The table is checked
-// once at load, so a number without a source is a build error rather than a quiet guess.
+// The frame tables of the modular AR family (models/guns/tables/<frame>.jsonnet) in the units the parts are built in.
+// A table is checked once at load, so a number without a source is a build error rather than a quiet guess.
 
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { array, gtValue, minLength, number, parse, pipe, strictObject, tuple, union } from 'valibot';
-import table from '../../../../../../models/guns/tables/ar15.json' with { type: 'json' };
+import ar15Table from '../../../../../../models/guns/tables/ar15.json' with { type: 'json' };
 import { SourceSchema } from '../platforms.ts';
 import { mmToU } from '../units.ts';
 
@@ -27,12 +27,47 @@ const checkMeasured = (node: unknown, path: string): void => {
   }
 };
 
-const checked = <T>(raw: T): T => {
-  checkMeasured(raw, 'ar15');
+/** A table as loaded, checked that every leaf is sourced; `name` heads the path a failure reports. */
+const checkFrameTable = <T>(name: string, raw: T): T => {
+  checkMeasured(raw, name);
   return raw;
 };
 
-export const AR15 = checked(table);
+type Ar15Table = typeof ar15Table;
+
+/**
+ * The shape every frame table shares, read off the AR-15's: the same groups and measurements, with the named choices
+ * (barrel lengths, handguard lengths) and the item masses left open to each frame.
+ */
+export type ArFrameTable = Omit<Ar15Table, 'barrel' | 'handguard' | 'masses'> & {
+  readonly barrel: Omit<Ar15Table['barrel'], 'lengths'> & {
+    readonly lengths: Readonly<Record<string, Ar15Table['barrel']['lengths']['16-mid']>>;
+  };
+  readonly handguard: Omit<Ar15Table['handguard'], 'lengths'> & {
+    readonly lengths: Readonly<Record<string, Ar15Table['handguard']['lengths']['15']>>;
+  };
+  readonly masses: Readonly<Record<string, Ar15Table['masses']['ar15_lower']>>;
+};
+
+/** A frame of the family: its table, and the name its families and template are registered under. */
+export interface ArFrame {
+  readonly name: string;
+  readonly table: ArFrameTable;
+}
+
+export const AR15_FRAME: ArFrame = { name: 'ar15', table: checkFrameTable('ar15', ar15Table) };
+
+/** The registry name of a frame's family for one role, such as `ar15-lower`. */
+export const familyName = (frame: ArFrame, role: string): string => `${frame.name}-${role}`;
+
+/** The named choice `key` of a frame's choices, which the family's params only ever offer from the same keys. */
+export const chosen = <T>(choices: Readonly<Record<string, T>>, key: string | undefined): T => {
+  const value = key === undefined ? undefined : choices[key];
+  if (value === undefined) {
+    throw new Error(`no choice '${key}' among ${Object.keys(choices).join(', ')}`);
+  }
+  return value;
+};
 
 /** A length or position of the table in u. */
 export const u = (dimension: { readonly mm: number }): number => mmToU(dimension.mm);

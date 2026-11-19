@@ -14,7 +14,7 @@ import {
   AR_MAGAZINE_PROFILE_BY_CALIBRE,
   AR_MAGAZINE_PROFILES,
 } from './arFrames.ts';
-import { arModular } from './arModular/index.ts';
+import { AR_MODULAR_TEMPLATES } from './arModular/index.ts';
 import type { OpticTypeId } from './optics.ts';
 
 const sightMix = (...weights: readonly (readonly [OpticTypeId, number])[]): readonly OpticTypeId[] =>
@@ -702,5 +702,5 @@ export const TEMPLATES: readonly Template[] = [
   boltRifleThumbhole,
   pumpShotgun,
   antiMateriel,
-  arModular,
+  ...AR_MODULAR_TEMPLATES,
 ];
