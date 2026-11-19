@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'cab_over_field_car.spec.libsonnet';
 local box = k.box;
@@ -201,7 +201,7 @@ local windscreenHigh = s.screenHigh;
 local screenSection(name, slot, low, high, z) = section(name, slot, plus(frontLine, -0.03), frontLine, low, high, z);
 local spring(i, reach, y) = box('leaf_' + i, 'steel', [-reach, y, s.springZ - 0.035], [reach, y + 0.02, s.springZ + 0.035]);
 
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   part('_wheel', 'wheel', s.mass.wheel, tyrePieces, wheelFinish, { hub: ['rim', [0.5, 0.5, 0.5]] }),
   part('_spare_wheel', 'spare wheel', s.mass.spare, [
     box('bracket', 'boss', [-s.voxel, -0.12, -0.12], [0, 0.12, 0.12]),

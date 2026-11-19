@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'abandoned_army_truck.spec.libsonnet';
@@ -131,7 +131,7 @@ local arc =
   local a0 = std.asin(-h / r);
   local n = 18;
   [[r * std.cos(a0 + i * (std.pi - 2 * a0) / n), r * std.sin(a0 + i * (std.pi - 2 * a0) / n)] for i in std.range(0, n)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'], state: ['abandoned'] } }, [
   k.compound('abandoned_army_truck_chassis', 3400,
              [
                box('rail_near', 'frame', [s.rear, s.rail[0], s.railZ - 0.1], [s.nose, s.rail[1], s.railZ]),

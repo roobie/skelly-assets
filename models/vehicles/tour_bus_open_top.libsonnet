@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'tour_bus_open_top.spec.libsonnet';
 local vehicle = import 'tour_bus_open_top.placements.libsonnet';
@@ -6,7 +6,7 @@ local box = k.box;
 local cap = s.roofBase;
 local topX = s.front - s.lean;
 local d = s.deflector;
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('tour_bus_open_top', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('tour_bus_open_top', vehicle.title, s) + [
   k.compound('tour_bus_open_top_deck_rail', 140, [
     box('cap_rear', 'cap', [s.rear, cap, -s.side], [s.rear + 0.08, cap + 0.04, s.side]),
     box('cap_front', 'cap', [topX - 0.08, cap, -s.side], [topX, cap + 0.04, s.side]),

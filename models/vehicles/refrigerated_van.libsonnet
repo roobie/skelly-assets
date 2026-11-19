@@ -1,9 +1,9 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'panel_van.spec.libsonnet';
 local box = k.box;
 local top = s.roof + 0.34;
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, [
   // Sits over the cab roof, its sloped nose facing the airflow.
   k.compound('refrigerated_van_cooling_unit', 75, [
     box('feet', 'frame', [-0.5, s.roof, -0.62], [0.3, s.roof + 0.04, 0.62]),

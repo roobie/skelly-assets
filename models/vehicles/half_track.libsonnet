@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local mk = import 'machine-kit.libsonnet';
@@ -23,7 +23,7 @@ local bayEnd = s.cabDoor[0] - k.swingStandOff(s.cabDoor[1] - s.cabDoor[0], cabPi
 local rearPinX = s.rear - 0.03;
 local rearDoorPins = k.hingePins('hinge_pin', 'y', [rearPinX, 1.09, s.rearDoorZ], [rearPinX, 1.49, s.rearDoorZ], 'steel');
 local rearDoorGap = k.swingStandOff(2 * s.rearDoorZ, back - rearPinX);
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'] } }, [
   // The armoured body round the cab and the open troop bay: its side plates, the rear plate round the door, the
   // scuttle under the windscreen and the floor. The cab's sides stop at the doors' height, the bay's run higher.
   k.compound('half_track_hull', 1650, [

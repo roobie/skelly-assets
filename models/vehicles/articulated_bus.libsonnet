@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local bus = import 'bus-body.libsonnet';
 local s = import 'articulated_bus.spec.libsonnet';
@@ -22,7 +22,7 @@ local rib(i) =
     box('far_' + i, slot, [x0, s.fore.sill, -half], [x1, head, -half + wall]),
     box('top_' + i, slot, [x0, head - wall, -half], [x1, head, half]),
   ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, [
   r
   for r in bus.rows('articulated_bus', vehicle.title, s.fore)
   if r.id != 'articulated_bus_rear_bumper'

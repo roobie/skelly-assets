@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'chopper.spec.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 // The raked steering axis passes through the front axle; the long reach out to it is what makes the bike a chopper.
 local forkX = k.forkX(s.frontAxle, s.frontHub, 0.9);
-taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('chopper_frame', 40, [
     k.bar('neck', 'frame', [forkX(1.0), 1.0], [forkX(1.12), 1.12], 0.1, [-0.05, 0.05]),
     k.bar('backbone', 'frame', [-0.3, 0.78], [0.47, 1.02], 0.07, [-0.032, 0.032]),

@@ -1,10 +1,10 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'log_trailer.spec.libsonnet';
 local box = k.box;
 local bothSides = k.bothSides;
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('log_trailer_chassis', 1900,
     [
       box('rear_beam', 'frame', [s.rear, s.frameLow, -1.1], [s.rear + 0.12, s.frameHigh, 1.1]),

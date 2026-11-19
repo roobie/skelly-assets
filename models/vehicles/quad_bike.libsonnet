@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'quad_bike.spec.libsonnet';
@@ -19,7 +19,7 @@ local rack(id, x0, x1, y) = k.compound(id, 5, [
 ] + bothSides([
   box('side_rail', 'steel', [x0, y, 0.3], [x1, y + 0.04, 0.34]),
 ]), { steel: 'steel-spall-black' });
-taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('quad_bike_frame', s.shellMass, [
     box('skid_plate', 'steel', [-0.42, 0.2, -0.15], [0.5, 0.24, 0.15]),
     box('cross_front', 'steel', [0.5, 0.26, -0.15], [0.56, 0.68, 0.15]),

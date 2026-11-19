@@ -1,8 +1,8 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local vehicle = import 'city_bus.placements.libsonnet';
 local rows = (import 'bus-body.libsonnet').rows('city_bus', vehicle.title, import 'city_bus.spec.libsonnet');
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, rows + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, rows + [
   // Hung from the ceiling at the height of the grab poles' heads, so rail and poles join.
   k.compound('city_bus_ceiling_rail', 7, [
     k.turned('rail', 'bright', 'x', k.disc(0.022, -3, 3)),

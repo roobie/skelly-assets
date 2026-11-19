@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -26,7 +26,7 @@ local cradle(id, x) =
     for j in std.range(0, cradleSteps - 1)
   ];
 local posts = [s.barrelRear + 0.5 + i * (s.barrelFront - s.barrelRear - 1.0) / 5 for i in std.range(0, 5)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tanker_truck', vehicle.title, s) + [
   k.compound('tanker_truck_barrel', 3000, [
     turned('shell', 'tank', 'x', [
       [s.barrelRear - s.dish, 0],

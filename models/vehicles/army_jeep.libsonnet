@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'army_jeep.spec.libsonnet';
@@ -15,7 +15,7 @@ local railFore = s.cutFront + 0.02;
 local railPivot = railIn + k.grain;
 local railPins = k.hingePins('hinge', 'y', [railFore, s.cut + 0.06, railPivot], [railFore, s.waist - 0.04, railPivot]);
 local finish = { paint: s.paint, trim: 'paint-charcoal', frame: 'steel-parkerized', dark: 'steel-spall-black', glass: 'glass-clear', tan: 'cloth-canvas', strap: 'webbing-olive-dark', seat: 'cloth-olive-drab', spring: 'steel-grey' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('army_jeep_frame', s.frameMass, [
     box('cross_front', 'frame', [1.46, 0.46, -0.34], [1.56, 0.58, 0.34]),
     box('cross_mid', 'frame', [-0.2, 0.46, -0.34], [-0.1, 0.58, 0.34]),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -27,7 +27,7 @@ local lidUnder(x) = 0.72 + (x + 1.82) * (s.waist - 0.72) / 0.5;
 local deckRear = aft(s.waist);
 local lidFront = deckRear - k.grain - clearance;
 local lidPins = k.hingePins('hinge', 'z', [lidFront, lidTop(lidFront) + k.grain, -0.35], [lidFront, lidTop(lidFront) + k.grain, 0.35]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('classic_small_car_shell', s.shellMass, [
     box('floor_pan', 'pan', [-1.3, 0.2, -s.body], [0.95, s.floor, s.body]),
     box('bulkhead', 'paint', [0.85, s.floor, -s.body], [0.95, s.waist, s.body]),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'abandoned_ambulance.spec.libsonnet';
@@ -41,7 +41,7 @@ local noseHole(z, y) =
   (a < 0.5 && y > 0.56 && y < 0.78) || (a > 0.55 && a < 0.86 && y > 0.6 && y < 0.82);
 local doorSkin(seed, windowBelow) = function(t, y)
   if y > windowBelow && y < windowBelow + 0.62 && t > 0.14 && t < 0.86 then null else skin(seed)(t * 2, y);
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'], state: ['abandoned'] } }, [
   k.compound('abandoned_ambulance_chassis', 280, [
     box('axle_front', 'rust', [s.frontAxle - 0.05, s.hubY - 0.04, -0.8], [s.frontAxle + 0.05, s.hubY + 0.04, 0.8]),
     box('axle_rear', 'rust', [s.rearAxle - 0.05, s.hubY - 0.04, -0.8], [s.rearAxle + 0.05, s.hubY + 0.04, 0.8]),

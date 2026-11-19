@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'crashed_hatchback.spec.libsonnet';
@@ -31,7 +31,7 @@ local nearDoorSlot(x, y) =
   if x > s.bFront + 0.2 && folds(x, y * 1.4) < 0.2 then 'crease'
   else if x > 0.3 && n > 0.62 then 'bare'
   else seamSlot(x, y);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'], state: ['crashed'] } }, [
   k.compound('crashed_hatchback_shell', s.shellMass,
              w.plate('near', 'z', [s.rear + 0.03, s.aPost], [s.sill, s.waist],
                    function(x, y) s.side - (if x > s.bFront then 0.15 * std.pow((x - s.bFront) / (s.aPost - s.bFront), 2) * (0.5 + folds(x, y)) else 0),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'caravan.spec.libsonnet';
@@ -33,7 +33,7 @@ local window(id, massKg, width) = k.compound(id, massKg, [
   box('frame_rear', 'frame', [-width / 2, 0, s.side - 0.04], [-width / 2 + 0.04, s.windowHigh - s.windowLow, s.side + 0.02]),
   box('frame_front', 'frame', [width / 2 - 0.04, 0, s.side - 0.04], [width / 2, s.windowHigh - s.windowLow, s.side + 0.02]),
 ], { glass: 'glass-clear', frame: 'plastic-charcoal' });
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('caravan_chassis', 225, [
     box('rear_rail', 'frame', [s.rear, s.floorLow - 0.1, -0.65], [s.rear + 0.06, s.floorLow, 0.65]),
     box('mid_rail', 'frame', [s.axle - 0.05, s.floorLow - 0.1, -0.65], [s.axle + 0.05, s.floorLow, 0.65]),

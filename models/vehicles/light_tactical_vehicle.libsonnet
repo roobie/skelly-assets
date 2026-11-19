@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local t = import 'truck-cab.libsonnet';
@@ -91,7 +91,7 @@ local lugs = [
   for i in std.range(0, lugCount - 1)
 ];
 local rakeTop = s.roof - 0.06;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   part('_wheel', 'wheel', 55, [
     k.turned('tyre', 'tyre', 'z', [[-0.16, 0.21], [-0.16, 0.4], [-0.128, 0.445], [0.128, 0.445], [0.16, 0.4], [0.16, 0.21], [-0.16, 0.21]]) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.disc(0.21, -0.12, 0.12)) + { sides: 24 },

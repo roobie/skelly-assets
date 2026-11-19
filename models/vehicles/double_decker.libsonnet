@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'double_decker.spec.libsonnet';
 local vehicle = import 'double_decker.placements.libsonnet';
@@ -12,7 +12,7 @@ local locker = bus.layout(s).locker;
 // What stands against the far skin under the stairs: the front wheelhouse and the battery locker, each up to its lid.
 local blocks = [{ x: [s.frontAxle - s.arch, s.frontAxle + s.arch], wall: -s.frontWell, lid: s.archTop + 0.06 }]
                + (if locker == null then [] else [{ x: locker.footprint, wall: locker.back + locker.wall, lid: locker.top + locker.wall }]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('double_decker', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('double_decker', vehicle.title, s) + [
   // Treads beside a block stop at its wall and only widen to the skin above its lid.
   k.compound('double_decker_stairs', 90, std.flattenArrays([
     local x0 = s.stairs.low - run * (i + 1);

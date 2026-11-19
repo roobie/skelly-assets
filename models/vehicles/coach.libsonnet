@@ -1,8 +1,8 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'coach.spec.libsonnet';
 local vehicle = import 'coach.placements.libsonnet';
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('coach', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('coach', vehicle.title, s) + [
   k.compound('coach_hold_floor', 180, [
     k.box('deck', 'floor', [s.hold.rear, s.hold.y - 0.06, -s.skin], [s.hold.front, s.hold.y, s.skin]),
   ], { floor: 'plastic-charcoal' }) + { title: 'Coach hold floor' },

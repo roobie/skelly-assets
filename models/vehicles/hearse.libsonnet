@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -58,7 +58,7 @@ local pinZ = 0.7 * s.hatchSide;
 local tailHalf = s.hatchSide - k.swingGap;
 local tailFoot = s.rearSill + k.swingGap;
 local skinTop = s.waist - k.swingGap;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet').rows('hearse', vehicle.title, s)) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row) row.id != 'hearse_tailgate', (import 'car-body.libsonnet').rows('hearse', vehicle.title, s)) + [
   // The narrow rear glass, in a blind tail.
   local tailgatePins = k.hingePins('hinge', 'z', [pinX, pinY, pinZ], [pinX, pinY, -pinZ], 'bright');
   k.compound('hearse_tailgate', 22, [

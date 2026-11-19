@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local s = import 'news_helicopter.spec.libsonnet';
@@ -16,7 +16,7 @@ local core = [
 local proudCowl = h.proud(s.cowl, 0.035);
 // The rear bow stands ahead of the rear fairing it closes.
 local rearBow = s.doorRear + 0.035;
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('news_helicopter_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.doorRear, s.noseCap], arc=[90, 270])
              + lower('skin', [s.doorRear, s.nose - 0.02]),

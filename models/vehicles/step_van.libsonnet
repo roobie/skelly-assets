@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local stow = import 'stowage-kit.libsonnet';
 local s = import 'step_van.spec.libsonnet';
@@ -34,7 +34,7 @@ local parcels = [
   [2.0, -1.25, -0.98, 0.35, 0.28, 'parcel_b'],
   [2.0, -0.62, -0.26, 0.2, 0.32, 'parcel_c'],
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('step_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('step_van', vehicle.title, s) + [
   // The far wall's walk-in door, matching the near side's sliding door outline.
   k.compound('step_van_far_door_trim', 3, [
     box('seam_rear', 'paint', [s.slideRear, s.sill, -s.side - grain], [s.slideRear + grain, band[0], -s.skin]),

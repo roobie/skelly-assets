@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'bulldozer.spec.libsonnet';
@@ -37,7 +37,7 @@ local clevis(name, x, y) = [
 ];
 local ripper = { beam: [-2.95, -2.65], top: 1.1, mount: [-2.05, -1.9] };
 local shankX = (ripper.beam[0] + ripper.beam[1]) / 2;
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('bulldozer_mainframe', 3000, [
     box('belly_guard', 'steel', [-0.2, 0.36, -0.55], [1.88, 0.42, 0.55]),
     box('front_cross', 'steel', [1.8, 0.42, -0.38], [1.88, s.frameTop, 0.38]),

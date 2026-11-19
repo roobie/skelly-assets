@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'touring_bike.spec.libsonnet';
 local box = k.box;
@@ -19,7 +19,7 @@ local fin(i) =
   prism('fin_' + i, if i % 2 == 0 then 'alloy' else 'dark', [
     [-0.04 + at(y), y], [0.3 + at(y), y], [0.3 + at(y + 0.032), y + 0.032], [-0.04 + at(y + 0.032), y + 0.032],
   ], [-half, half]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('touring_bike_frame', 28, [
     k.bar('head', 'frame', [forkX(0.84), 0.84], [forkX(1.06), 1.06], 0.08, [-0.04, 0.04]),
     k.bar('down', 'frame', [0.4, 0.22], [0.46, 0.95], 0.07, [-0.04, 0.04]),

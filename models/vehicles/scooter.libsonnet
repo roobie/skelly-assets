@@ -1,11 +1,11 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'scooter.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local forkX = k.forkX(s.frontAxle, s.hub, 0.42);
-taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('scooter_frame', 26, [
     box('backbone', 'frame', [-0.3, 0.2, -0.06], [0.3, 0.26, 0.06]),
     box('stand_cross', 'frame', [-0.24, 0.2, -0.13], [-0.14, 0.26, 0.13]),

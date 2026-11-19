@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local s = import 'luxury_saloon.spec.libsonnet';
@@ -11,7 +11,7 @@ local brightwork(door, from, to) = k.compound('luxury_saloon_' + door + '_door_b
   box('sill', 'bright', [from, 0.4, s.side - 0.02], [to, 0.44, s.side + 0.03]),
   box('belt', 'bright', [from, s.waist - 0.03, s.side - 0.02], [to, s.waist, s.side + 0.03]),
 ], { bright: 'steel-bright' }) + { title: 'Luxury saloon ' + door + ' door brightwork' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('luxury_saloon', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('luxury_saloon', vehicle.title, s) + [
   k.compound('luxury_saloon_grille', 9, [
     box('head', 'bright', [nose, hoodNose - 0.03, -0.34], [nose + 0.075, hoodNose + 0.03, 0.34]),
     box('foot', 'bright', [nose, 0.53, -0.34], [nose + 0.075, 0.57, 0.34]),

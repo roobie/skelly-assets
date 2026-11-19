@@ -1,11 +1,11 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'car_trailer.spec.libsonnet';
 local box = k.box;
 local bothSides = k.bothSides;
 local finish = { paint: s.paint, frame: s.frame };
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('car_trailer_chassis', 340, [
     box('rear_rail', 'frame', [s.rear - 0.04, s.frameLow, -s.side], [s.rear, s.frameHigh, s.side]),
     box('front_rail', 'frame', [s.front, s.frameLow, -0.55], [s.front + 0.04, s.frameHigh, 0.55]),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local mk = import 'machine-kit.libsonnet';
@@ -23,7 +23,7 @@ local tyreBody = s.r - 0.035;
 local rim = 0.2286;
 local spareFace = 0.04;
 local grain = k.grain;
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows(id, vehicle.title, s) + [
   mk.wheel(id + '_wheel', s.wheelMass, tyreWidth, rim, s.r, 22, 0.035, s.paint) + { title: vehicle.title + ' wheel' },
   // Carried upright behind the cab and seen end on, so it turns about x: the mount face is x = 0 on the wheel's axis
   // and the tyre stands rearward of it.

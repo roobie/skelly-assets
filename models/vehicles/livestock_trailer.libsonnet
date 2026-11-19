@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'livestock_trailer.spec.libsonnet';
@@ -10,7 +10,7 @@ local posts = [-1.9, -1.0, -0.1, 0.8, 1.64];
 local grain = k.grain;
 // At the foot of each spring arm, raised a grain so they clear the tail lamps under them.
 local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('livestock_trailer_chassis', 300, [
     box('rear_rail', 'frame', [s.rear - 0.04, s.frameLow, -s.side], [s.rear + 0.06, s.frameHigh, s.side]),
     box('front_rail', 'frame', [s.front - 0.06, s.frameLow, -s.side], [s.front + 0.04, s.frameHigh, s.side]),

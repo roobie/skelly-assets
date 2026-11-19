@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'ice_cream_van.spec.libsonnet';
 local vehicle = import 'ice_cream_van.placements.libsonnet';
@@ -6,7 +6,7 @@ local box = k.box;
 local b = s.box;
 local w = b.windows[0];
 local stripe = (w[1] - w[0] + 0.2) / 5;
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('ice_cream_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('ice_cream_van', vehicle.title, s) + [
   k.compound('ice_cream_van_serving_hatch', 22, [
     // Over the glass the helper fits on both walls: an open dark hatch here, and a plain wall on the far side.
     box('opening', 'dark', [w[0], b.waist, b.glassOut - 0.01], [w[1], b.windowTop, b.glassOut + 0.02]),

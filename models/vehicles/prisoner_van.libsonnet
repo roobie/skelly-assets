@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'prisoner_van.spec.libsonnet';
 local van = import 'van-body.libsonnet';
@@ -19,7 +19,7 @@ local sideBars(tag, z, window) =
     box(tag + '_' + i, 'steel', [(middle + i * 4 - 1) * grain, s.windowSill, z[0]], [(middle + i * 4 + 1) * grain, s.windowTop, z[1]])
     for i in [-1, 0, 1]
   ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('prisoner_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('prisoner_van', vehicle.title, s) + [
   // One rear leaf's window bars.
   k.compound('prisoner_van_rear_bars', 9, bars('rear', 0.1, s.hatchSide - 0.1, 5, rearBar) + [
     box('rail_low', 'steel', [tail - 0.03, s.windowSill - 0.03, 0.08], [tail, s.windowSill + 0.01, s.hatchSide - 0.08]),

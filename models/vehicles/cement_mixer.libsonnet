@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -31,7 +31,7 @@ local rollerX = s.apex[0] - 3.35;
 local rollerY = s.apex[1] - std.sqrt(1.13 * 1.13 - 0.59 * 0.59) - 0.13;
 local wall = 0.0625;
 local rungs = std.range(0, 5);
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('cement_mixer_subframe', 560, [
     box('rear_beam', 'frame', [-3.5, 1.14, -1.15], [-2.85, s.beamTop, 1.15]),
     box('guard_beam', 'frame', [-2.2, 1.14, -1.15], [-1.62, 1.26, 1.15]),

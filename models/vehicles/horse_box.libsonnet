@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'horse_box.spec.libsonnet';
@@ -21,7 +21,7 @@ local grain = k.grain;
 local rampPins = k.hingePins('ramp_hinge', 'z', [s.rear - 0.08 - grain, s.frameHigh + grain, s.side - 0.07], [s.rear - 0.08 - grain, s.frameHigh + grain, -s.side + 0.07], 'frame');
 local doorPins = k.hingePins('hinge', 'y', [s.doorFront - 0.02, s.doorLow + 0.42, s.side + grain], [s.doorFront - 0.02, s.doorTop - 0.3, s.side + grain], 'frame');
 local topDoorPins = k.hingePins('hinge', 'y', [s.rear - 0.06, s.eave - 0.06, s.side], [s.rear - 0.06, s.rampTop + 0.07, s.side], 'frame');
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('horse_box_chassis', 340, [
     box('rear_rail', 'frame', [s.rear - 0.08, s.frameLow, -s.side], [s.rear + 0.06, s.frameHigh, s.side]),
     box('front_rail', 'frame', [s.noseTip - 0.06, s.frameLow, -s.side], [s.noseTip, s.frameHigh, s.side]),

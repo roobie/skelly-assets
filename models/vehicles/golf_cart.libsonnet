@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'golf_cart.spec.libsonnet';
@@ -6,7 +6,7 @@ local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
 local fender(id, x) = k.arc(id, 'guard', x, s.hub, 0.27, 0.33, 8, 172, 8, [0.4, 0.62]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('golf_cart_frame', s.shellMass, [
     box('spine', 'dark', [-1.08, 0.16, -0.3], [1.12, 0.25, 0.3]),
     box('floor_pan', 'dark', [-0.46, 0.22, -s.side], [0.7, s.floor - 0.02, s.side]),

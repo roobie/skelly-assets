@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'military_cargo_truck.spec.libsonnet';
@@ -19,7 +19,7 @@ local tailgatePins = k.hingePins('hinge', 'z', [s.bedRear - 0.04 - grain, s.deck
 // that face, so the tilt's rear flaps hang inside it, down over its top, and never meet it.
 local gateFront = s.bedRear - k.swingGap;
 local HOOP_SHOULDER =[[peak + 0.03, 0.8], [peak + 0.06, 0.8], [shoulder + 0.08, outer + 0.01], [shoulder + 0.05, outer + 0.01]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, m.truckRows(s) + [
   k.compound('military_cargo_truck_bed_floor', s.bedFloorMass, [
     box('floor', 'floor', [s.bedRear, s.deckBottom, -s.bedSide], [s.bedFront, s.deckTop, s.bedSide]),
   ], finish) + { title: 'Military cargo truck bed floor' },

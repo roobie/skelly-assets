@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local s = import 'swat_truck.spec.libsonnet';
@@ -20,7 +20,7 @@ local screenBars = [-1.0 + 0.2 * i for i in std.range(0, 10)];
 local doorBars = [s.doorRear + 0.1 + 0.2 * i for i in std.range(0, 4)];
 local rearDoorPin(share) = [s.rear, b.floorTop + share * (b.top - b.floorTop), b.side - b.wall];
 local rearDoorPins = k.hingePins('hinge', 'y', rearDoorPin(0.2), rearDoorPin(0.8), 'plate');
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.libsonnet').rows('swat_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, (import 'truck-cab.libsonnet').rows('swat_truck', vehicle.title, s) + [
   k.compound('swat_truck_body_floor', 520, [
     box('deck', 'deck', [s.rear, b.floorLow, -wallZ[0]], [b.front, b.floorTop, wallZ[0]]),
     box('rear_apron', 'plate', [s.rear, b.apron[0], -b.side], [s.rear + 0.05, b.apron[1], b.side]),

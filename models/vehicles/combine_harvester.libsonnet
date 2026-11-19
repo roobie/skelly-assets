@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'combine_harvester.spec.libsonnet';
@@ -11,7 +11,7 @@ local doorHeight(share) = s.cabFloor + 0.04 + share * (s.cabRoof - 0.08 - s.cabF
 local doorPins = k.hingePins('hinge', 'y', [door + 0.01, doorHeight(0.1), s.cabSide + k.grain],
                              [door + 0.01, doorHeight(0.9), s.cabSide + k.grain]);
 local polar(r, degrees) = [s.reel[0] + r * std.cos(degrees * std.pi / 180), s.reel[1] + r * std.sin(degrees * std.pi / 180)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('combine_harvester_body', s.shellMass, [
     box('main', 'paint', [s.bodyRear + 0.32, s.sill, -s.side], [s.bodyFront, s.shoulder, s.side]),
     box('top_deck', 'dark', [s.bodyRear, s.shoulder, -s.side], [s.tankRear, s.shoulder + 0.06, s.side]),

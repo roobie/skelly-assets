@@ -1,11 +1,11 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'forklift.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('forklift_chassis', s.shellMass, [
     box('spine', 'steel', [-0.62, 0.18, -0.33], [1.08, 0.5, 0.33]),
     box('spine_rear', 'steel', [-0.62, 0.18, -0.33], [0.18, 0.64, 0.33]),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'excavator.spec.libsonnet';
@@ -14,7 +14,7 @@ local doorY = [s.deck + 0.06, belt, s.cabRoof - 0.12, s.cabRoof - 0.06];
 local left(piece) =
   if piece.kind == 'turned' then piece { origin: [piece.origin[0], piece.origin[1], -piece.origin[2]] }
   else piece { min: [piece.min[0], piece.min[1], -piece.max[2]], max: [piece.max[0], piece.max[1], -piece.min[2]] };
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('excavator_carbody', 2900, [
     box('centre', 'steel', [-0.9, 0.42, -0.85], [0.9, 0.86, 0.85]),
     m.axleDisc('swivel', 'steel', 0, 0.6, 0.2, [-0.9, 0.9]),

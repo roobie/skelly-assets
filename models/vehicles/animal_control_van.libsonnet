@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local van = import 'van-body.libsonnet';
 local s = import 'animal_control_van.spec.libsonnet';
@@ -11,7 +11,7 @@ local depth = wallIn - k.jambDepth - b.cageIn;
 local tail = van.tail(s);
 local hatchLength = b.hatches.size[0];
 local hatchHeight = b.hatches.size[1];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('animal_control_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('animal_control_van', vehicle.title, s) + [
   k.compound('animal_control_van_cage', 26, [
     box('floor', 'steel', [0, 0, 0], [b.width, 0.03, depth]),
     box('top', 'steel', [0, b.cageHeight - 0.03, 0], [b.width, b.cageHeight, depth]),
