@@ -78,7 +78,8 @@ import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './eject
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
 import {
-  MAGAZINE_PROFILES,
+  type DrawnMagazineProfile,
+  MAGAZINE_PROFILE_NAMES,
   MAGAZINE_WELL,
   magazineProfileContent,
   magazineStandardOf,
@@ -376,7 +377,7 @@ const magazineSectionFor = (
     : { depth: measured.depthU, width: measured.widthU };
 };
 type MagazineLength = '5-round' | '10-round' | SizeClass;
-type MagazineProfile = 'standard' | 'smg' | 'pistol' | 'ak-curved' | 'stanag-curved' | 'stanag-straight';
+type MagazineProfile = DrawnMagazineProfile;
 type MagazineBands = Readonly<Record<SizeClass, number>>;
 const STRAIGHT_STANAG_LENGTH_REFUSAL =
   'The straight STANAG magazine is available only at M length; other capacities are deferred to issue #414.';
@@ -2902,15 +2903,7 @@ const lower: PartFamily = {
       from: [{ port: 'magazine', param: 'orientation' }],
     },
     magazineProfile: {
-      values: [
-        'standard',
-        'smg',
-        'pistol',
-        'ak-curved',
-        'stanag-curved',
-        'stanag-straight',
-        ...Object.keys(MAGAZINE_PROFILES),
-      ],
+      values: MAGAZINE_PROFILE_NAMES,
       default: 'standard',
       from: [{ port: 'magazine', param: 'profile' }],
     },
@@ -5379,15 +5372,7 @@ export const magazine: PartFamily = {
   params: {
     boltCalibre: { ...boltCalibreParam, from: [{ port: 'top', param: 'boltCalibre' }] },
     length: { values: ['5-round', '10-round', ...SIZE_CLASSES], default: 'M' },
-    profile: choice(
-      'standard',
-      'smg',
-      'pistol',
-      'ak-curved',
-      'stanag-curved',
-      'stanag-straight',
-      ...Object.keys(MAGAZINE_PROFILES),
-    ),
+    profile: choice(...MAGAZINE_PROFILE_NAMES),
     integral: choice('no', 'yes'),
     wellBody: { values: Object.keys(BOLT_WELL_PROFILES), default: 'standard' },
     orientation: choice(...MAGAZINE_ORIENTATIONS),
