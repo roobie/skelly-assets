@@ -223,6 +223,7 @@
   'holders': import 'models/catalogue/sets/holders.libsonnet',
   'jacks': import 'models/catalogue/sets/jacks.libsonnet',
   'jerry-can': import 'models/catalogue/sets/jerry-can.libsonnet',
+  'katana': import 'models/catalogue/sets/katana.libsonnet',
   'lights': import 'models/catalogue/sets/lights.libsonnet',
   'materials': import 'models/catalogue/sets/materials.libsonnet',
   'medieval-stone': import 'models/catalogue/sets/medieval-stone.libsonnet',
