@@ -76,9 +76,9 @@ local bladeHang = [xOf(440), guardTopY];
 local breechSetback = profile.values.barrelMm.value - xOf(903);
 local tubeLength = 181;
 local tubeEndX = xOf(370) - tubeLength;
-// The close-up shows the upper's rear face upright where it meets the buffer tower; the profile's outline slants down
-// to the parting line only because the forward assist and its shadow hide that face.
-local upperRearX = dim(xOf(profile.values.upperRearXPx.value), traced('upperRearXPx'));
+// The upper's rear face stands upright where it meets the buffer tower; the profile's outline slants down to the parting
+// line only because the charging handle and its shadow hide that face there.
+local upperRearX = dim(xOf(profile.values.upperRearXPx.value), 'derived: ' + profile.values.upperRearXPx.reason);
 local stockMount = [tubeEndX, 0];
 
 {
