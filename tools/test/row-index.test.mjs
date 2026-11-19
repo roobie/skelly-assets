@@ -5,6 +5,8 @@ import { test } from 'node:test';
 import {
   CATALOGUE,
   catalogueIndex,
+  HEADS,
+  headsIndex,
   INDEX,
   PLACEMENTS,
   placementsIndex,
@@ -22,6 +24,10 @@ for (const dir of ROW_DIRS) {
 
 test('the committed catalogue lists every folder of row files', () => {
   assert.equal(readFileSync(CATALOGUE, 'utf8'), catalogueIndex());
+});
+
+test('the committed heads list every row file', () => {
+  assert.equal(readFileSync(HEADS, 'utf8'), headsIndex());
 });
 
 test('the committed placements index lists every vehicle placements file', () => {

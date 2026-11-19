@@ -1,6 +1,12 @@
-// The vehicles each pack builds, as names in `index.libsonnet`. A vehicle drives on the ground unless another pack
-// claims it, so a new road vehicle needs no recipe edit and parallel authors never edit one shared list.
-local fleet = import 'index.libsonnet';
+// The vehicles each pack builds, as names of the vehicle files. A vehicle drives on the ground unless another pack
+// claims it, so a new road vehicle needs no recipe edit and parallel authors never edit one shared list. A vehicle is
+// its file's head rows (models/catalogue/heads.libsonnet), which is all a pack reads of it.
+local heads = import 'models/catalogue/heads.libsonnet';
+local fleet = {
+  [std.strReplace(std.strReplace(path, 'models/vehicles/', ''), '.libsonnet', '')]: heads[path]
+  for path in std.objectFields(heads)
+  if std.startsWith(path, 'models/vehicles/')
+};
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local title = import 'tools/jsonnet/lib/title.libsonnet';

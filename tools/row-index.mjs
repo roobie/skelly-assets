@@ -1,5 +1,6 @@
 // Regenerates the index.libsonnet of each folder of row files (the catalogue sets, the kits and the vehicles),
-// models/index.libsonnet, the whole catalogue those indexes make, and models/vehicles/placements.libsonnet. Jsonnet
+// models/index.libsonnet, the whole catalogue those indexes make, models/catalogue/heads.libsonnet, the heads of every
+// row file's rows, and models/vehicles/placements.libsonnet. Jsonnet
 // imports must be literal, so a file's rows and a vehicle's placements reach the build only through generated lists;
 // parallel authors each add their own files and never touch a shared one. Every row source is a row file: a list of
 // finished rows as plain data, a code-built one in models/kits/ beside the sets and vehicles, so the
@@ -18,6 +19,7 @@ export const VEHICLES_DIR = join(models, 'vehicles');
 // In path order, which is the order of the catalogue's rows.
 export const ROW_DIRS = [join(models, 'catalogue/sets'), join(models, 'kits'), VEHICLES_DIR];
 export const CATALOGUE = join(models, 'index.libsonnet');
+export const HEADS = join(models, 'catalogue/heads.libsonnet');
 export const INDEX = 'index.libsonnet';
 export const PLACEMENTS = 'placements.libsonnet';
 const PLACEMENTS_SUFFIX = '.placements.libsonnet';
@@ -74,6 +76,19 @@ export function catalogueIndex() {
   return `${HEADER}${folders.join('\n+ ')}\n`;
 }
 
+// The heads text: the heads of each row file's rows under the file's root-relative path, which tools/sources.mjs
+// replaces in a compile with the heads its fragments stored. A recipe reads these and not the catalogue, so an edit
+// that leaves every head as it was recompiles no recipe.
+export function headsIndex() {
+  const entries = ROW_DIRS.flatMap((dir) =>
+    rowFiles(dir).map((file) => {
+      const path = relative(repository, join(dir, file));
+      return `  '${path}': heads.of(import '${path}'),`;
+    }),
+  );
+  return `${HEADER}local heads = import 'tools/jsonnet/heads.libsonnet';\n{\n${entries.join('\n')}\n}\n`;
+}
+
 // The placements index text: each vehicle's placements under its name, with variants laid out from their parents'
 // sites (models/vehicles/site.libsonnet, `variants`), for tools/placements.mjs.
 export function placementsIndex(dir = VEHICLES_DIR) {
@@ -86,5 +101,6 @@ export function placementsIndex(dir = VEHICLES_DIR) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   for (const dir of ROW_DIRS) writeFileSync(join(dir, INDEX), rowIndex(dir));
   writeFileSync(CATALOGUE, catalogueIndex());
+  writeFileSync(HEADS, headsIndex());
   writeFileSync(join(VEHICLES_DIR, PLACEMENTS), placementsIndex());
 }
