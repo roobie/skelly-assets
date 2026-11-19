@@ -7,6 +7,7 @@ local sourced(value, source) = { kind: 'sourced', value: value, source: source }
 local derived(value, reason) = { kind: 'derived', value: value, reason: reason };
 local feature(paths) = { kind: 'derived', paths: paths };
 local overall = sourced(1000, m16);
+local stockLength = sourced(266.7, a2Stock);
 local railPitch = sourced(10.01, picatinny);
 {
   title: 'M16A4 side profile',
@@ -16,7 +17,7 @@ local railPitch = sourced(10.01, picatinny);
     photoHeightPx: sourced(2880, photo),
     overallLengthMm: overall,
     carryHandleLengthMm: sourced(176.276, carryHandle),
-    stockLengthMm: sourced(266.7, a2Stock),
+    stockLengthMm: stockLength,
     boreYPx: derived(1349, 'Barrel centre either side of the front sight base; the muzzle centre reads 1350'),
     railTopYPx: derived(1240, 'Rail tooth tops under the carry handle, level along the receiver'),
     handleRearXPx: derived(1212, "The detachable handle's rear face, registered on the upper's rear face"),
@@ -39,7 +40,7 @@ local railPitch = sourced(10.01, picatinny);
         pixels: derived([[2000, 1240], [2329, 1240]], 'Nine slot pitches by autocorrelation of the rail top between 2000 and 3000 px'),
         lengthMm: derived(9 * railPitch.value, 'Nine sourced Picatinny slot pitches'),
       },
-      stockLength: { pixels: derived([[107.5, 1350], [1100, 1350]], 'Butt plate rearmost point to the stock front'), lengthMm: sourced(266.7, a2Stock) },
+      stockLength: { pixels: derived([[107.5, 1350], [1100, 1350]], 'Butt plate rearmost point to the stock front'), lengthMm: stockLength },
       carryHandleLength: { pixels: derived([[1212, 1240], [1838.5, 1240]], 'Handle rear face to the front leg'), lengthMm: sourced(176.276, carryHandle) },
     },
     landmarks: {

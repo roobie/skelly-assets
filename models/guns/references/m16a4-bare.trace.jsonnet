@@ -1,6 +1,5 @@
 local photo = 'BR-supplied reference photo (dert drop 2026-11-19), M16A4 bare side view';
 local m16 = 'https://en.wikipedia.org/wiki/M16_rifle';
-local a2Stock = 'https://www.gunmann.com/learning/a1-vs-a2-stock/';
 local side = import 'm16a4-side.trace.jsonnet';
 local sourced(value, source) = { kind: 'sourced', value: value, source: source };
 local derived(value, reason) = { kind: 'derived', value: value, reason: reason };
@@ -16,7 +15,7 @@ local sideMmPerPx = sideCalibration.lengthMm.value / (sideCalibration.pixels.val
     photoWidthPx: derived(1000, photo),
     photoHeightPx: derived(412, photo),
     overallLengthMm: overall,
-    stockLengthMm: sourced(266.7, a2Stock),
+    stockLengthMm: side.values.stockLengthMm,
     boreYPx: derived(169.8, 'Barrel centre between 800 and 875 px, ' + photo),
     combYPx: derived(157.0, 'Comb top, level within 0.6 px from the heel to the stock front, ' + photo),
     buttRearXPx: derived(114.6, 'Butt plate rearmost point, at the bore height, ' + photo),
@@ -30,7 +29,7 @@ local sideMmPerPx = sideCalibration.lengthMm.value / (sideCalibration.pixels.val
     },
     allowancePercent: derived(5, 'Visible-edge picking at 1.24 mm a pixel, ' + photo),
     comparisons: {
-      stockLength: { pixels: derived([[114.6, 170], [332, 170]], 'Butt plate rearmost point to the stock front'), lengthMm: sourced(266.7, a2Stock) },
+      stockLength: { pixels: derived([[114.6, 170], [332, 170]], 'Butt plate rearmost point to the stock front'), lengthMm: side.values.stockLengthMm },
       frontSightBaseToMuzzle: {
         pixels: derived([[787, 170], [921.4, 170]], 'Front sight base front face to the flash hider face'),
         lengthMm: derived((3798 - 3177) * sideMmPerPx, 'The same span on the m16a4-side record, at its scale'),

@@ -139,8 +139,9 @@ local sightBaseOutline(pixels) = outline([sightBasePoint(p) for p in pixels], 't
 local sightBaseX(px) = dim(sightBasePoint([px, 0])[0], 'traced: m16a4-side/frontSightBase');
 
 // The A2 stock's outline off the bare photo, registered at its butt plate on the sourced stock length and at its comb on
-// the side photo's comb height over the bore, which the side photo resolves five times finer.
-local a2StockRearX = tubeLengths.rifle.mm - 266.7;
+// the side photo's comb height over the bore, which the side photo resolves five times finer. The 13.5 in length of pull
+// the stock length's source also gives comes out 0.3 in longer from the trigger.
+local a2StockRearX = tubeLengths.rifle.mm - m16a4Bare.values.stockLengthMm.value;
 local combY = sideOverBore(m16a4Side.values.combYPx.value);
 local bareMmPerPx = mmPerPxOf(m16a4Bare);
 local stockPoint(p) = [
@@ -471,11 +472,6 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   stockA2: {
     buffer: choiceOf('receiverExtension.buffers', 'rifle'),
     frontX: dim(tubeLengths.rifle.mm, "derived: closed against the lower's buffer tower"),
-    rearX: dim(
-      a2StockRearX,
-      'derived: 10-1/2 in long (https://www.gunmann.com/learning/a1-vs-a2-stock/); the 13.5 in length of pull the same '
-      + 'page gives comes out 0.3 in longer from the trigger',
-    ),
     combY: dim(combY, 'traced: m16a4-side/combYPx'),
     tubeClearance: dim(0.25, 'derived: a fixed stock is a close fit on its extension'),
     butt: stockOutline([
