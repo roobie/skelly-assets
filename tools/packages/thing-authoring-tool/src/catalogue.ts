@@ -64,6 +64,7 @@ import { drinkCup, foodPortion, stemmedFruit, woundRoll } from './families/food-
 import { fuse } from './families/fuse.ts';
 import { foldedGarment } from './families/garment.ts';
 import { grenade } from './families/grenade.ts';
+import { grown } from './families/grown.ts';
 import { compass, keycard, key as keyFamily, lighter, matchbox } from './families/handheld.ts';
 import { handOpener } from './families/handOpener.ts';
 import { bottleJack, engineHoist, scissorJack } from './families/jacks.ts';
@@ -268,6 +269,7 @@ const builders = {
   spool,
   coil,
   compound,
+  grown,
   fuse,
   crowbar,
   hammer,

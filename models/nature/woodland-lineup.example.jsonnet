@@ -4,10 +4,13 @@ local site(id, model, x, z, yaw=0) = { site: id, model: 'woodland_' + model, at:
 {
   id: 'woodland_lineup_example',
   sites: [
-    site('tree-oak', 'oak_spreading', -12, -7),
-    site('tree-upright', 'oak_upright', -4, -7),
-    site('tree-birch', 'birch', 3, -7),
-    site('tree-pine', 'pine', 9, -7),
+    site('tree-oak', 'oak_spreading', -20, -7),
+    site('tree-upright', 'oak_upright', -10, -7),
+    site('tree-birch', 'birch', -2, -7),
+    site('tree-scots-pine', 'scots_pine', 4, -7),
+    site('tree-spruce', 'spruce', 10, -7),
+    site('tree-pine', 'pine', 16, -7),
+  ] + [
     site('sapling-oak', 'oak_sapling', -10, 2),
     site('sapling-pine', 'pine_sapling', -6, 2),
     site('dead-snag', 'snag', -1, 2),

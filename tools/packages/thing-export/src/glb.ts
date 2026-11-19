@@ -642,8 +642,11 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       part,
     );
   };
-  const itemsOf = (part: PartExport): DisplayItem[] =>
-    splitMixed(displayItems(part.def.displaySolids ?? part.def.solids), (solid) => appearanceFor(part, solid));
+  const itemsOf = (part: PartExport, copy: 'voxel' | 'smooth' = 'voxel'): DisplayItem[] => {
+    const drawn = part.def.displaySolids ?? part.def.solids;
+    const solids = copy === 'smooth' ? drawn.filter((solid) => !solid.display?.voxelOnly) : drawn;
+    return splitMixed(displayItems(solids), (solid) => appearanceFor(part, solid));
+  };
   /** What a part's voxels sample for an item: a terracing solid's steps on the part's lattice, else the item's mesh. */
   const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undefined) => {
     if (item.merged) {
@@ -840,7 +843,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
           });
     const primitives =
       grain === undefined
-        ? smoothPrimitivesFor(itemsOf(seatedInHost(part)))
+        ? smoothPrimitivesFor(itemsOf(seatedInHost(part), 'smooth'))
         : voxelPrimitivesFor(part, itemsOf(part), grain);
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);

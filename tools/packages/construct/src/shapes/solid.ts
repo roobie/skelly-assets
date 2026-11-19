@@ -27,6 +27,11 @@ export interface SolidDisplayHints {
    * as a slope; whole steps read as the terraced armour the eye expects of a voxel model. The smooth copy ignores it.
    */
   readonly terrace?: number;
+  /**
+   * Leaves the solid out of the smooth copy. Fill inside a shell of other solids spares the voxel copy the shell's
+   * inside faces, but the smooth copy draws surfaces rather than cells, so there the fill only shows where it pokes out.
+   */
+  readonly voxelOnly?: boolean;
 }
 
 export interface SolidFinish {

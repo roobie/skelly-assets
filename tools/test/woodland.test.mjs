@@ -6,6 +6,7 @@ import { sourceReport } from '../check-sources.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { loadCatalogue } from '../packages/thing-authoring-tool/src/catalogue.ts';
 import { exportItem } from '../packages/thing-authoring-tool/src/exports.ts';
+import { grown } from '../packages/thing-authoring-tool/src/families/grown.ts';
 import { readVocabulary } from '../taxonomy.mjs';
 import { glbBounds } from './architecture-helpers.mjs';
 
@@ -19,7 +20,10 @@ const { rows, recipe, edge, lineup, settings } = JSON.parse(
 }`),
 );
 const byId = new Map(rows.map((row) => [row.id, row]));
-const pieces = (id) => JSON.parse(byId.get(id).parts[0].params.pieces);
+const pieces = (id) => {
+  const [{ family, params }] = byId.get(id).parts;
+  return family === 'grown' ? grown(params) : JSON.parse(params.pieces);
+};
 const outputs = new Map();
 const exported = (id) => {
   if (!outputs.has(id)) {
@@ -39,19 +43,37 @@ const gltf = (bytes) => {
 const inRange = (value, [lo, hi], message) =>
   assert.ok(value >= lo - 1e-5 && value <= hi + 1e-5, `${message}: ${value} outside ${lo}..${hi}`);
 
-// Deliberate acceptance budgets, independent of the generators: width and full height including root/rock skirts.
+// Deliberate acceptance budgets, independent of the generators: width and full height including root/rock skirts. A
+// grown model's budget is its habit's as the woodland thins it: thinning takes the overtaking laterals a spreading oak
+// spreads by, and a shrub's clumps swell to the grain.
 const sizes = {
   woodland_oak_spreading: [
-    [7, 8.5],
-    [8.8, 9.3],
+    [5, 6.5],
+    [7, 8],
   ],
   woodland_oak_upright: [
-    [4.8, 6.2],
-    [10, 10.7],
+    [7, 8.5],
+    [12, 13.5],
   ],
   woodland_birch: [
+    [5, 6],
+    [11, 12],
+  ],
+  woodland_scots_pine: [
     [3.8, 4.8],
-    [11, 11.5],
+    [9.3, 10.3],
+  ],
+  woodland_spruce: [
+    [4.5, 5.6],
+    [9.1, 10.1],
+  ],
+  woodland_hazel: [
+    [2.6, 3.2],
+    [1.9, 2.4],
+  ],
+  woodland_shrub_low: [
+    [1.8, 2.5],
+    [1.1, 1.5],
   ],
   woodland_pine: [
     [4, 4.6],
@@ -81,14 +103,6 @@ const sizes = {
     [3.7, 4],
     [1, 1.2],
   ],
-  woodland_hazel: [
-    [2, 2.6],
-    [1.8, 2.2],
-  ],
-  woodland_shrub_low: [
-    [1.4, 1.8],
-    [0.7, 1],
-  ],
   woodland_fern: [
     [1.5, 1.8],
     [0.5, 0.6],
@@ -111,9 +125,8 @@ const sizes = {
   ],
 };
 
-test('seventeen woodland assets are registered once in the existing nature recipe, without replacing small props', () => {
-  assert.equal(rows.length, 17);
-  assert.equal(byId.size, 17);
+test('every woodland asset is registered once in the existing nature recipe, without replacing small props', () => {
+  assert.equal(byId.size, rows.length);
   assert.deepEqual([...byId.keys()].sort(), Object.keys(sizes).sort());
   loadCatalogue({ ...settings, items: rows });
   for (const row of rows) {
@@ -146,9 +159,12 @@ for (const { id, voxelGrain } of rows)
       const box = glbBounds(bytes);
       bounds.push(box);
       const [min, max] = box;
-      inRange(max[0] - min[0], sizes[id][0], `${id} width`);
-      inRange(max[1] - min[1], sizes[id][1], `${id} height`);
-      inRange(min[1], [-0.18, 0.001], `${id} base must contact, not float above, authored ground`);
+      // The voxel copy may round out to whole cells: up to a cell past each side, above the top and under the skirt.
+      const cell = bytes === output.glb ? voxelGrain : 0;
+      const [[least, most], [lowest, highest]] = sizes[id];
+      inRange(max[0] - min[0], [least, most + 2 * cell], `${id} width`);
+      inRange(max[1] - min[1], [lowest, highest + 2 * cell], `${id} height`);
+      inRange(min[1], [-0.18 - cell, 0.001], `${id} base must contact, not float above, authored ground`);
       if (['woodland_fern', 'woodland_grass', 'woodland_fallen_log'].includes(id))
         inRange(min[1], [-1e-5, 1e-5], `${id} exact ground`);
       if (id.includes('boulder')) inRange(min[1], [-0.16001, -0.15999], `${id} buried skirt`);
@@ -164,6 +180,10 @@ for (const { id, voxelGrain } of rows)
           'foliage survives voxelization',
         );
       if (id === 'woodland_boulder_low') assert.ok(used.has('stone-grey') && used.has('moss-woodland'));
+      // A shader tells a grown model's leaves from its wood by material alone, so every primitive is one or the other.
+      const [{ family, finish }] = byId.get(id).parts;
+      if (family === 'grown')
+        assert.deepEqual([...used].sort(), [finish.bark, finish.leaf].sort(), `${id} bark and leaf`);
     }
     for (const side of [0, 1])
       for (const axis of [0, 1, 2])
@@ -204,9 +224,10 @@ test('fern leaflet roots meet the actual rising/falling stalk segments, not an a
 });
 
 test('source compositions keep metre scale, ground-level origins, known ids and normalized yaw rotations', () => {
+  assert.deepEqual([...new Set(lineup.sites.map((s) => s.model))].sort(), [...byId.keys()].sort(), 'lineup shows all');
   for (const example of [edge, lineup]) {
     assert.equal(new Set(example.sites.map((s) => s.site)).size, example.sites.length);
-    assert.deepEqual([...new Set(example.sites.map((s) => s.model))].sort(), [...byId.keys()].sort());
+    for (const { model } of example.sites) assert.ok(byId.has(model), `${model} is a woodland model`);
     for (const site of example.sites) {
       assert.equal(site.at[1], 0);
       assert.ok(Math.abs(Math.hypot(...site.turn) - 1) < 1e-9);
