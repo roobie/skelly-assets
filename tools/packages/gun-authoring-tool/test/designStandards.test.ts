@@ -26,6 +26,15 @@ describe('the publish check on a design whose ports declare standards', () => {
     expect(wellStandard('ak-curved')).toBeUndefined();
   });
 
+  it('cuts an integral well and its magazine for no standard, since both are shaped round the cartridges', () => {
+    const standardOf = (family: 'lower' | 'magazine', params: Record<string, string>, portId: string) =>
+      gunDomain.families[family]!.build({ ...params, integral: 'yes' }).ports.find((port) => port.id === portId)
+        ?.standard;
+    const lower = { layout: 'conventional', magazineWell: 'recessed', magazineProfile: 'stanag-curved' };
+    expect(standardOf('lower', lower, 'magazine')).toBeUndefined();
+    expect(standardOf('magazine', { profile: 'stanag-curved' }, 'top')).toBeUndefined();
+  });
+
   it('fails a STANAG magazine in a fixed well sized by no magazine, which is cut for no standard', () => {
     const rifle = design('archetype-battle-rifle');
     rifle.assembly.parts.magazine.params = { ...rifle.assembly.parts.magazine.params, profile: 'stanag-curved' };

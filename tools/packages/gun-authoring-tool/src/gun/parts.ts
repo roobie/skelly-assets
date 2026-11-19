@@ -2964,14 +2964,17 @@ const lower: PartFamily = {
         portY = RECESSED_MAGAZINE_PORT_Y;
       }
       // A well is cut for the standard of the magazine it is shaped round: an AR well for the one its frame takes,
-      // whatever magazine is offered to it, and a well that reshapes for the one it is built for. A fixed well of any
-      // other lower is sized by no magazine, so it is cut for no standard.
+      // whatever magazine is offered to it, and a recessed well for the one it is built for. An integral well is shaped
+      // round its cartridges, and a fixed well of any other lower is sized by no magazine, so neither is cut for a
+      // standard.
       const shapedFor =
-        section !== undefined
-          ? magazineProfile
-          : layout === 'ar'
-            ? arWellMagazineProfile(params.actionFrame)
-            : undefined;
+        params.integral === 'yes'
+          ? undefined
+          : section !== undefined
+            ? magazineProfile
+            : layout === 'ar'
+              ? arWellMagazineProfile(params.actionFrame)
+              : undefined;
       const standard = shapedFor === undefined ? undefined : magazineStandardOf(shapedFor);
       const port: PortDef = {
         id: 'magazine',
@@ -5419,7 +5422,8 @@ export const magazine: PartFamily = {
     } else if (params.profile === 'stanag-curved') {
       curveProfile = CURVED_MAGAZINE_PROFILES.stanag30;
     }
-    const standard = magazineStandardOf(profile);
+    // An integral magazine is the cartridge box of its well, which is cut for no magazine standard.
+    const standard = params.integral === 'yes' ? undefined : magazineStandardOf(profile);
     const insertion = params.profile === 'pistol' ? PISTOL_MAGAZINE_INSERTION : MAGAZINE_INSERTION;
     const resolvedInsertion = curveProfile?.seat === 'face' ? 0 : insertion;
     const shape: MagazineShape = {
