@@ -10,7 +10,7 @@ import { heldItem } from './heldMotion.mjs';
 import { hideCovered } from './hiding.mjs';
 import { boneTransforms } from './kinematics.mjs';
 import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
-import { movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
+import { evenClocks, movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -145,7 +145,7 @@ const ownCopy = (material, copies) => {
 // of every part, and hides what a slide has stowed into its carrier.
 export function swing(moving, clock) {
   for (const { carrier, layers, materials } of moving) {
-    const clocks = typeof clock === 'number' ? layers.map(() => clock) : clock;
+    const clocks = typeof clock === 'number' ? evenClocks(layers, clock) : clock;
     const m = poseAt(layers, clocks);
     carrier.matrix.set(m[0], m[1], m[2], m[9], m[3], m[4], m[5], m[10], m[6], m[7], m[8], m[11], 0, 0, 0, 1);
     carrier.matrixWorldNeedsUpdate = true;

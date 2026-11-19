@@ -24,7 +24,7 @@
 import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
 import { resolve } from 'node:path';
-import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
+import { AUTHORED_LATERAL, evenClocks, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { shardUnits } from './generation.mjs';
 import { column, dot, perAxis } from './packages/construct/src/foundation/math.ts';
 import { shareStages } from './packages/motion/src/motion.ts';
@@ -272,10 +272,7 @@ export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only
   const posed = bodies.map(({ site, layers, members, carriers }) => ({
     site,
     carriers,
-    pose: poseAt(
-      layers,
-      layers.map(() => 1),
-    ),
+    pose: poseAt(layers, evenClocks(layers, 1)),
     planes: stowPlanesOf(layers),
     shapes: members.flatMap(shapesOf),
     members,

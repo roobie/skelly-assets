@@ -100,16 +100,24 @@ const layerClock = (/** @type {Clocks} */ clocks, /** @type {number} */ layer) =
 };
 
 /**
- * Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
+ * The same `clock` for each of a body's `layers`.
+ * @param {readonly Motion[]} layers
+ * @param {number} clock
+ * @returns {Clocks}
+ */
+export const evenClocks = (layers, clock) => layers.map(() => clock);
+
+/**
+ * Where a body's `layers` have put it at `clocks`: its own motion first, then each carrier's, so a rider's motion is
  * nested inside its carrier's. The outermost layer, the first, is the furthest carrier; `first` leaves out its stages
  * before that one.
  * @param {readonly Motion[]} layers
- * @param {Clocks} clock
+ * @param {Clocks} clocks
  * @returns {Pose}
  */
-export const poseAt = (layers, clock, first = 0) =>
+export const poseAt = (layers, clocks, first = 0) =>
   layers.reduceRight(
-    (inner, motion, i) => compose(poseOf(motionPoseAt(motion, layerClock(clock, i), i === 0 ? first : 0)), inner),
+    (inner, motion, i) => compose(poseOf(motionPoseAt(motion, layerClock(clocks, i), i === 0 ? first : 0)), inner),
     IDENTITY,
   );
 
@@ -130,15 +138,15 @@ export const stowPlanesOf = (layers) =>
   );
 
 /**
- * The planes that hide what a body's `layers` stow at `clock`, as { normal, constant } in the frame the body's pose
+ * The planes that hide what a body's `layers` stow at `clocks`, as { normal, constant } in the frame the body's pose
  * carries it into: a point `p` there is shown while `normal . p + constant >= 0`.
  * @param {readonly Motion[]} layers
- * @param {Clocks} clock
+ * @param {Clocks} clocks
  */
-export function stowClips(layers, clock) {
-  const body = invert(poseAt(layers, clock));
+export function stowClips(layers, clocks) {
+  const body = invert(poseAt(layers, clocks));
   return stowPlanesOf(layers).map(({ layers: outer, from, first, direction: [dx, dy, dz], stow }) => {
-    const m = compose(poseAt(outer, clock.slice(from), first), body);
+    const m = compose(poseAt(outer, clocks.slice(from), first), body);
     return {
       normal: [
         -(m[0] * dx + m[3] * dy + m[6] * dz),
