@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
-import { SMOOTH } from '@skelly/thing-export/glb.ts';
+import { isSmoothPiece, SMOOTH } from '@skelly/thing-export/glb.ts';
 import type { ModelExport } from '@skelly/thing-export/recipe.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -78,6 +78,16 @@ const defaultPart = (name: string): PartDef | undefined => {
 
 /** Whether a family's part keeps its authored mesh in a voxelized export. */
 const buildsSmooth = (name: string): boolean => defaultPart(name)?.tags?.includes(SMOOTH) ?? false;
+
+/** Whether a family's part draws these of its solids as smooth pieces, as a smooth feature of a voxelized part. */
+const smoothPieces = (name: string, solids: readonly string[]): boolean => {
+  const part = defaultPart(name);
+  return (
+    part !== undefined &&
+    solids.length > 0 &&
+    solids.every((id) => part.solids.some((solid) => solid.id === id && isSmoothPiece(solid)))
+  );
+};
 
 /** The family of each exported part node, with its mesh. */
 const partNodes = (glb: Uint8Array) =>
@@ -191,16 +201,16 @@ describe('recipe output grain', () => {
     expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
     // A loose part's node is named by the family its part builds, which need not be its catalogue family.
     const familyOf = (node: string) => (row.kind === 'part' ? PART_CATALOGUE.items.get(row.source)!.family : node);
-    const smoothMeshes = new Set(
-      partNodes(glb).flatMap(({ family, mesh }) =>
-        mesh !== undefined && buildsSmooth(familyOf(family)) ? [mesh] : [],
-      ),
+    const meshFamilies = new Map(
+      partNodes(glb).flatMap(({ family, mesh }) => (mesh === undefined ? [] : [[mesh, familyOf(family)] as const])),
     );
     meshes.forEach(({ primitives }, mesh) => {
-      const allowed = smoothMeshes.has(mesh) ? [undefined] : grains;
+      const family = meshFamilies.get(mesh);
       for (const { extras } of primitives) {
-        expect(allowed, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
-          (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
+        const { voxelGrain, solids = [] } = (extras ?? {}) as { voxelGrain?: number; solids?: string[] };
+        const smooth = family !== undefined && (buildsSmooth(family) || smoothPieces(family, solids));
+        expect(smooth ? [undefined] : grains, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
+          voxelGrain,
         );
       }
     });
