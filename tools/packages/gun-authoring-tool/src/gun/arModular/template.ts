@@ -1,6 +1,7 @@
 import type { ConnectionTemplate, SlotTemplate, Template } from '@skelly/construct/assembly/template.ts';
 import { barrelGas } from './barrel.ts';
-import { type ArFrame, familyName } from './frame.ts';
+import { type ArFrame, familyName, u } from './frame.ts';
+import { railSlotCount } from './rail.ts';
 
 /** What one of a frame's templates says of the gun it builds. */
 interface ArModularGun {
@@ -43,6 +44,15 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     { from: 'upper.port-cover', to: 'port-cover.upper' },
   ];
   const actionSlots = [slot('bolt-carrier'), slot('charging-handle'), slot('port-cover')];
+  const rearSightConnection: ConnectionTemplate = {
+    from: 'upper.rail',
+    slot: REAR_SIGHT_RAIL_SLOT,
+    to: 'rear-sight.base',
+  };
+  // The front sight stands at the front of the handguard's rail, on its last slot; the shortest handguard's, so it
+  // stands on every length.
+  const shortestHandguard = Math.min(...Object.values(frame.table.handguard.lengths).map(u));
+  const frontSightRailSlot = railSlotCount(frame.table.rail, shortestHandguard) - 1;
   const freeFloat: Template = {
     name: `${frame.name}-modular`,
     ...guns.freeFloat,
@@ -59,11 +69,15 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
       slot('stock', { style: 'collapsible' }),
       slot('grip'),
       { id: 'magazine', family: 'magazine', params: { length: 'L', profile: 'stanag-curved' } },
+      slot('rear-sight'),
+      { id: 'front-sight', family: familyName(frame, 'rail-front-sight') },
     ],
     connections: [
       ...sharedConnections,
       { from: 'barrel.gas-block', to: 'gas-block.barrel' },
       { from: 'barrel.muzzle', to: 'flash-hider.base' },
+      rearSightConnection,
+      { from: 'handguard.rail', slot: frontSightRailSlot, to: 'front-sight.base' },
     ],
   };
   // The A2 rifle's choices follow from its carry-handle upper and rifle extension; the gas system follows the barrel.
@@ -121,7 +135,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
       { from: 'barrel.gas-block', to: 'front-sight-base.barrel' },
       { from: 'front-sight-base.handguard-cap', to: 'handguard.handguard-cap' },
       { from: 'barrel.muzzle', to: 'flash-hider.base' },
-      { from: 'upper.rail', slot: REAR_SIGHT_RAIL_SLOT, to: 'rear-sight.base', when: isFlatTop },
+      { ...rearSightConnection, when: isFlatTop },
     ],
   };
   return [freeFloat, frontSight];

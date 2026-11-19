@@ -340,6 +340,16 @@ describe('modular AR', () => {
     },
   );
 
+  it("stands the free-float carbine's rail front post on its rear sight's line", () => {
+    const { resolved, issues } = validate(loadDesignAssembly('ar15-carbine-free-float'), gunDomain);
+    expect(issues).toEqual([]);
+    const sightY = (part: string) => {
+      const axis = resolved.defs.get(part)!.axes.find(({ kind }) => kind === 'sight')!;
+      return applyPoint(resolved.placed.get(part)!, axis.origin)[1];
+    };
+    expect(sightY('front-sight')).toBeCloseTo(sightY('rear-sight'), 6);
+  });
+
   it('exports the carbine action through the sourced stroke, and its cover and stock moving through their own stops', () => {
     const result = exportGunGlb(
       loadDesignAssembly('ar15-carbine-free-float'),

@@ -516,6 +516,11 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     apertureAboveRail: dim(sightPlane.mm - $.upper.rail.topY.mm, 'derived: the flat-top sight plane over the top rail'),
   },
 
+  // The fixed post a free-float handguard carries at the front of its rail, its tip on the same sight plane.
+  railFrontSight: {
+    postAboveRail: dim(sightPlane.mm - $.handguard.railTopY.mm, "derived: the flat-top sight plane over the handguard's top rail"),
+  },
+
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.
   sightLine: {
     tolerance: dim(flatTopExtra.mm / 2, 'derived: half the step between the two front sight base heights'),
@@ -676,6 +681,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
     ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
+    ar15_rail_front_sight: mass(0.048, 'derived: as the fixed rail rear sight it pairs with'),
     ar15_bolt_carrier: mass(0.3266, 'sourced: 11.52 oz, https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
     ar15_charging_handle: mass(0.0312, 'sourced: 1.1 oz, https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
     ar15_port_cover: mass(0.0221, 'sourced: 0.78 oz, https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),

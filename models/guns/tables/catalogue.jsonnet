@@ -314,6 +314,7 @@ local ar15Item(id, role, params) =
       height: 'carry-handle', profile: 'sight-block',
     }),
     ar15Item('ar15_rear_sight', 'rear-sight', {}),
+    ar15Item('ar15_rail_front_sight', 'rail-front-sight', {}),
     ar15Item('ar15_handguard_free_float', 'handguard', { length: '15' }),
     ar15Item('ar15_handguard_drop_in_mid', 'handguard-drop-in', { gas: 'mid' }),
     ar15Item('ar15_handguard_drop_in_rifle', 'handguard-drop-in', { gas: 'rifle' }),

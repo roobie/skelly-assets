@@ -16,6 +16,7 @@ import { arGrip } from './grip.ts';
 import { arDropInHandguard, arHandguard } from './handguard.ts';
 import { arLower } from './lower.ts';
 import { arPortCover } from './portCover.ts';
+import { arRailFrontSight } from './railFrontSight.ts';
 import { arRearSight } from './rearSight.ts';
 import { arModularRules } from './rules.ts';
 import { arReceiverExtension, arStock } from './stock.ts';
@@ -29,7 +30,7 @@ const FRAMES: readonly { readonly frame: ArFrame; readonly guns: ArModularGuns }
     guns: {
       freeFloat: {
         description:
-          'Modular AR-15 carbine: flat-top upper, free-float railed handguard, low-profile gas block, A2 flash hider, collapsible stock.',
+          'Modular AR-15 carbine: flat-top upper, free-float railed handguard, low-profile gas block, rail front and rear sights, A2 flash hider, collapsible stock.',
         variant: '5.56x45',
       },
       frontSight: {
@@ -51,6 +52,7 @@ const PART_FAMILIES: readonly ((frame: ArFrame) => GunPartFamily)[] = [
   arGasBlock,
   arFrontSightBase,
   arRearSight,
+  arRailFrontSight,
   arHandguard,
   arDropInHandguard,
   arFlashHider,

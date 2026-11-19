@@ -102,6 +102,7 @@ import {
   PUMP_LOADING_PORT_X,
   PUMP_SHELL_LOADED_LENGTH_U,
 } from './pumpShell.ts';
+import { RAIL_FRONT_SIGHT_REFERENCE_U, railFrontSightSolids } from './railFrontSight.ts';
 import { RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U, railPeepRearSightSolids } from './railPeepRearSight.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U, railRearSightSolids } from './railRearSight.ts';
 import {
@@ -4007,13 +4008,16 @@ const railFrontSight: PartFamily = {
     const sightAxisY = RECEIVER_FRONT_HALF_HEIGHT + 1 - handguardTop;
     return {
       family: 'rail-front-sight',
-      solids: [
-        solid('base', [-1, 0, -1], [1, 0.5, 1]),
-        solid('post', [-GRID, 0.5, -GRID / 2], [GRID, sightAxisY, GRID / 2]),
-      ],
+      solids: railFrontSightSolids(sightAxisY),
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
-      axes: [sightAxis('front', { origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 })],
+      axes: [
+        sightAxis('front', {
+          origin: [0, sightAxisY, 0],
+          dir: X,
+          referenceDistanceU: RAIL_FRONT_SIGHT_REFERENCE_U,
+        }),
+      ],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },

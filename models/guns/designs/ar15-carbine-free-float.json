@@ -5,7 +5,7 @@
   "calibre": "5.56x45",
   "assembly": {
     "name": "ar15-carbine-free-float",
-    "description": "AR-15 carbine: flat-top upper, 16 inch mid-length barrel under a 15 inch free-float railed handguard, low-profile gas block, A2 flash hider, carbine receiver extension with a collapsible stock, 30-round magazine.",
+    "description": "AR-15 carbine: flat-top upper, 16 inch mid-length barrel under a 15 inch free-float railed handguard, low-profile gas block, rail front and rear sights, A2 flash hider, carbine receiver extension with a collapsible stock, 30-round magazine.",
     "root": "lower",
     "parts": {
       "lower": { "item": "ar15_lower" },
@@ -24,7 +24,9 @@
         "family": "magazine",
         "params": { "length": "L", "profile": "stanag-curved" },
         "prefab": { "id": "stanag-30", "version": 1 }
-      }
+      },
+      "rear-sight": { "item": "ar15_rear_sight" },
+      "front-sight": { "item": "ar15_rail_front_sight" }
     },
     "connections": [
       { "from": "lower.ar-upper", "to": "upper.ar-upper" },
@@ -38,7 +40,9 @@
       { "from": "upper.charging-handle", "to": "charging-handle.mount" },
       { "from": "upper.port-cover", "to": "port-cover.upper" },
       { "from": "barrel.gas-block", "to": "gas-block.barrel" },
-      { "from": "barrel.muzzle", "to": "flash-hider.base" }
+      { "from": "barrel.muzzle", "to": "flash-hider.base" },
+      { "from": "upper.rail", "slot": 1, "to": "rear-sight.base" },
+      { "from": "handguard.rail", "slot": 36, "to": "front-sight.base" }
     ]
   },
   "locks": {
