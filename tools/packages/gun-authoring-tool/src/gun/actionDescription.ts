@@ -15,9 +15,9 @@ import { partNodeName } from '@skelly/thing-export/glb.ts';
 import { hingeOf, slideOf } from './actionMotion.ts';
 import {
   type ActionRoleKey,
-  actionKindOf,
   actionRoleKeyOf,
   type DescribedActionKind,
+  describedActionKindOf,
   type GunPartFamily,
 } from './actionRoles.ts';
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
@@ -100,9 +100,9 @@ const carrierCyclicRpm = (resolved: Resolved, id: string): number | undefined =>
 };
 
 export const resolveGunAction = (resolved: Resolved): ResolvedGunAction | undefined => {
-  const entry = [...resolved.defs].find(([, def]) => actionKindOf(def) !== undefined);
-  const kind = entry && actionKindOf(entry[1]);
-  if (!(entry && kind) || kind === 'barrett') {
+  const entry = [...resolved.defs].find(([, def]) => describedActionKindOf(def) !== undefined);
+  const kind = entry && describedActionKindOf(entry[1]);
+  if (!(entry && kind)) {
     return undefined;
   }
   const [id] = entry;
