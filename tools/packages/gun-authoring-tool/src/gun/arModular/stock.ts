@@ -2,7 +2,13 @@ import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/sc
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
-import { octagonalProfile, octagonalSection, octagonalSectionChamfered, octagonalTubeWalls } from '../octagon.ts';
+import {
+  OCTAGON_CORNER,
+  octagonalProfile,
+  octagonalSection,
+  octagonalSectionChamfered,
+  octagonalTubeWalls,
+} from '../octagon.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
 
@@ -115,6 +121,33 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
 };
 
 /**
+ * The A2 body's flanks either side of its sleeve's lower chamfers, from the stock's frame to `frontX`: the body under
+ * the sleeve rises to the octagon's full width on each side, so its section meets the sleeve's with no groove between.
+ */
+const bodyFlanks = (frontX: number, combY: number, half: number): Solid[] => {
+  const [flatEdge, flankFootY] = [half * OCTAGON_CORNER, -combY * OCTAGON_CORNER];
+  const flank = (id: string, profile: Vec2[]): Solid => ({
+    id,
+    kind: 'extruded-polygon',
+    profile,
+    axis: 'x',
+    z: [0, frontX],
+  });
+  return [
+    flank('body-flank-right', [
+      [-combY, half],
+      [-combY, flatEdge],
+      [flankFootY, half],
+    ]),
+    flank('body-flank-left', [
+      [-combY, -half],
+      [flankFootY, -half],
+      [-combY, -flatEdge],
+    ]),
+  ];
+};
+
+/**
  * The A2 fixed stock over the whole rifle extension. Its frame is the tube's end: the butt plate closes behind it, the
  * sleeve wraps the tube from there to the lower's tower, as thick under the tube as the comb stands over it, and the
  * body under the sleeve deepens from the tower to the butt's toe. Every piece of the side outline is whole behind the
@@ -155,7 +188,7 @@ const a2Stock = (frame: ArFrame): PartDef => {
   const sleeve = stockSleeve(frontX, bore, octagonalSection([-combY, combY], [-half, half]));
   return {
     family: 'stock',
-    solids: [...outlineSolids, ...sleeve.solids],
+    solids: [...outlineSolids, ...sleeve.solids, ...bodyFlanks(frontX, combY, half)],
     ports: [stockPort(s.buffer)],
     keepOuts: [],
     axes: [],
