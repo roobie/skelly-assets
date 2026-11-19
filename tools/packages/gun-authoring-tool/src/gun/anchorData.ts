@@ -8,7 +8,7 @@ import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geome
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
 import type { GunAnchorDeclarations, GunPartAnchors } from './anchors.ts';
 import { localEjectionPoint } from './ejection.ts';
-import { FIRING_GRIP } from './parts.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
 import { REVOLVER_GRIP_RAKE_DEGREES } from './revolver.ts';
 import { sporterSupport } from './sporter.ts';
 

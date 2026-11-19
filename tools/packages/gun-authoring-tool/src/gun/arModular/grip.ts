@@ -1,9 +1,7 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { X, Y } from '../antiMateriel/common.ts';
+import { FIRING_GRIP } from '../firingGrip.ts';
 import { AR15, outlineU, u } from './frame.ts';
-
-/** The firing-grip tag `firing-grip` (gun/rules.ts) looks for; parts.ts exports it, but parts.ts imports this folder. */
-const FIRING_GRIP = 'firing-grip';
 
 /**
  * The A2 pistol grip by its traced side outline. Its frame is the front of its top, which closes the trigger guard's

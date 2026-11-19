@@ -28,10 +28,11 @@ import { FEATURE_VOXELS, featureFitsGrain } from '@skelly/thing-export/featureFi
 import { partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { ACTION_ROLE_TAGS } from './actionRoles.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
 import gunVoxel from './gunVoxel.json' with { type: 'json' };
 import { mountCanAccept } from './mounts.ts';
 import { getOptic, opticRailContactSolids } from './optics.ts';
-import { FIRING_GRIP, G3_MAGAZINE_WELL_TILT, HANDGUARD_CLEARANCE, LOWER_LAYOUTS } from './parts.ts';
+import { G3_MAGAZINE_WELL_TILT, HANDGUARD_CLEARANCE, LOWER_LAYOUTS } from './parts.ts';
 import { cornerGuardRear, isTriggerBlade, TRIGGER_GUARD_REAR_TAGS } from './roundedTriggerGuard.ts';
 
 /**

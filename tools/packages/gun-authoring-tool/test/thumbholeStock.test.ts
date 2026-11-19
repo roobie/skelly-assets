@@ -10,7 +10,8 @@ import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { FAMILIES, FIRING_GRIP } from '../src/gun/parts.ts';
+import { FIRING_GRIP } from '../src/gun/firingGrip.ts';
+import { FAMILIES } from '../src/gun/parts.ts';
 import { boltRifle } from '../src/gun/templates.ts';
 import { loadFixture, variant } from './helpers.ts';
 

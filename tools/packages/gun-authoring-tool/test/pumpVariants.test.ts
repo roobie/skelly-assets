@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { FIRING_GRIP } from '../src/gun/parts.ts';
+import { FIRING_GRIP } from '../src/gun/firingGrip.ts';
 import { pumpShotgun } from '../src/gun/templates.ts';
 import { sweepGroup } from './sweeps.ts';
 

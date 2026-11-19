@@ -63,6 +63,7 @@ import {
 } from './boltCartridge.ts';
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
@@ -261,8 +262,6 @@ const keepOut = (
     ...(options?.allowFamilies ? { allowFamilies: options.allowFamilies } : {}),
   };
 };
-/** Tag for parts the firing hand can hold (see rules.ts). */
-export const FIRING_GRIP = 'firing-grip';
 /** A front post built into another part, which a built-in rear sight's drawn line aims at; see `exportGlb.ts`. */
 export const BUILT_IN_FRONT_POST = 'front-sight-post';
 
