@@ -1,4 +1,5 @@
 import type { PartDef, PortDef } from '@skelly/construct/assembly/schema.ts';
+import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
@@ -42,11 +43,17 @@ export const arActionLayout = (frame: ArFrame): ArActionLayout => {
   const { shaft } = chargingHandle;
   const shaftY: Span = [u(shaft.bottomY), u(shaft.bottomY) + u(shaft.depth)];
   const play = u(shaft.clearance);
+  const channelTopY = shaftY[1] + play;
+  if (u(upper.topY) - channelTopY < u(upper.roof) - TOLERANCE.position) {
+    throw new Error(
+      `${frame.name}.upper.topY: the receiver's roof over the charging handle's channel is thinner than upper.roof`,
+    );
+  }
   return {
     boreHalf,
     carrier: { rearX, frontX, radius: boreHalf - u(boltCarrier.clearance), boltFaceX },
     shaft: { frontX: shaftFrontX, y: shaftY, half: u(shaft.halfWidth) },
-    channel: { frontX: shaftFrontX + play, y: [shaftY[0] - play, shaftY[1] + play], half: u(shaft.halfWidth) + play },
+    channel: { frontX: shaftFrontX + play, y: [shaftY[0] - play, channelTopY], half: u(shaft.halfWidth) + play },
   };
 };
 

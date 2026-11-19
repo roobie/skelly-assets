@@ -137,19 +137,12 @@ local sideOverBore(py) = (side.boreYPx.value - py) * sideMmPerPx;
 // No print of the upper is published, so the rail top is taken from a forum compilation of measured flat-tops. The side
 // photo agrees within its trace; the bare photo reads it 2 mm lower and the AM-15 profile 3.8 mm higher, each at over a
 // millimetre a pixel.
-local railTopY = dim(
-  30.861,
-  'sourced: 1.215 in from the bore centreline, a forum compilation of flat-top rail heights, '
+local sourcedRailTopY = 30.861;
+local railHeightSource =
+  '1.215 in from the bore centreline, a forum compilation of flat-top rail heights, '
   + 'https://forum.308ar.com/topic/23364-advantage-of-various-upper-rail-heights/; the m16a4-side trace reads %.1f mm'
-  % sideOverBore(side.railTopYPx.value),
-);
+  % sideOverBore(side.railTopYPx.value);
 local drawnSlotDepth = dim(detailFeature, 'derived: the slot depth exaggerated to two detail voxels, so every slot cuts evenly');
-// The flat-top's receiver rises to the rail, which is only its teeth: the upper carries the charging handle under it.
-local upperTopY = dim(
-  railTopY.mm - drawnSlotDepth.mm,
-  "derived: the rail's teeth standing on the receiver, its slots cut to the receiver's top; the m16a4-side trace's "
-  + 'receiver top reads %.1f mm' % sideOverBore(side.receiverTopYPx.value),
-);
 
 // The carry handle, registered at its rear face on the upper's rear face; a null height stands on the handle's base,
 // the top of the receiver under its window.
@@ -274,11 +267,23 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
 
   upper: {
     rearX: upperRearX,
-    topY: upperTopY,
+    // The receiver's top stands a roof over the charging handle's channel. At the sourced rail height the roof is
+    // thinner than that, since the handle is lifted clear over the stock, so the receiver and its rail are raised.
+    roof: dim(grains.detailGrain * 1000, "derived: one detail voxel, so the roof over the charging handle's channel exports whole"),
+    topY: dim(
+      std.max(
+        sourcedRailTopY - drawnSlotDepth.mm,
+        $.chargingHandle.shaft.bottomY.mm + $.chargingHandle.shaft.depth.mm + $.chargingHandle.shaft.clearance.mm
+        + self.roof.mm,
+      ),
+      "derived: under the rail by its slot depth, or a roof over the charging handle's channel if that is higher; the "
+      + "m16a4-side trace's receiver top reads %.1f mm" % sideOverBore(side.receiverTopYPx.value),
+    ),
     halfWidth: dim(14.5, 'derived: wider than the rail it carries'),
+    // The flat-top's rail is only its teeth, standing on the receiver with its slots cut to the receiver's top.
     rail: {
       rearX: tracedX(386, 'upperRail'),
-      topY: railTopY,
+      topY: dim($.upper.topY.mm + drawnSlotDepth.mm, 'derived: its teeth on the receiver; sourced at ' + railHeightSource),
     },
     // The fixed A2 carry handle as convex side outlines: the rear sight housing with its sloped back, the aperture ears
     // over it and the block ahead of them, the bar falling to the front over the hand hole, and the front leg with its
@@ -288,8 +293,8 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       // handle runs in it, where the flat-top carries its rail.
       base: outline(
         [
-          [handleX(side.handleRearXPx.value), upperTopY.mm],
-          [handleX(handleFront), upperTopY.mm],
+          [handleX(side.handleRearXPx.value), $.upper.topY.mm],
+          [handleX(handleFront), $.upper.topY.mm],
           handlePoint([handleFront, null]),
           handlePoint([side.handleRearXPx.value, null]),
         ],
@@ -503,7 +508,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   // The fixed rear sight a flat-top carries on its rail, its aperture on the flat-top sight plane the flat-top front
   // sight base is made for.
   rearSight: {
-    apertureAboveRail: dim(sightPlane.mm - railTopY.mm, 'derived: the flat-top sight plane over the top rail'),
+    apertureAboveRail: dim(sightPlane.mm - $.upper.rail.topY.mm, 'derived: the flat-top sight plane over the top rail'),
   },
 
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.
@@ -515,7 +520,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     lengths: {
       '15': dim(calibration.lengthMm.value, 'sourced: https://www.jakt.se/anderson-am-15-utility-223-wylde-18-5rd'),
     },
-    railTopY: dim(railTopY.mm, "derived: flush with the upper's rail, so an optic may span the joint"),
+    railTopY: dim($.upper.rail.topY.mm, "derived: flush with the upper's rail, so an optic may span the joint"),
     bottomY: tracedY(120, 'handguard'),
     wall: detailWall('an aluminium tube'),
     outerTopY: dim(

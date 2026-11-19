@@ -9,6 +9,7 @@ import type { Motion } from '@skelly/motion/motion';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
+import { arActionLayout } from '../src/gun/arModular/action.ts';
 import { AR15_FRAME, checkFrameTable, checkRailSeats, FRAME_PICKS, pick, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { arUpper } from '../src/gun/arModular/upper.ts';
@@ -92,6 +93,14 @@ describe('modular AR', () => {
     expect(() => checkRailSeats('ar15', { ...AR15, handguard: { ...AR15.handguard, railTopY } })).toThrow(
       /ar15\.handguard\.outerTopY/,
     );
+  });
+
+  it("keeps the receiver's roof over the charging handle's channel at least upper.roof thick", () => {
+    const { shaft } = AR15.chargingHandle;
+    const channelTopY = shaft.bottomY.mm + shaft.depth.mm + shaft.clearance.mm;
+    expect(AR15.upper.topY.mm - channelTopY).toBeGreaterThanOrEqual(AR15.upper.roof.mm - 1e-9);
+    const thinned = { ...AR15, upper: { ...AR15.upper, topY: { ...AR15.upper.topY, mm: channelTopY + 0.5 } } };
+    expect(() => arActionLayout({ ...AR15_FRAME, table: thinned })).toThrow(/ar15\.upper\.topY: the receiver's roof/);
   });
 
   it('refuses the AR-15 table with a pick it pins left out or turned into a measurement', () => {
