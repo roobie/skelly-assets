@@ -11,7 +11,10 @@ local w = 0.055;  // half the receiver's width
 local underside = 0.15;  // the receiver's underside, where the magazine seats
 local top = 0.33;  // the receiver's top
 local barrelY = 0.245;
+local ridgeTop = 0.35;  // the receiver ridge's crest, which the rear sight stands on
 local sightTop = 0.375;  // the height both sights' tops share
+// The ejection port on the right side; the charging lever stands out of the bolt at its back end, centred on it.
+local port = { back: 0.03, front: 0.12, bottom: 0.25, top: 0.29, mid: (self.bottom + self.top) / 2 };
 
 // The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
 // magwell starts where the family's feeds do.
@@ -83,7 +86,7 @@ local drumMagazine = [
 ];
 
 local carbine(id, massKg, magazine) =
-  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, top, w, { front: 0.15, top: 0.35, halfWidth: 0.038 }) + [
+  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, top, w, { front: 0.15, top: ridgeTop, halfWidth: 0.038 }) + [
     // Barrel shroud, an octagonal slab with vents along both sides and a brass band at its mouth.
     h.prism('shroud', 'body', 'x', [[0.17, -0.045], [0.17, 0.045], [0.19, 0.062], [0.30, 0.062], [0.32, 0.045], [0.32, -0.045], [0.30, -0.062], [0.19, -0.062]], 0.17, 0.38),
     h.prism('shroud-band', 'trim', 'x', [[0.165, -0.049], [0.165, 0.049], [0.187, 0.067], [0.303, 0.067], [0.325, 0.049], [0.325, -0.049], [0.303, -0.067], [0.187, -0.067]], 0.36, 0.38),
@@ -104,13 +107,13 @@ local carbine(id, massKg, magazine) =
   ] + magazine + bolt.grip(0.155) + bolt.stock(top, 0.045) + [
     // Sights: a rear block on the ridge and a front post over the shroud, a fin tapering from a broad foot to a narrow
     // tip level with the rear block's top, so the two line up.
-    box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, sightTop, 0.02]),
-    box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, sightTop + 0.0005, 0.004]),
+    box('rear-sight', 'metal', [-0.12, ridgeTop, -0.02], [-0.07, sightTop, 0.02]),
+    box('rear-notch', 'vent', [-0.11, sightTop - 0.01, -0.004], [-0.08, sightTop + 0.0005, 0.004]),
     h.prism('front-post', 'metal', 'z', [[0.32, 0.316], [0.36, 0.316], [0.349, sightTop], [0.341, sightTop]], -0.01, 0.01),
     // Ejection port on the right side, with a chunky charging lever standing out of the bolt at its back end.
-    box('ejection', 'vent', [0.03, 0.25, w], [0.12, 0.29, w + 0.002]),
-    box('lever', 'metal', [0.03, 0.26, w], [0.07, 0.28, w + 0.03]),
-    box('lever-knob', 'metal', [0.02, 0.253, w + 0.022], [0.08, 0.287, w + 0.036]),
+    box('ejection', 'vent', [port.back, port.bottom, w], [port.front, port.top, w + 0.002]),
+    box('lever', 'metal', [port.back, port.mid - 0.01, w], [port.back + 0.04, port.mid + 0.01, w + 0.03]),
+    box('lever-knob', 'metal', [port.back - 0.01, port.mid - 0.017, w + 0.022], [port.back + 0.05, port.mid + 0.017, w + 0.036]),
   ] + [
     box('rivet-%d-%s' % [p[0], s], 'trim', [p[1] - 0.007, p[2] - 0.007, if s == 'r' then w else -w - 0.003], [p[1] + 0.007, p[2] + 0.007, if s == 'r' then w + 0.003 else -w])
     for p in [[0, -0.15, 0.18], [1, -0.15, 0.30], [2, 0.14, 0.18], [3, 0.14, 0.30]]
