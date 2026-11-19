@@ -70,12 +70,18 @@ local wrapStrap(id, slot, xc, cw, y0, y1, z0, z1, t=0.004) = [
   box(id + '-left', slot, [xc - cw - t, y0, z0], [xc - cw, y1, z1]),
   box(id + '-right', slot, [xc + cw, y0, z0], [xc + cw + t, y1, z1]),
 ];
-// The sole of the shoe a sabaton is strapped over: the plates stand on it and the heel strap runs under it.
+// The sole of the shoe a sabaton is strapped over: the plates stand on it and the straps wrap round it.
 local sabatonSole = 0.012;
-// A sabaton over a shoe that is not there: lames stepping down from the ankle to a toe cap, side plates and a heel
-// cup, strapped under the instep. Slots: plate, toe, strap, buckle.
+// A sabaton over a shoe of which only the sole is drawn, so the lift has something to stand on: lames stepping down
+// from the ankle to a toe cap, side plates and a heel cup, strapped under the instep. Slots: sole, plate, toe, strap,
+// buckle.
 local sabaton(p, xc) =
   local w = 0.11, l = 0.28, z0 = -l / 2, n = 6;
+  // The shoe's sole under the plates' footprint, from the heel cup's back to the toe cap's point.
+  local sole = [
+    [z0 - 0.004, xc - w * 0.4], [z0 - 0.004, xc + w * 0.4], [z0 + 0.02, xc + w / 2], [0.095, xc + w / 2],
+    [l / 2 + 0.01, xc + 0.004], [l / 2 + 0.01, xc - 0.004], [0.095, xc - w / 2], [z0 + 0.02, xc - w / 2],
+  ];
   local lame(i) =
     local zl = -0.045 + i * 0.024, yt = 0.125 - i * 0.012;
     [
@@ -89,6 +95,7 @@ local sabaton(p, xc) =
     ];
   // The lames, each overlapping the next toward the toe.
   std.flattenArrays([lame(i) for i in std.range(0, n - 1)]) + [
+    h.prism(p + '-sole', 'sole', 'y', sole, 0, sabatonSole),
     // A pointed toe cap riding over the last lame.
     h.prism(p + '-toe-top', 'toe', 'x', [[0.05, 0.095], [sabatonSole, l / 2 + 0.01], [sabatonSole, 0.095]], xc - w * 0.42, xc + w * 0.42),
     h.prism(p + '-toe-left', 'toe', 'y', [[0.095, xc - w / 2], [l / 2 + 0.01, xc - 0.004], [l / 2 + 0.01, xc + 0.004], [0.095, xc - w * 0.42]], sabatonSole, 0.05),
@@ -205,8 +212,10 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
   ]) + { title: 'Chainmail chausses' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of steel sabatons, each 280 mm long and 110 mm wide: six lames stepping down the instep to a pointed toe
-  // cap, a heel cup and ankle plate, and a leather strap under the arch. The steel grades ride on finishes maps.
+  // cap, a heel cup and ankle plate, and a leather strap under the arch, on a black leather sole. The steel grades ride
+  // on finishes maps.
   h.compound('sabaton', 1.3, pairOf(0.11, 0.03, sabaton), {
+    sole: 'leather-black',
     plate: 'steel-grey',
     toe: 'steel-grey',
     lining: 'leather-brown',

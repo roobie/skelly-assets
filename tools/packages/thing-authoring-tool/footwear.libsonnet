@@ -22,8 +22,8 @@ local ellipse(rx, rz) = [[rz * std.cos(2 * std.pi * i / 14), rx * std.sin(2 * st
 // One boot on a foot `b.l` long and `b.w` across, centred at x = cx. Its sole is `b.t` thick, a heel adds `b.heel`
 // under the back, the toe climbs in `b.layers` steps to the instep at `b.ankle`, and the shaft, an ellipse `b.rx` by
 // `b.rz` at the back of the foot, rises to `b.top` with a collar `b.collar` deep. A shaft of `b.top` 0 leaves a low
-// shell with no shaft, and `b.from` cuts away the foot behind that z, for a shell over the front of the foot.
-// `b.laneSlots` gives the toe steps two alternating slots, for lames. Slots: sole, upper, shaft, collar, lining, and
+// shell with no shaft, and `b.from` cuts away the foot behind that z, for a shell over the front of the foot, with a
+// heel piece as thick as the sole left under the heel, since the sole lifts the heel too. `b.laneSlots` gives the toe steps two alternating slots, for lames. Slots: sole, upper, shaft, collar, lining, and
 // the toe slot named by `b.toeSlot`.
 local boot(p, b, cx) =
   local l = b.l, w = b.w, t = b.t, n = b.layers;
@@ -44,6 +44,8 @@ local boot(p, b, cx) =
     h.prism(p + 'sole', 'sole', 'y', place(outline, cx, 0, 1.06, 1.03), 0, t),
   ] + (if heel > 0 then [
          h.prism(p + 'heel', 'sole', 'y', place(h.clipX(outline, -l * 0.24, false), cx, -0.004, 0.86, 1), t, t + heel),
+       ] else []) + (if std.objectHas(b, 'from') then [
+         h.prism(p + 'heel-piece', 'sole', 'y', place(h.clipX(whole, -l * 0.24, false), cx, -0.004, 0.86, 1), 0, t),
        ] else []) + [
     local s = layer(i);
     h.prism(p + 'vamp-%d' % i, if std.objectHas(b, 'laneSlots') then b.laneSlots[i % 2] else 'upper', 'y', s.poly, s.y0, s.y1 + 0.001)

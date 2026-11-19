@@ -22,8 +22,8 @@ local zfront(b, u) = local zs = shaftZ(b) + b.rz * 0.6; zs + (b.l / 2 - zs) * st
 // One shoe or boot on a foot `b.l` long and `b.w` across, centred at x = cx. Its sole is `b.t` thick, a heel adds
 // `b.heel` under the back, the toe climbs in `b.layers` steps to the instep at `b.ankle`, and the shaft, an ellipse
 // `b.rx` by `b.rz` at the back of the foot, rises to `b.top` with a collar `b.collar` deep. A shaft of `b.top` 0
-// leaves a shell with no shaft, and `b.from` cuts away the foot behind that z. `b.laneSlots` gives the toe steps two
-// alternating slots. Slots: sole, upper, shaft, collar, lining, and the toe slot named by `b.toeSlot`.
+// leaves a shell with no shaft, and `b.from` cuts away the foot behind that z, leaving a heel piece as thick as the
+// sole under the heel, since the sole lifts the heel too. `b.laneSlots` gives the toe steps two alternating slots. Slots: sole, upper, shaft, collar, lining, and the toe slot named by `b.toeSlot`.
 local boot(p, b, cx) =
   local l = b.l, w = b.w, t = b.t, n = b.layers;
   local whole = foot(l, w, std.get(b, 'point', 0));
@@ -36,6 +36,8 @@ local boot(p, b, cx) =
     h.prism(p + 'sole', 'sole', 'y', place(outline, cx, 0, 1.06, 1.03), 0, t),
   ] + (if heel > 0 then [
          h.prism(p + 'heel', 'sole', 'y', place(h.clipX(outline, -l * 0.24, false), cx, -0.004, 0.86, 1), t, t + heel),
+       ] else []) + (if std.objectHas(b, 'from') then [
+         h.prism(p + 'heel-piece', 'sole', 'y', place(h.clipX(whole, -l * 0.24, false), cx, -0.004, 0.86, 1), 0, t),
        ] else []) + [
     local s = layer(i);
     h.prism(p + 'vamp-%d' % i, if std.objectHas(b, 'laneSlots') then b.laneSlots[i % 2] else 'upper', 'y', s.poly, s.y0, s.y1 + 0.001)
@@ -180,7 +182,8 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A single tempered steel sabaton, 280 mm long and 100 mm tall: seven overlapping lames stepping down from the ankle
-  // over the instep to a rounded toe cap, open behind, held on by a strap under the arch and a buckled heel strap.
+  // over the instep to a rounded toe cap, open behind over a leather heel piece, held on by a strap under the arch and
+  // a buckled heel strap.
   h.compound('tempered_sabaton', 1.4, boot('', sabaton(0.28), 0) + sabatonStraps('', sabaton(0.28), 0),
     { sole: 'leather-black', plate: 'steel-heat-tint', edge: 'steel', strap: 'leather-black', buckle: 'steel-grey', lining: 'paint-charcoal' }) + { title: 'Tempered sabaton', soleLift: soleLift(sabaton(0.28)) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
@@ -248,7 +251,7 @@ local slipper = { l: 0.27, w: 0.104, t: 0.012, layers: 4, ankle: 0.06, top: 0.06
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'recreation', tags: { material: ['leather', 'metal'], slot: ['feet'] } } },
 
   // A pair of sheet metal sabatons, 300 mm long and 95 mm tall: three bent plates riveted over the front of each foot,
-  // open behind, strapped on under the arch and round the heel.
+  // open behind over a leather heel piece, strapped on under the arch and round the heel.
   h.compound('sheet_metal_sabatons', 1.4, pair(sheet, 0.03, function(p, cx)
     sabatonStraps(p, sheet, cx) + [
       h.turned(p + 'rivet-%d' % i, 'rivet', 'x', [[0, 0], [0, 0.005], [0.004, 0.003], [0.004, 0]], [cx + s * (sheet.w * 0.53) - (if s < 0 then 0.004 else 0), 0.016 + (i % 2) * 0.03, 0.04 - (i % 2) * 0.03])

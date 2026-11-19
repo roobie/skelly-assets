@@ -164,7 +164,7 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'rubber'], slot: ['feet'] } } },
 
   // A pair of rubber overshoes standing, each a 170 mm shell over the front of a 290 mm foot with a steel cap over
-  // the toes, its heel strap lying slack behind.
+  // the toes and a rubber heel piece under the heel, its heel strap lying slack behind.
   h.compound('toecaps', 0.88, f.pair(toecap, 0.03, function(p, cx) [
     box(p + 'hollow', 'lining', [cx - toecap.w * 0.36, toecap.t, toecap.from - 0.002], [cx + toecap.w * 0.36, toecap.ankle * 0.75, toecap.from + 0.004]),
     box(p + 'heel-strap', 'strap', [cx - toecap.w * 0.48, 0, -toecap.l / 2], [cx + toecap.w * 0.48, 0.006, -toecap.l / 2 + 0.006]),
