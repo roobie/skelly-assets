@@ -122,6 +122,9 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
       heads: join(root, 'rows/heads.libsonnet'),
     });
     const refresh = (code = []) => refreshJsonnetTwins(sources, options(code));
+    const catalogue = { folder: join(root, 'catalogue'), manifest: join(root, 'catalogue.ids.json') };
+    const refreshRows = () => refreshJsonnetTwins(sources, { ...options([]), catalogue });
+    const rowFile = (id) => join(catalogue.folder, `${id}.json`);
     const refreshElsewhere = () =>
       execFileAsync(process.execPath, [
         '--input-type=module',
@@ -153,6 +156,9 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
       store,
       stamp,
       refresh,
+      catalogue,
+      refreshRows,
+      rowFile,
       refreshElsewhere,
       refreshEditedMidway,
       twin,
@@ -565,4 +571,118 @@ fixtureTest('a file that imports a stand-in by its root-relative path is served'
   write('pkg/nested.jsonnet', "(import 'rows/a.libsonnet')[0]");
   await refresh();
   assert.deepEqual(value('pkg/nested'), { id: 'a', value: 1 });
+});
+
+// The catalogue's rows come out one to a file, listed by a manifest, and only a row that changed is written again.
+const mtimeOf = (path) => statSync(path).mtimeMs;
+const readManifest = ({ catalogue }) => JSON.parse(readFileSync(catalogue.manifest, 'utf8'));
+const manifestOf = (fixture) => readManifest(fixture).ids;
+
+fixtureTest('the catalogue is a file for each row and a manifest of their ids in order', async (fixture) => {
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder).sort(), ['a.json', 'b.json']);
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+});
+
+fixtureTest('an edit that changes one row writes that row and the manifest, and no other file', async (fixture) => {
+  await fixture.refreshRows();
+  const past = new Date(mtimeOf(fixture.rowFile('a')) - 60_000);
+  const files = [fixture.rowFile('a'), fixture.rowFile('b'), fixture.catalogue.manifest];
+  for (const file of files) utimesSync(file, past, past);
+  fixture.write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+  await fixture.refreshRows();
+  assert.deepEqual(
+    files.filter((file) => mtimeOf(file) > past.getTime()),
+    [fixture.rowFile('a'), fixture.catalogue.manifest],
+  );
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 2 });
+});
+
+fixtureTest('a row that leaves its row file is swept, and one that joins is listed', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/b.libsonnet', "[{ id: 'c' }]");
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'c']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder).sort(), ['a.json', 'c.json']);
+});
+
+fixtureTest('a row file deleted takes its rows from the catalogue', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/index.libsonnet', "{ a: import 'rows/a.libsonnet' }");
+  rmSync(join(fixture.root, 'rows/b.libsonnet'));
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder), ['a.json']);
+});
+
+fixtureTest('a catalogue missing from disk is written again in full', async (fixture) => {
+  await fixture.refreshRows();
+  rmSync(fixture.catalogue.folder, { recursive: true });
+  rmSync(fixture.catalogue.manifest);
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+  assert.ok(existsSync(fixture.rowFile('b')));
+});
+
+fixtureTest('a row file deleted from the catalogue is written again', async (fixture) => {
+  await fixture.refreshRows();
+  rmSync(fixture.rowFile('b'));
+  await fixture.refreshRows();
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('b'), 'utf8')), { id: 'b' });
+});
+
+fixtureTest('rows written from another fragment than the current one are written again', async (fixture) => {
+  await fixture.refreshRows();
+  // What a checkout of another branch leaves: the twins' stamp is current, the rows are another fragment's.
+  const manifest = readManifest(fixture);
+  manifest.shards['rows/a.libsonnet'] = 'another fragment';
+  writeFileSync(fixture.catalogue.manifest, JSON.stringify(manifest));
+  writeFileSync(fixture.rowFile('a'), '{"id":"a","value":9}');
+  await fixture.refreshRows();
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+  assert.notEqual(readManifest(fixture).shards['rows/a.libsonnet'], 'another fragment');
+});
+
+fixtureTest('a partial file of a refresh that died is swept, and that of one that lives is not', async (fixture) => {
+  await fixture.refreshRows();
+  const dead = join(fixture.catalogue.folder, 'a.json.99999999.partial');
+  // Named for rows this refresh does not write, since it would take the name of its own partial file.
+  const live = join(fixture.catalogue.folder, `c.json.${process.pid}.partial`);
+  const stale = join(fixture.catalogue.folder, `d.json.${process.pid}.partial`);
+  for (const file of [dead, live, stale]) writeFileSync(file, '{');
+  const longAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  utimesSync(stale, longAgo, longAgo);
+  // A refresh that died left the catalogue short of its fragments, so the next one writes it.
+  fixture.write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+  await fixture.refreshRows();
+  assert.deepEqual(
+    [dead, live, stale].map((file) => existsSync(file)),
+    [false, true, false],
+  );
+});
+
+fixtureTest(
+  'an id that is no plain id fails naming its row file and leaves the catalogue as it was',
+  async (fixture) => {
+    await fixture.refreshRows();
+    fixture.write('rows/b.libsonnet', "[{ id: '../outside' }]");
+    await assert.rejects(fixture.refreshRows(), /rows\/b\.libsonnet: row \.\.\/outside has no id/);
+    assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+    assert.ok(!existsSync(join(fixture.root, 'outside.json')));
+  },
+);
+
+fixtureTest('an id in two row files fails naming both and leaves the catalogue as it was', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/b.libsonnet', "[{ id: 'a', other: true }]");
+  await assert.rejects(fixture.refreshRows(), /rows\/b\.libsonnet: row a is also a row of rows\/a\.libsonnet/);
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+});
+
+fixtureTest('a row keeps the sign of its zeros', async (fixture) => {
+  fixture.write('rows/b.libsonnet', "[{ id: 'b', at: [-0, 0] }]");
+  await fixture.refreshRows();
+  assert.equal(readFileSync(fixture.rowFile('b'), 'utf8'), '{"at":[-0,0],"id":"b"}');
 });

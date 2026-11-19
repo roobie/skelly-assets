@@ -5,29 +5,24 @@
 // vehicles that tools/row-index.mjs lists, compiles first into a fragment and the heads of its rows, in tiers when one
 // row file imports another, and the twins compile over the fragments. A twin's key holds the digest of each fragment
 // and of the heads it reads and not the files behind them, so an edit that leaves a fragment or the heads as they were
-// recompiles no twin, and one that changes a fragment recompiles only the twins that read it.
+// recompiles no twin, and one that changes a fragment recompiles only the twins that read it. The catalogue itself is no
+// twin: every row of every fragment is written to a file of its own; see catalogue-rows.mjs.
 import { createHash } from 'node:crypto';
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  renameSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, isAbsolute, join, posix, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { BUILD_ROOT, makeBuildDir } from './buildDir.mjs';
+import { catalogueIsCurrent, writeCatalogueRows } from './catalogue-rows.mjs';
 import { entryFolder } from './entryFolder.mjs';
+import { jsonText, replaceFile, replaceFileIfChanged } from './generated-json.mjs';
 import { evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { HEADS, INDEX, ROW_DIRS } from './row-index.mjs';
 
 /** @import { EntryFolder } from './entryFolder.mjs' */
+/** @import { CatalogueOutput } from './catalogue-rows.mjs' */
 /** @typedef {{ rows: EntryFolder, twins: EntryFolder }} StoreFolders */
 /** @typedef {{ path: string, closure: string[], key: string }} Unit A row file, keyed by its whole import closure. */
 /** @typedef {{ path: string, closure: string[], standIns: string[] }} Scan A twin's files and the stand-ins it reads. */
@@ -46,6 +41,7 @@ import { HEADS, INDEX, ROW_DIRS } from './row-index.mjs';
  * @property {readonly string[]} [code]
  * @property {readonly string[]} [rowIndexes]
  * @property {string} [heads] The file whose heads, in a compile, are those of every row file's fragment.
+ * @property {CatalogueOutput} [catalogue] Where the rows of every row file are written, one file each.
  */
 
 const here = import.meta.dirname;
@@ -254,33 +250,6 @@ const planNow = ({ root, code, rowIndexes, heads }) => {
   };
 };
 
-/**
- * Test files run in parallel processes that each refresh the twins, so a reader must never see a half-written file.
- * @param {string} path
- * @param {string | Uint8Array} contents
- */
-const replaceFile = (path, contents) => {
-  mkdirSync(dirname(path), { recursive: true });
-  const partial = `${path}.${process.pid}.partial`;
-  writeFileSync(partial, contents);
-  renameSync(partial, path);
-};
-
-// A twin whose bytes are already on disk is left alone, mtime included: a dev server watching the twins reloads on
-// every write, and an edit reaches many twins that come out as they were.
-/**
- * @param {string} path
- * @param {string | Uint8Array} contents
- */
-const replaceFileIfChanged = (path, contents) => {
-  try {
-    if (readFileSync(path).equals(typeof contents === 'string' ? Buffer.from(contents) : contents)) return;
-  } catch (error) {
-    if (/** @type {NodeJS.ErrnoException} */ (error).code !== 'ENOENT') throw error;
-  }
-  replaceFile(path, contents);
-};
-
 // The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
 // foreign store costs a compile, never a wrong twin. It keeps its entries as the export cache does, so worktrees and
 // users on one host can share it as they share that cache: a shared store keeps what other checkouts still use. A
@@ -366,15 +335,6 @@ const HEADS_LIBRARY = join(here, 'jsonnet', 'heads.libsonnet');
 const rowsWithHeads = (path) =>
   `local rows = (import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))}); ` +
   `{ rows: rows, heads: (import ${JSON.stringify(HEADS_LIBRARY)}).of(rows) }`;
-
-// A fragment is the Jsonnet it stands in for, so the text keeps what JSON.stringify drops: a negative zero.
-const NEGATIVE_ZERO = '\0negative zero';
-/** @param {unknown} value */
-const jsonText = (value) =>
-  JSON.stringify(value, (_key, field) => (Object.is(field, -0) ? NEGATIVE_ZERO : field)).replaceAll(
-    `"\\u0000${NEGATIVE_ZERO.slice(1)}"`,
-    '-0',
-  );
 
 /**
  * The rows in tiers: a row file that reaches another row file is a tier above it, so it compiles over that file's
@@ -568,13 +528,17 @@ const headsDigest = (root, digests) =>
  * @param {RefreshOptions} options
  * @returns {Promise<void>}
  */
-export async function refreshJsonnetTwins(sources, { root, stamp, store, code = [], rowIndexes = [], heads }) {
+export async function refreshJsonnetTwins(
+  sources,
+  { root, stamp, store, code = [], rowIndexes = [], heads, catalogue },
+) {
   const plan = planNow({ root, code, rowIndexes, heads });
   const scans = sources.map(plan.scan);
   const stamped = readStamp(stamp);
   const reached = new Set(scans.flatMap(({ standIns }) => standIns));
   const readsHeads = plan.headsPath !== undefined && reached.has(plan.headsPath);
-  const needed = neededRows(plan.rows, reached, readsHeads);
+  // The catalogue's rows are every row file's.
+  const needed = catalogue === undefined ? neededRows(plan.rows, reached, readsHeads) : plan.rows;
   const options = { root, code, rowIndexes, heads, folders: storeFolders(resolve(store)) };
   /** @param {Unit} row */
   const stampedOutput = (row) => {
@@ -674,6 +638,13 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
     ));
   }
   for (const [twin, json] of [...stored, ...compiled]) replaceFileIfChanged(twinOf(twin.path), json);
+  if (catalogue !== undefined) {
+    const fragmentDigests = Object.fromEntries(
+      needed.map((row) => [relative(root, row.path), /** @type {string} */ (digests.get(row.path))]),
+    );
+    if (!catalogueIsCurrent(catalogue, fragmentDigests))
+      writeCatalogue(catalogue, needed, fragmentDigests, (await fragments()).outputs, options);
+  }
 
   const current = twins.filter((twin) => !changed.has(twin));
   const changedRows = compiling === undefined ? new Set() : (await compiling).changed;
@@ -713,6 +684,35 @@ const currentHeads = (rows, outputs, { folders }, root) =>
     if (heads === undefined) throw new Error(`${relative(root, row.path)}: its heads are in no store`);
     return [row, heads];
   });
+
+// The catalogue's rows from the fragments; the writer reads the fragment of a row file only when its rows are not on
+// disk as that fragment has them, so a geometry edit writes the rows it changed and no more.
+/**
+ * @param {CatalogueOutput} output
+ * @param {readonly Unit[]} rows Every row file, in catalogue order.
+ * @param {Readonly<Record<string, string>>} digests Each row file's fragment digest, by its path from the root.
+ * @param {ReadonlyMap<Unit, RowOutput>} outputs
+ * @param {CompileOptions} options
+ */
+const writeCatalogue = (output, rows, digests, outputs, options) => {
+  const { root, folders } = options;
+  writeCatalogueRows(
+    output,
+    currentHeads(rows, outputs, options, root).map(([row, heads]) => {
+      const path = relative(root, row.path);
+      return {
+        path,
+        digest: /** @type {string} */ (digests[path]),
+        ids: /** @type {{ id: string }[]} */ (JSON.parse(heads)).map(({ id }) => id),
+        rows: () => {
+          const fragment = outputs.get(row)?.fragment ?? folders.rows.read(row.key, [FRAGMENT])?.[FRAGMENT]?.toString();
+          if (fragment === undefined) throw new Error(`${path}: its fragment is in no store`);
+          return fragment;
+        },
+      };
+    }),
+  );
+};
 
 // Compiles `twins` over the stand-ins they read, storing each twin whose files held still. Returns each twin's JSON by
 // its twin, and the twins whose files changed during the compile.
@@ -768,19 +768,24 @@ const compileTwins = async (twins, rows, outputs, headsText, options, digest, un
   return { compiled, changed };
 };
 
-// This module and the compiler driver, plain-data check, heads projection and compiler pin beside it, since a store
-// shared by checkouts on different branches must not serve one compiler's twins under another's keys.
+// This module, the text of what it generates, and the compiler driver, plain-data check, heads projection and compiler
+// pin beside it, since a store shared by checkouts on different branches must not serve one compiler's twins under
+// another's keys.
 const COMPILER_FILE = /\.(mjs|libsonnet)$|^runtime\.json$/;
 export const compilerCode = () => [
   fileURLToPath(import.meta.url),
+  join(here, 'generated-json.mjs'),
   ...readdirSync(join(here, 'jsonnet'))
     .filter((name) => COMPILER_FILE.test(name))
     .sort()
     .map((name) => join(here, 'jsonnet', name)),
 ];
 
+// Where the thing tool's catalogue rows go; its `src/cli/content.ts` and the viewer read them from here.
+const THING_TOOL = join(here, 'packages', 'thing-authoring-tool');
 const installOptions = () => ({
   root: repositoryRoot,
+  catalogue: { folder: join(THING_TOOL, 'items'), manifest: join(THING_TOOL, 'item-ids.json') },
   stamp: join(BUILD_ROOT, 'jsonnet-twins.json'),
   store: process.env.JSONNET_TWIN_STORE || join(BUILD_ROOT, 'jsonnet'),
   code: compilerCode(),

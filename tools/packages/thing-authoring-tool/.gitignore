@@ -1,5 +1,7 @@
 dist/
 items.json
+items/
+item-ids.json
 item-settings.json
 exports/deadvox.json
 test/fixtures/bend-strip.json
