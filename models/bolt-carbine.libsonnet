@@ -21,30 +21,35 @@ local magBack = bolt.guardFront + 0.02;
 local magFront = magBack + roundLength + 2 * wall;
 local magTop = underside;
 
-// A bolt seen side on in a window at `z`: a brass body and a pointed accent nose, its base at `x` and its foot at `y`.
-local roundSide(id, x, y, z) = [
-  box(id, 'round', [x, y, z], [x + roundLength - 0.016, y + 0.014, z + 0.0015]),
-  h.prism(id + '-nose', 'accent', 'z', [[x + roundLength - 0.016, y], [x + roundLength - 0.004, y + 0.005], [x + roundLength - 0.004, y + 0.009], [x + roundLength - 0.016, y + 0.014]], z, z + 0.0015),
-];
-
 // The metal magwell collar either magazine seats in.
 local magwell = h.prism('magwell', 'metal', 'z', [
   [magBack - 0.006, magTop], [magBack - 0.006, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + 0.006, 0.136], [magFront + 0.006, magTop],
 ], -0.049, 0.049);
 
-// A straight box magazine square to the bore, with a bevelled brass base plate and a window in its right side showing
-// the stacked bolts.
+// A straight box magazine square to the bore, with a bevelled brass base plate and a narrow slot cut into its right
+// side, through which the brass of the stacked bolts shows. The slot is built round rather than cut, since pieces only
+// add: the body stops short of the right face, and a skin around the slot makes up the face. The slot's floor is dark
+// and the bolts stand just off it, below the face, so they read as inside the magazine rather than laid on it.
+local magHalf = 0.045;
+local magFoot = 0.012;
+local slot = { back: 0.079, front: 0.107, bottom: 0.032, top: 0.12, depth: 0.008 };
+local slotFloor = magHalf - slot.depth;
+local skinBack = slotFloor - 0.004;
 local boxMagazine = [
-  h.prism('magazine', 'body', 'z', [[magBack, 0.012], [magFront, 0.012], [magFront, magTop], [magBack, magTop]], -0.045, 0.045),
+  h.prism('magazine', 'body', 'z', [[magBack, magFoot], [magFront, magFoot], [magFront, magTop], [magBack, magTop]], -magHalf, skinBack),
+  box('mag-skin-back', 'body', [magBack, magFoot, skinBack], [slot.back, magTop, magHalf]),
+  box('mag-skin-front', 'body', [slot.front, magFoot, skinBack], [magFront, magTop, magHalf]),
+  box('mag-skin-below', 'body', [slot.back, magFoot, skinBack], [slot.front, slot.bottom, magHalf]),
+  box('mag-skin-above', 'body', [slot.back, slot.top, skinBack], [slot.front, magTop, magHalf]),
+  box('mag-slot', 'vent', [slot.back, slot.bottom, skinBack], [slot.front, slot.top, slotFloor]),
   magwell,
   h.prism('mag-base', 'trim', 'z', [
     [magBack - 0.004, 0.004], [magBack, 0], [magFront, 0], [magFront + 0.004, 0.004], [magFront + 0.004, 0.014], [magBack - 0.004, 0.014],
   ], -0.049, 0.049),
-  box('mag-window', 'vent', [magBack + wall, 0.032, 0.045], [magFront - wall, 0.118, 0.0465]),
-] + std.flattenArrays([
-  roundSide('round-%d' % i, magBack + wall + 0.002, 0.038 + i * 0.02, 0.0455)
-  for i in [0, 1, 2, 3]
-]);
+] + [
+  box('round-%d' % i, 'round', [slot.back, 0.028 + i * 0.02, slotFloor], [slot.front, 0.04 + i * 0.02, slotFloor + 0.004])
+  for i in [0, 1, 2, 3, 4]
+];
 
 // A rotary drum, a revolver cylinder hung on a neck below the magwell: its chambers lie along the bore around its
 // axle, so it is as long as a box magazine is deep and holds more bolts. It runs a little past the magwell's front so
