@@ -1,4 +1,4 @@
-import { motionTransform } from '@skelly/construct/assembly/motion.ts';
+import { motionTransform, OPEN_STOP, REST_STOP } from '@skelly/construct/assembly/motion.ts';
 import { keepOutsMetBy } from '@skelly/construct/assembly/rules.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
@@ -133,11 +133,20 @@ const keepOutsAtStops = (resolved: Resolved, id: string, motion: Motion): readon
   });
 
 /**
- * Certify every stop and every span between stops of every part of the gun that turns, a bolt's or a handle's turn and
- * a stock's fold alike: each span against everything that does not move, and each stop against the keep-outs of the
- * other parts. A part that only slides is not swept here, and no gate certifies its stops yet: a pistol's slide rides
- * inside its frame's rails by design, so solids that overlap there are no clash. A slide part with stops of its own
- * would need adding here.
+ * Whether a part's motion is swept: every turn, a bolt's or a handle's turn and a stock's fold alike, and every slide
+ * that names stops of its own, such as a stock's positions along its tube. A slide left to the default stops, rest and
+ * open, is an action's stroke, which rides inside the receiver by design, a pistol's slide in its frame's rails and a
+ * carrier in its bore, so solids that overlap there are no clash.
+ */
+const isSwept = (motion: Motion): boolean =>
+  hingeOf(motion) !== undefined || motion.stops.map(({ name }) => name).join() !== ACTION_STROKE_STOPS;
+
+/** The stops a motion that names none of its own is given: an action's stroke. */
+const ACTION_STROKE_STOPS = [REST_STOP, OPEN_STOP].join();
+
+/**
+ * Certify every stop and every span between stops of every swept part of the gun, a stock's slide along its tube
+ * alike: each span against everything that does not move, and each stop against the keep-outs of the other parts.
  */
 export const sweepStops = (resolved: Resolved): readonly string[] => {
   const obstacles = [...resolved.defs]
@@ -146,7 +155,7 @@ export const sweepStops = (resolved: Resolved): readonly string[] => {
       def.solids.map((solid) => ({ id: `${id}.${solid.id}`, shape: worldSolid(resolved.placed.get(id)!, solid) })),
     );
   return [...resolved.motions]
-    .filter(([, motion]) => hingeOf(motion))
+    .filter(([, motion]) => isSwept(motion))
     .flatMap(([id, motion]) => [
       ...sweepPartStops(
         { id, placed: resolved.placed.get(id)!, solids: resolved.defs.get(id)!.solids, motion },

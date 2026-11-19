@@ -7,6 +7,7 @@ import {
   type GenericSchema,
   gtValue,
   type InferOutput,
+  integer,
   minLength,
   number,
   pipe,
@@ -25,6 +26,7 @@ const MeasuredSchema = union([
   strictObject({ mm: number(), source: SourceSchema }),
   strictObject({ mm: pipe(array(tuple([number(), number()])), minLength(3)), source: SourceSchema }),
   strictObject({ kg: pipe(number(), gtValue(0)), source: SourceSchema }),
+  strictObject({ count: pipe(number(), integer(), gtValue(0)), source: SourceSchema }),
   strictObject({ deg: number(), source: SourceSchema }),
   strictObject({ rpm: pipe(number(), gtValue(0)), source: SourceSchema }),
 ]);

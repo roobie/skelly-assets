@@ -8,6 +8,7 @@ import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
 import type { MotionStage } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { AR15_FRAME, u } from '../src/gun/arModular/frame.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAL_FOLDING_STOCK } from '../src/gun/falFoldingStock.ts';
 import { sweepPartStops, sweepStops } from '../src/gun/stopSweep.ts';
@@ -253,6 +254,24 @@ describe('the stop sweep', () => {
         stage.kind === 'hinge' ? { ...stage, angle: stage.angle + 2 } : stage,
       );
       expect(sweepStops(past).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
+    });
+
+    it('collapses the stock through its positions to just short of the castle nut', () => {
+      expect(carbine.motions.get('stock')!.stops.map(({ name }) => name)).toEqual([
+        'extended',
+        'position-5',
+        'position-4',
+        'position-3',
+        'position-2',
+        'collapsed',
+      ]);
+      const pitch = u(AR15_FRAME.table.stock.pitch);
+      const past = overrun('stock', (stage) =>
+        stage.kind === 'slide' ? { ...stage, travel: stage.travel + pitch } : stage,
+      );
+      expect(sweepStops(past).some((issue) => /^stock\.sleeve.* vs receiver-extension\.castle-nut/.test(issue))).toBe(
+        true,
+      );
     });
   });
 

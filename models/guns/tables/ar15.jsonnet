@@ -8,6 +8,7 @@ local profile = import '../references/ar15-profile.trace.jsonnet';
 local dim(mm, source) = { mm: mm, source: source };
 local outline(points, source) = { mm: points, source: source };
 local mass(kg, source) = { kg: kg, source: source };
+local count(n, source) = { count: n, source: source };
 local angle(deg, source) = { deg: deg, source: source };
 local rate(rpm, source) = { rpm: rpm, source: source };
 // A pick among the table's own named choices, the group at the dot path `of`, or a port standard its mount lists.
@@ -115,6 +116,9 @@ local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 
 local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
 local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
 local m4Carbine = 'https://en.wikipedia.org/wiki/M4_carbine';
+local sixPositionTube = 'https://combathunting.com/AR-15-Parts-Accessories-milspec-carbine-receiver-extension-buffer-tube-6-position.html';
+// The M4's overall length with its stock extended (33 in) and collapsed (29.75 in).
+local m4Lengths = { extended: 838.2, collapsed: 755.65 };
 // The carrier's gas key, which the charging handle draws it back by, and the room the handle has behind it, from the
 // technical data package figures a gas key patent quotes.
 local gasKeyPatent = 'https://patents.google.com/patent/US10982916B1/en';
@@ -550,6 +554,14 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     toe: collapsibleToe,
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
     chamfer: dim(self.halfWidth.mm - self.toeHalfWidth.mm, 'derived: the bottom flat as wide as the toe under it'),
+    // The traced stock stands fully extended, its sleeve clear of the castle nut by more than the travel to its last
+    // position, so its positions run forward from the trace.
+    positions: count(6, 'sourced: ' + sixPositionTube),
+    pitch: dim(
+      (m4Lengths.extended - m4Lengths.collapsed) / (self.positions.count - 1),
+      'derived: the M4 extended less collapsed overall length (%g mm less %g mm) over the steps between its positions, %s'
+      % [m4Lengths.extended, m4Lengths.collapsed, m4Carbine],
+    ),
   },
 
   // The A2 fixed stock, measured from the end of the rifle extension it slides over: the butt plate covers the
