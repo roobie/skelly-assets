@@ -92,10 +92,18 @@ local canister = {
   x0: section.back + self.cap,
   x1: self.riser - self.cap,
 };
-// The straps holding each canister to the shroud, `inset` in from either end.
-local strap = { inset: 0.03, width: 0.015 };
+// The straps holding each canister to the shroud, `inset` in from either end, from `bottom` to `top` round it. A strap
+// reaches in to where the side stands at its top, its `face`, so it meets the slope all the way up.
+local strap = {
+  inset: 0.03,
+  width: 0.015,
+  bottom: canister.y - canister.r - bolt.bandProud,
+  top: canister.y + canister.r + bolt.bandProud,
+  face: shroud.zAt(self.top),
+};
 // The light slits down each side between the canister and the fins, spread from the collar to a gap behind the risers.
-local slits = { count: 6, width: 0.01, y0: 0.215, y1: 0.28, x: bolt.spread(self.count, section.back, canister.riser - gap, self.width) };
+// They start a voxel above the straps, so the glow never runs into them.
+local slits = { count: 6, width: 0.01, y0: strap.top + bolt.grain, y1: 0.28, x: bolt.spread(self.count, section.back, canister.riser - gap, self.width) };
 // The fins over the shroud's ridge, spread along the whole section: each a rib `height` proud of the shroud from `y`
 // up over the ridge.
 local fins = { count: 7, thick: 0.014, height: 0.02, y: 0.315, x: bolt.spread(self.count, section.back, section.front, self.thick) };
@@ -164,10 +172,8 @@ local finOutline = grown([[fins.y, -shroud.zAt(fins.y)], [fins.y, shroud.zAt(fin
     for i in std.range(0, fins.count - 1)
   ] + std.flattenArrays([
     local z = sides[s] * canister.z, low = canister.y - canister.pipe / 2;
-    // A strap reaches in to where the side stands at its top, so it meets the slope all the way up.
-    local strapTop = canister.y + canister.r + bolt.bandProud, strapFace = shroud.zAt(strapTop);
     local strapAt(id, x) =
-      onSide(strapFace, id, 'accent', s, [x, canister.y - canister.r - bolt.bandProud], [x + strap.width, strapTop], -weld, canister.z + canister.r + bolt.bandProud - strapFace);
+      onSide(strap.face, id, 'accent', s, [x, strap.bottom], [x + strap.width, strap.top], -weld, canister.z + canister.r + bolt.bandProud - strap.face);
     [
       canisterPart('canister-%s' % s, 'metal', canister.x0, canister.x1 - canister.x0, canister.r, z),
       canisterPart('canister-back-%s' % s, 'trim', canister.x0 - canister.cap, canister.cap, canister.r * 0.8, z),
