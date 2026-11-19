@@ -547,6 +547,12 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       traced('handguard'),
     ),
     skirtHalfWidth: dim(17, 'derived: the barrel nut under the tube'),
+    // Either handguard's, from its tube's rear end.
+    supportHold: dim(
+      54,
+      "derived: the support palm's middle cupping the tube's rear, a half hand's width ahead of the receiver, " +
+      'where the press check proved its thumb reaches the port cover and the charging handle',
+    ),
   },
 
   // The drop-in handguard runs from the delta ring on the barrel nut to the front sight base's rear face, so its length
