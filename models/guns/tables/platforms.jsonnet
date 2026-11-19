@@ -3,7 +3,18 @@
 // builder template: several templates can share one platform, and one platform can span frames that differ in size.
 local slot = { path: 'slot' };
 local job(kind) = { path: 'job', job: kind };
+// A dimension of an interface, in millimetres, with where it comes from: 'traced: <trace key>', 'sourced: <URL>' or
+// 'derived: <reason>'.
+local dim(mm, source) = { mm: mm, source: source };
+// A port standard its mount type lists: the standards a mount type names are the only ones its ports may declare, and
+// the dimensions are those that define the interface, not the dimensions of any one part.
+local standard(dimensions={}) = { dimensions: dimensions };
 local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bottom': 'picatinny' };
+// The buffer a tube takes is what a stock fits against.
+local bufferFit = 'sourced: https://blog.primaryarms.com/guide/ar15-stock-does-not-fit-buffer-tube-troubleshooting/';
+// The bores a muzzle is cut for, so a rifle suppressor never certifies on a shotgun.
+local bores = { rifled: standard(), smoothbore: standard() };
+local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-mil-spec-buffer-tube.html');
 
 {
   // The job kinds a heavy part waits for, rather than going on in the slot UI.
@@ -11,11 +22,25 @@ local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bot
 
   // How the part met at each mount type comes off and goes on. Light parts (optics on the rails, magazines, stocks,
   // muzzle devices and add-ons) swap by hand; parts held by pins or screws need a tool; parts fitted, pressed or
-  // timed into the gun need a bench.
+  // timed into the gun need a bench. A mount type's `standards` are the only ones its ports may declare.
   mounts: {
     magazine: { swap: slot },
-    stock: { swap: slot },
-    muzzle: { swap: slot },
+    // A stock slides on the receiver extension, so the extension's outside diameter defines its standard.
+    stock: {
+      swap: slot,
+      standards: {
+        'ar-tube-carbine': standard({
+          outerDiameter: tubeDiameter,
+          bufferLength: dim(82.55, bufferFit + ' (3.25 in)'),
+        }),
+        'ar-tube-rifle': standard({
+          outerDiameter: tubeDiameter,
+          bufferLength: dim(150.368, bufferFit + ' (5.92 in)'),
+        }),
+      },
+    },
+    // The thread is the muzzle port's size class; the standard is the bore the device is cut for.
+    muzzle: { swap: slot, standards: bores },
     rail: { swap: slot },
     'rail-top': { swap: slot },
     'rail-side': { swap: slot },
@@ -36,13 +61,35 @@ local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bot
     'handle-bar': { swap: job('tool') },
     'shroud-sight': { swap: job('tool') },
 
+    'ar-upper': { swap: job('tool') },
+    'receiver-extension': { swap: job('bench'), standards: { 'ar-tube-thread': standard() } },
+    // The upper's barrel thread is the same for every AR-15 handguard, so the size class carries it.
+    'barrel-nut': { swap: job('tool') },
+    'handguard-cap': { swap: job('tool') },
+    'port-cover': { swap: job('tool') },
+    'sight-height': {
+      swap: job('tool'),
+      standards: {
+        'ar-carry-handle': standard(),
+        // The flat-top front sight base stands 0.040 inch taller than the carry-handle one.
+        'ar-flat-top': standard({
+          baseExtraHeight: dim(1.02, 'sourced: https://www.firearmsnews.com/editorial/the-f-marked-front-sight/78343'),
+        }),
+      },
+    },
+
     barrel: { swap: job('bench') },
     'barrel-seat': { swap: job('bench') },
-    'plain-muzzle': { swap: job('bench') },
+    'plain-muzzle': { swap: job('bench'), standards: bores },
     lower: { swap: job('bench') },
     trunnion: { swap: job('bench') },
     'sight-block': { swap: job('bench') },
-    'gas-block': { swap: job('bench') },
+    'gas-block': {
+      swap: job('bench'),
+      standards: {
+        'ar-journal-750': standard({ journalDiameter: dim(19.05, 'derived: 0.750 in journal named by the standard') }),
+      },
+    },
     'gas-cylinder': { swap: job('bench') },
     lug: { swap: job('bench') },
     tube: { swap: job('bench') },
@@ -57,11 +104,12 @@ local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bot
   },
 
   // Each platform's size classes, one per frame size a design names, and the mount types whose class is shared
-  // across those frames, because the real guns share that interface.
+  // across those frames, because the real guns share that interface. A frame class also names the interfaces only its
+  // frame has, such as the muzzle thread (ar-15: 1/2x28) and the upper's barrel thread.
   platforms: {
-    // The AR-15 and AR-10 frames share buffer-tube stocks, grips and rails, and nothing else.
+    // The AR-15, AR-10 and AR-338 frames share buffer-tube stocks, grips and rails, and nothing else.
     ar: {
-      sizeClasses: ['ar-15', 'ar-10'],
+      sizeClasses: ['ar-15', 'ar-10', 'ar-338'],
       shared: picatinny { stock: 'ar-buffer-tube', grip: 'ar-grip' },
     },
     ak: { sizeClasses: ['ak'] },

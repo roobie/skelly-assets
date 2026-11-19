@@ -3,7 +3,6 @@ import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FOREGRIP_PROPORTIONS } from './foregripProportions.ts';
-import type { MuzzleBore } from './mounts.ts';
 
 const X: Vec3 = [1, 0, 0];
 const NEG_X: Vec3 = [-1, 0, 0];
@@ -32,7 +31,7 @@ const suppressorTube = (length: number, radius: number): Solid => ({
 });
 
 /** Both suppressors are rifle suppressors; a shotgun suppressor would be a type built for smoothbores. */
-const SUPPRESSOR_BORE: MuzzleBore = 'rifled';
+const SUPPRESSOR_BORE = 'rifled';
 
 const suppressor: PartFamily = {
   name: 'suppressor',

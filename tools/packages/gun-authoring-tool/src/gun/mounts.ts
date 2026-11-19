@@ -13,12 +13,6 @@ export interface MountStandard {
   readonly slotPitchU?: number;
 }
 
-/**
- * The bore a muzzle interface is cut for, declared as the `standard` of both muzzle ports: a device fits only a
- * muzzle cut for the bore it was built for, so a rifle suppressor never certifies on a shotgun.
- */
-export type MuzzleBore = 'rifled' | 'smoothbore';
-
 /** The real Picatinny (MIL-STD-1913) slot pitch, the one every rail and optic mount shares. */
 const RAIL_SLOT_PITCH_MM = 10.01;
 export const RAIL_SLOT_PITCH_U = mmToU(RAIL_SLOT_PITCH_MM);
