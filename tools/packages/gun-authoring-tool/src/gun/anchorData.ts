@@ -82,6 +82,12 @@ const muzzlePortAnchor = (_params: Readonly<Record<string, string>>, part: PartD
   return muzzle ? { muzzle: frameAt(muzzle.pos, muzzle.normal, muzzle.up) } : {};
 };
 
+/** A lower's magazine well: its `magazine` port. */
+const magwellAnchor = (_params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
+  const magazine = part.ports.find((port) => port.id === 'magazine');
+  return magazine ? { magwell: frameAt(magazine.pos) } : {};
+};
+
 const ejectionAnchor = (_params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
   const point = localEjectionPoint(part);
   return point ? { ejection: frameAt(point) } : {};
@@ -173,14 +179,16 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
         : undersideSupport(part, 0.6),
   },
   forend: { anchors: (_params, part) => undersideSupport(part, 0.5) },
-  lower: {
-    anchors: (_params, part) => {
-      const magazine = part.ports.find((port) => port.id === 'magazine');
-      return magazine ? { magwell: frameAt(magazine.pos) } : {};
-    },
-  },
+  lower: { anchors: magwellAnchor },
   barrel: { anchors: muzzlePortAnchor },
   'muzzle-brake': { anchors: muzzlePortAnchor },
+  'ar15-grip': { holdRank: 'grip', anchors: gripHold(['body'], () => ({ forward: X, up: Y })) },
+  'ar15-lower': { anchors: magwellAnchor },
+  'ar15-upper': { anchors: ejectionAnchor },
+  'ar15-barrel': { anchors: muzzlePortAnchor },
+  'ar15-flash-hider': { anchors: muzzlePortAnchor },
+  'ar15-handguard': { anchors: (_params, part) => undersideSupport(part, 0.6) },
+  'ar15-stock': { anchors: (_params, part) => rearFaceButt(part) },
   receiver: {
     anchors: (params, part) => {
       const mouth = part.keepOuts.find(

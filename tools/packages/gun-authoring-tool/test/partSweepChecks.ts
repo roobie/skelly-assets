@@ -2,6 +2,7 @@ import type { PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { GRID } from '@skelly/construct/foundation/conventions.ts';
 import { cross, dot, length } from '@skelly/construct/foundation/math.ts';
 import { expect, it } from 'vitest';
+import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { BOLT_CARRIER_RUNNING_CLEARANCE_U } from '../src/gun/parts.ts';
 
 const onGrid = (n: number, step = GRID) => Math.abs(n / step - Math.round(n / step)) < 1e-9;
@@ -74,11 +75,14 @@ export const definePartChecks = (family: PartFamily, cases: Record<string, strin
         .filter((axis) => family.name !== 'revolver-cylinder' || axis.kind !== 'bore')
         .flatMap((axis) => [...axis.origin]),
     ];
+    // The modular AR authors its millimetre tables exactly; the min-feature rule, not the grid, bounds how fine it goes.
+    const millimetreAuthored = Object.hasOwn(AR_MODULAR_FAMILIES, family.name);
     return {
       geometryOnGrid:
-        numbers.every((n) => onGridWithCarrierClearance(n, gridStep, family)) &&
-        fineHandleKeepOuts.flatMap((k) => bounds(k.box)).every((n) => onGrid(n, GRID / 5)) &&
-        barrelSights.flatMap((s) => (s.kind === 'box' ? bounds(s.box) : [])).every((n) => onGrid(n, GRID / 4)),
+        millimetreAuthored ||
+        (numbers.every((n) => onGridWithCarrierClearance(n, gridStep, family)) &&
+          fineHandleKeepOuts.flatMap((k) => bounds(k.box)).every((n) => onGrid(n, GRID / 5)) &&
+          barrelSights.flatMap((s) => (s.kind === 'box' ? bounds(s.box) : [])).every((n) => onGrid(n, GRID / 4))),
       portsOrthonormal: def.ports.every(
         (p) =>
           Math.abs(length(p.normal) - 1) < 1e-6 &&

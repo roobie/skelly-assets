@@ -50,6 +50,7 @@ import {
   AR_LOWER_PROPORTIONS,
 } from './arFrames.ts';
 import { AR_ACTION_LAYOUT, AR_ACTION_LAYOUTS, type ARActionLayout, arLayoutFor } from './arLayout.ts';
+import { AR_MODULAR_FAMILIES } from './arModular/index.ts';
 import { ATTACHMENT_FAMILIES } from './attachmentParts.ts';
 import {
   BOLT_MAGAZINE_WALL_U,
@@ -5789,4 +5790,5 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   ...ATTACHMENT_FAMILIES,
   ...revolverFamilySet,
   ...ANTI_MATERIEL_FAMILIES,
+  ...AR_MODULAR_FAMILIES,
 };

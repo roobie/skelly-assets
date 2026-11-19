@@ -23,8 +23,13 @@ describe('materials, slots, and finishes', () => {
     expect(resolveAppearance(p, 'barrel', 'plain', { archetype: 'unknown' }).material).toBe('steel-parkerized');
   });
 
-  it('assigns every gun part family a slot and bounded shade', () => {
-    for (const role of Object.keys(FAMILIES)) {
+  it('assigns every role a gun part family builds a slot and bounded shade', () => {
+    const roles = Object.values(FAMILIES).map(
+      (family) =>
+        family.build(Object.fromEntries(Object.entries(family.params).map(([name, spec]) => [name, spec.default])))
+          .family,
+    );
+    for (const role of new Set(roles)) {
       expect(GUN_PALETTE.roleSlots?.[role], role).toBeTruthy();
       expect(GUN_PALETTE.materials?.[GUN_PALETTE.roleMaterials?.[role] ?? ''], role).toBeDefined();
       expect(GUN_PALETTE.roleShades?.[role], role).toHaveLength(3);

@@ -22,14 +22,15 @@ const SwapSchema = variant('path', [
   strictObject({ path: literal('slot') }),
   strictObject({ path: literal('job'), job: Id }),
 ]);
-const SOURCE_KIND = /^(traced|sourced|derived): \S/;
-const DimensionSchema = strictObject({
-  mm: pipe(number(), gtValue(0)),
-  source: pipe(
-    string(),
-    regex(SOURCE_KIND, "a source reads 'traced: <trace key>', 'sourced: <URL>' or 'derived: <reason>'"),
+/** Where an authored measurement comes from, so every number in a table can be checked against its origin. */
+export const SourceSchema = pipe(
+  string(),
+  regex(
+    /^(traced|sourced|derived): \S/,
+    "a source reads 'traced: <trace key>', 'sourced: <URL>' or 'derived: <reason>'",
   ),
-});
+);
+const DimensionSchema = strictObject({ mm: pipe(number(), gtValue(0)), source: SourceSchema });
 const StandardSchema = strictObject({ dimensions: record(Id, DimensionSchema) });
 const MountSchema = strictObject({ swap: SwapSchema, standards: optional(record(Id, StandardSchema)) });
 const PlatformSchema = strictObject({ sizeClasses: pipe(array(Id), nonEmpty()), shared: optional(record(Id, Id)) });
