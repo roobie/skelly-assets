@@ -2,7 +2,7 @@ import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/sc
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, pickedName, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
 import { boxSleeve, roundBar } from './shapes.ts';
 
 /** The stock standard of an extension that takes the named buffer. */
@@ -62,7 +62,7 @@ const tubeRadius = (frame: ArFrame, buffer: ArFrameTable['stock']['buffer']): nu
 const stockPort = (buffer: ArFrameTable['stock']['buffer']): PortDef => ({
   id: 'front',
   mount: 'stock',
-  standard: tubeStandard(pickedName(buffer)),
+  standard: tubeStandard(buffer.choice),
   gender: 'male',
   pos: [0, 0, 0],
   normal: X,

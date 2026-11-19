@@ -1,14 +1,14 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrame, chosen, familyName, pick, pickedName, u } from './frame.ts';
+import { type ArFrame, chosen, familyName, pick, u } from './frame.ts';
 import { journalClamp, roundBar } from './shapes.ts';
 
 /** The gas-block standard of a journal, by the name the frame table gives it. */
 const journalStandard = (journal: string): string => `ar-journal-${journal}`;
 
 /** The journal every barrel of the frame is turned to under its gas block, by name. */
-const barrelJournal = (frame: ArFrame): string => pickedName(frame.table.barrel.journal);
+const barrelJournal = (frame: ArFrame): string => frame.table.barrel.journal.choice;
 
 /** The gas-block standard of the journal every barrel of the frame is turned to. */
 export const barrelJournalStandard = (frame: ArFrame): string => journalStandard(barrelJournal(frame));
@@ -22,7 +22,7 @@ export const barrelJournalRadius = (frame: ArFrame): number => u(pick(frame, fra
 
 /** The gas system, by name, that a barrel of the named length is drilled for. */
 export const barrelGas = (frame: ArFrame, length: string): string =>
-  pickedName(chosen(frame.table.barrel.lengths, length).gas);
+  chosen(frame.table.barrel.lengths, length).gas.choice;
 
 /**
  * The barrel, by its length and gas system. Only the part ahead of the upper is built: the chamber and barrel

@@ -141,7 +141,10 @@ type Buffer = Ar15Table['receiverExtension']['buffers']['rifle'] & {
   readonly castleNut?: Ar15Table['receiverExtension']['buffers']['carbine']['castleNut'];
 };
 
-/** A pick of the table: the named choice `choice` among the group at the dot path `Of`. */
+/**
+ * A pick of the table: the named choice `choice` among the group at the dot path `Of`. Each frame names its own
+ * choices, so the groups are open and `choice` is any name; the load check holds it to a key of its group.
+ */
 interface TablePick<Of extends string> {
   readonly choice: string;
   readonly of: Of;
@@ -203,12 +206,30 @@ export interface ArFrame {
   readonly table: ArFrameTable;
 }
 
-// The JSON import types every pick's group as any string. The load check holds each pick to the group FRAME_PICKS pins
-// at its path, which is the group ArFrameTable types it by, and to a choice of that group.
+/**
+ * The pins, each held to the field ArFrameTable types at its path: a pin whose field is missing or typed as a pick from
+ * another group becomes `never` here, so FRAME_PICKS no longer passes as the pins a frame table is loaded by.
+ */
+type FieldPins = {
+  readonly [Path in keyof typeof FRAME_PICKS]: [GroupAt<Path>] extends [never]
+    ? never
+    : [GroupAt<Path>] extends [FramePick<Path>]
+      ? (typeof FRAME_PICKS)[Path]
+      : never;
+};
+
+/**
+ * A frame table as loaded. The JSON import types every pick's group as any string; the load check holds each pick to
+ * the group its pin names and to a choice of that group, and the pins agree with the fields ArFrameTable types, which
+ * is what this cast assumes.
+ */
+const loadFrameTable = (name: string, raw: unknown, pins: FieldPins): ArFrameTable =>
+  checkFrameTable(name, raw, pins) as ArFrameTable;
+
 export const AR15_FRAME: ArFrame = {
   name: 'ar15',
   title: 'AR-15',
-  table: checkFrameTable('ar15', ar15Table, FRAME_PICKS) as ArFrameTable,
+  table: loadFrameTable('ar15', ar15Table, FRAME_PICKS),
 };
 
 /** The registry name of a frame's family for one role, such as `ar15-lower`. */
@@ -223,14 +244,19 @@ export const chosen = <T>(choices: Readonly<Record<string, T>>, key: string | un
   return value;
 };
 
-/** The type of the table's node at a dot path. */
-type GroupAt<Path extends string, Node = ArFrameTable> = Path extends `${infer Head}.${infer Rest}`
-  ? Head extends keyof Node
-    ? GroupAt<Rest, Node[Head]>
+/** The type of one child of a node: the named one, or with `*` any child of an open group. */
+type ChildOf<Node, Key extends string> = Key extends '*'
+  ? Node extends Readonly<Record<string, infer Child>>
+    ? Child
     : never
-  : Path extends keyof Node
-    ? Node[Path]
+  : Key extends keyof Node
+    ? Node[Key]
     : never;
+
+/** The type of the table's node at a dot path, `*` standing for any key of an open group. */
+type GroupAt<Path extends string, Node = ArFrameTable> = Path extends `${infer Head}.${infer Rest}`
+  ? GroupAt<Rest, ChildOf<Node, Head>>
+  : ChildOf<Node, Path>;
 
 /** What a pick among the group at `Of` picks: one of that group's choices. */
 type Picked<Of extends string> = GroupAt<Of>[keyof GroupAt<Of>];
@@ -240,13 +266,7 @@ type Picked<Of extends string> = GroupAt<Of>[keyof GroupAt<Of>];
  * pick to that group guards exactly what the build uses.
  */
 export const pick = <Of extends string>(frame: ArFrame, ref: TablePick<Of>): Picked<Of> =>
-  chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, pickedName(ref));
-
-/**
- * The name of the choice a pick picks, which the load check holds to a key of the group at `Of`, for a part's standard
- * or param that names that choice.
- */
-export const pickedName = <Of extends string>(ref: TablePick<Of>): string => ref.choice;
+  chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, ref.choice);
 
 /** A length or position of the table in u. */
 export const u = (dimension: { readonly mm: number }): number => mmToU(dimension.mm);
