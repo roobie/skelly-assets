@@ -13,7 +13,7 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { type Motion, stageDistance } from '@skelly/motion/motion';
-import { hingeOf } from './actionMotion.ts';
+import { actionKindOf } from './actionRoles.ts';
 
 /** A moving solid's pose along a path, by the path's phase from 0 to 1. */
 type Path = (phase: number) => WorldSolid;
@@ -133,11 +133,11 @@ const keepOutsAtStops = (resolved: Resolved, id: string, motion: Motion): readon
   });
 
 /**
- * Certify every stop and every span between stops of every part of the gun that turns, a bolt's or a handle's turn and
- * a stock's fold alike: each span against everything that does not move, and each stop against the keep-outs of the
- * other parts. A part that only slides is not swept here, and no gate certifies its stops yet: a pistol's slide rides
- * inside its frame's rails by design, so solids that overlap there are no clash. A slide part with stops of its own
- * would need adding here.
+ * Certify every stop and every span between stops of every part of the gun that moves, a handle's draw or turn, a
+ * stock's fold and its slide along its tube alike: each span against everything that does not move, and each stop
+ * against the keep-outs of the other parts. An action carrier's solids are left out of the sweep by one allowance: a
+ * carrier rides inside its receiver by design, a pistol's slide in its frame's rails, a rifle's carrier in its bore,
+ * tower and buffer tube, so solids that overlap there are no clash. Its stops are still held to the keep-outs.
  */
 export const sweepStops = (resolved: Resolved): readonly string[] => {
   const obstacles = [...resolved.defs]
@@ -145,13 +145,12 @@ export const sweepStops = (resolved: Resolved): readonly string[] => {
     .flatMap(([id, def]) =>
       def.solids.map((solid) => ({ id: `${id}.${solid.id}`, shape: worldSolid(resolved.placed.get(id)!, solid) })),
     );
-  return [...resolved.motions]
-    .filter(([, motion]) => hingeOf(motion))
-    .flatMap(([id, motion]) => [
-      ...sweepPartStops(
-        { id, placed: resolved.placed.get(id)!, solids: resolved.defs.get(id)!.solids, motion },
-        obstacles,
-      ),
+  return [...resolved.motions].flatMap(([id, motion]) => {
+    const def = resolved.defs.get(id)!;
+    const swept = actionKindOf(def) === undefined;
+    return [
+      ...(swept ? sweepPartStops({ id, placed: resolved.placed.get(id)!, solids: def.solids, motion }, obstacles) : []),
       ...keepOutsAtStops(resolved, id, motion),
-    ]);
+    ];
+  });
 };

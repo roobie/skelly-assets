@@ -25,6 +25,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
+import { ACTION_ROLE_TAGS } from './actionRoles.ts';
 import { cycleLegs, type TimelineLeg } from './actionTimeline.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
@@ -59,14 +60,18 @@ import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
 export type DeadvoxModelFile = `assets/models/${string}.glb`;
 
-interface ActionPartMetadata {
-  /** Exact glTF node name; the existing part node carries its geometry as a separate mesh. */
+/** A part that moves, by its node, and how it moves through its named stops in the model file's frame and metres. */
+interface MovingPartMetadata {
+  /** Exact glTF node name of the part; it carries its geometry as a separate mesh. */
   readonly node: string;
+  readonly motion: Motion;
+}
+
+/** A part that moves with the action, which the shared timelines play its motion for. */
+interface ActionPartMetadata extends MovingPartMetadata {
   readonly handGrip?: Vec3;
   /** Shared timelines this node follows; other modes leave it at home. */
   readonly modes: readonly CycleMode[];
-  /** What the timelines play of the part, in the model file's frame and metres. */
-  readonly motion: Motion;
 }
 
 interface CycleMetadata {
@@ -113,6 +118,8 @@ export interface GunModelFields {
   readonly internalMagazine?: { readonly capacity: number };
   readonly rounds?: readonly { readonly at: Vec3; readonly tilt: number }[];
   readonly action?: GunActionMetadata;
+  /** Parts that move outside the action, such as a port cover or a collapsible stock; each node names its part. */
+  readonly moving?: readonly MovingPartMetadata[];
   readonly revolver?: RevolverMetadata;
   /** Metadata for an attachment exported as its own item model. */
   readonly attachment?: AttachmentMetadata;
@@ -214,8 +221,10 @@ const handGripMetadata = (part: ResolvedGunAction['carrier'], metresPerUnit: num
   return grip ? { handGrip: modelPoint(applyPoint(part.placed, grip.origin), metresPerUnit) } : {};
 };
 
-const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
-  const description = resolveGunAction(resolved);
+const buildActionExport = (
+  resolved: Resolved,
+  description: ResolvedGunAction | undefined,
+): GunActionExport | undefined => {
   const cycle = description?.cycle;
   if (!(description?.ejection && cycle)) {
     return undefined;
@@ -245,6 +254,25 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
       ...(cycle.rpm === undefined ? {} : { roundsPerSimMinute: cycle.rpm }),
     },
   };
+};
+
+/**
+ * Every part that moves for its own sake rather than with the action, a port cover or a stock: its node and its motion
+ * in the file's frame and metres. A part with an action role moves with the action, so it is left to the action
+ * description, or left out with the action where none is described.
+ */
+const movingPartsData = (resolved: Resolved): GunModelFields['moving'] | undefined => {
+  const { metresPerUnit } = resolved.domain.units;
+  const acts = (id: string) => resolved.defs.get(id)!.tags?.some((tag) => ACTION_ROLE_TAGS.includes(tag));
+  const moving = [...resolved.motions]
+    .filter(([id]) => !acts(id))
+    .map(
+      ([id, motion]): MovingPartMetadata => ({
+        node: partNodeName(id, resolved.assembly.parts[id]!.family),
+        motion: fileMotion(motion, resolved.placed.get(id)!, metresPerUnit),
+      }),
+    );
+  return moving.length > 0 ? moving : undefined;
 };
 
 const frontBeadSightLine = (
@@ -986,7 +1014,9 @@ export const exportGunGlb = (
     return result;
   }
   const voxelFile = voxelFileOf(result.glb, grains);
-  const handling = buildActionExport(resolved);
+  const action = resolveGunAction(resolved);
+  const handling = buildActionExport(resolved, action);
+  const moving = movingPartsData(resolved);
   const internalCapacity = integralCapacity(resolved, metadata.cartridge);
   const {
     units: { metresPerUnit },
@@ -1035,6 +1065,7 @@ export const exportGunGlb = (
       gun: {
         ...modelEntry.gun,
         ...(revolver ? { revolver } : {}),
+        ...(moving ? { moving } : {}),
         attachments: fittedAttachments,
         attachmentSlots: attachmentSlotsData,
         ...certificates,

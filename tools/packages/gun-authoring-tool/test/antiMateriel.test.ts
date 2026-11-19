@@ -50,9 +50,10 @@ import {
 } from '../src/gun/antiMateriel/heavyMagazine.ts';
 import { HEAVY_RECEIVER_LENGTH } from '../src/gun/antiMateriel/heavyReceiver.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { RAIL_SLOT_PITCH_U } from '../src/gun/mounts.ts';
 import { EJECTION_PORT_MARGIN_U, FAMILIES, GRIP_MOUNT_PROFILE, TRIGGER_GUARD } from '../src/gun/parts.ts';
-import { fitAntiMaterielScope, motionOf, strokeOf, variant } from './helpers.ts';
+import { fitAntiMaterielScope, loadDesignAssembly, motionOf, strokeOf, variant } from './helpers.ts';
 
 const family = (key: string): PartFamily => FAMILIES[key]!;
 const solidById = (def: PartDef, id: string): Solid => {
@@ -66,6 +67,21 @@ const bounds = (solid: Solid) => {
   const [min, max] = localSolidBounds(solid);
   return { min, max };
 };
+
+describe('export', () => {
+  it('describes no action and no moving parts, since the carrier is the only mover and its cycle is not described', () => {
+    const result = exportGunGlb(
+      loadDesignAssembly('archetype-anti-materiel'),
+      { id: 'anti_materiel_export_test', file: 'assets/models/anti_materiel_export_test.glb' },
+      { appearanceProfile: 'anti-materiel' },
+    );
+    if (!result.ok) {
+      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+    }
+    expect(result.modelEntry.gun.action).toBeUndefined();
+    expect(result.modelEntry.gun.moving).toBeUndefined();
+  });
+});
 
 describe('registration', () => {
   it.each([

@@ -1,0 +1,4 @@
+---
+type: added
+---
+The AR-15s now have moving parts. Each one has a bolt carrier and charging handle in `gun.action`, which draw back together through the 95.25 mm stroke at 700 rounds a minute. The charging handle rides back clear over the stock. A gun's `gun.moving` lists the parts that move outside its action, each with its node and motion. On the AR-15s these are the ejection port cover and, on the carbines, the collapsible stock. The upper is hollow, and its ejection port opens onto the carrier. The port cover turns out and down about 168° until it rests on the magazine well. The stock slides through stops `extended`, `position-5` to `position-2` and `collapsed`.

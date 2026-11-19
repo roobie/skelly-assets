@@ -1,7 +1,7 @@
-import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
+import type { PartDef, PartFamily, PartMotion, PortDef } from '@skelly/construct/assembly/schema.ts';
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
-import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
+import { choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
 import {
   OCTAGON_CORNER,
   octagonalProfile,
@@ -9,6 +9,7 @@ import {
   octagonalSectionChamfered,
   octagonalTubeWalls,
 } from '../octagon.ts';
+import { EXTENDED_STOP } from '../stockStops.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
 import { roundBar } from './shapes.ts';
 
@@ -78,37 +79,62 @@ const stockPort = (buffer: ArFrameTable['stock']['buffer']): PortDef => ({
 });
 
 /**
- * The sleeve of `outer` section that wraps the extension from the stock's frame forward, with the detail grain its
- * walls need: they are thinner than the coarse voxel, and every stock is exported at the detail grain.
+ * The sleeve of `outer` section that wraps the extension along `along`, with the detail grain its walls need: they are
+ * thinner than the coarse voxel, and every stock is exported at the detail grain.
  */
 const stockSleeve = (
-  frontX: number,
+  along: readonly [number, number],
   bore: number,
   outer: readonly Vec2[],
 ): Required<Pick<PartDef, 'solids' | 'tags' | 'features'>> => {
   const [ys, zs] = [outer.map(([y]) => y), outer.map(([, z]) => z)];
   const flats = [Math.max(...ys), -Math.min(...ys), Math.max(...zs), -Math.min(...zs)];
   return {
-    solids: octagonalTubeWalls('sleeve', outer, octagonalProfile(bore), [0, frontX]),
+    solids: octagonalTubeWalls('sleeve', outer, octagonalProfile(bore), along),
     tags: [VOXEL_DETAIL],
     features: [{ name: 'sleeve-wall', size: Math.min(...flats) - bore, disposition: { kind: 'detail' } }],
   };
 };
 
+/** The collapsible stock's stop at its shortest. */
+const COLLAPSED_STOP = 'collapsed';
+
 /**
- * The collapsible carbine stock at its traced position on the carbine extension. Its frame is the tube's end: the body's
- * rear block closes behind it, the sleeve wraps the tube ahead of it with a sliding fit, and the toe hangs under both.
+ * The collapsible stock's slide forward along its tube, from fully extended through every position to collapsed, one
+ * pitch apart. The positions between the ends are named by their number counted from collapsed, as the stock's are.
+ */
+const collapseMotion = (positions: number, pitch: number): PartMotion => {
+  const steps = positions - 1;
+  return {
+    stages: [{ kind: 'slide', direction: X, travel: steps * pitch }],
+    stops: Array.from({ length: positions }, (_, step) => {
+      const name = step === 0 ? EXTENDED_STOP : step === steps ? COLLAPSED_STOP : `position-${positions - step}`;
+      return { name, stage: 0, at: step * pitch };
+    }),
+  };
+};
+
+/**
+ * The collapsible carbine stock at its traced position on the carbine extension, fully extended. Its frame is the
+ * tube's end: the sleeve wraps the tube ahead of it with a sliding fit and runs back into the body as far as the stock
+ * collapses, so the tube's end slides into the body; the body's end block closes behind that, and the toe hangs under
+ * both.
  */
 const collapsibleStock = (frame: ArFrame): PartDef => {
   const s = frame.table.stock;
   const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
   const bore = tubeRadius(frame, s.buffer) + u(s.tubeClearance);
   const toeHalf = u(s.toeHalfWidth);
-  const sleeve = stockSleeve(frontX, bore, octagonalSectionChamfered([bottomY, topY], [-half, half], u(s.chamfer)));
+  const travel = (s.positions.count - 1) * u(s.pitch);
+  if (rearX >= -travel) {
+    throw new Error(`${frame.name}.stock: the body is shorter than the travel, so the tube would run out of its rear`);
+  }
+  const section = octagonalSectionChamfered([bottomY, topY], [-half, half], u(s.chamfer));
+  const sleeve = stockSleeve([-travel, frontX], bore, section);
   return {
     family: 'stock',
     solids: [
-      box('butt', [rearX, bottomY, -half], [0, topY, half]),
+      { id: 'butt', kind: 'extruded-polygon', profile: section, axis: 'x', z: [rearX, -travel] },
       ...sleeve.solids,
       { id: 'toe', kind: 'extruded-polygon', profile: outlineU(s.toe), z: [-toeHalf, toeHalf] },
     ],
@@ -117,6 +143,7 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
     axes: [],
     tags: sleeve.tags,
     features: sleeve.features,
+    motion: collapseMotion(s.positions.count, u(s.pitch)),
   };
 };
 
@@ -185,7 +212,7 @@ const a2Stock = (frame: ArFrame): PartDef => {
       ...(Math.max(...xs) > 0 && Math.min(...xs) < frontX ? [piece('-under-sleeve', ahead)] : []),
     ];
   });
-  const sleeve = stockSleeve(frontX, bore, octagonalSection([-combY, combY], [-half, half]));
+  const sleeve = stockSleeve([0, frontX], bore, octagonalSection([-combY, combY], [-half, half]));
   return {
     family: 'stock',
     solids: [...outlineSolids, ...sleeve.solids, ...bodyFlanks(frontX, combY, half)],

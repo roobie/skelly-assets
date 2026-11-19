@@ -60,7 +60,7 @@ const walkSpeedOf = (clips) => {
   return speed;
 };
 // Each model's sidecar, keyed by the model file it names, with the motion the sidecar declares for a part that moves and
-// the action of a gun, whose parts each carry a motion of their own.
+// the action of a gun and its parts that move outside the action, whose parts each carry a motion of their own.
 const sidecars = new Map(
   Object.entries(manifest.packs).flatMap(([pack, { files }]) =>
     files
@@ -73,6 +73,7 @@ const sidecars = new Map(
             sidecar: `${pack}/${f}`,
             ...(motion ? { motion } : {}),
             ...(gun?.action ? { action: gun.action } : {}),
+            ...(gun?.moving ? { moving: gun.moving } : {}),
           },
         ];
       }),

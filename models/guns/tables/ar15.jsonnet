@@ -8,6 +8,9 @@ local profile = import '../references/ar15-profile.trace.jsonnet';
 local dim(mm, source) = { mm: mm, source: source };
 local outline(points, source) = { mm: points, source: source };
 local mass(kg, source) = { kg: kg, source: source };
+local count(n, source) = { count: n, source: source };
+local angle(deg, source) = { deg: deg, source: source };
+local rate(rpm, source) = { rpm: rpm, source: source };
 // A pick among the table's own named choices, the group at the dot path `of`, or a port standard its mount lists.
 local choiceOf(of, name) = { choice: name, of: of };
 local standardOf(mount, name) = { standard: name, mount: mount };
@@ -112,6 +115,16 @@ local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 
 // The flat-top's front post stands at this height over the bore; the carry-handle base is the ar-flat-top extra lower.
 local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
 local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
+local m4Carbine = 'https://en.wikipedia.org/wiki/M4_carbine';
+local sixPositionTube = 'https://combathunting.com/AR-15-Parts-Accessories-milspec-carbine-receiver-extension-buffer-tube-6-position.html';
+// The M4's overall length with its stock extended (33 in) and collapsed (29.75 in).
+local m4Lengths = { extended: 838.2, collapsed: 755.65 };
+// The carrier's gas key, which the charging handle draws it back by, and the room the handle has behind it, from the
+// technical data package figures a gas key patent quotes.
+local gasKeyPatent = 'https://patents.google.com/patent/US10982916B1/en';
+// A mil-spec-size billet dust cover as a shop lists it: 3.13 in long and 0.885 in wide, the width read as the cover's
+// height across the port.
+local fortisDustCover = 'https://armsagora.com/fortis-manufacturing-billet-dust-cover-for-850015927034';
 
 // The A2 parts are traced off the M16A4 side photos, each scaled by the rifle's published overall length. The side
 // photo's heights are over its bore, which the sight line is measured from.
@@ -124,19 +137,12 @@ local sideOverBore(py) = (side.boreYPx.value - py) * sideMmPerPx;
 // No print of the upper is published, so the rail top is taken from a forum compilation of measured flat-tops. The side
 // photo agrees within its trace; the bare photo reads it 2 mm lower and the AM-15 profile 3.8 mm higher, each at over a
 // millimetre a pixel.
-local railTopY = dim(
-  30.861,
-  'sourced: 1.215 in from the bore centreline, a forum compilation of flat-top rail heights, '
+local sourcedRailTopY = 30.861;
+local railHeightSource =
+  '1.215 in from the bore centreline, a forum compilation of flat-top rail heights, '
   + 'https://forum.308ar.com/topic/23364-advantage-of-various-upper-rail-heights/; the m16a4-side trace reads %.1f mm'
-  % sideOverBore(side.railTopYPx.value),
-);
+  % sideOverBore(side.railTopYPx.value);
 local drawnSlotDepth = dim(detailFeature, 'derived: the slot depth exaggerated to two detail voxels, so every slot cuts evenly');
-// The flat-top's receiver rises to the rail, which is only its teeth: the upper carries the charging handle under it.
-local upperTopY = dim(
-  railTopY.mm - drawnSlotDepth.mm,
-  "derived: the rail's teeth standing on the receiver, its slots cut to the receiver's top; the m16a4-side trace's "
-  + 'receiver top reads %.1f mm' % sideOverBore(side.receiverTopYPx.value),
-);
 
 // The carry handle, registered at its rear face on the upper's rear face; a null height stands on the handle's base,
 // the top of the receiver under its window.
@@ -261,11 +267,28 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
 
   upper: {
     rearX: upperRearX,
-    topY: upperTopY,
+    // The receiver's top stands a roof over the charging handle's channel. At the sourced rail height the roof is
+    // thinner than that, since the handle is lifted clear over the stock, so the receiver and its rail are raised.
+    roof: dim(grains.detailGrain * 1000, "derived: one detail voxel, so the roof over the charging handle's channel exports whole"),
+    topY: dim(
+      std.max(
+        sourcedRailTopY - drawnSlotDepth.mm,
+        $.chargingHandle.shaft.bottomY.mm + $.chargingHandle.shaft.depth.mm + $.chargingHandle.shaft.clearance.mm
+        + self.roof.mm,
+      ),
+      "derived: under the rail by its slot depth, or a roof over the charging handle's channel if that is higher; the "
+      + "m16a4-side trace's receiver top reads %.1f mm" % sideOverBore(side.receiverTopYPx.value),
+    ),
     halfWidth: dim(14.5, 'derived: wider than the rail it carries'),
+    // The flat-top's rail is only its teeth, standing on the receiver with its slots cut to the receiver's top.
     rail: {
       rearX: tracedX(386, 'upperRail'),
-      topY: railTopY,
+      topY: dim(
+        $.upper.topY.mm + drawnSlotDepth.mm,
+        'derived: its teeth on the receiver, %.2f mm above the sourced height so the charging handle\'s channel keeps its roof; sourced at '
+        % ($.upper.topY.mm + drawnSlotDepth.mm - sourcedRailTopY)
+        + railHeightSource,
+      ),
     },
     // The fixed A2 carry handle as convex side outlines: the rear sight housing with its sloped back, the aperture ears
     // over it and the block ahead of them, the bar falling to the front over the hand hole, and the front leg with its
@@ -275,8 +298,8 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       // handle runs in it, where the flat-top carries its rail.
       base: outline(
         [
-          [handleX(side.handleRearXPx.value), upperTopY.mm],
-          [handleX(handleFront), upperTopY.mm],
+          [handleX(side.handleRearXPx.value), $.upper.topY.mm],
+          [handleX(handleFront), $.upper.topY.mm],
           handlePoint([handleFront, null]),
           handlePoint([side.handleRearXPx.value, null]),
         ],
@@ -333,13 +356,78 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       bottomY: tracedY(97, 'brassDeflector'),
       stand: dim(6, 'derived: a hump standing out of the right side'),
     },
+    // The port is cut to the cover that closes it, whose size a shop lists. The trace of the cover reads 83.6 mm by
+    // 13.1 mm and stands 10.3 mm ahead of the bolt face, so only its bottom edge is kept.
     ejectionPort: {
-      rearX: tracedX(459, 'ejectionPortCover'),
-      frontX: tracedX(529, 'ejectionPortCover'),
-      topY: tracedY(110, 'ejectionPortCover'),
+      frontX: dim(-breechSetback, "derived: on the bolt face, so the bolt's head ejects through the port's front"),
+      rearX: dim(self.frontX.mm - $.portCover.length.mm, 'derived: as long as the cover'),
       bottomY: tracedY(121, 'ejectionPortCover'),
+      // The cover is drawn thicker than it is, inward into the port, so its inner top edge swings out above the cover's
+      // top; the port is cut that much taller.
+      topY: dim(
+        self.bottomY.mm - $.portCover.rodDrop.mm + std.sqrt(
+          std.pow($.portCover.rodDrop.mm + $.portCover.height.mm, 2)
+          + std.pow($.portCover.rodStandoff.mm + $.portCover.drawnThickness.mm, 2)
+        ),
+        "derived: as far over the cover's rod as its drawn inner top edge swings",
+      ),
       lane: dim(100, 'derived: room for a spent case to leave the port'),
     },
+    wall: detailWall('an aluminium receiver'),
+  },
+
+  // The bolt carrier group in battery: the carrier's rear on the upper's rear face, where the buffer meets it, and the
+  // bolt's face on the barrel's breech. The carrier's length is the two spans either side of the gas key's rear, so it
+  // is derived, not sourced.
+  boltCarrier: {
+    stroke: dim(95.25, 'sourced: the 3.75 in stroke, ' + gasKeyPatent),
+    keyLength: dim(62.611, "sourced: 2.465 in from the carrier's front to the rear of its gas key, " + gasKeyPatent),
+    keyRoom: dim(
+      99.06,
+      "derived: the gas key's rear this far ahead of the upper's rear face, read from the 3.90 in the patent gives the charging handle to draw the key back in, "
+      + gasKeyPatent,
+    ),
+    clearance: dim(0.5, 'derived: a sliding fit in the upper'),
+    boltRadius: dim(6.5, "derived: the bolt head standing out of the carrier's front, about 0.5 in across"),
+    // The animated cycle's spring return takes about 83 ms over this stroke, so 700 is the fastest sourced rate it fits.
+    cyclicRate: rate(700, 'derived: the low end of the M4 rate of 700 to 970 rounds a minute, ' + m4Carbine),
+  },
+
+  // The charging handle at rest: its latch closes the upper's rear face and its shaft runs forward under the rail to the
+  // carrier's gas key. Drawn, both ride back over the stock, so both stand clear over the taller stock's top.
+  chargingHandle: {
+    rearX: tracedX(375, 'chargingHandle'),
+    topY: tracedY(78, 'chargingHandle'),
+    clearance: dim(0.5, "derived: a running clearance over the stock's top"),
+    // The trace's 1 px below the collapsible stock's top is read as trace error.
+    bottomY: dim(
+      std.max($.stock.topY.mm, $.stockA2.combY.mm) + self.clearance.mm,
+      "derived: clear over the stock's top, which the handle is drawn back over; the trace reads %.1f mm" % yOf(87),
+    ),
+    halfWidth: dim($.upper.halfWidth.mm, 'derived: as wide as the upper whose rear it closes'),
+    shaft: {
+      bottomY: dim($.chargingHandle.bottomY.mm, 'derived: level with the latch, clear over the stock it is drawn back over'),
+      depth: dim(detailFeature, 'derived: a shaft two detail voxels deep'),
+      halfWidth: dim(detailFeature / 2, 'derived: a shaft two detail voxels wide'),
+      clearance: dim(0.5, 'derived: a sliding fit in its channel'),
+    },
+  },
+
+  // The ejection port's dust cover, closing the port flush with its outer face standing its thickness off the upper's
+  // side, and hung on a rod under the port's bottom edge and outboard of the cover. It turns out and down about the rod
+  // until its outer face comes to rest on the magazine well's top outer edge, which stands out past the upper's side.
+  portCover: {
+    length: dim(79.502, 'sourced: 3.13 in, ' + fortisDustCover),
+    height: dim(22.479, 'sourced: 0.885 in, listed as its width and read as its height across the port, ' + fortisDustCover),
+    thickness: dim(1, 'derived: a stamped steel sheet'),
+    drawnThickness: dim(detailFeature, 'derived: two detail voxels, drawn inward of the outer face into the port'),
+    rodDrop: dim(0.75, "derived: the rod's centre under the port's bottom edge, in the upper's hinge lugs"),
+    rodStandoff: dim(0.85, "derived: the rod's centre outboard of the cover's outer face, inside the knuckle rolled round it"),
+    // Where the well's top outer edge stands from the rod, and the turn that brings the outer face onto it.
+    local rod = [$.upper.ejectionPort.bottomY.mm - self.rodDrop.mm, $.upper.halfWidth.mm + self.thickness.mm + self.rodStandoff.mm],
+    local edge = [$.lower.partingY.mm - rod[0], $.lower.well.outerHalfWidth.mm - rod[1]],
+    local turn = std.atan2(-edge[0], edge[1]) + std.acos(-self.rodStandoff.mm / std.sqrt(edge[0] * edge[0] + edge[1] * edge[1])),
+    openAngle: angle(turn * 180 / std.pi, "derived: the turn that rests the cover's outer face on the magazine well's top outer edge"),
   },
 
   barrel: {
@@ -425,7 +513,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   // The fixed rear sight a flat-top carries on its rail, its aperture on the flat-top sight plane the flat-top front
   // sight base is made for.
   rearSight: {
-    apertureAboveRail: dim(sightPlane.mm - railTopY.mm, 'derived: the flat-top sight plane over the top rail'),
+    apertureAboveRail: dim(sightPlane.mm - $.upper.rail.topY.mm, 'derived: the flat-top sight plane over the top rail'),
   },
 
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.
@@ -437,7 +525,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     lengths: {
       '15': dim(calibration.lengthMm.value, 'sourced: https://www.jakt.se/anderson-am-15-utility-223-wylde-18-5rd'),
     },
-    railTopY: dim(railTopY.mm, "derived: flush with the upper's rail, so an optic may span the joint"),
+    railTopY: dim($.upper.rail.topY.mm, "derived: flush with the upper's rail, so an optic may span the joint"),
     bottomY: tracedY(120, 'handguard'),
     wall: detailWall('an aluminium tube'),
     outerTopY: dim(
@@ -500,12 +588,20 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     frontX: dim(xOf(284) - stockMount[0], traced('moduleStockToReceiverExtension')),
     rearX: dim(xOf(128) - stockMount[0], traced('stock')),
     topY: tracedY(86, 'stock'),
-    bottomY: dim(-yOf(86), 'derived: the body is centred on the tube'),
+    bottomY: dim(-self.topY.mm, 'derived: the body is centred on the tube'),
     tubeClearance: dim(1, 'derived: a sliding fit on the tube'),
     halfWidth: dim(20, 'derived: a body a little wider than the tube it wraps'),
     toe: collapsibleToe,
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
     chamfer: dim(self.halfWidth.mm - self.toeHalfWidth.mm, 'derived: the bottom flat as wide as the toe under it'),
+    // The traced stock stands fully extended, its sleeve clear of the castle nut by more than the travel to its last
+    // position, so its positions run forward from the trace.
+    positions: count(6, 'sourced: ' + sixPositionTube),
+    pitch: dim(
+      (m4Lengths.extended - m4Lengths.collapsed) / (self.positions.count - 1),
+      'derived: the M4 extended less collapsed overall length (%g mm less %g mm) over the steps between its positions, %s'
+      % [m4Lengths.extended, m4Lengths.collapsed, m4Carbine],
+    ),
   },
 
   // The A2 fixed stock, measured from the end of the rifle extension it slides over: the butt plate covers the
@@ -580,5 +676,8 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
     ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
+    ar15_bolt_carrier: mass(0.3266, 'sourced: 11.52 oz, https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
+    ar15_charging_handle: mass(0.0312, 'sourced: 1.1 oz, https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
+    ar15_port_cover: mass(0.0221, 'sourced: 0.78 oz, https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),
   },
 }

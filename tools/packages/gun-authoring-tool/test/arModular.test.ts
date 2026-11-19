@@ -5,9 +5,11 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { Motion } from '@skelly/motion/motion';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
+import { arActionLayout } from '../src/gun/arModular/action.ts';
 import { AR15_FRAME, checkFrameTable, checkRailSeats, FRAME_PICKS, pick, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { arUpper } from '../src/gun/arModular/upper.ts';
@@ -93,6 +95,23 @@ describe('modular AR', () => {
     );
   });
 
+  it("keeps the receiver's roof over the charging handle's channel at least upper.roof thick", () => {
+    const channelTopY = arActionLayout(AR15_FRAME).channel.y[1];
+    expect(u(AR15.upper.topY) - channelTopY).toBeGreaterThanOrEqual(u(AR15.upper.roof) - 1e-9);
+    const thinnedMm = AR15.upper.topY.mm - AR15.upper.roof.mm / 2;
+    const thinned = { ...AR15, upper: { ...AR15.upper, topY: { ...AR15.upper.topY, mm: thinnedMm } } };
+    expect(() => arActionLayout({ ...AR15_FRAME, table: thinned })).toThrow(/ar15\.upper\.topY: the receiver's roof/);
+  });
+
+  it('refuses an ejection port whose front is off the bolt face', () => {
+    const port = AR15.upper.ejectionPort;
+    const shifted = { ...port, frontX: { ...port.frontX, mm: port.frontX.mm - 1 } };
+    const table = { ...AR15, upper: { ...AR15.upper, ejectionPort: shifted } };
+    expect(() => arUpper({ ...AR15_FRAME, table }).build({ top: 'flat-top' })).toThrow(
+      /ar15\.upper\.ejectionPort: the port's front is off the bolt face/,
+    );
+  });
+
   it('refuses the AR-15 table with a pick it pins left out or turned into a measurement', () => {
     const withBuffer = { ...AR15, stock: { ...AR15.stock, buffer: AR15.receiverExtension.buffers.carbine!.radius } };
     expect(() => checkFrameTable('ar15', withBuffer, FRAME_PICKS)).toThrow(/ar15\.stock\.buffer: expected a pick/);
@@ -135,7 +154,7 @@ describe('modular AR', () => {
     expect(validate(loadDesignAssembly('ar15-carbine-free-float'), gunDomain).issues).toEqual([]);
     const issues = validate(loadDesignAssembly('ar15-carbine-free-float'), coarse).issues;
     expect(new Set(issues.filter(({ rule }) => rule === 'min-feature').flatMap(({ parts }) => parts))).toEqual(
-      new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock']),
+      new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock', 'bolt-carrier', 'charging-handle']),
     );
     // Every stock style has sleeve walls under the coarse grain, the A2's as the collapsible's.
     const a2 = validate(loadDesignAssembly('ar15-rifle-a2'), coarse).issues;
@@ -164,7 +183,7 @@ describe('modular AR', () => {
       return localSolidBounds(def.solids.find(({ id }) => id === solid)!).map((corner) => applyPoint(placed, corner));
     };
     const towerFront = boundsOf('lower', 'tower')[1]!;
-    const upperRear = boundsOf('upper', 'receiver-body')[0]!;
+    const upperRear = boundsOf('upper', 'receiver-floor')[0]!;
     expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
   });
 
@@ -320,6 +339,31 @@ describe('modular AR', () => {
       }
     },
   );
+
+  it('exports the carbine action through the sourced stroke, and its cover and stock moving through their own stops', () => {
+    const result = exportGunGlb(
+      loadDesignAssembly('ar15-carbine-free-float'),
+      { id: 'ar15_motion_test', file: 'assets/models/ar15_motion_test.glb' },
+      { appearanceProfile: 'ar' },
+    );
+    if (!result.ok) {
+      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+    }
+    const { action, moving } = result.modelEntry.gun;
+    const travelOf = (motion: Motion) => motion.stages.find((stage) => stage.kind === 'slide')?.travel;
+    const stroke = AR15.boltCarrier.stroke.mm / 1000;
+    expect(travelOf(action!.parts.carrier!.motion)).toBeCloseTo(stroke, 6);
+    expect(travelOf(action!.parts.handle!.motion)).toBeCloseTo(stroke, 6);
+    const motionOf = (part: string) => moving!.find(({ node }) => node.startsWith(`${part}:`))!.motion;
+    expect(moving!.map(({ node }) => node.split(':')[0]).sort()).toEqual(['port-cover', 'stock']);
+    const cover = motionOf('port-cover');
+    expect(cover.stages.map(({ kind }) => kind)).toEqual(['hinge']);
+    expect(cover.stages[0]!.kind === 'hinge' && cover.stages[0]!.angle).toBeCloseTo(AR15.portCover.openAngle.deg, 6);
+    const stock = motionOf('stock');
+    expect(stock.stops).toHaveLength(AR15.stock.positions.count);
+    const pitch = AR15.stock.pitch.mm / 1000;
+    expect(travelOf(stock)).toBeCloseTo((AR15.stock.positions.count - 1) * pitch, 6);
+  });
 
   it('takes a rail front sight for no rear sight', () => {
     const front = variant('broken-ar15-rear-sight', (assembly) => {

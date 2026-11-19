@@ -323,5 +323,8 @@ local ar15Item(id, role, params) =
     ar15Item('ar15_stock_collapsible', 'stock', { style: 'collapsible' }),
     ar15Item('ar15_stock_a2', 'stock', { style: 'a2' }),
     ar15Item('ar15_grip', 'grip', {}),
+    ar15Item('ar15_bolt_carrier', 'bolt-carrier', {}),
+    ar15Item('ar15_charging_handle', 'charging-handle', {}),
+    ar15Item('ar15_port_cover', 'port-cover', {}),
   ],
 }

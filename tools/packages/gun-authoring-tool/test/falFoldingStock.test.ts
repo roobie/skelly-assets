@@ -6,7 +6,8 @@ import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@
 import { stopClock } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
-import { EXTENDED_STOP, FAL_FOLDING_STOCK, FOLDED_STOP, parseFalFoldingStock } from '../src/gun/falFoldingStock.ts';
+import { FAL_FOLDING_STOCK, FOLDED_STOP, parseFalFoldingStock } from '../src/gun/falFoldingStock.ts';
+import { EXTENDED_STOP } from '../src/gun/stockStops.ts';
 import { sweepStops } from '../src/gun/stopSweep.ts';
 import { loadFixture } from './helpers.ts';
 

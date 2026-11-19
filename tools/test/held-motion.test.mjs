@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { heldItem } from '../../site/heldMotion.mjs';
+import { gunMovers, heldItem } from '../../site/heldMotion.mjs';
 import { partStrokes } from '../press-check.mjs';
 import { dollTree, heldThings, repo } from './doll-tree.mjs';
 
@@ -19,7 +19,7 @@ test('a moved pose draws each part along its stroke by the share of the clock it
   const { pack, path } = manifest.models.find(({ id }) => id === model);
   const bytes = readFileSync(join(built, pack, path));
   const { scene } = await new GLTFLoader().parseAsync(Uint8Array.from(bytes).buffer, '');
-  const { obj, move } = heldItem({ scene, action: thingOf(model).gun.action }, model);
+  const { obj, move } = heldItem({ scene, movers: gunMovers(thingOf(model).gun) }, model);
   const strokes = partStrokes(thingOf(model));
   const positionOf = (part) => {
     let found;

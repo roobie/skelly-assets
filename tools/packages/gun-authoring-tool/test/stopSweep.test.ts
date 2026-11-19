@@ -5,12 +5,14 @@ import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import { applyDir, applyPoint, IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
+import type { MotionStage } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { AR15_FRAME, u } from '../src/gun/arModular/frame.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAL_FOLDING_STOCK } from '../src/gun/falFoldingStock.ts';
 import { sweepPartStops, sweepStops } from '../src/gun/stopSweep.ts';
-import { loadCorpus, loadFixture } from './helpers.ts';
+import { loadCorpus, loadDesignAssembly, loadFixture } from './helpers.ts';
 
 const centreOf = (solid: Parameters<typeof localSolidBounds>[0]): Vec3 => {
   const [min, max] = localSolidBounds(solid);
@@ -236,6 +238,68 @@ describe('the stop sweep', () => {
     expect(sweepStops(intruding).some((issue) => /^stock at folded: .*ejection volume of receiver/.test(issue))).toBe(
       true,
     );
+  });
+
+  describe('the AR-15 carbine', () => {
+    const carbine = resolve(loadDesignAssembly('ar15-carbine-free-float'), gunDomain);
+    /** The carbine with `id`'s single stage carried `by` further than its table says, its stops kept. */
+    const overrun = (id: string, by: (stage: MotionStage) => MotionStage): Resolved => {
+      const motion = carbine.motions.get(id)!;
+      return { ...carbine, motions: new Map(carbine.motions).set(id, { ...motion, stages: motion.stages.map(by) }) };
+    };
+
+    it('opens the port cover down to the magazine well, out of the ejection lane, and no further', () => {
+      expect(sweepStops(carbine)).toEqual([]);
+      const turnedTo = (angle: (open: number) => number) =>
+        sweepStops(
+          overrun('port-cover', (stage) => (stage.kind === 'hinge' ? { ...stage, angle: angle(stage.angle) } : stage)),
+        );
+      expect(turnedTo((open) => open + 2).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
+      expect(turnedTo(() => 90).some((issue) => /^port-cover at open: .*ejection volume of upper/.test(issue))).toBe(
+        true,
+      );
+    });
+
+    const { chargingHandle, stock, stockA2 } = AR15_FRAME.table;
+    it.each([
+      ['ar15-carbine-free-float', stock.topY, /^stock at collapsed: .*clearance volume of charging-handle/],
+      ['ar15-rifle-a2', stockA2.combY, /^charging-handle\.shaft vs stock\./],
+    ])('draws the charging handle back clear over the stock: %s', (design, stockTopY, clash) => {
+      const rifle = resolve(loadDesignAssembly(design), gunDomain);
+      expect(sweepStops(rifle)).toEqual([]);
+      const handle = rifle.defs.get('charging-handle')!;
+      // Down past the stock's top by the handle's clearance.
+      const drop = u(chargingHandle.bottomY) - u(stockTopY) + u(chargingHandle.clearance);
+      const lowered = <T extends { readonly box: BoxSolid['box'] }>(piece: T): T => ({
+        ...piece,
+        box: { ...piece.box, center: [piece.box.center[0], piece.box.center[1] - drop, piece.box.center[2]] },
+      });
+      const sagging = {
+        ...handle,
+        solids: handle.solids.map((solid) => (solid.kind === 'box' ? lowered(solid) : solid)),
+        keepOuts: handle.keepOuts.map(lowered),
+      };
+      const issues = sweepStops({ ...rifle, defs: new Map(rifle.defs).set('charging-handle', sagging) });
+      expect(issues.some((issue) => clash.test(issue))).toBe(true);
+    });
+
+    it('collapses the stock through its positions to just short of the castle nut', () => {
+      expect(carbine.motions.get('stock')!.stops.map(({ name }) => name)).toEqual([
+        'extended',
+        'position-5',
+        'position-4',
+        'position-3',
+        'position-2',
+        'collapsed',
+      ]);
+      const pitch = u(AR15_FRAME.table.stock.pitch);
+      const past = overrun('stock', (stage) =>
+        stage.kind === 'slide' ? { ...stage, travel: stage.travel + pitch } : stage,
+      );
+      expect(sweepStops(past).some((issue) => /^stock\.sleeve.* vs receiver-extension\.castle-nut/.test(issue))).toBe(
+        true,
+      );
+    });
   });
 
   it.each(loadCorpus())('finds every stop and the path between stops clear: $label', ({ assembly }) => {

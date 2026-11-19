@@ -14,10 +14,10 @@ import type { Motion } from '@skelly/motion/motion';
 import { partNodeName } from '@skelly/thing-export/glb.ts';
 import { hingeOf, slideOf } from './actionMotion.ts';
 import {
-  type ActionKind,
   type ActionRoleKey,
-  actionKindOf,
   actionRoleKeyOf,
+  type DescribedActionKind,
+  describedActionKindOf,
   type GunPartFamily,
 } from './actionRoles.ts';
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
@@ -37,7 +37,7 @@ interface ActionPart {
 }
 
 export interface ResolvedGunAction {
-  readonly kind: ActionKind;
+  readonly kind: DescribedActionKind;
   readonly carrier: ActionPart;
   readonly parts: { readonly carrier: ActionPart } & Readonly<Partial<Record<ActionRoleKey, ActionPart>>>;
   readonly receiverId: string;
@@ -100,8 +100,8 @@ const carrierCyclicRpm = (resolved: Resolved, id: string): number | undefined =>
 };
 
 export const resolveGunAction = (resolved: Resolved): ResolvedGunAction | undefined => {
-  const entry = [...resolved.defs].find(([, def]) => actionKindOf(def) !== undefined);
-  const kind = entry && actionKindOf(entry[1]);
+  const entry = [...resolved.defs].find(([, def]) => describedActionKindOf(def) !== undefined);
+  const kind = entry && describedActionKindOf(entry[1]);
   if (!(entry && kind)) {
     return undefined;
   }

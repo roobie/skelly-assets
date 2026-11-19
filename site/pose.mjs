@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
 import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip, slerp } from './clipFrames.mjs';
-import { heldItem } from './heldMotion.mjs';
+import { gunMovers, heldItem } from './heldMotion.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -324,14 +324,14 @@ function drawEyeTile(obj, size, figure) {
   return tile.toDataURL('image/png');
 }
 
-// Each held model's scene, loaded once at the origin, with the action its sidecar gives it.
+// Each held model's scene, loaded once at the origin, with the parts its sidecar moves.
 const heldScenes = new Map();
 function heldScene(model) {
   if (!heldScenes.has(model))
     heldScenes.set(
       model,
       Promise.all([ready, loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] })]).then(
-        ([{ models }, { scene }]) => ({ scene, action: models.get(model)?.action }),
+        ([{ models }, { scene }]) => ({ scene, movers: gunMovers(models.get(model) ?? {}) }),
       ),
     );
   return heldScenes.get(model);

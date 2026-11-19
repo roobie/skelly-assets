@@ -8,8 +8,11 @@ export const ACTION_PART_ROLES = {
   knob: 'bolt-handle-knob',
 } as const;
 
-/** The tag of each kind of action carrier; the carrier's tag is how the action description finds it and its kind. */
-export const ACTION_CARRIER_ROLES = {
+/**
+ * The tag of each kind of action carrier whose cycle the action description plays; the carrier's tag is how the
+ * description finds it and its kind.
+ */
+const DESCRIBED_CARRIER_ROLES = {
   ar: 'ar-carrier',
   ak: 'ak-carrier',
   smg: 'smg-carrier',
@@ -18,8 +21,12 @@ export const ACTION_CARRIER_ROLES = {
   slide: 'slide-carrier',
 } as const;
 
+/** The tag of each kind of action carrier: the described ones, and the Barrett's, whose cycle is not described. */
+export const ACTION_CARRIER_ROLES = { ...DESCRIBED_CARRIER_ROLES, barrett: 'barrett-carrier' } as const;
+
 export type ActionRoleKey = keyof typeof ACTION_PART_ROLES;
-export type ActionKind = keyof typeof ACTION_CARRIER_ROLES;
+type ActionKind = keyof typeof ACTION_CARRIER_ROLES;
+export type DescribedActionKind = keyof typeof DESCRIBED_CARRIER_ROLES;
 
 /** Every action role tag a part may claim, at most once per gun. */
 export const ACTION_ROLE_TAGS: readonly string[] = [
@@ -35,6 +42,10 @@ export const actionRoleKeyOf = (def: PartDef): ActionRoleKey | undefined => look
 
 /** The action kind a part's tags give it, if it declares itself an action carrier. */
 export const actionKindOf = (def: PartDef): ActionKind | undefined => lookup(ACTION_CARRIER_ROLES, def.tags);
+
+/** The action kind a part's tags give it, if it declares itself a carrier whose cycle is described. */
+export const describedActionKindOf = (def: PartDef): DescribedActionKind | undefined =>
+  lookup(DESCRIBED_CARRIER_ROLES, def.tags);
 
 /**
  * What a gun part family declares of itself beyond its parts. Each is the family's own content, so a family in any
