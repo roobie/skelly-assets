@@ -14,6 +14,7 @@ import {
   applyDir,
   applyPoint,
   compose,
+  extrusionPoint,
   invert,
   type Mat3,
   type Transform,
@@ -22,7 +23,7 @@ import {
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
 import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { displayBevel, meshForSolid, meshForSolidGroup, terracedMesh } from '@skelly/construct/shapes/mesh.ts';
-import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import type { TerraceLattice } from '@skelly/construct/shapes/terrace.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
 import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
@@ -157,15 +158,22 @@ export const VOXEL_DETAIL = 'voxel-detail';
  */
 export const SMOOTH = 'smooth';
 
+/** Whether a voxelized export keeps the solid's authored mesh inside its voxelized part; see `SolidDisplayHints`. */
+export const isSmoothPiece = (solid: Solid): boolean => solid.display?.smooth !== undefined;
+
+/** The drawn solids a voxelized part samples at its grain: all but its smooth pieces. */
+export const voxelizedSolids = (solids: readonly Solid[]): readonly Solid[] =>
+  solids.some(isSmoothPiece) ? solids.filter((solid) => !isSmoothPiece(solid)) : solids;
+
 /**
- * Whether the part's drawn solids, taken together, are too thin on some axis to read at the grain. The part is judged
- * whole, not solid by solid, because a receiver or a stock is built of thin walls and plates that read as one body, while
- * a part thin all through, such as a charging handle or a trigger, lands on one uneven layer of voxels.
+ * Whether the part's voxelized solids, taken together, are too thin on some axis to read at the grain. The part is
+ * judged whole, not solid by solid, because a receiver or a stock is built of thin walls and plates that read as one
+ * body, while a part thin all through, such as a charging handle or a trigger, lands on one uneven layer of voxels.
  */
 const isThinPart = (def: PartDef, grain: number, metresPerUnit: number): boolean => {
   const low = [Infinity, Infinity, Infinity];
   const high = [-Infinity, -Infinity, -Infinity];
-  for (const solid of def.displaySolids ?? def.solids) {
+  for (const solid of voxelizedSolids(def.displaySolids ?? def.solids)) {
     const [min, max] = localSolidBounds(solid);
     for (const axis of [0, 1, 2]) {
       low[axis] = Math.min(low[axis]!, min[axis]!);
@@ -194,22 +202,60 @@ export const partVoxelGrain = (
     : voxelGrain;
 };
 
+/** The axis a unit axis vector runs along, or none for any other vector. */
+const axisOf = (normal: Vec3): number | undefined => {
+  const axis = normal.findIndex((component) => Math.abs(component) === 1);
+  return axis < 0 ? undefined : axis;
+};
+
+/**
+ * The solid with its face whose outward normal is `normal`, an axis of its frame, moved `depth` out along it: a box or
+ * a prism grows, a prism's profile corners on that face move with it.
+ */
+const reachedThrough = (solid: Solid, normal: Vec3, depth: number): Solid => {
+  const axis = axisOf(normal);
+  if (axis === undefined) {
+    throw new Error(`Solid ${solid.id} cannot reach along [${normal.join(', ')}], which is not an axis of its frame`);
+  }
+  const sign = normal[axis]!;
+  if (solid.kind === 'box') {
+    const grow = (v: Vec3, by: number): Vec3 => v.map((x, i) => (i === axis ? x + by : x)) as unknown as Vec3;
+    const { center, half } = solid.box;
+    return { ...solid, box: { center: grow(center, (sign * depth) / 2), half: grow(half, depth / 2) } };
+  }
+  if (solid.kind === 'extruded-polygon') {
+    const along = ['x', 'y', 'z'].indexOf(solid.axis ?? 'z');
+    if (axis === along) {
+      const [low, high] = solid.z;
+      return { ...solid, z: sign > 0 ? [low, high + depth] : [low - depth, high] };
+    }
+    const coordinate = extrusionPoint(solid.axis, [1, 0], 0)[axis] === 1 ? 0 : 1;
+    const values = solid.profile.map((corner) => corner[coordinate]);
+    const face = sign > 0 ? Math.max(...values) : Math.min(...values);
+    const profile = solid.profile.map(
+      (corner): Vec2 =>
+        Math.abs(corner[coordinate] - face) > 1e-9
+          ? corner
+          : coordinate === 0
+            ? [corner[0] + sign * depth, corner[1]]
+            : [corner[0], corner[1] + sign * depth],
+    );
+    return { ...solid, profile };
+  }
+  throw new Error(`Solid ${solid.id} is turned; only a box or a prism can reach through a face`);
+};
+
 /**
  * A smooth part's drawn boxes that stand on the port it mounts by, reaching `depth` through that port into its host.
  * The voxel host's face snaps to its grid, so a part seated on the authored face would float by up to half a voxel;
  * reaching a whole grain in, where the host's voxels hide it, closes that gap whatever the grid.
  */
 const seatedDef = (def: PartDef, port: PortDef, depth: number): PartDef => {
-  const axis = port.normal.findIndex((component) => Math.abs(component) === 1);
-  if (axis < 0) {
+  const axis = axisOf(port.normal);
+  if (axis === undefined) {
     return def;
   }
   const sign = port.normal[axis]!;
-  const grow = ([x, y, z]: Vec3, by: number): Vec3 => [
-    axis === 0 ? x + by : x,
-    axis === 1 ? y + by : y,
-    axis === 2 ? z + by : z,
-  ];
   const seat = (solid: Solid): Solid => {
     if (solid.kind !== 'box') {
       return solid;
@@ -218,7 +264,7 @@ const seatedDef = (def: PartDef, port: PortDef, depth: number): PartDef => {
     if (Math.abs(center[axis]! + sign * half[axis]! - port.pos[axis]!) > 1e-9) {
       return solid;
     }
-    return { ...solid, box: { center: grow(center, (sign * depth) / 2), half: grow(half, depth / 2) } };
+    return reachedThrough(solid, port.normal, depth);
   };
   return {
     ...def,
@@ -650,8 +696,20 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
   };
   const itemsOf = (part: PartExport, copy: 'voxel' | 'smooth' = 'voxel'): DisplayItem[] => {
     const drawn = part.def.displaySolids ?? part.def.solids;
-    const solids = copy === 'smooth' ? drawn.filter((solid) => !solid.display?.voxelOnly) : drawn;
+    const solids = copy === 'smooth' ? drawn.filter((solid) => !solid.display?.voxelOnly) : voxelizedSolids(drawn);
     return splitMixed(displayItems(solids), (solid) => appearanceFor(part, solid));
+  };
+  /** A voxelized part's smooth pieces, each reaching one of the part's voxels through the face it stands on. */
+  const piecesOf = (part: PartExport, grain: number): DisplayItem[] => {
+    const depth = grain / metresPerUnit;
+    const pieces = (part.def.displaySolids ?? part.def.solids).flatMap((solid) => {
+      const piece = solid.display?.smooth;
+      if (piece === undefined) {
+        return [];
+      }
+      return [piece.seat === undefined ? solid : reachedThrough(solid, piece.seat, depth)];
+    });
+    return splitMixed(displayItems(pieces), (solid) => appearanceFor(part, solid));
   };
   /** The part's voxel sources in part-local metres, one per display item, or none for an empty one. */
   const drawnMeshes = new Map<string, ({ positions: Float32Array; indices: Uint32Array } | undefined)[]>();
@@ -838,7 +896,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     const primitives =
       grain === undefined
         ? smoothPrimitivesFor(itemsOf(seatedInHost(part), 'smooth'))
-        : voxelPrimitivesFor(part, itemsOf(part), grain);
+        : [...voxelPrimitivesFor(part, itemsOf(part), grain), ...smoothPrimitivesFor(piecesOf(part, grain))];
     const name = partNodeName(part.id, part.family);
     const joints = mounts.get(part.id);
     const node: Json = { name };

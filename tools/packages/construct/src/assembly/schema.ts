@@ -99,10 +99,13 @@ export interface PartMotion {
   readonly stops?: readonly { readonly name: string; readonly after: number }[];
 }
 
-/** What a part does with a feature too thin for the export grain; the reason of an exaggeration is the part's to give. */
+/**
+ * What a part does with a feature too thin for the export grain; the reason of an exaggeration is the part's to give.
+ * A smooth feature is drawn by a smooth piece of the part (`SolidDisplayHints.smooth`), which no grain reaches.
+ */
 export type FeatureDisposition =
   | { readonly kind: 'exaggerated'; readonly reason: string }
-  | { readonly kind: 'detail' | 'omitted' };
+  | { readonly kind: 'detail' | 'omitted' | 'smooth' };
 
 /** A thin feature a part authors at its real size; `disposition` says how the export carries it, if it must. */
 export interface PartFeature {

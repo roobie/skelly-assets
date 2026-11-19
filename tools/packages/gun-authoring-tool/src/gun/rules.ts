@@ -25,7 +25,7 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { FEATURE_VOXELS, featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
-import { partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import { isSmoothPiece, partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { ACTION_ROLE_TAGS } from './actionRoles.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
@@ -989,7 +989,8 @@ const gunGrains = recipeVoxel({ voxel: gunVoxel });
 /**
  * A part authored at real size may hold a feature the grain its export gives it cannot carry. Such a feature has to
  * say what becomes of it, or it is lost to the voxelization unannounced. A feature disposed as detail holds only on a
- * part the export already gives the detail grain, and only if it fits that grain. A part exported smooth is not
+ * part the export already gives the detail grain, and only if it fits that grain; a feature disposed as smooth, only on
+ * a part that keeps a smooth piece to draw it. A part exported smooth is not
  * voxelized, so its features are not judged.
  */
 export const minFeature: Rule = {
@@ -1009,6 +1010,16 @@ export const minFeature: Rule = {
           continue;
         }
         const label = `${part} feature "${feature.name}"`;
+        if (kind === 'smooth') {
+          if (!(def.displaySolids ?? def.solids).some(isSmoothPiece)) {
+            issues.push({
+              rule: 'min-feature',
+              message: `${label} is disposed as smooth but the part has no smooth piece to draw it.`,
+              parts: [part],
+            });
+          }
+          continue;
+        }
         if (kind === 'detail' && grain !== gunGrains.voxelDetailGrain) {
           issues.push({
             rule: 'min-feature',

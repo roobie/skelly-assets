@@ -17,7 +17,7 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { VoxelGrains } from './exportTypes.ts';
-import { latticeOrigin, partVoxelGrain, terraceLattice, voxelSourceOf } from './glb.ts';
+import { isSmoothPiece, latticeOrigin, partVoxelGrain, terraceLattice, voxelizedSolids, voxelSourceOf } from './glb.ts';
 import { fillVoxels, type VoxelFill } from './voxelize.ts';
 
 /** A solid's bounds, centre and volume in its part's local frame and domain units. */
@@ -115,8 +115,8 @@ const unionOf = (boxes: readonly (readonly [Vec3, Vec3])[]): [Vec3, Vec3] => [
 /**
  * Reads datums off the drawn voxels of `resolved` at the export's grains: each solid is sampled on its part's lattice
  * together with the solids it is drawn among, as `glb.ts` samples them for the file, and measured by the voxels it
- * fills there. Without a grain, for the file or the part, the file holds the authored meshes, so datums stay on the
- * authored solids.
+ * fills there. Without a grain, for the file or the part, and for a smooth piece, the file holds the authored meshes, so
+ * datums stay on the authored solids.
  */
 export const drawnGeometry = (
   resolved: Resolved,
@@ -141,6 +141,13 @@ export const drawnGeometry = (
    * undefined where it draws none. Parts built from one definition share its solids list but not their placement.
    */
   const sampled = new Map<readonly Solid[], Map<string, Sampled>>();
+  // The samples are keyed by their list, so a part's voxelized solids are filtered once into one list.
+  const voxelized = new Map<readonly Solid[], readonly Solid[]>();
+  const voxelizedOf = (solids: readonly Solid[]): readonly Solid[] => {
+    const known = voxelized.get(solids) ?? voxelizedSolids(solids);
+    voxelized.set(solids, known);
+    return known;
+  };
   const sampledOf = (siblings: readonly Solid[], grain: number, placed: Transform): Sampled => {
     const origin = latticeOrigin(placed, grain, unit);
     const lattices = sampled.get(siblings) ?? new Map<string, Sampled>();
@@ -189,14 +196,16 @@ export const drawnGeometry = (
   const measure = (partId: string, solid: Solid): SolidMeasure => {
     const { def, placed } = placedPart(partId);
     const grain = grainOf(def);
-    if (grain === undefined) {
+    if (grain === undefined || isSmoothPiece(solid)) {
       const authored = authoredMeasures.get(solid) ?? authoredMeasure(solid);
       authoredMeasures.set(solid, authored);
       return authored;
     }
     // A solid is sampled with the solids it is drawn among, as the file samples them; a collision solid the file does
     // not draw, with the part's other collision solids.
-    const siblings = [def.displaySolids ?? def.solids, def.solids].find((list) => list.includes(solid)) ?? [solid];
+    const siblings = [def.displaySolids ?? def.solids, def.solids]
+      .map(voxelizedOf)
+      .find((list) => list.includes(solid)) ?? [solid];
     const found = sampledOf(siblings, grain, placed).measures.get(solid);
     if (!found) {
       throw new Error(`Solid ${solid.id} of ${partId} draws no voxels to read its datums from`);
@@ -206,7 +215,7 @@ export const drawnGeometry = (
   const voxels = (partId: string): VoxelFill | undefined => {
     const { def, placed } = placedPart(partId);
     const grain = grainOf(def);
-    const drawn = def.displaySolids ?? def.solids;
+    const drawn = voxelizedOf(def.displaySolids ?? def.solids);
     return grain === undefined || drawn.some((solid) => solid.display?.mergeGroup !== undefined)
       ? undefined
       : sampledOf(drawn, grain, placed).fill;

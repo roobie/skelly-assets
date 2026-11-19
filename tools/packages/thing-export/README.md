@@ -97,6 +97,16 @@ half a voxel. A smooth part exported alone, such as a loose rail sight the game 
 voxel gun, seats the same way through the port it mounts by, so it matches the sight drawn
 fitted. See `src/glb.ts`, `seatedDef`, and `src/exportTypes.ts`, `rootMount`.
 
+A piece built into a bigger part, such as a lower's trigger, is too small to voxelize for
+the same reason, but it is not a part of its own: splitting it out would change what the gun
+is made of and how it mounts. So a single solid is marked smooth instead, and one mechanism
+serves every such piece. It stays in its part's node, and its part still collides and keeps
+clear with it, since only the drawing changes. The part's voxels are sampled without it, so
+they draw no stray layer where the piece stands, and they stay closed around the solids
+under it. The face it stands on reaches one grain into the part, as a smooth part's does,
+and its datums are read off its authored solid. See `src/glb.ts`, `isSmoothPiece` and
+`reachedThrough`, and `packages/construct/src/shapes/solid.ts`, `SmoothPiece`.
+
 A class may also give the finest grain to every part too thin for its own grain, because a charging handle or a trigger a few millimetres thick draws as one blocky layer that no tag
 author thinks to mark. The part is judged as a whole, so a receiver built of thin walls keeps the class grain.
 Only the gun class asks for it: an item's thin parts, a garment's panels above all, are large, and the finest grain
