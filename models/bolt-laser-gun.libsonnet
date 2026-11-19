@@ -23,26 +23,27 @@ local beamY = (underside + top) / 2;  // the beam's axis, the emitter centred on
 local spread(count, from, to, length) =
   local pitch = (to - from) / count;
   [from + i * pitch + (pitch - length) / 2 for i in std.range(0, count - 1)];
-// The battery pack the gun feeds from, in place of the family's cell, so the laser reads as its own weapon: a heavy
-// steel slab, flat bottomed on a rubber pad with its back raked away from the guard, seated into the receiver through a
-// brass contact plate, with a latch on its front and a charge strip of glowing segments down each side. `half` is its
-// half width; it seats `seat` up into the receiver so no seam shows.
+// The battery pack the gun feeds from, in place of the family's cell, so the laser reads as its own weapon: a long
+// heavy steel slab leaning forward, its back square to the guard and its front raked back to its foot, flat bottomed on
+// a rubber pad, seated into the receiver through a brass contact plate, with a latch and grip ridges on its raked front
+// and a charge strip of glowing segments down each side. `half` is its half width; it seats `seat` up into the receiver
+// so no seam shows.
 local battery = {
   back: bolt.feedBack,
-  front: 0.15,
+  front: self.back + 0.16,
   half: 0.06,
   bottom: 0.012,
   top: underside + self.seat,
   seat: 0.01,
-  rake: 0.035,  // how far its back's foot stands forward of its top
+  rake: 0.035,  // how far its front's foot stands back of its top
   pad: 0.01,  // the rubber pad's depth
   contact: 0.012,  // the contact plate's depth, below the receiver's underside
   // The charge strip: `count` segments in a dark window from `y0` to `y1`, the window inset `margin` inside the faces.
   // Its segments are two voxels wide with two between them, so each reads apart at the guns' grain.
-  charge: { count: 4, y0: 0.06, y1: 0.095, margin: 0.012, segment: 0.008 },
-  latch: { y0: 0.085, y1: 0.115, half: 0.03, depth: 0.014 },
-  // Rubber ridges across the raked back, where the off hand pulls the battery free.
-  ridges: { count: 3, y0: 0.04, y1: 0.12, thick: 0.012, proud: 0.004 },
+  charge: { count: 6, y0: 0.06, y1: 0.095, margin: 0.012, segment: 0.008 },
+  latch: { y0: 0.105, y1: 0.125, half: 0.03, proud: 0.012 },
+  // Rubber ridges across the raked front, below the latch, where the off hand pulls the battery free.
+  ridges: { count: 3, y0: 0.03, y1: 0.095, thick: 0.012, proud: 0.004 },
 };
 // The clearance kept between the block's fittings and what they stand beside, so each reads as its own part.
 local gap = 0.02;
@@ -83,21 +84,20 @@ local onSide(face, id, slot, s, min, max, out0, out1) =
 local onFlank(id, slot, s, min, max, out0, out1) = onSide(w, id, slot, s, min, max, out0, out1);
 local batteryPieces =
   local b = battery, c = battery.charge, foot = b.bottom + b.pad;
-  local window = { x0: b.back + b.rake + c.margin, x1: b.front - c.margin };
+  local window = { x0: b.back + c.margin, x1: b.front - b.rake - c.margin };
   local segments = spread(c.count, window.x0, window.x1, c.segment);
-  // The x of the raked back at height `y`.
-  local backAt(y) = b.back + b.rake * (b.top - y) / (b.top - foot);
-  local ridge(i, y) =
-    local r = b.ridges, y1 = y + r.thick;
-    h.prism('battery-ridge-%d' % i, 'grip', 'z', [
-      [backAt(y) - r.proud, y], [backAt(y) + seat, y], [backAt(y1) + seat, y1], [backAt(y1) - r.proud, y1],
-    ], -b.half, b.half);
-  local ridgeYs = spread(b.ridges.count, b.ridges.y0, b.ridges.y1, b.ridges.thick);
-  [ridge(i, ridgeYs[i]) for i in std.range(0, b.ridges.count - 1)] + [
-    h.prism('battery', 'metal', 'z', [[b.back, b.top], [b.front, b.top], [b.front, foot], [b.back + b.rake, foot]], -b.half, b.half),
-    box('battery-pad', 'grip', [b.back + b.rake, b.bottom, -b.half - 0.002], [b.front, foot, b.half + 0.002]),
+  // The x of the raked front at height `y`.
+  local frontAt(y) = b.front - b.rake * (b.top - y) / (b.top - foot);
+  // A piece on the raked front from `y0` to `y1`, standing `proud` out of it, `half` its half width.
+  local onFront(id, slot, y0, y1, proud, half) = h.prism(id, slot, 'z', [
+    [frontAt(y0) - seat, y0], [frontAt(y0) + proud, y0], [frontAt(y1) + proud, y1], [frontAt(y1) - seat, y1],
+  ], -half, half);
+  local r = b.ridges, ridgeYs = spread(r.count, r.y0, r.y1, r.thick);
+  [onFront('battery-ridge-%d' % i, 'grip', ridgeYs[i], ridgeYs[i] + r.thick, r.proud, b.half) for i in std.range(0, r.count - 1)] + [
+    h.prism('battery', 'metal', 'z', [[b.back, b.top], [b.front, b.top], [b.front - b.rake, foot], [b.back, foot]], -b.half, b.half),
+    box('battery-pad', 'grip', [b.back, b.bottom, -b.half - 0.002], [b.front - b.rake, foot, b.half + 0.002]),
     box('battery-contact', 'trim', [b.back - bolt.bandProud, underside - b.contact, -b.half - bolt.bandProud], [b.front + bolt.bandProud, underside, b.half + bolt.bandProud]),
-    box('battery-latch', 'accent', [b.front, b.latch.y0, -b.latch.half], [b.front + b.latch.depth, b.latch.y1, b.latch.half]),
+    onFront('battery-latch', 'accent', b.latch.y0, b.latch.y1, b.latch.proud, b.latch.half),
   ] + std.flattenArrays([
     [onSide(b.half, 'battery-charge-%s' % s, 'vent', s, [window.x0, c.y0], [window.x1, c.y1], -seat, 0.002)] + [
       onSide(b.half, 'battery-charge-%d-%s' % [i, s], 'glow', s, [segments[i], c.y0 + 0.005], [segments[i] + c.segment, c.y1 - 0.005], 0, 0.003)
