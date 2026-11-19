@@ -7,6 +7,50 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.14.0 - 2026-11-19
+
+### Breaking
+
+- The APC's cupola opens: its lid is an `apc_hatch` on the ring, swinging up as the roof hatches do, and the ring and
+  the roof under it are open, so the raised lid shows the hull below.
+- A gun's `gun.action.parts` each carry a `motion` (stages and stops, in the model file's axes and in metres, as a vehicle part's) instead of `axis`, `strokeMetres` and `turn`, and its `fire` and `hand` timelines name the stops they run through, as `legs`, instead of phase seconds. The glTF nodes no longer carry `extras.motion`; the sidecar is the one place a model's motion is read.
+- A model's `motion` is an object: its stages under `stages`, and the named places on its clock under `stops`, `rest` at 0 and `open` at 1 for every vehicle part.
+
+### Upgrading from 0.13.0
+
+- Place `apc_hatch` wherever you place `apc_cupola`, as the APC's `cupola_lid` site does, and open it by playing its
+  `motion`.
+- Pose an action part with `poseAt(part.motion, clock)` from `@skelly/motion/motion`, with the clock from the timeline: each leg of `fire` or `hand` runs the clock linearly from the stop the part is at (`rest` to begin) to the stop named by `to`, in `seconds`; a leg to the stop it is at holds; after the last leg the part stays at rest until `durationSimSeconds`.
+- Find the clock of a stop by its name in `part.motion.stops` (`rest`, `open`, and `unlocked` on a part that turns free); never assume clock 1 is `open`. Read a part's slide as its slide stage's `direction` times `travel`, not as the shift of `poseAt(part.motion, 1)`, which a hinge's swing adds to.
+- Derive the timings you read from the legs. The open time is the sum of the legs through the last leg to `open`. The reach is the legs before the first leg to `open`, and the case is ejected at the reach plus `ejectAt` of that leg's seconds (`ejectAt` is a fraction of the first leg to `open`). The forward sound is at the end of the last leg to `open`. A bolt gun is one with a part that has an `unlocked` stop: a part may hinge without unlocking anything, as a charging handle turning into its notch.
+- Read a part's motion from the sidecar's `gun.action.parts[*].motion`, matched to its glTF node by `node` (`<part>:<family>`, which the node's `extras.part` and `extras.family` give, since a loader rewrites node names), instead of the node's `extras.motion`.
+- An SMG's charging handle exports its stroke only: the notch it turns into is not a step of the cycle, so its `motion` has the slide stage and the stops `rest` and `open`.
+- Read a model's stages from `motion.stages`.
+- Take the motion type and math from `@skelly/motion/motion` (which `npm install` links from the submodule's workspace), and place a fitting's motion with `transformMotion(motion, { ...(mirror ? reflection(0) : IDENTITY_RIGID), shift: at })` instead of thing-core's `mirrorMotion` plus shifting the hinge points.
+
+### Added
+
+- The doll walks holding what it wields: `doll_guns` gains `<gun>_<sneak|walk|run|crouch_walk>_<idle|guard>` and
+  `doll_melee` gains `<class>_<sneak|walk|run|crouch_walk>_idle`. Each loops in place and is advanced as the empty walk
+  of `doll_locomotion` is (`strideMetres`, `speedMetresPerSecond`), its legs that walk's, with `held` as the class's
+  stance clips. A gun stays in both hands, at guard aimed ahead and tipped only as far as the walk leans the body, and a
+  two-hand melee weapon stays in both hands as its idle holds it, while a one-hand weapon swings with its hand.
+- The showcase site serves the shader lab as a page of its own, so the built models' looks can be judged, and tuned
+  into a snippet to paste, without running the lab locally.
+- A finish can carry a shader `surface` (bark or leaves, from `@skelly/surfaces`), exported in each GLB material's
+  `extras.surface`, with the manifest's `surfaceContract` naming its version; the `bark` and `bark-birch` finishes now
+  wear bark looks. A shader lab (`tools/packages/shader-lab`) shows the built models wearing their looks and retunes them
+  live, so a look is judged by eye before it ships; the bark looks now have longer plates and finer birch marks.
+- A Landsknecht two-handed greatsword, `zweihander`, joins the melee weapons. Its grip point seats the two-hand wield, and its anchors are `strike`, the point a thrust lands with, `edge`, a point on the cutting edge a swing lands with, and `ricasso`, where a hand closes on the leather above the cross to half-sword.
+
+### Changed
+
+- Picatinny rails now space their slots at the real 10.01 mm pitch, so rail optics and sights sit where they would on a real gun. Parts keep their places within a few millimetres, except the rear iron sights of the assault and anti-materiel rifles, which sit one slot further forward, and the guard stance's head aim, which follows the sight.
+
+### Fixed
+
+- Voxel firearms are now filled from the solids as authored rather than from their bevelled display meshes, which punched see-through pinholes where solids meet (the receiver of the pipe rifle) and shaved the corners of boxes. Forty-one firearm models change: their collision bounds grow by up to one voxel and their centres of mass move by up to about 9 mm (the sporter receiver). No other model changes, and the smooth copies keep their bevel.
+
 ## 0.13.0 - 2026-11-19
 
 ### Breaking
