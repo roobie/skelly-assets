@@ -87,8 +87,8 @@ local familyHex = {
     ['optic-' + optic]: { appearance: { finish: { lens: opticLenses[optic] } } }
     for optic in std.objectFields(opticLenses)
   },
-  // Sides of every round thing drawn as a polygon beside voxel guns: optic bodies, the lenses seated in them, and
-  // cartridges. One count keeps them one faceted family.
+  // Sides of the round things drawn as polygons: optic bodies, the lenses seated in them, cartridges, and the modular
+  // guns' turned bars. One count keeps them one faceted family.
   roundSides: 8,
   gun: {
     familyColors: { [role]: rgb(familyHex[role]) for role in std.objectFields(familyHex) },

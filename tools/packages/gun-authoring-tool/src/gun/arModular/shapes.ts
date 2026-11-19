@@ -1,7 +1,8 @@
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
+import appearance from '../../../../../../models/guns/tables/appearance.json' with { type: 'json' };
 import { octagonalProfile, octagonalSection, octagonalTubeWalls } from '../octagon.ts';
 
-/** A solid round bar along x from `fromX` to `toX`. */
+/** A solid round bar along x from `fromX` to `toX`, with the content side count optics and cartridges are drawn with. */
 export const roundBar = (id: string, fromX: number, toX: number, radius: number): RevolvedSolid => ({
   id,
   kind: 'revolved',
@@ -12,6 +13,7 @@ export const roundBar = (id: string, fromX: number, toX: number, radius: number)
     [toX, radius],
     [toX, 0],
   ],
+  sides: appearance.roundSides,
 });
 
 /**
