@@ -30,6 +30,7 @@ local detailWall(what) = dim(detailFeature, 'derived: ' + what + ' wall two deta
 local mounts = (import 'platforms.jsonnet').mounts;
 local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.outerDiameter;
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
+local flatTopExtra = mounts['sight-height'].standards['ar-flat-top'].dimensions.baseExtraHeight.mm;
 local tubeRadius = tubeOuterDiameter.mm / 2;
 local towerWall = 3;
 
@@ -74,12 +75,36 @@ local bladeHang = [xOf(440), guardTopY];
 // The barrel's breech sits this far behind the upper front face: the listing's 457 mm barrel ends at the traced muzzle
 // shoulder.
 local breechSetback = profile.values.barrelMm.value - xOf(903);
-local tubeLength = 181;
+local rifleConfigurator = 'https://www.rifleconfigurator.com/tools/how-ar-15-gas-systems-work';
+// Sources differ by about an inch: the Primary Arms guide's ~9 in (229 mm) mid-length port is a rounded figure from the
+// upper's front face, while these are Faxon's barrel prints from the bolt face, the datum the barrel is built on.
+local gasPorts = {
+  mid: dim(245.4, 'sourced: 9.66 in from the bolt face, ' + rifleConfigurator),
+  rifle: dim(331.216, 'sourced: 13.04 in from the bolt face, ' + rifleConfigurator),
+};
+// The front sight base's rear face stands this far behind its gas port, where a drop-in handguard's cap meets it.
+local magpulMid = 'https://magpul.com/moem-lokhandguard-mid-length-ar15-m4.html';
+local midHandguardMounting = 218.44;
+local sightBaseRearOfPort = gasPorts.mid.mm - breechSetback - midHandguardMounting;
+local tubeLengths = {
+  carbine: dim(181, 'derived: a mil-spec carbine extension, 7.125 in'),
+  rifle: dim(
+    257.175,
+    'sourced: 10-1/8 in overall, https://www.ar15.build/products/buffer-tube/33353/ar-15-m16-a2-rifle-buffer-tube-assembly-080000625',
+  ),
+};
+local tubeLength = tubeLengths.carbine.mm;
 local tubeEndX = xOf(370) - tubeLength;
 // The upper's rear face stands upright where it meets the buffer tower; the profile's outline slants down to the parting
 // line only because the charging handle and its shadow hide that face there.
 local upperRearX = dim(xOf(profile.values.upperRearXPx.value), 'derived: ' + profile.values.upperRearXPx.reason);
 local stockMount = [tubeEndX, 0];
+local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock');
+local railTopY = tracedY(75, 'topRailLine');
+// The flat-top's front post stands at this height over the bore; the carry-handle base is the ar-flat-top extra lower.
+local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
+local wingCarryHandle = 'https://www.wingtactical.com/accessories/optics-sights/sights/aero-precision-a2-detachable-carry-handle-with-rear-sight';
+local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
 
 {
   rail: {
@@ -157,7 +182,24 @@ local stockMount = [tubeEndX, 0];
     halfWidth: dim(14.5, 'derived: wider than the rail it carries'),
     rail: {
       rearX: tracedX(386, 'upperRail'),
-      topY: tracedY(75, 'topRailLine'),
+      topY: railTopY,
+    },
+    // The fixed A2 carry handle, from the receiver's rear face forward: the rear sight housing, the bar a hand closes
+    // round, and the front leg. No print of the fixed handle was found, so it takes the detachable handle's size.
+    carryHandle: {
+      length: dim(176.276, "sourced: the detachable A2 handle's 6.94 in, " + wingCarryHandle),
+      topY: dim(
+        railTopY.mm + 41.402,
+        "derived: the detachable A2 handle's 1.63 in (" + wingCarryHandle + ') over the flat-top rail, the fixed one standing as tall',
+      ),
+      apertureY: dim(sightPlane.mm - flatTopExtra, 'derived: the sight plane less the ar-flat-top extra height, level with the carry-handle front post'),
+      apertureHalfHeight: dim(3, 'derived: a flip aperture plate between the ears'),
+      apertureThickness: dim(1.5, 'derived: a stamped aperture plate, drawn smooth'),
+      slotHalfWidth: dim(3.5, 'derived: the slot between the ears the aperture flips in'),
+      halfWidth: dim(9, 'derived: a forged handle narrower than the receiver'),
+      rearSightLength: dim(30, 'derived: the rear sight housing with its windage drum'),
+      barDepth: dim(12, 'derived: a bar a hand closes round'),
+      frontLegLength: dim(20, 'derived: a forged leg standing on the receiver'),
     },
     forwardAssist: {
       // The profile's trace runs on to its plunger and that plunger's shadow; the close-up shows the housing's rear on
@@ -187,21 +229,52 @@ local stockMount = [tubeEndX, 0];
   barrel: {
     radius: dim((yOf(96) - yOf(112)) / 2, traced('exposedBarrel')),
     breechSetback: dim(breechSetback, 'derived: the listing barrel length less the traced muzzle shoulder'),
+    // The gas systems by name, each the port a barrel is drilled at; a drop-in handguard is made for one of them.
+    gasPorts: gasPorts,
     // A barrel length and gas system, by name; lengths and the gas port are measured from the bolt face.
     lengths: {
-      '16-mid': {
-        length: dim(406.4, 'derived: 16 in'),
-        // Sources differ by about an inch: the Primary Arms guide's ~9 in (229 mm) is a rounded figure from the upper's
-        // front face, while this is Faxon's barrel print from the bolt face, the datum the barrel is built on.
-        gasPort: dim(245.4, 'sourced: 9.66 in from the bolt face, https://www.rifleconfigurator.com/tools/how-ar-15-gas-systems-work'),
-      },
+      '16-mid': { length: dim(406.4, 'derived: 16 in'), gasPort: gasPorts.mid },
+      '20-rifle': { length: dim(508, 'derived: 20 in'), gasPort: gasPorts.rifle },
     },
   },
 
   gasBlock: {
     journalRadius: dim(journalRadius, 'derived: the ar-journal-750 journal the block clamps'),
+    // The journals a block can be bored for, by the name its port standard ends in; the barrel has the 0.750 in one.
+    journals: {
+      '750': journalDiameter,
+      '936': mounts['gas-block'].standards['ar-journal-936'].dimensions.journalDiameter,
+    },
     length: dim(22, 'derived: a low-profile block about as long as its two set screws need'),
     wall: dim(gasBlockWall, 'derived: a steel wall around the journal, room for the set screws'),
+  },
+
+  // The A2 front sight base, measured from the top of the journal at its gas port: a ring round the journal with the
+  // bayonet lug ahead of it, the tower, the post between its ears, and the sling loop under the ring. Its heights are
+  // the carry-handle base's; the flat-top base stands the ar-flat-top extra height taller.
+  frontSightBase: {
+    length: dim(45.72, 'sourced: 1.8 in, ' + cmmgSightBase),
+    halfWidth: dim(11.303, 'sourced: 0.89 in across, ' + cmmgSightBase),
+    bottomY: dim(
+      sightPlane.mm - 92.202 - journalRadius,
+      "derived: the flat-top base's 3.63 in height (" + cmmgSightBase + '), read as from its ear tops at the sight plane down to the sling loop',
+    ),
+    rearOfPort: dim(
+      sightBaseRearOfPort,
+      "derived: the mid gas port less the Magpul mid-length handguard's 8.6 in mounting length (" + magpulMid
+      + ') ahead of the upper; the 12 in rifle handguard puts it within 0.6 mm',
+    ),
+    deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
+    postTipY: dim(
+      sightPlane.mm - flatTopExtra - journalRadius,
+      'derived: the sight plane less the ar-flat-top extra height, over the top of the journal',
+    ),
+    ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
+    wall: dim(gasBlockWall, 'derived: a forged wall round the journal, as on the gas block'),
+    towerLength: dim(12, 'derived: a tower thinner than the ring, as forged'),
+    earThickness: dim(3, 'derived: ears guarding the post'),
+    postWidth: dim(1.8, 'derived: a post about 0.07 in square'),
+    lugHalfWidth: dim(5, 'derived: the bayonet lug and sling loop narrower than the ring'),
   },
 
   handguard: {
@@ -226,6 +299,19 @@ local stockMount = [tubeEndX, 0];
     skirtHalfWidth: dim(17, 'derived: the barrel nut under the tube'),
   },
 
+  // The drop-in handguard runs from the delta ring on the barrel nut to the front sight base's rear face, so its length
+  // follows the gas system it is made for. Its front cap seats on the base's ring.
+  dropInHandguard: {
+    halfWidth: dim(31.75, "derived: half the Magpul mid-length handguard's 2.5 in height, " + magpulMid),
+    wall: detailWall('a moulded handguard'),
+    boreRadius: dim(12.5, "derived: the delta ring and cap clear the barrel nut and barrel, and the cap's hole is smaller than the front sight base's ring"),
+    deltaRing: {
+      length: dim(12, 'derived: the delta ring and its weld spring, ahead of the barrel nut'),
+      halfWidth: dim(33.75, 'derived: the ring standing 2 mm proud of the handguard it holds'),
+    },
+    capThickness: detailWall('a stamped steel cap, drawn as a'),
+  },
+
   flashHider: {
     length: dim(44.5, 'derived: the A2 birdcage, 1.75 in ahead of the barrel shoulder'),
     radius: dim(11.1, 'derived: the A2 birdcage, 0.875 in across'),
@@ -233,10 +319,17 @@ local stockMount = [tubeEndX, 0];
 
   receiverExtension: {
     radius: dim(tubeRadius, 'derived: the ar-tube-carbine outer diameter'),
-    length: dim(tubeLength, 'derived: a mil-spec carbine extension, 7.125 in'),
-    castleNut: {
-      length: dim(xOf(370) - xOf(357), traced('castleNut')),
-      radius: dim((yOf(86) - yOf(117)) / 2, traced('castleNut')),
+    // By the buffer each takes, the name its stock port standard ends in. The carbine extension is locked by a castle
+    // nut ahead of the collapsible stock; the rifle extension is held by the fixed stock's screw, so it has none.
+    buffers: {
+      carbine: {
+        length: tubeLengths.carbine,
+        castleNut: {
+          length: dim(xOf(370) - xOf(357), traced('castleNut')),
+          radius: dim((yOf(86) - yOf(117)) / 2, traced('castleNut')),
+        },
+      },
+      rifle: { length: tubeLengths.rifle },
     },
   },
 
@@ -248,8 +341,24 @@ local stockMount = [tubeEndX, 0];
     bottomY: dim(-yOf(86), 'derived: the body is centred on the tube'),
     tubeClearance: dim(1, 'derived: a sliding fit on the tube'),
     halfWidth: dim(20, 'derived: a body a little wider than the tube it wraps'),
-    toe: tracedOutline([[270, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock'),
+    toe: collapsibleToe,
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
+  },
+
+  // The A2 fixed stock, measured from the end of the rifle extension it slides over: its front closes against the
+  // lower's buffer tower, and the butt plate covers the extension's end. No A2 side reference is traced, so its depth
+  // is the traced collapsible stock's.
+  stockA2: {
+    frontX: dim(tubeLengths.rifle.mm, "derived: closed against the lower's buffer tower"),
+    rearX: dim(
+      tubeLengths.rifle.mm - 266.7,
+      'derived: 10-1/2 in long (https://www.gunmann.com/learning/a1-vs-a2-stock/); the 13.5 in length of pull the same '
+      + 'page gives comes out 0.3 in longer from the trigger',
+    ),
+    topY: dim(tubeRadius + 6, 'derived: the comb a 6 mm wall over the extension'),
+    frontBottomY: dim(-tubeRadius - 6, 'derived: a 6 mm wall under the extension where the stock meets the tower'),
+    toeY: dim(std.foldl(std.min, [p[1] for p in collapsibleToe.mm], 0), 'derived: the butt as deep as the traced collapsible toe'),
+    halfWidth: dim(20, 'derived: as wide as the collapsible stock'),
   },
 
   // The pistol grip, measured from the front of its top, where it closes the trigger guard.
@@ -276,5 +385,17 @@ local stockMount = [tubeEndX, 0];
     ar15_tube_carbine: mass(0.278, 'sourced: https://www.primaryarms.com/product/5877'),
     ar15_stock_collapsible: mass(0.227, 'sourced: https://www.midwestgunworks.com/page/mgwi/prod/MAG400-BLK'),
     ar15_grip: mass(0.094, 'sourced: https://www.opticsplanet.com/luth-ar-ar-15-a2-pistol-grip.html'),
+    ar15_upper_carry_handle: mass(0.272, 'sourced: 9.6 oz stripped, https://heartoftexasarmory.com/luth-ar-a2-stripped-upper-receiver-with-carry-handle-ur-a2-s/'),
+    ar15_barrel_20_rifle: mass(0.992, 'sourced: 35 oz, https://www.midwestgunworks.com/page/mgwi/prod/babl556026m'),
+    ar15_front_sight_base_flat_top: mass(0.147, 'sourced: 5.19 oz with its post and sling loop, ' + cmmgSightBase),
+    ar15_front_sight_base_carry_handle: mass(0.147, 'derived: as the flat-top base (' + cmmgSightBase + '), which is 0.040 in taller'),
+    ar15_handguard_drop_in_mid: mass(0.247, 'sourced: 8.7 oz, ' + magpulMid),
+    ar15_handguard_drop_in_rifle: mass(0.204, 'sourced: 7.2 oz, https://www.opticsplanet.com/luth-ar-a2-rifle-handguard.html'),
+    ar15_tube_rifle: mass(
+      0.283,
+      'sourced: 10 oz with its buffer, spring, spacer and screw, '
+      + 'https://www.ar15.build/products/buffer-tube/33353/ar-15-m16-a2-rifle-buffer-tube-assembly-080000625',
+    ),
+    ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
   },
 }

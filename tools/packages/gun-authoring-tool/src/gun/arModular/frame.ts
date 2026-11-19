@@ -35,27 +35,43 @@ export const checkFrameTable = <T>(name: string, raw: T): T => {
 
 type Ar15Table = typeof ar15Table;
 
+type Measure = Ar15Table['barrel']['gasPorts']['mid'];
+type Buffer = Ar15Table['receiverExtension']['buffers']['rifle'] & {
+  readonly castleNut?: Ar15Table['receiverExtension']['buffers']['carbine']['castleNut'];
+};
+
 /**
  * The shape every frame table shares, read off the AR-15's: the same groups and measurements, with the named choices
- * (barrel lengths, handguard lengths) and the item masses left open to each frame.
+ * (gas systems, barrel lengths, journals, handguard lengths, buffers) and the item masses left open to each frame.
  */
-export type ArFrameTable = Omit<Ar15Table, 'barrel' | 'handguard' | 'masses'> & {
-  readonly barrel: Omit<Ar15Table['barrel'], 'lengths'> & {
+export type ArFrameTable = Omit<Ar15Table, 'barrel' | 'gasBlock' | 'handguard' | 'receiverExtension' | 'masses'> & {
+  readonly barrel: Omit<Ar15Table['barrel'], 'gasPorts' | 'lengths'> & {
+    readonly gasPorts: Readonly<Record<string, Measure>>;
     readonly lengths: Readonly<Record<string, Ar15Table['barrel']['lengths']['16-mid']>>;
+  };
+  readonly gasBlock: Omit<Ar15Table['gasBlock'], 'journals'> & {
+    readonly journals: Readonly<Record<string, Measure>>;
   };
   readonly handguard: Omit<Ar15Table['handguard'], 'lengths'> & {
     readonly lengths: Readonly<Record<string, Ar15Table['handguard']['lengths']['15']>>;
   };
+  readonly receiverExtension: Omit<Ar15Table['receiverExtension'], 'buffers'> & {
+    readonly buffers: Readonly<Record<string, Buffer>>;
+  };
   readonly masses: Readonly<Record<string, Ar15Table['masses']['ar15_lower']>>;
 };
 
-/** A frame of the family: its table, and the name its families and template are registered under. */
+/**
+ * A frame of the family: its table, the name its families and templates are registered under, and the name a reason
+ * calls it by.
+ */
 export interface ArFrame {
   readonly name: string;
+  readonly title: string;
   readonly table: ArFrameTable;
 }
 
-export const AR15_FRAME: ArFrame = { name: 'ar15', table: checkFrameTable('ar15', ar15Table) };
+export const AR15_FRAME: ArFrame = { name: 'ar15', title: 'AR-15', table: checkFrameTable('ar15', ar15Table) };
 
 /** The registry name of a frame's family for one role, such as `ar15-lower`. */
 export const familyName = (frame: ArFrame, role: string): string => `${frame.name}-${role}`;

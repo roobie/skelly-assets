@@ -19,5 +19,6 @@ export const arModularAnchors = (frame: ArFrame): GunAnchorDeclarations => ({
   [familyName(frame, 'barrel')]: { anchors: muzzlePortAnchor },
   [familyName(frame, 'flash-hider')]: { anchors: muzzlePortAnchor },
   [familyName(frame, 'handguard')]: { anchors: (_params, part) => undersideSupport(part, 0.6) },
+  [familyName(frame, 'handguard-drop-in')]: { anchors: (_params, part) => undersideSupport(part, 0.6) },
   [familyName(frame, 'stock')]: { anchors: (_params, part) => rearFaceButt(part) },
 });

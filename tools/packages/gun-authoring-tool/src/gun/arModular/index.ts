@@ -10,21 +10,30 @@ import type { GunAnchorDeclarations } from '../anchors.ts';
 import { arModularAnchors } from './anchors.ts';
 import { arBarrel, arFlashHider, arGasBlock } from './barrel.ts';
 import { AR15_FRAME, type ArFrame } from './frame.ts';
+import { arFrontSightBase } from './frontSightBase.ts';
 import { arGrip } from './grip.ts';
-import { arHandguard } from './handguard.ts';
+import { arDropInHandguard, arHandguard } from './handguard.ts';
 import { arLower } from './lower.ts';
+import { arModularRules } from './rules.ts';
 import { arReceiverExtension, arStock } from './stock.ts';
-import { type ArModularGun, arModularTemplate } from './template.ts';
+import { type ArModularGuns, arModularTemplates } from './template.ts';
 import { arUpper } from './upper.ts';
 
-/** Each frame of the family, with what its template says of the gun it builds. */
-const FRAMES: readonly { readonly frame: ArFrame; readonly gun: ArModularGun }[] = [
+/** Each frame of the family, with what its templates say of the guns they build. */
+const FRAMES: readonly { readonly frame: ArFrame; readonly guns: ArModularGuns }[] = [
   {
     frame: AR15_FRAME,
-    gun: {
-      description:
-        'Modular AR-15 carbine: flat-top upper, free-float railed handguard, low-profile gas block, A2 flash hider, collapsible stock.',
-      variant: '5.56x45',
+    guns: {
+      freeFloat: {
+        description:
+          'Modular AR-15 carbine: flat-top upper, free-float railed handguard, low-profile gas block, A2 flash hider, collapsible stock.',
+        variant: '5.56x45',
+      },
+      frontSight: {
+        description:
+          'Modular AR-15 with a front sight base: flat-top or carry-handle upper, drop-in handguard, A2 flash hider, collapsible or A2 stock.',
+        variant: '5.56x45',
+      },
     },
   },
 ];
@@ -34,7 +43,9 @@ const PART_FAMILIES: readonly ((frame: ArFrame) => PartFamily)[] = [
   arUpper,
   arBarrel,
   arGasBlock,
+  arFrontSightBase,
   arHandguard,
+  arDropInHandguard,
   arFlashHider,
   arReceiverExtension,
   arStock,
@@ -54,6 +65,8 @@ export const AR_MODULAR_ANCHORS: GunAnchorDeclarations = Object.assign(
   ...FRAMES.map(({ frame }) => arModularAnchors(frame)),
 );
 
-export const AR_MODULAR_TEMPLATES: readonly Template[] = FRAMES.map(({ frame, gun }) => arModularTemplate(frame, gun));
+export const AR_MODULAR_TEMPLATES: readonly Template[] = FRAMES.flatMap(({ frame, guns }) =>
+  arModularTemplates(frame, guns),
+);
 
-export const AR_MODULAR_RULES: readonly Rule[] = [];
+export const AR_MODULAR_RULES: readonly Rule[] = FRAMES.flatMap(({ frame }) => arModularRules(frame));

@@ -100,11 +100,14 @@ describe('modular AR', () => {
     expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
   });
 
-  it("keeps every solid of the upper receiver ahead of its rear face, clear of the lower's buffer tower", () => {
-    const upper = arUpper(AR15_FRAME).build({});
-    const behind = upper.solids.filter((solid) => localSolidBounds(solid)[0][0] < u(AR15.upper.rearX) - 1e-9);
-    expect(behind.map(({ id }) => id)).toEqual([]);
-  });
+  it.each(['flat-top', 'carry-handle'])(
+    "keeps every solid of the %s upper receiver ahead of its rear face, clear of the lower's buffer tower",
+    (top) => {
+      const upper = arUpper(AR15_FRAME).build({ top });
+      const behind = upper.solids.filter((solid) => localSolidBounds(solid)[0][0] < u(AR15.upper.rearX) - 1e-9);
+      expect(behind.map(({ id }) => id)).toEqual([]);
+    },
+  );
 
   it('draws the trigger blade smooth inside the voxelized lower, not as its voxels', () => {
     const { assembly, items } = loadDesigns().find(({ label }) => label === 'design ar15-carbine-free-float.json')!;
