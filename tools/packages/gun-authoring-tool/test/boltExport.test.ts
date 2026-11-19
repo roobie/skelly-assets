@@ -269,8 +269,11 @@ it('exports integral capacity from the well, iron or fitted-optic sights, and a 
   const { hand } = model.gun.action!;
   expect(hand.legs.map(({ to }) => to)).toEqual(['unlocked', 'open', 'open', 'unlocked', 'rest']);
   expect(hand.legs.reduce((sum, { seconds }) => sum + seconds, 0)).toBeLessThanOrEqual(hand.durationSimSeconds);
-  const unlockedForGood = structuredClone(model);
-  unlockedForGood.gun.action!.hand.legs.pop();
+  const action = model.gun.action!;
+  const unlockedForGood = {
+    ...model,
+    gun: { ...model.gun, action: { ...action, hand: { ...hand, legs: hand.legs.slice(0, -1) } } },
+  };
   expect(modelIssues(unlockedForGood).map(({ message }) => message)).toContain(
     'every timeline must end with its parts back at rest',
   );
