@@ -15,10 +15,9 @@ import {
   localSolidBounds,
   polyhedronMeasures,
 } from '@skelly/construct/shapes/geometry.ts';
-import { meshForSampling, terracedMesh } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { VoxelGrains } from './exportTypes.ts';
-import { latticeOrigin, partVoxelGrain, terraceLattice } from './glb.ts';
+import { latticeOrigin, partVoxelGrain, terraceLattice, voxelSourceOf } from './glb.ts';
 import { fillVoxels, type VoxelFill } from './voxelize.ts';
 
 /** A solid's bounds, centre and volume in its part's local frame and domain units. */
@@ -153,7 +152,7 @@ export const drawnGeometry = (
     }
     const lattice = terraceLattice(placed, grain, unit);
     const sources = siblings.map((solid) => {
-      const mesh = terracedMesh(solid, lattice) ?? meshForSampling(solid, options.revolveFacets);
+      const mesh = voxelSourceOf({ id: solid.id, solids: [solid], merged: false }, lattice, options.revolveFacets);
       // A solid without triangles draws nothing, and the file leaves it out of its sampling.
       return mesh.triangleCount === 0 || mesh.indices.length === 0
         ? { positions: [], indices: [] }

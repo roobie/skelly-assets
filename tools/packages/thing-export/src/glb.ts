@@ -21,13 +21,7 @@ import {
 } from '@skelly/construct/foundation/math.ts';
 import { type DisplayItem, displayItems } from '@skelly/construct/shapes/display.ts';
 import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
-import {
-  displayBevel,
-  meshForSampling,
-  meshForSolid,
-  meshForSolidGroup,
-  terracedMesh,
-} from '@skelly/construct/shapes/mesh.ts';
+import { displayBevel, meshForSolid, meshForSolidGroup, terracedMesh } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { TerraceLattice } from '@skelly/construct/shapes/terrace.ts';
 import { surfaceOf } from '@skelly/thing-core/materials';
@@ -139,7 +133,8 @@ export const terraceLattice = (
 
 /**
  * What a part's voxels sample for a display item: a terracing solid's steps on the part's lattice, else the solid as
- * authored, never the bevelled display mesh.
+ * authored, never the bevelled display mesh. A bevel is cosmetic, and at a voxel's size its chamfers would notch every
+ * edge two solids share and shave box corners, leaving see-through lines. This is the one place that decides it.
  */
 export const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undefined, revolveFacets?: number) => {
   if (item.merged) {
@@ -150,7 +145,7 @@ export const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undef
     }
     return meshForSolidGroup(item.solids);
   }
-  return (lattice && terracedMesh(item.solids[0]!, lattice)) ?? meshForSampling(item.solids[0]!, revolveFacets);
+  return (lattice && terracedMesh(item.solids[0]!, lattice)) ?? meshForSolid(item.solids[0]!, 0, revolveFacets);
 };
 
 /** Part-definition tag that asks a voxelized export for the finer `voxelDetailGrain`. */

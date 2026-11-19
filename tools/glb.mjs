@@ -32,6 +32,7 @@
  * @property {[number, number, number, number]} [rotation]
  * @property {[number, number, number]} [scale]
  * @property {number} [mesh]
+ * @property {string} [name]
  * @property {number[]} [children]
  * @property {{ part?: string; port?: ExportPortMetadata }} [extras]
  */
@@ -42,7 +43,7 @@
  * @property {{ POSITION: number } & Record<string, number>} attributes
  * @property {number} [indices]
  * @property {number} [mode]
- * @property {{ piece?: string; slot?: string }} [extras]
+ * @property {{ piece?: string; slot?: string; voxelGrain?: number }} [extras]
  */
 
 /** @typedef {{ primitives: GltfPrimitive[] }} GltfMesh */
