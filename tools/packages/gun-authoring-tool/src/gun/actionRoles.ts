@@ -8,7 +8,10 @@ export const ACTION_PART_ROLES = {
   knob: 'bolt-handle-knob',
 } as const;
 
-/** The tag of each kind of action carrier; the carrier's tag is how the action description finds it and its kind. */
+/**
+ * The tag of each kind of action carrier; the carrier's tag is how the action description finds it and its kind. The
+ * Barrett's carrier is one too, though its cycle is not described.
+ */
 export const ACTION_CARRIER_ROLES = {
   ar: 'ar-carrier',
   ak: 'ak-carrier',
@@ -16,10 +19,14 @@ export const ACTION_CARRIER_ROLES = {
   pump: 'pump-carrier',
   bolt: 'turn-bolt-carrier',
   slide: 'slide-carrier',
+  barrett: 'barrett-carrier',
 } as const;
 
 export type ActionRoleKey = keyof typeof ACTION_PART_ROLES;
 export type ActionKind = keyof typeof ACTION_CARRIER_ROLES;
+
+/** The carriers whose cycle the action description plays. */
+export type DescribedActionKind = Exclude<ActionKind, 'barrett'>;
 
 /** Every action role tag a part may claim, at most once per gun. */
 export const ACTION_ROLE_TAGS: readonly string[] = [

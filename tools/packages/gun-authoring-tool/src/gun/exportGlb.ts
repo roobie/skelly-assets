@@ -25,7 +25,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
-import { isActionStroke } from './actionMotion.ts';
+import { ACTION_ROLE_TAGS } from './actionRoles.ts';
 import { cycleLegs, type TimelineLeg } from './actionTimeline.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
@@ -261,17 +261,14 @@ const buildActionExport = (
 
 /**
  * Every part that moves for its own sake rather than with the action, a port cover or a stock: its node and its motion
- * in the file's frame and metres. An action's stroke outside the action description has no timeline to follow, so it
- * is left out with the action's own parts.
+ * in the file's frame and metres. A part with an action role moves with the action, so it is left to the action
+ * description, or left out with the action where none is described.
  */
-const movingPartsData = (
-  resolved: Resolved,
-  description: ResolvedGunAction | undefined,
-): GunModelFields['moving'] | undefined => {
-  const acting = new Set(Object.values(description?.parts ?? {}).map(({ id }) => id));
+const movingPartsData = (resolved: Resolved): GunModelFields['moving'] | undefined => {
   const { metresPerUnit } = resolved.domain.units;
+  const acts = (id: string) => resolved.defs.get(id)!.tags?.some((tag) => ACTION_ROLE_TAGS.includes(tag));
   const moving = [...resolved.motions]
-    .filter(([id, motion]) => !(acting.has(id) || isActionStroke(motion)))
+    .filter(([id]) => !acts(id))
     .map(
       ([id, motion]): MovingPartMetadata => ({
         node: partNodeName(id, resolved.assembly.parts[id]!.family),
@@ -1022,7 +1019,7 @@ export const exportGunGlb = (
   const voxelFile = voxelFileOf(result.glb, grains);
   const action = resolveGunAction(resolved);
   const handling = buildActionExport(resolved, action);
-  const moving = movingPartsData(resolved, action);
+  const moving = movingPartsData(resolved);
   const internalCapacity = integralCapacity(resolved, metadata.cartridge);
   const {
     units: { metresPerUnit },

@@ -1,6 +1,7 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { ACTION_CARRIER_ROLES } from '../actionRoles.ts';
 import { EJECTION_PORT_MARGIN_U } from '../ejectionPort.ts';
 import { box, X } from './common.ts';
 import { HEAVY_MAGAZINE_DEPTH } from './heavyMagazine.ts';
@@ -123,6 +124,7 @@ export const heavyBoltCarrier: PartFamily = {
       ],
       axes: [],
       motion: { stages: [{ kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'bolt-travel' } }] },
+      tags: [ACTION_CARRIER_ROLES.barrett],
     };
   },
 };

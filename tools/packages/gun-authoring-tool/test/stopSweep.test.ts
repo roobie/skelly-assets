@@ -256,6 +256,29 @@ describe('the stop sweep', () => {
       expect(sweepStops(past).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
     });
 
+    const { chargingHandle, stock, stockA2 } = AR15_FRAME.table;
+    it.each([
+      ['ar15-carbine-free-float', stock.topY, /^stock at collapsed: .*clearance volume of charging-handle/],
+      ['ar15-rifle-a2', stockA2.combY, /^charging-handle\.shaft vs stock\./],
+    ])('draws the charging handle back clear over the stock: %s', (design, stockTopY, clash) => {
+      const rifle = resolve(loadDesignAssembly(design), gunDomain);
+      expect(sweepStops(rifle)).toEqual([]);
+      const handle = rifle.defs.get('charging-handle')!;
+      // Down past the stock's top by the handle's clearance.
+      const drop = u(chargingHandle.bottomY) - u(stockTopY) + u(chargingHandle.clearance);
+      const lowered = <T extends { readonly box: BoxSolid['box'] }>(piece: T): T => ({
+        ...piece,
+        box: { ...piece.box, center: [piece.box.center[0], piece.box.center[1] - drop, piece.box.center[2]] },
+      });
+      const sagging = {
+        ...handle,
+        solids: handle.solids.map((solid) => (solid.kind === 'box' ? lowered(solid) : solid)),
+        keepOuts: handle.keepOuts.map(lowered),
+      };
+      const issues = sweepStops({ ...rifle, defs: new Map(rifle.defs).set('charging-handle', sagging) });
+      expect(issues.some((issue) => clash.test(issue))).toBe(true);
+    });
+
     it('collapses the stock through its positions to just short of the castle nut', () => {
       expect(carbine.motions.get('stock')!.stops.map(({ name }) => name)).toEqual([
         'extended',

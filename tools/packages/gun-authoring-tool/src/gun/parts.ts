@@ -2780,8 +2780,7 @@ const boltCarrier: GunPartFamily = {
       ],
       axes: [],
       motion: boltCarrierMotion(pattern, params),
-      // The barrett pattern has no action description.
-      tags: pattern === 'barrett' ? [] : [ACTION_CARRIER_ROLES[pattern]],
+      tags: [ACTION_CARRIER_ROLES[pattern]],
     };
   },
   // Only the AR pattern's frame table carries a cyclic rate.
