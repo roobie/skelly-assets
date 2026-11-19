@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { outputPath } from '../layout.mjs';
 import { buildManifest, manifestFiles, mobManifest, readCredits, treeDifferences } from '../manifest.mjs';
-import { SURFACE_CONTRACT } from '../packages/surfaces/src/schema.ts';
+import { SURFACE_CONTRACT } from '../packages/surfaces/src/contract.ts';
 
 const withReuse = (text, work) => {
   const root = mkdtempSync(join(tmpdir(), 'manifest-'));

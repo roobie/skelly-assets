@@ -14,13 +14,6 @@ import {
   variant,
 } from 'valibot';
 
-/**
- * The version of what a consumer relies on: the kinds, their look fields, uniforms, game inputs and the extras shape.
- * It rises by one with every breaking change, so a consumer that reads only release files can refuse a contract it
- * does not know.
- */
-export const SURFACE_CONTRACT = 1;
-
 /** The closed set of surface kinds, so a game can compile every program variant before first draw. */
 export const SURFACE_KINDS = ['bark', 'leaf'] as const;
 export type SurfaceKind = (typeof SURFACE_KINDS)[number];

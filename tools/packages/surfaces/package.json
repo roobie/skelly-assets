@@ -5,6 +5,7 @@
   "license": "EUPL-1.2",
   "type": "module",
   "exports": {
+    "./contract": "./src/contract.ts",
     "./schema": "./src/schema.ts",
     "./patch": "./src/patch.ts"
   },

@@ -1,11 +1,11 @@
 import { safeParse } from 'valibot';
 import { describe, expect, it } from 'vitest';
+import { SURFACE_CONTRACT } from '../src/contract.ts';
 import { SURFACE_EDITS } from '../src/patch.ts';
 import {
   BarkSchema,
   LeafInputsSchema,
   LeafSchema,
-  SURFACE_CONTRACT,
   SURFACE_KINDS,
   SurfaceSchema,
   uniformFields,

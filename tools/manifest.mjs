@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { outputPath, undeclaredDirectories } from './layout.mjs';
-import { SURFACE_CONTRACT } from './packages/surfaces/src/schema.ts';
+import { SURFACE_CONTRACT } from './packages/surfaces/src/contract.ts';
 import { manifestTaxonomy } from './taxonomy.mjs';
 
 /** @typedef {{ path: string[]; 'SPDX-FileCopyrightText': string; 'SPDX-License-Identifier': string }} Annotation */
