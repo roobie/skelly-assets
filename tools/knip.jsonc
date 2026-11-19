@@ -24,8 +24,9 @@
       "entry": ["server/labServer.ts"]
     },
     "packages/thing-authoring-tool": {
-      // Run by hand to write the skin fixture's exports; see `README.md`.
-      "entry": ["test/export-skin-fixture.ts"]
+      // The skin fixture's writer is run by hand (see `README.md`); the dev server imports the live-row modules by a
+      // computed URL so they reload on edit, see `vite.config.ts`, `serverModule`.
+      "entry": ["test/export-skin-fixture.ts", "server/evaluateRow.ts", "server/liveRows.ts"]
     },
     "packages/vehicle-authoring-tool": {
       // The dev server imports the endpoints by a computed URL; see `vite.config.ts`, `vehicleEndpoints`.
