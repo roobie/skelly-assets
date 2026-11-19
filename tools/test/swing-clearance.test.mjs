@@ -254,16 +254,16 @@ test('a vehicle of several moving bodies sweeps to its pinned result', () => {
     sites: {
       lid: { clear: 1, extent: { unit: '°', total: 90 }, contacts: [] },
       tip: {
-        clear: 0.5673723253286928,
+        clear: 0.5609853948371877,
         extent: null,
         contacts: [
-          { other: 'hatch', depth: 0.01171875, at: 0.5684368137439436, pieces: ['skin', 'skin'] },
-          { other: 'post', depth: 0.01171875, at: 0.9410077590817452, pieces: ['skin', 'post'] },
+          { other: 'hatch', depth: 0.015625, at: 0.5620498832524385, pieces: ['skin', 'skin'] },
+          { other: 'post', depth: 0.0499936306409291, at: 0.9346208285902409, pieces: ['skin', 'post'] },
         ],
       },
       hatch: { clear: 1, extent: { unit: '°', total: 120 }, contacts: [] },
     },
-    open: [{ sites: ['tip', 'hatch'], depth: 0.01171875, pieces: ['skin', 'skin'] }],
+    open: [{ sites: ['tip', 'hatch'], depth: 0.015625, pieces: ['skin', 'skin'] }],
   });
 });
 
