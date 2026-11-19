@@ -17,8 +17,9 @@ local yOf(px) = (profile.values.boreYPx.value - px) * mmPerPx;
 local traced(key) = 'traced: ar15-profile/' + key;
 local tracedX(px, key) = dim(xOf(px), traced(key));
 local tracedY(px, key) = dim(yOf(px), traced(key));
-// A traced outline about a mount point: each pixel point less the mount, in mm.
-local tracedOutline(pixels, mount, key) = outline([[xOf(p[0]) - mount[0], yOf(p[1]) - mount[1]] for p in pixels], traced(key));
+// Profile pixel points about a mount point: each point less the mount, in mm.
+local aboutMount(pixels, mount) = [[xOf(p[0]) - mount[0], yOf(p[1]) - mount[1]] for p in pixels];
+local tracedOutline(pixels, mount, key) = outline(aboutMount(pixels, mount), traced(key));
 
 local picatinny = 'sourced: https://en.wikipedia.org/wiki/Picatinny_rail';
 // The parts with thin features export at the detail grain; the thinnest feature it carries evenly is this many mm. An
@@ -31,7 +32,9 @@ local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.o
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
 local tubeRadius = tubeOuterDiameter.mm / 2;
 
-// The parting line is traced level: its 3 px fall across the receiver is the photo's tilt, which the rail line shares.
+// The parting line is built level at the mean of its traced ends, since the forging's parting line runs parallel to the
+// bore; its 3 px fall across the receiver is read as trace error, as the rail line above it falls only 2 px over three
+// times the length.
 local partingY = (yOf(121) + yOf(124)) / 2;
 // The body of the shared stanag-30 magazine as the magazine family builds it: its depth and width, and how far its top
 // stands above the seat it hangs from. test/arModular.test.ts holds the well to the built magazine.
@@ -152,7 +155,9 @@ local stockMount = [tubeEndX, 0];
     lengths: {
       '16-mid': {
         length: dim(406.4, 'derived: 16 in'),
-        gasPort: dim(245.4, 'sourced: https://www.rifleconfigurator.com/tools/how-ar-15-gas-systems-work'),
+        // Sources differ by about an inch: the Primary Arms guide's ~9 in (229 mm) is a rounded figure from the upper's
+        // front face, while this is Faxon's barrel print from the bolt face, the datum the barrel is built on.
+        gasPort: dim(245.4, 'sourced: 9.66 in from the bolt face, https://www.rifleconfigurator.com/tools/how-ar-15-gas-systems-work'),
       },
     },
   },
@@ -213,7 +218,11 @@ local stockMount = [tubeEndX, 0];
 
   // The pistol grip, measured from the front of its top, where it closes the trigger guard.
   grip: {
-    outline: tracedOutline([[418, 162], [380, 162], [346, 214], [390, 232]], gripMount, 'grip'),
+    outline: outline(
+      aboutMount([[418, 162], [380, 162], [346, 214], [390, 232]], gripMount),
+      'derived: the ar15-profile/grip trace with its top levelled to seat on the lower (the rear corner from 158 px to 162 '
+      + 'px) and the 1 px kink in its front strap at 391,220 dropped',
+    ),
     halfWidth: dim(14, 'derived: a hand-filling A2 grip'),
   },
 
