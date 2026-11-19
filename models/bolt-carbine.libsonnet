@@ -13,11 +13,13 @@ local top = 0.33;  // the receiver's top
 local barrelY = 0.245;
 local ridgeTop = 0.35;  // the receiver ridge's crest, which the rear sight stands on
 local sightTop = 0.375;  // the height both sights' tops share
+// The rear sight block, set in from the ridge's back so it stands whole on the ridge, and the notch cut `inset` inside
+// its ends.
+local rearSight = { back: bolt.ridgeBack + 0.04, front: self.back + 0.05, inset: 0.01 };
 // The ejection port on the right side; the charging lever stands out of the bolt at its back end, centred on it.
 local port = { back: 0.03, front: 0.12, bottom: 0.25, top: 0.29, mid: (self.bottom + self.top) / 2 };
 
-// The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
-// magwell starts where the family's feeds do.
+// The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls.
 local roundLength = 0.11;
 local wall = 0.011;
 local collar = 0.006;  // the magwell's lip behind and ahead of the magazine
@@ -107,8 +109,8 @@ local carbine(id, massKg, magazine) =
   ] + magazine + bolt.grip(0.155) + bolt.stock(top, 0.045) + [
     // Sights: a rear block on the ridge and a front post over the shroud, a fin tapering from a broad foot to a narrow
     // tip level with the rear block's top, so the two line up.
-    box('rear-sight', 'metal', [-0.12, ridgeTop, -0.02], [-0.07, sightTop, 0.02]),
-    box('rear-notch', 'vent', [-0.11, sightTop - 0.01, -0.004], [-0.08, sightTop + 0.0005, 0.004]),
+    box('rear-sight', 'metal', [rearSight.back, ridgeTop, -0.02], [rearSight.front, sightTop, 0.02]),
+    box('rear-notch', 'vent', [rearSight.back + rearSight.inset, sightTop - 0.01, -0.004], [rearSight.front - rearSight.inset, sightTop + 0.0005, 0.004]),
     h.prism('front-post', 'metal', 'z', [[0.32, 0.316], [0.36, 0.316], [0.349, sightTop], [0.341, sightTop]], -0.01, 0.01),
     // Ejection port on the right side, with a chunky charging lever standing out of the bolt at its back end.
     box('ejection', 'vent', [port.back, port.bottom, w], [port.front, port.top, w + 0.002]),

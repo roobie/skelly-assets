@@ -8,6 +8,8 @@ local box = h.box;
 {
   // Where the receiver's back meets the stock.
   joint: -0.18,
+  // Where the receiver's top ridge starts, named so what stands on the ridge is placed from it.
+  ridgeBack: -0.16,
   // The trigger group is sized for a trooper in thick armoured gauntlets, whose finger is about twice a bare one's
   // thickness. `front` is the x at which the guard ends, which anything hung ahead of the grip must clear; `opening`
   // is the height of the gap under the trigger's root, `bar` the guard's thickness. The trigger blade stands `gap`
@@ -36,7 +38,7 @@ local box = h.box;
   // `ridge.front`, rising to `ridge.top`, `ridge.halfWidth` its half width, and a painted band round it.
   receiver(front, y0, y1, w, ridge): [
     h.prism('receiver', 'body', 'x', $.bevel(y0, y1, w, 0.016, 0.01), $.joint, front),
-    h.prism('ridge', 'body', 'x', [[y1, -ridge.halfWidth], [y1, ridge.halfWidth], [ridge.top, ridge.halfWidth - 0.008], [ridge.top, -ridge.halfWidth + 0.008]], -0.16, ridge.front),
+    h.prism('ridge', 'body', 'x', [[y1, -ridge.halfWidth], [y1, ridge.halfWidth], [ridge.top, ridge.halfWidth - 0.008], [ridge.top, -ridge.halfWidth + 0.008]], $.ridgeBack, ridge.front),
     $.band('receiver-band', 'accent', -0.04, 0.0, y0, y1, w, 0.018, 0.012),
   ],
 
