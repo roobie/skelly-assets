@@ -14,6 +14,7 @@ import { arFrontSightBase } from './frontSightBase.ts';
 import { arGrip } from './grip.ts';
 import { arDropInHandguard, arHandguard } from './handguard.ts';
 import { arLower } from './lower.ts';
+import { arRearSight } from './rearSight.ts';
 import { arModularRules } from './rules.ts';
 import { arReceiverExtension, arStock } from './stock.ts';
 import { type ArModularGuns, arModularTemplates } from './template.ts';
@@ -44,6 +45,7 @@ const PART_FAMILIES: readonly ((frame: ArFrame) => PartFamily)[] = [
   arBarrel,
   arGasBlock,
   arFrontSightBase,
+  arRearSight,
   arHandguard,
   arDropInHandguard,
   arFlashHider,

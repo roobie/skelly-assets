@@ -1,10 +1,10 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { box, choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
+import { sightAxis } from '../sightAxis.ts';
 import { TOO_SMALL_TO_VOXELIZE } from '../tooSmallToVoxelize.ts';
-import { mmToU } from '../units.ts';
-import { BARREL_JOURNAL, journalStandard } from './barrel.ts';
-import { type ArFrame, familyName, u } from './frame.ts';
-import { sightHeightExtraMm, sightHeightStandard, UPPER_TOP_NAMES } from './upper.ts';
+import { barrelJournalRadius, journalStandard } from './barrel.ts';
+import { type ArFrame, chosen, familyName, u } from './frame.ts';
+import { journalClamp } from './shapes.ts';
 
 /**
  * The A2 front sight base, by the upper top whose rear sight it is made to meet. It clamps the barrel's journal over
@@ -14,12 +14,11 @@ import { sightHeightExtraMm, sightHeightStandard, UPPER_TOP_NAMES } from './uppe
  */
 export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'front-sight-base'),
-  params: { height: choice(...UPPER_TOP_NAMES) },
+  params: { height: choice(...Object.keys(frame.table.frontSightBase.raise)) },
   build(params): PartDef {
     const F = frame.table.frontSightBase;
-    const radius = u(frame.table.gasBlock.journalRadius);
-    const standard = sightHeightStandard(params.height!);
-    const extra = mmToU(sightHeightExtraMm(standard));
+    const radius = barrelJournalRadius(frame);
+    const raise = u(chosen(F.raise, params.height));
     const [wall, half, lugHalf] = [u(F.wall), u(F.halfWidth), u(F.lugHalfWidth)];
     const rearX = -u(F.rearOfPort);
     const ringFrontX = rearX + u(F.ringLength);
@@ -27,18 +26,15 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
     const towerRearX = rearX + (u(F.ringLength) - u(F.towerLength)) / 2;
     const towerFrontX = towerRearX + u(F.towerLength);
     const postX = (towerRearX + towerFrontX) / 2;
-    const deckY = u(F.deckAboveJournal) + extra;
-    const postTipY = u(F.postTipY) + extra;
+    const deckY = u(F.deckAboveJournal) + raise;
+    const postTipY = u(F.postTipY) + raise;
     const underY = -2 * radius - wall;
     const postHalf = u(F.postWidth) / 2;
     const earInner = lugHalf - u(F.earThickness);
     return {
       family: 'front-sight-base',
       solids: [
-        box('ring-top', [rearX, 0, -half], [ringFrontX, wall, half]),
-        box('ring-right', [rearX, -2 * radius, radius], [ringFrontX, 0, half]),
-        box('ring-left', [rearX, -2 * radius, -half], [ringFrontX, 0, -radius]),
-        box('ring-under', [rearX, underY, -half], [ringFrontX, -2 * radius, half]),
+        ...journalClamp((side) => `ring-${side}`, rearX, ringFrontX, radius, wall, half),
         box('bayonet-lug', [ringFrontX, underY, -lugHalf], [frontX, -2 * radius, lugHalf]),
         box('tower', [towerRearX, wall, -lugHalf], [towerFrontX, deckY, lugHalf]),
         box('ear-right', [towerRearX, deckY, earInner], [towerFrontX, postTipY, lugHalf]),
@@ -50,7 +46,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
         {
           id: 'barrel',
           mount: 'gas-block',
-          standard: journalStandard(BARREL_JOURNAL),
+          standard: journalStandard(frame.table.barrel.journal),
           gender: 'male',
           pos: [0, 0, 0],
           normal: NEG_Y,
@@ -65,18 +61,9 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
           normal: NEG_X,
           up: Y,
         },
-        {
-          id: 'sight-height',
-          mount: 'sight-height',
-          standard,
-          gender: 'male',
-          pos: [postX, postTipY, 0],
-          normal: NEG_X,
-          up: Y,
-        },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [postX, postTipY, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [postX, postTipY, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },

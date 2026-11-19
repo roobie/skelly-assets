@@ -22,7 +22,7 @@
         "params": { "length": "L", "profile": "stanag-curved" },
         "prefab": { "id": "stanag-30", "version": 1 }
       },
-      "rear-sight": { "family": "rail-rear-sight" }
+      "rear-sight": { "item": "ar15_rear_sight" }
     },
     "connections": [
       { "from": "lower.ar-upper", "to": "upper.ar-upper" },

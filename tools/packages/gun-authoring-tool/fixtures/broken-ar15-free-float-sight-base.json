@@ -9,7 +9,7 @@
     "barrel": { "family": "ar15-barrel", "params": { "length": "16-mid" } },
     "front-sight-base": { "family": "ar15-front-sight-base", "params": { "height": "flat-top" } },
     "handguard": { "family": "ar15-handguard", "params": { "length": "15" } },
-    "rear-sight": { "family": "rail-rear-sight" },
+    "rear-sight": { "family": "ar15-rear-sight" },
     "flash-hider": { "family": "ar15-flash-hider" },
     "receiver-extension": { "family": "ar15-receiver-extension", "params": { "buffer": "carbine" } },
     "stock": { "family": "ar15-stock", "params": { "style": "collapsible" } },

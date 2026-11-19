@@ -13,8 +13,14 @@ const MeasuredSchema = union([
   strictObject({ kg: pipe(number(), gtValue(0)), source: SourceSchema }),
 ]);
 
-/** Every leaf of the table is a measurement with its source; every other node only groups them. */
+/**
+ * Every leaf of the table is a measurement with its source, or the name of one of the table's named choices, which the
+ * family that reads it looks up; every other node only groups them.
+ */
 const checkMeasured = (node: unknown, path: string): void => {
+  if (typeof node === 'string') {
+    return;
+  }
   if (typeof node !== 'object' || node === null || Array.isArray(node)) {
     throw new Error(`${path}: expected a measurement or a group of them`);
   }
@@ -42,15 +48,22 @@ type Buffer = Ar15Table['receiverExtension']['buffers']['rifle'] & {
 
 /**
  * The shape every frame table shares, read off the AR-15's: the same groups and measurements, with the named choices
- * (gas systems, barrel lengths, journals, handguard lengths, buffers) and the item masses left open to each frame.
+ * (gas systems, barrel lengths, journals, front sight base raises, handguard lengths, buffers) and the item masses left
+ * open to each frame.
  */
-export type ArFrameTable = Omit<Ar15Table, 'barrel' | 'gasBlock' | 'handguard' | 'receiverExtension' | 'masses'> & {
+export type ArFrameTable = Omit<
+  Ar15Table,
+  'barrel' | 'gasBlock' | 'frontSightBase' | 'handguard' | 'receiverExtension' | 'masses'
+> & {
   readonly barrel: Omit<Ar15Table['barrel'], 'gasPorts' | 'lengths'> & {
     readonly gasPorts: Readonly<Record<string, Measure>>;
     readonly lengths: Readonly<Record<string, Ar15Table['barrel']['lengths']['16-mid']>>;
   };
   readonly gasBlock: Omit<Ar15Table['gasBlock'], 'journals'> & {
     readonly journals: Readonly<Record<string, Measure>>;
+  };
+  readonly frontSightBase: Omit<Ar15Table['frontSightBase'], 'raise'> & {
+    readonly raise: Readonly<Record<string, Measure>>;
   };
   readonly handguard: Omit<Ar15Table['handguard'], 'lengths'> & {
     readonly lengths: Readonly<Record<string, Ar15Table['handguard']['lengths']['15']>>;

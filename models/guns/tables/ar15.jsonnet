@@ -30,7 +30,9 @@ local detailWall(what) = dim(detailFeature, 'derived: ' + what + ' wall two deta
 local mounts = (import 'platforms.jsonnet').mounts;
 local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.outerDiameter;
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
-local flatTopExtra = mounts['sight-height'].standards['ar-flat-top'].dimensions.baseExtraHeight.mm;
+// The flat-top front sight base stands 0.040 in taller than the carry-handle one, as the flat-top's rear sights stand
+// that much higher.
+local flatTopExtra = dim(1.016, 'sourced: 1.98 in against 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped');
 local tubeRadius = tubeOuterDiameter.mm / 2;
 local towerWall = 3;
 
@@ -192,7 +194,7 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
         railTopY.mm + 41.402,
         "derived: the detachable A2 handle's 1.63 in (" + wingCarryHandle + ') over the flat-top rail, the fixed one standing as tall',
       ),
-      apertureY: dim(sightPlane.mm - flatTopExtra, 'derived: the sight plane less the ar-flat-top extra height, level with the carry-handle front post'),
+      apertureY: dim(sightPlane.mm - flatTopExtra.mm, 'derived: the sight plane less the flat-top extra height, level with the carry-handle front post'),
       apertureHalfHeight: dim(5, 'derived: a flip aperture plate between the ears, a rim round its hole'),
       apertureRadius: dim(
         2.54,
@@ -233,30 +235,34 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
   barrel: {
     radius: dim((yOf(96) - yOf(112)) / 2, traced('exposedBarrel')),
     breechSetback: dim(breechSetback, 'derived: the listing barrel length less the traced muzzle shoulder'),
+    // The journal every barrel is turned to under its gas block, by name.
+    journal: '750',
     // The gas systems by name, each the port a barrel is drilled at; a drop-in handguard is made for one of them.
     gasPorts: gasPorts,
-    // A barrel length and gas system, by name; lengths and the gas port are measured from the bolt face.
+    // A barrel length, by name, with the gas system it is drilled for; lengths are measured from the bolt face.
     lengths: {
-      '16-mid': { length: dim(406.4, 'derived: 16 in'), gasPort: gasPorts.mid },
-      '20-rifle': { length: dim(508, 'derived: 20 in'), gasPort: gasPorts.rifle },
+      '16-mid': { length: dim(406.4, 'derived: 16 in'), gas: 'mid' },
+      '20-rifle': { length: dim(508, 'derived: 20 in'), gas: 'rifle' },
     },
   },
 
   gasBlock: {
-    journalRadius: dim(journalRadius, 'derived: the ar-journal-750 journal the block clamps'),
-    // The journals a block can be bored for, by the name its port standard ends in; the barrel has the 0.750 in one.
-    journals: {
-      '750': journalDiameter,
-      '936': mounts['gas-block'].standards['ar-journal-936'].dimensions.journalDiameter,
-    },
+    // The journals a block can be bored for, by the name its port standard ends in.
+    journals: { '750': journalDiameter },
     length: dim(22, 'derived: a low-profile block about as long as its two set screws need'),
     wall: dim(gasBlockWall, 'derived: a steel wall around the journal, room for the set screws'),
   },
 
   // The A2 front sight base, measured from the top of the journal at its gas port: a ring round the journal with the
   // bayonet lug ahead of it, the tower, the post between its ears, and the sling loop under the ring. Its heights are
-  // the carry-handle base's; the flat-top base stands the ar-flat-top extra height taller.
+  // the carry-handle base's; each base stands its raise taller.
   frontSightBase: {
+    // Each base by the upper top whose rear sight it is made to meet, with how much taller than the carry-handle base
+    // it stands.
+    raise: {
+      'carry-handle': dim(0, 'derived: the base the heights below are measured for'),
+      'flat-top': flatTopExtra,
+    },
     length: dim(45.72, 'sourced: 1.8 in, ' + cmmgSightBase),
     halfWidth: dim(11.303, 'sourced: 0.89 in across, ' + cmmgSightBase),
     bottomY: dim(
@@ -270,8 +276,8 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     ),
     deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
     postTipY: dim(
-      sightPlane.mm - flatTopExtra - journalRadius,
-      'derived: the sight plane less the ar-flat-top extra height, over the top of the journal',
+      sightPlane.mm - flatTopExtra.mm - journalRadius,
+      'derived: the sight plane less the flat-top extra height, over the top of the journal',
     ),
     ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
     wall: dim(gasBlockWall, 'derived: a forged wall round the journal, as on the gas block'),
@@ -279,6 +285,17 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     earThickness: dim(3, 'derived: ears guarding the post'),
     postWidth: dim(1.8, 'derived: a post about 0.07 in square'),
     lugHalfWidth: dim(5, 'derived: the bayonet lug and sling loop narrower than the ring'),
+  },
+
+  // The fixed rear sight a flat-top carries on its rail, its aperture on the flat-top sight plane the flat-top front
+  // sight base is made for.
+  rearSight: {
+    apertureAboveRail: dim(sightPlane.mm - railTopY.mm, 'derived: the flat-top sight plane over the top rail'),
+  },
+
+  // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.
+  sightLine: {
+    tolerance: dim(flatTopExtra.mm / 2, 'derived: half the step between the two front sight base heights'),
   },
 
   handguard: {
@@ -339,6 +356,8 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
 
   // The collapsible stock, measured from the end of its tube at the traced position.
   stock: {
+    // The buffer of the extension it slides on.
+    buffer: 'carbine',
     frontX: dim(xOf(284) - stockMount[0], traced('moduleStockToReceiverExtension')),
     rearX: dim(xOf(128) - stockMount[0], traced('stock')),
     topY: tracedY(86, 'stock'),
@@ -353,6 +372,7 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
   // lower's buffer tower, and the butt plate covers the extension's end. No A2 side reference is traced, so its depth
   // is the traced collapsible stock's.
   stockA2: {
+    buffer: 'rifle',
     frontX: dim(tubeLengths.rifle.mm, "derived: closed against the lower's buffer tower"),
     rearX: dim(
       tubeLengths.rifle.mm - 266.7,
@@ -401,5 +421,6 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
       + 'https://www.ar15.build/products/buffer-tube/33353/ar-15-m16-a2-rifle-buffer-tube-assembly-080000625',
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
+    ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
   },
 }

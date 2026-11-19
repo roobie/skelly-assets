@@ -68,6 +68,26 @@ const stockPort = (buffer: string): PortDef => ({
 });
 
 /**
+ * The sleeve that wraps the extension from the stock's frame forward, with the detail grain its walls need: they are
+ * thinner than the coarse voxel, and every stock is exported at the detail grain.
+ */
+const stockSleeve = (
+  frontX: number,
+  bore: number,
+  section: readonly [number, number],
+  half: number,
+): Required<Pick<PartDef, 'solids' | 'tags' | 'features'>> => {
+  const [bottom, top] = section;
+  return {
+    solids: boxSleeve('sleeve', 0, frontX, bore, section, half),
+    tags: [VOXEL_DETAIL],
+    features: [
+      { name: 'sleeve-wall', size: Math.min(top - bore, half - bore, -bore - bottom), disposition: { kind: 'detail' } },
+    ],
+  };
+};
+
+/**
  * The collapsible carbine stock at its traced position on the carbine extension. Its frame is the tube's end: the body's
  * rear block closes behind it, four walls wrap the tube ahead of it with a sliding fit, and the toe hangs under both.
  */
@@ -76,24 +96,19 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
   const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
   const bore = u(frame.table.receiverExtension.radius) + u(s.tubeClearance);
   const toeHalf = u(s.toeHalfWidth);
+  const sleeve = stockSleeve(frontX, bore, [bottomY, topY], half);
   return {
     family: 'stock',
     solids: [
       box('butt', [rearX, bottomY, -half], [0, topY, half]),
-      ...boxSleeve('sleeve', 0, frontX, bore, [bottomY, topY], half),
+      ...sleeve.solids,
       { id: 'toe', kind: 'extruded-polygon', profile: outlineU(s.toe), z: [-toeHalf, toeHalf] },
     ],
-    ports: [stockPort(stockBuffer('collapsible'))],
+    ports: [stockPort(s.buffer)],
     keepOuts: [],
     axes: [],
-    tags: [VOXEL_DETAIL],
-    features: [
-      {
-        name: 'sleeve-wall',
-        size: Math.min(topY - bore, half - bore, -bore - bottomY),
-        disposition: { kind: 'detail' },
-      },
-    ],
+    tags: sleeve.tags,
+    features: sleeve.features,
   };
 };
 
@@ -118,31 +133,27 @@ const a2Stock = (frame: ArFrame): PartDef => {
     [0, frontBottomY],
     [0, toeY],
   ];
+  const sleeve = stockSleeve(frontX, bore, [frontBottomY, topY], half);
   return {
     family: 'stock',
     solids: [
       box('butt', [rearX, toeY, -half], [0, topY, half]),
-      ...boxSleeve('sleeve', 0, frontX, bore, [frontBottomY, topY], half),
+      ...sleeve.solids,
       { id: 'belly', kind: 'extruded-polygon', profile: belly, z: [-half, half] },
     ],
-    ports: [stockPort(stockBuffer('a2'))],
+    ports: [stockPort(s.buffer)],
     keepOuts: [],
     axes: [],
+    tags: sleeve.tags,
+    features: sleeve.features,
   };
 };
 
-/** Each stock style, with the buffer of the extension it is made to slide on. */
-const STOCK_STYLES = {
-  collapsible: { buffer: 'carbine', build: collapsibleStock },
-  a2: { buffer: 'rifle', build: a2Stock },
-} as const;
+const STOCK_STYLES = { collapsible: collapsibleStock, a2: a2Stock } as const;
 
-/** The buffer of the extension a stock of the named style slides on. */
-export const stockBuffer = (style: string): string => chosen(STOCK_STYLES, style).buffer;
-
-/** A stock by its style; each style fits the extension of the buffer it is made for. */
+/** A stock by its style; each style fits the extension of the buffer its table names. */
 export const arStock = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'stock'),
   params: { style: choice(...Object.keys(STOCK_STYLES)) },
-  build: (params) => chosen(STOCK_STYLES, params.style).build(frame),
+  build: (params) => chosen(STOCK_STYLES, params.style)(frame),
 });

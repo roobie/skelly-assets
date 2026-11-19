@@ -65,10 +65,13 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
   const isCarryHandle = { part: 'upper', param: 'top', equals: 'carry-handle' };
   const isFlatTop = { part: 'upper', param: 'top', equals: 'flat-top' };
   const isA2 = { part: 'stock', param: 'style', equals: 'a2' };
-  // A condition can name only one value, so the drop-in follows the frame's one rifle-gas barrel.
+  // A construct condition tests a param against one value, so the drop-in can follow the barrel's gas system only
+  // while one barrel length has rifle gas.
   const rifleLengths = keys(barrel.lengths).filter((length) => barrelGas(frame, length) === 'rifle');
   if (rifleLengths.length !== 1) {
-    throw new Error(`${frame.name}: the front sight template needs exactly one rifle-gas barrel`);
+    throw new Error(
+      `${frame.name}: a template condition tests one value, so the front sight template needs exactly one rifle-gas barrel`,
+    );
   }
   const isRifleGas = { part: 'barrel', param: 'length', equals: rifleLengths[0]! };
   const frontSight: Template = {
@@ -105,7 +108,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
           profile: { when: isA2, onMatch: 'stanag-straight', onMismatch: 'stanag-curved' },
         },
       },
-      { id: 'rear-sight', family: 'rail-rear-sight', when: isFlatTop },
+      { id: 'rear-sight', family: familyName(frame, 'rear-sight'), when: isFlatTop },
     ],
     connections: [
       ...sharedConnections,

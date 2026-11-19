@@ -67,17 +67,6 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
     'barrel-nut': { swap: job('tool') },
     'handguard-cap': { swap: job('tool') },
     'port-cover': { swap: job('tool') },
-    'sight-height': {
-      swap: job('tool'),
-      standards: {
-        'ar-carry-handle': standard(),
-        // The flat-top front sight base stands 0.040 inch taller than the carry-handle one, as the flat-top's rear
-        // sights stand that much higher.
-        'ar-flat-top': standard({
-          baseExtraHeight: dim(1.016, 'sourced: 1.98 in against 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
-        }),
-      },
-    },
 
     barrel: { swap: job('bench') },
     'barrel-seat': { swap: job('bench') },
@@ -89,8 +78,6 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
       swap: job('bench'),
       standards: {
         'ar-journal-750': standard({ journalDiameter: dim(19.05, 'derived: 0.750 in journal named by the standard') }),
-        // The heavy-barrel journal: a block bored for it slides loose on a 0.750 in journal.
-        'ar-journal-936': standard({ journalDiameter: dim(23.774, 'derived: 0.936 in journal named by the standard') }),
       },
     },
     'gas-cylinder': { swap: job('bench') },

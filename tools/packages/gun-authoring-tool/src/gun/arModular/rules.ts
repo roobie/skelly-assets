@@ -7,12 +7,10 @@ import { applyDir, applyPoint, dot, sub } from '@skelly/construct/foundation/mat
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { X } from '../antiMateriel/common.ts';
 import { MAGAZINE_FRAME_WELLS } from '../magazineProfiles.ts';
-import { GUN_PLATFORMS } from '../platforms.ts';
-import { mmToInches, uToMm } from '../units.ts';
+import { type SightRole, sightAxisOf, sightRoleOf } from '../sightAxis.ts';
+import { uToMm } from '../units.ts';
 import { barrelGas } from './barrel.ts';
-import { type ArFrame, familyName } from './frame.ts';
-import { stockBuffer } from './stock.ts';
-import { sightHeightExtraMm, sightHeightStandard } from './upper.ts';
+import { type ArFrame, familyName, u } from './frame.ts';
 
 const EPSILON = 1e-6;
 
@@ -34,30 +32,6 @@ const endsOf = (rc: ResolvedConnection, part: string) =>
       : undefined;
 
 const issue = (rule: string, message: string, parts: string[]): Issue => ({ rule, message, parts });
-
-/** The barrel's gas port is turned to one journal, and a block bored for another slides loose on it. */
-const gasJournal = (frame: ArFrame): Rule => {
-  const id = `${frame.name}-gas-journal`;
-  return {
-    id,
-    title: 'The gas block is bored for the barrel journal',
-    check: (r) =>
-      placedOf(r, familyName(frame, 'barrel')).flatMap((barrel) =>
-        r.connections.flatMap((rc) => {
-          const ends = endsOf(rc, barrel);
-          if (ends?.own.port.mount !== 'gas-block' || ends.own.port.standard === ends.other.port.standard) {
-            return [];
-          }
-          const journal = GUN_PLATFORMS.standards.get('gas-block')?.get(ends.own.port.standard ?? '')
-            ?.dimensions.journalDiameter;
-          const size = journal ? `${mmToInches(journal.mm).toFixed(3)}"` : 'unstated';
-          return [
-            issue(id, `gas block does not fit the ${size} gas journal of the ${barrel}`, [ends.other.part, barrel]),
-          ];
-        }),
-      ),
-  };
-};
 
 /** A drop-in handguard spans from the upper to the front sight base over one gas port, so only that one fits. */
 const dropInGas = (frame: ArFrame): Rule => {
@@ -160,81 +134,60 @@ const carryHandleRail = (frame: ArFrame): Rule => {
   };
 };
 
-/** The placed parts other than `except` that a shooter can aim through. */
-const sightsBesides = (r: Resolved, except: string): string[] =>
+/** The placed parts whose sight serves in one of the given roles. */
+const placedSights = (r: Resolved, roles: readonly SightRole[]): string[] =>
   [...r.defs]
-    .filter(([part, def]) => part !== except && r.placed.has(part) && def.axes.some((axis) => axis.kind === 'sight'))
+    .filter(([part, def]) => {
+      const role = sightRoleOf(def);
+      return r.placed.has(part) && role !== undefined && roles.includes(role);
+    })
     .map(([part]) => part);
 
+/** The height over the bore, in the gun's frame, of a placed part's sight line. */
+const sightLineY = (r: Resolved, part: string): number =>
+  applyPoint(r.placed.get(part)!, sightAxisOf(r.defs.get(part)!)!.origin)[1];
+
 /**
- * The front post must stand on the rear sight's line: a carry-handle upper's aperture is lower than a rail rear
- * sight's on a flat-top, and each front sight base is made for one of them.
+ * The front post must stand on the rear sight's line: a carry handle's aperture is lower than a flat-top's rail rear
+ * sight's, and each front sight base is made for one of them. An optic aims on its own line, so only iron rear sights
+ * are judged.
  */
 const sightHeight = (frame: ArFrame): Rule => {
   const id = `${frame.name}-sight-height`;
+  const tolerance = u(frame.table.sightLine.tolerance);
   return {
     id,
     title: 'The front sight base stands at the rear sight height',
     check: (r) =>
       placedOf(r, familyName(frame, 'front-sight-base')).flatMap((base) =>
-        placedOf(r, familyName(frame, 'upper')).flatMap((upper) => {
-          const height = paramOf(r, base, 'height');
-          const rear = paramOf(r, upper, 'top');
-          const rearSights = sightsBesides(r, base);
-          if (height === undefined || rear === undefined || rearSights.length === 0 || height === rear) {
-            return [];
-          }
-          const offMm = Math.abs(
-            sightHeightExtraMm(sightHeightStandard(height)) - sightHeightExtraMm(sightHeightStandard(rear)),
-          );
-          return [
-            issue(
-              id,
-              `${height} front sight base does not match the ${rear} rear sight: the sight line is ${offMm.toFixed(2)} mm off at the front`,
-              [base, upper],
-            ),
-          ];
+        placedSights(r, ['rear']).flatMap((rear) => {
+          const off = sightLineY(r, base) - sightLineY(r, rear);
+          return Math.abs(off) <= tolerance
+            ? []
+            : [
+                issue(
+                  id,
+                  `${paramOf(r, base, 'height')} front sight base does not match the rear sight on ${rear}: its post stands ${uToMm(Math.abs(off)).toFixed(2)} mm ${off > 0 ? 'above' : 'below'} the sight line`,
+                  [base, rear],
+                ),
+              ];
         }),
       ),
   };
 };
 
-/** A front post alone cannot be aimed with. */
+/** A front post alone cannot be aimed with: the eye needs a rear sight or an optic to line it up through. */
 const rearSightPresent = (frame: ArFrame): Rule => {
   const id = `${frame.name}-rear-sight`;
   return {
     id,
     title: 'A front sight base has a rear sight',
     check: (r) =>
-      placedOf(r, familyName(frame, 'front-sight-base'))
-        .filter((base) => sightsBesides(r, base).length === 0)
-        .map((base) => issue(id, 'front sight base without a rear sight: add a rail rear sight or an optic', [base])),
-  };
-};
-
-/** A stock slides on the extension of the buffer it is made for; the others differ in length. */
-const tubeStock = (frame: ArFrame): Rule => {
-  const id = `${frame.name}-tube-stock`;
-  return {
-    id,
-    title: 'The stock fits the receiver extension',
-    check: (r) =>
-      placedOf(r, familyName(frame, 'stock')).flatMap((stock) =>
-        placedOf(r, familyName(frame, 'receiver-extension')).flatMap((tube) => {
-          const style = paramOf(r, stock, 'style');
-          const tubeBuffer = paramOf(r, tube, 'buffer');
-          if (style === undefined || tubeBuffer === undefined || stockBuffer(style) === tubeBuffer) {
-            return [];
-          }
-          return [
-            issue(
-              id,
-              `${style} stock needs the ${stockBuffer(style)} receiver extension; this lower carries the ${tubeBuffer} extension`,
-              [stock, tube],
-            ),
-          ];
-        }),
-      ),
+      placedSights(r, ['rear', 'optic']).length > 0
+        ? []
+        : placedOf(r, familyName(frame, 'front-sight-base')).map((base) =>
+            issue(id, 'front sight base without a rear sight: add a rail rear sight or an optic', [base]),
+          ),
   };
 };
 
@@ -271,13 +224,11 @@ const magazineWell = (frame: ArFrame): Rule => {
 
 /** The coupling rules of a frame's modules. */
 export const arModularRules = (frame: ArFrame): Rule[] => [
-  gasJournal(frame),
   dropInGas(frame),
   dropInCap(frame),
   freeFloatPastBase(frame),
   carryHandleRail(frame),
   sightHeight(frame),
   rearSightPresent(frame),
-  tubeStock(frame),
   magazineWell(frame),
 ];

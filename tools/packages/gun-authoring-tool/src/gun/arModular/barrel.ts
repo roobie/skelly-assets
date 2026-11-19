@@ -1,28 +1,21 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
-import { box, choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
+import { choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { type ArFrame, chosen, familyName, u } from './frame.ts';
-import { roundBar } from './shapes.ts';
-
-/**
- * Every barrel of the family is turned to this journal; a block bored for another exists only so a broken fixture can
- * show it refused.
- */
-export const BARREL_JOURNAL = '750';
+import { journalClamp, roundBar } from './shapes.ts';
 
 /** The gas-block standard of a journal, by the name the frame table gives it. */
 export const journalStandard = (journal: string): string => `ar-journal-${journal}`;
 
+/** The radius of the named journal of the frame. */
+const journalRadiusOf = (frame: ArFrame, journal: string): number =>
+  u(chosen(frame.table.gasBlock.journals, journal)) / 2;
+
+/** The radius of the journal every barrel of the frame is turned to under its gas block. */
+export const barrelJournalRadius = (frame: ArFrame): number => journalRadiusOf(frame, frame.table.barrel.journal);
+
 /** The gas system, by name, that a barrel of the named length is drilled for. */
-export const barrelGas = (frame: ArFrame, length: string): string => {
-  const { gasPorts, lengths } = frame.table.barrel;
-  const port = chosen(lengths, length).gasPort.mm;
-  const gas = Object.keys(gasPorts).find((name) => gasPorts[name]!.mm === port);
-  if (gas === undefined) {
-    throw new Error(`barrel ${length} is drilled at none of the gas ports`);
-  }
-  return gas;
-};
+export const barrelGas = (frame: ArFrame, length: string): string => chosen(frame.table.barrel.lengths, length).gas;
 
 /**
  * The barrel, by its length and gas system. Only the part ahead of the upper is built: the chamber and barrel
@@ -33,10 +26,11 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'barrel'),
   params: { length: choice(...Object.keys(frame.table.barrel.lengths)) },
   build(params): PartDef {
-    const { barrel, gasBlock } = frame.table;
+    const { barrel } = frame.table;
     const choiceOf = chosen(barrel.lengths, params.length);
     const setback = u(barrel.breechSetback);
     const muzzleX = u(choiceOf.length) - setback;
+    const gasPortX = u(chosen(barrel.gasPorts, choiceOf.gas)) - setback;
     return {
       family: 'barrel',
       solids: [roundBar('barrel', 0, muzzleX, u(barrel.radius))],
@@ -45,9 +39,9 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
         {
           id: 'gas-block',
           mount: 'gas-block',
-          standard: journalStandard(BARREL_JOURNAL),
+          standard: journalStandard(barrel.journal),
           gender: 'female',
-          pos: [u(choiceOf.gasPort) - setback, u(gasBlock.journalRadius), 0],
+          pos: [gasPortX, barrelJournalRadius(frame), 0],
           normal: Y,
           up: X,
         },
@@ -63,35 +57,22 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
  * A low-profile gas block clamped on a journal over the gas port, by the journal it is bored for; its frame sits on top
  * of the journal.
  */
-export const arGasBlock = (frame: ArFrame): PartFamily => {
-  const journals = Object.keys(frame.table.gasBlock.journals);
-  return {
-    name: familyName(frame, 'gas-block'),
-    params: {
-      journal: {
-        values: journals,
-        default: BARREL_JOURNAL,
-        fault: journals.filter((journal) => journal !== BARREL_JOURNAL),
-      },
-    },
-    build: (params) => gasBlockDef(frame, params.journal!),
-  };
-};
+export const arGasBlock = (frame: ArFrame): PartFamily => ({
+  name: familyName(frame, 'gas-block'),
+  params: {
+    journal: { values: Object.keys(frame.table.gasBlock.journals), default: frame.table.barrel.journal },
+  },
+  build: (params) => gasBlockDef(frame, params.journal!),
+});
 
 const gasBlockDef = (frame: ArFrame, journal: string): PartDef => {
   const { gasBlock } = frame.table;
-  const radius = u(chosen(gasBlock.journals, journal)) / 2;
+  const radius = journalRadiusOf(frame, journal);
   const wall = u(gasBlock.wall);
   const half = u(gasBlock.length) / 2;
-  const outer = radius + wall;
   return {
     family: 'gas-block',
-    solids: [
-      box('top', [-half, 0, -outer], [half, wall, outer]),
-      box('right', [-half, -2 * radius, radius], [half, 0, outer]),
-      box('left', [-half, -2 * radius, -outer], [half, 0, -radius]),
-      box('under', [-half, -2 * radius - wall, -outer], [half, -2 * radius, outer]),
-    ],
+    solids: journalClamp((side) => side, -half, half, radius, wall, radius + wall),
     ports: [
       {
         id: 'barrel',

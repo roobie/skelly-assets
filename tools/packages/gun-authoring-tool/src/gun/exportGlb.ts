@@ -53,6 +53,7 @@ import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type PlatformChoice, withPlatformPorts } from './platforms.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
+import { type SightRole, sightAxisOf, sightRoleOf } from './sightAxis.ts';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
@@ -280,15 +281,20 @@ interface SightCandidate {
   eyeReliefMetres: number;
   ocularDiameterMetres?: number;
 }
+
+/** Which sight an export aims from: the eye looks through an optic or a rear sight, and only a front sight left alone. */
+const SIGHT_PRIORITY: Readonly<Record<SightRole, number>> = { optic: 0, rear: 1, front: 2 };
+
 const sightCandidate = (resolved: Resolved, id: string, part: PartDef): SightCandidate | undefined => {
-  const axis = part.axes.find(({ kind }) => kind === 'sight');
+  const axis = sightAxisOf(part);
+  const role = sightRoleOf(part);
   const transform = resolved.placed.get(id);
-  if (!(axis && transform)) {
+  if (!(axis && role && transform)) {
     return undefined;
   }
   const { family } = resolved.assembly.parts[id]!;
   const params = resolved.params.get(id);
-  const optic = family === 'sight' ? getOptic(params?.type?.value, params?.mountSection?.value) : undefined;
+  const optic = role === 'optic' ? getOptic(params?.type?.value, params?.mountSection?.value) : undefined;
   const eyeLocal = optic ? ([optic.ocularX, optic.opticalAxisY, 0] as Vec3) : axis.origin;
   const eye = applyPoint(transform, eyeLocal);
   let direction = normalize(applyDir(transform, axis.dir));
@@ -299,19 +305,9 @@ const sightCandidate = (resolved: Resolved, id: string, part: PartDef): SightCan
   if (eyeReliefU === undefined) {
     throw new Error(`Sight part ${id} needs exported eye relief`);
   }
-  // The eye is behind a rear sight, so a rear sight built into another part, such as a receiver or carry handle,
-  // outranks a front sight.
-  let priority = 2;
-  if (optic) {
-    priority = 0;
-  } else if (family.includes('rear-sight')) {
-    priority = 1;
-  } else if (family.includes('front-sight')) {
-    priority = 3;
-  }
   return {
     id,
-    priority,
+    priority: SIGHT_PRIORITY[role],
     kind: optic ? 'optic' : 'iron',
     eye,
     direction,
@@ -510,13 +506,13 @@ const drawnTopOrThrow = (file: VoxelFile, partId: string, column: Column = {}): 
 };
 
 const frontSightPost = (resolved: Resolved) => {
-  const id = Object.entries(resolved.assembly.parts).find(
-    ([partId, part]) =>
-      part.family.includes('front-sight') && resolved.defs.get(partId)?.solids.some((solid) => solid.id === 'post'),
-  )?.[0];
+  const id = Object.keys(resolved.assembly.parts).find((partId) => {
+    const def = resolved.defs.get(partId);
+    return def && sightRoleOf(def) === 'front' && def.solids.some((solid) => solid.id === 'post');
+  });
   const transform = id && resolved.placed.get(id);
   const def = id ? resolved.defs.get(id) : undefined;
-  const axis = def?.axes.find(({ kind }) => kind === 'sight');
+  const axis = def && sightAxisOf(def);
   const post = def?.solids.find((candidate) => candidate.id === 'post');
   if (!(id && transform && axis && post)) {
     throw new Error('A rear sight needs a front-sight post to define its aim line');
@@ -552,7 +548,7 @@ const leafSpan = (resolved: Resolved, sight: { readonly id: string }): readonly 
   const def = resolved.defs.get(sight.id)!;
   const transform = resolved.placed.get(sight.id)!;
   const { metresPerUnit } = resolved.domain.units;
-  const [, top] = def.axes.find(({ kind }) => kind === 'sight')!.origin;
+  const [, top] = sightAxisOf(def)!.origin;
   const bounds = def.solids.map((solid) => localSolidBounds(solid));
   const toppedOut = bounds.filter(([, high]) => Math.abs(high[1] - top) < 1e-6);
   const leaves = toppedOut.length > 0 ? toppedOut : bounds.filter(([low, high]) => low[1] < top && high[1] > top);
@@ -660,15 +656,15 @@ const drawnIronSightLine = (
   resolved: Resolved,
   sight: { readonly id: string; readonly eye: Vec3; readonly direction: Vec3 },
 ): { readonly eye: Vec3; readonly direction: Vec3 } => {
-  const { family } = resolved.assembly.parts[sight.id]!;
   const { metresPerUnit } = resolved.domain.units;
   const { bore, up, side } = FILE_AXES;
   const grainOf = (partId: string) => partVoxelGrain(resolved.defs.get(partId)!, file.grains, metresPerUnit);
   const sightGrain = grainOf(sight.id);
   if (sightGrain === undefined) {
-    const direction = family.includes('rear-sight')
-      ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
-      : sight.direction;
+    const direction =
+      sightRoleOf(resolved.defs.get(sight.id)!) === 'rear'
+        ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
+        : sight.direction;
     return { eye: sight.eye, direction };
   }
   const top = drawnTopOrThrow(file, sight.id, {

@@ -15,7 +15,7 @@ import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { isTriggerBlade } from '../src/gun/roundedTriggerGuard.ts';
 import { readGlb } from './glbReader.ts';
-import { itemsKept, loadDesignAssembly, loadDesigns } from './helpers.ts';
+import { itemsKept, loadDesignAssembly, loadDesigns, loadFixtures, variant } from './helpers.ts';
 
 const FOLDER = join(import.meta.dirname, '../src/gun/arModular');
 const AR15 = AR15_FRAME.table;
@@ -43,6 +43,8 @@ describe('modular AR', () => {
     expect(() => checkFrameTable('t', { a: { mm: 1 } })).toThrow(/t\.a/);
     expect(() => checkFrameTable('t', { a: { mm: 1, source: 'a guess' } })).toThrow();
     expect(() => checkFrameTable('t', { a: 1 })).toThrow(/t\.a/);
+    // A name picks one of the table's named choices, so it needs no source.
+    expect(() => checkFrameTable('t', { a: 'rifle' })).not.toThrow();
   });
 
   it('gives every item the sourced mass of its frame table', () => {
@@ -72,6 +74,9 @@ describe('modular AR', () => {
     expect(new Set(issues.filter(({ rule }) => rule === 'min-feature').flatMap(({ parts }) => parts))).toEqual(
       new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock']),
     );
+    // Every stock style has sleeve walls under the coarse grain, the A2's as the collapsible's.
+    const a2 = validate(loadDesignAssembly('ar15-rifle-a2'), coarse).issues;
+    expect(a2.filter(({ rule }) => rule === 'min-feature').flatMap(({ parts }) => parts)).toContain('stock');
   });
 
   it('seats the STANAG magazine in its well without touching the walls', () => {
@@ -144,5 +149,72 @@ describe('modular AR', () => {
       return Array.from({ length: positions.length / 3 }, (_, i) => [...positions.subarray(i * 3, i * 3 + 3)]);
     });
     expect(voxelPoints.filter(inBlade)).toEqual([]);
+  });
+
+  it('refuses each broken modular AR for the reason a builder would give', () => {
+    // The reason each broken-ar15-* fixture is built to show, by the rule that gives it.
+    const reasons: Readonly<Record<string, readonly [string, string]>> = {
+      'broken-ar15-carry-handle-rail': [
+        'ar15-carry-handle-rail',
+        'the carry-handle upper has no top rail: rear-sight needs the flat-top upper',
+      ],
+      'broken-ar15-drop-in-cap': [
+        'ar15-drop-in-cap',
+        'drop-in handguard needs a front sight base to hold its front; a low-profile gas block has no handguard cap',
+      ],
+      'broken-ar15-drop-in-gas': [
+        'ar15-drop-in-gas',
+        'mid-length drop-in handguard does not fit a rifle-length gas system; use the rifle-length drop-in',
+      ],
+      'broken-ar15-free-float-sight-base': [
+        'ar15-free-float-sight-base',
+        'free-float handguard (381 mm) runs past the front sight base at 218 mm; fit a low-profile gas block',
+      ],
+      'broken-ar15-magazine-well': [
+        'ar15-magazine-well',
+        'sr25-straight magazine does not fit the AR-15 magazine well',
+      ],
+      'broken-ar15-rear-sight': [
+        'ar15-rear-sight',
+        'front sight base without a rear sight: add a rail rear sight or an optic',
+      ],
+      'broken-ar15-sight-height': [
+        'ar15-sight-height',
+        'flat-top front sight base does not match the rear sight on upper: its post stands 1.02 mm above the sight line',
+      ],
+      'broken-ar15-tube-stock': [
+        'port-compat',
+        'Standard mismatch: receiver-extension.stock is ar-tube-rifle but stock.front is ar-tube-carbine.',
+      ],
+    };
+    const broken = loadFixtures().filter(({ name }) => name.startsWith('broken-ar15-'));
+    expect(broken.map(({ name }) => name).sort()).toEqual(Object.keys(reasons).sort());
+    for (const fixture of broken) {
+      const [rule, message] = reasons[fixture.name]!;
+      const messages = validate(fixture, gunDomain)
+        .issues.filter((issue) => issue.rule === rule)
+        .map((issue) => issue.message);
+      expect(messages, fixture.name).toEqual([message]);
+    }
+  });
+
+  it('aims a flat-top with only an optic past the front sight base, judging no iron sight line', () => {
+    const optic = variant('broken-ar15-rear-sight', (assembly) => {
+      assembly.parts.sight = { family: 'sight' };
+      assembly.connections.push({ from: 'upper.rail', slot: 1, to: 'sight.base' });
+    });
+    const { resolved, issues } = validate(optic, gunDomain);
+    expect(resolved.placed.has('sight')).toBe(true);
+    const rules = issues.map(({ rule }) => rule);
+    expect(rules).not.toContain('ar15-rear-sight');
+    expect(rules).not.toContain('ar15-sight-height');
+  });
+
+  it('takes a rail front sight for no rear sight', () => {
+    const front = variant('broken-ar15-rear-sight', (assembly) => {
+      assembly.parts['rail-front-sight'] = { family: 'rail-front-sight' };
+      assembly.connections.push({ from: 'upper.rail', slot: 1, to: 'rail-front-sight.base' });
+    });
+    expect(validate(front, gunDomain).issues.map(({ rule }) => rule)).toEqual(['ar15-rear-sight']);
   });
 });

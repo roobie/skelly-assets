@@ -3,26 +3,10 @@ import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { GUN_PLATFORMS } from '../platforms.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U } from '../railRearSight.ts';
+import { sightAxis } from '../sightAxis.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
-
-/**
- * The sight-height standard of a sight standing at the height of the named upper top. A front sight base is made for
- * one of them, since the flat-top's rear sights stand taller than the carry handle's; a rail rear sight is a generic
- * attachment with no port to say so, so the flat-top's height is its height.
- */
-export const sightHeightStandard = (top: string): string => `ar-${top}`;
-
-/** How much taller than the carry handle's a front sight base of the named sight-height standard stands, in mm. */
-export const sightHeightExtraMm = (standard: string): number => {
-  const dimensions = GUN_PLATFORMS.standards.get('sight-height')?.get(standard)?.dimensions;
-  if (dimensions === undefined) {
-    throw new Error(`no sight-height standard ${standard}`);
-  }
-  return dimensions.baseExtraHeight?.mm ?? 0;
-};
 
 /** A housing's traced side outline and how far it stands out of the receiver's side. */
 type SideOutline = ArFrameTable['upper']['forwardAssist'];
@@ -88,19 +72,13 @@ const carryHandle = (frame: ArFrame): UpperTop => {
       box('handle-bar', [sightFrontX, topY - u(h.barDepth), -half], [frontX - u(h.frontLegLength), topY, half]),
       box('handle-front-leg', [frontX - u(h.frontLegLength), baseY, -half], [frontX, topY, half]),
     ],
-    ports: [
-      {
-        id: 'sight-height',
-        mount: 'sight-height',
-        standard: sightHeightStandard('carry-handle'),
-        gender: 'female',
-        pos: [apertureX, apertureY, 0],
-        normal: X,
-        up: Y,
-      },
-    ],
+    ports: [],
     axes: [
-      { kind: 'sight', origin: [apertureX, apertureY, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U },
+      sightAxis('rear', {
+        origin: [apertureX, apertureY, 0],
+        dir: X,
+        referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U,
+      }),
     ],
     features: [
       { name: 'rear-sight-ear', size: half - slotHalf, disposition: { kind: 'detail' } },
@@ -111,9 +89,6 @@ const carryHandle = (frame: ArFrame): UpperTop => {
 
 const UPPER_TOPS = { 'flat-top': flatTop, 'carry-handle': carryHandle } as const;
 
-/** The tops an upper is made with, by name; a front sight base is made for the height of one of them. */
-export const UPPER_TOP_NAMES: readonly string[] = Object.keys(UPPER_TOPS);
-
 /**
  * The upper receiver, by its top: the body over the lower, the forward assist and brass deflector on the right, and the
  * ejection port between them, under a flat-top rail or a carry handle. Its frame is the gun's; the barrel and the
@@ -121,7 +96,7 @@ export const UPPER_TOP_NAMES: readonly string[] = Object.keys(UPPER_TOPS);
  */
 export const arUpper = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'upper'),
-  params: { top: choice(...UPPER_TOP_NAMES) },
+  params: { top: choice(...Object.keys(UPPER_TOPS)) },
   build(params): PartDef {
     const { upper, lower } = frame.table;
     const halfWidth = u(upper.halfWidth);

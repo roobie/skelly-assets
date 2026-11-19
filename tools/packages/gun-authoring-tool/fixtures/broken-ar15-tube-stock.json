@@ -1,7 +1,7 @@
 {
   "name": "broken-ar15-tube-stock",
   "description": "An A2 rifle with a collapsible carbine stock on its rifle receiver extension.",
-  "expect": ["ar15-tube-stock", "port-compat"],
+  "expect": ["port-compat"],
   "root": "lower",
   "parts": {
     "lower": { "family": "ar15-lower" },

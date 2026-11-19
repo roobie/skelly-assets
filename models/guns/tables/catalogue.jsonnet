@@ -309,6 +309,7 @@ local ar15Item(id, role, params) =
     ar15Item('ar15_gas_block_low', 'gas-block', { journal: '750' }),
     ar15Item('ar15_front_sight_base_flat_top', 'front-sight-base', { height: 'flat-top' }),
     ar15Item('ar15_front_sight_base_carry_handle', 'front-sight-base', { height: 'carry-handle' }),
+    ar15Item('ar15_rear_sight', 'rear-sight', {}),
     ar15Item('ar15_handguard_free_float', 'handguard', { length: '15' }),
     ar15Item('ar15_handguard_drop_in_mid', 'handguard-drop-in', { gas: 'mid' }),
     ar15Item('ar15_handguard_drop_in_rifle', 'handguard-drop-in', { gas: 'rifle' }),
