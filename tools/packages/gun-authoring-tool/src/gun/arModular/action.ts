@@ -87,7 +87,7 @@ export const arBoltCarrier = (frame: ArFrame): GunPartFamily => ({
       keepOuts: [],
       axes: [],
       tags: [ACTION_CARRIER_ROLES.ar, VOXEL_DETAIL],
-      features: [{ name: 'bolt-head', size: boltFaceX - frontX, disposition: { kind: 'detail' } }],
+      features: [{ name: 'bolt-head-length', size: boltFaceX - frontX, disposition: { kind: 'detail' } }],
       motion: { stages: [{ kind: 'slide', direction: NEG_X, travel: u(frame.table.boltCarrier.stroke) }] },
     };
   },

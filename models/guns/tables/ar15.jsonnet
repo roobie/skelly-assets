@@ -367,11 +367,16 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   },
 
   // The bolt carrier group in battery: the carrier's rear on the upper's rear face, where the buffer meets it, and the
-  // bolt's face on the barrel's breech.
+  // bolt's face on the barrel's breech. The carrier's length is the two spans either side of the gas key's rear, so it
+  // is derived, not sourced.
   boltCarrier: {
     stroke: dim(95.25, 'sourced: the 3.75 in stroke, ' + gasKeyPatent),
     keyLength: dim(62.611, "sourced: 2.465 in from the carrier's front to the rear of its gas key, " + gasKeyPatent),
-    keyRoom: dim(99.06, 'sourced: the 3.90 in the charging handle has to draw the gas key back in, ' + gasKeyPatent),
+    keyRoom: dim(
+      99.06,
+      "derived: the gas key's rear this far ahead of the upper's rear face, read from the 3.90 in the patent gives the charging handle to draw the key back in, "
+      + gasKeyPatent,
+    ),
     clearance: dim(0.5, 'derived: a sliding fit in the upper'),
     boltRadius: dim(6.5, "derived: the bolt head standing out of the carrier's front, about 0.5 in across"),
     // The animated cycle's spring return takes about 83 ms over this stroke, so 700 is the fastest sourced rate it fits.
@@ -661,8 +666,8 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
     ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
-    ar15_bolt_carrier: mass(0.3266, 'sourced: https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
-    ar15_charging_handle: mass(0.0312, 'sourced: https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
-    ar15_port_cover: mass(0.0221, 'sourced: https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),
+    ar15_bolt_carrier: mass(0.3266, 'sourced: 11.52 oz, https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
+    ar15_charging_handle: mass(0.0312, 'sourced: 1.1 oz, https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
+    ar15_port_cover: mass(0.0221, 'sourced: 0.78 oz, https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),
   },
 }
