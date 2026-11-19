@@ -381,3 +381,23 @@ test('the twin digest covers this module, the compiler driver, the plain-data ch
   ])
     assert.ok(code.includes(driver), driver);
 });
+
+fixtureTest(
+  'a twin whose bytes come out as they were keeps its mtime',
+  async ({ root, write, refresh, value, twin, keep }) => {
+    const mtime = (name) => statSync(join(root, `${name}.json`)).mtimeMs;
+    const past = new Date(mtime('source') - 60_000);
+    for (const name of ['source', 'other']) utimesSync(join(root, `${name}.json`), past, past);
+    // Both twins go stale: one comes out different, the other the same, as a comment edit does.
+    write('lib/value.libsonnet', '{ value: 2 }');
+    write('lib/other.libsonnet', '{ other: 1 } // reworded');
+    await refresh();
+    assert.deepEqual(value('source'), { value: 2 });
+    assert.ok(mtime('source') > past.getTime(), 'a changed twin is written');
+    assert.equal(mtime('other'), past.getTime(), 'an identical twin is not');
+    // The identical twin counts as fresh, so the next refresh leaves it alone.
+    keep('other');
+    await refresh();
+    assert.equal(twin('other'), 'kept');
+  },
+);

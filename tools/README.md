@@ -29,8 +29,11 @@ catalogue is costly to compile, so a refresh recompiles only what an edit reache
 evaluating, so an edit invalidates exactly the twins that can see it. The catalogue and the recipes evaluate every
 row file, so each row file compiles on its own into a fragment, in parallel, and the stale twins compile in one run
 over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
-twins over it, not every row again, and one run evaluates the catalogue the recipes share once. CI jobs start from
-fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
+twins over it, not every row again, and one run evaluates the catalogue the recipes share once. A twin is written only
+when its bytes differ from the file on disk, so an edit that leaves a recipe's output as it was leaves the file and its
+mtime alone, so a dev server watching the twins reloads only what changed and 40 MB is not rewritten for nothing. CI
+jobs start from fresh checkouts, so they share compiled units through a content-addressed twin store restored from the
+latest run.
 A fresh worktree is a fresh checkout too, so worktrees and users on one host can share a store the way they share the
 export cache: `JSONNET_TWIN_STORE` names its folder, and a setgid, group-writable folder keeps every entry some
 checkout's refresh used within an entry life rather than only the entries of the checkout that refreshed last. The

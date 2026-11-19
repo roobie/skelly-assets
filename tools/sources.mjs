@@ -189,13 +189,28 @@ const unitPlan = (sources, { root, code, rowIndexes }) => {
 /**
  * Test files run in parallel processes that each refresh the twins, so a reader must never see a half-written file.
  * @param {string} path
- * @param {string | NodeJS.ArrayBufferView} contents
+ * @param {string | Uint8Array} contents
  */
 const replaceFile = (path, contents) => {
   mkdirSync(dirname(path), { recursive: true });
   const partial = `${path}.${process.pid}.partial`;
   writeFileSync(partial, contents);
   renameSync(partial, path);
+};
+
+// A twin whose bytes are already on disk is left alone, mtime included: a dev server watching the twins reloads on
+// every write, and an edit reaches many twins that come out as they were.
+/**
+ * @param {string} path
+ * @param {string | Uint8Array} contents
+ */
+const replaceFileIfChanged = (path, contents) => {
+  try {
+    if (readFileSync(path).equals(typeof contents === 'string' ? Buffer.from(contents) : contents)) return;
+  } catch (error) {
+    if (/** @type {NodeJS.ErrnoException} */ (error).code !== 'ENOENT') throw error;
+  }
+  replaceFile(path, contents);
 };
 
 // The store is content-addressed, so an entry is only ever read under the key of the inputs that made it: a stale or
@@ -348,7 +363,8 @@ const readStamp = (stamp) => (existsSync(stamp) ? JSON.parse(readFileSync(stamp,
 
 // The stamp maps each twin to the key it was written under, so a refresh with nothing changed reads no store. Stale
 // twins whose keys the store lacks compile together in one run, which evaluates the catalogue they share once. A twin
-// whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then.
+// whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then. A
+// twin left unwritten because its bytes are unchanged is stamped like any other: its key is current.
 /**
  * @param {readonly string[]} sources
  * @param {RefreshOptions} options
@@ -360,7 +376,7 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   const stale = twins.filter(({ path, key }) => stamped[relative(root, path)] !== key || !existsSync(twinOf(path)));
   if (stale.length === 0) return;
   const options = { root, code, folders: storeFolders(resolve(store)) };
-  /** @type {Map<Unit, string | NodeJS.ArrayBufferView>} */
+  /** @type {Map<Unit, string | Uint8Array>} */
   const stored = new Map();
   for (const twin of stale) {
     const json = storedJson(options.folders.twins, twin.key);
@@ -368,7 +384,7 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   }
   const unstored = stale.filter((twin) => !stored.has(twin));
   const { compiled, changed } = await compileTwins(unstored, rows, options);
-  for (const [twin, json] of [...stored, ...compiled]) replaceFile(twinOf(twin.path), json);
+  for (const [twin, json] of [...stored, ...compiled]) replaceFileIfChanged(twinOf(twin.path), json);
   pruneStore(options.folders, {
     rows: rows.map(({ key }) => key),
     twins: twins.map(({ key }) => key),
