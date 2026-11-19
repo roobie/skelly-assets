@@ -19,7 +19,13 @@ const { explodable, hasSmooth, movers, registerModels, siteNode, smoothEntry, sp
   '../../site/render.mjs'
 );
 
-const door = [{ kind: 'hinge', axis: { from: [1, 0, 0], to: [1, 1, 0] }, angle: 90, share: 1 }];
+const door = {
+  stages: [{ kind: 'hinge', axis: { from: [1, 0, 0], to: [1, 1, 0] }, angle: 90, share: 1 }],
+  stops: [
+    { name: 'rest', clock: 0 },
+    { name: 'open', clock: 1 },
+  ],
+};
 const placed = (name, at) => {
   const part = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5));
   part.name = name;

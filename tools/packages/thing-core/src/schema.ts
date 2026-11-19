@@ -1,12 +1,15 @@
+import type { Motion } from '@skelly/motion/motion';
 import {
   array,
   type BaseIssue,
   type BaseSchema,
   check,
   finite,
+  type GenericSchema,
   type InferOutput,
   literal,
   maxValue,
+  minLength,
   minValue,
   nonEmpty,
   number,
@@ -129,47 +132,58 @@ const ShareSchema = pipe(
 );
 
 /**
- * A part's motion from rest to its design stop, in the model frame and metres: rigid stages run one after another,
- * each through its `share` of the clock. A hinge turns `angle` degrees about the line `from` → `to`, signed by the
- * right-hand rule; a slide moves `travel` along `direction`, and a stowing slide hides what it carries past `stow`, an
- * offset along its direction in the frame just outside it; see `src/motion.ts`, `isStowed`. Every stage is given in the part's rest frame, and the
- * first carries the rest; see `src/motion.ts`, `posePoint`. A far-side twin's motion is not stored; see
- * `src/motion.ts`, `mirrorMotion`.
+ * The named places on a motion's clock, in order from rest at 0 to the stop at 1, so a reader finds a place by what it
+ * is called rather than by a number it would have to guess.
  */
-export const MotionSchema = pipe(
-  array(
-    variant('kind', [
-      strictObject({
-        kind: literal('hinge'),
-        axis: pipe(
-          strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
-          check(
-            ({ from, to }) => from.some((value, axis) => value !== to[axis]),
-            'hinge axis needs two distinct points',
-          ),
-        ),
-        angle: pipe(
-          number(),
-          finite(),
-          check((angle) => angle !== 0 && Math.abs(angle) <= 180, 'hinge angle must be nonzero, at most a half turn'),
-        ),
-        share: ShareSchema,
-      }),
-      strictObject({
-        kind: literal('slide'),
-        direction: UnitVectorSchema,
-        travel: positive,
-        stow: optional(pipe(number(), finite())),
-        share: ShareSchema,
-      }),
-    ]),
-  ),
-  nonEmpty(),
-  check(
-    (stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9,
-    'stage shares must sum to 1',
-  ),
+export const StopsSchema = pipe(
+  array(strictObject({ name: Name, clock: pipe(number(), finite(), minValue(0), maxValue(1)) })),
+  minLength(2, 'needs a stop at rest and one at the end'),
+  check((stops) => stops[0]?.clock === 0 && stops.at(-1)?.clock === 1, 'must run from clock 0 to 1'),
+  check((stops) => stops.every(({ clock }, i) => i === 0 || clock > stops[i - 1]!.clock), 'clocks must increase'),
+  check((stops) => new Set(stops.map(({ name }) => name)).size === stops.length, 'two stops of one name'),
 );
+
+/**
+ * A part's motion from rest to its design stop, in the model frame and metres; the type, and what the stages and the
+ * stops mean, is `@skelly/motion`, `Motion`. Each stage's share is above 0 and they sum to 1.
+ */
+export const MotionSchema = strictObject({
+  stages: pipe(
+    array(
+      variant('kind', [
+        strictObject({
+          kind: literal('hinge'),
+          axis: pipe(
+            strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
+            check(
+              ({ from, to }) => from.some((value, axis) => value !== to[axis]),
+              'hinge axis needs two distinct points',
+            ),
+          ),
+          angle: pipe(
+            number(),
+            finite(),
+            check((angle) => angle !== 0 && Math.abs(angle) <= 180, 'hinge angle must be nonzero, at most a half turn'),
+          ),
+          share: ShareSchema,
+        }),
+        strictObject({
+          kind: literal('slide'),
+          direction: UnitVectorSchema,
+          travel: positive,
+          stow: optional(pipe(number(), finite())),
+          share: ShareSchema,
+        }),
+      ]),
+    ),
+    nonEmpty(),
+    check(
+      (stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9,
+      'stage shares must sum to 1',
+    ),
+  ),
+  stops: StopsSchema,
+}) satisfies GenericSchema<unknown, Motion>;
 
 /** A stowage port's frame: its origin, x along its normal, y along its up and z = normal × up. */
 const StowageFrameSchema = pipe(
@@ -286,7 +300,4 @@ type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonl
 export type NeutralModel = DeepReadonly<InferOutput<typeof NeutralModelSchema>>;
 export type ModelParts = NonNullable<NeutralModel['parts']>;
 export type ModelBox = DeepReadonly<InferOutput<typeof ModelBoxSchema>>;
-export type Motion = DeepReadonly<InferOutput<typeof MotionSchema>>;
 export type Stowage = DeepReadonly<InferOutput<typeof StowageSchema>>;
-export type MotionStage = Motion[number];
-export type HingeAxis = Extract<MotionStage, { kind: 'hinge' }>['axis'];

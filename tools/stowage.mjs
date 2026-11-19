@@ -319,7 +319,7 @@ export function loadOutStowage(out, models, placements) {
   const moving = new Set(
     [...new Set(closures)].filter((id) => {
       const pack = packOf.get(id);
-      return pack !== undefined && thingEntry(out, pack, id)?.motion?.length > 0;
+      return pack !== undefined && thingEntry(out, pack, id)?.motion !== undefined;
     }),
   );
   return { items: readStowage(out, models, ids), moving };

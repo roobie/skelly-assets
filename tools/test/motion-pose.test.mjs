@@ -1,13 +1,19 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { apply, MODEL_LATERAL, motionAtSite, movingSites, poseAt, stowClips } from '../../site/motionPose.mjs';
-import { isStowed, mirrorMotion, posePoint } from '../packages/thing-core/src/motion.ts';
+import { isStowed, posePoint, reflection, transformMotion } from '../packages/motion/src/motion.ts';
+
+const mirrorMotion = (motion) => transformMotion(motion, reflection(MODEL_LATERAL));
+const stops = [
+  { name: 'rest', clock: 0 },
+  { name: 'open', clock: 1 },
+];
 
 const hinge = { kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 1, 0] }, angle: 90, share: 0.5 };
 const shutter = { kind: 'slide', direction: [0, 1, 0], travel: 1, share: 0.5, stow: 1 };
 // Off every axis's centre, so a twin reflected across the wrong axis swings about the wrong pin.
-const door = [{ ...hinge, axis: { from: [0.3, 0, 0.2], to: [0.3, 1, 0.2] } }];
-const roller = [shutter, { ...hinge, axis: { from: [0, 0, 0], to: [1, 0, 0] } }];
+const door = { stages: [{ ...hinge, axis: { from: [0.3, 0, 0.2], to: [0.3, 1, 0.2] } }], stops };
+const roller = { stages: [shutter, { ...hinge, axis: { from: [0, 0, 0], to: [1, 0, 0] } }], stops };
 const close = (a, b) => a.forEach((value, i) => assert.ok(Math.abs(value - b[i]) < 1e-9, `${a} vs ${b}`));
 // Points on a lattice around the part, so a plane is crossed from both sides.
 const lattice = [-0.5, -0.1, 0.35, 0.9, 1.4].flatMap((x) =>

@@ -494,7 +494,19 @@ it('exports the player bust with joint anchors that seat the limbs symmetrically
 });
 
 it.each([
-  ['with', { motion: { part: 'lower', stages: [{ kind: 'hinge', pins: ['pin'], toward: 'up', open: 30 }] } }],
+  [
+    'with',
+    {
+      motion: {
+        part: 'lower',
+        stages: [{ kind: 'hinge', pins: ['pin'], toward: 'up', open: 30 }],
+        stops: [
+          { name: 'rest', clock: 0 },
+          { name: 'open', clock: 1 },
+        ],
+      },
+    },
+  ],
   ['without', {}],
 ])('refuses a hinge anchor on a row %s a motion, naming the row', (_case, motion) => {
   const input = fixture();

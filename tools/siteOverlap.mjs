@@ -38,7 +38,13 @@ import { solid } from './pieceSolid.mjs';
  */
 /** @typedef {{ readonly pairs: readonly (readonly [string, string, number])[]; readonly why: string }} Fit */
 /** @typedef {NonNullable<ToolItem['motion']>['stages'][number]} AuthoredStage */
-/** @typedef {{ readonly stages: readonly AuthoredStage[]; readonly pieces: readonly Piece[] }} PartMotion */
+/**
+ * @typedef {{
+ *   readonly stages: readonly AuthoredStage[];
+ *   readonly stops: NonNullable<ToolItem['motion']>['stops'];
+ *   readonly pieces: readonly Piece[];
+ * }} PartMotion
+ */
 /**
  * A vehicle's drawn sites and the overlaps and swing contacts it allows and has not judged; `ledger` is its rows of
  * its family's unjudged list.

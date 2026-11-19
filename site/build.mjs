@@ -13,6 +13,7 @@
 // shows the release that introduced it, the one that last changed it and whether this build differs; without it the
 // models show no versions.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -340,6 +341,12 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 for (const f of SITE_FILES) cpSync(join(here, f), join(out, f));
 for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
+// The motion package is TypeScript, which a browser cannot load, so the pages' import maps point the source path the
+// modules import it by (which node and tsc resolve) at this copy with its types stripped.
+writeFileSync(
+  join(out, 'motion.mjs'),
+  stripTypeScriptTypes(readFileSync(join(root, 'tools/packages/motion/src/motion.ts'), 'utf8')),
+);
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES))

@@ -106,6 +106,7 @@ const importTarget = (file: string, specifier: string, roots: Roots): string | u
 // Each edge rejects an import from the files under `from` into the targets it forbids.
 const packageEdges = (roots: Roots): readonly PackageEdge[] => {
   const construct = join(roots.packages, 'construct');
+  const motion = join(roots.packages, 'motion');
   const thingCore = join(roots.packages, 'thing-core');
   const thingExport = join(roots.packages, 'thing-export');
   const thingTool = join(roots.packages, 'thing-authoring-tool');
@@ -129,8 +130,13 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
       from: thingTool,
       forbids: (target) =>
         isWithin(roots.packages, target) &&
-        ![construct, thingCore, thingExport, toolUi, thingTool].some((root) => isWithin(root, target)),
+        ![construct, motion, thingCore, thingExport, toolUi, thingTool].some((root) => isWithin(root, target)),
       problem: 'thing tool imports outside its lower layers',
+    },
+    {
+      from: motion,
+      forbids: (target) => isWithin(roots.packages, target) && !isWithin(motion, target),
+      problem: 'motion imports another package',
     },
     {
       from: join(roots.packages, 'deadvox'),
@@ -141,8 +147,8 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
     {
       from: thingCore,
       forbids: (target) =>
-        isWithin(roots.packages, target) && !isWithin(construct, target) && !isWithin(thingCore, target),
-      problem: 'thing-core imports a package other than the construct package',
+        isWithin(roots.packages, target) && ![construct, motion, thingCore].some((root) => isWithin(root, target)),
+      problem: 'thing-core imports a package other than the construct or motion package',
     },
     {
       from: join(roots.packages, 'deadvox'),
@@ -504,7 +510,7 @@ describe('construct import boundary', () => {
       expect(findBoundaryViolations([constructImport], fixtureRoots)).toEqual([]);
       const violations = findBoundaryViolations([toolImport], fixtureRoots);
       expect(violations).toHaveLength(1);
-      expect(violations[0]).toContain('thing-core imports a package other than the construct package');
+      expect(violations[0]).toContain('thing-core imports a package other than the construct or motion package');
     } finally {
       rmSync(fixtureRoot, { recursive: true, force: true });
     }

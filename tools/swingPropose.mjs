@@ -8,7 +8,7 @@
 // are drawn by a template that other vehicles share. The reason for the search is in
 // `docs/decisions/0016-swing-check.md`, "A failing site gets a proposal, never an edit".
 /** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
-/** @import { HingeAxis } from './packages/thing-core/src/schema.ts' */
+/** @import { HingeStage } from './packages/motion/src/motion.ts' */
 /** @import { SitePieces, SiteVehicle } from './siteOverlap.mjs' */
 /** @import { Adjust, SweepSite, SwingReport } from './swingClearance.mjs' */
 
@@ -47,7 +47,7 @@ const along = (vector, axis) => sub(vector, scale(axis, dot(vector, axis)));
  * The directions the hinge line may move in, both across it: toward the part's middle, and down. A vertical line has
  * no down across it, so it moves toward the middle only.
  * @param {SweepSite} site
- * @param {HingeAxis} axis
+ * @param {HingeStage['axis']} axis
  * @returns {readonly [] | readonly [Vec3, Vec3 | null]}
  */
 function directionsOf(site, axis) {
@@ -61,7 +61,7 @@ function directionsOf(site, axis) {
 /**
  * The hinge offsets to try, shortest first, as vectors in the vehicle frame.
  * @param {SweepSite} site
- * @param {HingeAxis} axis
+ * @param {HingeStage['axis']} axis
  * @param {number} grain
  * @returns {Vec3[]}
  */
@@ -157,7 +157,7 @@ export function proposeFix(pieces, vehicle, siteId) {
     const report = reportOf(adjust, false);
     return failing(report) ? null : { entries: wornBy(report).filter((message) => !known.has(message)) };
   };
-  const [stage, ...rest] = motionAtSite(adjustedMotion(motion, {}, task.forward, grain), site, AUTHORED_LATERAL);
+  const [stage, ...rest] = motionAtSite(adjustedMotion(motion, {}, task.forward, grain), site, AUTHORED_LATERAL).stages;
   if (stage === undefined) throw new Error(`${part} has a motion with no stage`);
   let reachable = start.clear;
   if (rest.length > 0) return { status: 'none', clear: start.clear, reachable };

@@ -1,11 +1,12 @@
 // @ts-check
 // How the moving parts of a vehicle stand at a point of their clock, shared by the showcase's "Open" view and the swing
 // check (tools/swingClearance.mjs), so what the viewer draws open is what the check proved clear. Plain arrays, no
-// three.js. A motion is thing-core's `Motion`; a pose is one rigid motion as twelve numbers: a row-major 3x3 turn, then
+// three.js. A motion is `@skelly/motion`'s `Motion`; a pose is one rigid motion as twelve numbers: a row-major 3x3 turn, then
 // the shift. The reason for the model is in docs/decisions/0015-motion-as-content.md.
 /** @import { Vec3 } from '../tools/packages/construct/src/foundation/math.ts' */
-/** @import { Motion, MotionStage } from '../tools/packages/thing-core/src/schema.ts' */
+/** @import { Motion, MotionStage } from '../tools/packages/motion/src/motion.ts' */
 
+import { IDENTITY_RIGID, reflection, transformMotion } from '../tools/packages/motion/src/motion.ts';
 import { MIRRORED_AXIS } from './modelFrame.mjs';
 
 /** @typedef {readonly [number, number, number, number, number, number, number, number, number, number, number, number]} Pose */
@@ -106,15 +107,15 @@ function stageMotion(stage, fraction) {
 }
 
 /**
- * Where one motion (thing-core `Motion`) has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
+ * Where one motion has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
  * motion. Stages run in turn through their shares of the clock, and the first is the outermost, as `posePoint`. From
  * stage `first` on, the stages outside it are left out.
  * @param {Motion} motion
  * @param {number} clock
  */
-function stagesAt(motion, clock, first = 0) {
-  const fractions = motion.map((stage, i) => {
-    const start = motion.slice(0, i).reduce((sum, { share }) => sum + share, 0);
+function stagesAt({ stages }, clock, first = 0) {
+  const fractions = stages.map((stage, i) => {
+    const start = stages.slice(0, i).reduce((sum, { share }) => sum + share, 0);
     return { stage, fraction: Math.min(1, Math.max(0, (clock - start) / stage.share)) };
   });
   return fractions
@@ -142,7 +143,7 @@ export const poseAt = (layers, clock, first = 0) =>
  */
 export const stowPlanesOf = (layers) =>
   layers.flatMap((motion, k) =>
-    motion.flatMap((stage, s) =>
+    motion.stages.flatMap((stage, s) =>
       stage.kind === 'slide' && stage.stow !== undefined
         ? [{ layers: layers.slice(k), first: s, direction: stage.direction, stow: stage.stow }]
         : [],
@@ -182,22 +183,8 @@ export function stowClips(layers, clock) {
 export function motionAtSite(motion, { at, mirror }, lateral) {
   if (lateral !== AUTHORED_LATERAL && lateral !== MODEL_LATERAL)
     throw new Error(`motionAtSite: lateral must be AUTHORED_LATERAL or MODEL_LATERAL, not ${lateral}`);
-  /** @type {(point: Vec3) => Vec3} */
-  const reflect = ([x, y, z]) => [lateral === 0 ? 0 - x : x, lateral === 1 ? 0 - y : y, lateral === 2 ? 0 - z : z];
-  /** @param {Vec3} point @returns {Vec3} */
-  const moved = (point) => [point[0] + at[0], point[1] + at[1], point[2] + at[2]];
-  /** @param {Vec3} a @param {Vec3} b */
-  const along = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  /** @param {Vec3} point */
-  const placed = (point) => moved(mirror ? reflect(point) : point);
-  return motion.map((stage) => {
-    if (stage.kind === 'slide') {
-      const direction = mirror ? reflect(stage.direction) : stage.direction;
-      return { ...stage, direction, ...(stage.stow === undefined ? {} : { stow: stage.stow + along(at, direction) }) };
-    }
-    const axis = { from: placed(stage.axis.from), to: placed(stage.axis.to) };
-    return { ...stage, axis, angle: mirror ? -stage.angle : stage.angle };
-  });
+  const across = /** @type {0 | 1 | 2} */ (lateral);
+  return transformMotion(motion, { ...(mirror ? reflection(across) : IDENTITY_RIGID), shift: at });
 }
 
 /**

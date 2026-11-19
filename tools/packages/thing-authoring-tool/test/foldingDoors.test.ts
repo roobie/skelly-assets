@@ -1,8 +1,7 @@
 import { resolve } from 'node:path';
 import { add, applyPoint, fromColumns, sub, type Transform, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { type Motion, posePoint } from '@skelly/motion/motion';
 import { toModelFrame } from '@skelly/thing-core/frame';
-import { posePoint } from '@skelly/thing-core/motion';
-import type { Motion } from '@skelly/thing-core/schema';
 import { expect, it } from 'vitest';
 import { evaluateJsonnet } from '../../../jsonnet/index.mjs';
 import { buildItem, itemMotion, loadCatalogue } from '../src/catalogue.ts';

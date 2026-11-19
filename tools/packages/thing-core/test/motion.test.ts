@@ -1,9 +1,20 @@
 import { dot, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  type Motion,
+  type MotionStage,
+  posePoint,
+  reflection,
+  type Stop,
+  transformMotion,
+} from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
-import { type AnalyticPiece, hingeSense, mirrorMotion, pinAxis, posePoint, TOWARD } from '../src/motion.ts';
-import type { Motion } from '../src/schema.ts';
+import { type AnalyticPiece, hingeSense, pinAxis, TOWARD } from '../src/motion.ts';
 
 const grain = 0.03125;
+const stops: readonly Stop[] = [
+  { name: 'rest', clock: 0 },
+  { name: 'open', clock: 1 },
+];
 const pin = (id: string, at: Vec3): AnalyticPiece => ({
   id,
   kind: 'turned',
@@ -44,7 +55,7 @@ describe('hinge sense', () => {
   it('takes the sense that swings the centre toward the hint', () => {
     for (const toward of ['near', 'far'] as const) {
       const opened = posePoint(
-        [{ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30, share: 1 }],
+        { stages: [{ kind: 'hinge', axis, angle: hingeSense(axis, centre, toward, grain) * 30, share: 1 }], stops },
         centre,
       );
       expect(dot(sub(opened, centre), TOWARD[toward]), toward).toBeGreaterThan(0);
@@ -58,11 +69,14 @@ describe('hinge sense', () => {
 
 describe('mirrored motion', () => {
   const reflect = ([x, y, z]: Vec3): Vec3 => [-x, y, z];
-  const door: Motion = [{ kind: 'hinge', axis: { from: [-0.9, 0.4, 1], to: [-0.9, 1.2, 1] }, angle: 65, share: 1 }];
+  const door: Motion = {
+    stages: [{ kind: 'hinge', axis: { from: [-0.9, 0.4, 1], to: [-0.9, 1.2, 1] }, angle: 65, share: 1 }],
+    stops,
+  };
   const leaf: Vec3 = [-0.9, 0.8, 0.2];
 
   it('poses the far twin at its stop where the reflection of the near part lies', () => {
-    const twin = posePoint(mirrorMotion(door), reflect(leaf));
+    const twin = posePoint(transformMotion(door, reflection(0)), reflect(leaf));
     reflect(posePoint(door, leaf)).forEach((value, axis) => expect(twin[axis]).toBeCloseTo(value, 12));
   });
 });
@@ -70,7 +84,8 @@ describe('mirrored motion', () => {
 describe('a staged motion', () => {
   const hinge = { kind: 'hinge', axis: { from: [-0.9, 0, 0.5], to: [-0.9, 1, 0.5] }, angle: 70, share: 0.4 } as const;
   const slide = { kind: 'slide', direction: [0, 0, -1], travel: 0.8, share: 0.6 } as const;
-  const staged: Motion = [hinge, slide];
+  const staged: Motion = { stages: [hinge, slide], stops };
+  const alone = (stage: MotionStage): Motion => ({ stages: [stage], stops });
   const leaf: Vec3 = [-0.9, 0.5, -0.4];
   const expectClose = (actual: Vec3, expected: Vec3) =>
     actual.forEach((value, axis) => expect(value).toBeCloseTo(expected[axis]!, 12));
@@ -80,11 +95,11 @@ describe('a staged motion', () => {
       { ...hinge, share: 1 },
       { ...slide, share: 1 },
     ];
-    expectClose(posePoint(staged, leaf, hinge.share / 2), posePoint([outer], leaf, 0.5));
-    expectClose(posePoint(staged, leaf, hinge.share), posePoint([outer], leaf));
+    expectClose(posePoint(staged, leaf, hinge.share / 2), posePoint(alone(outer), leaf, 0.5));
+    expectClose(posePoint(staged, leaf, hinge.share), posePoint(alone(outer), leaf));
     expectClose(
       posePoint(staged, leaf, hinge.share + slide.share / 2),
-      posePoint([outer], posePoint([inner], leaf, 0.5)),
+      posePoint(alone(outer), posePoint(alone(inner), leaf, 0.5)),
     );
   });
 });

@@ -1,7 +1,9 @@
-// How a part moves on its carrier, derived from the pins it is drawn with so the axis the game plays is the axis a
-// check proves; see docs/decisions/0015-motion-as-content.md.
+// What an authored vehicle part's motion is derived from: the pins it is drawn with, so the axis the game plays is the
+// axis a check proves; see docs/decisions/0015-motion-as-content.md. The motion itself is `@skelly/motion`.
 import { add, cross, dot, length, normalize, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
-import type { HingeAxis, Motion, MotionStage } from './schema.ts';
+import type { HingeStage } from '@skelly/motion/motion';
+
+type HingeAxis = HingeStage['axis'];
 
 /**
  * Which way a part opens or slides, fixed in the model frame wherever the part is drawn or placed: near is the side
@@ -180,100 +182,4 @@ export const hingeSense = (axis: HingeAxis, centre: Vec3, toward: Toward, grain:
     throw new Error(`neither sense of the hinge carries the part's centre clearly ${toward}`);
   }
   return along > 0 ? 1 : -1;
-};
-
-const reflect = ([x, y, z]: readonly [number, number, number]): [number, number, number] => [-x, y, z];
-
-/** The motion of a far-side twin, which consumers place reflected across the model's x = 0 plane. */
-export const mirrorMotion = (motion: Motion): Motion =>
-  motion.map((stage) =>
-    stage.kind === 'hinge'
-      ? { ...stage, axis: { from: reflect(stage.axis.from), to: reflect(stage.axis.to) }, angle: -stage.angle }
-      : { ...stage, direction: reflect(stage.direction) },
-  ) as unknown as Motion;
-
-/** A stage as authored, before the build gives it its share of the clock. */
-export type StageMove = {
-  [Kind in MotionStage['kind']]: Omit<Extract<MotionStage, { kind: Kind }>, 'share'>;
-}[MotionStage['kind']];
-
-/** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
-const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
-  if (stage.kind === 'slide') {
-    return stage.travel;
-  }
-  const u = normalize(sub(stage.axis.to, stage.axis.from));
-  const radius = Math.max(...hull.map((point) => length(cross(u, sub(point, stage.axis.from)))));
-  return (Math.abs(stage.angle) * Math.PI * radius) / 180;
-};
-
-/**
- * The motion that runs `stages` in order, each through the share of the clock its distance is of theirs together, so
- * the part keeps one pace from rest to stop. `hull` is the corners of the part's rest bounds in the model frame.
- */
-export const shareStages = (stages: readonly StageMove[], hull: readonly Vec3[]): Motion => {
-  const distances = stages.map((stage) => stageDistance(stage, hull));
-  const total = distances.reduce((sum, distance) => sum + distance, 0);
-  if (!(total > 0)) {
-    throw new Error('the motion moves no point of the part, so it has no clock to share');
-  }
-  return stages.map((stage, i) => ({ ...stage, share: distances[i]! / total })) as unknown as Motion;
-};
-
-/** How far each stage has moved from rest to its stop at `clock`, from 0 to 1: a stage waits for the ones before it. */
-const stageFractions = (motion: Motion, clock: number): number[] => {
-  let start = 0;
-  return motion.map(({ share }) => {
-    const fraction = Math.min(1, Math.max(0, (clock - start) / share));
-    start += share;
-    return fraction;
-  });
-};
-
-/** Where one stage carries a point once it has moved `fraction` of the way from rest to its stop. */
-const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
-  if (stage.kind === 'slide') {
-    const step = stage.travel * fraction;
-    return [
-      point[0] + stage.direction[0] * step,
-      point[1] + stage.direction[1] * step,
-      point[2] + stage.direction[2] * step,
-    ];
-  }
-  const u = normalize(sub(stage.axis.to, stage.axis.from));
-  const r = sub(point, stage.axis.from);
-  const turn = (stage.angle * fraction * Math.PI) / 180;
-  const [c, s] = [Math.cos(turn), Math.sin(turn)];
-  // Rodrigues' rotation of the offset from the axis.
-  const across = cross(u, r);
-  const kept = dot(u, r) * (1 - c);
-  return [0, 1, 2].map((i) => stage.axis.from[i]! + r[i]! * c + across[i]! * s + u[i]! * kept) as unknown as Vec3;
-};
-
-/**
- * Whether a stowing slide hides a point of the part at `clock`: the point, carried by the stages inside the slide and
- * then by the slide itself, lies past the slide's `stow` plane, which stays where it is as the slide moves.
- */
-export const isStowed = (motion: Motion, point: Vec3, clock = 1): boolean => {
-  const fractions = stageFractions(motion, clock);
-  let at = point;
-  for (let i = motion.length - 1; i >= 0; i--) {
-    const stage = motion[i]!;
-    at = poseStage(stage, at, fractions[i]!);
-    if (stage.kind === 'slide' && stage.stow !== undefined && dot(at, stage.direction) > stage.stow) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. In time, the first stage runs first:
- * each runs linearly through its share of the clock once the stages before it have finished. In space, the first
- * stage is the outermost transform: every stage is given in the part's rest frame and carries the stages after it,
- * so a point is put through the last stage's transform first and the first stage's last.
- */
-export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => {
-  const fractions = stageFractions(motion, clock);
-  return motion.reduceRight((at, stage, i) => poseStage(stage, at, fractions[i]!), point);
 };

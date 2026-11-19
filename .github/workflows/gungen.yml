@@ -6,6 +6,7 @@ on:
     paths:
       - 'tools/packages/gun-authoring-tool/**'
       - 'tools/packages/construct/**'
+      - 'tools/packages/motion/**'
       - 'tools/packages/thing-core/**'
       - 'models/finishes.jsonnet'
       - 'models/guns/**'
@@ -29,6 +30,7 @@ on:
     paths:
       - 'tools/packages/gun-authoring-tool/**'
       - 'tools/packages/construct/**'
+      - 'tools/packages/motion/**'
       - 'tools/packages/thing-core/**'
       - 'models/finishes.jsonnet'
       - 'models/guns/**'

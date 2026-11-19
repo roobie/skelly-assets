@@ -48,12 +48,26 @@ describe('neutral model envelope', () => {
 
 describe('motion', () => {
   const slide = (share: number) => ({ kind: 'slide', direction: [0, 0, -1], travel: 0.5, share });
-  const withMotion = (motion: unknown) => safeParse(NeutralModelSchema, { ...model, motion }).success;
+  const stop = (name: string, clock: number) => ({ name, clock });
+  const restOpen = [stop('rest', 0), stop('open', 1)];
+  const withMotion = (stages: unknown, stops: unknown = restOpen) =>
+    safeParse(NeutralModelSchema, { ...model, motion: { stages, stops } }).success;
 
   it('holds each stage to a share above 0 and the shares to a sum of 1', () => {
     expect(withMotion([slide(0.25), slide(0.75)])).toBe(true);
     expect(withMotion([slide(0), slide(1)])).toBe(false);
     expect(withMotion([slide(0.25), slide(0.5)])).toBe(false);
+  });
+
+  it('requires stops, running from 0 to 1 in order, each named once', () => {
+    const stages = [slide(1)];
+    expect(safeParse(NeutralModelSchema, { ...model, motion: { stages } }).success).toBe(false);
+    expect(withMotion(stages, [stop('rest', 0), stop('half', 0.5), stop('open', 1)])).toBe(true);
+    expect(withMotion(stages, [stop('rest', 0)])).toBe(false);
+    expect(withMotion(stages, [stop('rest', 0.1), stop('open', 1)])).toBe(false);
+    expect(withMotion(stages, [stop('rest', 0), stop('open', 0.9)])).toBe(false);
+    expect(withMotion(stages, [stop('rest', 0), stop('half', 0.5), stop('back', 0.4), stop('open', 1)])).toBe(false);
+    expect(withMotion(stages, [stop('rest', 0), stop('rest', 1)])).toBe(false);
   });
 });
 
