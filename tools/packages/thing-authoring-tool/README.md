@@ -79,8 +79,8 @@ place: the camera is what the author has just set, and a reload would throw it a
 (`?item=`) for the cases a reload happens anyway. Only viewed rows are evaluated because compiling every twin costs
 seconds and rewrites the whole catalogue, while Jsonnet is lazy and one row costs about one evaluation. The page draws
 a row only from its own evaluation, and a failed one is shown beside the old drawing, so a model is never silently
-stale. A row's data is self-contained, so nothing else is evaluated with it. The list, the settings and the recipes'
-rows come from the twins made when the server started. A row no recipe exports yet is drawn too, since a row is
+stale. A row's data is self-contained, so nothing else is evaluated with it. The list of rows and the settings come
+from the twins made when the server started. A row no recipe exports yet is drawn too, since a row is
 authored before it is exported. See `vite.config.ts`, `server/evaluateRow.ts` and `src/main.ts`.
 
 Pack-owned recipes make consumption explicit rather than inferring targets from item

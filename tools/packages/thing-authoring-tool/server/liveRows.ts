@@ -1,11 +1,9 @@
 // Which rows the open pages view, and the evaluating of them: a viewed row is evaluated when it is first asked for and
 // again after every saved source, never two at once, and each page is told what its row evaluated to.
-import type { RowResult, RowView } from '../src/live.ts';
+import { type RowResult, type RowView, viewKey } from '../src/live.ts';
 
 // One save can touch several files, and an editor may write twice, so a burst evaluates once.
 const QUIET_MS = 150;
-
-const keyOf = ({ item, row }: RowView) => JSON.stringify([item, row]);
 
 export const liveRows = <Page>(
   evaluate: (view: RowView) => Promise<RowResult>,
@@ -25,7 +23,7 @@ export const liveRows = <Page>(
       for (const [key, view] of waiting) {
         waiting.delete(key);
         const result = await evaluate(view);
-        for (const [page, viewed] of views) if (keyOf(viewed) === key) deliver(page, view, result);
+        for (const [page, viewed] of views) if (viewKey(viewed) === key) deliver(page, view, result);
       }
     } finally {
       running = false;
@@ -33,7 +31,7 @@ export const liveRows = <Page>(
   };
 
   const want = (view: RowView) => {
-    waiting.set(keyOf(view), view);
+    waiting.set(viewKey(view), view);
     void run();
   };
 
