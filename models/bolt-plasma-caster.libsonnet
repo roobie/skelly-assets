@@ -12,6 +12,10 @@ local w = 0.07;  // half the receiver's width
 local top = 0.35;  // the receiver's top
 local coreY = 0.25;
 local muzzleX = 0.49;
+local emitterX = 0.40;  // the emitter's back
+// The rails' faces, out from the core's axis: inside the collars' reach, so the collars clamp them.
+local railInner = 0.06;
+local railOuter = 0.08;
 local cellBack = bolt.guard.front + 0.01;
 local cellFront = 0.15;
 // The energy cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
@@ -28,8 +32,13 @@ local cellPlan(half, x0, x1, cut) = [
     h.turned('collar-a', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.17, coreY, 0]) + { sides: 8 },
     h.turned('collar-b', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.25, coreY, 0]) + { sides: 8 },
     h.turned('collar-c', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.33, coreY, 0]) + { sides: 8 },
-    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [0.05, 0.09], [0.08, 0.09], [0.08, 0]], [0.40, coreY, 0]) + { sides: 8 },
+    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [0.05, 0.09], [0.08, 0.09], [0.08, 0]], [emitterX, coreY, 0]) + { sides: 8 },
     h.turned('lens', 'glow', 'x', [[0, 0], [0, 0.064], [muzzleX - 0.48, 0.06], [muzzleX - 0.48, 0]], [0.48, coreY, 0]) + { sides: 8 },
+  ] + [
+    // Rails above and below the coil tie the emitter to the receiver: each runs from inside the receiver's front,
+    // through the collars, into the emitter's cone, and the fins stand on the top one.
+    h.prism('rail-top', 'metal', 'x', bolt.bevel(coreY + railInner, coreY + railOuter, 0.015, 0.004), 0.13, emitterX + 0.03),
+    h.prism('rail-bottom', 'metal', 'x', bolt.bevel(coreY - railOuter, coreY - railInner, 0.015, 0.004), 0.13, emitterX + 0.03),
   ] + [
     // Cooling fins along the top of the coil.
     box('fin-%d' % i, 'metal', [0.21 + i * 0.08, 0.325, -0.02], [0.225 + i * 0.08, 0.37, 0.02])
