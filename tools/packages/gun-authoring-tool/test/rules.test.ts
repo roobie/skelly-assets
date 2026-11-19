@@ -1,9 +1,12 @@
 import { CORE_RULES } from '@skelly/construct/assembly/rules.ts';
-import type { Assembly, Domain } from '@skelly/construct/assembly/schema.ts';
+import type { Assembly, Domain, FeatureDisposition, PartFeature } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { CORE_RULE_IDS } from '@skelly/construct/foundation/issue.ts';
+import { FEATURE_VOXELS } from '@skelly/thing-export/featureFit.ts';
+import { SMOOTH, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
+import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { pistolBarrelCrown } from '../src/gun/rules.ts';
 import { loadFixture, scopedArDesign, variant } from './helpers.ts';
 
@@ -216,5 +219,87 @@ describe('rules', () => {
 describe('rule id registry', () => {
   it('CORE_RULE_IDS is the core rule ids plus structure', () => {
     expect([...CORE_RULE_IDS].sort()).toEqual([...CORE_RULES.map((r) => r.id), 'structure'].sort());
+  });
+});
+
+describe('min-feature', () => {
+  const { metresPerUnit } = gunDomain.units;
+  // Feature sizes in units, with room either side of each grain's minimum.
+  const gunMinimum = FEATURE_VOXELS * gunVoxel.grain;
+  const detailMinimum = FEATURE_VOXELS * gunVoxel.detailGrain;
+  const fitsGun = (gunMinimum * 1.5) / metresPerUnit;
+  const thinForGun = (gunMinimum * 0.5) / metresPerUnit;
+  const fitsDetailOnly = (detailMinimum * 1.5) / metresPerUnit;
+  const thinForDetail = (detailMinimum * 0.5) / metresPerUnit;
+
+  const withFeature = (feature: PartFeature, tags?: readonly string[]): Domain => {
+    const barrel = gunDomain.families.barrel!;
+    return {
+      ...gunDomain,
+      families: {
+        ...gunDomain.families,
+        barrel: {
+          ...barrel,
+          build: (p) => {
+            const def = barrel.build(p);
+            return { ...def, tags: [...(def.tags ?? []), ...(tags ?? [])], features: [feature] };
+          },
+        },
+      },
+    };
+  };
+  const minFeatureMessages = (domain: Domain) =>
+    validate(loadFixture('archetype-battle-rifle'), domain)
+      .issues.filter((i) => i.rule === 'min-feature')
+      .map((i) => i.message);
+
+  it('fails an undisposed feature under the minimum, naming its size and the grain', () => {
+    const messages = minFeatureMessages(withFeature({ name: 'rib', size: thinForGun }));
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(`"rib" is ${Number((thinForGun * metresPerUnit).toPrecision(3))} m`);
+    expect(messages[0]).toContain(`${FEATURE_VOXELS} voxels of the ${gunVoxel.grain} m grain (${gunMinimum} m)`);
+    expect(messages[0]).toContain('give it a disposition');
+  });
+
+  it('passes a feature that fits the grain', () => {
+    expect(minFeatureMessages(withFeature({ name: 'rib', size: fitsGun }))).toEqual([]);
+  });
+
+  it.each<FeatureDisposition>([{ kind: 'exaggerated', reason: 'reads from a distance' }, { kind: 'omitted' }])(
+    'passes a thin feature disposed as $kind',
+    (disposition) => {
+      expect(minFeatureMessages(withFeature({ name: 'rib', size: thinForGun, disposition }))).toEqual([]);
+    },
+  );
+
+  it('passes a thin detail feature on a part exported at the detail grain', () => {
+    const feature = { name: 'rib', size: fitsDetailOnly, disposition: { kind: 'detail' } } as const;
+    expect(minFeatureMessages(withFeature(feature, [VOXEL_DETAIL]))).toEqual([]);
+  });
+
+  it('fails a detail feature on a part not exported at the detail grain', () => {
+    const feature = { name: 'rib', size: fitsDetailOnly, disposition: { kind: 'detail' } } as const;
+    const messages = minFeatureMessages(withFeature(feature));
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(`exports at the ${gunVoxel.grain} m grain; tag the part ${VOXEL_DETAIL}`);
+  });
+
+  it('fails a detail feature the detail grain cannot carry either', () => {
+    const feature = { name: 'rib', size: thinForDetail, disposition: { kind: 'detail' } } as const;
+    const messages = minFeatureMessages(withFeature(feature, [VOXEL_DETAIL]));
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(`of the ${gunVoxel.detailGrain} m grain`);
+    expect(messages[0]).not.toContain('give it a disposition');
+  });
+
+  it('judges an undisposed feature at the grain the export gives the part', () => {
+    expect(minFeatureMessages(withFeature({ name: 'rib', size: fitsDetailOnly }, [VOXEL_DETAIL]))).toEqual([]);
+    const messages = minFeatureMessages(withFeature({ name: 'rib', size: thinForDetail }, [VOXEL_DETAIL]));
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(`of the ${gunVoxel.detailGrain} m grain`);
+  });
+
+  it('skips a part exported smooth', () => {
+    expect(minFeatureMessages(withFeature({ name: 'rib', size: thinForDetail }, [SMOOTH]))).toEqual([]);
   });
 });

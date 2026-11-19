@@ -10,8 +10,12 @@ describe('fixtures', () => {
   it('has a broken fixture for every core and gun rule', () => {
     const covered = new Set(fixtures.flatMap((f) => f.expect ?? []));
     // Revolver part-internal alignment predicates are covered by synthetic malformed Resolved values
-    // in revolverRules.test.ts; assembly JSON cannot alter their convex part geometry.
-    const revolverUnitRules = new Set([
+    // in revolverRules.test.ts; assembly JSON cannot alter their convex part geometry. No part family
+    // declares features yet and assembly JSON cannot, so rules.test.ts covers min-feature with a synthetic family.
+    // Temporary: once the arModular families declare features, a fixture that shrinks a feature through a param
+    // replaces this exclusion.
+    const unitTestedRules = new Set([
+      'min-feature',
       'revolver-top-chamber-bore',
       'revolver-cylinder-axis',
       'revolver-cylinder-gap',
@@ -21,7 +25,7 @@ describe('fixtures', () => {
     ]);
     const rules = [
       ...CORE_RULE_IDS.filter((r) => r !== 'structure'),
-      ...(gunDomain.rules ?? []).map((r) => r.id).filter((id) => !revolverUnitRules.has(id)),
+      ...(gunDomain.rules ?? []).map((r) => r.id).filter((id) => !unitTestedRules.has(id)),
     ];
     for (const rule of rules) {
       expect(covered).toContain(rule);
