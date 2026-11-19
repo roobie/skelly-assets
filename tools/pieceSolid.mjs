@@ -3,7 +3,7 @@
 // can be tested against each other by sampling the space their boxes share.
 /** @import { AxisIndex, Vec3 } from './packages/construct/src/foundation/math.ts' */
 /** @import { AnalyticPiece } from './packages/thing-core/src/motion.ts' */
-import { AXES, perAxis } from './packages/construct/src/foundation/math.ts';
+import { perAxis } from './packages/construct/src/foundation/math.ts';
 
 /** @typedef {{ readonly normal: Vec3; readonly offset: number }} CutPlane */
 /** @typedef {Extract<AnalyticPiece, { kind: 'prism' }> & { readonly clip?: readonly CutPlane[] | undefined }} CutPrism */
@@ -21,18 +21,24 @@ const ALONG = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] };
  */
 function outline(polygon, [u, v]) {
   let inside = false;
-  let nearest = Infinity;
+  let nearestSquared = Infinity;
   let previous = polygon.at(-1);
-  if (previous === undefined) return nearest;
+  if (previous === undefined) return nearestSquared;
   for (const next of polygon) {
-    const [[ax, ay], [bx, by]] = [previous, next];
+    const ax = previous[0];
+    const ay = previous[1];
+    const bx = next[0];
+    const by = next[1];
     if (ay > v !== by > v && u < ax + ((v - ay) / (by - ay)) * (bx - ax)) inside = !inside;
     const dx = bx - ax;
     const dy = by - ay;
     const t = dx || dy ? Math.max(0, Math.min(1, ((u - ax) * dx + (v - ay) * dy) / (dx * dx + dy * dy))) : 0;
-    nearest = Math.min(nearest, Math.hypot(u - ax - t * dx, v - ay - t * dy));
+    const ex = u - ax - t * dx;
+    const ey = v - ay - t * dy;
+    nearestSquared = Math.min(nearestSquared, ex * ex + ey * ey);
     previous = next;
   }
+  const nearest = Math.sqrt(nearestSquared);
   return inside ? -nearest : nearest;
 }
 
@@ -53,7 +59,15 @@ export function solid(piece) {
       box: true, // a box fills its bounds, so a reader may take them as the solid
       min: piece.min,
       max: piece.max,
-      distance: (p) => Math.max(...AXES.map((i) => Math.max(piece.min[i] - p[i], p[i] - piece.max[i]))),
+      distance: (p) =>
+        Math.max(
+          piece.min[0] - p[0],
+          p[0] - piece.max[0],
+          piece.min[1] - p[1],
+          p[1] - piece.max[1],
+          piece.min[2] - p[2],
+          p[2] - piece.max[2],
+        ),
     };
   }
   const [axis, u, v] = ALONG[piece.axis];
@@ -71,13 +85,11 @@ export function solid(piece) {
     return {
       min: placed(piece.start, uLow, vLow),
       max: placed(piece.end, uHigh, vHigh),
-      distance: (p) =>
-        Math.max(
-          outline(piece.profile, [p[u], p[v]]),
-          piece.start - p[axis],
-          p[axis] - piece.end,
-          ...cuts.map((cut) => cut(p)),
-        ),
+      distance: (p) => {
+        let distance = Math.max(outline(piece.profile, [p[u], p[v]]), piece.start - p[axis], p[axis] - piece.end);
+        for (const cut of cuts) distance = Math.max(distance, cut(p));
+        return distance;
+      },
     };
   }
   const o = piece.origin ?? [0, 0, 0];
