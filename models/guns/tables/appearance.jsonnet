@@ -21,7 +21,7 @@ local roles = {
   'carry-handle': ['metal', 0.75], 'handle-trunnion': ['metal', 0.75], 'handle-strut': ['metal', 0.75],
   'handle-bar': ['metal', 0.75], monopod: ['metal', 0.7], 'recoil-stock': ['furniture', 1],
   'heavy-receiver': ['metal', 1], 'heavy-lower': ['metal', 0.83], 'heavy-magazine': ['metal', 0.48],
-  'heavy-bolt-carrier': ['metal', 0.78],
+  'heavy-bolt-carrier': ['metal', 0.78], 'muzzle-device': ['metal', 0.55], 'receiver-extension': ['metal', 0.72],
 };
 local slots = [['metal', 'steel-parkerized'], ['furniture', 'polymer-black'], ['accent', 'rubber-black']];
 local slotMaterials = { [slot[0]]: slot[1] for slot in slots };
@@ -56,6 +56,7 @@ local familyHex = {
   'rail-peep-rear-sight': '363d47', 'shroud-front-sight': '363d47',
   'gas-block': '2f3238', 'gas-cylinder': '545a63',
   'muzzle-brake': '3b4149', 'barrel-shroud': '7a8088', bipod: '4a4f55', 'carry-handle': '5a6068', monopod: '4a4f55',
+  'muzzle-device': '3b4149', 'receiver-extension': '4d535b',
 };
 {
   finishSlots: [slot[0] for slot in slots],

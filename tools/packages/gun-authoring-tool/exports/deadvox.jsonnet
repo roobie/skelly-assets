@@ -35,8 +35,13 @@ local attachment(row) = {
 // A look for an attachment no row exports is a misspelt id, not an unused entry.
 local strays = std.setDiff(std.objectFields(looks), std.set([row.source for row in roster.attachments]));
 assert std.length(strays) == 0 : 'attachment looks with no export row: %s' % [strays];
-// Every catalogue item exports as its loose part, on the gun class so it matches the gun it is fitted to.
-local partItems = [entry for entry in (import 'models/guns/tables/catalogue.jsonnet').parts if std.objectHas(entry, 'params')];
+// Every titled catalogue item exports as its loose part, on the gun class so it matches the gun it is fitted to. An
+// untitled item belongs to a gun no roster row ships yet.
+local partItems = [
+  entry
+  for entry in (import 'models/guns/tables/catalogue.jsonnet').parts
+  if std.objectHas(entry, 'params') && std.objectHas(entry, 'title')
+];
 local partWeapon(id) =
   local classes = [roster.partWeapons[token] for token in std.split(id, '_') if std.objectHas(roster.partWeapons, token)];
   if std.length(classes) == 0 then null else classes[0];

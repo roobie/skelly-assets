@@ -6,6 +6,10 @@ local row(id, family, match, massKg) = { id: id, family: family, match: match, m
 local item(id, family, selector, params, massKg, profile) =
   row(id, family, { [key]: params[key] for key in selector }, massKg)
   + { params: params, finish: appearance.gun.profileFinishes[profile] };
+// A modular AR-15 item: its family is the AR-15 frame's family for that role, and its mass is the frame table's.
+local ar15Masses = (import 'ar15.jsonnet').masses;
+local ar15Item(id, role, params) =
+  item(id, 'ar15-' + role, std.objectFields(params), params, ar15Masses[id].kg, 'ar');
 {
   // Pose and placement never select a part or its mass; an item leaves them to the assembly instance.
   placementParams: ['pose', 'muzzleInsetRatio', 'chamberIndex', 'frontSightMuzzleInsetRatio'],
@@ -294,5 +298,17 @@ local item(id, family, selector, params, massKg, profile) =
     row('carry-bar', 'handle-bar', {}, 0.1),
     row('bipod', 'bipod', {}, 0.8),
     row('monopod', 'monopod', {}, 0.25),
+  ] + [
+    // The modular AR-15: each item's mass is sourced in the frame table. They carry no title until a roster gun ships
+    // them, so the exporter leaves them out.
+    ar15Item('ar15_lower', 'lower', {}),
+    ar15Item('ar15_upper_flattop', 'upper', {}),
+    ar15Item('ar15_barrel_16_mid', 'barrel', { length: '16-mid' }),
+    ar15Item('ar15_gas_block_low', 'gas-block', {}),
+    ar15Item('ar15_handguard_free_float', 'handguard', { length: '15' }),
+    ar15Item('ar15_flash_hider', 'flash-hider', {}),
+    ar15Item('ar15_tube_carbine', 'receiver-extension', {}),
+    ar15Item('ar15_stock_collapsible', 'stock', {}),
+    ar15Item('ar15_grip', 'grip', {}),
   ],
 }

@@ -61,6 +61,7 @@ import {
   AR_LOWER_PROPORTIONS,
 } from './arFrames.ts';
 import { AR_ACTION_LAYOUT, AR_ACTION_LAYOUTS, type ARActionLayout, arLayoutFor } from './arLayout.ts';
+import { AR_MODULAR_FAMILIES } from './arModular/index.ts';
 import { ATTACHMENT_FAMILIES } from './attachmentParts.ts';
 import {
   BOLT_MAGAZINE_WALL_U,
@@ -74,7 +75,8 @@ import {
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
-import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
+import { MAGAZINE_PROFILES, MAGAZINE_WELL, magazineProfileContent, STANAG30_BODY } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
@@ -274,8 +276,6 @@ const keepOut = (
 };
 /** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and any bolt-handle part. */
 const ACTION_ALLOWANCE = { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] } as const;
-/** Tag for parts the firing hand can hold (see rules.ts). */
-export const FIRING_GRIP = 'firing-grip';
 /** A front post built into another part, which a built-in rear sight's drawn line aims at; see `exportGlb.ts`. */
 export const BUILT_IN_FRONT_POST = 'front-sight-post';
 
@@ -317,9 +317,9 @@ const STANAG20_BODY_BOX_U = {
   width: snapMagazineDimension(STANAG20_SOURCED_WIDTH_MM),
 } as const;
 const STANAG30_CENTERLINE_LENGTH_U = snapMagazineDimension(190);
-const STANAG30_BODY_DEPTH_U = snapMagazineDimension(65);
-const STANAG30_BODY_WIDTH_U = STANAG20_BODY_BOX_U.width;
-const MAGAZINE_WELL_CLEARANCE = 0.25;
+const STANAG30_BODY_DEPTH_U = STANAG30_BODY.depthU;
+const STANAG30_BODY_WIDTH_U = STANAG30_BODY.widthU;
+const MAGAZINE_WELL_CLEARANCE = MAGAZINE_WELL.clearanceU;
 const wellSpan = (extent: number) => 2 * Math.ceil((extent / 2 + MAGAZINE_WELL_CLEARANCE) / GRID) * GRID;
 const boltWellOpening = (calibre: string | undefined) => {
   const section = boltMagazineSection(boltCartridge(calibre));
@@ -327,7 +327,7 @@ const boltWellOpening = (calibre: string | undefined) => {
 };
 const MAGAZINE_WELL_DEPTH = MAGAZINE_DEPTH + 2 * MAGAZINE_WELL_CLEARANCE;
 const MAGAZINE_WELL_WIDTH = MAGAZINE_WIDTH + 2 * MAGAZINE_WELL_CLEARANCE;
-const MAGAZINE_WELL_HEIGHT = 1;
+const MAGAZINE_WELL_HEIGHT = MAGAZINE_WELL.heightU;
 const MAGAZINE_WELL_CENTER_X = -7 + MAGAZINE_DEPTH / 2;
 const RECESSED_MAGAZINE_PORT_Y = 2;
 /** A magazine's section (front to back, side to side) by profile. */
@@ -5818,4 +5818,5 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   ...ATTACHMENT_FAMILIES,
   ...revolverFamilySet,
   ...ANTI_MATERIEL_FAMILIES,
+  ...AR_MODULAR_FAMILIES,
 };

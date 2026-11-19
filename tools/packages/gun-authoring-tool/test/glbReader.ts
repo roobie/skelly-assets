@@ -32,7 +32,14 @@ interface GltfPrimitive {
   attributes: { POSITION: number; NORMAL: number };
   indices: number;
   material: number;
-  extras?: { solid?: string; material?: string; slot?: string };
+  extras?: {
+    solid?: string;
+    solids?: string[];
+    mergeGroup?: string;
+    voxelGrain?: number;
+    material?: string;
+    slot?: string;
+  };
 }
 
 export interface ReadGlb {

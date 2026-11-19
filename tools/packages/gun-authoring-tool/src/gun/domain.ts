@@ -1,5 +1,6 @@
 import type { Domain } from '@skelly/construct/assembly/schema.ts';
 import { ANTI_MATERIEL_RULES } from './antiMateriel/index.ts';
+import { AR_MODULAR_RULES } from './arModular/index.ts';
 import { FAMILIES } from './parts.ts';
 import { revolverRules } from './revolver.ts';
 import {
@@ -51,5 +52,6 @@ export const gunDomain: Domain = {
     opticEyeRelief,
     ...revolverRules,
     ...ANTI_MATERIEL_RULES,
+    ...AR_MODULAR_RULES,
   ],
 };

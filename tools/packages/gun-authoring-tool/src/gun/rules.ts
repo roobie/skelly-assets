@@ -1,6 +1,13 @@
 // Gun-specific rules, added to the core rules through the domain.
 
-import type { PartDef, PortRef, Resolved, ResolvedConnection, Rule } from '@skelly/construct/assembly/schema.ts';
+import type {
+  PartDef,
+  PartFeature,
+  PortRef,
+  Resolved,
+  ResolvedConnection,
+  Rule,
+} from '@skelly/construct/assembly/schema.ts';
 import type { Issue } from '@skelly/construct/foundation/issue.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
@@ -25,13 +32,14 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { FEATURE_VOXELS, featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
-import { partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import { isSmoothPiece, partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { ACTION_ROLE_TAGS } from './actionRoles.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
 import gunVoxel from './gunVoxel.json' with { type: 'json' };
 import { mountCanAccept } from './mounts.ts';
 import { getOptic, opticRailContactSolids } from './optics.ts';
-import { FIRING_GRIP, G3_MAGAZINE_WELL_TILT, HANDGUARD_CLEARANCE, LOWER_LAYOUTS } from './parts.ts';
+import { G3_MAGAZINE_WELL_TILT, HANDGUARD_CLEARANCE, LOWER_LAYOUTS } from './parts.ts';
 import { cornerGuardRear, isTriggerBlade, TRIGGER_GUARD_REAR_TAGS } from './roundedTriggerGuard.ts';
 
 /**
@@ -985,11 +993,15 @@ export const feedMatch: Rule = {
 
 const gunGrains = recipeVoxel({ voxel: gunVoxel });
 
+/** Whether the solid is one of those named after the feature: its name alone, or its name and a dashed suffix. */
+const drawsFeature = ({ id }: Solid, { name }: PartFeature): boolean => id === name || id.startsWith(`${name}-`);
+
 /**
  * A part authored at real size may hold a feature the grain its export gives it cannot carry. Such a feature has to
  * say what becomes of it, or it is lost to the voxelization unannounced. A feature disposed as detail holds only on a
- * part the export already gives the detail grain, and only if it fits that grain. A part exported smooth is not
- * voxelized, so its features are not judged.
+ * part the export already gives the detail grain, and only if it fits that grain; a feature disposed as smooth, only if
+ * the part keeps smooth pieces named after it to draw it. A part exported smooth is not voxelized, so its features are
+ * not judged.
  */
 export const minFeature: Rule = {
   id: 'min-feature',
@@ -1008,6 +1020,18 @@ export const minFeature: Rule = {
           continue;
         }
         const label = `${part} feature "${feature.name}"`;
+        if (kind === 'smooth') {
+          if (
+            !(def.displaySolids ?? def.solids).some((solid) => isSmoothPiece(solid) && drawsFeature(solid, feature))
+          ) {
+            issues.push({
+              rule: 'min-feature',
+              message: `${label} is disposed as smooth but the part has no smooth piece named after it to draw it.`,
+              parts: [part],
+            });
+          }
+          continue;
+        }
         if (kind === 'detail' && grain !== gunGrains.voxelDetailGrain) {
           issues.push({
             rule: 'min-feature',

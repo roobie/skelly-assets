@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "template": "ar15-modular",
+  "platform": { "id": "ar", "sizeClass": "ar-15" },
+  "calibre": "5.56x45",
+  "assembly": {
+    "name": "ar15-carbine-free-float",
+    "description": "AR-15 carbine: flat-top upper, 16 inch mid-length barrel under a 15 inch free-float railed handguard, low-profile gas block, A2 flash hider, carbine receiver extension with a collapsible stock, 30-round magazine.",
+    "root": "lower",
+    "parts": {
+      "lower": { "item": "ar15_lower" },
+      "upper": { "item": "ar15_upper_flattop" },
+      "barrel": { "item": "ar15_barrel_16_mid" },
+      "gas-block": { "item": "ar15_gas_block_low" },
+      "handguard": { "item": "ar15_handguard_free_float" },
+      "flash-hider": { "item": "ar15_flash_hider" },
+      "receiver-extension": { "item": "ar15_tube_carbine" },
+      "stock": { "item": "ar15_stock_collapsible" },
+      "grip": { "item": "ar15_grip" },
+      "magazine": {
+        "family": "magazine",
+        "params": { "length": "L", "profile": "stanag-curved" },
+        "prefab": { "id": "stanag-30", "version": 1 }
+      }
+    },
+    "connections": [
+      { "from": "lower.ar-upper", "to": "upper.ar-upper" },
+      { "from": "lower.receiver-extension", "to": "receiver-extension.lower" },
+      { "from": "receiver-extension.stock", "to": "stock.front" },
+      { "from": "lower.grip", "to": "grip.top" },
+      { "from": "lower.magazine", "to": "magazine.top" },
+      { "from": "upper.barrel", "to": "barrel.rear" },
+      { "from": "upper.barrel-nut", "to": "handguard.barrel-nut" },
+      { "from": "barrel.gas-block", "to": "gas-block.barrel" },
+      { "from": "barrel.muzzle", "to": "flash-hider.base" }
+    ]
+  },
+  "locks": {
+    "params": {},
+    "optionalParts": []
+  },
+  "status": "published"
+}

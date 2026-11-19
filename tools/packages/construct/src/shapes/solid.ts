@@ -9,7 +9,7 @@ export interface Box {
   readonly half: Vec3;
 }
 
-/** Rendering-only hints ignored by collision and rule logic; omitted options retain the viewer's bevel and outline defaults. */
+/** How a solid is drawn, which collision ignores; omitted options retain the viewer's bevel and outline defaults. */
 export interface SolidDisplayHints {
   readonly bevel?: boolean;
   readonly outline?: boolean;
@@ -32,6 +32,22 @@ export interface SolidDisplayHints {
    * inside faces, but the smooth copy draws surfaces rather than cells, so there the fill only shows where it pokes out.
    */
   readonly voxelOnly?: boolean;
+  /**
+   * Keeps the solid's authored mesh in a voxelized export while the rest of its part is voxelized. A piece built into a
+   * bigger part and read by its exact outline, such as a trigger, loses that outline to any grain; splitting it into a
+   * part of its own would change what the part is.
+   */
+  readonly smooth?: SmoothPiece;
+}
+
+/** How a smooth piece meets the voxels of the part it is built into. */
+export interface SmoothPiece {
+  /**
+   * The outward normal, along one axis of the part frame, of the face the piece stands on the part by. The part's
+   * voxels snap to their grid, so a piece standing on the authored face would float by up to half a voxel; that face
+   * reaches a whole voxel into the part instead, where the voxels hide it.
+   */
+  readonly seat?: Vec3;
 }
 
 export interface SolidFinish {
