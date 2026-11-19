@@ -1,5 +1,5 @@
-// What the viewer draws, as one module so a change to the catalogue or to a recipe is one hot update: every recipe row
-// with its item, then the items no recipe exports yet, so a row under authoring can be seen before it has a recipe.
+// What the viewer lists, from the twins made when it started: every recipe row with its item, then the items no recipe
+// exports yet, so a row under authoring can be seen before it has a recipe. The dev server re-evaluates the viewed row.
 import { catalogue } from './content.ts';
 import { loadThingRecipeFiles } from './exports.ts';
 

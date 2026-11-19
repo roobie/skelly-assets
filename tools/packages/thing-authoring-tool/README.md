@@ -74,12 +74,14 @@ not a second model implementation. See `src/main.ts` and `tools/packages/tool-ui
 `buildLayers`. The page is `index.html`.
 
 Authoring a row is a loop of edit and look, so the dev server (`npm run dev`, which listens on the LAN so another
-machine's browser can watch) recompiles the twins when a Jsonnet source is saved and the page redraws the row in
+machine's browser can watch) evaluates the row a page views when a Jsonnet source is saved, and the page redraws it in
 place: the camera is what the author has just set, and a reload would throw it away. The row is in the address
-(`?item=`) for the cases a reload happens anyway. The verdict of the compile travels as data apart from the twins,
-since a failed compile writes no twin and the page would otherwise go on drawing the old model unannounced. A row no
-recipe exports yet is drawn too, since a row is authored before it is exported. See `vite.config.ts`,
-`server/liveSources.ts` and `src/main.ts`.
+(`?item=`) for the cases a reload happens anyway. Only viewed rows are evaluated because compiling every twin costs
+seconds and rewrites the whole catalogue, while Jsonnet is lazy and one row costs about one evaluation. The page draws
+a row only from its own evaluation, and a failed one is shown beside the old drawing, so a model is never silently
+stale. A row's data is self-contained, so nothing else is evaluated with it. The list, the settings and the recipes'
+rows come from the twins made when the server started. A row no recipe exports yet is drawn too, since a row is
+authored before it is exported. See `vite.config.ts`, `server/evaluateRow.ts` and `src/main.ts`.
 
 Pack-owned recipes make consumption explicit rather than inferring targets from item
 relationships. Shared validation and file writing prevent parallel formats. See

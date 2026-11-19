@@ -369,14 +369,23 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
     ...(part.smooth ? { tags: [SMOOTH] } : {}),
   };
 };
+const checkItem = (item: ToolItem, turnedSides: number | undefined) => {
+  for (const part of item.parts) {
+    buildPart(part, part.params, turnedSides);
+  }
+};
 export const loadCatalogue = (value: unknown): Catalogue => {
   const data = parse(CatalogueSchema, value);
   for (const item of data.items) {
-    for (const part of item.parts) {
-      buildPart(part, part.params, data.turnedSides);
-    }
+    checkItem(item, data.turnedSides);
   }
   return data;
+};
+/** One item as the catalogue would load it, for a driver that evaluates a row apart from its catalogue. */
+export const loadItem = (value: unknown, { turnedSides }: CatalogueSettings): ToolItem => {
+  const item = parse(ItemSchema, value);
+  checkItem(item, turnedSides);
+  return item;
 };
 export const itemPalette = ({ defaultMaterial }: Pick<CatalogueSettings, 'defaultMaterial'>): Palette => ({
   familyColors: {},

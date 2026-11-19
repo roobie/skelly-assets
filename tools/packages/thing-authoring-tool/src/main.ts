@@ -3,30 +3,26 @@ import { createPreview } from '@skelly/tool-ui/preview';
 import { buildLayers, disposeGroup } from '@skelly/tool-ui/scene';
 import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Group } from 'three';
-import { buildItem, itemPalette } from './catalogue.ts';
-import { exportItem } from './exports.ts';
-import { LIVE_EVENT, LIVE_READY, type LiveStatus } from './live.ts';
-import * as initial from './viewerContent.ts';
+import { buildItem, itemPalette, loadItem } from './catalogue.ts';
+import { exportItem, loadThingRecipeFiles } from './exports.ts';
+import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowResult, type RowView } from './live.ts';
+import { catalogue, type Entry, entries } from './viewerContent.ts';
 
 // The selected row is the page's address, so a reload or a shared link lands on the same row.
 const ITEM_PARAM = 'item';
 
 const select = document.querySelector<HTMLSelectElement>('#item')!;
 const preview = createPreview(document.querySelector<HTMLCanvasElement>('#view')!);
-let { catalogue, entries } = initial;
+const compileError = document.querySelector<HTMLPreElement>('#compile-error')!;
+const drawError = document.querySelector<HTMLPreElement>('#error')!;
 let drawn: Group | undefined;
+// The row the camera was last framed on: a redraw of that row leaves the camera where the author put it.
+let framed: string | undefined;
 
-const fill = (wanted: string | null) => {
-  select.replaceChildren(...entries.map(({ id, label }) => new Option(label, id)));
-  select.value = wanted ?? '';
-  if (select.selectedIndex < 0) select.selectedIndex = 0;
-};
+const message = (failure: unknown) => (failure instanceof Error ? failure.message : String(failure));
 
-// A redraw of the row already framed leaves the camera where the author put it.
-const show = (reframe: boolean) => {
-  const error = document.querySelector<HTMLPreElement>('#error')!;
+const draw = ({ id, item, row }: Entry) => {
   try {
-    const { item, row } = entries.find(({ id }) => id === select.value)!;
     const { report } = buildItem(item, catalogue);
     // Only a recipe says how the item is voxelled, so only a recipe row has an export to take the balance point from.
     const centre = row && exportItem(item, catalogue, recipeAsset(row), row.voxel).physical.centreOfMass;
@@ -49,34 +45,50 @@ const show = (reframe: boolean) => {
       disposeGroup(unused);
     }
     preview.scene.add(drawn);
-    if (reframe) preview.frame(drawn, centre);
-    error.hidden = true;
+    if (framed !== id) preview.frame(drawn, centre);
+    framed = id;
+    drawError.hidden = true;
   } catch (failure) {
-    error.textContent = failure instanceof Error ? failure.message : String(failure);
-    error.hidden = false;
+    drawError.textContent = message(failure);
+    drawError.hidden = false;
   }
 };
 
-fill(new URLSearchParams(location.search).get(ITEM_PARAM));
-select.addEventListener('change', () => {
-  history.replaceState(undefined, '', `?${new URLSearchParams({ [ITEM_PARAM]: select.value })}`);
-  show(true);
-});
-show(true);
+const selected = () => entries.find(({ id }) => id === select.value)!;
+const viewOf = ({ item, row }: Entry): RowView => ({ item: item.id, row: row?.id });
 
-if (import.meta.hot) {
-  // New content is a new module graph under this one, so the page stays and only the drawing is redone.
-  import.meta.hot.accept('./viewerContent.ts', (next) => {
-    if (!next) return;
-    const previous = select.value;
-    ({ catalogue, entries } = next);
-    fill(previous);
-    show(select.value !== previous);
-  });
-  const compileError = document.querySelector<HTMLPreElement>('#compile-error')!;
-  import.meta.hot.on(LIVE_EVENT, ({ error }: LiveStatus) => {
-    compileError.textContent = error ?? '';
-    compileError.hidden = error === undefined;
-  });
-  import.meta.hot.send(LIVE_READY);
-}
+// The entry as the server evaluated it, loaded the way the catalogue and the recipes load theirs.
+const evaluated = (entry: Entry, result: Exclude<RowResult, { error: string }>): Entry => {
+  const item = loadItem(result.item, catalogue);
+  const [row] = result.row === undefined ? [] : loadThingRecipeFiles([[result.row]], { ...catalogue, items: [item] });
+  return { id: entry.id, label: entry.label, item, ...(row ? { row } : {}) };
+};
+
+const open = () => {
+  const entry = selected();
+  history.replaceState(undefined, '', `?${new URLSearchParams({ [ITEM_PARAM]: entry.id })}`);
+  // Under the dev server the Jsonnet may have changed since the content was built, so the row is drawn only once the
+  // server has evaluated it; a built page has nothing newer.
+  if (import.meta.hot) import.meta.hot.send(LIVE_VIEW, viewOf(entry));
+  else draw(entry);
+};
+
+select.replaceChildren(...entries.map(({ id, label }) => new Option(label, id)));
+select.value = new URLSearchParams(location.search).get(ITEM_PARAM) ?? '';
+if (select.selectedIndex < 0) select.selectedIndex = 0;
+select.addEventListener('change', open);
+open();
+
+import.meta.hot?.on(LIVE_ROW, ({ view, result }: RowMessage) => {
+  const entry = selected();
+  if (JSON.stringify(view) !== JSON.stringify(viewOf(entry))) return;
+  try {
+    if ('error' in result) throw new Error(result.error);
+    const fresh = evaluated(entry, result);
+    compileError.hidden = true;
+    draw(fresh);
+  } catch (failure) {
+    compileError.textContent = message(failure);
+    compileError.hidden = false;
+  }
+});

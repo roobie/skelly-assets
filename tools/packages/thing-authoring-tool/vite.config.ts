@@ -1,47 +1,54 @@
 import { resolve, sep } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { Plugin } from 'vite';
+import type { Plugin, WebSocketClient } from 'vite';
 import { defineConfig } from 'vitest/config';
-import { LIVE_EVENT, LIVE_READY, type LiveStatus } from './src/live.ts';
+import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowView } from './src/live.ts';
 
 // Manual sweeps have no per-test timer; their complete export is intentionally exhaustive.
 const sweepTimeout = process.env.TAT_SWEEPS === '1' ? { testTimeout: 0 } : {};
 
 const tools = fileURLToPath(new URL('../..', import.meta.url));
-// By a computed URL, so the config's bundler leaves sources.mjs to Node, which it reads its files beside.
-const sourcesModule = (): Promise<typeof import('./server/liveSources.ts')> =>
-  import(pathToFileURL(resolve(import.meta.dirname, 'server/liveSources.ts')).href);
+// By computed URLs, so the config's bundler leaves the server's tools to Node, which they read their files beside.
+const serverModule = <Module>(name: string): Promise<Module> =>
+  import(pathToFileURL(resolve(import.meta.dirname, 'server', name)).href);
 
-// Every Jsonnet file a twin can import: the models, TAT's and the other packages' own, and the shared library.
+// Every Jsonnet file a row can import: the models, TAT's and the other packages' own, and the shared library.
 const sourceFolders = [resolve(tools, '..', 'models'), resolve(tools, 'packages'), resolve(tools, 'jsonnet')];
 
-// A saved Jsonnet source recompiles the twins, which vite then sees change and hot-updates; see src/main.ts.
-const liveSources = (): Plugin => ({
-  name: 'thing-live-sources',
+// The page draws the row it views from that row's own evaluated Jsonnet, so a saved source costs one row's evaluation
+// rather than the twins' whole compile; see server/liveRows.ts and src/main.ts.
+const liveRows = (): Plugin => ({
+  name: 'thing-live-rows',
   apply: 'serve',
-  configureServer({ config, watcher, ws }) {
-    let status: LiveStatus = {};
-    const queue = sourcesModule().then(({ liveSources: create }) =>
-      create((settled) => {
-        status = settled;
-        if (settled.error !== undefined) config.logger.error(`Jsonnet did not compile:\n${settled.error}`);
-        ws.send({ type: 'custom', event: LIVE_EVENT, data: status });
-      }),
-    );
+  async configureServer({ config, watcher, ws }) {
+    const [{ evaluateRow }, { liveRows: create }] = await Promise.all([
+      serverModule<typeof import('./server/evaluateRow.ts')>('evaluateRow.ts'),
+      serverModule<typeof import('./server/liveRows.ts')>('liveRows.ts'),
+    ]);
+    const rows = create<WebSocketClient>(evaluateRow, (page, view, result) => {
+      if ('error' in result) config.logger.error(`Jsonnet did not evaluate ${view.item}:\n${result.error}`);
+      page.send({ type: 'custom', event: LIVE_ROW, data: { view, result } satisfies RowMessage });
+    });
+    const known = new WeakSet<WebSocketClient>();
+    ws.on(LIVE_VIEW, (view: RowView, page) => {
+      if (!known.has(page)) {
+        known.add(page);
+        page.socket.once('close', () => rows.forget(page));
+      }
+      rows.view(page, view);
+    });
     watcher.add(sourceFolders);
     watcher.on('all', (_event, file) => {
       if (/\.(jsonnet|libsonnet)$/.test(file) && sourceFolders.some((folder) => file.startsWith(folder + sep)))
-        void queue.then(({ request }) => request());
+        rows.changed();
     });
-    // A tab opened or reloaded during a failure has missed its event.
-    ws.on(LIVE_READY, (_data, client) => client.send({ type: 'custom', event: LIVE_EVENT, data: status }));
   },
 });
 
 export default defineConfig({
   base: './',
-  plugins: [liveSources()],
+  plugins: [liveRows()],
   server: { fs: { allow: [fileURLToPath(new URL('../..', import.meta.url))] } },
   test: sweepTimeout,
 });
