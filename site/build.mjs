@@ -59,14 +59,22 @@ const walkSpeedOf = (clips) => {
   if (!(speed > 0)) throw new Error(`${clips}: no models/mobs.json row with a positive walk_speed`);
   return speed;
 };
-// Each model's sidecar, keyed by the model file it names, with the motion the sidecar declares for a part that moves.
+// Each model's sidecar, keyed by the model file it names, with the motion the sidecar declares for a part that moves and
+// the action of a gun, whose parts each carry a motion of their own.
 const sidecars = new Map(
   Object.entries(manifest.packs).flatMap(([pack, { files }]) =>
     files
       .filter((f) => f.endsWith('.model.json'))
       .map((f) => {
-        const { file, motion } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
-        return [`${pack}/${file}`, { sidecar: `${pack}/${f}`, ...(motion ? { motion } : {}) }];
+        const { file, motion, gun } = JSON.parse(readFileSync(join(built, pack, f), 'utf8'));
+        return [
+          `${pack}/${file}`,
+          {
+            sidecar: `${pack}/${f}`,
+            ...(motion ? { motion } : {}),
+            ...(gun?.action ? { action: gun.action } : {}),
+          },
+        ];
       }),
   ),
 );

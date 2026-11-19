@@ -5,13 +5,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { add, mat3ToQuat, mulMM, mulMV, quatToMat3, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
+import { add, mat3ToQuat, mulMM, mulMV, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
 import { compareNumbered } from './codeUnitOrder.mjs';
 import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
-import { glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
+import { poseAt } from './packages/motion/src/motion.ts';
 import { graspOf, handSocket, heldItems, heldWeapon } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -20,25 +20,11 @@ const POSES = 'models/poses';
 export const readPressCheck = (root = repo) =>
   JSON.parse(evaluateJsonnet(`import '${POSES}/press-check.libsonnet'`, root));
 
-/** How far each moving part of a GLB slides at the far end of its linear motion, in metres in the model's frame. */
-export function partStrokes(glb) {
-  const gltf = glbJson(glb);
-  const unit = gltf.nodes.find((node) => node.extras?.gungen)?.extras.gungen.metresPerUnit;
-  const strokes = {};
-  const walk = (index, turn) => {
-    const node = gltf.nodes[index];
-    const own = node.rotation ? mulMM(turn, quatToMat3(node.rotation)) : turn;
-    const motion = node.extras?.motion;
-    if (motion?.kind === 'linear')
-      strokes[node.name.split(':')[0]] = mulMV(
-        own,
-        sub(motion.rearmost, motion.rest).map((x) => x * unit),
-      );
-    for (const child of node.children ?? []) walk(child, own);
-  };
-  for (const index of gltf.scenes[gltf.scene ?? 0].nodes) walk(index, [1, 0, 0, 0, 1, 0, 0, 0, 1]);
-  return strokes;
-}
+/** How far each moving part of a gun slides at the end of its motion, in metres in the model's frame, keyed by part. */
+export const partStrokes = (entry) =>
+  Object.fromEntries(
+    Object.values(entry.gun.action.parts).map(({ node, motion }) => [node.split(':')[0], poseAt(motion, 1).shift]),
+  );
 
 /**
  * The press check as a clip of its pose files: each key a fixture and the seconds from the start at which the figure
@@ -125,10 +111,9 @@ if (import.meta.main) {
   const dressing = readDressing(repo);
   const rig = dollRig(readRigContent(repo), readDoll(built, manifest, dressing), dressing);
   const check = readPressCheck(repo);
-  const rifle = manifest.models.find((model) => model.id === check.rifle && model.path.endsWith('.glb'));
   const { meshOf, entryOf } = heldItems(built, manifest);
   const sockets = pressCheckSockets(check, heldWeapon(entryOf(check.rifle), meshOf(check.rifle)));
-  const poses = pressCheckPoses(rig, check, partStrokes(readFileSync(join(built, rifle.pack, rifle.path))), sockets);
+  const poses = pressCheckPoses(rig, check, partStrokes(entryOf(check.rifle)), sockets);
   for (const [name, file] of Object.entries(poses))
     writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} press-check poses -> ${POSES}`);

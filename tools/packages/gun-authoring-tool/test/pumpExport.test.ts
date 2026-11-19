@@ -8,6 +8,7 @@ import { expect, it } from 'vitest';
 import { parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { PUMP_ACTION_TRAVEL_U, PUMP_LOADING_PORT_X, PUMP_SHELL_LOADED_LENGTH_U } from '../src/gun/pumpShell.ts';
 import { tubeMagazineCapacity } from '../src/gun/tubeCapacity.ts';
@@ -41,7 +42,7 @@ it('exports a hand-only coupled 12-gauge action and an integral tube without box
   expect(action.roundsPerSimMinute).toBeUndefined();
   for (const part of Object.values(action.parts)) {
     expect(part.modes).toEqual(['hand']);
-    expect(part.strokeMetres).toBeCloseTo(PUMP_ACTION_TRAVEL_U * gunDomain.units.metresPerUnit, 6);
+    expect(slideOf(part.motion).travel).toBeCloseTo(PUMP_ACTION_TRAVEL_U * gunDomain.units.metresPerUnit, 6);
   }
   expect(action.ejectAt).toBeGreaterThan(0);
   expect(action.ejectAt).toBeLessThan(1);

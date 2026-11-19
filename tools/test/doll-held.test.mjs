@@ -29,7 +29,7 @@ import {
 import { dollTree, heldThings, repo, WEAR } from './doll-tree.mjs';
 
 // One garment dresses the doll, for the body a held gun must stand clear of.
-const { built, manifest, models, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
+const { built, manifest, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
 const { pressCheck, wields, guns, gunIds } = heldThings();
 const rest = restIn(WEAR);
 
@@ -59,11 +59,10 @@ const assertBorne = (name, depths) => {
   assert.ok(touch >= -TOUCH, `${name}: the gun stands ${(-touch * 1000).toFixed(0)} mm off the shoulder`);
 };
 
-const rifleEntry = models.find((model) => model.id === pressCheck.rifle);
 const pressPoses = pressCheckPoses(
   rig,
   pressCheck,
-  partStrokes(readFileSync(join(built, rifleEntry.pack, rifleEntry.path))),
+  partStrokes(thingOf(pressCheck.rifle)),
   pressCheckSockets(pressCheck, heldWeapon(thingOf(pressCheck.rifle), itemMesh(pressCheck.rifle))),
 );
 
