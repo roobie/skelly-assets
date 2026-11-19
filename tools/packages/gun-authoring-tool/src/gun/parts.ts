@@ -73,6 +73,7 @@ import {
 } from './boltCartridge.ts';
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
+import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
@@ -1932,6 +1933,7 @@ const receiver: PartFamily = {
         'tapered',
         'tapered-sawed',
         'ak-buttstock',
+        'fal-folding',
         'telescoping',
         'plank',
       ),
@@ -5591,6 +5593,7 @@ const stock: PartFamily = {
       'straight',
       'sporting',
       'ak-buttstock',
+      'fal-folding',
       'm4',
       'tapered',
       'tapered-sawed',
@@ -5625,6 +5628,16 @@ const stock: PartFamily = {
         ports: [port],
         keepOuts: [],
         axes: [cheekDatum],
+      };
+    }
+    if (params.style === 'fal-folding') {
+      return {
+        family: 'stock',
+        solids: falFoldingStockSolids(len),
+        ports: [port],
+        keepOuts: [],
+        axes: [cheekDatum],
+        motion: falFoldMotion(),
       };
     }
     if (params.style === 'ak-buttstock') {

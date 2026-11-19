@@ -37,7 +37,7 @@ Compare the loaded curated design, not a fresh random battle rifle: `models/guns
 
 ## Settled authoring scope
 
-The target replaces the legacy battle rifle as an authored design. Its stock, handguard, receiver and iron sights are authored for this gun, not drawn from a shared Para family; reuse is a later choice when another design needs it. Model working stock folding, including hinge, clearance and export, rather than a decorative static folding-stock outline. Include handguard slots, magazine ribs, carry handle, charging handle and sling loop with their proper part ownership. Keep the photo iron sights and support an optional optic as a real fitted attachment. Use clean dark metal and polymer: incidental tape and wear are not the target finish.
+The target replaces the legacy battle rifle as an authored design. Its stock, handguard, receiver and iron sights are authored for this gun, not drawn from a shared Para family; reuse is a later choice when another design needs it. Model working stock folding, including hinge, clearance and export, rather than a decorative static folding-stock outline. The `fal-folding` stock style is that hinge: it stands at `open` and turns half a turn to `folded` along the receiver's right side, so the stop sweep can certify both stops and the swing between them against the rest of the rifle, which a static outline cannot be. Include handguard slots, magazine ribs, carry handle, charging handle and sling loop with their proper part ownership. Keep the photo iron sights and support an optional optic as a real fitted attachment. Use clean dark metal and polymer: incidental tape and wear are not the target finish.
 
 ## Detail references and remaining limits
 
