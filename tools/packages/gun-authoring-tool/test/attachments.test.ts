@@ -729,16 +729,17 @@ describe('attachment parts and export metadata', () => {
     ).toBe(true);
   });
 
-  it('offers every fitted rail iron sight at its own mount, on the AR and the anti-materiel rifle', () => {
-    for (const name of ['archetype-ar', 'archetype-anti-materiel']) {
+  it.each(['archetype-ar', 'archetype-anti-materiel'])(
+    'offers every fitted rail iron sight of %s at its own mount',
+    (name) => {
       const { attachments, compatibility } = exported(design(name), `${name}_own_mount`).modelEntry.gun;
       const irons = attachments?.filter(({ kind, mount }) => kind === 'iron-sight' && mount === 'rail-top') ?? [];
-      expect(irons.length, name).toBeGreaterThan(0);
+      expect(irons.length).toBeGreaterThan(0);
       for (const iron of irons) {
-        expect(compatibility?.[iron.mountedAt], `${name} ${iron.id}`).toContain(iron.id);
+        expect(compatibility?.[iron.mountedAt], iron.id).toContain(iron.id);
       }
-    }
-  });
+    },
+  );
 
   it("ships the AR with a removable rear iron and offers a scope on the upper's rail in its place", () => {
     const {
