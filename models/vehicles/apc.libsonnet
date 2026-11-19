@@ -19,7 +19,9 @@ local louvre(i) = box('louvre_' + i, 'grille', [1.22 + i * 0.16, 2.44, 0.12], [1
 local rampPins = k.hingePins('ramp_pin', 'z', [s.rear - 0.22, 0.81, -s.rampPinZ], [s.rear - 0.22, 0.81, s.rampPinZ], 'steel');
 local hatch = k.hatch(s.hatch.radius, s.hatch.thickness, s.hatch.open);
 // The roof is open under the hatches and inside the turret ring, so the open turret hatch looks down into the hull.
-local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), k.ringHole(s.turretX, s.ring.inner)]
+// The cupola's ring is open as far as its hole, so its lid opens onto the hull below too.
+local cupolaHole = k.hatchHole(s.cupola.x, s.cupola.z, s.hatch.radius);
+local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), k.ringHole(s.turretX, s.ring.inner), cupolaHole]
                   + [k.hatchHole(s.squadHatch.x, z, s.hatch.radius) for z in [s.squadHatch.z, -s.squadHatch.z]];
 taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 1660, [
@@ -84,11 +86,10 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_turret_ring', 150, [
     k.turned('ring', 'steel', 'y', k.annulus(s.ring.inner, s.ring.outer, 0, s.ring.height)) + { sides: 24 },
   ], { steel: 'steel-parkerized' }) + { title: 'APC turret ring' },
-  k.compound('apc_cupola', 45, [
-    k.turned('ring', 'paint', 'y', k.disc(0.36, 0, 0.14)) + { sides: 12 },
-    k.turned('lid', 'paint', 'y', k.disc(0.3, 0.14, 0.2)) + { sides: 12 },
-    box('hinge', 'steel', [-0.3, 0.14, -0.1], [-0.24, 0.2, 0.1]),
-  ], paint + { steel: 'steel-parkerized' }) + { title: 'APC cupola' },
+  // Its lid is an `apc_hatch` of its own, placed on the ring, so it opens as the roof hatches do.
+  k.compound('apc_cupola', 20, [
+    k.turned('ring', 'paint', 'y', k.annulus(cupolaHole.radius, s.cupola.radius, 0, s.cupola.height)) + { sides: 12 },
+  ], paint) + { title: 'APC cupola' },
   k.compound('apc_hatch', 25, hatch.pieces, paint + { steel: 'steel-parkerized' }, motion=hatch.motion) + { title: 'APC hatch' },
   k.compound('apc_engine_deck', 180, [
     box('frame', 'paint', [1.15, s.roofTop, 0.05], [2.48, 2.44, 1.15]),
