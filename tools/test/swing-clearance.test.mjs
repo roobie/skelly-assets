@@ -3,9 +3,10 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
+import { evenClocks, IDENTITY, poseAt } from '../../site/motionPose.mjs';
 import { key } from '../siteOverlap.mjs';
 import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swingClearance.mjs';
-import { shapeOf, sweepBody } from '../swingSweep.mjs';
+import { shapeOf, sweepBody, sweepOpenPose } from '../swingSweep.mjs';
 
 const GRAIN = 0.03125;
 const stops = [
@@ -89,6 +90,56 @@ test('a plate that a faster part carries through a nearly still one is reported,
     tolerance: GRAIN / 4,
   });
   assert.ok(contacts.has('other'));
+});
+
+// The contact floor, and a press between it and the depth the deepest point shared by a pressed corner has, which is
+// 0.41 of the press, so a corner pressed this far is a contact only when the press itself is read.
+const FLOOR = GRAIN / 4;
+const PRESS = 1.5 * FLOOR;
+// A square bar 0.1 m across along z, centred on the z axis, and the pose that turns it 45° about that axis, pointing
+// a corner along +x out to `CORNER`.
+const bar = shapeOf(box('bar', [-0.05, -0.05, -0.1], [0.05, 0.05, 0.1]));
+const quarterTurn = [
+  { stages: [{ kind: 'hinge', axis: { from: [0, 0, -1], to: [0, 0, 1] }, angle: 45, share: 1 }], stops },
+];
+const CORNER = 0.05 * Math.SQRT2;
+// A block whose -x face stands `depth` short of the turned bar's corner.
+const wall = (depth) => shapeOf(box('wall', [CORNER - depth, -0.2, -0.2], [CORNER + 0.2, 0.2, 0.2]));
+/**
+ * The depth the all-open pose reads between a body of `a` posed by `poseA` and one of `b` posed by `poseB`, 0 when none.
+ */
+const openDepth = (a, poseA, b, poseB) => {
+  const body = (site, shape, pose) => ({ site, pose, shapes: [shape], planes: [] });
+  const bodies = [body('a', a, poseA), body('b', b, poseB)];
+  const found = sweepOpenPose({ bodies, step: FLOOR, tolerance: FLOOR, key });
+  return found.get(key('a', 'b'))?.depth ?? 0;
+};
+const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `read ${actual}, not ${expected}`);
+
+test('a square corner pressed into a face reads as deep as it is pressed, whichever of the two it belongs to', () => {
+  const turned = poseAt(quarterTurn, evenClocks(quarterTurn, 1));
+  near(openDepth(bar, turned, wall(PRESS), IDENTITY), PRESS);
+  near(openDepth(wall(PRESS), IDENTITY, bar, turned), PRESS);
+});
+
+test('a swing that drives a corner into a face is reported as deep as the corner goes', () => {
+  const { contacts } = sweepBody({
+    layers: quarterTurn,
+    movers: [{ site: 'bar', shape: bar }],
+    obstacles: [{ site: 'wall', shape: wall(PRESS) }],
+    step: FLOOR,
+    tolerance: FLOOR,
+  });
+  near(contacts.get('wall')?.depth ?? 0, PRESS);
+});
+
+test('a piece thinner than twice the contact floor is read as deep as it sinks, on its edge or its face', () => {
+  const stripe = shapeOf(box('stripe', [0, 0, -0.1], [0.01, 0.2, 0.1]));
+  const raised = (y) => [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, y, 0];
+  const above = shapeOf(box('above', [-0.1, 0.25, -0.2], [0.1, 0.4, 0.2]));
+  near(openDepth(stripe, raised(0.07), above, IDENTITY), 0.02);
+  const beside = shapeOf(box('beside', [0.02, 0, -0.2], [0.2, 0.2, 0.2]));
+  near(openDepth(stripe, [1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, 0], beside, IDENTITY), 0.01);
 });
 
 test('the ground stops a lid that opens downward into it', () => {
@@ -203,16 +254,16 @@ test('a vehicle of several moving bodies sweeps to its pinned result', () => {
     sites: {
       lid: { clear: 1, extent: { unit: '°', total: 90 }, contacts: [] },
       tip: {
-        clear: 0.5673723253286928,
+        clear: 0.5609853948371877,
         extent: null,
         contacts: [
-          { other: 'hatch', depth: 0.01171875, at: 0.5684368137439436, pieces: ['skin', 'skin'] },
-          { other: 'post', depth: 0.01171875, at: 0.9410077590817452, pieces: ['skin', 'post'] },
+          { other: 'hatch', depth: 0.015621334828128183, at: 0.5620498832524385, pieces: ['skin', 'pin_a'] },
+          { other: 'post', depth: 0.0499936306409291, at: 0.9346208285902409, pieces: ['skin', 'post'] },
         ],
       },
       hatch: { clear: 1, extent: { unit: '°', total: 120 }, contacts: [] },
     },
-    open: [{ sites: ['tip', 'hatch'], depth: 0.01171875, pieces: ['skin', 'skin'] }],
+    open: [{ sites: ['tip', 'hatch'], depth: 0.015465501606095944, pieces: ['skin', 'skin'] }],
   });
 });
 

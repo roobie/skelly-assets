@@ -161,13 +161,14 @@ test('a sheet shows one look, so a look with other options drops the rows drawn 
   );
 });
 
-test('an open look is a look of its own, so its rows never mix with the closed ones', () => {
-  assert.notEqual(lookName({ open: true }), lookName());
+test('a look at a stop is a look of its own, so its rows never mix with the rest ones or another stop', () => {
+  assert.notEqual(lookName({ stop: 'open' }), lookName());
+  assert.notEqual(lookName({ stop: 'open' }), lookName({ stop: 'notched' }));
 });
 
 test('a smooth look is a look of its own, so its rows never mix with the voxel ones', () => {
   assert.notEqual(lookName({ smooth: true }), lookName());
-  assert.notEqual(lookName({ smooth: true }), lookName({ open: true }));
+  assert.notEqual(lookName({ smooth: true }), lookName({ stop: 'open' }));
 });
 
 test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {

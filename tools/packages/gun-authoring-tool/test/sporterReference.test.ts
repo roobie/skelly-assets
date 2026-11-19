@@ -8,11 +8,11 @@ import { expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { boltCartridge } from '../src/gun/boltCartridge.ts';
-import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { internalMagazineLayout } from '../src/gun/internalMagazine.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
+import { sweepStops } from '../src/gun/stopSweep.ts';
 import { designText, expectWatertightMesh, type MutableAssembly } from './helpers.ts';
 
 const loaded = loadGunDesign(designText('hunting-rifle'));
@@ -117,7 +117,7 @@ it('fits the staggered stack through the stock aperture clear of the full bolt s
       [...withStack.defs].map(([id, def]) => [id, moving.has(id) || id === 'packed' ? def : { ...def, solids: [] }]),
     ),
   };
-  expect(sweepTurningAction(roundsOnly)).toEqual([]);
+  expect(sweepStops(roundsOnly)).toEqual([]);
 });
 
 const stock = FAMILIES.stock!.params;

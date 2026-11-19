@@ -18,8 +18,8 @@ import { MIRRORED_AXIS } from './modelFrame.mjs';
 /** @typedef {[number, number, number]} Point A point `apply` writes into. */
 /**
  * What a stowing slide hides: what it carries past `stow` along `direction`, read in the pose of `layers` from stage
- * `first` of the outermost.
- * @typedef {{ layers: readonly Motion[]; first: number; direction: Vec3; stow: number }} StowPlane
+ * `first` of the outermost, which is layer `from` of the body's.
+ * @typedef {{ layers: readonly Motion[]; from: number; first: number; direction: Vec3; stow: number }} StowPlane
  */
 
 /** @type {Pose} */
@@ -90,16 +90,34 @@ export const invert = (m) => [
 const poseOf = ({ rotation: [x, y, z], shift }) => [...x, ...y, ...z, ...shift];
 
 /**
- * Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
- * nested inside its carrier's and both run on the one clock. The outermost layer, the first, is the furthest carrier;
- * `first` leaves out its stages before that one.
+ * A clock for every layer, each its own, as a stop one layer names at a clock other than another layer's does.
+ * @typedef {readonly number[]} Clocks
+ */
+const layerClock = (/** @type {Clocks} */ clocks, /** @type {number} */ layer) => {
+  const clock = clocks[layer];
+  if (clock === undefined) throw new Error(`no clock for layer ${layer}: ${clocks.length} given`);
+  return clock;
+};
+
+/**
+ * The same `clock` for each of a body's `layers`.
  * @param {readonly Motion[]} layers
  * @param {number} clock
+ * @returns {Clocks}
+ */
+export const evenClocks = (layers, clock) => layers.map(() => clock);
+
+/**
+ * Where a body's `layers` have put it at `clocks`: its own motion first, then each carrier's, so a rider's motion is
+ * nested inside its carrier's. The outermost layer, the first, is the furthest carrier; `first` leaves out its stages
+ * before that one.
+ * @param {readonly Motion[]} layers
+ * @param {Clocks} clocks
  * @returns {Pose}
  */
-export const poseAt = (layers, clock, first = 0) =>
+export const poseAt = (layers, clocks, first = 0) =>
   layers.reduceRight(
-    (inner, motion, i) => compose(poseOf(motionPoseAt(motion, clock, i === 0 ? first : 0)), inner),
+    (inner, motion, i) => compose(poseOf(motionPoseAt(motion, layerClock(clocks, i), i === 0 ? first : 0)), inner),
     IDENTITY,
   );
 
@@ -114,21 +132,21 @@ export const stowPlanesOf = (layers) =>
   layers.flatMap((motion, k) =>
     motion.stages.flatMap((stage, s) =>
       stage.kind === 'slide' && stage.stow !== undefined
-        ? [{ layers: layers.slice(k), first: s, direction: stage.direction, stow: stage.stow }]
+        ? [{ layers: layers.slice(k), from: k, first: s, direction: stage.direction, stow: stage.stow }]
         : [],
     ),
   );
 
 /**
- * The planes that hide what a body's `layers` stow at `clock`, as { normal, constant } in the frame the body's pose
+ * The planes that hide what a body's `layers` stow at `clocks`, as { normal, constant } in the frame the body's pose
  * carries it into: a point `p` there is shown while `normal . p + constant >= 0`.
  * @param {readonly Motion[]} layers
- * @param {number} clock
+ * @param {Clocks} clocks
  */
-export function stowClips(layers, clock) {
-  const body = invert(poseAt(layers, clock));
-  return stowPlanesOf(layers).map(({ layers: outer, first, direction: [dx, dy, dz], stow }) => {
-    const m = compose(poseAt(outer, clock, first), body);
+export function stowClips(layers, clocks) {
+  const body = invert(poseAt(layers, clocks));
+  return stowPlanesOf(layers).map(({ layers: outer, from, first, direction: [dx, dy, dz], stow }) => {
+    const m = compose(poseAt(outer, clocks.slice(from), first), body);
     return {
       normal: [
         -(m[0] * dx + m[3] * dy + m[6] * dz),

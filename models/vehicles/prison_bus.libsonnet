@@ -12,10 +12,15 @@ local steps(span) = std.floor(span / b.pitch);
 local offsets(span) = [(i - steps(span) / 2) * b.pitch for i in std.range(0, steps(span))];
 local hole = s.rearHoles[0];
 local g = bus.layout(s);
-local doorSpan = g.fold(g.leaves[0]).span;
+local doorH = g.doorHeight - s.doorKick;
+// A panel's origin lies on its pins (`fold-door.libsonnet`). Bars proud of the jamb panel's pins cross the jamb as it
+// turns out, so they stop short of the pins by the pins' depth under the pillar's face: past the jamb, they lie outside
+// it.
+local jamb = g.leaves[0].jamb;
+local pinsUnderSkin = s.side - (g.doorZ + g.doorThick / 2);
+local doorSpan = std.sort([-jamb * pinsUnderSkin, -jamb * g.leafWidth / 2]);
 local doorW = doorSpan[1] - doorSpan[0];
 local doorMid = (doorSpan[0] + doorSpan[1]) / 2;
-local doorH = g.doorHeight - s.doorKick;
 local cage = s.bulkhead;
 taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', vehicle.title, s) + [
   // The rails overlap the pillars either side, so the grille is seated on the skin at its fitting's `at`.

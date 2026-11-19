@@ -1,7 +1,8 @@
 // A prison transport on the coach's body: the same 12.2 m high-floor chassis in plain paint, with no sign, no luggage
-// doors and white pillars, so each barred window stands alone in the side. The door is solid to shoulder height.
+// doors and white pillars, so each barred window stands alone in the side. The door is solid to shoulder height
+// and folds, unlike the coach's, so its bars can be fitted to each of its panels.
 local coach = import 'coach.spec.libsonnet';
-std.objectRemoveKey(coach, 'sign') + {
+std.objectRemoveKey(std.objectRemoveKey(coach, 'sign'), 'pivotDoor') + {
   paint: 'paint-white', band: 'paint-white', pillarFinish: 'paint-white',
   bumperFinish: 'paint-charcoal',
   stripes: [],

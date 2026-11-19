@@ -61,14 +61,19 @@ await refreshJsonnetTwins(sources, options);
 `;
 
 // A refresh whose `compiler`, of the compiler driver's functions, finds `file` saved as `text` just before it reads the
-// files, as an edit landing after the refresh keyed them would.
+// files, as an edit landing after the refresh keyed them would. The edit is saved once, before the first compile: the
+// compiles run concurrently, and saving again under a running one would hand it a truncated file.
 const REFRESH_EDITED_MIDWAY = `
 import { writeFileSync } from 'node:fs';
 import { mock } from 'node:test';
 const { compiler, file, text, sources, ...options } = JSON.parse(process.argv[1]);
 const real = await import(${moduleUrl('../jsonnet/index.mjs')});
+let saved = false;
 const editFirst = (...args) => {
-  writeFileSync(file, text);
+  if (!saved) {
+    writeFileSync(file, text);
+    saved = true;
+  }
   return real[compiler](...args);
 };
 mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, [compiler]: editFirst } });

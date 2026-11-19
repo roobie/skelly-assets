@@ -25,7 +25,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
-import { cycleLegs, playedMotion, type TimelineLeg } from './actionTimeline.ts';
+import { cycleLegs, type TimelineLeg } from './actionTimeline.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
 import {
@@ -227,7 +227,7 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
         node: part.node,
         modes: part.modes,
         ...handGripMetadata(part, metresPerUnit),
-        motion: fileMotion(playedMotion(part.motion, part.modes, cycle), part.placed, metresPerUnit),
+        motion: fileMotion(part.motion, part.placed, metresPerUnit),
       },
     ]),
   );

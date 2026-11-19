@@ -89,14 +89,29 @@ export type PartStage =
   | (Omit<Extract<StageMove, { readonly kind: 'slide' }>, 'travel'> & { readonly travel: number | KeepOutTravel });
 
 /**
+ * A named place on a part's clock, given as how far one stage has moved: in the stage's own measure, so a slide's
+ * offset is in the part's units whatever travel its keep-out turns out to give it, and a hinge's is in degrees.
+ */
+export interface PartStop {
+  readonly name: string;
+  /** The stage the stop lies on. */
+  readonly stage: number;
+  /** How far that stage has moved there, signed as the stage's own travel or angle; omitted, the stage's end. */
+  readonly at?: number;
+}
+
+/**
  * How a part moves, in its own frame and units, before the assembly has given every slide its travel. `resolve` turns
  * it into the part's `Motion`.
  */
 export interface PartMotion {
   /** The stages in the order they run; every stage is given in the part's rest frame and the first carries the rest. */
   readonly stages: readonly PartStage[];
-  /** Ends of stages that are named places on the clock besides rest and open: each names the stage it follows. */
-  readonly stops?: readonly { readonly name: string; readonly after: number }[];
+  /**
+   * The stops in the order the clock reaches them, the first at the rest (`at: 0` on the first stage) and the last at
+   * the end of the last stage. Omitted, they are `rest` and `open`.
+   */
+  readonly stops?: readonly PartStop[];
 }
 
 /**

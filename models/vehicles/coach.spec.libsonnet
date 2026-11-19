@@ -11,6 +11,9 @@
   wheelBrakes: 'disc',
   lean: 0.35, screens: [[1.34, 3.1]], screenPost: true, pillar: 0.1,
   doors: [{ bay: 0, width: 0.95 }], doorLeaves: 1, doorSteps: 4, doorSill: 0.35, doorKick: 0.3, doorFinish: 'plastic-black',
+  // A touring coach's door swings out on an arm and stands beside the doorway, out of the way of the steps. It ends
+  // aft of the doorway, because the mirror on its horn hangs forward of it.
+  pivotDoor: { reach: 0.5, open: 140, jamb: -1 },
   rearHoles: [{ y: [2.3, 3.05], z: 0.9 }], engineHatch: [0.55, 1.75],
   sign: { y: [3.12, 3.38], z: 0.7 },
   stripes: [
