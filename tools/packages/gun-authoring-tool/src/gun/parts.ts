@@ -107,6 +107,7 @@ import {
 } from './roundedTriggerGuard.ts';
 import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIONS } from './shotgunProportions.ts';
 import { shroudFrontSightSolids } from './shroudFrontSight.ts';
+import { sightAxis } from './sightAxis.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
 import {
   cutSporterAction,
@@ -1756,12 +1757,7 @@ const compactSmgReceiverDetails = (): Solid[] => {
 /** The drum's eye looks through its aperture along the bore, level with the front post's tip. */
 const compactSmgSightAxis = () => {
   const { aperture, eyeReliefU } = COMPACT_SMG_PROPORTIONS.rearSight;
-  return {
-    kind: 'sight' as const,
-    origin: [aperture.eyeX, aperture.centreY, 0] as Vec3,
-    dir: X,
-    referenceDistanceU: eyeReliefU,
-  };
+  return sightAxis('rear', { origin: [aperture.eyeX, aperture.centreY, 0], dir: X, referenceDistanceU: eyeReliefU });
 };
 
 const receiverSolids = (context: ReceiverContext): Solid[] => {
@@ -3963,7 +3959,7 @@ const frontSight: PartFamily = {
       solids,
       ports: [{ id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: X, up: Y, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -3989,7 +3985,7 @@ const muzzleBead: PartFamily = {
         },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, 1.25, 0], dir: X }],
+      axes: [sightAxis('front', { origin: [0, 1.25, 0], dir: X })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4038,7 +4034,7 @@ const sportingRearSight: PartFamily = {
       ports: [
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
-      axes: [{ kind: 'sight', origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 }],
+      axes: [sightAxis('rear', { origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
       keepOuts: [],
     };
@@ -4067,7 +4063,7 @@ const railFrontSight: PartFamily = {
       ],
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4084,7 +4080,9 @@ const railRearSight: PartFamily = {
       solids: railRearSightSolids(apertureU),
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }],
+      axes: [
+        sightAxis('rear', { origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }),
+      ],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4102,7 +4100,7 @@ const railPeepRearSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [
-        { kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U },
+        sightAxis('rear', { origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U }),
       ],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
@@ -4122,7 +4120,7 @@ const shroudFrontSight: PartFamily = {
         { id: 'base', mount: 'shroud-sight', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4230,7 +4228,7 @@ const akRearSight: PartFamily = {
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 }],
+      axes: [sightAxis('rear', { origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -5093,12 +5091,11 @@ const pistolSlide: PartFamily = {
           origin: [PISTOL_SLIDE_REAR + pistolAction.rackGripFromRearU, pistolAction.rackGripHeightU, -slideHalfWidth],
           dir: X,
         },
-        {
-          kind: 'sight',
+        sightAxis('rear', {
           origin: [PISTOL_SLIDE_REAR + PISTOL_IRON_SIGHT_LENGTH_U / 2, 3 + PISTOL_IRON_SIGHT_HEIGHT_U, 0],
           dir: X,
           referenceDistanceU: 4,
-        },
+        }),
       ],
       motion: {
         stages: [{ kind: 'slide', direction: NEG_X, travel: Math.ceil(mmToU(pistolAction.strokeMm) / GRID) * GRID }],
@@ -5779,7 +5776,7 @@ const sight: PartFamily = {
         { id: 'base', mount: optic.mount.kind, gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: optic.keepOuts,
-      axes: [{ kind: 'sight', origin: [0, optic.opticalAxisY, 0], dir: X }],
+      axes: [sightAxis('optic', { origin: [0, optic.opticalAxisY, 0], dir: X })],
       tags: [VOXEL_DETAIL],
     };
   },

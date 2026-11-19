@@ -70,8 +70,10 @@ export interface KeepOut {
 }
 
 /** A named axis on a part for domain-defined rules. */
-interface Axis {
+export interface Axis {
   readonly kind: string;
+  /** What the axis is to its domain among axes of the same kind, for rules that treat them differently. */
+  readonly role?: string;
   readonly origin: Vec3;
   readonly dir: Vec3;
   readonly referenceDistanceU?: number;

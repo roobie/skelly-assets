@@ -8,6 +8,7 @@ import appearanceContent from '../../../../../models/guns/tables/appearance.json
 import { toFileAxes } from './exportFrame.ts';
 import { MOUNT_STANDARDS, type MountKind } from './mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_TYPE_IDS, opticRailContactSolids } from './optics.ts';
+import { sightAxisOf } from './sightAxis.ts';
 import { ironEyeDistanceRangeMetres } from './sightView.ts';
 
 type AttachmentKind = 'optic' | 'iron-sight' | 'suppressor' | 'muzzle-device' | 'flashlight-mount' | 'foregrip';
@@ -295,7 +296,7 @@ const railIronSightMetadata = (
   metresPerUnit: number,
   part?: PartDef,
 ): AttachmentCoreMetadata => {
-  const axis = part?.axes.find(({ kind }) => kind === 'sight');
+  const axis = part && sightAxisOf(part);
   const span = railSpanNotches(part, 'rail-top');
   if (!part) {
     throw new Error(`${id} has no geometry for mass metadata`);
