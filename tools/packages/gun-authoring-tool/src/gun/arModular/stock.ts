@@ -23,7 +23,7 @@ export const arReceiverExtension = (frame: ArFrame): PartFamily => ({
     return {
       family: 'receiver-extension',
       solids: [
-        roundBar('tube', -length, 0, u(tube.radius)),
+        roundBar('tube', -length, 0, u(buffer.radius)),
         ...(buffer.castleNut
           ? [roundBar('castle-nut', -u(buffer.castleNut.length), 0, u(buffer.castleNut.radius))]
           : []),
@@ -54,6 +54,10 @@ export const arReceiverExtension = (frame: ArFrame): PartFamily => ({
     };
   },
 });
+
+/** The outside radius of the extension a stock slides onto, by the buffer that extension takes. */
+const tubeRadius = (frame: ArFrame, buffer: string): number =>
+  u(chosen(frame.table.receiverExtension.buffers, buffer).radius);
 
 /** The port a stock slides onto its extension by, at its frame: the end of the extension. */
 const stockPort = (buffer: string): PortDef => ({
@@ -94,7 +98,7 @@ const stockSleeve = (
 const collapsibleStock = (frame: ArFrame): PartDef => {
   const s = frame.table.stock;
   const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
-  const bore = u(frame.table.receiverExtension.radius) + u(s.tubeClearance);
+  const bore = tubeRadius(frame, s.buffer.choice) + u(s.tubeClearance);
   const toeHalf = u(s.toeHalfWidth);
   const sleeve = stockSleeve(frontX, bore, [bottomY, topY], half);
   return {
@@ -127,7 +131,7 @@ const a2Stock = (frame: ArFrame): PartDef => {
     u(s.toeY),
     u(s.halfWidth),
   ];
-  const bore = u(frame.table.receiverExtension.radius) + u(frame.table.stock.tubeClearance);
+  const bore = tubeRadius(frame, s.buffer.choice) + u(frame.table.stock.tubeClearance);
   const belly: Vec2[] = [
     [frontX, frontBottomY],
     [0, frontBottomY],

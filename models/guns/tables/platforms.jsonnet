@@ -14,7 +14,6 @@ local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bot
 local bufferFit = 'sourced: https://blog.primaryarms.com/guide/ar15-stock-does-not-fit-buffer-tube-troubleshooting/';
 // The bores a muzzle is cut for, so a rifle suppressor never certifies on a shotgun.
 local bores = { rifled: standard(), smoothbore: standard() };
-local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-mil-spec-buffer-tube.html');
 
 {
   // The job kinds a heavy part waits for, rather than going on in the slot UI.
@@ -26,16 +25,20 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
   mounts: {
     // A well is cut for one family of magazines, so a magazine that fits it by size alone is still refused.
     magazine: { swap: slot, standards: { 'ar15-magazine': standard() } },
-    // A stock slides on the receiver extension, so the extension's outside diameter defines its standard.
+    // A stock slides on the receiver extension, so the extension's outside diameter defines its standard; the carbine
+    // and rifle extensions are made to different diameters, so a stock fits only its own.
     stock: {
       swap: slot,
       standards: {
         'ar-tube-carbine': standard({
-          outerDiameter: tubeDiameter,
+          outerDiameter: dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-mil-spec-buffer-tube.html'),
           bufferLength: dim(82.55, bufferFit + ' (3.25 in)'),
         }),
         'ar-tube-rifle': standard({
-          outerDiameter: tubeDiameter,
+          outerDiameter: dim(
+            28.32,
+            'sourced: https://www.opticsplanet.com/questions/questions-guntec-usa-ar-15-a2-buffer-tube.html (1.115 in)'
+          ),
           bufferLength: dim(150.368, bufferFit + ' (5.92 in)'),
         }),
       },

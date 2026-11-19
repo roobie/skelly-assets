@@ -31,12 +31,14 @@ local grains = import 'models/voxel-grains.libsonnet';
 local detailFeature = grains.featureVoxels * grains.detailGrain * 1000;
 local detailWall(what) = dim(detailFeature, 'derived: ' + what + ' wall two detail voxels thick');
 local mounts = (import 'platforms.jsonnet').mounts;
-local tubeOuterDiameter = mounts.stock.standards['ar-tube-carbine'].dimensions.outerDiameter;
+// The outside radius of the extension that takes the named buffer, from its stock standard.
+local tubeRadiusOf(buffer) = mounts.stock.standards['ar-tube-' + buffer].dimensions.outerDiameter.mm / 2;
 local journalDiameter = mounts['gas-block'].standards['ar-journal-750'].dimensions.journalDiameter;
 // The flat-top front sight base stands 0.040 in taller than the carry-handle one, as the flat-top's rear sights stand
 // that much higher.
 local flatTopExtra = dim(1.016, 'sourced: 1.98 in against 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped');
-local tubeRadius = tubeOuterDiameter.mm / 2;
+// The tower is cut for the larger of the two extensions, since both thread into it.
+local tubeRadius = std.max(tubeRadiusOf('carbine'), tubeRadiusOf('rifle'));
 local towerWall = 3;
 
 // The parting line is built level at the mean of its traced ends, since the forging's parting line runs parallel to the
@@ -344,18 +346,21 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
   },
 
   receiverExtension: {
-    radius: dim(tubeRadius, 'derived: the ar-tube-carbine outer diameter'),
     // By the buffer each takes, the name its stock port standard ends in. The carbine extension is locked by a castle
     // nut ahead of the collapsible stock; the rifle extension is held by the fixed stock's screw, so it has none.
     buffers: {
       carbine: {
+        radius: dim(tubeRadiusOf('carbine'), 'derived: the ar-tube-carbine outer diameter'),
         length: tubeLengths.carbine,
         castleNut: {
           length: dim(xOf(370) - xOf(357), traced('castleNut')),
           radius: dim((yOf(86) - yOf(117)) / 2, traced('castleNut')),
         },
       },
-      rifle: { length: tubeLengths.rifle },
+      rifle: {
+        radius: dim(tubeRadiusOf('rifle'), 'derived: the ar-tube-rifle outer diameter'),
+        length: tubeLengths.rifle,
+      },
     },
   },
 
