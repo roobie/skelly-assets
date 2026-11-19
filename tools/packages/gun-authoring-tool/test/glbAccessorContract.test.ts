@@ -34,7 +34,7 @@ interface ExportCase {
 const cases: ExportCase[] = (Object.keys(FOLDERS) as Folder[]).flatMap((folder) =>
   jsonFiles(FOLDERS[folder], folder === 'designs')
     .sort()
-    .map((path) => {
+    .flatMap((path): ExportCase[] => {
       const key = `${folder}/${path}`;
       const file = basename(path);
       const text = readFileSync(join(FOLDERS[folder], path), 'utf8');
@@ -51,14 +51,20 @@ const cases: ExportCase[] = (Object.keys(FOLDERS) as Folder[]).flatMap((folder) 
         if (typeof parsed !== 'object' || parsed === null) {
           throw new Error(`${key}: expected fixture object`);
         }
-        const record = parsed as { assembly?: Assembly } & Assembly;
+        const record = parsed as { assembly?: Assembly; expect?: string[] } & Assembly;
+        // The export refuses a fixture broken in structure, so it has no geometry to probe.
+        if (record.expect?.includes('structure')) {
+          return [];
+        }
         assembly = record.assembly ?? record;
       }
-      return {
-        key,
-        id: basename(file, '.json').replaceAll('-', '_'),
-        assembly,
-      };
+      return [
+        {
+          key,
+          id: basename(file, '.json').replaceAll('-', '_'),
+          assembly,
+        },
+      ];
     }),
 );
 

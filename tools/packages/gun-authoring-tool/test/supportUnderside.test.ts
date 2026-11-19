@@ -11,15 +11,34 @@ import { itemsKept, loadDesigns, type MutableAssembly, partTriangles } from './h
 
 const ASSET = { id: 'support_underside_test', file: 'assets/models/support_underside_test.glb' };
 
+/** Whether every part but `without` still hangs on the root once `without` is gone. */
+const allHangWithout = (assembly: MutableAssembly, without: string): boolean => {
+  const partOf = (end: string) => end.split('.')[0]!;
+  const reached = new Set([assembly.root]);
+  for (let grew = true; grew; ) {
+    grew = false;
+    for (const { from, to } of assembly.connections) {
+      const [a, b] = [partOf(from), partOf(to)];
+      if (a === without || b === without || reached.has(a) === reached.has(b)) {
+        continue;
+      }
+      reached.add(reached.has(a) ? b : a);
+      grew = true;
+    }
+  }
+  return Object.keys(assembly.parts).every((id) => id === without || reached.has(id));
+};
+
 /**
- * A design without its sight-axis parts: this test reads the forend, and a sight line needs its own profile. The root
- * stays even when it carries the sight axis, as a receiver with a built-in rear sight does, since every part hangs on it.
+ * A design without its sight-axis parts: this test reads the forend, and a sight line needs its own profile. A part
+ * others hang on stays even when it carries the sight axis, as a receiver or carry-handle upper with a built-in rear
+ * sight does.
  */
 const sightless = (assembly: Parameters<typeof exportGunGlb>[0]): typeof assembly => {
   const copy = structuredClone(assembly) as MutableAssembly;
   const resolved = resolve(copy, gunDomain);
   for (const [id, def] of resolved.defs) {
-    if (id !== copy.root && def.axes.some(({ kind }) => kind === 'sight')) {
+    if (def.axes.some(({ kind }) => kind === 'sight') && allHangWithout(copy, id)) {
       delete copy.parts[id];
       copy.connections = copy.connections.filter(
         ({ from, to }) => !(from.startsWith(`${id}.`) || to.startsWith(`${id}.`)),

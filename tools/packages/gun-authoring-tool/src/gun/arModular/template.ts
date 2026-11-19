@@ -3,7 +3,7 @@ import { barrelGas } from './barrel.ts';
 import { type ArFrame, familyName } from './frame.ts';
 
 /** What one of a frame's templates says of the gun it builds. */
-export interface ArModularGun {
+interface ArModularGun {
   readonly description: string;
   readonly variant: string;
 }
