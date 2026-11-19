@@ -93,10 +93,10 @@ local carbine(id, massKg, magazine) =
     box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, 0.375, 0.02]),
     box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, 0.3755, 0.004]),
     box('front-post', 'metal', [0.33, 0.32, -0.007], [0.35, 0.36, 0.007]),
-    // Ejection port and a chunky charging lever on the right side.
+    // Ejection port on the right side, with a chunky charging lever standing out of the bolt at its back end.
     box('ejection', 'vent', [0.03, 0.25, w], [0.12, 0.29, w + 0.002]),
-    box('lever', 'metal', [-0.15, 0.27, w], [-0.11, 0.29, w + 0.03]),
-    box('lever-knob', 'metal', [-0.16, 0.263, w + 0.022], [-0.10, 0.297, w + 0.036]),
+    box('lever', 'metal', [0.03, 0.26, w], [0.07, 0.28, w + 0.03]),
+    box('lever-knob', 'metal', [0.02, 0.253, w + 0.022], [0.08, 0.287, w + 0.036]),
   ] + [
     box('rivet-%d-%s' % [p[0], s], 'trim', [p[1] - 0.007, p[2] - 0.007, if s == 'r' then w else -w - 0.003], [p[1] + 0.007, p[2] + 0.007, if s == 'r' then w + 0.003 else -w])
     for p in [[0, -0.15, 0.18], [1, -0.15, 0.30], [2, 0.14, 0.18], [3, 0.14, 0.30]]
