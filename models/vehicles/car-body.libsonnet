@@ -39,9 +39,9 @@ local pressings(id, title, s) = {
     local edgeTop(i) = profile[if onFoot(i + 1) then (i + n - 1) % n else (i + 1) % n];
     [if onFoot(i) then lift(profile[i], edgeTop(i)) else profile[i] for i in std.range(0, n - 1)],
   local roofHalf = s.glassOut - 0.09 - lean,
-  local hood(x) = s.hoodBack - (x - s.aPost) * s.hoodFall,
-  local nose = s.front - 0.075,
-  local bonnetThick = 0.0625,
+  local hood = shape.hood,
+  local nose = shape.nose,
+  local bonnetThick = shape.bonnetThick,
   // One whole grain under the bonnet top: voxelised level with it, the two tops fight along the nose.
   local noseShut = (std.round(hood(nose) / grain) - 1) * grain,
   local roofRear = s.tailWaist + s.dLean,

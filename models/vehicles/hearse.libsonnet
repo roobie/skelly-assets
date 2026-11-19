@@ -15,8 +15,10 @@ local panelIn = s.glassOut - 0.03;
 local panelOut = s.glassOut + 0.02;
 // The tailgate's rake, followed by every piece stacked on the tail.
 local rake(y) = s.tailWaist + s.dLean * (y - s.waist) / (s.roof - s.waist);
-local nose = s.front - 0.075;
-local hoodNose = s.hoodBack - (nose - s.aPost) * s.hoodFall;
+local hoodNose = shape.hood(shape.nose);
+local grilleTop = hoodNose + 0.02;
+// The grille stands clear of the bonnet's nose as it lifts.
+local grilleBack = shape.nose + shape.bonnetSweep(grilleTop);
 local vane = 0.0625;
 local pleat = 0.0625;
 // The drapes hang against the side glass's inner face (`car-body.libsonnet`, `paneZ`) and step in with it.
@@ -98,13 +100,13 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, std.filter(function(row)
     + hang('valance', 'cloth', [s.cWaist, deckFront], [windowTop - 0.1, windowTop], 0.04)
   ), { cloth: 'cloth-cream', fold: 'cloth-heather-grey' }) + { title: 'Hearse curtains' },
   k.compound('hearse_grille', 9, [
-    box('head', 'bright', [nose, hoodNose - 0.03, -0.42], [nose + 0.075, hoodNose + 0.02, 0.42]),
-    box('foot', 'bright', [nose, 0.53, -0.42], [nose + 0.075, 0.57, 0.42]),
-    box('backing', 'dark', [nose, 0.57, -0.38], [nose + 0.05, hoodNose - 0.03, 0.38]),
+    box('head', 'bright', [grilleBack, hoodNose - 0.03, -0.42], [grilleBack + 0.075, grilleTop, 0.42]),
+    box('foot', 'bright', [grilleBack, 0.53, -0.42], [grilleBack + 0.075, 0.57, 0.42]),
+    box('backing', 'dark', [grilleBack, 0.57, -0.38], [grilleBack + 0.05, hoodNose - 0.03, 0.38]),
   ] + k.bothSides([
-    box('cheek', 'bright', [nose, 0.53, 0.38], [nose + 0.075, hoodNose + 0.02, 0.42]),
+    box('cheek', 'bright', [grilleBack, 0.53, 0.38], [grilleBack + 0.075, grilleTop, 0.42]),
   ]) + [
-    box('vane_' + i, 'bright', [nose + 0.04, 0.57, -0.375 + 2 * i * vane], [nose + 0.07, hoodNose - 0.03, -0.375 + (2 * i + 1) * vane])
+    box('vane_' + i, 'bright', [grilleBack + 0.04, 0.57, -0.375 + 2 * i * vane], [grilleBack + 0.07, hoodNose - 0.03, -0.375 + (2 * i + 1) * vane])
     for i in std.range(0, 6)
   ], { bright: 'steel-bright', dark: 'plastic-black' }) + { title: 'Hearse grille' },
   // A load floor's cargo face is its highest point, so the slats and rollers finish level and the rails stand in their own part.

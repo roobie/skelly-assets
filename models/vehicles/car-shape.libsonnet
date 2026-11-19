@@ -101,6 +101,20 @@ function(s) {
       consoleTop: self.top + 0.1,
     },
 
+  // The bonnet's top at `x` along the car, its front face's line and its thickness.
+  hood(x): s.hoodBack - (x - s.aPost) * s.hoodFall,
+  nose: s.front - 0.075,
+  bonnetThick: 0.0625,
+  // The bonnet hinges on its top rear edge, above its nose, so its nose swings forward as it lifts, its lower front edge
+  // furthest. What stands ahead of the nose up to `top`, below the pins, must stand this far clear of it: how far that
+  // edge has passed the nose by the time it rises to `top`.
+  bonnetSweep(top):
+    local pins = [s.aPost, outer.hood(s.aPost)];
+    local reach = outer.nose - pins[0];
+    local drop = pins[1] - (outer.hood(outer.nose) - outer.bonnetThick);
+    assert top < pins[1] : 'the bonnet sweep is measured below its pins';
+    std.max(0, std.sqrt(reach * reach + drop * drop - std.pow(pins[1] - top, 2)) - reach),
+
   chamfer: std.get(s, 'archChamfer', std.round(s.arch * 0.5 / grain) * grain),
   local c = outer.chamfer,
   aftCorner(id, slot, axle, z, top=s.archTop):
