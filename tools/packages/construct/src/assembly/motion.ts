@@ -11,7 +11,7 @@ import {
 import { compose, length, type Transform, type Vec3 } from '../foundation/math.ts';
 import { boundsOfPoints, localSolidBounds } from '../shapes/geometry.ts';
 import type { Solid } from '../shapes/solid.ts';
-import type { KeepOutTravel, PartMotion } from './schema.ts';
+import type { KeepOutTravel, PartMotion, PartStop } from './schema.ts';
 
 /** A part's authored motion cannot form a motion; the message says why, for the structure report. */
 export class MotionError extends Error {}
@@ -38,7 +38,7 @@ const restHull = (solids: readonly Solid[]): Vec3[] => {
 
 /**
  * The motion a part's stages make once every slide has its travel: each stage's share of the clock is the distance it
- * carries the part's solids, and the clock's stops are rest, the named ends of stages, then open. `travelOf` gives the
+ * carries the part's solids, and the clock's stops lie where the part authors them along its stages. `travelOf` gives the
  * travel a keep-out source stands for along a direction, and throws a `MotionError` when it has none. Throws a
  * `MotionError` when the stages cannot form a motion.
  */
@@ -63,18 +63,35 @@ export const resolveMotion = (
   } catch (error) {
     throw new MotionError(error instanceof Error ? error.message : String(error));
   }
-  const ends = stages.map((_, i) => stages.slice(0, i + 1).reduce((clock, { share }) => clock + share, 0));
-  const named: Stop[] = (authored.stops ?? []).map(({ name, after }) => {
-    const clock = ends[after];
-    if (!(Number.isInteger(after) && after >= 0 && after < stages.length - 1 && clock !== undefined)) {
-      throw new MotionError(`stop "${name}" follows stage ${after}, which is not one before the last`);
-    }
-    return { name, clock };
-  });
-  const stops = [{ name: REST_STOP, clock: 0 }, ...named, { name: OPEN_STOP, clock: 1 }];
-  const error = stopsError(stops);
+  const stops = (authored.stops ?? defaultStops(stages.length)).map((stop) => resolveStop(stop, stages));
+  const error = stopsError(stops) ?? (stops[0]?.clock === 0 && stops.at(-1)?.clock === 1 ? undefined : endsError);
   if (error !== undefined) {
     throw new MotionError(error);
   }
   return { stages, stops };
+};
+
+const endsError = 'stops run from the rest to the end of the last stage';
+
+/** Every motion's stops unless it names its own: the rest, and open at the end of the last stage. */
+const defaultStops = (stageCount: number): PartStop[] => [
+  { name: REST_STOP, stage: 0, at: 0 },
+  { name: OPEN_STOP, stage: stageCount - 1 },
+];
+
+/** Where on the clock `stop` lies once the stages have their shares. */
+const resolveStop = ({ name, stage: index, at }: PartStop, stages: readonly MotionStage[]): Stop => {
+  const stage = stages[index];
+  if (stage === undefined) {
+    throw new MotionError(`stop "${name}" lies on stage ${index}, which the part does not have`);
+  }
+  const full = stage.kind === 'slide' ? stage.travel : stage.angle;
+  const fraction = at === undefined ? 1 : at / full;
+  if (!(fraction >= 0 && fraction <= 1)) {
+    throw new MotionError(`stop "${name}" lies ${at} into stage ${index}, which moves ${full}`);
+  }
+  const before = stages.slice(0, index).reduce((clock, { share }) => clock + share, 0);
+  // The last stage ends the clock exactly, whatever the shares sum to in floating point.
+  const clock = index === stages.length - 1 && fraction === 1 ? 1 : before + stage.share * fraction;
+  return { name, clock };
 };

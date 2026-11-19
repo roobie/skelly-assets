@@ -12,6 +12,7 @@ import {
   reflection,
   shareStages,
   stagePose,
+  stopClock,
   transformMotion,
   type Vec3,
 } from '../src/motion.ts';
@@ -138,5 +139,12 @@ describe('transformMotion', () => {
     const [mirrored, turned] = [reflection(0), turnedAboutY].map((rigid) => transformMotion(door(), rigid).stages[0]!);
     expect(mirrored).toMatchObject({ angle: -70 });
     expect(turned).toMatchObject({ angle: 70 });
+  });
+});
+
+describe('stopClock', () => {
+  it('gives the clock of a stop by its name and refuses a name the motion lacks', () => {
+    expect(stopClock(door(), 'open')).toBe(1);
+    expect(() => stopClock(door(), 'notched')).toThrow('"notched"');
   });
 });

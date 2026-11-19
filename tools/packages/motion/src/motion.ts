@@ -105,6 +105,15 @@ export const stopsError = (stops: readonly Stop[]): string | undefined => {
   return stops.some(({ clock }, i) => i > 0 && clock <= stops[i - 1]!.clock) ? 'clocks must increase' : undefined;
 };
 
+/** The clock of the stop `name` of `motion`, which has to have it. */
+export const stopClock = ({ stops }: Motion, name: string): number => {
+  const stop = stops.find((candidate) => candidate.name === name);
+  if (!stop) {
+    throw new Error(`the motion has no stop "${name}"; its stops are ${stops.map((s) => s.name).join(', ')}`);
+  }
+  return stop.clock;
+};
+
 /**
  * The stages that run `moves` in order, each through the share of the clock its distance is of theirs together, so the
  * part keeps one pace from rest to the end of travel. `hull` is the corners of the part's rest bounds.
