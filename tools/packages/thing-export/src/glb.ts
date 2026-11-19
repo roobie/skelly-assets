@@ -16,6 +16,7 @@ import {
   compose,
   invert,
   type Mat3,
+  normalize,
   scale,
   sub,
   type Transform,
@@ -393,7 +394,7 @@ interface PartExport {
   readonly id: string;
   readonly family: string;
   readonly appearance?: PartInstance['appearance'];
-  readonly def: PartDef;
+  readonly def: Omit<PartDef, 'motion'>;
   readonly motion?: Motion;
   readonly placed: Transform;
 }
@@ -437,7 +438,7 @@ const motionMetadata = ({ stages }: Motion) => {
       ? {
           turn: {
             pivot: hinge.axis.from,
-            axis: sub(hinge.axis.to, hinge.axis.from),
+            axis: normalize(sub(hinge.axis.to, hinge.axis.from)),
             angleRadians: (hinge.angle * Math.PI) / 180,
           },
         }

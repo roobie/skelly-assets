@@ -77,4 +77,10 @@ describe('turn-bolt part motion', () => {
       expect(clock).toBeCloseTo(unlocked, 9);
     },
   );
+
+  it('refuses a clock where a stage has moved before the one ahead of it finished', () => {
+    const { part } = boltParts[0]!;
+    expect(() => clockOf(part.motion, 0.5, 0.5)).toThrow('moved before');
+    expect(() => clockOf(part.motion, 0.5, 1)).not.toThrow();
+  });
 });

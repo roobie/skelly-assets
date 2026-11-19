@@ -22,7 +22,7 @@ import {
 } from '../foundation/math.ts';
 import { validateExtrudedPolygon } from '../shapes/geometry.ts';
 import { revolvedProfileError } from '../shapes/revolve.ts';
-import { resolveMotion } from './motion.ts';
+import { MotionError, resolveMotion } from './motion.ts';
 import type {
   Assembly,
   Domain,
@@ -119,7 +119,7 @@ const resolveMotions = (
         ? built.get(owner)?.keepOuts.find(({ id: keepOutId }) => keepOutId === source.keepOut)
         : undefined;
       if (!(connection && path)) {
-        throw new Error(`motion source ${source.port} → ${source.keepOut} is not connected`);
+        throw new MotionError(`motion source ${source.port} → ${source.keepOut} is not connected`);
       }
       const inOwner =
         connection.from.part === owner
@@ -130,7 +130,10 @@ const resolveMotions = (
     try {
       motions.set(id, resolveMotion(motion, travelOf, def.solids));
     } catch (error) {
-      structure(`Part "${id}" ${error instanceof Error ? error.message : String(error)}.`, [id]);
+      if (!(error instanceof MotionError)) {
+        throw error;
+      }
+      structure(`Part "${id}" ${error.message}.`, [id]);
     }
   }
   return { defs, motions };

@@ -240,7 +240,7 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
             ? {
                 turn: {
                   pivot: modelPoint(applyPoint(part.placed, hinge.axis.from), resolved.domain.units.metresPerUnit),
-                  axis: toFileAxes(applyDir(part.placed, sub(hinge.axis.to, hinge.axis.from))),
+                  axis: toFileAxes(applyDir(part.placed, normalize(sub(hinge.axis.to, hinge.axis.from)))),
                   angleRadians: (hinge.angle * Math.PI) / 180,
                 },
               }

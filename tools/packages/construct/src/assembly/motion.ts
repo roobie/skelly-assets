@@ -1,8 +1,20 @@
-import { type Motion, poseAt, type Rigid, type StageMove, type Stop, shareStages } from '@skelly/motion/motion';
+import {
+  type Motion,
+  type MotionStage,
+  poseAt,
+  type Rigid,
+  type StageMove,
+  type Stop,
+  shareStages,
+  stopsError,
+} from '@skelly/motion/motion';
 import { compose, length, type Transform, type Vec3 } from '../foundation/math.ts';
 import { boundsOfPoints, localSolidBounds } from '../shapes/geometry.ts';
 import type { Solid } from '../shapes/solid.ts';
 import type { KeepOutTravel, PartMotion } from './schema.ts';
+
+/** A part's authored motion cannot form a motion; the message says why, for the structure report. */
+export class MotionError extends Error {}
 
 /** The stop at the start of every motion's clock. */
 export const REST_STOP = 'rest';
@@ -27,8 +39,8 @@ const restHull = (solids: readonly Solid[]): Vec3[] => {
 /**
  * The motion a part's stages make once every slide has its travel: each stage's share of the clock is the distance it
  * carries the part's solids, and the clock's stops are rest, the named ends of stages, then open. `travelOf` gives the
- * travel a keep-out source stands for along a direction, and throws when it has none. Throws when the stages cannot
- * form a motion.
+ * travel a keep-out source stands for along a direction, and throws a `MotionError` when it has none. Throws a
+ * `MotionError` when the stages cannot form a motion.
  */
 export const resolveMotion = (
   authored: PartMotion,
@@ -40,26 +52,29 @@ export const resolveMotion = (
       return stage;
     }
     if (Math.abs(length(stage.direction) - 1) > 1e-9) {
-      throw new Error('a slide goes along a unit direction');
+      throw new MotionError('a slide goes along a unit direction');
     }
     const { travel } = stage;
     return { ...stage, travel: typeof travel === 'number' ? travel : travelOf(travel, stage.direction) };
   });
-  const stages = shareStages(moves, restHull(solids));
+  let stages: MotionStage[];
+  try {
+    stages = shareStages(moves, restHull(solids));
+  } catch (error) {
+    throw new MotionError(error instanceof Error ? error.message : String(error));
+  }
   const ends = stages.map((_, i) => stages.slice(0, i + 1).reduce((clock, { share }) => clock + share, 0));
   const named: Stop[] = (authored.stops ?? []).map(({ name, after }) => {
     const clock = ends[after];
     if (!(Number.isInteger(after) && after >= 0 && after < stages.length - 1 && clock !== undefined)) {
-      throw new Error(`stop "${name}" follows stage ${after}, which is not one before the last`);
+      throw new MotionError(`stop "${name}" follows stage ${after}, which is not one before the last`);
     }
     return { name, clock };
   });
   const stops = [{ name: REST_STOP, clock: 0 }, ...named, { name: OPEN_STOP, clock: 1 }];
-  if (new Set(stops.map(({ name }) => name)).size !== stops.length) {
-    throw new Error('two stops of one name');
-  }
-  if (stops.some(({ clock }, i) => i > 0 && clock <= stops[i - 1]!.clock)) {
-    throw new Error('stops follow the stages in order');
+  const error = stopsError(stops);
+  if (error !== undefined) {
+    throw new MotionError(error);
   }
   return { stages, stops };
 };

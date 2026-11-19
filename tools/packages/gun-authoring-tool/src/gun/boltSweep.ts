@@ -1,6 +1,6 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
-import { dot, length, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
   distanceWorld,
   localSolidBounds,
@@ -10,7 +10,7 @@ import {
   worldSolid,
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
-import type { MotionStage } from '@skelly/motion/motion';
+import { stageDistance } from '@skelly/motion/motion';
 import { resolveGunAction } from './actionDescription.ts';
 import { hingeOf } from './actionMotion.ts';
 
@@ -53,25 +53,10 @@ const clearsInterval = (
   );
 };
 
-/** How far the furthest point of a solid travels while `stage` runs: a slide's travel, a hinge's arc. */
-const stageSpeedBound = (stage: MotionStage, solid: Solid): number => {
-  if (stage.kind === 'slide') {
-    return stage.travel;
-  }
+/** The corners of the box `solid` fills at rest. */
+const restHull = (solid: Solid): Vec3[] => {
   const [min, max] = localSolidBounds(solid);
-  const axis = sub(stage.axis.to, stage.axis.from);
-  // Axial length does not contribute to turn speed, especially for the long rear bolt tail.
-  const radius = Math.max(
-    ...[min[0], max[0]].flatMap((x) =>
-      [min[1], max[1]].flatMap((y) =>
-        [min[2], max[2]].map((z) => {
-          const offset = sub([x, y, z] as Vec3, stage.axis.from);
-          return length(sub(offset, scale(axis, dot(offset, axis) / dot(axis, axis))));
-        }),
-      ),
-    ),
-  );
-  return radius * Math.abs((stage.angle * Math.PI) / 180);
+  return [min[0], max[0]].flatMap((x) => [min[1], max[1]].flatMap((y) => [min[2], max[2]].map((z): Vec3 => [x, y, z])));
 };
 
 /**
@@ -101,7 +86,7 @@ export const sweepTurningAction = (resolved: Resolved): readonly string[] => {
           at: cachedPoses((phase) =>
             worldSolid(motionTransform(part.placed, motion, from + phase * stage.share), solid),
           ),
-          speedBound: stageSpeedBound(stage, solid),
+          speedBound: stageDistance(stage, restHull(solid)),
         };
       });
       return obstacles
