@@ -7,10 +7,11 @@
 //
 // A point of the rifle is one its export names (`from`: one of its anchors, or `grip`), moved by `offset` in the
 // rifle's frame (its bore along +z, up +y, the port side -x), so a reshaped rifle carries the hands and eyes with it.
+// A point `on` one of the rifle's moving parts is the part's point at rest, carried wherever the frame's `moved` stands
+// the part, so a hand on a drawn handle or an open cover stays on it.
 // A frame's `carry` turns the rifle (degrees: pitch tips the bore down, roll turns it about the bore), `look` is the
 // rifle point the eyes turn to and `tilt` leans the head toward the figure's right. The left hand `hold`s a socket,
-// may `pinch` named rifle points (moved with the charging handle's draw) and, with `close: false`, rests there open
-// instead of gripping.
+// may `pinch` named rifle points and, with `close: false`, rests there open instead of gripping.
 // The pose page plays the frames as a clip in their names' numbered order, so a frame's number is its place in the check.
 //
 // A frame's `into` is the seconds the move into it takes from the frame before, and `hold` the seconds it stays before
@@ -32,15 +33,14 @@ local crease = { grip: sockets.support.grip, slant: sockets.support.slant };
 local support = { hold: crease { socket: 'support', beneath: true, pole: [0, -1, 0] }, hands: sockets.support.hands };
 // The thumb pad on the T's rear face left of the middle and the index pad on its left end, the palm beside and behind
 // the T; the other fingers close on the rifle by contact. The T's anchor is the middle of its rear face.
-local handle(offset) = { from: 'charging_handle', offset: offset };
-local pinch(drawn) = {
+local handle(offset) = { from: 'charging_handle', offset: offset, on: 'charging-handle' };
+local pinch = {
   hold: crease {
     socket: { at: handle([0.051, -0.02, 0.03]), into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
     pole: [0.483, -0.866, -0.129],
     pinch: { thumb: handle([0.009, 0, -0.005]), index: handle([0.0195, 0, 0.003]) },
   },
   hands: 'pinch',
-  drawn: drawn,
 };
 // Unsighted fire: the bore level ahead with the stock in the shoulder, the eyes over the rifle rather than on its
 // sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit; the
@@ -71,10 +71,10 @@ local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': 
   frames: {
     'press-1-fire': ready { hold: 0.3 },
     'press-2-turned': turned { left: support, into: 0.5 },
-    'press-3-handle': turned { left: pinch(0), into: 0.45 },
-    'press-4-retracted': turned + retracted { left: pinch(pull), into: 0.2 },
+    'press-3-handle': turned { left: pinch, into: 0.45 },
+    'press-4-retracted': turned + retracted { left: pinch, into: 0.2 },
     // The pose of the frame before, held while the eyes find the round in the chamber.
-    'press-5-inspect': turned + retracted { left: pinch(pull), into: 0.6 },
+    'press-5-inspect': turned + retracted { left: pinch, into: 0.6 },
     // The handle let go, the open hand beside the receiver's left side, palm toward it, not holding.
     'press-6-released': turned {
       into: 0.12,

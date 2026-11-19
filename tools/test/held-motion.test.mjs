@@ -6,13 +6,19 @@ import { Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { gunMovers, heldItem } from '../../site/heldMotion.mjs';
 import { poseAt } from '../packages/motion/src/motion.ts';
-import { partStrokes } from '../press-check.mjs';
 import { dollTree, heldThings, repo } from './doll-tree.mjs';
 
 // The pose page moves a held gun's parts by the motions its sidecar gives them, found through the nodes the glTF
 // loader hands back, whose names it has rewritten: a part must still find its motion there. An action part must slide
-// by the stroke the press check places the hand by (partStrokes), so the drawn carrier and handle meet the fingers; a
-// part moving outside the action, such as a hinged cover or the stock, has no stroke and stands where its motion says.
+// its whole stroke, its slide's direction times its travel, by the clock, as the press check's hand on the handle
+// follows it; a part moving outside the action, such as a hinged cover or the stock, stands where its motion says.
+const partStrokes = (entry) =>
+  Object.fromEntries(
+    Object.values(entry.gun.action.parts).map(({ node, motion }) => {
+      const { direction, travel } = motion.stages.find(({ kind }) => kind === 'slide');
+      return [node.split(':')[0], direction.map((x) => x * travel)];
+    }),
+  );
 const { built, manifest, thingOf } = dollTree({ held: true });
 const { pressCheck } = heldThings();
 const model = pressCheck.rifle;

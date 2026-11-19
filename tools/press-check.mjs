@@ -5,12 +5,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { gunMovers } from '../site/heldMotion.mjs';
 import { add, mat3ToQuat, mulMM, mulMV, rotX, rotY, rotZ, sub } from '../site/kinematics.mjs';
 import { compareNumbered } from './codeUnitOrder.mjs';
 import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
+import { posePoint } from './packages/motion/src/motion.ts';
 import { anchorPoint, graspOf, handSocket, heldItems, heldWeapon } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -19,14 +21,9 @@ const POSES = 'models/poses';
 export const readPressCheck = (root = repo) =>
   JSON.parse(evaluateJsonnet(`import '${POSES}/press-check.libsonnet'`, root));
 
-/** How far each moving part of a gun slides along its slide stage, in metres in the model's frame, keyed by part. */
-export const partStrokes = (entry) =>
-  Object.fromEntries(
-    Object.values(entry.gun.action.parts).map(({ node, motion }) => {
-      const { direction, travel } = motion.stages.find(({ kind }) => kind === 'slide');
-      return [node.split(':')[0], direction.map((x) => x * travel)];
-    }),
-  );
+/** Each part of a gun its sidecar moves, its motion keyed by the part. */
+export const partMotions = (entry) =>
+  Object.fromEntries(gunMovers(entry.gun).map(({ node, motion }) => [node.split(':')[0], motion]));
 
 /**
  * The press check as a clip of its pose files: each key a fixture and the seconds from the start at which the figure
@@ -54,16 +51,17 @@ export function pressCheckClip(check) {
 
 /**
  * The press check's pose files by name, for `rig`, from `check` (`readPressCheck`), the rifle as `heldWeapon` gives it
- * and its part strokes (`partStrokes`). Each rifle point the check names is read off the rifle's anchors; a frame's hold
- * naming a socket takes that one of the check's `sockets`.
+ * and the motions of its moving parts (`partMotions`). Each rifle point the check names is read off the rifle's
+ * anchors, and one `on` a moving part is carried by that part's motion as far as the frame's `moved` stands it; a
+ * frame's hold naming a socket takes that one of the check's `sockets`.
  */
-export function pressCheckPoses(rig, check, rifle, strokes) {
+export function pressCheckPoses(rig, check, rifle, motions) {
   const pocket = shoulderPoints(rig, check.stance)('hand.R', check.pocket);
-  const point = (named) => anchorPoint(rifle, named);
+  const restPoint = (named) => anchorPoint(rifle, named);
   const sockets = Object.fromEntries(
     Object.entries(check.sockets).map(([name, hand]) => [name, handSocket(rifle, hand)]),
   );
-  const butt = point(check.butt);
+  const butt = restPoint(check.butt);
 
   // The rifle turned by its carry, yaw then pitch then roll about its own bore, its butt pad in the pocket.
   const placed = ({ pitch, yaw, roll }) => {
@@ -73,6 +71,12 @@ export function pressCheckPoses(rig, check, rifle, strokes) {
   const inWorld = (place, p) => add(mulMV(place.turn, p), place.at);
 
   const poseOf = ({ carry, gripPole, look, tilt = 0, left, moved }) => {
+    const point = (named) => {
+      if (named.on === undefined) return restPoint(named);
+      const motion = motions[named.on];
+      if (!motion) throw new Error(`press check: ${check.rifle} has no moving ${named.on}`);
+      return posePoint(motion, restPoint(named), moved?.[named.on] ?? 0);
+    };
     const place = placed(carry);
     const held = { model: check.rifle, at: r4(place.at), turn: r4(mat3ToQuat(place.turn)) };
     const file = {
@@ -87,24 +91,17 @@ export function pressCheckPoses(rig, check, rifle, strokes) {
         ? sockets[left.hold.socket]
         : { ...left.hold.socket, at: point(left.hold.socket.at) };
     const unroll = beneath ? rotZ(-carry.roll) : rotZ(0);
-    const drawn = (p) =>
-      add(
-        p,
-        strokes['charging-handle'].map((x) => x * (left.drawn ?? 0)),
-      );
     file.hold['hand.L'] = {
       ...held,
       pole,
       socket: {
-        at: r4(drawn(mulMV(unroll, socket.at))),
+        at: r4(mulMV(unroll, socket.at)),
         into: r4(mulMV(unroll, socket.into)),
         axis: r4(mulMV(unroll, socket.axis)),
       },
       ...(grip !== undefined ? { grip } : {}),
       ...(slant !== undefined ? { slant } : {}),
-      ...(pinch
-        ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(drawn(point(p)))])) }
-        : {}),
+      ...(pinch ? { pinch: Object.fromEntries(Object.entries(pinch).map(([digit, p]) => [digit, r4(point(p))])) } : {}),
       ...(close === false ? { close } : {}),
     };
     if (moved) file.moved = { [check.rifle]: moved };
@@ -122,7 +119,7 @@ if (import.meta.main) {
   const check = readPressCheck(repo);
   const { meshOf, entryOf } = heldItems(built, manifest);
   const rifle = heldWeapon(entryOf(check.rifle), meshOf(check.rifle));
-  const poses = pressCheckPoses(rig, check, rifle, partStrokes(entryOf(check.rifle)));
+  const poses = pressCheckPoses(rig, check, rifle, partMotions(entryOf(check.rifle)));
   for (const [name, file] of Object.entries(poses))
     writeFileSync(join(repo, POSES, `${name}.json`), `${poseJson(file)}\n`);
   console.log(`${Object.keys(poses).length} press-check poses -> ${POSES}`);
