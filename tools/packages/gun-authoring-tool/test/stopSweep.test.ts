@@ -134,6 +134,32 @@ describe('the stop sweep', () => {
     ]);
   });
 
+  it('finds a blocker on the arc a hinge turns the solid through after a long slide', () => {
+    // The stages are given in the rest frame and the first is outermost, so the hinge turns the solid about the pivot as
+    // it rests, and the slide has carried the pivot with it: the arc's radius is the rest hull's, whatever the slide did.
+    const solid: BoxSolid = { id: 'p', kind: 'box', box: { center: [0.3, 0, 0], half: [0.05, 0.05, 0.05] } };
+    const motion = resolveMotion(
+      {
+        stages: [
+          { kind: 'slide', direction: [1, 0, 0], travel: 2 },
+          { kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 0, 1] }, angle: 90 },
+        ],
+      },
+      () => 0,
+      [solid],
+    );
+    const arc = Math.PI / 4;
+    const blocker: BoxSolid = {
+      id: 'blocker',
+      kind: 'box',
+      box: { center: [2 + 0.3 * Math.cos(arc), 0.3 * Math.sin(arc), 0], half: [0.01, 0.01, 0.01] },
+    };
+    const part = { id: 'p', placed: IDENTITY, solids: [solid], motion };
+    expect(sweepPartStops(part, [{ id: 'blocker', shape: worldSolid(IDENTITY, blocker) }])).toEqual([
+      'p.p vs blocker from rest to open',
+    ]);
+  });
+
   describe('the position allowance', () => {
     const slideThrough = (plate: BoxSolid, partHalf: number) => {
       const solid: BoxSolid = { id: 'p', kind: 'box', box: { center: [0, 0, 0], half: [partHalf, 0.5, 0.5] } };
