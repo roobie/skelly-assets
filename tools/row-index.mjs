@@ -68,12 +68,14 @@ export function rowIndex(dir) {
 
 // The catalogue's text: every row file's rows, folder by folder, each folder's files in name order. The model sources
 // the build installs are the rows of this list, each under its own id; models/export.json or a pack's recipe in
-// models/recipes/ selects which, and the rest, such as ground models, are built only on request.
+// models/recipes/ selects which, and the rest, such as ground models, are built only on request. The files are listed
+// one by one and not through their folder's index, whose object lists its fields by stem, since `worn-carry` sorts
+// after `worn` as a stem and before it as a file name, and the heads and the catalogue's row files follow the file's.
 export function catalogueIndex() {
-  const folders = ROW_DIRS.map(
-    (dir) => `std.flattenArrays(std.objectValues(import '${relative(repository, join(dir, INDEX))}'))`,
+  const files = ROW_DIRS.flatMap((dir) =>
+    rowFiles(dir).map((file) => `  import '${relative(repository, join(dir, file))}',`),
   );
-  return `${HEADER}${folders.join('\n+ ')}\n`;
+  return `${HEADER}std.flattenArrays([\n${files.join('\n')}\n])\n`;
 }
 
 // The heads text: the heads of each row file's rows under the file's root-relative path, which tools/sources.mjs
