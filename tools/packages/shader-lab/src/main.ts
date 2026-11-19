@@ -27,15 +27,15 @@ import { type Content, parseContent, pieceSurface } from './content.ts';
 import { kinds, onKindsUpdate } from './kinds.ts';
 import { byId, fillSelect, fillSliders } from './panel.ts';
 import { buildGround, buildPieces } from './pieces.ts';
-import { CONTENT_EVENT, CONTENT_PATH, type ContentMessage } from './protocol.ts';
+import { CONTENT_EVENT, CONTENT_FILE, type ContentMessage, SITE } from './protocol.ts';
 import { describe, type FailedShader, shaderErrors } from './shaderError.ts';
 import { type Lit, stages } from './stage.ts';
 import { SurfaceMaterials, type Worn } from './surfaceMaterials.ts';
 import { difference, jsonnet, jsonnetKey, nearestLook, slidersOf, valueAt, wearSnippet, withValue } from './tune.ts';
 
 // The page: a built model's voxel and smooth copies beside the test pieces, lit by a stage, seen through a camera, its
-// surfaces tunable live. Content arrives from the dev server and again on every edit of it; the surfaces package's code
-// arrives as hot updates through kinds.ts.
+// surfaces tunable live. Content arrives as the static build compiled it, or from the dev server and again on every
+// edit of it; under the dev server the surfaces package's code arrives as hot updates too, through kinds.ts.
 
 /** A models.json model, as far as the lab reads it. */
 interface Entry {
@@ -420,14 +420,14 @@ declare global {
 
 const start = async () => {
   const [catalogue, message] = await Promise.all([
-    fetch('models.json').then(async (response) => {
+    fetch(`${SITE}models.json`).then(async (response) => {
       if (!response.ok) throw new Error(await response.text());
       return response.json() as Promise<{ models: Entry[] }>;
     }),
-    fetch(CONTENT_PATH).then((response) => response.json() as Promise<ContentMessage>),
+    fetch(CONTENT_FILE).then((response) => response.json() as Promise<ContentMessage>),
   ]);
   if (!adopt(message)) throw new Error('the lab content did not load');
-  registerModels(catalogue.models);
+  registerModels(catalogue.models, SITE);
   entries = catalogue.models;
   cameras = new Cameras(camera, canvas, content.lab.camera);
   world.add(model, cameras.marker);
