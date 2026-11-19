@@ -4,12 +4,17 @@ import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint } from '@skelly/construct/foundation/math.ts';
 import { distanceWorld, localSolidBounds, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { AR15_FRAME, checkFrameTable, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { loadDesignAssembly } from './helpers.ts';
+import { exportGunGlb } from '../src/gun/exportGlb.ts';
+import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
+import { isTriggerBlade } from '../src/gun/roundedTriggerGuard.ts';
+import { readGlb } from './glbReader.ts';
+import { itemsKept, loadDesignAssembly, loadDesigns } from './helpers.ts';
 
 const FOLDER = join(import.meta.dirname, '../src/gun/arModular');
 const AR15 = AR15_FRAME.table;
@@ -92,5 +97,42 @@ describe('modular AR', () => {
     const towerFront = boundsOf('lower', 'tower')[1]!;
     const upperRear = boundsOf('upper', 'receiver-body')[0]!;
     expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
+  });
+
+  it('draws the trigger blade smooth inside the voxelized lower, not as its voxels', () => {
+    const { assembly, items } = loadDesigns().find(({ label }) => label === 'design ar15-carbine-free-float.json')!;
+    const result = exportGunGlb(
+      assembly,
+      { id: 'ar_trigger_test', file: 'assets/models/ar_trigger_test.glb' },
+      { appearanceProfile: 'ar' },
+      { ...recipeVoxel({ voxel: gunVoxel }), items: itemsKept(assembly, items) },
+    );
+    if (!result.ok) {
+      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+    }
+    const { json, floats } = readGlb(result.glb);
+    const lower = json.nodes.find(({ extras }) => extras?.part === 'lower')!;
+    const primitives = json.meshes[lower.mesh!]!.primitives;
+    const blade = resolve(assembly, gunDomain)
+      .defs.get('lower')!
+      .solids.filter(({ id }) => isTriggerBlade(id));
+    expect(blade.length).toBeGreaterThan(0);
+    const smooth = primitives.filter(({ extras }) => extras?.voxelGrain === undefined);
+    expect(smooth.map(({ extras }) => extras?.solids)).toEqual([blade.map(({ id }) => id)]);
+    const voxels = primitives.filter(({ extras }) => extras?.voxelGrain !== undefined);
+    expect(voxels.flatMap(({ extras }) => extras?.solids ?? []).filter(isTriggerBlade)).toEqual([]);
+    // Below the guard's top bar the blade hangs in the open guard, where no voxel may draw it.
+    const { metresPerUnit } = gunDomain.units;
+    const guardTop = u(AR15.lower.triggerGuard.topY) * metresPerUnit;
+    const corners = blade.map(localSolidBounds);
+    const low = [0, 1, 2].map((axis) => Math.min(...corners.map(([min]) => min[axis]!)) * metresPerUnit);
+    const high = [0, 1, 2].map((axis) => Math.max(...corners.map(([, max]) => max[axis]!)) * metresPerUnit);
+    const inBlade = (p: readonly number[]) =>
+      p[1]! < guardTop - 1e-6 && [0, 1, 2].every((axis) => p[axis]! > low[axis]! && p[axis]! < high[axis]!);
+    const voxelPoints = voxels.flatMap(({ attributes }) => {
+      const positions = floats(attributes.POSITION);
+      return Array.from({ length: positions.length / 3 }, (_, i) => [...positions.subarray(i * 3, i * 3 + 3)]);
+    });
+    expect(voxelPoints.filter(inBlade)).toEqual([]);
   });
 });

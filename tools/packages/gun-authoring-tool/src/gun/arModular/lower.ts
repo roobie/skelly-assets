@@ -105,7 +105,9 @@ const triggerGuard = (g: LowerTable['triggerGuard']): { readonly finger: KeepOut
 
 /**
  * The trigger blade swept along its midline from where it leaves the receiver to its tip, one convex segment per stretch
- * of the midline, so the curve the finger pulls on keeps its bow.
+ * of the midline, so the curve the finger pulls on keeps its bow. It is a smooth piece of the voxelized lower, since
+ * the eye reads a trigger by its outline, and its first segment stands on the guard's top bar. The segments are drawn
+ * as one mesh, so their joints show no seam.
  */
 const triggerBlade = (t: LowerTable['trigger']): Solid[] => {
   const midline = outlineU(t.midline);
@@ -133,7 +135,13 @@ const triggerBlade = (t: LowerTable['trigger']): Solid[] => {
     if (error) {
       throw new Error(`Trigger blade segment ${i}: ${error}`);
     }
-    return { id: `${TRIGGER_BLADE_ID}-${i}`, kind: 'extruded-polygon', profile, z: [-half, half] };
+    return {
+      id: `${TRIGGER_BLADE_ID}-${i}`,
+      kind: 'extruded-polygon',
+      profile,
+      z: [-half, half],
+      display: { mergeGroup: TRIGGER_BLADE_ID, smooth: i === 0 ? { seat: Y } : {} },
+    };
   });
 };
 
@@ -198,11 +206,7 @@ export const arLower = (frame: ArFrame): PartFamily => ({
       features: [
         { name: 'well-wall', size: u(L.well.wall), disposition: { kind: 'detail' } },
         { name: 'trigger-guard-bar', size: u(L.triggerGuard.bar), disposition: { kind: 'detail' } },
-        {
-          name: 'trigger-blade',
-          size: u(L.trigger.thickness),
-          disposition: { kind: 'exaggerated', reason: 'drawn two detail voxels thick, so the blade exports whole' },
-        },
+        { name: 'trigger-blade', size: u(L.trigger.thickness), disposition: { kind: 'smooth' } },
       ],
     };
   },

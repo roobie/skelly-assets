@@ -137,8 +137,11 @@ local stockMount = [tubeEndX, 0];
         ],
         'derived: the midline of the ar15-receiver/trigger trace at its rail-pitch scale, hung from the top of the ar15-profile/trigger trace',
       ),
-      // The forged blade is about 2 mm thick at its middle, under what the detail grain carries.
-      thickness: detailWall('trigger blade'),
+      // The blade is drawn smooth, so it keeps the thickness the close-up shows where it hangs nearly upright.
+      thickness: dim(
+        closeUpMmPerPx * (bladeFront[1][0] - bladeRear[1][0] + bladeFront[2][0] - bladeRear[2][0]) / 2,
+        "derived: the gap between the ar15-receiver/trigger trace's rear and front edges at its two middle levels, at its rail-pitch scale",
+      ),
       halfWidth: dim(3, 'derived: a blade narrower than the guard'),
     },
     gripMount: {
