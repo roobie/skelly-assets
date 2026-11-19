@@ -13,27 +13,35 @@ local top = 0.35;  // the receiver's top
 local coreY = 0.25;
 local muzzleX = 0.49;
 local emitterX = 0.40;  // the emitter's back
-// The rails' faces, out from the core's axis: inside the collars' reach, so the collars clamp them.
-local railInner = 0.06;
-local railOuter = 0.08;
+local emitterFlare = 0.05;  // how far the emitter's cone runs from its back before it reaches full width
+// The collars' radius: an eight-sided turned shape has its flats at that radius.
+local collarRadius = 0.08;
+local collar(id, x) = h.turned(id, 'metal', 'x', [[0, 0], [0, collarRadius], [0.03, collarRadius], [0.03, 0]], [x, coreY, 0]) + { sides: 8 };
+// The rails' faces, out from the core's axis: their outer faces sit inside the collars' flats, so the collars wrap
+// them. Each rail starts inside the receiver's front and ends where the emitter's cone has reached full width, so its
+// end is buried in the cone.
+local railOuter = collarRadius - 0.008;
+local railInner = railOuter - 0.02;
+local railStart = 0.13;
+local railEnd = emitterX + emitterFlare;
 [
   // A deeper receiver than the carbine's.
   bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(0.15, 0.14, top, w, { front: 0.14, top: 0.37, halfWidth: 0.045 }) + [
     // The coil: a glowing core with three collars round it, then the emitter cup and its lens.
     h.rod('core', 'glow', 0.045, 0.15, 0.47, coreY) + { sides: 16 },
-    h.turned('collar-a', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.17, coreY, 0]) + { sides: 8 },
-    h.turned('collar-b', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.25, coreY, 0]) + { sides: 8 },
-    h.turned('collar-c', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.33, coreY, 0]) + { sides: 8 },
-    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [0.05, 0.09], [0.08, 0.09], [0.08, 0]], [emitterX, coreY, 0]) + { sides: 8 },
+    collar('collar-a', 0.17),
+    collar('collar-b', 0.25),
+    collar('collar-c', 0.33),
+    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [emitterFlare, 0.09], [0.08, 0.09], [0.08, 0]], [emitterX, coreY, 0]) + { sides: 8 },
     h.turned('lens', 'glow', 'x', [[0, 0], [0, 0.064], [muzzleX - 0.48, 0.06], [muzzleX - 0.48, 0]], [0.48, coreY, 0]) + { sides: 8 },
   ] + [
     // Rails above and below the coil tie the emitter to the receiver: each runs from inside the receiver's front,
     // through the collars, into the emitter's cone, and the fins stand on the top one.
-    h.prism('rail-top', 'metal', 'x', bolt.bevel(coreY + railInner, coreY + railOuter, 0.015, 0.004), 0.13, emitterX + 0.03),
-    h.prism('rail-bottom', 'metal', 'x', bolt.bevel(coreY - railOuter, coreY - railInner, 0.015, 0.004), 0.13, emitterX + 0.03),
+    h.prism('rail-top', 'metal', 'x', bolt.bevel(coreY + railInner, coreY + railOuter, 0.015, 0.004), railStart, railEnd),
+    h.prism('rail-bottom', 'metal', 'x', bolt.bevel(coreY - railOuter, coreY - railInner, 0.015, 0.004), railStart, railEnd),
   ] + [
     // Cooling fins along the top of the coil.
-    box('fin-%d' % i, 'metal', [0.21 + i * 0.08, 0.325, -0.02], [0.225 + i * 0.08, 0.37, 0.02])
+    box('fin-%d' % i, 'metal', [0.21 + i * 0.08, coreY + railOuter, -0.02], [0.225 + i * 0.08, 0.37, 0.02])
     for i in [0, 1, 2]
   ]
   + bolt.cell(bolt.feedBack, 0.15, 0.15) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
