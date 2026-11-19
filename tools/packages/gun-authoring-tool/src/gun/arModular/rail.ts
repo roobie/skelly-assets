@@ -4,18 +4,23 @@ import { box, X, Y } from '../antiMateriel/common.ts';
 import { type ArFrameTable, u } from './frame.ts';
 
 /**
- * A Picatinny top rail of the frame's `rail` along x from `fromX` to `toX`, standing on `baseY` with its top at `topY`:
- * a spine with teeth between the cross slots. A rail no taller than its slots are deep is its teeth alone, standing on
- * what carries it. The slots are centred on the run, so its two end teeth share what is left over. Its port is the
- * sight rail every optic mounts on, one slot per cross slot. Its teeth and slots are carried by the detail grain, so
- * the part that carries the rail takes it.
+ * What a rail stands on: a spine of its own down to `spineBaseY` under its teeth, or its teeth alone, on a part whose top is
+ * cut to the slots' depth.
+ */
+type RailFoot = { readonly spineBaseY: number } | 'teeth-only';
+
+/**
+ * A Picatinny top rail of the frame's `rail` along x from `fromX` to `toX` with its top at `topY`: teeth between the
+ * cross slots, standing on `foot`. The slots are centred on the run, so its two end teeth share what is left over. Its
+ * port is the sight rail every optic mounts on, one slot per cross slot. Its teeth and slots are carried by the detail
+ * grain, so the part that carries the rail takes it.
  */
 export const picatinnyRail = (
   rail: ArFrameTable['rail'],
   fromX: number,
   toX: number,
-  baseY: number,
   topY: number,
+  foot: RailFoot,
 ): { readonly solids: Solid[]; readonly port: PortDef; readonly features: PartFeature[] } => {
   const pitch = u(rail.pitch);
   const slotWidth = u(rail.slotWidth);
@@ -29,11 +34,11 @@ export const picatinnyRail = (
   const toothRuns = [fromX, ...slotEdges.map(([, rear]) => rear)].map(
     (start, index) => [start, slotEdges[index]?.[0] ?? toX] as const,
   );
-  const teethY = Math.max(topY - u(rail.drawnSlotDepth), baseY);
+  const teethY = topY - u(rail.drawnSlotDepth);
   const detail = { kind: 'detail' } as const;
   return {
     solids: [
-      ...(teethY > baseY ? [box('rail', [fromX, baseY, -halfWidth], [toX, teethY, halfWidth])] : []),
+      ...(foot === 'teeth-only' ? [] : [box('rail', [fromX, foot.spineBaseY, -halfWidth], [toX, teethY, halfWidth])]),
       ...toothRuns.map(([start, end], index) =>
         box(`rail-tooth-${index}`, [start, teethY, -halfWidth], [end, topY, halfWidth]),
       ),

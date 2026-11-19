@@ -35,7 +35,7 @@ export const arHandguard = (frame: ArFrame): PartFamily => ({
     const H = frame.table.handguard;
     const length = u(chosen(H.lengths, params.length));
     const [wall, half, topY, bottomY] = [u(H.wall), u(H.halfWidth), u(H.outerTopY), u(H.bottomY)];
-    const rail = picatinnyRail(frame.table.rail, 0, length, topY, u(H.railTopY));
+    const rail = picatinnyRail(frame.table.rail, 0, length, u(H.railTopY), { spineBaseY: topY });
     const skirtHalf = u(H.skirtHalfWidth);
     return {
       family: 'handguard',

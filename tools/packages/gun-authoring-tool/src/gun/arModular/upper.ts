@@ -30,7 +30,7 @@ interface UpperTop {
 /** The flat-top: a full-length top rail for optics and rail sights. */
 const flatTop = (frame: ArFrame): UpperTop => {
   const { upper, rail: railTable } = frame.table;
-  const rail = picatinnyRail(railTable, u(upper.rail.rearX), 0, u(upper.topY), u(upper.rail.topY));
+  const rail = picatinnyRail(railTable, u(upper.rail.rearX), 0, u(upper.rail.topY), 'teeth-only');
   return { solids: rail.solids, ports: [rail.port], axes: [], features: rail.features };
 };
 

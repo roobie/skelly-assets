@@ -129,9 +129,10 @@ local railTopY = dim(
   + 'https://forum.308ar.com/topic/23364-advantage-of-various-upper-rail-heights/; the m16a4-side trace reads %.1f mm'
   % sideOverBore(side.railTopYPx.value),
 );
+local drawnSlotDepth = dim(detailFeature, 'derived: the slot depth exaggerated to two detail voxels, so every slot cuts evenly');
 // The flat-top's receiver rises to the rail, which is only its teeth: the upper carries the charging handle under it.
 local upperTopY = dim(
-  railTopY.mm - detailFeature,
+  railTopY.mm - drawnSlotDepth.mm,
   "derived: the rail's teeth standing on the receiver, its slots cut to the receiver's top; the m16a4-side trace's "
   + 'receiver top reads %.1f mm' % sideOverBore(side.receiverTopYPx.value),
 );
@@ -191,7 +192,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     pitch: dim(10.01, picatinny),
     slotWidth: dim(5.23, picatinny),
     slotDepth: dim(3.0, picatinny),
-    drawnSlotDepth: dim(detailFeature, 'derived: the slot depth exaggerated to two detail voxels, so every slot cuts evenly'),
+    drawnSlotDepth: drawnSlotDepth,
     topWidth: dim(21.21, 'sourced: https://www.shootingillustrated.com/content/is-your-rail-truly-mil-spec'),
   },
 
