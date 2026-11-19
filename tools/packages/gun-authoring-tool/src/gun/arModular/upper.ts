@@ -45,7 +45,8 @@ const handlePiece = (id: string, profile: readonly Vec2[], z: readonly [number, 
 
 /**
  * A handle piece that stands over the sight line, with the channel cut along its top that the eye looks down: whole
- * below the channel's floor, and above it a cheek either side of the channel.
+ * below the channel's floor, and above it a cheek either side of the channel. A piece wholly on one side of the floor
+ * has nothing on the other, so that side's clip would be empty and is left out.
  */
 const channelled = (
   id: string,
@@ -53,11 +54,18 @@ const channelled = (
   floorY: number,
   channelHalf: number,
   half: number,
-): Solid[] => [
-  handlePiece(id, profile, [-half, half], { normal: Y, offset: floorY }),
-  handlePiece(`${id}-right`, profile, [channelHalf, half], { normal: NEG_Y, offset: -floorY }),
-  handlePiece(`${id}-left`, profile, [-half, -channelHalf], { normal: NEG_Y, offset: -floorY }),
-];
+): Solid[] => {
+  const ys = profile.map(([, y]) => y);
+  return [
+    ...(Math.min(...ys) < floorY ? [handlePiece(id, profile, [-half, half], { normal: Y, offset: floorY })] : []),
+    ...(Math.max(...ys) > floorY
+      ? [
+          handlePiece(`${id}-right`, profile, [channelHalf, half], { normal: NEG_Y, offset: -floorY }),
+          handlePiece(`${id}-left`, profile, [-half, -channelHalf], { normal: NEG_Y, offset: -floorY }),
+        ]
+      : []),
+  ];
+};
 
 /**
  * The A2 carry handle forged on the receiver: the rear sight housing at its rear, with the aperture plate flipping
