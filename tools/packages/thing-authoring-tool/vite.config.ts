@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -46,9 +47,23 @@ const liveRows = (): Plugin => ({
   },
 });
 
+// The catalogue is tens of megabytes. Vite's JSON transform serves it with a source map holding all of it again, which
+// Firefox refuses to load; as one JSON.parse call it carries none.
+const catalogueModule = (): Plugin => ({
+  name: 'thing-catalogue-module',
+  apply: 'serve',
+  enforce: 'pre',
+  load(id) {
+    const file = id.split('?')[0]!;
+    if (!file.endsWith(`${sep}items.json`)) return null;
+    const json = JSON.stringify(JSON.stringify(JSON.parse(readFileSync(file, 'utf8'))));
+    return { code: `export default JSON.parse(${json});`, map: { mappings: '' }, moduleType: 'js' };
+  },
+});
+
 export default defineConfig({
   base: './',
-  plugins: [liveRows()],
+  plugins: [catalogueModule(), liveRows()],
   server: { fs: { allow: [fileURLToPath(new URL('../..', import.meta.url))] } },
   test: sweepTimeout,
 });
