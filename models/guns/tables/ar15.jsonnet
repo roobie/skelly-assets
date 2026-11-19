@@ -372,11 +372,11 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       rearFoot: sightBaseOutline([[3013, 1282], [3044, 1282], [3027, 1254], [3013, 1274.4]]),
       frontStrut: sightBaseOutline([[3163, 1282], [3176.65, 1282], [3167.65, 1162], [3159, 1162]]),
     },
-    // A straight tower over the middle of the ring, as on a clamp-on front sight gas block, the ears standing on its
-    // deck.
-    tower: {
+    // A straight sight block over the middle of the ring, as on a clamp-on front sight gas block, the ears standing on
+    // its deck.
+    sightBlock: {
       deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
-      length: dim(12, 'derived: a tower thinner than the ring'),
+      length: dim(12, 'derived: a block thinner than the ring'),
     },
   },
 
@@ -529,9 +529,9 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ar15_barrel_20_rifle: mass(0.992, 'sourced: 35 oz, https://www.midwestgunworks.com/page/mgwi/prod/babl556026m'),
     ar15_front_sight_base_flat_top: mass(0.147, 'sourced: 5.19 oz with its post and sling loop, ' + cmmgSightBase),
     ar15_front_sight_base_carry_handle: mass(0.147, 'derived: as the flat-top base (' + cmmgSightBase + '), which is 0.040 in taller'),
-    // No tower base is sold to weigh; its frame is no heavier than the triangle's struts and crown it replaces.
-    ar15_front_sight_base_tower_flat_top: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
-    ar15_front_sight_base_tower_carry_handle: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
+    // No sight-block base is sold to weigh; its block is no heavier than the triangle's struts and crown it replaces.
+    ar15_front_sight_base_sight_block_flat_top: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
+    ar15_front_sight_base_sight_block_carry_handle: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
     ar15_handguard_drop_in_mid: mass(0.247, 'sourced: 8.7 oz, ' + magpulMid),
     ar15_handguard_drop_in_rifle: mass(0.204, 'sourced: 7.2 oz, https://www.opticsplanet.com/luth-ar-a2-rifle-handguard.html'),
     ar15_tube_rifle: mass(

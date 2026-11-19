@@ -56,23 +56,23 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
   };
 };
 
-/** A straight tower over the middle of the ring, its ears standing on its deck. */
-const tower = (F: SightBaseTable, at: Placement): PostFrame => {
-  const towerRearX = at.rearX + (u(F.ringLength) - u(F.tower.length)) / 2;
-  const towerFrontX = towerRearX + u(F.tower.length);
-  const deckY = u(F.tower.deckAboveJournal) + at.raise;
+/** A straight sight block over the middle of the ring, its ears standing on its deck. */
+const sightBlock = (F: SightBaseTable, at: Placement): PostFrame => {
+  const blockRearX = at.rearX + (u(F.ringLength) - u(F.sightBlock.length)) / 2;
+  const blockFrontX = blockRearX + u(F.sightBlock.length);
+  const deckY = u(F.sightBlock.deckAboveJournal) + at.raise;
   return {
     solids: [
-      box('tower', [towerRearX, at.ringTopY, -at.lugHalf], [towerFrontX, deckY, at.lugHalf]),
-      box('ear-right', [towerRearX, deckY, at.earInner], [towerFrontX, at.postTipY, at.lugHalf]),
-      box('ear-left', [towerRearX, deckY, -at.lugHalf], [towerFrontX, at.postTipY, -at.earInner]),
+      box('block', [blockRearX, at.ringTopY, -at.lugHalf], [blockFrontX, deckY, at.lugHalf]),
+      box('ear-right', [blockRearX, deckY, at.earInner], [blockFrontX, at.postTipY, at.lugHalf]),
+      box('ear-left', [blockRearX, deckY, -at.lugHalf], [blockFrontX, at.postTipY, -at.earInner]),
     ],
     deckY,
-    postX: (towerRearX + towerFrontX) / 2,
+    postX: (blockRearX + blockFrontX) / 2,
   };
 };
 
-const PROFILES = { 'a-frame': aFrame, tower } as const;
+const PROFILES = { 'a-frame': aFrame, 'sight-block': sightBlock } as const;
 
 /**
  * The front sight base, by the upper top whose rear sight it is made to meet and by the profile its post stands on. It
