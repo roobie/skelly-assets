@@ -87,8 +87,41 @@ const checkLeaves = (node: unknown, keys: readonly string[], check: TableCheck):
 };
 
 /**
- * A table as loaded, checked leaf by leaf, with its picks only where `picks` places them; `name` heads the path a
- * failure reports.
+ * The places a pick pattern names in the table, each `*` standing for every key of the group there. A place whose
+ * group is missing is still named, so the pick it should hold is reported missing.
+ */
+const placesOf = (table: unknown, segments: readonly string[], keys: readonly string[] = []): string[][] => {
+  const [segment, ...rest] = segments;
+  if (segment === undefined) {
+    return [[...keys]];
+  }
+  const group = keys.length === 0 ? table : groupAt(table, keys.join('.'));
+  const children = segment === '*' ? Object.keys(isGroup(group) ? group : {}) : [segment];
+  return children.flatMap((key) => placesOf(table, rest, [...keys, key]));
+};
+
+/**
+ * Every place `picks` names holds a pick, so a family reading one finds it there; a pattern that names no place at all
+ * is a load error too, since it pins nothing.
+ */
+const requirePicks = (name: string, table: unknown, picks: PickGroups): void => {
+  for (const [pattern, group] of Object.entries(picks)) {
+    const places = placesOf(table, pattern.split('.'));
+    if (places.length === 0) {
+      throw new Error(`${name}.${pattern}: no place holds the pick from ${group} that belongs here`);
+    }
+    for (const keys of places) {
+      const node = groupAt(table, keys.join('.'));
+      if (node === undefined || !Object.hasOwn(node, 'choice')) {
+        throw new Error(`${[name, ...keys].join('.')}: expected a pick from ${group}`);
+      }
+    }
+  }
+};
+
+/**
+ * A table as loaded, checked leaf by leaf, with a pick at every place `picks` names and nowhere else; `name` heads the
+ * path a failure reports.
  */
 export const checkFrameTable = <T>(
   name: string,
@@ -96,6 +129,7 @@ export const checkFrameTable = <T>(
   picks: PickGroups,
   platforms: GunPlatforms = GUN_PLATFORMS,
 ): T => {
+  requirePicks(name, raw, picks);
   checkLeaves(raw, [], { name, table: raw, picks, platforms });
   return raw;
 };
@@ -114,7 +148,7 @@ interface TablePick<Of extends string> {
 }
 
 /** Where every frame table holds its picks, and the group each picks from, which also types each pick. */
-const FRAME_PICKS = {
+export const FRAME_PICKS = {
   'barrel.journal': 'gasBlock.journals',
   'barrel.lengths.*.gas': 'barrel.gasPorts',
   'stock.buffer': 'receiverExtension.buffers',

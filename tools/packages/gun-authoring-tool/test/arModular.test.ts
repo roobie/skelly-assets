@@ -8,7 +8,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { AR15_FRAME, checkFrameTable, pick, u } from '../src/gun/arModular/frame.ts';
+import { AR15_FRAME, checkFrameTable, FRAME_PICKS, pick, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { arUpper } from '../src/gun/arModular/upper.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -48,24 +48,48 @@ describe('modular AR', () => {
   });
 
   it('refuses a frame table with an unsourced measurement', () => {
-    const check = (table: unknown) => () => checkFrameTable('t', table, { 'a.*': 'kinds' });
+    const kinds = { rifle: { mm: 1, source: 'sourced: x' } };
+    const rifle = { choice: 'rifle', of: 'kinds' };
+    // Every table below holds the picks its pins place, so each case tests only what it adds.
+    const check =
+      (extra: object, picks: object = { b: rifle }) =>
+      () =>
+        checkFrameTable('t', { kinds, picks, ...extra }, { 'picks.*': 'kinds' });
     expect(check({ a: { mm: 1, source: 'sourced: x' } })).not.toThrow();
     expect(check({ a: { mm: 1 } })).toThrow(/t\.a/);
     expect(check({ a: { mm: 1, source: 'a guess' } })).toThrow();
     expect(check({ a: 1 })).toThrow(/t\.a/);
     expect(check({ a: 'rifle' })).toThrow(/t\.a/);
     // A pick names the group its place pins, which must hold it.
-    const kinds = { rifle: { mm: 1, source: 'sourced: x' } };
-    expect(check({ kinds, a: { b: { choice: 'rifle', of: 'kinds' } } })).not.toThrow();
-    expect(check({ kinds, a: { b: { choice: 'rilfe', of: 'kinds' } } })).toThrow(/t\.a\.b/);
-    expect(check({ kinds, a: { b: { choice: 'rifle', of: 'sorts' } } })).toThrow(/t\.a\.b/);
-    expect(check({ kinds, sorts: kinds, a: { b: { choice: 'rifle', of: 'sorts' } } })).toThrow(/not the kinds/);
-    expect(check({ kinds, b: { choice: 'rifle', of: 'kinds' } })).toThrow(/t\.b: no pick belongs here/);
-    expect(check({ kinds, a: { b: { choice: 'rifle' } } })).toThrow();
+    expect(check({}, { b: { choice: 'rilfe', of: 'kinds' } })).toThrow(/t\.picks\.b/);
+    expect(check({}, { b: { choice: 'rifle', of: 'sorts' } })).toThrow(/t\.picks\.b/);
+    expect(check({ sorts: kinds }, { b: { choice: 'rifle', of: 'sorts' } })).toThrow(/not the kinds/);
+    expect(check({ b: rifle })).toThrow(/t\.b: no pick belongs here/);
+    expect(check({}, { b: { choice: 'rifle' } })).toThrow();
+    // A place the pins name holds a pick, and a pin names some place.
+    expect(check({}, { b: rifle, c: { mm: 1, source: 'sourced: x' } })).toThrow(
+      /t\.picks\.c: expected a pick from kinds/,
+    );
+    expect(check({}, {})).toThrow(/t\.picks\.\*: no place holds/);
+    expect(() => checkFrameTable('t', { kinds, a: { b: kinds.rifle } }, { 'a.b': 'kinds' })).toThrow(
+      /t\.a\.b: expected/,
+    );
+    expect(() => checkFrameTable('t', { kinds, a: {} }, { 'a.b': 'kinds' })).toThrow(/t\.a\.b: expected/);
     // A standard must be one its mount lists.
     expect(check({ a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
     expect(check({ a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
     expect(check({ a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
+  });
+
+  it('refuses the AR-15 table with a pick it pins left out or turned into a measurement', () => {
+    const withBuffer = { ...AR15, stock: { ...AR15.stock, buffer: AR15.receiverExtension.buffers.carbine!.radius } };
+    expect(() => checkFrameTable('ar15', withBuffer, FRAME_PICKS)).toThrow(/ar15\.stock\.buffer: expected a pick/);
+    const { gas: _, ...gasless } = AR15.barrel.lengths['16-mid']!;
+    const withoutGas = {
+      ...AR15,
+      barrel: { ...AR15.barrel, lengths: { ...AR15.barrel.lengths, '16-mid': gasless } },
+    };
+    expect(() => checkFrameTable('ar15', withoutGas, FRAME_PICKS)).toThrow(/16-mid\.gas: expected a pick/);
   });
 
   it('reads a pick from the group the pick names', () => {
