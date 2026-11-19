@@ -59,6 +59,7 @@ import {
   AR_EJECTION_PORT_CENTERS,
   AR_FREE_FLOAT_HANDGUARDS,
   AR_LOWER_PROPORTIONS,
+  arWellMagazineProfile,
 } from './arFrames.ts';
 import { AR_ACTION_LAYOUT, AR_ACTION_LAYOUTS, type ARActionLayout, arLayoutFor } from './arLayout.ts';
 import { AR_MODULAR_FAMILIES } from './arModular/index.ts';
@@ -2969,8 +2970,13 @@ const lower: PartFamily = {
       } else if (params.magazineWell === 'recessed') {
         portY = RECESSED_MAGAZINE_PORT_Y;
       }
-      // This lower's well is cut to the magazine it takes, so it is cut for that magazine's standard.
-      const standard = magazineStandardOf(magazineProfile);
+      // An AR well is cut by its frame, so it is cut for the standard of the magazine its frame takes, whatever magazine
+      // is offered to it. Any other well is either sized by no magazine, or reshapes to the one it takes and so fits
+      // it by construction; neither is cut for a standard.
+      const standard =
+        layout === 'ar' && section === undefined
+          ? magazineStandardOf(arWellMagazineProfile(params.actionFrame))
+          : undefined;
       const port: PortDef = {
         id: 'magazine',
         mount: 'magazine',

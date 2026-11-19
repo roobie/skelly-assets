@@ -609,7 +609,13 @@ describe('loadDesign: change policy', () => {
       ...ar,
       slots: ar.slots.map((slot) => (slot.id === 'magazine' ? { ...slot, family: registryKey } : slot)),
     };
-    const assembly = withPart({ family: registryKey, params: { length: 'M' }, prefab: { id: 'keyed', version: 1 } });
+    // The generated lower's well is cut for its frame's magazine, so the keyed magazine keeps the generated profile.
+    const profile = baseAssembly.parts.magazine!.params!.profile!;
+    const assembly = withPart({
+      family: registryKey,
+      params: { length: 'M', profile },
+      prefab: { id: 'keyed', version: 1 },
+    });
     const design = makeDesign({ assembly });
     const matching = { id: 'keyed', version: 1, family: registryKey, fixedParams: { length: 'M' } };
     const admitted = load(design, { domain, template, prefabs: [matching] });
