@@ -25,6 +25,8 @@ const MeasuredSchema = union([
   strictObject({ mm: number(), source: SourceSchema }),
   strictObject({ mm: pipe(array(tuple([number(), number()])), minLength(3)), source: SourceSchema }),
   strictObject({ kg: pipe(number(), gtValue(0)), source: SourceSchema }),
+  strictObject({ deg: number(), source: SourceSchema }),
+  strictObject({ rpm: pipe(number(), gtValue(0)), source: SourceSchema }),
 ]);
 
 const Name = pipe(string(), minLength(1));

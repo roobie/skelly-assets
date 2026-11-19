@@ -135,7 +135,7 @@ describe('modular AR', () => {
     expect(validate(loadDesignAssembly('ar15-carbine-free-float'), gunDomain).issues).toEqual([]);
     const issues = validate(loadDesignAssembly('ar15-carbine-free-float'), coarse).issues;
     expect(new Set(issues.filter(({ rule }) => rule === 'min-feature').flatMap(({ parts }) => parts))).toEqual(
-      new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock']),
+      new Set(['upper', 'handguard', 'lower', 'gas-block', 'stock', 'bolt-carrier', 'charging-handle']),
     );
     // Every stock style has sleeve walls under the coarse grain, the A2's as the collapsible's.
     const a2 = validate(loadDesignAssembly('ar15-rifle-a2'), coarse).issues;
@@ -164,7 +164,7 @@ describe('modular AR', () => {
       return localSolidBounds(def.solids.find(({ id }) => id === solid)!).map((corner) => applyPoint(placed, corner));
     };
     const towerFront = boundsOf('lower', 'tower')[1]!;
-    const upperRear = boundsOf('upper', 'receiver-body')[0]!;
+    const upperRear = boundsOf('upper', 'receiver-floor')[0]!;
     expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
   });
 

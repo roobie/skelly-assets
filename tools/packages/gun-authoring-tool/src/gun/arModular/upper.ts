@@ -5,7 +5,9 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U } from '../railRearSight.ts';
 import { sightAxis } from '../sightAxis.ts';
+import { arActionLayout, carrierPorts, chargingHandlePorts } from './action.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, u } from './frame.ts';
+import { portCoverHinge } from './portCover.ts';
 import { picatinnyRail } from './rail.ts';
 
 /** A housing's traced side outline and how far it stands out of the receiver's side. */
@@ -131,9 +133,48 @@ const carryHandle = (frame: ArFrame): UpperTop => {
 const UPPER_TOPS = { 'flat-top': flatTop, 'carry-handle': carryHandle } as const;
 
 /**
+ * The receiver's body as a shell round the action: the carrier's bore from the rear face to the bolt face, cut through
+ * the right wall at the ejection port, and over it the charging handle's channel, open at the rear face. Ahead of the
+ * bolt face the body is whole to the front face, where the barrel's extension sits.
+ */
+const receiverShell = (frame: ArFrame): Solid[] => {
+  const { upper, lower } = frame.table;
+  const { boreHalf: c, carrier, channel } = arActionLayout(frame);
+  const [rearX, frontX, half, topY, partingY] = [
+    carrier.rearX,
+    carrier.boltFaceX,
+    u(upper.halfWidth),
+    u(upper.topY),
+    u(lower.partingY),
+  ];
+  const port = upper.ejectionPort;
+  const [portRearX, portFrontX, portBottomY, portTopY] = [u(port.rearX), u(port.frontX), u(port.bottomY), u(port.topY)];
+  const [channelBottomY, channelTopY] = channel.y;
+  // The traced port may run on past the bolt face, where the front of the receiver closes it.
+  const aheadOfPort = portFrontX < frontX;
+  return [
+    box('receiver-front', [frontX, partingY, -half], [0, topY, half]),
+    box('receiver-floor', [rearX, partingY, -half], [frontX, -c, c]),
+    box('receiver-floor-right-rear', [rearX, partingY, c], [portRearX, -c, half]),
+    ...(aheadOfPort ? [box('receiver-floor-right-front', [portFrontX, partingY, c], [frontX, -c, half])] : []),
+    box('receiver-under-port', [portRearX, partingY, c], [Math.min(portFrontX, frontX), portBottomY, half]),
+    box('receiver-left', [rearX, -c, -half], [frontX, c, -c]),
+    box('receiver-right-rear', [rearX, -c, c], [portRearX, c, half]),
+    ...(aheadOfPort ? [box('receiver-right-front', [portFrontX, -c, c], [frontX, c, half])] : []),
+    box('receiver-over-port', [portRearX, portTopY, c], [Math.min(portFrontX, frontX), c, half]),
+    box('receiver-web', [rearX, c, -half], [frontX, channelBottomY, half]),
+    box('receiver-channel-left', [rearX, channelBottomY, -half], [channel.frontX, channelTopY, -channel.half]),
+    box('receiver-channel-right', [rearX, channelBottomY, channel.half], [channel.frontX, channelTopY, half]),
+    box('receiver-channel-front', [channel.frontX, channelBottomY, -half], [frontX, channelTopY, half]),
+    box('receiver-roof', [rearX, channelTopY, -half], [frontX, topY, half]),
+  ];
+};
+
+/**
  * The upper receiver, by its top: the body over the lower, the forward assist and brass deflector on the right, and the
  * ejection port between them, under a flat-top rail or a carry handle. Its frame is the gun's; the barrel and the
- * handguard's barrel nut meet it at its front face, on the bore.
+ * handguard's barrel nut meet it at its front face, on the bore. The bolt carrier, the charging handle and the port's
+ * cover hang in it.
  */
 export const arUpper = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'upper'),
@@ -141,11 +182,11 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
   build(params): PartDef {
     const { upper, lower } = frame.table;
     const halfWidth = u(upper.halfWidth);
-    const topY = u(upper.topY);
     const partingY = u(lower.partingY);
     const top = chosen(UPPER_TOPS, params.top)(frame);
     const port = upper.ejectionPort;
-    // A spent case leaves the port to the right; nothing may stand in its way.
+    // A spent case leaves the port to the right; nothing but the cover, which opens out of its way, may stand there.
+    const coverHinge = portCoverHinge(frame);
     const ejection: KeepOut = {
       id: 'ejection',
       kind: 'ejection',
@@ -153,11 +194,13 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
         [u(port.rearX), u(port.bottomY), halfWidth],
         [u(port.frontX), u(port.topY), halfWidth + u(port.lane)],
       ),
+      allowPort: coverHinge.id,
     };
+    const action = arActionLayout(frame);
     return {
       family: 'receiver',
       solids: [
-        box('receiver-body', [u(upper.rearX), partingY, -halfWidth], [0, topY, halfWidth]),
+        ...receiverShell(frame),
         ...top.solids,
         rightSideBoss('forward-assist', upper.forwardAssist, halfWidth),
         rightSideBoss('brass-deflector', upper.brassDeflector, halfWidth),
@@ -174,6 +217,9 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
         },
         { id: 'barrel', mount: 'barrel', gender: 'female', pos: [0, 0, 0], normal: X, up: Y },
         { id: 'barrel-nut', mount: 'barrel-nut', gender: 'male', pos: [0, 0, 0], normal: X, up: Y },
+        carrierPorts(action).upper,
+        chargingHandlePorts(action).upper,
+        coverHinge,
         ...top.ports,
       ],
       keepOuts: [ejection],
@@ -181,6 +227,7 @@ export const arUpper = (frame: ArFrame): PartFamily => ({
       tags: [VOXEL_DETAIL],
       features: [
         ...top.features,
+        { name: 'receiver-wall', size: u(upper.wall), disposition: { kind: 'detail' } },
         { name: 'brass-deflector', size: u(upper.brassDeflector.stand), disposition: { kind: 'detail' } },
       ],
     };

@@ -8,6 +8,8 @@ local profile = import '../references/ar15-profile.trace.jsonnet';
 local dim(mm, source) = { mm: mm, source: source };
 local outline(points, source) = { mm: points, source: source };
 local mass(kg, source) = { kg: kg, source: source };
+local angle(deg, source) = { deg: deg, source: source };
+local rate(rpm, source) = { rpm: rpm, source: source };
 // A pick among the table's own named choices, the group at the dot path `of`, or a port standard its mount lists.
 local choiceOf(of, name) = { choice: name, of: of };
 local standardOf(mount, name) = { standard: name, mount: mount };
@@ -112,6 +114,10 @@ local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 
 // The flat-top's front post stands at this height over the bore; the carry-handle base is the ar-flat-top extra lower.
 local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
 local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
+local m4Carbine = 'https://en.wikipedia.org/wiki/M4_carbine';
+// The carrier's gas key, which the charging handle draws it back by, and the room the handle has behind it, from the
+// technical data package figures a gas key patent quotes.
+local gasKeyPatent = 'https://patents.google.com/patent/US10982916B1/en';
 
 // The A2 parts are traced off the M16A4 side photos, each scaled by the rifle's published overall length. The side
 // photo's heights are over its bore, which the sight line is measured from.
@@ -340,6 +346,44 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       bottomY: tracedY(121, 'ejectionPortCover'),
       lane: dim(100, 'derived: room for a spent case to leave the port'),
     },
+    wall: detailWall('an aluminium receiver'),
+  },
+
+  // The bolt carrier group in battery: the carrier's rear on the upper's rear face, where the buffer meets it, and the
+  // bolt's face on the barrel's breech.
+  boltCarrier: {
+    stroke: dim(95.25, 'sourced: the 3.75 in stroke, ' + gasKeyPatent),
+    keyLength: dim(62.611, "sourced: 2.465 in from the carrier's front to the rear of its gas key, " + gasKeyPatent),
+    keyRoom: dim(99.06, 'sourced: the 3.90 in the charging handle has to draw the gas key back in, ' + gasKeyPatent),
+    clearance: dim(0.5, 'derived: a sliding fit in the upper'),
+    boltRadius: dim(6.5, "derived: the bolt head standing out of the carrier's front, about 0.5 in across"),
+    // The animated cycle's spring return takes about 83 ms over this stroke, so 700 is the fastest sourced rate it fits.
+    cyclicRate: rate(700, 'derived: the low end of the M4 rate of 700 to 970 rounds a minute, ' + m4Carbine),
+  },
+
+  // The charging handle at rest: its latch closes the upper's rear face and its shaft runs forward under the rail to the
+  // carrier's gas key.
+  chargingHandle: {
+    rearX: tracedX(375, 'chargingHandle'),
+    topY: tracedY(78, 'chargingHandle'),
+    // The latch is drawn back over the collapsible stock; the trace's 1 px below the stock's top is read as trace error.
+    bottomY: dim(
+      yOf(86) + 0.5,
+      "derived: clear over the collapsible stock's top, which the handle is drawn back over; the trace reads %.1f mm" % yOf(87),
+    ),
+    halfWidth: dim($.upper.halfWidth.mm, 'derived: as wide as the upper whose rear it closes'),
+    shaft: {
+      bottomY: dim(tubeRadius + towerWall + 0.5, 'derived: clear over the buffer tower the shaft is drawn back over'),
+      depth: dim(detailFeature, 'derived: a shaft two detail voxels deep'),
+      halfWidth: dim(detailFeature / 2, 'derived: a shaft two detail voxels wide'),
+      clearance: dim(0.5, 'derived: a sliding fit in its channel'),
+    },
+  },
+
+  // The ejection port's dust cover, hung on its rod along the port's bottom edge.
+  portCover: {
+    thickness: dim(detailFeature, 'derived: the ~1 mm sheet exaggerated to two detail voxels, so the cover reads as a lid that moves'),
+    openAngle: angle(63, "derived: the cover turns down about its rod until it meets the magazine well's flank"),
   },
 
   barrel: {
@@ -580,5 +624,8 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
     ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
+    ar15_bolt_carrier: mass(0.3266, 'sourced: https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
+    ar15_charging_handle: mass(0.0312, 'sourced: https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
+    ar15_port_cover: mass(0.0221, 'sourced: https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),
   },
 }

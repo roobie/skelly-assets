@@ -38,7 +38,11 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     { from: 'lower.magazine', to: 'magazine.top' },
     { from: 'upper.barrel', to: 'barrel.rear' },
     { from: 'upper.barrel-nut', to: 'handguard.barrel-nut' },
+    { from: 'upper.bolt-carrier', to: 'bolt-carrier.mount' },
+    { from: 'upper.charging-handle', to: 'charging-handle.mount' },
+    { from: 'upper.port-cover', to: 'port-cover.upper' },
   ];
+  const actionSlots = [slot('bolt-carrier'), slot('charging-handle'), slot('port-cover')];
   const freeFloat: Template = {
     name: `${frame.name}-modular`,
     ...guns.freeFloat,
@@ -46,6 +50,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     slots: [
       slot('lower'),
       slot('upper', { top: 'flat-top' }),
+      ...actionSlots,
       slot('barrel', { length: keys(barrel.lengths) }),
       slot('gas-block'),
       slot('handguard', { length: keys(frame.table.handguard.lengths) }),
@@ -81,6 +86,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     slots: [
       slot('lower'),
       slot('upper', { top: ['flat-top', 'carry-handle'] }),
+      ...actionSlots,
       slot('barrel', { length: keys(barrel.lengths) }),
       slot('front-sight-base', {
         height: { when: isCarryHandle, onMatch: 'carry-handle', onMismatch: 'flat-top' },

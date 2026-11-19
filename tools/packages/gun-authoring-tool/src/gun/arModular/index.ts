@@ -3,10 +3,11 @@
 // the rest of the work stays here. Nothing here may import the first AR (arLayout.ts, arFrames.ts or the `ar`
 // template); test/arModular.test.ts holds that line.
 
-import type { PartFamily, Rule } from '@skelly/construct/assembly/schema.ts';
+import type { Rule } from '@skelly/construct/assembly/schema.ts';
 import type { Template } from '@skelly/construct/assembly/template.ts';
 import type { GunPartFamily } from '../actionRoles.ts';
 import type { GunAnchorDeclarations } from '../anchors.ts';
+import { arBoltCarrier, arChargingHandle } from './action.ts';
 import { arModularAnchors } from './anchors.ts';
 import { arBarrel, arFlashHider, arGasBlock } from './barrel.ts';
 import { AR15_FRAME, type ArFrame } from './frame.ts';
@@ -14,6 +15,7 @@ import { arFrontSightBase } from './frontSightBase.ts';
 import { arGrip } from './grip.ts';
 import { arDropInHandguard, arHandguard } from './handguard.ts';
 import { arLower } from './lower.ts';
+import { arPortCover } from './portCover.ts';
 import { arRearSight } from './rearSight.ts';
 import { arModularRules } from './rules.ts';
 import { arReceiverExtension, arStock } from './stock.ts';
@@ -39,9 +41,12 @@ const FRAMES: readonly { readonly frame: ArFrame; readonly guns: ArModularGuns }
   },
 ];
 
-const PART_FAMILIES: readonly ((frame: ArFrame) => PartFamily)[] = [
+const PART_FAMILIES: readonly ((frame: ArFrame) => GunPartFamily)[] = [
   arLower,
   arUpper,
+  arBoltCarrier,
+  arChargingHandle,
+  arPortCover,
   arBarrel,
   arGasBlock,
   arFrontSightBase,

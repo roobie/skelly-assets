@@ -6,6 +6,9 @@
   "parts": {
     "lower": { "family": "ar15-lower" },
     "upper": { "family": "ar15-upper", "params": { "top": "flat-top" } },
+    "bolt-carrier": { "family": "ar15-bolt-carrier" },
+    "charging-handle": { "family": "ar15-charging-handle" },
+    "port-cover": { "family": "ar15-port-cover" },
     "barrel": { "family": "ar15-barrel", "params": { "length": "16-mid" } },
     "front-sight-base": { "family": "ar15-front-sight-base", "params": { "height": "flat-top" } },
     "handguard": { "family": "ar15-handguard-drop-in", "params": { "gas": "mid" } },
@@ -23,6 +26,9 @@
     { "from": "lower.magazine", "to": "magazine.top" },
     { "from": "upper.barrel", "to": "barrel.rear" },
     { "from": "upper.barrel-nut", "to": "handguard.barrel-nut" },
+    { "from": "upper.bolt-carrier", "to": "bolt-carrier.mount" },
+    { "from": "upper.charging-handle", "to": "charging-handle.mount" },
+    { "from": "upper.port-cover", "to": "port-cover.upper" },
     { "from": "barrel.gas-block", "to": "front-sight-base.barrel" },
     { "from": "front-sight-base.handguard-cap", "to": "handguard.handguard-cap" },
     { "from": "barrel.muzzle", "to": "flash-hider.base" }

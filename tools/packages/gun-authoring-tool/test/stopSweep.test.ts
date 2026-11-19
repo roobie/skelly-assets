@@ -5,12 +5,13 @@ import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import { applyDir, applyPoint, IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
+import type { MotionStage } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAL_FOLDING_STOCK } from '../src/gun/falFoldingStock.ts';
 import { sweepPartStops, sweepStops } from '../src/gun/stopSweep.ts';
-import { loadCorpus, loadFixture } from './helpers.ts';
+import { loadCorpus, loadDesignAssembly, loadFixture } from './helpers.ts';
 
 const centreOf = (solid: Parameters<typeof localSolidBounds>[0]): Vec3 => {
   const [min, max] = localSolidBounds(solid);
@@ -236,6 +237,23 @@ describe('the stop sweep', () => {
     expect(sweepStops(intruding).some((issue) => /^stock at folded: .*ejection volume of receiver/.test(issue))).toBe(
       true,
     );
+  });
+
+  describe('the AR-15 carbine', () => {
+    const carbine = resolve(loadDesignAssembly('ar15-carbine-free-float'), gunDomain);
+    /** The carbine with `id`'s single stage carried `by` further than its table says, its stops kept. */
+    const overrun = (id: string, by: (stage: MotionStage) => MotionStage): Resolved => {
+      const motion = carbine.motions.get(id)!;
+      return { ...carbine, motions: new Map(carbine.motions).set(id, { ...motion, stages: motion.stages.map(by) }) };
+    };
+
+    it('opens the port cover to the magazine well and no further', () => {
+      expect(sweepStops(carbine)).toEqual([]);
+      const past = overrun('port-cover', (stage) =>
+        stage.kind === 'hinge' ? { ...stage, angle: stage.angle + 2 } : stage,
+      );
+      expect(sweepStops(past).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
+    });
   });
 
   it.each(loadCorpus())('finds every stop and the path between stops clear: $label', ({ assembly }) => {

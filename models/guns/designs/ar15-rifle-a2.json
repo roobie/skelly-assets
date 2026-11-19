@@ -10,6 +10,9 @@
     "parts": {
       "lower": { "item": "ar15_lower" },
       "upper": { "item": "ar15_upper_carry_handle" },
+      "bolt-carrier": { "item": "ar15_bolt_carrier" },
+      "charging-handle": { "item": "ar15_charging_handle" },
+      "port-cover": { "item": "ar15_port_cover" },
       "barrel": { "item": "ar15_barrel_20_rifle" },
       "front-sight-base": { "item": "ar15_front_sight_base_carry_handle" },
       "handguard": { "item": "ar15_handguard_drop_in_rifle" },
@@ -31,6 +34,9 @@
       { "from": "lower.magazine", "to": "magazine.top" },
       { "from": "upper.barrel", "to": "barrel.rear" },
       { "from": "upper.barrel-nut", "to": "handguard.barrel-nut" },
+      { "from": "upper.bolt-carrier", "to": "bolt-carrier.mount" },
+      { "from": "upper.charging-handle", "to": "charging-handle.mount" },
+      { "from": "upper.port-cover", "to": "port-cover.upper" },
       { "from": "barrel.gas-block", "to": "front-sight-base.barrel" },
       { "from": "front-sight-base.handguard-cap", "to": "handguard.handguard-cap" },
       { "from": "barrel.muzzle", "to": "flash-hider.base" }
