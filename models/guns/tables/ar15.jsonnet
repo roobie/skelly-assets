@@ -366,18 +366,19 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
   },
 
   // The charging handle at rest: its latch closes the upper's rear face and its shaft runs forward under the rail to the
-  // carrier's gas key.
+  // carrier's gas key. Drawn, both ride back over the stock, so both stand clear over the taller stock's top.
   chargingHandle: {
     rearX: tracedX(375, 'chargingHandle'),
     topY: tracedY(78, 'chargingHandle'),
-    // The latch is drawn back over the collapsible stock; the trace's 1 px below the stock's top is read as trace error.
+    clearance: dim(0.5, "derived: a running clearance over the stock's top"),
+    // The trace's 1 px below the collapsible stock's top is read as trace error.
     bottomY: dim(
-      yOf(86) + 0.5,
-      "derived: clear over the collapsible stock's top, which the handle is drawn back over; the trace reads %.1f mm" % yOf(87),
+      std.max($.stock.topY.mm, $.stockA2.combY.mm) + self.clearance.mm,
+      "derived: clear over the stock's top, which the handle is drawn back over; the trace reads %.1f mm" % yOf(87),
     ),
     halfWidth: dim($.upper.halfWidth.mm, 'derived: as wide as the upper whose rear it closes'),
     shaft: {
-      bottomY: dim(tubeRadius + towerWall + 0.5, 'derived: clear over the buffer tower the shaft is drawn back over'),
+      bottomY: dim($.chargingHandle.bottomY.mm, 'derived: level with the latch, clear over the stock it is drawn back over'),
       depth: dim(detailFeature, 'derived: a shaft two detail voxels deep'),
       halfWidth: dim(detailFeature / 2, 'derived: a shaft two detail voxels wide'),
       clearance: dim(0.5, 'derived: a sliding fit in its channel'),
@@ -548,7 +549,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     frontX: dim(xOf(284) - stockMount[0], traced('moduleStockToReceiverExtension')),
     rearX: dim(xOf(128) - stockMount[0], traced('stock')),
     topY: tracedY(86, 'stock'),
-    bottomY: dim(-yOf(86), 'derived: the body is centred on the tube'),
+    bottomY: dim(-self.topY.mm, 'derived: the body is centred on the tube'),
     tubeClearance: dim(1, 'derived: a sliding fit on the tube'),
     halfWidth: dim(20, 'derived: a body a little wider than the tube it wraps'),
     toe: collapsibleToe,

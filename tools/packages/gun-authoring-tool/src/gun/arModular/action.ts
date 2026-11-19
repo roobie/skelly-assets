@@ -95,8 +95,8 @@ export const arBoltCarrier = (frame: ArFrame): GunPartFamily => ({
 
 /**
  * The charging handle at rest: its latch across the upper's rear face and its shaft forward along the channel under
- * the rail. Its frame is the upper's rear face on the bore. It is drawn back through the carrier's stroke, and the hand
- * that draws it needs the latch's path behind it clear.
+ * the rail. Its frame is the upper's rear face on the bore. It is drawn back through the carrier's stroke, so behind
+ * each piece the path it is drawn back along is kept clear, under the piece's own name.
  */
 export const arChargingHandle = (frame: ArFrame): GunPartFamily => ({
   name: familyName(frame, 'charging-handle'),
@@ -110,22 +110,19 @@ export const arChargingHandle = (frame: ArFrame): GunPartFamily => ({
       y: [u(handle.bottomY), u(handle.topY)],
       half: u(handle.halfWidth),
     } as const;
-    const { shaft } = layout;
+    const { shaft: shaftLayout } = layout;
+    const shaft = { x: [0, shaftLayout.frontX - rearX], y: shaftLayout.y, half: shaftLayout.half } as const;
     const stroke = u(boltCarrier.stroke);
+    const pieces = { 'charging-handle': latch, shaft };
     return {
       family: 'ar-charging-handle',
-      solids: [
-        box('charging-handle', [latch.x[0], latch.y[0], -latch.half], [latch.x[1], latch.y[1], latch.half]),
-        box('shaft', [0, shaft.y[0], -shaft.half], [shaft.frontX - rearX, shaft.y[1], shaft.half]),
-      ],
+      solids: Object.entries(pieces).map(([id, { x, y, half }]) => box(id, [x[0], y[0], -half], [x[1], y[1], half])),
       ports: [chargingHandlePorts(layout).part],
-      keepOuts: [
-        {
-          id: 'charging-handle',
-          kind: 'clearance',
-          box: boxFromMinMax([latch.x[0] - stroke, latch.y[0], -latch.half], [latch.x[0], latch.y[1], latch.half]),
-        },
-      ],
+      keepOuts: Object.entries(pieces).map(([id, { x, y, half }]) => ({
+        id,
+        kind: 'clearance',
+        box: boxFromMinMax([x[0] - stroke, y[0], -half], [x[0], y[1], half]),
+      })),
       axes: [],
       tags: [ACTION_PART_ROLES.handle, VOXEL_DETAIL],
       features: [{ name: 'shaft', size: 2 * shaft.half, disposition: { kind: 'detail' } }],
