@@ -3,6 +3,8 @@
 // side. Fields are documented in growth/species.ts; values the article leaves open come from Palubicki et al. 2009.
 // A species' hidden `finish` is what its wood and leaves are drawn in: the family never sees it, the row takes it.
 // The wood is tagged bark, not drawn as bark: at a coarse grain its furrows and plates are a shader's to draw.
+// Its hidden `keywords` are what a search finds a row of it by (models/TAXONOMY.md): a habit is a tree or a shrub, so
+// a new species carries the word its habit does.
 local base = {
   alpha: 2,
   shootCap: 4,
@@ -19,6 +21,7 @@ local base = {
   // each column; two-layer terraces read as a voxel crown's steps and keep its slopes from costing a face per layer.
   foliage: { least: 1, core: 1.3, terrace: 2 },
   finish:: { bark: 'bark', leaf: 'foliage-oak' },
+  keywords:: ['tree'],
 };
 // An oak's crown: weak apical control lets laterals overtake the leader into a broad, rounded dome on a short bole. Its
 // twigs vanish into a crown this dense, so only limbs are barked, and its wide slopes step three layers at a time.
@@ -56,6 +59,8 @@ local dome(radius, height, markers) = {
   reach: 5,
   perception: 90,
 };
+// A shrub's habit: many stems from the ground, filling a dome rather than reaching for light.
+local shrub = base { keywords:: ['shrub'] };
 {
   broadleaf: broadleaf,
   // An upright oak: a stronger leader holds its laterals in, so the crown rises taller than it spreads.
@@ -90,7 +95,7 @@ local dome(radius, height, markers) = {
     finish:: { bark: 'bark-birch', leaf: 'foliage-birch' },
   },
   // A hazel: many stems from the ground with laterals favoured, filling a dome a little taller than wide.
-  hazel: base {
+  hazel: shrub {
     seasons: 7,
     internode: 0.12,
     lambda: 0.45,
@@ -105,7 +110,7 @@ local dome(radius, height, markers) = {
     finish:: base.finish { leaf: 'foliage-understorey' },
   },
   // A low shrub: a mat of short stems under a flat dome.
-  low: base {
+  low: shrub {
     seasons: 6,
     internode: 0.06,
     lambda: 0.42,
