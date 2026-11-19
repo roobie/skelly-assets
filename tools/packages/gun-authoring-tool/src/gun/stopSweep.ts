@@ -1,5 +1,7 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
+import { keepOutForPart } from '@skelly/construct/assembly/rules.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
+import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import type { Transform, Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
   distanceWorld,
@@ -11,6 +13,7 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { type Motion, stageDistance } from '@skelly/motion/motion';
+import { resolveGunAction } from './actionDescription.ts';
 import { hingeOf } from './actionMotion.ts';
 
 /** A moving solid's pose along a path, by the path's phase from 0 to 1. */
@@ -30,6 +33,8 @@ const cachedPoses = (at: Path): Path => {
   };
 };
 
+const MAX_DEPTH = 20;
+
 /** Certify continuous intervals by bounding each vertex's maximum displacement from the midpoint. */
 const clearsInterval = (
   at: Path,
@@ -46,8 +51,12 @@ const clearsInterval = (
   if (distanceWorld(shape, obstacle) > (speedBound * (hi - lo)) / 2 + 1e-9) {
     return true;
   }
-  if (penetrationWorld(shape, obstacle) > 1e-7 || depth >= 20) {
+  if (penetrationWorld(shape, obstacle) > TOLERANCE.contact) {
     return false;
+  }
+  // Parts that only touch, flush, never part from the obstacle however finely the interval is split.
+  if (depth >= MAX_DEPTH) {
+    return true;
   }
   return (
     clearsInterval(at, obstacle, speedBound, { lo, hi: middle, depth: depth + 1 }) &&
@@ -110,13 +119,25 @@ export const sweepPartStops = (part: SweptPart, obstacles: readonly Obstacle[]):
   );
 };
 
+/** Every keep-out `id` meets when it stands at each named stop of `motion`, as `id at stop: what intrudes`. */
+const keepOutsAtStops = (resolved: Resolved, id: string, motion: Motion): readonly string[] =>
+  motion.stops.flatMap(({ name, clock }) => {
+    const placed = new Map(resolved.placed).set(id, motionTransform(resolved.placed.get(id)!, motion, clock));
+    return keepOutForPart({ ...resolved, placed }, id).map(({ message }) => `${id} at ${name}: ${message}`);
+  });
+
 /**
  * Certify every stop and every span between stops of every part of the gun that turns, a bolt's or a handle's turn and
- * a stock's fold alike, against everything that does not move. A part that only slides is certified against its
- * keep-outs by `sweepMovingPart` instead: a pistol's slide rides inside its frame's rails by design, so solids that
- * overlap there are no clash.
+ * a stock's fold alike: each span against everything that does not move, and each stop against the keep-outs. The
+ * action's own parts are no judge of keep-outs, which are made room for them: a bolt rides through the receiver's
+ * loading and clearance volumes by design. A part that only slides is left to `sweepMovingPart`, which certifies it
+ * against its keep-outs: a pistol's slide rides inside its frame's rails by design, so solids that overlap there are no
+ * clash. A slide part with stops of its own would need adding here.
  */
 export const sweepStops = (resolved: Resolved): readonly string[] => {
+  const actionParts = new Set(
+    Object.values(resolveGunAction(resolved)?.parts ?? {}).flatMap((part) => (part ? [part.id] : [])),
+  );
   const obstacles = [...resolved.defs]
     .filter(([id]) => !resolved.motions.has(id))
     .flatMap(([id, def]) =>
@@ -124,10 +145,11 @@ export const sweepStops = (resolved: Resolved): readonly string[] => {
     );
   return [...resolved.motions]
     .filter(([, motion]) => hingeOf(motion))
-    .flatMap(([id, motion]) =>
-      sweepPartStops(
+    .flatMap(([id, motion]) => [
+      ...sweepPartStops(
         { id, placed: resolved.placed.get(id)!, solids: resolved.defs.get(id)!.solids, motion },
         obstacles,
       ),
-    );
+      ...(actionParts.has(id) ? [] : keepOutsAtStops(resolved, id, motion)),
+    ]);
 };

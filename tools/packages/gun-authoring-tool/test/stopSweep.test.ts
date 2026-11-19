@@ -1,4 +1,4 @@
-import { motionTransform } from '@skelly/construct/assembly/motion.ts';
+import { motionTransform, resolveMotion } from '@skelly/construct/assembly/motion.ts';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartFamily, Resolved } from '@skelly/construct/assembly/schema.ts';
 import { applyDir, applyPoint, IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
@@ -87,6 +87,52 @@ describe('the stop sweep', () => {
     expect(sweepPartStops(part, [])).toEqual([]);
     const issues = sweepPartStops(part, [obstacle]);
     expect(issues.some((issue) => issue.endsWith('vs blocker from open to notched'))).toBe(true);
+  });
+
+  it('passes a part that rests flush against an obstacle and draws away from it', () => {
+    const solid: BoxSolid = { id: 'slab', kind: 'box', box: { center: [0.5, 0.5, 0.5], half: [0.5, 0.5, 0.5] } };
+    const motion = resolveMotion(
+      {
+        stages: [{ kind: 'slide', direction: [-1, 0, 0], travel: 3 }],
+        stops: [
+          { name: 'a', stage: 0, at: 0 },
+          { name: 'b', stage: 0 },
+        ],
+      },
+      () => 0,
+      [solid],
+    );
+    const wall: BoxSolid = { id: 'wall', kind: 'box', box: { center: [1.5, 0, 0], half: [0.5, 5, 5] } };
+    const part = { id: 'slab', placed: IDENTITY, solids: [solid], motion };
+    const obstacle = { id: 'wall', shape: worldSolid(IDENTITY, wall) };
+    expect(penetrationWorld(worldSolid(IDENTITY, solid), obstacle.shape)).toBeLessThan(1e-9);
+    expect(sweepPartStops(part, [obstacle])).toEqual([]);
+  });
+
+  it('fails a stop that sits in a keep-out, naming the stop and the volume', () => {
+    const rifle = loadFixture('archetype-battle-rifle');
+    const folding = resolve(
+      {
+        ...rifle,
+        parts: { ...rifle.parts, stock: { family: 'stock', params: { length: 'M', style: 'fal-folding' } } },
+      },
+      gunDomain,
+    );
+    expect(sweepStops(folding)).toEqual([]);
+    // The upper tube raised by its own thickness lies in the ejection volume once the stock is folded.
+    const stock = folding.defs.get('stock')!;
+    const raised = stock.solids.map((solid) =>
+      solid.id === 'tube-upper' && solid.kind === 'box'
+        ? {
+            ...solid,
+            box: { ...solid.box, center: [solid.box.center[0], solid.box.center[1] + 1, solid.box.center[2]] as Vec3 },
+          }
+        : solid,
+    );
+    const intruding = { ...folding, defs: new Map(folding.defs).set('stock', { ...stock, solids: raised }) };
+    expect(sweepStops(intruding).some((issue) => /^stock at folded: .*ejection volume of receiver/.test(issue))).toBe(
+      true,
+    );
   });
 
   it.each(loadCorpus())('finds every stop and the path between stops clear: $label', ({ assembly }) => {

@@ -31,23 +31,24 @@ const exportedPart = (authored: PartMotion) => {
       },
     },
   };
-  return { motion, entry };
+  return { entry };
 };
 
 it('exports a part with six slide stops and round-trips them through the sidecar schema', () => {
   const names = ['rest', 'one', 'two', 'three', 'four', 'five'];
-  const { motion, entry } = exportedPart({
+  const { entry } = exportedPart({
     stages: [{ kind: 'slide', direction: [1, 0, 0], travel: 5 }],
     stops: names.map((name, i) => ({ name, stage: 0, at: i })),
   });
   expect(modelIssues(entry)).toEqual([]);
   const parsed = parseModel(JSON.parse(JSON.stringify(entry)));
-  expect(parsed.gun?.action?.parts.part?.motion.stops.map(({ name }) => name)).toEqual(names);
-  expect(motion.stops.map(({ clock }) => clock)).toEqual([0, 0.2, 0.4, 0.6, 0.8, 1]);
+  const stops = parsed.gun?.action?.parts.part?.motion.stops;
+  expect(stops?.map(({ name }) => name)).toEqual(names);
+  expect(stops?.map(({ clock }) => clock)).toEqual([0, 0.2, 0.4, 0.6, 0.8, 1]);
 });
 
 it('exports a hinge with two stops and round-trips them through the sidecar schema', () => {
-  const { motion, entry } = exportedPart({
+  const { entry } = exportedPart({
     stages: [{ kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 1, 0] }, angle: -90 }],
     stops: [
       { name: 'open', stage: 0, at: 0 },
@@ -56,6 +57,10 @@ it('exports a hinge with two stops and round-trips them through the sidecar sche
   });
   expect(modelIssues(entry)).toEqual([]);
   const parsed = parseModel(JSON.parse(JSON.stringify(entry)));
-  expect(parsed.gun?.action?.parts.part?.motion.stops).toEqual(motion.stops);
-  expect(stopClock(motion, 'folded')).toBe(1);
+  const exported = parsed.gun!.action!.parts.part!.motion;
+  expect(exported.stops).toEqual([
+    { name: 'open', clock: 0 },
+    { name: 'folded', clock: 1 },
+  ]);
+  expect(stopClock(exported, 'folded')).toBe(1);
 });
