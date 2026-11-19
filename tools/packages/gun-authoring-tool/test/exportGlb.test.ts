@@ -46,7 +46,7 @@ import { FAMILIES } from '../src/gun/parts.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { type ReadGlb, readGlb } from './glbReader.ts';
-import { expectWatertightMesh, loadCorpus, motionOf, partTriangles, strokeOf, variant } from './helpers.ts';
+import { expectWatertightMesh, loadCorpus, motionOf, partTriangles, variant } from './helpers.ts';
 import { sweepGroup } from './sweeps.ts';
 
 const design = (name: string): Assembly => {
@@ -97,10 +97,11 @@ const actionExportFacts = (name: string) => {
   const parts = Object.values(action.parts).map((part) => {
     const node = out.read.json.nodes.find(({ name: nodeName }) => nodeName === part.node)!;
     const partId = part.node.split(':')[0]!;
+    const slide = slideOf(part.motion);
     return {
       hasMesh: node.mesh !== undefined,
-      axisLength: Math.hypot(...part.axis),
-      strokeMetres: part.strokeMetres,
+      axisLength: Math.hypot(...slide.direction),
+      strokeMetres: slide.travel,
       expectedStrokeMetres: slideOf(motionOf(out.resolved, partId)).travel * out.resolved.domain.units.metresPerUnit,
     };
   });
@@ -118,14 +119,7 @@ const actionExportFacts = (name: string) => {
     holdOpen: action.holdOpen,
     fireDuration: action.fire.durationSimSeconds,
     handDuration: action.hand.durationSimSeconds,
-    phases: [
-      action.fire.rearwardSimSeconds,
-      action.fire.dwellSimSeconds,
-      action.fire.forwardSimSeconds,
-      action.hand.rearwardSimSeconds,
-      action.hand.dwellSimSeconds,
-      action.hand.forwardSimSeconds,
-    ],
+    phases: [...action.fire.legs, ...action.hand.legs].map(({ seconds }) => seconds),
     ejectAt: action.ejectAt,
     modes: Object.fromEntries(Object.entries(action.parts).map(([role, part]) => [role, part.modes])),
     parts,
@@ -357,15 +351,12 @@ describe('glb export: nodes', () => {
     expect((root.extras!.gungen as { materialCount: number }).materialCount).toBe(ar.read.json.materials.length);
   });
 
-  it('emits the BCG as its own node with linear travel extras and keeps port metadata children', () => {
+  it('emits the BCG as its own node, its motion in the sidecar rather than the node extras, and keeps port metadata children', () => {
     const node = ar.read.json.nodes.find((entry) => entry.extras?.part === 'bolt-carrier')!;
     expect(node.name).toBe(partNodeName('bolt-carrier', 'bolt-carrier'));
-    expect(node.extras?.motion).toEqual({
-      kind: 'linear',
-      axis: slideOf(motionOf(ar.resolved, 'bolt-carrier')).direction,
-      rest: [0, 0, 0],
-      rearmost: strokeOf(ar.resolved, 'bolt-carrier'),
-    });
+    expect(node.extras).not.toHaveProperty('motion');
+    const slide = slideOf(ar.modelEntry.gun.action!.parts.carrier!.motion);
+    expect(slide.travel).toBeCloseTo(slideOf(motionOf(ar.resolved, 'bolt-carrier')).travel * S, 9);
     expect((node.children ?? []).some((index) => ar.read.json.nodes[index]!.name === 'bolt-carrier.mount')).toBe(true);
   });
 

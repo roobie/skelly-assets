@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@skelly/construct": "*",
-    "@skelly/motion": "*",
     "@skelly/thing-core": "*",
     "valibot": "^1.5.0"
   },

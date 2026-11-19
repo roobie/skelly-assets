@@ -16,9 +16,6 @@ import {
   compose,
   invert,
   type Mat3,
-  normalize,
-  scale,
-  sub,
   type Transform,
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
@@ -27,7 +24,6 @@ import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geome
 import { displayBevel, meshForSolid, meshForSolidGroup, terracedMesh } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { TerraceLattice } from '@skelly/construct/shapes/terrace.ts';
-import type { Motion } from '@skelly/motion/motion';
 import { surfaceOf } from '@skelly/thing-core/materials';
 import { invalidPaletteFinish, type ResolvedAppearance, resolveAppearance } from './appearance.ts';
 import type {
@@ -396,7 +392,6 @@ interface PartExport {
   readonly family: string;
   readonly appearance?: PartInstance['appearance'];
   readonly def: Omit<PartDef, 'motion'>;
-  readonly motion?: Motion;
   readonly placed: Transform;
 }
 
@@ -424,32 +419,6 @@ const splitMixed = (
       : item.solids.map((solid) => ({ id: solid.id, solids: [solid], merged: false }));
   });
 const fail = (error: GlbExportError): GlbExportResult => ({ ok: false, error });
-
-/** The established GLB extras keys, for the motion of a part with one slide and at most one hinge. */
-const motionMetadata = ({ stages }: Motion) => {
-  const slide = stages.find((stage) => stage.kind === 'slide');
-  const hinge = stages.find((stage) => stage.kind === 'hinge');
-  if (!slide || stages.length !== (hinge ? 2 : 1)) {
-    throw new Error('the GLB extras describe a part with one slide and at most one hinge');
-  }
-  return {
-    kind: 'linear',
-    axis: slide.direction,
-    ...(hinge
-      ? {
-          turn: {
-            pivot: hinge.axis.from,
-            axis: normalize(sub(hinge.axis.to, hinge.axis.from)),
-            angleRadians: (hinge.angle * Math.PI) / 180,
-          },
-        }
-      : {}),
-    // biome-ignore lint/complexity/useLiteralKeys: preserve legacy GLB keys without core domain identifiers.
-    ['rest']: [0, 0, 0],
-    // biome-ignore lint/complexity/useLiteralKeys: preserve legacy GLB keys without core domain identifiers.
-    ['rearmost']: scale(slide.direction, slide.travel),
-  };
-};
 
 /** Checks the input in the order the frozen error variants are listed; the first problem wins. */
 const refusal = (input: Parameters<ExportGlb>[0]): GlbExportError | undefined => {
@@ -537,7 +506,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     .sort()
     .flatMap((id) => {
       const def = resolved.defs.get(id);
-      const motion = resolved.motions.get(id);
       const placed = resolved.placed.get(id);
       const instance = resolved.assembly.parts[id];
       return def && placed && instance
@@ -547,7 +515,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
               family: instance.family,
               ...(instance.appearance ? { appearance: instance.appearance } : {}),
               def,
-              ...(motion ? { motion } : {}),
               placed,
             },
           ]
@@ -896,7 +863,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       ...(appearance.material === undefined ? {} : { material: appearance.material }),
       ...(appearance.slot === undefined ? {} : { slot: appearance.slot }),
       solids: drawn.map((s) => s.id),
-      ...(part.motion ? { motion: motionMetadata(part.motion) } : {}),
       ...(joints?.mount ? { mount: joints.mount } : {}),
       ...(joints && joints.meets.length > 0 ? { meets: joints.meets } : {}),
     };

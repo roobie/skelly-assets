@@ -1,15 +1,12 @@
-import { type Motion, stopsError } from '@skelly/motion/motion';
 import {
   array,
   type BaseIssue,
   type BaseSchema,
   check,
   finite,
-  type GenericSchema,
   type InferOutput,
   literal,
   maxValue,
-  minLength,
   minValue,
   nonEmpty,
   number,
@@ -17,28 +14,25 @@ import {
   optional,
   picklist,
   pipe,
-  rawCheck,
   record,
   regex,
   strictObject,
   string,
   tuple,
-  variant,
 } from 'valibot';
 import { BuildingReaderSchema } from './building.ts';
 import { ModelPointSchema } from './modelPoint.ts';
+import { MotionSchema } from './motionSchema.ts';
+import { Name, PositiveSchema, UnitVectorSchema } from './schemaPrimitives.ts';
 
+export { MotionSchema, OpenAngleSchema, StopsSchema } from './motionSchema.ts';
+export { Name } from './schemaPrimitives.ts';
 export { ModelPointSchema };
 
 const dotOf = (a: readonly number[], b: readonly number[]) => a.reduce((sum, value, axis) => sum + value * b[axis]!, 0);
-const UnitVectorSchema = pipe(
-  ModelPointSchema,
-  check((point) => Math.abs(Math.hypot(...point) - 1) <= 1e-6, 'must be a unit vector'),
-);
 const ID_PATTERN = /^[a-z0-9_]+$/;
 const CALIBRE_ID_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
 export const Id = pipe(string(), regex(ID_PATTERN, 'must be lowercase letters, digits and _'));
-export const Name = pipe(string(), nonEmpty('must not be empty'));
 export const CalibreId = pipe(string(), regex(CALIBRE_ID_PATTERN, 'must be a cartridge-data id'));
 
 export { type FirearmPrimitives, firearmModelSchema } from './firearmModelSchema.ts';
@@ -116,78 +110,6 @@ const surfaceEntries = {
   size: tuple([pipe(number(), finite(), minValue(0)), pipe(number(), finite(), minValue(0))]),
 };
 
-const positive = pipe(
-  number(),
-  finite(),
-  check((value) => value > 0, 'must be positive'),
-);
-
-/** The authored stop of a hinge in degrees: a part opening further than a half turn would pass through its carrier. */
-export const OpenAngleSchema = pipe(positive, maxValue(180));
-
-/** A stage's part of its motion's clock, from 0 to 1, which it runs through linearly. */
-const ShareSchema = pipe(
-  number(),
-  finite(),
-  check((share) => share > 0 && share <= 1, 'stage share must be above 0 and at most 1'),
-);
-
-/**
- * The named places on a motion's clock, in order from rest at 0 to the end of travel at 1, so a reader finds a place by what it
- * is called rather than by a number it would have to guess.
- */
-export const StopsSchema = pipe(
-  array(strictObject({ name: Name, clock: pipe(number(), finite(), minValue(0), maxValue(1)) })),
-  minLength(2, 'needs a stop at rest and one at the end'),
-  check((stops) => stops[0]?.clock === 0 && stops.at(-1)?.clock === 1, 'must run from clock 0 to 1'),
-  rawCheck(({ dataset, addIssue }) => {
-    const error = dataset.typed ? stopsError(dataset.value) : undefined;
-    if (error !== undefined) addIssue({ message: error });
-  }),
-);
-
-/**
- * A part's motion from rest to the end of its travel, in the model frame and metres; the type, and what the stages and the
- * stops mean, is `@skelly/motion`, `Motion`. Each stage's share is above 0 and they sum to 1.
- */
-export const MotionSchema = strictObject({
-  stages: pipe(
-    array(
-      variant('kind', [
-        strictObject({
-          kind: literal('hinge'),
-          axis: pipe(
-            strictObject({ from: ModelPointSchema, to: ModelPointSchema }),
-            check(
-              ({ from, to }) => from.some((value, axis) => value !== to[axis]),
-              'hinge axis needs two distinct points',
-            ),
-          ),
-          angle: pipe(
-            number(),
-            finite(),
-            check((angle) => angle !== 0 && Math.abs(angle) <= 180, 'hinge angle must be nonzero, at most a half turn'),
-          ),
-          share: ShareSchema,
-        }),
-        strictObject({
-          kind: literal('slide'),
-          direction: UnitVectorSchema,
-          travel: positive,
-          stow: optional(pipe(number(), finite())),
-          share: ShareSchema,
-        }),
-      ]),
-    ),
-    nonEmpty(),
-    check(
-      (stages) => Math.abs(stages.reduce((sum, { share }) => sum + share, 0) - 1) <= 1e-9,
-      'stage shares must sum to 1',
-    ),
-  ),
-  stops: StopsSchema,
-}) satisfies GenericSchema<unknown, Motion>;
-
 /** A stowage port's frame: its origin, x along its normal, y along its up and z = normal × up. */
 const StowageFrameSchema = pipe(
   strictObject({ position: ModelPointSchema, normal: UnitVectorSchema, up: UnitVectorSchema }),
@@ -252,7 +174,7 @@ export const NeutralModelSchema = strictObject({
    * On footwear, how far in metres its sole stands the bare foot above the ground: the sole lies under the foot, so a
    * consumer stands the figure that wears it that much higher, by the largest lift among what it wears.
    */
-  soleLift: optional(positive),
+  soleLift: optional(PositiveSchema),
   /**
    * Where the hand holds the model, and the XYZ Euler turn in degrees that carries the file's axes onto the held axes,
    * working end +z and up +y, so a model that faces its working end forward needs none.

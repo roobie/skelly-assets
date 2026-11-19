@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
 import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip, slerp } from './clipFrames.mjs';
+import { heldItem } from './heldMotion.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -323,53 +324,15 @@ function drawEyeTile(obj, size, figure) {
   return tile.toDataURL('image/png');
 }
 
-// The node of `obj` marked as the part `part`; the model needs exactly one.
-function partNode(obj, model, part) {
-  const found = [];
-  obj.traverse((node) => {
-    if (node.userData.part === part) found.push(node);
-  });
-  if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
-  return found[0];
-}
-
-// A copy of a held model at rest, `obj`, and `move(moved)`, which stands each moving part the share `moved` gives it
-// (a pose file's `moved` for the model) of the way along its linear motion and the rest at rest. A motion's ends are in
-// the part's own axes and in the model's unit, which the model's root node states (the gun exporter's `gungen` extras).
-function heldItem(scene, model) {
-  const obj = scene.clone(true);
-  const slides = new Map();
-  const slideOf = (part) => {
-    if (slides.has(part)) return slides.get(part);
-    const node = partNode(obj, model, part);
-    const { motion } = node.userData;
-    if (motion?.kind !== 'linear') throw new Error(`moved.${model}.${part}: ${part} has no linear motion`);
-    let unit;
-    for (let o = node; o && unit === undefined; o = o.parent) unit = o.userData.gungen?.metresPerUnit;
-    if (!unit) throw new Error(`moved.${model}.${part}: ${model} states no unit for its motion`);
-    const rest = node.position.clone();
-    const stroke = new THREE.Vector3(...motion.rearmost)
-      .sub(new THREE.Vector3(...motion.rest))
-      .multiplyScalar(unit)
-      .applyQuaternion(node.quaternion);
-    const slide = (share) => node.position.copy(rest).addScaledVector(stroke, share);
-    slides.set(part, slide);
-    return slide;
-  };
-  const move = (moved = {}) => {
-    for (const part of Object.keys(moved)) slideOf(part);
-    for (const [part, slide] of slides) slide(moved[part] ?? 0);
-  };
-  return { obj, move };
-}
-
-// Each held model's scene, loaded once at the origin.
+// Each held model's scene, loaded once at the origin, with the action its sidecar gives it.
 const heldScenes = new Map();
 function heldScene(model) {
   if (!heldScenes.has(model))
     heldScenes.set(
       model,
-      loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] }).then(({ scene }) => scene),
+      Promise.all([ready, loadEntry({ id: `held ${model}`, sites: [{ model, at: [0, 0, 0] }] })]).then(
+        ([{ models }, { scene }]) => ({ scene, action: models.get(model)?.action }),
+      ),
     );
   return heldScenes.get(model);
 }

@@ -8,9 +8,12 @@ import {
   mulMM,
   mulMV,
   rotation,
+  scale,
+  type Transform,
   transpose,
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
+import { type Motion, transformMotion } from '@skelly/motion/motion';
 import { type Forward, FRONT_TURNS } from '@skelly/thing-core/frame';
 import unitScale from '../../../../../models/guns/tables/unitScale.json' with { type: 'json' };
 
@@ -71,6 +74,26 @@ export const inFileFrame = (resolved: Resolved): Resolved => ({
     [...resolved.placed].map(([id, placed]) => [id, compose(rotation(FILE_FROM_GUNGEN), placed)] as const),
   ),
 });
+
+/**
+ * A part's motion, authored in the part's own frame and units, as it moves in the file: placed where the part sits, in the
+ * file's axes and in metres.
+ */
+export const fileMotion = (motion: Motion, placed: Transform, metresPerUnit: number): Motion => {
+  const [a, b, c, d, e, f, g, h, i] = mulMM(FILE_FROM_GUNGEN, placed.r);
+  return transformMotion(
+    motion,
+    {
+      rotation: [
+        [a!, b!, c!],
+        [d!, e!, f!],
+        [g!, h!, i!],
+      ],
+      shift: scale(toFileAxes(placed.t), metresPerUnit),
+    },
+    metresPerUnit,
+  );
+};
 
 /**
  * Held-model `grip.turn` for a model written with `fileFromGungen`: the fixed rotation that carries the

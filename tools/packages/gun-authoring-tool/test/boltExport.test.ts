@@ -267,20 +267,16 @@ it('exports integral capacity from the well, iron or fitted-optic sights, and a 
   parseModel(model);
   parseModel(optic.modelEntry);
   const { hand } = model.gun.action!;
-  expect(
-    hand.unlockSimSeconds! +
-      hand.rearwardSimSeconds +
-      hand.dwellSimSeconds +
-      hand.forwardSimSeconds +
-      hand.lockSimSeconds!,
-  ).toBeLessThanOrEqual(hand.durationSimSeconds);
-  for (const phase of ['unlockSimSeconds', 'lockSimSeconds'] as const) {
-    const bad = structuredClone(model);
-    delete bad.gun.action!.hand[phase];
-    expect(modelIssues(bad).map(({ message }) => message)).toContain(
-      'turning parts need unlock and lock phases in every referenced timeline',
-    );
-  }
+  expect(hand.legs.map(({ to }) => to)).toEqual(['unlocked', 'open', 'open', 'unlocked', 'rest']);
+  expect(hand.legs.reduce((sum, { seconds }) => sum + seconds, 0)).toBeLessThanOrEqual(hand.durationSimSeconds);
+  const action = model.gun.action!;
+  const unlockedForGood = {
+    ...model,
+    gun: { ...model.gun, action: { ...action, hand: { ...hand, legs: hand.legs.slice(0, -1) } } },
+  };
+  expect(modelIssues(unlockedForGood).map(({ message }) => message)).toContain(
+    'every timeline must end with its parts back at rest',
+  );
 });
 
 it('accepts and exports a top-loaded action over a well-less lower as a hand-fed single-shot', () => {
