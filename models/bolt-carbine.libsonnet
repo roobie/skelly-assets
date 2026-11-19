@@ -17,7 +17,7 @@ local sightTop = 0.375;  // the height both sights' tops share
 // back keeps a hand's gap ahead of the trigger guard.
 local roundLength = 0.11;
 local wall = 0.011;
-local magBack = bolt.guardFront + 0.02;
+local magBack = bolt.guard.front + 0.012;
 local magFront = magBack + roundLength + 2 * wall;
 local magTop = underside;
 

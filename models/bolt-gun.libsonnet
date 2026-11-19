@@ -7,8 +7,12 @@ local box = h.box;
 {
   // Where the receiver's back meets the stock.
   joint: -0.18,
-  // The x at which the trigger guard's front ends, which anything hung ahead of the grip must clear.
-  guardFront: 0.005,
+  // The trigger group is sized for a trooper in thick armoured gauntlets, whose finger is about twice a bare one's
+  // thickness. `front` is the x at which the guard ends, which anything hung ahead of the grip must clear; `opening`
+  // is the height of the gap under the trigger's root, `bar` the guard's thickness. The trigger blade stands `gap`
+  // ahead of the grip, leaning its `sweep` forward down its `length`, so the finger has the guard's length ahead of it.
+  guard: { front: 0.02, opening: 0.06, bar: 0.012, halfWidth: 0.011 },
+  trigger: { gap: 0.012, width: 0.02, length: 0.045, sweep: 0.006, halfWidth: 0.007 },
 
   // A section from `y0` to `y1`, `w` its half width, its top edges cut back by `top` and its bottom edges by
   // `bottom`, as the [y, z] outline of a prism along x. Cut edges keep the chunky slabs from reading as raw boxes.
@@ -27,13 +31,21 @@ local box = h.box;
 
   // The pistol grip with a flared cap, trigger guard and trigger, hung from height `top`, at or just inside the
   // receiver's underside.
-  grip(top): [
-    h.prism('grip', 'grip', 'z', [[-0.13, top], [-0.07, top], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
-    h.prism('grip-cap', 'body', 'z', [[-0.16, 0.034], [-0.096, 0.034], [-0.093, 0.024], [-0.1, 0.016], [-0.158, 0.016], [-0.164, 0.024]], -0.03, 0.03),
-    box('guard', 'metal', [-0.075, top - 0.045, -0.008], [0.005, top - 0.033, 0.008]),
-    box('guard-front', 'metal', [-0.005, top - 0.045, -0.008], [$.guardFront, top, 0.008]),
-    box('trigger', 'metal', [-0.045, top - 0.033, -0.005], [-0.033, top - 0.002, 0.005]),
-  ],
+  grip(top):
+    local front = -0.07, g = $.guard, t = $.trigger;
+    // The x of the grip's front at height `y`, raked back toward its foot.
+    local frontAt(y) = -0.10 + (front + 0.10) * (y - 0.03) / (top - 0.03);
+    local floor = top - g.opening, bottom = floor - g.bar, blade = front + t.gap;
+    [
+      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
+      h.prism('grip-cap', 'body', 'z', [[-0.16, 0.034], [-0.096, 0.034], [-0.093, 0.024], [-0.1, 0.016], [-0.158, 0.016], [-0.164, 0.024]], -0.03, 0.03),
+      // The guard's bottom bar runs back into the grip, so it reads as one with it.
+      box('guard', 'metal', [frontAt(bottom) - g.bar, bottom, -g.halfWidth], [g.front, floor, g.halfWidth]),
+      box('guard-front', 'metal', [g.front - g.bar, floor, -g.halfWidth], [g.front, top, g.halfWidth]),
+      h.prism('trigger', 'metal', 'z', [
+        [blade, top], [blade + t.width, top], [blade + t.width + t.sweep, top - t.length], [blade + t.sweep, top - t.length],
+      ], -t.halfWidth, t.halfWidth),
+    ],
 
   // The stock's size against its outline, so the stock is resized in one place without redrawing it.
   stockScale: 0.9,
