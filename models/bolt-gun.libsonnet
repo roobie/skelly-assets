@@ -19,8 +19,18 @@ local box = h.box;
   // The x at which a feed hung under the receiver, a magazine's well or a cell's cap, starts: a small clearance ahead
   // of the guard, so the two read as separate parts while the feed stays close ahead of the grip.
   feedBack: $.guard.front + 0.006,
-  // How far a band stands proud of the section it wraps: one voxel at the guns' grain, so it always reads.
-  bandProud: 0.004,
+  // How far a feed hung under the receiver rises up into it, so no seam shows between them.
+  feedSeat: 0.01,
+  // The guns' voxel size, the smallest step that still reads.
+  grain: 0.004,
+  // How far a band stands proud of the section it wraps: one voxel, so it always reads.
+  bandProud: $.grain,
+
+  // The x of the `count` parts `length` long spread from `from` to `to`, each centred in an equal share, so a row of
+  // them reads as evenly spaced whatever its length.
+  spread(count, from, to, length):
+    local pitch = (to - from) / count;
+    [from + i * pitch + (pitch - length) / 2 for i in std.range(0, count - 1)],
 
   // A section from `y0` to `y1`, `w` its half width, its top edges cut back by `top` and its bottom edges by
   // `bottom`, as the [y, z] outline of a prism along x. Cut edges keep the chunky slabs from reading as raw boxes.
@@ -71,10 +81,10 @@ local box = h.box;
     ],
 
   // The energy guns' power cell, hung under a receiver whose underside is at `underside`, with its brass foot from
-  // `capBack` and its body to `front`, seated a little up into the receiver so no seam shows: an octagonal block with a
-  // glowing window down each side. Slot `glow` must be in the gun's finish.
+  // `capBack` and its body to `front`: an octagonal block with a glowing window down each side. Slot `glow` must be in
+  // the gun's finish.
   cell(front, underside, capBack=$.feedBack):
-    local half = 0.055, foot = 0.02, top = underside + 0.01, lip = 0.005, back = capBack + lip;
+    local half = 0.055, foot = 0.02, top = underside + $.feedSeat, lip = 0.005, back = capBack + lip;
     // The windows keep an even margin of the cell's body above and below them.
     local margin = 0.03, windows = [foot + margin, top - margin];
     // The cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
@@ -140,6 +150,6 @@ local box = h.box;
       grip: 'rubber-black',
     } + finish) + h.gripOn(id, 'grip') + {
       taxonomy: { category: 'weapons', tags: { weapon: [weapon], setting: ['sci-fi'] } },
-      voxelGrain: 0.004,
+      voxelGrain: $.grain,
     },
 }

@@ -17,8 +17,8 @@ local shroudBottom = 2 * barrelY - top;
 local shroudCut = 0.016;
 local mouth = 0.955;  // where the shroud ends and the muzzle stands out
 local bandLength = 0.03;  // the length of the brass band at either end of the shroud
-// The vents down each side of the shroud, each centred in an equal share of the shroud between its bands.
-local vents = { count: 7, length: 0.04, x0: front + bandLength, pitch: (mouth - bandLength - self.x0) / self.count };
+// The vents down each side of the shroud, spread along it between its bands.
+local vents = { count: 7, length: 0.04, x: bolt.spread(self.count, front + bandLength, mouth - bandLength, self.length) };
 local muzzleX = 0.98;
 local ridgeTop = 0.36;  // the top ridge's crest, the rear of the sight line
 local sightTop = 0.375;  // the front post's tip, standing on the ridge
@@ -36,7 +36,7 @@ local ribStart = pump.x0 + (pump.x1 - pump.x0 - (pump.ribs - 1) * pump.ribPitch 
     bolt.band('breech-band', 'trim', front, front + bandLength, shroudBottom, top, w, shroudCut),
     bolt.band('shroud-band', 'trim', mouth - bandLength, mouth, shroudBottom, top, w, shroudCut),
   ] + [
-    local x = vents.x0 + i * vents.pitch + (vents.pitch - vents.length) / 2;
+    local x = vents.x[i];
     box('vent-%d-%s' % [i, s], 'vent', [x, barrelY - 0.02, if s == 'r' then w - 0.001 else -w - 0.002], [x + vents.length, barrelY + 0.02, if s == 'r' then w + 0.002 else -w + 0.001])
     for i in std.range(0, vents.count - 1)
     for s in ['l', 'r']
