@@ -130,7 +130,8 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       wrist: { part: 'fore', solid: 'wrist', fraction: [0.5, 0, 0.5] },
       knuckles: { part: 'palm', solid: 'palm', fraction: [0.5, 0, 0.5] },
       thumb_root: { part: 'thumb', solid: 'thumb', fraction: [0.5, 1, 0] },
-      grip: { part: 'palm', solid: 'palm', fraction: [0.5, 0.5, 0.5] },
+      // The palm's y runs from the knuckles (0) to the wrist (1).
+      grip: { part: 'palm', solid: 'palm', fraction: [0.5, 1 - hand.fistShare, 0.5] },
     },
   },
   {

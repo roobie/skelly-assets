@@ -112,17 +112,16 @@ export function heldWeapon(entry, mesh) {
 
 /**
  * The socket a hand closes on, in the weapon's file: `seat` metres along the handle from the grip point toward the
- * working end, the palm on the handle's surface on the side `into` (held axes) points away from, the thumb toward the
- * working end. The handle runs along the held +z, so the surface is found by depth from the axis.
+ * working end, on the handle's axis, the palm facing it from the side `into` (held axes) points away from, the thumb
+ * toward the working end. A game's figure holds an item with its grip point on the palm's face, so the doll's palm
+ * meets the axis rather than the handle's surface, and a clip baked on the doll seats the weapon in the figure's fist.
  */
 export function gripSocket(weapon, { seat, into }) {
   const toFile = transpose(weapon.held);
   const axis = mulMV(toFile, [0, 0, 1]);
   const centre = add(weapon.at, scale(axis, seat));
-  const across = mulMV(toFile, normalize([into[0], into[1], 0]));
-  const radius = -signedDepth(weapon.solid, centre);
-  if (!(radius > 0)) throw new Error(`grip seat ${seat} lies off the handle`);
-  return { at: r4(sub(centre, scale(across, radius))), into: r4(across), axis: r4(axis) };
+  if (!(signedDepth(weapon.solid, centre) < 0)) throw new Error(`grip seat ${seat} lies off the handle`);
+  return { at: r4(centre), into: r4(mulMV(toFile, normalize([into[0], into[1], 0]))), axis: r4(axis) };
 }
 
 /** The anchor `from` of the weapon (`heldWeapon`'s `anchors`) moved by `offset` (held axes, metres), in its file. */
@@ -365,15 +364,21 @@ function seatOn(rig, frame, item, lead) {
   return { r: mulMM(back, item.r), t: mulMV(back, sub(item.t, hand.t)) };
 }
 
+// A rounded quaternion scaled back to unit length.
+const unitQuat = (q) => {
+  const n = Math.hypot(...q);
+  return q.map((c) => c / n);
+};
+
 /**
  * The seat as a game reads it: the leading hand's bone, and the weapon's grip point and held axes (working end +z, up
  * +y) in that bone's rest frame, so the bone's transform carries them and a game seats any weapon of the class by its
- * own grip.
+ * own grip. The turn is unit length as written, so a game checks it as strictly as any other rotation.
  */
 const heldSeat = (seat, weapon, lead) => ({
   bone: lead,
   at: r4(add(mulMV(seat.r, weapon.at), seat.t)),
-  turn: r4(mat3ToQuat(mulMM(seat.r, transpose(weapon.held)))),
+  turn: unitQuat(r4(mat3ToQuat(mulMM(seat.r, transpose(weapon.held))))),
 });
 
 /**
@@ -751,7 +756,7 @@ export function wieldProblems(reports) {
 // presets a pose file names.
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
 const MELEE_DOC =
-  "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; a class wielding with one hand swings its arms as there, the weapon riding the leading hand, while a two-hand class keeps both hands on its weapon as its idle holds it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
+  "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; a class wielding with one hand swings its arms as there, the weapon riding the leading hand, while a two-hand class keeps both hands on its weapon as its idle holds it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip; each hand on the weapon holds its handle's axis on the palm's face beside the arm's grip anchor, where a figure's fist holds an item.";
 const GUNS_DOC =
   "The doll's held gun clips by name, <gun>_stance_<idle|guard> and <gun>_<walk>_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. <gun>_<walk>_<stance>, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk in that stance, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's and both hands on the gun as in the stance, the gun tipped down by its stance's share of the walk's forward lean; at idle the gun sways a little with the stride, at guard the bore stays ahead and does not sway. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
 /**

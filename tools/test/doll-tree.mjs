@@ -104,6 +104,7 @@ export const dollTree = ({ wears = [], held = false }) => {
   return {
     built,
     manifest,
+    doll,
     rig,
     models,
     sitesIn,

@@ -2,6 +2,7 @@
 // leading. The guard holds the weapon up before the body; the overhead comes down from over the head, the side swing
 // cuts across from the right, the thrust drives the end straight out. Heavy strikes wind up longer than one hand's.
 local body = import 'body.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 local wield = import 'models/measures/wield.libsonnet';
 local legs = body { pelvis: [0, -10, 0], 'thigh.L': [18, 0, 4], 'thigh.R': [-8, 0, -6], 'shin.L': [12, 0, 0], 'shin.R': [14, 0, 0] };
 local held(at, pitch, yaw, roll=0, right=[-0.6, -1, 0], left=[0.6, -1, 0]) = {
@@ -16,15 +17,15 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
   weapon: {
     model: 'baseball_bat',
     lead: 'hand.R',
-    // A hand's width apart, both thumbs toward the working end.
+    // A hand's width apart, both thumbs toward the working end, each where a game's fist holds it.
     hands: {
-      'hand.L': { seat: 0, into: [1, 0, 0], hands: 'grip' },
-      'hand.R': { seat: wield.twoHand.leadSeat, into: [1, 0, 0], hands: 'grip' },
+      'hand.L': { seat: 0, into: [1, 0, 0], grip: hand.fistShare, hands: 'grip' },
+      'hand.R': { seat: wield.twoHand.leadSeat, into: [1, 0, 0], grip: hand.fistShare, hands: 'grip' },
     },
   },
   stances: {
     // The weapon carried low across the body, its end down by the left foot.
-    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.18, -0.42, 0.18], 20, 25, 80, [-0.74, -0.67, 0], [-0.47, -0.79, -0.39]) },
+    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.19, -0.42, 0.17], 20, 25, 80, [-0.74, -0.67, 0], [-0.47, -0.79, -0.39]) },
     guard: guard,
   },
   // Walked as the idle stands, both hands on the weapon: swung in one hand, a two-hand weapon hangs into the body. It

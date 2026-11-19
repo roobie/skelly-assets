@@ -3,6 +3,7 @@
 // the right, the backhand from the left; the overhead comes down from behind the head; the thrust drives the tip
 // straight out from a hand drawn back by the hip.
 local body = import 'body.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 local legs = body { pelvis: [0, 12, 0], 'thigh.R': [18, 0, -4], 'thigh.L': [-8, 0, 6], 'shin.R': [12, 0, 0], 'shin.L': [14, 0, 0] };
 local left = { at: [-0.04, -0.12, 0.2], pole: [0.4, -1, 0], twist: 0 };
 local held(at, pitch, yaw, roll=0, pole=[-0.5, -1, 0]) = { at: at, aim: { pitch: pitch, yaw: yaw, roll: roll }, poles: { 'hand.R': pole } };
@@ -13,15 +14,15 @@ local swing = { shares: { windup: 18, strike: 12, follow: 25, recovery: 45 }, se
   weapon: {
     model: 'baseball_bat',
     lead: 'hand.R',
-    // The thumb toward the working end, the palm on the weapon's right as it points ahead.
-    hands: { 'hand.R': { seat: 0, into: [1, 0, 0], hands: 'grip' } },
+    // The thumb toward the working end, the palm on the weapon's right as it points ahead, where a game's fist holds it.
+    hands: { 'hand.R': { seat: 0, into: [1, 0, 0], grip: hand.fistShare, hands: 'grip' } },
   },
   free: { 'hand.L': { hands: 'fist' } },
   stances: {
     // The weapon hanging from a relaxed hand by the thigh, its end down and forward.
     idle: {
       body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] },
-      weapon: held([0.02, -0.46, 0.1], 25, 0, 80, [-0.73, 0, -0.68]),
+      weapon: held([0.02, -0.46, 0.1], 25, 0, 68, [-0.73, 0, -0.68]),
       free: { 'hand.L': { at: [-0.03, -0.5, 0.06], pole: [0, 0, -1], twist: 0 } },
     },
     guard: guard,

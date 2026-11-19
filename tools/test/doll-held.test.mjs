@@ -7,7 +7,18 @@ import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { holdItem } from '../../site/fingers.mjs';
-import { add, applyPoint, boneTransforms, length, mulMM, mulMV, quatToMat3, sub } from '../../site/kinematics.mjs';
+import {
+  add,
+  applyPoint,
+  boneTransforms,
+  length,
+  mulMM,
+  mulMV,
+  quatToMat3,
+  scale,
+  sub,
+  transpose,
+} from '../../site/kinematics.mjs';
 import { compilePose } from '../../site/poseFile.mjs';
 import { poseJson } from '../keyFrames.mjs';
 import { outputPath } from '../layout.mjs';
@@ -29,7 +40,7 @@ import {
 import { dollTree, heldThings, repo, WEAR } from './doll-tree.mjs';
 
 // One garment dresses the doll, for the body a held gun must stand clear of.
-const { built, manifest, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
+const { built, manifest, doll, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
 const { pressCheck, wields, guns, gunIds } = heldThings();
 const rest = restIn(WEAR);
 
@@ -227,6 +238,48 @@ test("a weapon seated by a strike's held seat stands where the hit key holds it,
       end[2] > chest.t[2] + 0.3,
       `${name}: the striking end stands ${(end[2] - chest.t[2]).toFixed(2)} m ahead of the chest`,
     );
+  }
+});
+
+// skelly holds an item with its grip point on the palm's face where the arm's grip anchor lies
+// (https://github.com/roobie/skelly, `packages/presentation/src/render/armRig.ts`, `gripFromWrist`), and plays a wield
+// clip's held seat on its figure only within this of that point (https://github.com/roobie/skelly,
+// `packages/deadvox/test/wieldStance.test.ts`, `HAND_TOLERANCE_METRES`).
+const FIST_TOLERANCE = 0.005;
+// Where the figure's fist of `hand` closes, in the doll frame at rest: the palm's face beside the arm's grip anchor.
+const fistPoint = (hand) => {
+  const { model, site, box, mirror } = hand.bind;
+  const sign = mirror ? -1 : 1;
+  const [x, y, z] = thingOf(model).anchors.grip;
+  const anchor = add(doll.sites[site].at, [sign * x, y, z]);
+  return [sign > 0 ? box.max[0] : box.min[0], anchor[1], anchor[2]];
+};
+
+test("a melee guard's held seat closes each hand's fist on the weapon where the player figure holds it", () => {
+  const armed = Object.entries(wields.classes).filter(([, { weapon }]) => weapon);
+  assert.ok(armed.length > 1);
+  const guards = {
+    ...wields,
+    classes: Object.fromEntries(
+      armed.map(([name, c]) => [name, { ...c, stances: { guard: c.stances.guard }, strikes: {}, walks: {} }]),
+    ),
+  };
+  const { clips } = wieldClips(rig, { wields: guards, weapons, gait }, itemMesh);
+  for (const [kind, { weapon }] of armed) {
+    const clip = clips[`${kind}_stance_guard`];
+    assert.ok(
+      Math.abs(Math.hypot(...clip.held.turn) - 1) < 1e-12,
+      `${kind}: the held turn is ${Math.hypot(...clip.held.turn)} long`,
+    );
+    const posed = boneTransforms(rig.bones, decodeFrame(clip.frames[0]));
+    const seated = seatedWeapon(clip, kind, posed);
+    const along = mulMV(seated.r, mulMV(transpose(weapons[kind].weapon.held), [0, 0, 1]));
+    for (const [id, { seat }] of Object.entries(weapon.hands)) {
+      const onHandle = add(applyPoint(seated, thingOf(weapon.model).grip.at), scale(along, seat));
+      const fist = applyPoint(posed.get(id), fistPoint(rig.bones.find((bone) => bone.id === id)));
+      const off = length(sub(onHandle, fist));
+      assert.ok(off <= FIST_TOLERANCE, `${kind}: ${id}'s fist closes ${(off * 1000).toFixed(1)} mm off the handle`);
+    }
   }
 });
 

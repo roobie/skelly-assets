@@ -24,4 +24,8 @@ local phalanges = std.length(arm.phalanxShares);
   thumbBones: std.length(arm.thumbShares),
   thumbPart(k):: self.part('thumb', k),
   thumbLength(k):: arm.thumbLength * arm.thumbShares[k],
+  // Where a game's fist closes on a held item's grip point, as a share of the palm's length from the wrist: the arm's
+  // grip anchor, and the palm seat of the doll's melee hands, so a wield clip baked on the doll seats its weapon where
+  // the game's figure holds it. The doll's own power grip (models/poses/rig.libsonnet, the hand's `grip`) seats deeper.
+  fistShare: 0.5,
 }
