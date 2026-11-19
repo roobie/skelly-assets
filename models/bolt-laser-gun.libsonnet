@@ -2,12 +2,12 @@ local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local bolt = import 'bolt-gun.libsonnet';
 local box = h.box;
 
-// The bolt carbine's laser gun: the family's grip, stock and energy cell kept, and the receiver itself carried on
-// forward as one chunky block instead of a barrel, its sides cut with slits the beam's light leaks from, coolant
-// canisters piped up its flanks and fins along its top, ending in a squared emitter with a glowing lens. Slot `glow` is
-// the model's own light: crystal-glow-blue is a stand-in colour, the game decides what colour the glow is. About 0.95 m
-// long, a little longer than the plasma caster. Laid out with the muzzle at +x, the axis `gripOn` names, so the built
-// model's muzzle faces +z.
+// The bolt carbine's laser gun: the family's grip and stock kept, a battery pack for its feed, and the receiver itself
+// carried on forward as one chunky block instead of a barrel, its sides cut with slits the beam's light leaks from,
+// coolant canisters piped up its flanks and fins along its top, ending in a squared emitter with a glowing lens. Slot
+// `glow` is the model's own light: crystal-glow-blue is a stand-in colour, the game decides what colour the glow is.
+// About 0.95 m long, a little longer than the plasma caster. Laid out with the muzzle at +x, the axis `gripOn` names,
+// so the built model's muzzle faces +z.
 // Hand-guard point (the off hand's hold): under the emitter's head, midway along it. The canisters, their straps and
 // pipes all end behind the block's front band, so the hand there is clear of them.
 
@@ -18,17 +18,37 @@ local bodyFront = 0.44;  // where the receiver's block ends and the emitter begi
 local bandLength = 0.03;  // the brass band closing the block
 local muzzleX = 0.56;
 local beamY = (underside + top) / 2;  // the beam's axis, the emitter centred on it
-local cellFront = 0.15;
-// The clearance kept between the block's fittings and what they stand beside, so each reads as its own part.
-local gap = 0.02;
-// The block's forward section, which carries the fittings: from a gap ahead of the cell to the front band.
-local section = { back: cellFront + gap, front: bodyFront - bandLength };
 // The x of the `count` parts `length` long spread from `from` to `to`, each centred in an equal share.
 local spread(count, from, to, length) =
   local pitch = (to - from) / count;
   [from + i * pitch + (pitch - length) / 2 for i in std.range(0, count - 1)];
+// The battery pack the gun feeds from, in place of the family's cell, so the laser reads as its own weapon: a heavy
+// steel slab, flat bottomed on a rubber pad with its back raked away from the guard, seated into the receiver through a
+// brass contact plate, with a latch on its front and a charge strip of glowing segments down each side. `half` is its
+// half width; it seats `seat` up into the receiver so no seam shows.
+local battery = {
+  back: bolt.feedBack,
+  front: 0.15,
+  half: 0.06,
+  bottom: 0.012,
+  top: underside + self.seat,
+  seat: 0.01,
+  rake: 0.035,  // how far its back's foot stands forward of its top
+  pad: 0.01,  // the rubber pad's depth
+  contact: 0.012,  // the contact plate's depth, below the receiver's underside
+  // The charge strip: `count` segments in a dark window from `y0` to `y1`, the window inset `margin` inside the faces.
+  // Its segments are two voxels wide with two between them, so each reads apart at the guns' grain.
+  charge: { count: 4, y0: 0.06, y1: 0.095, margin: 0.012, segment: 0.008 },
+  latch: { y0: 0.085, y1: 0.115, half: 0.03, depth: 0.014 },
+  // Rubber ridges across the raked back, where the off hand pulls the battery free.
+  ridges: { count: 3, y0: 0.04, y1: 0.12, thick: 0.012, proud: 0.004 },
+};
+// The clearance kept between the block's fittings and what they stand beside, so each reads as its own part.
+local gap = 0.02;
+// The block's forward section, which carries the fittings: from a gap ahead of the battery to the front band.
+local section = { back: battery.front + gap, front: bodyFront - bandLength };
 // A coolant canister along each flank's foot, half sunk into the side, its brass end caps `cap` long, the back one
-// against the cell's front. Its coolant line, `pipe` wide, rises up the flank a gap behind the section's front, into
+// against the battery's front. Its coolant line, `pipe` wide, rises up the flank a gap behind the section's front, into
 // the block under the fins, and both the line's foot and its riser stand `reach` out from the flank.
 local canister = {
   cap: 0.01,
@@ -39,7 +59,7 @@ local canister = {
   reach: self.sink + self.pipe / 2,
   inlet: top - 0.02,
   riser: section.front - gap - self.pipe,
-  x0: cellFront + self.cap,
+  x0: battery.front + self.cap,
   x1: self.riser - self.cap,
 };
 // The straps holding each canister to the flank, `inset` in from either end.
@@ -56,9 +76,34 @@ local sides = { l: -1, r: 1 };
 // Flank pieces are placed by how far they stand out from the side face, so one definition serves both flanks: a box on
 // flank `s` from `out0` to `out1` out. Pieces start `seat` inside the face so they weld to it.
 local seat = 0.001;
-local onFlank(id, slot, s, min, max, out0, out1) =
-  local z0 = sides[s] * (w + out0), z1 = sides[s] * (w + out1);
+local onSide(face, id, slot, s, min, max, out0, out1) =
+  local z0 = sides[s] * (face + out0), z1 = sides[s] * (face + out1);
   box(id, slot, min + [std.min(z0, z1)], max + [std.max(z0, z1)]);
+local onFlank(id, slot, s, min, max, out0, out1) = onSide(w, id, slot, s, min, max, out0, out1);
+local batteryPieces =
+  local b = battery, c = battery.charge, foot = b.bottom + b.pad;
+  local window = { x0: b.back + b.rake + c.margin, x1: b.front - c.margin };
+  local segments = spread(c.count, window.x0, window.x1, c.segment);
+  // The x of the raked back at height `y`.
+  local backAt(y) = b.back + b.rake * (b.top - y) / (b.top - foot);
+  local ridge(i, y) =
+    local r = b.ridges, y1 = y + r.thick;
+    h.prism('battery-ridge-%d' % i, 'grip', 'z', [
+      [backAt(y) - r.proud, y], [backAt(y) + seat, y], [backAt(y1) + seat, y1], [backAt(y1) - r.proud, y1],
+    ], -b.half, b.half);
+  local ridgeYs = spread(b.ridges.count, b.ridges.y0, b.ridges.y1, b.ridges.thick);
+  [ridge(i, ridgeYs[i]) for i in std.range(0, b.ridges.count - 1)] + [
+    h.prism('battery', 'metal', 'z', [[b.back, b.top], [b.front, b.top], [b.front, foot], [b.back + b.rake, foot]], -b.half, b.half),
+    box('battery-pad', 'grip', [b.back + b.rake, b.bottom, -b.half - 0.002], [b.front, foot, b.half + 0.002]),
+    box('battery-contact', 'trim', [b.back - bolt.bandProud, underside - b.contact, -b.half - bolt.bandProud], [b.front + bolt.bandProud, underside, b.half + bolt.bandProud]),
+    box('battery-latch', 'accent', [b.front, b.latch.y0, -b.latch.half], [b.front + b.latch.depth, b.latch.y1, b.latch.half]),
+  ] + std.flattenArrays([
+    [onSide(b.half, 'battery-charge-%s' % s, 'vent', s, [window.x0, c.y0], [window.x1, c.y1], -seat, 0.002)] + [
+      onSide(b.half, 'battery-charge-%d-%s' % [i, s], 'glow', s, [segments[i], c.y0 + 0.005], [segments[i] + c.segment, c.y1 - 0.005], 0, 0.003)
+      for i in std.range(0, c.count - 1)
+    ]
+    for s in std.objectFields(sides)
+  ]);
 local canisterPart(id, slot, x, length, r, z) =
   h.turned(id, slot, 'x', [[0, 0], [0, r], [length, r], [length, 0]], [x, canister.y, z]) + { sides: 8 };
 [
@@ -95,5 +140,5 @@ local canisterPart(id, slot, x, length, r, z) =
     ]
     for s in std.objectFields(sides)
   ])
-  + bolt.cell(cellFront, underside) + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
+  + batteryPieces + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic laser gun' },
 ]
