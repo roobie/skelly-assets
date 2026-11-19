@@ -131,7 +131,7 @@ describe('resolve', () => {
     // Root the assembly at the sight: the receiver is placed from the sight.
     const fromSight = variant('broken-axis-alignment', (a) => {
       a.root = 'sight';
-      a.connections.find((c) => c.to === 'sight.base')!.slot = 3;
+      a.connections.find((c) => c.to === 'sight.base')!.slot = 7;
     });
     const r1 = resolve(rolled, gunDomain);
     const r2 = resolve(fromSight, gunDomain);
@@ -211,9 +211,9 @@ describe('resolve: structure issues', () => {
     ).toEqual(['Connection #1: part "receiver" (receiver) has no port "nose".']);
     expect(
       structure((a) => {
-        a.connections[7] = { from: 'receiver.rail', slot: 7, to: 'sight.base' };
+        a.connections[7] = { from: 'receiver.rail', slot: 15, to: 'sight.base' };
       }),
-    ).toEqual(['Connection #7: slot 7 is outside receiver.rail (0–6).']);
+    ).toEqual(['Connection #7: slot 15 is outside receiver.rail (0–14).']);
     expect(
       structure((a) => {
         a.connections[7] = { from: 'receiver.rail', slot: 1, to: 'sight.base', roll: 45 };

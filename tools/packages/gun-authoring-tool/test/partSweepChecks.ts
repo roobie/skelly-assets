@@ -68,7 +68,8 @@ export const definePartChecks = (family: PartFamily, cases: Record<string, strin
           ? []
           : bounds(k.box),
       ),
-      ...def.ports.flatMap((p) => [...p.pos, p.slots?.pitch ?? 0]),
+      // A slot pitch is a standard in millimetres, so it is off the grid by design.
+      ...def.ports.flatMap((p) => p.pos),
       ...def.axes
         .filter((axis) => family.name !== 'revolver-cylinder' || axis.kind !== 'bore')
         .flatMap((axis) => [...axis.origin]),

@@ -31,7 +31,7 @@ import { attachmentInstanceForId, attachmentLookIssue, attachmentSlots } from '.
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { METRES_PER_UNIT, toFileAxes } from '../src/gun/exportFrame.ts';
-import { MOUNT_KINDS, MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
+import { MOUNT_KINDS, MOUNT_STANDARDS, mountCanAccept, RAIL_SLOT_PITCH_U, railSlots } from '../src/gun/mounts.ts';
 import { getOptic, LENS_SLOT, OPTIC_CATALOG, OPTIC_TYPE_IDS } from '../src/gun/optics.ts';
 import { GUN_PALETTE, resolveAppearance } from '../src/gun/palette.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
@@ -454,12 +454,22 @@ describe('generic rail mount fit', () => {
   )!;
   const highMag = getOptic('high-mag-5-25x').mount;
 
-  it('requires enough length, slots, matching pitch, and support at the selected slot', () => {
+  it('requires enough length and support at the selected slot', () => {
     expect(rail.mount).toBe('rail-top');
-    expect(mountCanAccept(rail, highMag, 3)).toBe(true);
-    expect(mountCanAccept(rail, highMag, 2)).toBe(false);
-    expect(mountCanAccept({ ...rail, slots: { count: 6, pitch: 2 } }, highMag, 2)).toBe(false);
-    expect(mountCanAccept({ ...rail, slots: { count: 7, pitch: 1.5 } }, highMag, 3)).toBe(false);
+    expect(mountCanAccept(rail, highMag, 7)).toBe(true);
+    expect(mountCanAccept(rail, highMag, 6)).toBe(false);
+    expect(mountCanAccept({ ...rail, slots: railSlots(8) }, highMag, 4)).toBe(false);
+  });
+
+  it('accepts a rail cut at the real 10.01 mm Picatinny pitch', () => {
+    expect(uToMm(RAIL_SLOT_PITCH_U)).toBeCloseTo(10.01, 9);
+    expect(rail.slots?.pitch).toBe(RAIL_SLOT_PITCH_U);
+    expect(mountCanAccept({ ...rail, slots: railSlots(30) }, highMag, 15)).toBe(true);
+  });
+
+  it('rejects a rail whose slots sit at another pitch, however long it is', () => {
+    expect(mountCanAccept({ ...rail, slots: { count: 31, pitch: 2 } }, highMag, 3)).toBe(false);
+    expect(mountCanAccept({ ...rail, slots: { count: 31, pitch: RAIL_SLOT_PITCH_U * 1.01 } }, highMag, 7)).toBe(false);
   });
 
   it('keeps the threaded muzzle interface and supports the high-mag optic on its receiver rail', () => {
@@ -471,8 +481,8 @@ describe('generic rail mount fit', () => {
     expect(MOUNT_STANDARDS.muzzle.family).toBe('thread');
     expect(muzzle.mount).toBe('muzzle');
     expect(heavyRail.mount).toBe('rail-top');
-    expect(heavyRail.slots).toEqual({ count: 11, pitch: 2 });
-    expect(mountCanAccept(heavyRail, highMag, 5)).toBe(true);
+    expect(heavyRail.slots).toEqual({ count: 24, pitch: RAIL_SLOT_PITCH_U });
+    expect(mountCanAccept(heavyRail, highMag, 11)).toBe(true);
   });
 });
 
@@ -915,7 +925,7 @@ describe('optic incompatibility validation', () => {
   it('rejects a rail over the handguard even when the compact footprint fits it', () => {
     const assembly = fitOptic(ar, 0, 'tube-dot');
     assembly.connections = assembly.connections.map((connection) =>
-      connection.to === 'sight.base' ? { ...connection, from: 'handguard.rail', slot: 3 } : connection,
+      connection.to === 'sight.base' ? { ...connection, from: 'handguard.rail', slot: 7 } : connection,
     );
     expect(validate(assembly, gunDomain).issues.map(({ rule }) => rule)).toContain('optic-mount-fit');
   });

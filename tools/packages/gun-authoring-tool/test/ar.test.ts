@@ -8,6 +8,7 @@ import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { AR_ACTION_LAYOUT } from '../src/gun/arLayout.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { magazineRoundColumn } from '../src/gun/magazineGeometry.ts';
+import { RAIL_SLOT_PITCH_U } from '../src/gun/mounts.ts';
 import { BOLT_CARRIER_ENVELOPES, FAMILIES } from '../src/gun/parts.ts';
 import type { GunPortDef } from '../src/gun/portData.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
@@ -33,7 +34,7 @@ describe('AR-pattern parts', () => {
       throw new Error('T-bar is missing');
     }
     expect(bar.box.center[0] + bar.box.half[0]).toBeLessThan(-16);
-    expect(rail?.slots).toEqual({ count: 7, pitch: 2 });
+    expect(rail?.slots).toEqual({ count: 15, pitch: RAIL_SLOT_PITCH_U });
   });
 
   it('gives the AR housing a longer rear plate and sloped side walls without changing insertion clearance', () => {

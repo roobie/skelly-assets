@@ -27,7 +27,7 @@ import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { toFileAxes } from '../src/gun/exportFrame.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
-import { MOUNT_STANDARDS, mountCanAccept } from '../src/gun/mounts.ts';
+import { MOUNT_STANDARDS, mountCanAccept, RAIL_SLOT_PITCH_U, railSlots } from '../src/gun/mounts.ts';
 import { OPTIC_CATALOG, opticRailContactSolids } from '../src/gun/optics.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
 import type { PartItems } from '../src/gun/physical.ts';
@@ -37,9 +37,11 @@ import { readGlb } from './glbReader.ts';
 import { loadCorpus, scopedArDesign } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
 
-/** The middle of three notches, where an attachment spanning its neighbours stays on the rail. */
-const PAIR_NOTCH = 1;
-const PAIR_RAIL_SLOTS = { count: 3, pitch: 2 };
+/** The middle notch, with enough notches either side that an attachment spanning its neighbours stays on the rail. */
+const PAIR_NOTCH = 4;
+const PAIR_RAIL_SLOTS = { count: 2 * PAIR_NOTCH + 1, pitch: RAIL_SLOT_PITCH_U };
+/** Where the pair rails start, so their middle notch sits at the origin. */
+const PAIR_RAIL_START_X = -PAIR_NOTCH * RAIL_SLOT_PITCH_U;
 
 const pairFixture = (withInstalledDefault = false) => {
   const family: PartFamily = {
@@ -53,7 +55,7 @@ const pairFixture = (withInstalledDefault = false) => {
           mount: 'rail-bottom',
           gender: 'female',
           slots: PAIR_RAIL_SLOTS,
-          pos: [-2, 0, 0],
+          pos: [PAIR_RAIL_START_X, 0, 0],
           normal: [0, -1, 0],
           up: [1, 0, 0],
         },
@@ -62,7 +64,7 @@ const pairFixture = (withInstalledDefault = false) => {
           mount: 'rail-bottom',
           gender: 'female',
           slots: PAIR_RAIL_SLOTS,
-          pos: [-2, 0, 0],
+          pos: [PAIR_RAIL_START_X, 0, 0],
           normal: [0, -1, 0],
           up: [1, 0, 0],
         },
@@ -71,7 +73,7 @@ const pairFixture = (withInstalledDefault = false) => {
           mount: 'rail-bottom',
           gender: 'female',
           slots: PAIR_RAIL_SLOTS,
-          pos: [-2, 0, 100],
+          pos: [PAIR_RAIL_START_X, 0, 100],
           normal: [0, -1, 0],
           up: [1, 0, 0],
         },
@@ -100,6 +102,12 @@ const pairFixture = (withInstalledDefault = false) => {
   return { assembly, domain, slots, compatibility, pairs };
 };
 
+const SIGHTLINE_RAIL_SPAN_U = 60;
+/** Notches 4, 24 and 54 units along the rail: two optics too close to coexist, and one far enough from the first. */
+const SIGHTLINE_NEAR_NOTCH = 5;
+const SIGHTLINE_CLOSE_NOTCH = 28;
+const SIGHTLINE_CLEAR_NOTCH = 62;
+
 const sightlinePairFixture = () => {
   const receiver: PartFamily = {
     name: 'receiver',
@@ -114,7 +122,7 @@ const sightlinePairFixture = () => {
           pos: [0, 0, 0],
           normal: [0, 1, 0],
           up: [1, 0, 0],
-          slots: { count: 31, pitch: 2 },
+          slots: railSlots(SIGHTLINE_RAIL_SPAN_U),
         },
       ],
       solids: [{ id: 'receiver-fixture-body', kind: 'box', box: { center: [27, -2, 0], half: [43, 2, 3] } }],
@@ -138,9 +146,9 @@ const sightlinePairFixture = () => {
   const compatibility = attachmentCompatibility(assembly, slots, domain);
   const topRailSlots = slots.filter(({ mount }) => mount === 'rail-top');
   const slotAtNotch = (notch: number) => topRailSlots.find((slot) => slot.notchIndex === notch);
-  const closeFirst = slotAtNotch(2);
-  const closeSecond = slotAtNotch(12);
-  const clearSecond = slotAtNotch(27);
+  const closeFirst = slotAtNotch(SIGHTLINE_NEAR_NOTCH);
+  const closeSecond = slotAtNotch(SIGHTLINE_CLOSE_NOTCH);
+  const clearSecond = slotAtNotch(SIGHTLINE_CLEAR_NOTCH);
   if (!(closeFirst && closeSecond && clearSecond)) {
     throw new Error('Sightline fixture did not expose its near and far notches');
   }
@@ -216,8 +224,8 @@ const singleObstructionFixture = (obstructionKind: 'solid' | 'keep-out') => {
   if (!(rail?.slots && rail.mount === 'rail-top')) {
     throw new Error('Fixture receiver has no top rail');
   }
-  const blockedIndex = 2;
-  const clearIndex = 5;
+  const blockedIndex = 5;
+  const clearIndex = 11;
   const blockedX = rail.pos[0] + rail.up[0] * blockedIndex * rail.slots.pitch;
   const obstructedReceiver: PartFamily = {
     ...receiverFamily,
@@ -292,7 +300,7 @@ const inheritedHostParamFixture = () => {
           pos: [0, 0, 0],
           normal: [0, 1, 0],
           up: [1, 0, 0],
-          slots: { count: 5, pitch: 2 },
+          slots: railSlots(8),
         },
       ],
       solids: [{ id: 'fixture-host-body', kind: 'box', box: { center: [4, -2, 0], half: [8, 2, 3] } }],
@@ -719,6 +727,17 @@ describe('attachment parts and export metadata', () => {
         ({ id, mount }) => id === fittedSight?.mountedAt && mount === fittedSight.mount,
       ),
     ).toBe(true);
+  });
+
+  it('offers every fitted rail iron sight at its own mount, on the AR and the anti-materiel rifle', () => {
+    for (const name of ['archetype-ar', 'archetype-anti-materiel']) {
+      const { attachments, compatibility } = exported(design(name), `${name}_own_mount`).modelEntry.gun;
+      const irons = attachments?.filter(({ kind, mount }) => kind === 'iron-sight' && mount === 'rail-top') ?? [];
+      expect(irons.length, name).toBeGreaterThan(0);
+      for (const iron of irons) {
+        expect(compatibility?.[iron.mountedAt], `${name} ${iron.id}`).toContain(iron.id);
+      }
+    }
   });
 
   it("ships the AR with a removable rear iron and offers a scope on the upper's rail in its place", () => {

@@ -60,7 +60,7 @@ local fin = [[-6.125, 3.5], [-4.875, 3.5], [-5.375, 5.25], [-5.875, 5.25]];
   // Preserves the mounting/eye-datum tolerance, not a manufacturer specification.
   eyeDatumToleranceU: 8,
   mount: {
-    contactLengthU: 8, contactWidthU: 1.75, minimumSlots: 5,
+    contactLengthU: 8, contactWidthU: 1.75,
     description: 'TA51 flattop mount, photo-estimated two thumbscrews',
     clearanceU: { forward: 0.75, rearward: 0.75, lateral: 0.5 },
   },

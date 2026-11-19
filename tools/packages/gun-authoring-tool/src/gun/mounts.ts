@@ -1,4 +1,5 @@
 import type { PortDef } from '@skelly/construct/assembly/schema.ts';
+import { mmToU } from './units.ts';
 
 /** Generic attachment faces. Future accessories use these interfaces, not optic-specific ports. */
 export const MOUNT_KINDS = ['rail-top', 'rail-side', 'rail-bottom', 'muzzle'] as const;
@@ -18,11 +19,25 @@ export interface MountStandard {
  */
 export type MuzzleBore = 'rifled' | 'smoothbore';
 
+/** The real Picatinny (MIL-STD-1913) slot pitch, the one every rail and optic mount shares. */
+const RAIL_SLOT_PITCH_MM = 10.01;
+export const RAIL_SLOT_PITCH_U = mmToU(RAIL_SLOT_PITCH_MM);
+
+/**
+ * The slots of a rail whose slotted run is at least `spanU` long: a slot at each end and one every pitch between. The
+ * run rounds up, so a rail never gets shorter than the contact length of the optic it was sized for. A rail bounded
+ * by its host (a handguard's, with an end margin) may thus overshoot that margin by up to one pitch, by design.
+ */
+export const railSlots = (spanU: number): NonNullable<PortDef['slots']> => ({
+  count: Math.ceil(spanU / RAIL_SLOT_PITCH_U - 1e-9) + 1,
+  pitch: RAIL_SLOT_PITCH_U,
+});
+
 /** Mount specifications are data so future parts can declare compatible interfaces. */
 export const MOUNT_STANDARDS: Readonly<Record<MountKind, MountStandard>> = {
-  'rail-top': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: 2 },
-  'rail-side': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: 2 },
-  'rail-bottom': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: 2 },
+  'rail-top': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: RAIL_SLOT_PITCH_U },
+  'rail-side': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: RAIL_SLOT_PITCH_U },
+  'rail-bottom': { family: 'slotted-rail', contactWidthU: 1.75, slotPitchU: RAIL_SLOT_PITCH_U },
   muzzle: { family: 'thread', contactWidthU: 0 },
 };
 
@@ -30,7 +45,6 @@ export interface MountRequirement {
   readonly kind: MountKind;
   readonly contactLengthU: number;
   readonly contactWidthU: number;
-  readonly minimumSlots: number;
   readonly ringSpanU?: number;
   /** Conservative keep-clear distances around the interface, in U. */
   readonly clearanceU: { readonly forward: number; readonly rearward: number; readonly lateral: number };
@@ -47,7 +61,6 @@ export const mountCanAccept = (port: PortDef, requirement: MountRequirement, slo
   return (
     standard.family !== 'slotted-rail' ||
     (port.slots !== undefined &&
-      port.slots.count >= requirement.minimumSlots &&
       (standard.slotPitchU === undefined || Math.abs(port.slots.pitch - standard.slotPitchU) <= 1e-9) &&
       railSpanU(port) + 1e-9 >= requirement.contactLengthU &&
       (requirement.ringSpanU === undefined || railSpanU(port) + 1e-9 >= requirement.ringSpanU) &&

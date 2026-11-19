@@ -49,6 +49,7 @@ import {
 } from '../src/gun/antiMateriel/heavyMagazine.ts';
 import { HEAVY_RECEIVER_LENGTH } from '../src/gun/antiMateriel/heavyReceiver.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { RAIL_SLOT_PITCH_U } from '../src/gun/mounts.ts';
 import { EJECTION_PORT_MARGIN_U, FAMILIES, GRIP_MOUNT_PROFILE, TRIGGER_GUARD } from '../src/gun/parts.ts';
 import { fitAntiMaterielScope, variant } from './helpers.ts';
 
@@ -348,10 +349,7 @@ describe('barrel shroud', () => {
 
   it('extends the top rail forward and hangs the bipod mount on the underside near the front', () => {
     const shroud = family('barrel-shroud').build({ length: 'M' });
-    expect(shroud.ports.find(({ id }) => id === 'rail')!.slots).toEqual({
-      count: (SHROUD_LENGTH.M! - 4) / 2 + 1,
-      pitch: 2,
-    });
+    expect(shroud.ports.find(({ id }) => id === 'rail')!.slots).toEqual({ count: 22, pitch: RAIL_SLOT_PITCH_U });
     const bipod = shroud.ports.find(({ id }) => id === 'bipod')!;
     expect([bipod.pos, bipod.normal]).toEqual([
       [SHROUD_LENGTH.M! - 3, -SHROUD_HALF_HEIGHT, 0],
