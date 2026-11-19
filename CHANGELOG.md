@@ -47,6 +47,10 @@ What each release changes for those who consume the assets. Each version's secti
 
 - Picatinny rails now space their slots at the real 10.01 mm pitch, so rail optics and sights sit where they would on a real gun. Parts keep their places within a few millimetres, except the rear iron sights of the assault and anti-materiel rifles, which sit one slot further forward, and the guard stance's head aim, which follows the sight.
 
+### Fixed
+
+- Voxel firearms are now filled from the solids as authored rather than from their bevelled display meshes, which punched see-through pinholes where solids meet (the receiver of the pipe rifle) and shaved the corners of boxes. Forty-one firearm models change: their collision bounds grow by up to one voxel and their centres of mass move by up to about 9 mm (the sporter receiver). No other model changes, and the smooth copies keep their bevel.
+
 ## 0.13.0 - 2026-11-19
 
 ### Breaking
