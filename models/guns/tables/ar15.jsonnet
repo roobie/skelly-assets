@@ -364,9 +364,9 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     wall: dim(gasBlockWall, 'derived: a steel wall around the journal, room for the set screws'),
   },
 
-  // The front sight base, measured from the top of the journal at its gas port: a ring round the journal with the
-  // bayonet lug ahead of it, the post standing over the ring on one of the profiles below, and the sling loop under the
-  // ring. Its heights are the carry-handle base's; each base stands its raise taller.
+  // The front sight base, measured from the top of the journal at its gas port: a ring round the journal, the sight
+  // standing over the ring on one of the profiles below, and the sling loop under the ring. Its heights are the
+  // carry-handle base's; each base stands its raise taller.
   frontSightBase: {
     // Each base by the upper top whose rear sight it is made to meet, with how much taller than the carry-handle base
     // it stands.
@@ -389,7 +389,6 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       sightPlane.mm - flatTopExtra.mm - journalRadius,
       'derived: the sight plane less the flat-top extra height, over the top of the journal',
     ),
-    ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
     wall: dim(gasBlockWall, 'derived: a forged wall round the journal, as on the gas block'),
     slingLoopLength: dim(12, 'derived: a loop a sling clip closes through, centred under the ring'),
     earThickness: dim(3, 'derived: ears guarding the post'),
@@ -397,8 +396,9 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     lugHalfWidth: dim(5, "derived: the bayonet lug, sling loop and the post's frame narrower than the ring"),
     // The forged A2 triangle, from the base's rear face: a deck over the ring, the rear strut raked back to the rear
     // face, the near-upright front strut, and the crown over the window between them, which is the two ears with the
-    // post between them. The struts are drawn thick and the crown plain, so the triangle reads at a glance. A taller
-    // base lifts everything over the deck by its raise.
+    // sight's notch between them. The ring runs forward to the front strut's foot, so the front is one face from the
+    // strut down past the barrel. The struts are drawn thick and the crown plain, so the triangle reads at a glance. A
+    // taller base lifts everything over the deck by its raise.
     'a-frame': {
       deckY: dim(sightBasePoint([0, fsbDeck])[1], 'traced: m16a4-side/fsbDeckYPx'),
       frontFootX: sightBaseX(fsbFront),
@@ -410,9 +410,10 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       rearStrut: strut(fsbRear, 3075.3, 1),
       frontStrut: strut(fsbFront, 3167.7, -1),
     },
-    // A straight sight block over the middle of the ring, as on a clamp-on front sight gas block, the ears standing on
-    // its deck.
+    // A straight sight block over the middle of the ring, as on a clamp-on front sight gas block, the ears and post
+    // standing on its deck, and the bayonet lug under the barrel from the ring's front to the base's length.
     sightBlock: {
+      ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
       deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
       length: dim(12, 'derived: a block thinner than the ring'),
     },
