@@ -121,11 +121,12 @@ local side = m16a4Side.values;
 local sideMmPerPx = mmPerPxOf(m16a4Side);
 local sideOverBore(py) = (side.boreYPx.value - py) * sideMmPerPx;
 
-// No print of the upper is published, so the rail top is a measurement off a rifle. The side photo agrees within its
-// trace; the bare photo reads it 2 mm lower and the AM-15 profile 3.8 mm higher, each at over a millimetre a pixel.
+// No print of the upper is published, so the rail top is taken from a forum compilation of measured flat-tops. The side
+// photo agrees within its trace; the bare photo reads it 2 mm lower and the AM-15 profile 3.8 mm higher, each at over a
+// millimetre a pixel.
 local railTopY = dim(
   30.861,
-  'sourced: 1.215 in from the bore centreline, measured where no print is published, '
+  'sourced: 1.215 in from the bore centreline, a forum compilation of flat-top rail heights, '
   + 'https://forum.308ar.com/topic/23364-advantage-of-various-upper-rail-heights/; the m16a4-side trace reads %.1f mm'
   % sideOverBore(side.railTopYPx.value),
 );

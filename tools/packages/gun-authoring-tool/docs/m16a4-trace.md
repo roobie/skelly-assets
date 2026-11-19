@@ -22,7 +22,7 @@ The bare photo is preferred for the stock because the side photo's belly sits ag
 
 The side photo's handle is the detachable one of a flat-top M16A4. The fixed A2 handle has the same sight housing and bar, so the trace stands for it above the rail; below the rail the fixed handle is forged to the receiver, solid down to the receiver's top, where the flat-top carries its rail. Its window keeps the photo's bottom, the top of the handle's base, so the charging handle's volume under it stays.
 
-The rail's height over the bore is an owner's measurement of a flat-top, since no print of the upper is published; the side photo reads within its trace of it, and it governs the R1 carbine too, whose profile photo is too coarse to place the rail. The receiver stands to the foot of the rail's teeth, as the side photo shows.
+The rail's height over the bore comes from a 308ar forum compilation of flat-top rail heights, since no print of the upper is published; an ar15.com thread on the same dimension refused automated fetching, so it does not corroborate it here; the side photo reads within its trace of it, and it governs the R1 carbine too, whose profile photo is too coarse to place the rail. The receiver stands to the foot of the rail's teeth, as the side photo shows.
 
 ## Known departures
 
