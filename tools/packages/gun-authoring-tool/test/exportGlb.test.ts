@@ -47,6 +47,7 @@ import {
   expectWatertightMesh,
   LINE_HALF_THICKNESS,
   loadCorpus,
+  type MutableAssembly,
   motionOf,
   partTriangles,
   segmentBox,
@@ -836,6 +837,15 @@ describe('glb export: deadvox model entry', () => {
     expect(postTip[1]).toBeCloseTo(leafTop[1], 7);
     expect(notchWidth).toBeLessThan(leafWidth / 2);
     expect(leafWidth).toBeGreaterThan(leafHeight);
+  });
+
+  it('refuses an AK rear sight with no front sight to aim at', () => {
+    const sightless = structuredClone(design('archetype-ak')) as MutableAssembly;
+    delete sightless.parts['front-sight'];
+    sightless.connections = sightless.connections.filter(({ to }) => !to.startsWith('front-sight.'));
+    expect(() => exportGunGlb(sightless, ASSET, { appearanceProfile: 'ar' })).toThrow(
+      'A rear sight needs exactly one front sight to aim at, but the gun has 0',
+    );
   });
 
   it('shows light at least as wide as the AK front post either side of it from the farthest eye', () => {

@@ -505,19 +505,18 @@ const drawnTopOrThrow = (file: VoxelFile, partId: string, column: Column = {}): 
   return top;
 };
 
-const frontSightPost = (resolved: Resolved) => {
-  const id = Object.keys(resolved.assembly.parts).find((partId) => {
-    const def = resolved.defs.get(partId);
-    return def && sightRoleOf(def) === 'front' && def.solids.some((solid) => solid.id === 'post');
+/** The point a rear sight aims at: the origin of the one front-sight axis on the gun, placed. */
+const frontSightTip = (resolved: Resolved): Vec3 => {
+  const fronts = Object.keys(resolved.assembly.parts).flatMap((id) => {
+    const def = resolved.defs.get(id);
+    const transform = resolved.placed.get(id);
+    const axis = def && sightRoleOf(def) === 'front' ? sightAxisOf(def) : undefined;
+    return axis && transform ? [applyPoint(transform, axis.origin)] : [];
   });
-  const transform = id && resolved.placed.get(id);
-  const def = id ? resolved.defs.get(id) : undefined;
-  const axis = def && sightAxisOf(def);
-  const post = def?.solids.find((candidate) => candidate.id === 'post');
-  if (!(id && transform && axis && post)) {
-    throw new Error('A rear sight needs a front-sight post to define its aim line');
+  if (fronts.length !== 1) {
+    throw new Error(`A rear sight needs exactly one front sight to aim at, but the gun has ${fronts.length}`);
   }
-  return { tip: applyPoint(transform, axis.origin) };
+  return fronts[0]!;
 };
 
 /**
@@ -663,7 +662,7 @@ const drawnIronSightLine = (
   if (sightGrain === undefined) {
     const direction =
       sightRoleOf(resolved.defs.get(sight.id)!) === 'rear'
-        ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
+        ? normalize(sub(modelPoint(frontSightTip(resolved), metresPerUnit), sight.eye))
         : sight.direction;
     return { eye: sight.eye, direction };
   }
@@ -801,8 +800,8 @@ const sightMetadata = (resolved: Resolved, voxel?: VoxelFile): GunModelFields['s
   const toModelDirection = (vector: Vec3): Vec3 => normalize(toFileAxes(vector));
   let direction = chosenDirection;
   if (sightKind === 'iron' && resolved.assembly.parts[sightId]!.family === 'ak-rear-sight') {
-    const front = frontSightPost(resolved);
-    direction = normalize([front.tip[0] - eye[0], front.tip[1] - eye[1], front.tip[2] - eye[2]]);
+    const tip = frontSightTip(resolved);
+    direction = normalize([tip[0] - eye[0], tip[1] - eye[1], tip[2] - eye[2]]);
   }
   // An optic's line is its optical axis, which the drawn tube does not define, so only iron sights read the file.
   const drawn =
