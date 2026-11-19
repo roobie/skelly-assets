@@ -40,8 +40,8 @@ local swing = { shares: { windup: 18, strike: 12, follow: 25, recovery: 45 }, se
       follow: guard { body+: { spine: [12, -30, 0] }, weapon: held([-0.25, -0.05, 0.28], 2.5, -110, 80, [0.1, -1, 0]) },
     },
     overhead: swing {
-      windup: guard { body+: { spine: [-10, 0, 0] }, weapon: held([0.05, 0.25, 0], -160, 0, 80, [-0.47, 0.28, 0.83]) },
-      hit: guard { body+: { spine: [15, 8, 0] }, weapon: held([0.12, -0.05, 0.42], -42.5, 5, 80, [-0.41, -0.82, 0.41]) },
+      windup: guard { body+: { spine: [-10, 0, 0] }, weapon: held([0.05, 0.25, 0], -160, 0, 74, [-0.47, 0.28, 0.83]) },
+      hit: guard { body+: { spine: [15, 8, 0] }, weapon: held([0.12, -0.05, 0.42], -42.5, 5, 70, [-0.41, -0.82, 0.41]) },
       follow: guard { body+: { spine: [25, 8, 0] }, weapon: held([0.14, -0.3, 0.3], -2.5, 5, 20, [-0.72, -0.24, -0.65]) },
     },
     thrust: {
