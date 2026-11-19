@@ -2,7 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { distanceWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import { applyPoint } from '@skelly/construct/foundation/math.ts';
+import { distanceWorld, localSolidBounds, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { AR15_FRAME, checkFrameTable, u } from '../src/gun/arModular/frame.ts';
@@ -79,5 +80,17 @@ describe('modular AR', () => {
     const gap = Math.min(...solidsOf('magazine').flatMap((mag) => walls.map((wall) => distanceWorld(mag, wall))));
     expect(gap).toBeGreaterThan(0);
     expect(gap).toBeLessThanOrEqual(u(AR15.lower.well.clearance) + 1e-6);
+  });
+
+  it('closes the buffer tower against the upper receiver, with no gap at the rear of the receiver', () => {
+    const resolved = resolve(loadDesignAssembly('ar15-carbine-free-float'), gunDomain);
+    const boundsOf = (part: string, solid: string) => {
+      const def = resolved.defs.get(part)!;
+      const placed = resolved.placed.get(part)!;
+      return localSolidBounds(def.solids.find(({ id }) => id === solid)!).map((corner) => applyPoint(placed, corner));
+    };
+    const towerFront = boundsOf('lower', 'tower')[1]!;
+    const upperRear = boundsOf('upper', 'receiver-body')[0]!;
+    expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
   });
 });
