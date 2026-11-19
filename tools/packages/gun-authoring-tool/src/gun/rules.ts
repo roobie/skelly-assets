@@ -24,6 +24,10 @@ import {
   worldSolid,
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
+import { FEATURE_VOXELS, featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
+import { partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
+import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import gunVoxel from './gunVoxel.json' with { type: 'json' };
 import { mountCanAccept } from './mounts.ts';
 import { getOptic, opticRailContactSolids } from './optics.ts';
 import { FIRING_GRIP, G3_MAGAZINE_WELL_TILT, HANDGUARD_CLEARANCE, LOWER_LAYOUTS } from './parts.ts';
@@ -951,6 +955,54 @@ export const feedMatch: Rule = {
         continue;
       }
       issues.push(...feedIssuesForLower(r, receiver, lower));
+    }
+    return issues;
+  },
+};
+
+const gunGrains = recipeVoxel({ voxel: gunVoxel });
+
+/**
+ * A part authored at real size may hold a feature the grain its export gives it cannot carry. Such a feature has to
+ * say what becomes of it, or it is lost to the voxelization unannounced. A feature disposed as detail holds only on a
+ * part the export already gives the detail grain, and only if it fits that grain. A part exported smooth is not
+ * voxelized, so its features are not judged.
+ */
+export const minFeature: Rule = {
+  id: 'min-feature',
+  title: 'Thin features fit the export grain or say what becomes of them',
+  check(r) {
+    const { metresPerUnit } = r.domain.units;
+    const issues: Issue[] = [];
+    for (const [part, def] of placedParts(r)) {
+      const grain = partVoxelGrain(def, gunGrains, metresPerUnit);
+      if (grain === undefined) {
+        continue;
+      }
+      for (const feature of def.features ?? []) {
+        const kind = feature.disposition?.kind;
+        if (kind === 'exaggerated' || kind === 'omitted') {
+          continue;
+        }
+        const label = `${part} feature "${feature.name}"`;
+        if (kind === 'detail' && grain !== gunGrains.voxelDetailGrain) {
+          issues.push({
+            rule: 'min-feature',
+            message: `${label} is disposed as detail but the part exports at the ${grain} m grain; tag the part ${VOXEL_DETAIL}.`,
+            parts: [part],
+          });
+          continue;
+        }
+        const size = feature.size * metresPerUnit;
+        if (!featureFitsGrain(size, grain)) {
+          const thinner = `thinner than ${FEATURE_VOXELS} voxels of the ${grain} m grain (${FEATURE_VOXELS * grain} m)`;
+          issues.push({
+            rule: 'min-feature',
+            message: `${label} is ${Number(size.toPrecision(3))} m, ${thinner}${kind === 'detail' ? '' : '; give it a disposition'}.`,
+            parts: [part],
+          });
+        }
+      }
     }
     return issues;
   },

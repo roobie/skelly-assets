@@ -94,6 +94,19 @@ export interface PartMotion {
   readonly sourceKeepOut?: { readonly port: string; readonly id: string };
 }
 
+/** What a part does with a feature too thin for the export grain; the reason of an exaggeration is the part's to give. */
+export type FeatureDisposition =
+  | { readonly kind: 'exaggerated'; readonly reason: string }
+  | { readonly kind: 'detail' | 'omitted' };
+
+/** A thin feature a part authors at its real size; `disposition` says how the export carries it, if it must. */
+export interface PartFeature {
+  readonly name: string;
+  /** The feature's thickness, in domain units. */
+  readonly size: number;
+  readonly disposition?: FeatureDisposition;
+}
+
 export interface PartDef {
   readonly family: string;
   /** Optional finish override for attachments or aftermarket parts. */
@@ -110,6 +123,8 @@ export interface PartDef {
   readonly motion?: PartMotion;
   /** Free-form labels that domain rules can look for. */
   readonly tags?: readonly string[];
+  /** The part's thin features, for domain rules that judge them against an export grain. */
+  readonly features?: readonly PartFeature[];
 }
 
 /** Where a param can read its value from: the part on one of our ports. */
