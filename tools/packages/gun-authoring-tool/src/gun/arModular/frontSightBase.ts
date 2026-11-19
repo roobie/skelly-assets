@@ -33,7 +33,7 @@ interface Placement {
  * The forged A2 triangle: a deck over the ring from the rear face to the front foot, the two struts across the frame's
  * width, and the crown over the window as two ears with the sight's notch between them. The ring wraps the barrel
  * forward to the front strut's foot, so the front is one face from the strut down past the barrel, its underside
- * standing for the bayonet lug. The post stands from the deck up through the window to the notch.
+ * standing for the bayonet lug. Nothing stands in the window; the eye aims through the notch.
  */
 const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
   const a = F['a-frame'];
@@ -41,7 +41,6 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
     outlineU(outline).map(([x, y]): Vec2 => [at.rearX + x, at.raise + y]);
   const deckY = u(a.deckY) + at.raise;
   const frontX = at.rearX + u(a.frontFootX);
-  const postX = at.rearX + u(a.postX);
   const across: [number, number] = [-at.lugHalf, at.lugHalf];
   const piece = (id: string, profile: Vec2[], z: readonly [number, number]): Solid => ({
     id,
@@ -56,9 +55,8 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
       piece('front-strut', lift(a.frontStrut), across),
       piece('ear-right', lift(a.crown), [at.earInner, at.lugHalf]),
       piece('ear-left', lift(a.crown), [-at.lugHalf, -at.earInner]),
-      box('post', [postX - at.postHalf, deckY, -at.postHalf], [postX + at.postHalf, at.postTipY, at.postHalf]),
     ],
-    postX,
+    postX: at.rearX + u(a.postX),
     ringFrontX: frontX,
   };
 };

@@ -273,7 +273,7 @@ describe('modular AR', () => {
     expect(rules).not.toContain('ar15-sight-height');
   });
 
-  // The profile is only what the post stands on, so every profile must keep every height's post on its rear sight.
+  // The profile is only what the sight stands on, so every profile must keep every height's sight on its rear sight.
   const sightBaseFamily = gunDomain.families['ar15-front-sight-base']!;
   const sightMatrix = sightBaseFamily.params.profile!.values.flatMap((profile) =>
     sightBaseFamily.params.height!.values.flatMap((height) =>
@@ -284,7 +284,7 @@ describe('modular AR', () => {
     ),
   );
   it.each(sightMatrix)(
-    'stands a $profile $height base on $design only at its own height, its line clear to the post',
+    'stands a $profile $height base on $design only at its own height, its line clear to the sight',
     ({ profile, height, design, rearHeight }) => {
       const assembly = loadDesignAssembly(design);
       assembly.parts['front-sight-base']!.params = { height, profile };
@@ -301,7 +301,8 @@ describe('modular AR', () => {
       const eye = sightOf(rearPart);
       const post = sightOf('front-sight-base');
       const along = (x: number): Vec3 => [x, eye[1] + ((post[1] - eye[1]) * (x - eye[0])) / (post[0] - eye[0]), 0];
-      // The line stops short of the post's rear face by its own half-thickness, so its end stays off the target.
+      // The line stops short of a post's rear face by its own half-thickness, so its end stays off the target; an
+      // A-frame has no post, and its line runs the same way into the notch between the ears.
       const line = segmentBox(
         eye,
         along(post[0] - u(AR15.frontSightBase.postWidth) / 2 - LINE_HALF_THICKNESS),
