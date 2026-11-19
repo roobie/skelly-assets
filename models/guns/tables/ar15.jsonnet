@@ -156,7 +156,6 @@ local handleWindowTopY = sideOverBore(handleBarTop(windowFront)) - detailFeature
 
 // The A2 front sight base's triangle, from its rear face and the top of the journal.
 local sightBasePoint(p) = [(p[0] - side.fsbRearXPx.value) * sideMmPerPx, sideOverBore(p[1]) - journalRadius];
-local sightBaseX(px) = dim(sightBasePoint([px, 0])[0], 'traced: m16a4-side/frontSightBase');
 local fsbRear = side.fsbRearXPx.value;
 local fsbFront = side.fsbFrontXPx.value;
 local fsbDeck = side.fsbDeckYPx.value;
@@ -374,7 +373,6 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       'carry-handle': dim(0, 'derived: the base the heights below are measured for'),
       'flat-top': flatTopExtra,
     },
-    length: dim(45.72, 'sourced: 1.8 in, ' + cmmgSightBase),
     halfWidth: dim(11.303, 'sourced: 0.89 in across, ' + cmmgSightBase),
     bottomY: dim(
       sightPlane.mm - 92.202 - journalRadius,
@@ -401,7 +399,11 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     // taller base lifts everything over the deck by its raise.
     'a-frame': {
       deckY: dim(sightBasePoint([0, fsbDeck])[1], 'traced: m16a4-side/fsbDeckYPx'),
-      frontFootX: sightBaseX(fsbFront),
+      frontFootX: dim(
+        sightBasePoint([fsbFront, 0])[0],
+        "traced: m16a4-side/fsbFrontXPx; 1.3 mm short of the base's sourced 1.8 in (" + cmmgSightBase
+        + "), kept so the front strut's foot is the front face",
+      ),
       postX: dim(sightBasePoint([side.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
       crown: outline(
         [sightBasePoint(p) for p in [[3075.3, crownFoot], [3167.7, crownFoot], [3161, 1124], [3146, 1109], [3130, 1109], [3096, 1130]]],
@@ -413,9 +415,10 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     // A straight sight block over the middle of the ring, as on a clamp-on front sight gas block, the ears and post
     // standing on its deck, and the bayonet lug under the barrel from the ring's front to the base's length.
     sightBlock: {
-      ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
+      length: dim(45.72, 'sourced: 1.8 in, ' + cmmgSightBase),
+      ringLength: dim(25.4, "derived: the ring round the journal, the bayonet lug filling the rest of this base's length"),
       deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
-      length: dim(12, 'derived: a block thinner than the ring'),
+      blockLength: dim(12, 'derived: a block thinner than the ring'),
     },
   },
 

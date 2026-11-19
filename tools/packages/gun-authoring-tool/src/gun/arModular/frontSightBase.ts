@@ -66,18 +66,19 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
  * lug under the barrel ahead of the ring.
  */
 const sightBlock = (F: SightBaseTable, at: Placement): PostFrame => {
-  const blockRearX = at.rearX + (u(F.sightBlock.ringLength) - u(F.sightBlock.length)) / 2;
-  const blockFrontX = blockRearX + u(F.sightBlock.length);
+  const blockRearX = at.rearX + (u(F.sightBlock.ringLength) - u(F.sightBlock.blockLength)) / 2;
+  const blockFrontX = blockRearX + u(F.sightBlock.blockLength);
   const deckY = u(F.sightBlock.deckAboveJournal) + at.raise;
   const postX = (blockRearX + blockFrontX) / 2;
   const ringFrontX = at.rearX + u(F.sightBlock.ringLength);
+  const frontX = at.rearX + u(F.sightBlock.length);
   return {
     solids: [
       box('block', [blockRearX, at.ringTopY, -at.lugHalf], [blockFrontX, deckY, at.lugHalf]),
       box('ear-right', [blockRearX, deckY, at.earInner], [blockFrontX, at.postTipY, at.lugHalf]),
       box('ear-left', [blockRearX, deckY, -at.lugHalf], [blockFrontX, at.postTipY, -at.earInner]),
       box('post', [postX - at.postHalf, deckY, -at.postHalf], [postX + at.postHalf, at.postTipY, at.postHalf]),
-      box('bayonet-lug', [ringFrontX, at.underY, -at.lugHalf], [at.rearX + u(F.length), -2 * at.radius, at.lugHalf]),
+      box('bayonet-lug', [ringFrontX, at.underY, -at.lugHalf], [frontX, -2 * at.radius, at.lugHalf]),
     ],
     postX,
     ringFrontX,
