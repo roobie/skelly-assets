@@ -6,7 +6,7 @@
 // vehicle's sites (lookOptions.mjs), to show what opens at its stop, so a door's swing is reviewed where it ends, and to
 // draw the smooth copy instead of the voxels (docs/decisions/0020-smooth-copy.md), so both forms compare from one camera.
 // tools/model-sheet.mjs drives it headless through `window.look`; opened with `?id=a,b` it shows those tiles in the
-// page, and `&views=`, `&sites=a,b`, `&open` and `&smooth` ask as the tool does. Its picker writes
+// page, and `&views=`, `&sites=a,b`, `&stop=open` and `&smooth` ask as the tool does. Its picker writes
 // the ids it picks into `?id=`, and asked nothing the page shows a few of the day's models (lookOptions.mjs, lookedIds).
 import * as THREE from 'three';
 import { makeCombobox } from './combobox.mjs';
@@ -15,19 +15,17 @@ import { dailySeed, landingSeed } from './filter.mjs';
 import { idSuggestions, keepSites, lookedIds, viewSet } from './lookOptions.mjs';
 import { EXPLODED_VIEWS, FRONT_QUARTER } from './modelFrame.mjs';
 import {
+  atStop,
   comesApart,
   explodable,
   hasSmooth,
   isVehicle,
   isWearable,
   loadEntry,
-  movers,
-  opens,
   registerModels,
   smoothEntry,
   spread,
   stillInstance,
-  swing,
   wornEntry,
 } from './render.mjs';
 import { drawView, gridCell, groundGrid, makeDrawer, metres, ruleAt, startTile } from './tile.mjs';
@@ -46,9 +44,10 @@ const ready = (async () => {
 })();
 
 // One entry's tile, `size` pixels a view, as a PNG data URL, with what the sheet prints beside it. `views` names the
-// view set and `sites` the site prefixes a vehicle or an assembly keeps (lookOptions.mjs); `open` draws every part that
-// opens at its stop; `smooth` draws the smooth copy, the worn view's too, so a tile is never half smooth.
-async function look(id, size, { views = 'review', sites = [], open = false, smooth = false } = {}) {
+// view set and `sites` the site prefixes a vehicle or an assembly keeps (lookOptions.mjs); `stop` draws every part that
+// has a stop of that name at it, a door open or a folding stock folded, and the rest at rest; `smooth` draws the smooth
+// copy, the worn view's too, so a tile is never half smooth.
+async function look(id, size, { views = 'review', sites = [], stop = null, smooth = false } = {}) {
   const whole = (await ready).byId.get(id);
   if (!whole) throw new Error(`${id} is no model, vehicle or assembly of the built tree`);
   const formOf = (drawn) => {
@@ -60,8 +59,8 @@ async function look(id, size, { views = 'review', sites = [], open = false, smoo
   const entry = formOf(kept);
   const directions = viewSet(views).map(([name, direction]) => [name, new THREE.Vector3(...direction)]);
   const loaded = await loadEntry(entry);
-  const obj = stillInstance(loaded, entry);
-  if (open && opens(loaded)) swing(movers(obj, loaded), 1);
+  const rested = stillInstance(loaded, entry);
+  const obj = stop === null ? rested : atStop(rested, loaded, entry, stop);
   const exploded = comesApart(entry);
   const worn = isWearable(entry);
   const wide = exploded || worn;
@@ -117,7 +116,7 @@ const query = new URLSearchParams(location.search);
 const options = {
   views: query.get('views') ?? 'review',
   sites: query.get('sites')?.split(',') ?? [],
-  open: query.has('open'),
+  stop: query.get('stop'),
   smooth: query.has('smooth'),
 };
 const hint = Object.assign(document.createElement('p'), {

@@ -66,12 +66,12 @@ export function lookDigest(built, manifest, id) {
   return hash.digest('hex');
 }
 
-// A look's options as the sheet prints and keys them: its view set, whether it draws what opens open, whether it draws
-// the smooth copy, and the sites it keeps (site/lookOptions.mjs).
-export const lookName = ({ views = 'review', sites = [], open = false, smooth = false } = {}) =>
+// A look's options as the sheet prints and keys them: its view set, the stop it draws parts at, whether it draws the
+// smooth copy, and the sites it keeps (site/lookOptions.mjs).
+export const lookName = ({ views = 'review', sites = [], stop = null, smooth = false } = {}) =>
   [
     `${views} views`,
-    ...(open ? ['open'] : []),
+    ...(stop === null ? [] : [`at ${stop}`]),
     ...(smooth ? ['smooth'] : []),
     ...(sites.length > 0 ? [`sites ${sites.join(', ')}`] : []),
   ].join(', ');

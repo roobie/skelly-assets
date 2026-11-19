@@ -12,11 +12,11 @@ import { hingeOf } from '../src/gun/actionMotion.ts';
 import { attachmentCompatibility } from '../src/gun/attachmentCompatibility.ts';
 import { attachmentSlots } from '../src/gun/attachments.ts';
 import { BOLT_EXTRACTION_CLEARANCE_U, boltCartridge, boltStrokeUnits } from '../src/gun/boltCartridge.ts';
-import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { internalMagazineCapacity } from '../src/gun/internalMagazine.ts';
+import { sweepStops } from '../src/gun/stopSweep.ts';
 import { designText, loadDesigns } from './helpers.ts';
 import { modelIssues, parseModel } from './modelSchema.ts';
 
@@ -171,7 +171,7 @@ for (const assembly of [...designs.map((design) => design.assembly), { ...scoped
     `certifies the whole handle arc and draw against fixed geometry: ${assembly.name}`,
     () => {
       expect(validate(assembly, gunDomain).issues).toEqual([]);
-      expect(sweepTurningAction(resolve(assembly, gunDomain))).toEqual([]);
+      expect(sweepStops(resolve(assembly, gunDomain))).toEqual([]);
     },
     1000 + sweepPairs(assembly) * SWEEP_MS_PER_PAIR_BUDGET,
   );

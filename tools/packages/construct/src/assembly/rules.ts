@@ -368,6 +368,14 @@ const checkKeepOut = (r: Resolved, focusPart?: string): Issue[] => {
 /** Existing keep-out rule restricted to interactions involving one newly placed part. */
 export const keepOutForPart = (r: Resolved, part: string): Issue[] => checkKeepOut(r, part);
 
+/** The keep-outs of every other part that `part` occupies where it stands: its own keep-outs are none of its business. */
+export const keepOutsMetBy = (r: Resolved, part: string): Issue[] => {
+  const solids = placedSolids(r, [part]);
+  return [...r.placed]
+    .filter(([owner]) => owner !== part)
+    .flatMap(([owner, ownerT]) => keepOutIssuesForOwner({ r, solids, owner, ownerT, focusPart: part }));
+};
+
 /** Existing keep-out rule restricted to the interaction between two newly placed parts. */
 export const keepOutBetweenParts = (r: Resolved, first: string, second: string): Issue[] => {
   const solids = placedSolids(r, [first, second]);

@@ -30,7 +30,7 @@ test('a part is posed where the game would pose it, whatever the site it sits at
         const expected = posePoint(game, p, clock);
         close(
           apply(
-            poseAt([placed], clock),
+            poseAt([placed], [clock]),
             p.map((v, i) => v + at[i]),
             [0, 0, 0],
           ),
@@ -52,9 +52,9 @@ test('what a slide stows is hidden exactly where the game hides it, at the site,
     const placed = motionAtSite(roller, { at, mirror }, MODEL_LATERAL);
     const game = mirror ? mirrorMotion(roller) : roller;
     for (const clock of [0, 0.3, 0.6, 1]) {
-      const clips = stowClips([placed], clock);
+      const clips = stowClips([placed], [clock]);
       assert.equal(clips.length, 1);
-      const pose = poseAt([placed], clock);
+      const pose = poseAt([placed], [clock]);
       for (const p of lattice) {
         const world = apply(
           pose,
@@ -107,4 +107,12 @@ test('sites that name no site, as the doll wears a piece, ride nothing, so each 
     [1],
   );
   assert.equal(found[0].layers.length, 1);
+});
+
+test('each layer takes its own clock, and a list too short for the layers fails rather than leave one at rest', () => {
+  const slide = { stages: [{ kind: 'slide', direction: [1, 0, 0], travel: 2, share: 1 }], stops };
+  const pose = poseAt([slide, door], [0.5, 0]);
+  close(apply(pose, [0, 0, 0], [0, 0, 0]), [1, 0, 0]);
+  assert.throws(() => poseAt([slide, door], [0.5]), /no clock for layer 1/);
+  assert.throws(() => stowClips([roller, door], [0.5]), /no clock for layer 1/);
 });

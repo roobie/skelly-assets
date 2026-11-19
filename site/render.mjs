@@ -6,10 +6,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
+import { heldItem } from './heldMotion.mjs';
 import { hideCovered } from './hiding.mjs';
 import { boneTransforms } from './kinematics.mjs';
 import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
-import { movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
+import { evenClocks, movingSites, poseAt, stowClips, stowPlanesOf } from './motionPose.mjs';
 
 const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 
@@ -140,18 +141,45 @@ const ownCopy = (material, copies) => {
   return copy;
 };
 
-// Carries every part of `moving` the share `clock` of the way from rest (0) to its stop (1), and hides what a slide has
-// stowed into its carrier.
+// Carries every part of `moving` to `clock` on its motion, a number for every layer or a list with one for each layer
+// of every part, and hides what a slide has stowed into its carrier.
 export function swing(moving, clock) {
   for (const { carrier, layers, materials } of moving) {
-    const m = poseAt(layers, clock);
+    const clocks = typeof clock === 'number' ? evenClocks(layers, clock) : clock;
+    const m = poseAt(layers, clocks);
     carrier.matrix.set(m[0], m[1], m[2], m[9], m[3], m[4], m[5], m[10], m[6], m[7], m[8], m[11], 0, 0, 0, 1);
     carrier.matrixWorldNeedsUpdate = true;
-    const planes = stowClips(layers, clock).map(
+    const planes = stowClips(layers, clocks).map(
       ({ normal, constant }) => new THREE.Plane(new THREE.Vector3(...normal), constant),
     );
     for (const material of materials) material.clippingPlanes = planes;
   }
+}
+
+const stopOf = (motion, name) => motion.stops.find((stop) => stop.name === name)?.clock;
+
+// `obj`, an instance of `entry` (`loaded` is what it was loaded as), with every part that has a stop called `name` stood
+// at it and the rest at rest: a vehicle's moving parts by their own motion, a gun's action parts by the motions its
+// sidecar gives them. A gun is drawn as the pose page draws a held one (heldMotion.mjs), so it comes back as a copy.
+export function atStop(obj, loaded, entry, name) {
+  if (entry.action) {
+    const held = heldItem({ scene: obj, action: entry.action }, entry.id);
+    const clocks = Object.values(entry.action.parts).flatMap(({ node, motion }) => {
+      const clock = stopOf(motion, name);
+      return clock === undefined ? [] : [[node.split(':')[0], clock]];
+    });
+    held.move(Object.fromEntries(clocks));
+    return held.obj;
+  }
+  for (const mover of loaded.moving ? movers(obj, loaded) : []) {
+    const clocks = mover.layers.map((layer) => stopOf(layer, name));
+    if (clocks.some((clock) => clock !== undefined))
+      swing(
+        [mover],
+        clocks.map((clock) => clock ?? 0),
+      );
+  }
+  return obj;
 }
 
 // A site's finish paints that copy of its part, as a game spawning the vehicle would: only the materials the part marks

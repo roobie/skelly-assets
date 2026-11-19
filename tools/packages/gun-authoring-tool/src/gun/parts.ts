@@ -19,6 +19,7 @@
 //   lug        barrel ↔ tube magazine front (closes a loop, like clamp)
 //   forend     tube magazine ↔ sliding forend
 
+import { OPEN_STOP, REST_STOP } from '@skelly/construct/assembly/motion.ts';
 import type {
   KeepOut,
   ParamSpec,
@@ -45,7 +46,7 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
-import { UNLOCKED_STOP } from './actionMotion.ts';
+import { NOTCHED_STOP, UNLOCKED_STOP } from './actionMotion.ts';
 import { ACTION_CARRIER_ROLES, ACTION_PART_ROLES, type GunPartFamily } from './actionRoles.ts';
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
@@ -72,6 +73,7 @@ import {
 } from './boltCartridge.ts';
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
+import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
@@ -270,6 +272,8 @@ const keepOut = (
     ...(options?.allowFamilies ? { allowFamilies: options.allowFamilies } : {}),
   };
 };
+/** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and any bolt-handle part. */
+const ACTION_ALLOWANCE = { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] } as const;
 /** Tag for parts the firing hand can hold (see rules.ts). */
 export const FIRING_GRIP = 'firing-grip';
 /** A front post built into another part, which a built-in rear sight's drawn line aims at; see `exportGlb.ts`. */
@@ -1599,6 +1603,7 @@ const addActionKeepOuts = (params: Readonly<Record<string, string>>, keepOuts: K
           'bolt-stock-clearance',
           [-26, params.section === 'sporter' ? SPORTER_PROPORTIONS.stock.joinTopU : -1.5, -1.5],
           [-16, 1.5, 1.5],
+          ACTION_ALLOWANCE,
         ),
       );
       break;
@@ -1661,11 +1666,14 @@ const addFeedKeepOuts = (context: ReceiverContext, keepOuts: KeepOut[]): void =>
   const { params, receiverDrop, receiverBottom, receiverTop } = context;
   switch (params.feed) {
     case 'top':
-      // The roof-mouth is closed to every family. Above it, opticLoadingClearance permits only bodies.
+      // The roof-mouth is closed to every family but the carrier that cycles through it. Above it, opticLoadingClearance permits only bodies.
       keepOuts.push(
-        keepOut('loading-mouth', [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5], [-4, receiverTop, 1.5]),
+        keepOut('loading-mouth', [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5], [-4, receiverTop, 1.5], {
+          allowPort: ACTION_ALLOWANCE.allowPort,
+        }),
         keepOut('loading-port', [-4 - carrierTravelLength(params), receiverTop, -1.5], [-4, 9, 1.5], {
-          allowFamilies: ['sight'],
+          allowPort: ACTION_ALLOWANCE.allowPort,
+          allowFamilies: ['sight', ...ACTION_ALLOWANCE.allowFamilies],
         }),
       );
       break;
@@ -1692,7 +1700,7 @@ const receiverKeepOuts = (context: ReceiverContext): KeepOut[] => {
       'ejection',
       [portWindow.x[0], portWindow.y[0], sectionData?.faces.portSide ?? 2],
       [portWindow.x[1], portWindow.y[1], 10],
-      { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] },
+      ACTION_ALLOWANCE,
     ),
   ];
   keepOuts.push(
@@ -1931,6 +1939,7 @@ const receiver: PartFamily = {
         'tapered',
         'tapered-sawed',
         'ak-buttstock',
+        'fal-folding',
         'telescoping',
         'plank',
       ),
@@ -2269,7 +2278,11 @@ const boltTurn = (profile: BoltHandleProfile, frame?: Transform): PartStage => {
 /** A turn-bolt part's motion: it turns free of its lugs, then is drawn back along its own stroke. */
 const boltMotion = (turn: PartStage, slide: PartStage): PartMotion => ({
   stages: [turn, slide],
-  stops: [{ name: UNLOCKED_STOP, after: 0 }],
+  stops: [
+    { name: REST_STOP, stage: 0, at: 0 },
+    { name: UNLOCKED_STOP, stage: 0 },
+    { name: OPEN_STOP, stage: 1 },
+  ],
 });
 const boltArmFrame = (section?: string): Transform => {
   const basis = boltHandleBasis(section);
@@ -2608,6 +2621,11 @@ const smgSlidingHandle: PartFamily = {
           { kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'smg-handle-travel' } },
           // At the slot's rear end the stem turns up about the bore into the notch: the held-back state.
           { kind: 'hinge', axis: { from: [0, 0, 0], to: [-1, 0, 0] }, angle: turnDegrees },
+        ],
+        stops: [
+          { name: REST_STOP, stage: 0, at: 0 },
+          { name: OPEN_STOP, stage: 0 },
+          { name: NOTCHED_STOP, stage: 1 },
         ],
       },
     };
@@ -2967,7 +2985,8 @@ const lower: PartFamily = {
         'magazine-path',
         [x - wellDepth / 2, -40, -wellWidth / 2],
         [x + wellDepth / 2, pathTop, wellWidth / 2],
-        'magazine',
+        // A recessed well rises into the carrier's turn, which the bolt's stop sweep reaches; no other lower is entered.
+        params.magazineWell === 'recessed' ? { allowPort: 'magazine', allowFamilies: ['bolt-carrier'] } : 'magazine',
       );
       if (tilt === 0) {
         return { port, path };
@@ -5581,6 +5600,7 @@ const stock: PartFamily = {
       'straight',
       'sporting',
       'ak-buttstock',
+      'fal-folding',
       'm4',
       'tapered',
       'tapered-sawed',
@@ -5615,6 +5635,16 @@ const stock: PartFamily = {
         ports: [port],
         keepOuts: [],
         axes: [cheekDatum],
+      };
+    }
+    if (params.style === 'fal-folding') {
+      return {
+        family: 'stock',
+        solids: falFoldingStockSolids(len),
+        ports: [port],
+        keepOuts: [],
+        axes: [cheekDatum],
+        motion: falFoldMotion(),
       };
     }
     if (params.style === 'ak-buttstock') {

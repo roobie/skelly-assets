@@ -15,9 +15,8 @@ registerHooks({
   },
 });
 const THREE = await import('three');
-const { explodable, hasSmooth, movers, registerModels, siteNode, smoothEntry, spread, swing, wornEntry } = await import(
-  '../../site/render.mjs'
-);
+const { atStop, explodable, hasSmooth, movers, registerModels, siteNode, smoothEntry, spread, swing, wornEntry } =
+  await import('../../site/render.mjs');
 
 const door = {
   stages: [{ kind: 'hinge', axis: { from: [1, 0, 0], to: [1, 1, 0] }, angle: 90, share: 1 }],
@@ -82,4 +81,22 @@ test('a model, a vehicle or a worn view is drawn smooth only when everything it 
     ],
   };
   assert.ok(hasSmooth(wornEntry(vest)));
+});
+
+test('a stop only the carrier names stands the carrier there and leaves the rider at rest', () => {
+  const carrier = {
+    stages: [{ kind: 'slide', direction: [1, 0, 0], travel: 2, share: 1 }],
+    stops: [
+      { name: 'rest', clock: 0 },
+      { name: 'out', clock: 0.5 },
+    ],
+  };
+  const scene = new THREE.Group();
+  const panel = placed('door', [0, 0, 0]);
+  scene.add(siteNode(panel, true));
+  const loaded = { moving: [{ index: 0, layers: [carrier, door] }] };
+  const posed = atStop(scene, loaded, {}, 'out');
+  posed.updateMatrixWorld(true);
+  assert.ok(Math.abs(panel.getWorldPosition(new THREE.Vector3()).x - 1) < 1e-9);
+  assert.ok(Math.abs(panel.getWorldQuaternion(new THREE.Quaternion()).w - 1) < 1e-9, 'the rider stays shut');
 });

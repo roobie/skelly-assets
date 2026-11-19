@@ -220,6 +220,7 @@ local item(id, family, selector, params, massKg, profile) =
     row('stock-thumbhole-long', 'stock', { style: 'thumbhole', length: 'L' }, 0.75),
     // The telescoping stock is traced to one gun, so its length param does not change its build.
     row('stock-telescoping', 'stock', { style: 'telescoping' }, 0.4),
+    row('stock-fal-folding', 'stock', { style: 'fal-folding' }, 0.9),
     item('rear_sight_ak', 'ak-rear-sight', [], {}, 0.05, 'ak') + { title: 'AK tangent rear sight' },
     item('front_sight_ak', 'front-sight', ['style'], { style: 'ak', section: 'ak', bore: 'S' }, 0.05, 'ak') + { title: 'AK front sight' },
     // The AR sight block is built to its barrel's section and bore, so the narrow-section build is its own shape.
