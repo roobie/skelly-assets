@@ -15,6 +15,7 @@
   standards: {
     'stanag-curved': 'ar15-magazine',
     'stanag-straight': 'ar15-magazine',
+    'sr25-straight': 'ar10-magazine',
   },
   profiles: {
     // The 20-round 7.62×51 SR-25 magazine for the large AR frame, traced from the same photo as that frame's

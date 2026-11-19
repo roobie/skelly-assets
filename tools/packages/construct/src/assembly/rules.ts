@@ -39,12 +39,27 @@ export const portMismatches = (a: PortDef, b: PortDef, [nameA, nameB]: readonly 
   if (a.sizeClass !== undefined && b.sizeClass !== undefined && a.sizeClass !== b.sizeClass) {
     mismatches.push(`Size class mismatch: ${nameA} is ${a.sizeClass} but ${nameB} is ${b.sizeClass}.`);
   }
-  if (a.standard !== b.standard) {
-    mismatches.push(
-      `Standard mismatch: ${nameA} is ${a.standard ?? 'unstated'} but ${nameB} is ${b.standard ?? 'unstated'}.`,
-    );
+  const standard = standardMismatch(a, nameA, b, nameB) ?? standardMismatch(b, nameB, a, nameA);
+  if (standard !== undefined) {
+    mismatches.push(standard);
   }
   return mismatches;
+};
+
+/**
+ * Why `port` does not take `mate` by standard, judged from `port`'s side when it accepts standards and from both sides'
+ * shared standard otherwise; undefined when it does, or when only `mate` accepts and so judges.
+ */
+const standardMismatch = (port: PortDef, name: string, mate: PortDef, mateName: string): string | undefined => {
+  if (port.accepts !== undefined) {
+    return mate.standard === undefined || port.accepts.includes(mate.standard)
+      ? undefined
+      : `Standard mismatch: ${mateName} is ${mate.standard} but ${name} accepts only ${port.accepts.join(', ')}.`;
+  }
+  if (mate.accepts !== undefined || port.standard === mate.standard) {
+    return undefined;
+  }
+  return `Standard mismatch: ${name} is ${port.standard ?? 'unstated'} but ${mateName} is ${mate.standard ?? 'unstated'}.`;
 };
 
 /** Each connection's ports can meet (see `portMismatches`); each port (or slot) is used at most once. */

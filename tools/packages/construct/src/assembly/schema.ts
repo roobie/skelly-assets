@@ -31,12 +31,14 @@ export interface PortDef {
   readonly swap?: SwapPath;
   /**
    * What the interface is built for within its mount type, such as a thread cut. Both sides of a connection declare
-   * the same standard or neither does, so fit is a property of both parts rather than of whichever side declares it.
+   * the same standard or neither does, so fit is a property of both parts rather than of whichever side declares it,
+   * unless one side accepts standards instead (see `accepts`).
    */
   readonly standard?: string;
   /**
-   * The standards a port that holds whatever is put in it takes, rather than one it shares with its mate: a stowage
-   * slot takes any item whose stowage port declares one of them.
+   * The standards a port that holds whatever is put in it takes, rather than one it shares with its mate: it meets a
+   * mate that declares one of them or none, since it is cut for no standard of its own. A stowage slot takes any item
+   * whose stowage port declares one of them; a well that reshapes to its magazine takes every magazine standard.
    */
   readonly accepts?: readonly string[];
   /** The space, in this port's frame, that whatever is met at the port must stay inside. */

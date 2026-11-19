@@ -23,8 +23,9 @@ local bores = { rifled: standard(), smoothbore: standard() };
   // muzzle devices and add-ons) swap by hand; parts held by pins or screws need a tool; parts fitted, pressed or
   // timed into the gun need a bench. A mount type's `standards` are the only ones its ports may declare.
   mounts: {
-    // A well is cut for one family of magazines, so a magazine that fits it by size alone is still refused.
-    magazine: { swap: slot, standards: { 'ar15-magazine': standard() } },
+    // A well is cut for one family of magazines, so a magazine that fits it by size alone is still refused. The large
+    // AR frame's well takes SR-25 magazines, not STANAGs, so it is cut for a standard of its own.
+    magazine: { swap: slot, standards: { 'ar15-magazine': standard(), 'ar10-magazine': standard() } },
     // A stock slides on the receiver extension, so the extension's outside diameter defines its standard; the carbine
     // and rifle extensions are made to different diameters, so a stock fits only its own.
     stock: {

@@ -189,7 +189,7 @@ describe('modular AR', () => {
       ],
       'broken-ar15-magazine-well': [
         'port-compat',
-        'Standard mismatch: lower.magazine is ar15-magazine but magazine.top is unstated.',
+        'Standard mismatch: lower.magazine is ar15-magazine but magazine.top is ar10-magazine.',
       ],
       'broken-ar15-rear-sight': [
         'ar15-rear-sight',

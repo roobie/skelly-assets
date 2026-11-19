@@ -87,6 +87,7 @@ import {
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
+import { GUN_PLATFORMS } from './platforms.ts';
 import { gunPort } from './portData.ts';
 import {
   PUMP_ACTION_TRAVEL_U,
@@ -336,6 +337,8 @@ const boltWellOpening = (calibre: string | undefined) => {
 const MAGAZINE_WELL_DEPTH = MAGAZINE_DEPTH + 2 * MAGAZINE_WELL_CLEARANCE;
 const MAGAZINE_WELL_WIDTH = MAGAZINE_WIDTH + 2 * MAGAZINE_WELL_CLEARANCE;
 const MAGAZINE_WELL_HEIGHT = MAGAZINE_WELL.heightU;
+/** Every standard a magazine can be cut for, which a well cut for none accepts. */
+const MAGAZINE_STANDARDS: readonly string[] = [...(GUN_PLATFORMS.standards.get('magazine')?.keys() ?? [])];
 const MAGAZINE_WELL_CENTER_X = -7 + MAGAZINE_DEPTH / 2;
 const RECESSED_MAGAZINE_PORT_Y = 2;
 /** A magazine's section (front to back, side to side) by profile. */
@@ -2972,7 +2975,7 @@ const lower: PartFamily = {
       }
       // An AR well is cut by its frame, so it is cut for the standard of the magazine its frame takes, whatever magazine
       // is offered to it. Any other well is either sized by no magazine, or reshapes to the one it takes and so fits
-      // it by construction; neither is cut for a standard.
+      // it by construction; neither is cut for a standard, so it accepts every magazine whatever it is cut for.
       const standard =
         layout === 'ar' && section === undefined
           ? magazineStandardOf(arWellMagazineProfile(params.actionFrame))
@@ -2980,7 +2983,7 @@ const lower: PartFamily = {
       const port: PortDef = {
         id: 'magazine',
         mount: 'magazine',
-        ...(standard === undefined ? {} : { standard }),
+        ...(standard === undefined ? { accepts: MAGAZINE_STANDARDS } : { standard }),
         gender: 'female',
         pos: [x, portY, 0],
         normal: [Math.sin(tilt), -Math.cos(tilt), 0],

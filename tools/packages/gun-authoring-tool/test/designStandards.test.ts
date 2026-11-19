@@ -16,6 +16,22 @@ describe('the publish check on a design whose ports declare standards', () => {
     expect(problem).toContain('Standard mismatch: barrel.muzzle is smoothbore but suppressor.base is rifled');
   });
 
+  it('passes a STANAG magazine in a well that reshapes to its magazine, which accepts every standard', () => {
+    const rifle = design('archetype-battle-rifle');
+    rifle.assembly.parts.magazine.params = { ...rifle.assembly.parts.magazine.params, profile: 'stanag-curved' };
+    expect(designTextProblem(JSON.stringify(rifle)).problem).toBeUndefined();
+  });
+
+  it('fails a magazine of another family in the large AR frame well, which is cut for SR-25 magazines', () => {
+    for (const profile of ['ak-curved', 'stanag-straight']) {
+      const rifle = design('archetype-ar-large');
+      rifle.assembly.parts.magazine.params = { ...rifle.assembly.parts.magazine.params, profile };
+      expect(designTextProblem(JSON.stringify(rifle)).problem, profile).toContain(
+        'Standard mismatch: lower.magazine is ar10-magazine but magazine.top is',
+      );
+    }
+  });
+
   it('fails a port declaring a standard its mount type does not list, naming the port', () => {
     const withoutMuzzleStandards = {
       ...GUN_PLATFORMS,

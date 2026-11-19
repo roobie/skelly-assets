@@ -18,7 +18,7 @@
     "barrel": { "family": "barrel", "params": { "length": "M" } },
     "handguard": { "family": "handguard" },
     "grip": { "family": "grip", "params": { "length": "M" } },
-    "magazine": { "family": "magazine", "params": { "length": "M" } },
+    "magazine": { "family": "magazine", "params": { "length": "M", "profile": "stanag-curved" } },
     "stock": { "family": "stock", "params": { "length": "M", "style": "straight" } },
     "front-sight": { "family": "front-sight" },
     "sight": { "family": "sight" }
