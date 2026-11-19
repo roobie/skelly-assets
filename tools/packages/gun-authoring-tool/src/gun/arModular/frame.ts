@@ -218,6 +218,12 @@ type FieldPins = {
       : never;
 };
 
+/**
+ * The height a rail's teeth rise from under a rail top at `topY`: the floor of its cross slots, which are drawn
+ * `drawnSlotDepth` deep. Both heights are in one unit, so the builder and the table's load check share it.
+ */
+export const railTeethY = (topY: number, drawnSlotDepth: number): number => topY - drawnSlotDepth;
+
 /** How far apart two heights of the table may be and still be one height, read off the same derivation. */
 const SAME_HEIGHT_MM = 1e-6;
 
@@ -228,16 +234,18 @@ const SAME_HEIGHT_MM = 1e-6;
 export const checkRailSeats = (name: string, table: ArFrameTable): void => {
   const depth = table.rail.drawnSlotDepth.mm;
   const { upper, handguard } = table;
-  if (Math.abs(upper.rail.topY.mm - depth - upper.topY.mm) > SAME_HEIGHT_MM) {
+  const upperTeethY = railTeethY(upper.rail.topY.mm, depth);
+  if (Math.abs(upperTeethY - upper.topY.mm) > SAME_HEIGHT_MM) {
     throw new Error(
       `${name}.upper.topY: the flat-top's rail is its teeth alone, so the receiver's top must stand at ` +
-        `upper.rail.topY less rail.drawnSlotDepth, ${upper.rail.topY.mm - depth} mm, not ${upper.topY.mm} mm`,
+        `upper.rail.topY less rail.drawnSlotDepth, ${upperTeethY} mm, not ${upper.topY.mm} mm`,
     );
   }
-  if (handguard.outerTopY.mm > handguard.railTopY.mm - depth) {
+  const handguardTeethY = railTeethY(handguard.railTopY.mm, depth);
+  if (handguard.outerTopY.mm > handguardTeethY) {
     throw new Error(
       `${name}.handguard.outerTopY: the rail's spine runs from the tube's top up to its teeth, so the top must stand ` +
-        `no higher than handguard.railTopY less rail.drawnSlotDepth, ${handguard.railTopY.mm - depth} mm, ` +
+        `no higher than handguard.railTopY less rail.drawnSlotDepth, ${handguardTeethY} mm, ` +
         `not ${handguard.outerTopY.mm} mm`,
     );
   }

@@ -1,7 +1,7 @@
 import type { PartFeature, PortDef } from '@skelly/construct/assembly/schema.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { box, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrameTable, u } from './frame.ts';
+import { type ArFrameTable, railTeethY, u } from './frame.ts';
 
 /**
  * What a rail stands on: a spine of its own down to `spineBaseY` under its teeth, or its teeth alone, on a part whose
@@ -34,7 +34,7 @@ export const picatinnyRail = (
   const toothRuns = [fromX, ...slotEdges.map(([, rear]) => rear)].map(
     (start, index) => [start, slotEdges[index]?.[0] ?? toX] as const,
   );
-  const teethY = topY - u(rail.drawnSlotDepth);
+  const teethY = railTeethY(topY, u(rail.drawnSlotDepth));
   const detail = { kind: 'detail' } as const;
   return {
     solids: [
