@@ -1,4 +1,4 @@
 ---
 type: added
 ---
-Two more modular AR-15s, `ar15_rifle_a2` (20 inch A2 rifle with carry handle and fixed stock) and `ar15_carbine_front_sight` (16 inch carbine with front sight base and rail rear sight), built from the same lower and parts as the free-float carbine, so their items share ids and masses where they share parts. Their front sight base comes as the forged A2 triangle the rifles use and as a straight sight block, `ar15_front_sight_base_sight_block_*`.
+Two more modular AR-15s, `ar15_rifle_a2` (20 inch A2 rifle with carry handle and fixed stock) and `ar15_carbine_front_sight` (16 inch carbine with front sight base and rail rear sight), built from the same lower and parts as the free-float carbine, so their items share ids and masses where they share parts. Their front sight base comes as the forged A2 triangle the rifles use and as a straight sight block, `ar15_front_sight_base_sight_block_*`. The free-float carbine's rail now stands at a measured flat-top's height, 3.8 mm lower, with the receiver filled up to it round the charging handle, so its rail sights and optics sit 3.8 mm lower over the bore.

@@ -5,9 +5,10 @@ import { type ArFrameTable, u } from './frame.ts';
 
 /**
  * A Picatinny top rail of the frame's `rail` along x from `fromX` to `toX`, standing on `baseY` with its top at `topY`:
- * a spine with teeth between the cross slots. The slots are centred on the run, so its two end teeth share what is
- * left over. Its port is the sight rail every optic mounts on, one slot per cross slot. Its teeth and slots are carried
- * by the detail grain, so the part that carries the rail takes it.
+ * a spine with teeth between the cross slots. A rail no taller than its slots are deep is its teeth alone, standing on
+ * what carries it. The slots are centred on the run, so its two end teeth share what is left over. Its port is the
+ * sight rail every optic mounts on, one slot per cross slot. Its teeth and slots are carried by the detail grain, so
+ * the part that carries the rail takes it.
  */
 export const picatinnyRail = (
   rail: ArFrameTable['rail'],
@@ -28,11 +29,11 @@ export const picatinnyRail = (
   const toothRuns = [fromX, ...slotEdges.map(([, rear]) => rear)].map(
     (start, index) => [start, slotEdges[index]?.[0] ?? toX] as const,
   );
-  const teethY = topY - u(rail.drawnSlotDepth);
+  const teethY = Math.max(topY - u(rail.drawnSlotDepth), baseY);
   const detail = { kind: 'detail' } as const;
   return {
     solids: [
-      box('rail', [fromX, baseY, -halfWidth], [toX, teethY, halfWidth]),
+      ...(teethY > baseY ? [box('rail', [fromX, baseY, -halfWidth], [toX, teethY, halfWidth])] : []),
       ...toothRuns.map(([start, end], index) =>
         box(`rail-tooth-${index}`, [start, teethY, -halfWidth], [end, topY, halfWidth]),
       ),

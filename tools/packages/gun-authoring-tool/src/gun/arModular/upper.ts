@@ -68,9 +68,10 @@ const channelled = (
 };
 
 /**
- * The A2 carry handle forged on the receiver: the rear sight housing at its rear, with the aperture plate flipping
- * between two ears, the bar over the hand hole, and the front leg. Its aperture is the gun's rear sight, and the eye
- * looks from it down a channel in the handle's top, the channel as wide as the slot the aperture flips in.
+ * The A2 carry handle forged on the receiver: its base on the receiver's top, the rear sight housing at its rear, with
+ * the aperture plate flipping between two ears, the bar over the hand hole, and the front leg. Its aperture is the
+ * gun's rear sight, and the eye looks from it down a channel in the handle's top, the channel as wide as the slot the
+ * aperture flips in.
  */
 const carryHandle = (frame: ArFrame): UpperTop => {
   const h = frame.table.upper.carryHandle;
@@ -94,6 +95,7 @@ const carryHandle = (frame: ArFrame): UpperTop => {
   ];
   return {
     solids: [
+      handlePiece('handle-base', outlineU(h.base), [-half, half]),
       handlePiece('rear-sight-housing', outlineU(h.housing), [-half, half]),
       handlePiece('rear-sight-ear-right', outlineU(h.ears), [slotHalf, half]),
       handlePiece('rear-sight-ear-left', outlineU(h.ears), [-half, -slotHalf]),

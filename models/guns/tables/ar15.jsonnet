@@ -12,9 +12,13 @@ local mass(kg, source) = { kg: kg, source: source };
 local choiceOf(of, name) = { choice: name, of: of };
 local standardOf(mount, name) = { standard: name, mount: mount };
 
+// A trace record's scale, from its calibration span.
+local mmPerPxOf(record) =
+  local c = record.reference.calibration;
+  c.lengthMm.value / (c.pixels.value[1][0] - c.pixels.value[0][0]);
 // Profile pixels to the gun frame: the handguard calibration sets the scale, the upper front face and the bore the datum.
 local calibration = profile.reference.calibration;
-local mmPerPx = calibration.lengthMm.value / (calibration.pixels.value[1][0] - calibration.pixels.value[0][0]);
+local mmPerPx = mmPerPxOf(profile);
 local xOf(px) = (px - profile.values.registrationXPx.value) * mmPerPx;
 local yOf(px) = (profile.values.boreYPx.value - px) * mmPerPx;
 local traced(key) = 'traced: ar15-profile/' + key;
@@ -72,9 +76,7 @@ local guardTopY = yOf(145);
 // receiver to its tip. It hangs from the top of the profile's trigger trace. The profile's coarser trace bows the same
 // way but runs 5 mm longer, which would put the tip into the guard's floor bar.
 local closeUp = import '../references/ar15-receiver.trace.jsonnet';
-local closeUpCalibration = closeUp.reference.calibration;
-local closeUpMmPerPx =
-  closeUpCalibration.lengthMm.value / (closeUpCalibration.pixels.value[1][0] - closeUpCalibration.pixels.value[0][0]);
+local closeUpMmPerPx = mmPerPxOf(closeUp);
 local bladeRear = [[1795, 2120], [1770, 2300], [1800, 2420], [1890, 2520]];
 local bladeFront = [[1850, 2120], [1805, 2300], [1830, 2400], [1900, 2490]];
 local bladeMid = [[(bladeRear[i][0] + bladeFront[i][0]) / 2, (bladeRear[i][1] + bladeFront[i][1]) / 2] for i in std.range(0, 3)];
@@ -107,8 +109,6 @@ local tubeEndX = xOf(370) - tubeLength;
 local upperRearX = dim(xOf(profile.values.upperRearXPx.value), 'derived: ' + profile.values.upperRearXPx.reason);
 local stockMount = [tubeEndX, 0];
 local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock');
-local railTopY = tracedY(75, 'topRailLine');
-local upperTopY = tracedY(88, 'upperReceiver');
 // The flat-top's front post stands at this height over the bore; the carry-handle base is the ar-flat-top extra lower.
 local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
 local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
@@ -117,32 +117,68 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
 // photo's heights are over its bore, which the sight line is measured from.
 local m16a4Side = import '../references/m16a4-side.trace.jsonnet';
 local m16a4Bare = import '../references/m16a4-bare.trace.jsonnet';
-local mmPerPxOf(record) =
-  local c = record.reference.calibration;
-  c.lengthMm.value / (c.pixels.value[1][0] - c.pixels.value[0][0]);
+local side = m16a4Side.values;
 local sideMmPerPx = mmPerPxOf(m16a4Side);
-local sideOverBore(py) = (m16a4Side.values.boreYPx.value - py) * sideMmPerPx;
+local sideOverBore(py) = (side.boreYPx.value - py) * sideMmPerPx;
 
-// The carry handle, registered at its rear face on the upper's rear face; a null height stands on the upper's top,
-// where the fixed handle is forged to the receiver.
-local handleX(px) = upperRearX.mm + (px - m16a4Side.values.handleRearXPx.value) * sideMmPerPx;
-local handlePoint(p) = [handleX(p[0]), if p[1] == null then upperTopY.mm else sideOverBore(p[1])];
+// No print of the upper is published, so the rail top is a measurement off a rifle. The side photo agrees within its
+// trace; the bare photo reads it 2 mm lower and the AM-15 profile 3.8 mm higher, each at over a millimetre a pixel.
+local railTopY = dim(
+  30.861,
+  'sourced: 1.215 in from the bore centreline, measured where no print is published, '
+  + 'https://forum.308ar.com/topic/23364-advantage-of-various-upper-rail-heights/; the m16a4-side trace reads %.1f mm'
+  % sideOverBore(side.railTopYPx.value),
+);
+// The flat-top's receiver rises to the rail, which is only its teeth: the upper carries the charging handle under it.
+local upperTopY = dim(
+  railTopY.mm - detailFeature,
+  "derived: the rail's teeth standing on the receiver, its slots cut to the receiver's top; the m16a4-side trace's "
+  + 'receiver top reads %.1f mm' % sideOverBore(side.receiverTopYPx.value),
+);
+
+// The carry handle, registered at its rear face on the upper's rear face; a null height stands on the handle's base,
+// the top of the receiver under its window.
+local handleX(px) = upperRearX.mm + (px - side.handleRearXPx.value) * sideMmPerPx;
+local handleBaseY = sideOverBore(side.handleBaseYPx.value);
+local handlePoint(p) = [handleX(p[0]), if p[1] == null then handleBaseY else sideOverBore(p[1])];
 local handleOutline(pixels) = outline([handlePoint(p) for p in pixels], 'traced: m16a4-side/carryHandle');
-// The bar's top falls 1 px in 10 to the front, so the trace's bar is thinnest where it meets the front leg.
-local handleBarTop(px) = 1093.5 + (px - 1410) / 10;
-local windowFrontPx = 1809.5;
-local handleWindowTopY = sideOverBore(handleBarTop(windowFrontPx)) - detailFeature;
+// The bar's top falls to the front, so the trace's bar is thinnest where it meets the front leg.
+local barTopLine = m16a4Side.reference.landmarks.handleBarTop.value;
+local handleBarTop(px) =
+  barTopLine[0][1] + (px - barTopLine[0][0]) * (barTopLine[1][1] - barTopLine[0][1]) / (barTopLine[1][0] - barTopLine[0][0]);
+local housingTop = side.housingTopYPx.value;
+local housingFront = side.housingFrontXPx.value;
+local windowFront = side.windowFrontXPx.value;
+local handleFront = side.handleFrontXPx.value;
+local handleWindowTopY = sideOverBore(handleBarTop(windowFront)) - detailFeature;
 
 // The A2 front sight base's triangle, from its rear face and the top of the journal.
-local sightBasePoint(p) = [(p[0] - m16a4Side.values.fsbRearXPx.value) * sideMmPerPx, sideOverBore(p[1]) - journalRadius];
-local sightBaseOutline(pixels) = outline([sightBasePoint(p) for p in pixels], 'traced: m16a4-side/frontSightBase');
+local sightBasePoint(p) = [(p[0] - side.fsbRearXPx.value) * sideMmPerPx, sideOverBore(p[1]) - journalRadius];
 local sightBaseX(px) = dim(sightBasePoint([px, 0])[0], 'traced: m16a4-side/frontSightBase');
+local fsbRear = side.fsbRearXPx.value;
+local fsbFront = side.fsbFrontXPx.value;
+local fsbDeck = side.fsbDeckYPx.value;
+local crownFoot = side.fsbCrownFootYPx.value;
+local simplified = 'simplified for legibility, BR 2026-11-19';
+// A strut from its outer edge on the deck up to the crown's foot, drawn this thick across its rake and standing in from
+// its outer edge by `inward` (+1 forward, -1 rearward).
+local strutThickness = 5;
+local strut(deckX, crownX, inward) =
+  local rise = fsbDeck - crownFoot;
+  local across = inward * strutThickness / sideMmPerPx * std.sqrt(std.pow(crownX - deckX, 2) + std.pow(rise, 2)) / rise;
+  local corners = [[deckX, fsbDeck], [deckX + across, fsbDeck], [crownX + across, crownFoot], [crownX, crownFoot]];
+  // Rear to front along the deck, then front to rear along the crown's foot.
+  local ordered = if inward > 0 then corners else [corners[1], corners[0], corners[3], corners[2]];
+  outline(
+    [sightBasePoint(p) for p in ordered],
+    'derived: the m16a4-side/frontSightBase strut %g mm thick across its rake, %s' % [strutThickness, simplified],
+  );
 
 // The A2 stock's outline off the bare photo, registered at its butt plate on the sourced stock length and at its comb on
 // the side photo's comb height over the bore, which the side photo resolves five times finer. The 13.5 in length of pull
 // the stock length's source also gives comes out 0.3 in longer from the trigger.
 local a2StockRearX = tubeLengths.rifle.mm - m16a4Bare.values.stockLengthMm.value;
-local combY = sideOverBore(m16a4Side.values.combYPx.value);
+local combY = sideOverBore(side.combYPx.value);
 local bareMmPerPx = mmPerPxOf(m16a4Bare);
 local stockPoint(p) = [
   a2StockRearX + (p[0] - m16a4Bare.values.buttRearXPx.value) * bareMmPerPx,
@@ -234,31 +270,42 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     // over it and the block ahead of them, the bar falling to the front over the hand hole, and the front leg with its
     // rounded corner. The ears stand either side of the aperture's slot, the rest across the handle's width.
     carryHandle: {
-      housing: handleOutline([[1212, null], [1405, null], [1405, 1151], [1240, 1151], [1212, 1222]]),
-      ears: handleOutline([[1260, 1151], [1358, 1151], [1358, 1079], [1272, 1079], [1260, 1092]]),
-      housingFront: handleOutline([[1358, 1151], [1405, 1151], [1405, 1088.4], [1358, 1082.8]]),
+      // The receiver's top under the handle, from the flat-top's receiver top up to the window's bottom: the charging
+      // handle runs in it, where the flat-top carries its rail.
+      base: outline(
+        [
+          [handleX(side.handleRearXPx.value), upperTopY.mm],
+          [handleX(handleFront), upperTopY.mm],
+          handlePoint([handleFront, null]),
+          handlePoint([side.handleRearXPx.value, null]),
+        ],
+        'traced: m16a4-side/handleBaseYPx',
+      ),
+      housing: handleOutline([[side.handleRearXPx.value, null], [housingFront, null], [housingFront, housingTop], [1240, housingTop]]),
+      ears: handleOutline([[1260, housingTop], [1358, housingTop], [1358, 1079], [1272, 1079], [1260, 1092]]),
+      housingFront: handleOutline([[1358, housingTop], [housingFront, housingTop], [housingFront, 1088.4], [1358, 1082.8]]),
       bar: outline(
         [
-          [handleX(1405), handleWindowTopY],
-          [handleX(windowFrontPx), handleWindowTopY],
-          handlePoint([windowFrontPx, handleBarTop(windowFrontPx)]),
-          handlePoint([1405, handleBarTop(1405)]),
+          [handleX(housingFront), handleWindowTopY],
+          [handleX(windowFront), handleWindowTopY],
+          handlePoint([windowFront, handleBarTop(windowFront)]),
+          handlePoint([housingFront, handleBarTop(housingFront)]),
         ],
-        "derived: the m16a4-side/carryHandle bar top over a window top lowered from the trace's 1137.5 px so the bar's "
-        + 'thinnest is one bar depth; the trace thins it to %g px' % m16a4Side.values.barDepthPx.value,
+        "derived: the m16a4-side/carryHandle bar top over a window top lowered from the trace's %g px so the bar's "
+        % side.windowTopYPx.value + 'thinnest is one bar depth; the trace thins it to %g px' % side.barDepthPx.value,
       ),
       frontLeg: handleOutline([
-        [windowFrontPx, null],
-        [1838.5, null],
-        [1838.5, 1165],
+        [windowFront, null],
+        [handleFront, null],
+        [handleFront, 1165],
         [1832, 1148],
         [1820, 1138],
-        [windowFrontPx, handleBarTop(windowFrontPx)],
+        [windowFront, handleBarTop(windowFront)],
       ]),
       // The ears' foot, where the aperture plate stands on the housing between them.
-      earBottomY: dim(sideOverBore(1151), 'traced: m16a4-side/carryHandle'),
+      earBottomY: dim(sideOverBore(housingTop), 'traced: m16a4-side/housingTopYPx'),
       barDepth: detailWall('the bar over the window front, a'),
-      apertureX: dim(handleX(m16a4Side.values.apertureXPx.value), 'traced: m16a4-side/apertureXPx'),
+      apertureX: dim(handleX(side.apertureXPx.value), 'traced: m16a4-side/apertureXPx'),
       apertureY: dim(sightPlane.mm - flatTopExtra.mm, 'derived: the sight plane less the flat-top extra height, level with the carry-handle front post'),
       apertureHalfHeight: dim(5, 'derived: a flip aperture plate between the ears, a rim round its hole'),
       apertureRadius: dim(
@@ -348,30 +395,18 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     lugHalfWidth: dim(5, "derived: the bayonet lug, sling loop and the post's frame narrower than the ring"),
     // The forged A2 triangle, from the base's rear face: a deck over the ring, the rear strut raked back to the rear
     // face, the near-upright front strut, and the crown over the window between them, which is the two ears with the
-    // post between them. A taller base lifts everything over the deck by its raise.
+    // post between them. The struts are drawn thick and the crown plain, so the triangle reads at a glance. A taller
+    // base lifts everything over the deck by its raise.
     'a-frame': {
-      deckY: dim(sightBasePoint([0, 1282])[1], 'traced: m16a4-side/frontSightBase'),
-      frontFootX: sightBaseX(3177),
-      postX: dim(sightBasePoint([m16a4Side.values.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
-      crown: sightBaseOutline([
-        [3075.3, 1162],
-        [3167.7, 1162],
-        [3166, 1140],
-        [3164, 1130],
-        [3161, 1124],
-        [3157, 1118],
-        [3151, 1112],
-        [3146, 1109],
-        [3130, 1109],
-        [3123, 1112],
-        [3102, 1124],
-        [3096, 1130],
-        [3089, 1140],
-      ]),
-      rearStrut: sightBaseOutline([[3013, 1262], [3013, 1274.4], [3090.25, 1162], [3075.3, 1162]]),
-      // The fillet where the rear strut meets the deck, drawn as a chamfer.
-      rearFoot: sightBaseOutline([[3013, 1282], [3044, 1282], [3027, 1254], [3013, 1274.4]]),
-      frontStrut: sightBaseOutline([[3163, 1282], [3176.65, 1282], [3167.65, 1162], [3159, 1162]]),
+      deckY: dim(sightBasePoint([0, fsbDeck])[1], 'traced: m16a4-side/fsbDeckYPx'),
+      frontFootX: sightBaseX(fsbFront),
+      postX: dim(sightBasePoint([side.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
+      crown: outline(
+        [sightBasePoint(p) for p in [[3075.3, crownFoot], [3167.7, crownFoot], [3161, 1124], [3146, 1109], [3130, 1109], [3096, 1130]]],
+        'derived: the m16a4-side/frontSightBase crown through its corners, ' + simplified,
+      ),
+      rearStrut: strut(fsbRear, 3075.3, 1),
+      frontStrut: strut(fsbFront, 3167.7, -1),
     },
     // A straight sight block over the middle of the ring, as on a clamp-on front sight gas block, the ears standing on
     // its deck.

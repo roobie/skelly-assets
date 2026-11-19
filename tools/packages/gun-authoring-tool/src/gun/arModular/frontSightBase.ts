@@ -27,8 +27,8 @@ interface Placement {
 }
 
 /**
- * The forged A2 triangle: a deck over the ring from the rear face to the front foot, the two struts and the rear
- * strut's foot across the frame's width, and the crown over the window as two ears with the post's slot between them.
+ * The forged A2 triangle: a deck over the ring from the rear face to the front foot, the two struts across the frame's
+ * width, and the crown over the window as two ears with the post's slot between them.
  */
 const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
   const a = F['a-frame'];
@@ -46,7 +46,6 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
     solids: [
       box('deck', [at.rearX, at.ringTopY, -at.lugHalf], [at.rearX + u(a.frontFootX), deckY, at.lugHalf]),
       piece('rear-strut', lift(a.rearStrut), across),
-      piece('rear-foot', lift(a.rearFoot), across),
       piece('front-strut', lift(a.frontStrut), across),
       piece('ear-right', lift(a.crown), [at.earInner, at.lugHalf]),
       piece('ear-left', lift(a.crown), [-at.lugHalf, -at.earInner]),

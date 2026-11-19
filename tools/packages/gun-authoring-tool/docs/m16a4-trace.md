@@ -20,8 +20,10 @@ Both photos show the whole rifle, so both are scaled by the M16A4's published ov
 
 The bare photo is preferred for the stock because the side photo's belly sits against a dark shadow, which reads about 7% shallower. The side photo traces the carry handle, since only it resolves the handle at all, and the comb height over the bore, since at its scale one pixel is a fifth of the bare photo's. The front sight base is traced from the side photo too: at the bare photo's scale the whole base is about 36 pixels long, too few to place its struts, so the bare outline serves only as a check of its height and rake.
 
-The side photo's handle is the detachable one of a flat-top M16A4. The fixed A2 handle has the same sight housing and bar, so the trace stands for it above the rail; below the rail the fixed handle is forged to the receiver, so its window opens down to the receiver top.
+The side photo's handle is the detachable one of a flat-top M16A4. The fixed A2 handle has the same sight housing and bar, so the trace stands for it above the rail; below the rail the fixed handle is forged to the receiver, solid down to the receiver's top, where the flat-top carries its rail. Its window keeps the photo's bottom, the top of the handle's base, so the charging handle's volume under it stays.
+
+The rail's height over the bore is an owner's measurement of a flat-top, since no print of the upper is published; the side photo reads within its trace of it, and it governs the R1 carbine too, whose profile photo is too coarse to place the rail. The receiver stands to the foot of the rail's teeth, as the side photo shows.
 
 ## Known departures
 
-The handle's bar is thinner over the window front than a detail voxel; the model lowers the window top so the bar keeps two voxels there. The traced handle is 3.7% shorter than the published detachable handle; the trace is kept, as the photo shows the shape the published length does not. Both photos put the rail top lower over the bore than the AR-15 profile trace does; that trace still governs the R1 carbine and is not changed here.
+The handle's bar is thinner over the window front than a detail voxel; the model lowers the window top so the bar keeps two voxels there. The traced handle is 3.7% shorter than the published detachable handle; the trace is kept, as the photo shows the shape the published length does not. The front sight base's struts are drawn thicker than the photo's and its crown plainer, so the triangle reads at the model's scale.
