@@ -43,8 +43,17 @@ describe('modular AR', () => {
     expect(() => checkFrameTable('t', { a: { mm: 1 } })).toThrow(/t\.a/);
     expect(() => checkFrameTable('t', { a: { mm: 1, source: 'a guess' } })).toThrow();
     expect(() => checkFrameTable('t', { a: 1 })).toThrow(/t\.a/);
-    // A name picks one of the table's named choices, so it needs no source.
-    expect(() => checkFrameTable('t', { a: 'rifle' })).not.toThrow();
+    expect(() => checkFrameTable('t', { a: 'rifle' })).toThrow(/t\.a/);
+    // A pick names the group it picks from, which must hold it.
+    const picks = { kinds: { rifle: { mm: 1, source: 'sourced: x' } } };
+    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle', of: 'kinds' } })).not.toThrow();
+    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rilfe', of: 'kinds' } })).toThrow(/t\.a/);
+    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle', of: 'sorts' } })).toThrow(/t\.a/);
+    expect(() => checkFrameTable('t', { ...picks, a: { choice: 'rifle' } })).toThrow();
+    // A standard must be one its mount lists.
+    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
+    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
+    expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
   });
 
   it('gives every item the sourced mass of its frame table', () => {

@@ -8,6 +8,9 @@ local profile = import '../references/ar15-profile.trace.jsonnet';
 local dim(mm, source) = { mm: mm, source: source };
 local outline(points, source) = { mm: points, source: source };
 local mass(kg, source) = { kg: kg, source: source };
+// A pick among the table's own named choices, the group at the dot path `of`, or a port standard its mount lists.
+local choiceOf(of, name) = { choice: name, of: of };
+local standardOf(mount, name) = { standard: name, mount: mount };
 
 // Profile pixels to the gun frame: the handguard calibration sets the scale, the upper front face and the bore the datum.
 local calibration = profile.reference.calibration;
@@ -143,7 +146,7 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
       outerHalfWidth: dim(magazine.width / 2 + wellClearance + detailFeature, 'derived: the side wall outside the clearance'),
     },
     // The magazine standard the well is cut for.
-    magazine: 'ar15-magazine',
+    magazine: standardOf('magazine', 'ar15-magazine'),
     magazineSeat: {
       x: dim(wellInnerFrontX - wellClearance - magazine.depth / 2, 'derived: the magazine body centred in the well'),
       y: dim(partingY - 1 - magazine.topAboveSeat, 'derived: the magazine top 1 mm under the upper'),
@@ -238,13 +241,13 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     radius: dim((yOf(96) - yOf(112)) / 2, traced('exposedBarrel')),
     breechSetback: dim(breechSetback, 'derived: the listing barrel length less the traced muzzle shoulder'),
     // The journal every barrel is turned to under its gas block, by name.
-    journal: '750',
+    journal: choiceOf('gasBlock.journals', '750'),
     // The gas systems by name, each the port a barrel is drilled at; a drop-in handguard is made for one of them.
     gasPorts: gasPorts,
     // A barrel length, by name, with the gas system it is drilled for; lengths are measured from the bolt face.
     lengths: {
-      '16-mid': { length: dim(406.4, 'derived: 16 in'), gas: 'mid' },
-      '20-rifle': { length: dim(508, 'derived: 20 in'), gas: 'rifle' },
+      '16-mid': { length: dim(406.4, 'derived: 16 in'), gas: choiceOf('barrel.gasPorts', 'mid') },
+      '20-rifle': { length: dim(508, 'derived: 20 in'), gas: choiceOf('barrel.gasPorts', 'rifle') },
     },
   },
 
@@ -359,7 +362,7 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
   // The collapsible stock, measured from the end of its tube at the traced position.
   stock: {
     // The buffer of the extension it slides on.
-    buffer: 'carbine',
+    buffer: choiceOf('receiverExtension.buffers', 'carbine'),
     frontX: dim(xOf(284) - stockMount[0], traced('moduleStockToReceiverExtension')),
     rearX: dim(xOf(128) - stockMount[0], traced('stock')),
     topY: tracedY(86, 'stock'),
@@ -374,7 +377,7 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
   // lower's buffer tower, and the butt plate covers the extension's end. No A2 side reference is traced, so its depth
   // is the traced collapsible stock's.
   stockA2: {
-    buffer: 'rifle',
+    buffer: choiceOf('receiverExtension.buffers', 'rifle'),
     frontX: dim(tubeLengths.rifle.mm, "derived: closed against the lower's buffer tower"),
     rearX: dim(
       tubeLengths.rifle.mm - 266.7,

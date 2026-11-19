@@ -12,10 +12,12 @@ const journalRadiusOf = (frame: ArFrame, journal: string): number =>
   u(chosen(frame.table.gasBlock.journals, journal)) / 2;
 
 /** The radius of the journal every barrel of the frame is turned to under its gas block. */
-export const barrelJournalRadius = (frame: ArFrame): number => journalRadiusOf(frame, frame.table.barrel.journal);
+export const barrelJournalRadius = (frame: ArFrame): number =>
+  journalRadiusOf(frame, frame.table.barrel.journal.choice);
 
 /** The gas system, by name, that a barrel of the named length is drilled for. */
-export const barrelGas = (frame: ArFrame, length: string): string => chosen(frame.table.barrel.lengths, length).gas;
+export const barrelGas = (frame: ArFrame, length: string): string =>
+  chosen(frame.table.barrel.lengths, length).gas.choice;
 
 /**
  * The barrel, by its length and gas system. Only the part ahead of the upper is built: the chamber and barrel
@@ -27,10 +29,10 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
   params: { length: choice(...Object.keys(frame.table.barrel.lengths)) },
   build(params): PartDef {
     const { barrel } = frame.table;
-    const choiceOf = chosen(barrel.lengths, params.length);
+    const length = chosen(barrel.lengths, params.length);
     const setback = u(barrel.breechSetback);
-    const muzzleX = u(choiceOf.length) - setback;
-    const gasPortX = u(chosen(barrel.gasPorts, choiceOf.gas)) - setback;
+    const muzzleX = u(length.length) - setback;
+    const gasPortX = u(chosen(barrel.gasPorts, length.gas.choice)) - setback;
     return {
       family: 'barrel',
       solids: [roundBar('barrel', 0, muzzleX, u(barrel.radius))],
@@ -39,7 +41,7 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
         {
           id: 'gas-block',
           mount: 'gas-block',
-          standard: journalStandard(barrel.journal),
+          standard: journalStandard(barrel.journal.choice),
           gender: 'female',
           pos: [gasPortX, barrelJournalRadius(frame), 0],
           normal: Y,
@@ -60,7 +62,7 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
 export const arGasBlock = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'gas-block'),
   params: {
-    journal: { values: Object.keys(frame.table.gasBlock.journals), default: frame.table.barrel.journal },
+    journal: { values: Object.keys(frame.table.gasBlock.journals), default: frame.table.barrel.journal.choice },
   },
   build: (params) => gasBlockDef(frame, params.journal!),
 });

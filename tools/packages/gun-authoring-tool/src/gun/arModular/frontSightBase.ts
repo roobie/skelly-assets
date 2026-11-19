@@ -46,7 +46,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
         {
           id: 'barrel',
           mount: 'gas-block',
-          standard: journalStandard(frame.table.barrel.journal),
+          standard: journalStandard(frame.table.barrel.journal.choice),
           gender: 'male',
           pos: [0, 0, 0],
           normal: NEG_Y,

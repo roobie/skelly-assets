@@ -2,9 +2,9 @@
 // A table is checked once at load, so a number without a source is a build error rather than a quiet guess.
 
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, gtValue, minLength, number, parse, pipe, strictObject, tuple, union } from 'valibot';
+import { array, gtValue, minLength, number, parse, pipe, strictObject, string, tuple, union } from 'valibot';
 import ar15Table from '../../../../../../models/guns/tables/ar15.json' with { type: 'json' };
-import { SourceSchema } from '../platforms.ts';
+import { GUN_PLATFORMS, type GunPlatforms, SourceSchema } from '../platforms.ts';
 import { mmToU } from '../units.ts';
 
 const MeasuredSchema = union([
@@ -13,29 +13,54 @@ const MeasuredSchema = union([
   strictObject({ kg: pipe(number(), gtValue(0)), source: SourceSchema }),
 ]);
 
+const Name = pipe(string(), minLength(1));
+const ChoiceSchema = strictObject({ choice: Name, of: Name });
+const StandardSchema = strictObject({ standard: Name, mount: Name });
+
+const isGroup = (node: unknown): node is Readonly<Record<string, unknown>> =>
+  typeof node === 'object' && node !== null && !Array.isArray(node);
+
+/** The group of the table at a dot path, if there is one. */
+const groupAt = (table: unknown, path: string): Readonly<Record<string, unknown>> | undefined => {
+  const group = path.split('.').reduce<unknown>((node, key) => (isGroup(node) ? node[key] : undefined), table);
+  return isGroup(group) ? group : undefined;
+};
+
 /**
- * Every leaf of the table is a measurement with its source, or the name of one of the table's named choices, which the
- * family that reads it looks up; every other node only groups them.
+ * Every leaf of the table is a measurement with its source, a pick among one of the table's own groups of named
+ * choices, or a port standard its mount lists; every other node only groups them. A pick names what it picks from, so
+ * a misspelt one is a load error rather than a lookup that fails in whichever family reads it first.
  */
-const checkMeasured = (node: unknown, path: string): void => {
-  if (typeof node === 'string') {
-    return;
-  }
-  if (typeof node !== 'object' || node === null || Array.isArray(node)) {
-    throw new Error(`${path}: expected a measurement or a group of them`);
+const checkLeaves = (node: unknown, path: string, table: unknown, platforms: GunPlatforms): void => {
+  if (!isGroup(node)) {
+    throw new Error(`${path}: expected a measurement, a choice, a standard or a group of them`);
   }
   if (Object.hasOwn(node, 'source')) {
     parse(MeasuredSchema, node);
     return;
   }
+  if (Object.hasOwn(node, 'choice')) {
+    const { choice, of } = parse(ChoiceSchema, node);
+    if (!Object.hasOwn(groupAt(table, of) ?? {}, choice)) {
+      throw new Error(`${path}: '${choice}' is not a choice of ${of}`);
+    }
+    return;
+  }
+  if (Object.hasOwn(node, 'standard')) {
+    const { standard, mount } = parse(StandardSchema, node);
+    if (!platforms.standards.get(mount)?.has(standard)) {
+      throw new Error(`${path}: the ${mount} mount lists no standard '${standard}'`);
+    }
+    return;
+  }
   for (const [key, child] of Object.entries(node)) {
-    checkMeasured(child, `${path}.${key}`);
+    checkLeaves(child, `${path}.${key}`, table, platforms);
   }
 };
 
-/** A table as loaded, checked that every leaf is sourced; `name` heads the path a failure reports. */
-export const checkFrameTable = <T>(name: string, raw: T): T => {
-  checkMeasured(raw, name);
+/** A table as loaded, checked leaf by leaf; `name` heads the path a failure reports. */
+export const checkFrameTable = <T>(name: string, raw: T, platforms: GunPlatforms = GUN_PLATFORMS): T => {
+  checkLeaves(raw, name, raw, platforms);
   return raw;
 };
 
