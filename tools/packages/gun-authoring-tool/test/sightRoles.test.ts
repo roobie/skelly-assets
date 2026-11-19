@@ -6,20 +6,19 @@ import { SIGHT_ROLES, sightRoleOf } from '../src/gun/sightAxis.ts';
 const defaults = (family: PartFamily): Record<string, string> =>
   Object.fromEntries(Object.entries(family.params).map(([name, spec]) => [name, spec.default]));
 
-/** The family built at its defaults and at every value of each param in turn; a combination it refuses is skipped. */
+/**
+ * The family built at its defaults and at every value of each param in turn. A combination its params check refuses is
+ * skipped, since no design can build it; any other failure to build fails the test.
+ */
 const builds = (family: PartFamily): PartDef[] =>
   [
     defaults(family),
     ...Object.entries(family.params).flatMap(([name, spec]) =>
       spec.values.map((value) => ({ ...defaults(family), [name]: value })),
     ),
-  ].flatMap((params) => {
-    try {
-      return [family.build(params)];
-    } catch {
-      return [];
-    }
-  });
+  ]
+    .filter((params) => family.validateParams?.(params) === undefined)
+    .map((params) => family.build(params));
 
 describe('sight roles', () => {
   it('gives every sight axis of every family a role the domain knows', () => {
