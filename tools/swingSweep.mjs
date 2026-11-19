@@ -20,7 +20,7 @@ import { solid } from './pieceSolid.mjs';
 /** @typedef {StowPlane & { readonly pace?: number }} PacedPlane A stow plane with how fast its pose carries a shape. */
 /**
  * A stow plane over a window of the clock (`stowsOver`).
- * @typedef {{ readonly from: Pose; readonly to: Pose; readonly direction: Vec3; readonly stow: number; readonly reach: number }} Stow
+ * @typedef {{ readonly from: Pose; readonly direction: Vec3; readonly stow: number; readonly reach: number }} Stow
  */
 /**
  * A mover or an obstacle of a sweep: a site's shape and, for an obstacle, the layers that move it.
@@ -88,9 +88,9 @@ export function paceOf(layers, bounds, first = 0) {
 }
 
 /**
- * The stow planes of one shape over the window of the clock from `start` to `end`: `from` and `to` carry a point of
- * the shape at rest into each plane's frame at the window's ends, and `reach` is how far the plane's pose carries a
- * point of the shape in the window, from the plane's `pace`.
+ * The stow planes of one shape over the window of the clock from `start` to `end`: `from` carries a point of the shape
+ * at rest into each plane's frame at the window's start, and `reach` is how far the plane's pose carries a point of the
+ * shape in the window, from the plane's `pace`.
  * @param {readonly PacedPlane[]} planes
  * @param {number} start
  * @param {number} end
@@ -99,28 +99,23 @@ export function paceOf(layers, bounds, first = 0) {
 const stowsOver = (planes, start, end) =>
   planes.map(({ layers, first, direction, stow, pace = 0 }) => ({
     from: poseAt(layers, evenClocks(layers, start), first),
-    to: poseAt(layers, evenClocks(layers, end), first),
     direction,
     stow,
     reach: pace * (end - start),
   }));
 
 /**
- * How far a point lies on the shown side of the stow planes `stows`, Infinity when nothing stows: read at the window's
- * end with `atEnd`, else the most it can be anywhere in the window. A depth inside a shape is no deeper than this.
+ * How far a point lies on the shown side of the stow planes `stows`, Infinity when nothing stows: the most it can be
+ * anywhere in their window. A depth inside a shape is no deeper than this.
  * @param {readonly Stow[]} stows
  * @param {Vec3} point
- * @param {boolean} atEnd
  * @param {Point} out
  */
-function shownBy(stows, point, atEnd, out) {
+function shownBy(stows, point, out) {
   let shown = Infinity;
-  for (const { from, to, direction, stow, reach } of stows) {
-    apply(atEnd ? to : from, point, out);
-    shown = Math.min(
-      shown,
-      stow - (out[0] * direction[0] + out[1] * direction[1] + out[2] * direction[2]) + (atEnd ? 0 : reach),
-    );
+  for (const { from, direction, stow, reach } of stows) {
+    apply(from, point, out);
+    shown = Math.min(shown, stow - (out[0] * direction[0] + out[1] * direction[1] + out[2] * direction[2]) + reach);
   }
   return shown;
 }
@@ -202,7 +197,6 @@ function placedBounds(shape, pose) {
  * @property {Shape} mover
  * @property {Shape} obstacle
  * @property {Pose} from
- * @property {Pose} to
  * @property {number} reach
  * @property {number} floor
  * @property {number} step
@@ -212,13 +206,13 @@ function placedBounds(shape, pose) {
  */
 
 /**
- * How deep (m) `mover`, moved from the pose `from` to the pose `to`, and `obstacle` sink into each other: of the
- * points of a lattice at most `step` m apart over the mover, its corners, edges and faces among them, those inside both
- * solids at `to`, the deepest any lies in either, or -Infinity when no cell that could hold a point deeper than
- * `floor` was found. `reach` is the furthest a point travels between the poses. `moverStows` and `obstacleStows` are
- * the stow planes (`stowsOver`) that hide parts of each over the same window, read in the mover's rest frame and in the
- * frame the obstacle is read in. With `probe` it answers only whether any cell could not be cleared, as `true`, and
- * stops at the first such cell it splits down to `probeCell` lattice steps across.
+ * How deep (m) `mover`, at the pose `from`, sinks into `obstacle`: of the points of a lattice at most `step` m apart
+ * over the mover, its corners, edges and faces among them, the deepest any lies in the obstacle, or -Infinity when
+ * none lies deeper than `floor`. `moverStows` and `obstacleStows` are the stow planes (`stowsOver`) that hide parts of
+ * each, read in the mover's rest frame and in the frame the obstacle is read in. With `probe` it answers instead for a
+ * window of the clock that starts at `from`, in which a point travels at most `reach` and the stows move as theirs
+ * say: only whether any cell could not be cleared, as `true`, stopping at the first such cell it splits down to
+ * `probeCell` lattice steps across. Without it, `reach` and the stows' reach are 0.
  * @overload
  * @param {DepthSearch & { probe: true }} search
  * @returns {boolean}
@@ -236,7 +230,6 @@ function deepestOf({
   mover,
   obstacle,
   from,
-  to,
   reach,
   floor,
   step,
@@ -258,8 +251,9 @@ function deepestOf({
   // A point of one solid inside the other must move at least its depth there to leave it, so the deepest such point
   // never reads deeper than the move that parts the two, and a corner, an edge or a face pressed in reads as far as it
   // is pressed: the lattice holds the mover's corners, and the obstacle's are read from its own (`depthAt`).
-  // A probe answers for all the space between the poses, so each lattice point holds the space half a spacing about it;
-  // a measurement reads the lattice points alone.
+  // A probe answers for all the space its window sweeps, so each lattice point holds the space half a spacing about it;
+  // a measurement reads the lattice points alone, so a single point's bound is its reading. A probe answers for the
+  // obstacle's lattice too, so it keeps a cell where a point inside both could lie deep in either.
   const pad = probe ? 1 : 0;
   /**
    * A cell holds the lattice points `lo` to `hi`, and with them the space each point holds.
@@ -276,24 +270,15 @@ function deepestOf({
     }
     const radius =
       Math.hypot((size[0] + pad) * spacing[0], (size[1] + pad) * spacing[1], (size[2] + pad) * spacing[2]) / 2;
-    const inMover = -mover.distance(centre);
-    const moverMost = Math.min(inMover, shownBy(moverStows, centre, false, scratch)) + radius;
+    const moverMost = Math.min(-mover.distance(centre), shownBy(moverStows, centre, scratch)) + radius;
     if (moverMost < 0) return;
     apply(from, centre, world);
-    const obstacleMost =
-      Math.min(-obstacle.distance(world), shownBy(obstacleStows, world, false, scratch)) + radius + reach;
-    if (obstacleMost < 0 || Math.max(moverMost, obstacleMost) <= Math.max(floor, deepest)) return;
+    const obstacleMost = Math.min(-obstacle.distance(world), shownBy(obstacleStows, world, scratch)) + radius + reach;
+    const most = probe ? Math.max(moverMost, obstacleMost) : obstacleMost;
+    if (obstacleMost < 0 || most <= Math.max(floor, deepest)) return;
     if (size[0] === 0 && size[1] === 0 && size[2] === 0) {
-      if (probe) {
-        open = true;
-        return;
-      }
-      apply(to, centre, world);
-      const [moverAt, obstacleAt] = [
-        Math.min(inMover, shownBy(moverStows, centre, true, scratch)),
-        Math.min(-obstacle.distance(world), shownBy(obstacleStows, world, true, scratch)),
-      ];
-      if (Math.min(moverAt, obstacleAt) >= 0) deepest = Math.max(deepest, moverAt, obstacleAt);
+      if (probe) open = true;
+      else deepest = obstacleMost;
       return;
     }
     if (probe && Math.max(...size) <= probeCell) {
@@ -346,7 +331,6 @@ const depthAt = ({ mover, obstacle, pose, floor, step, moverStows, obstacleStows
     mover,
     obstacle,
     from: pose,
-    to: pose,
     reach: 0,
     floor,
     step,
@@ -358,7 +342,6 @@ const depthAt = ({ mover, obstacle, pose, floor, step, moverStows, obstacleStows
     mover: obstacle,
     obstacle: mover,
     from: back,
-    to: back,
     reach: 0,
     floor: Math.max(floor, onMover),
     step,
@@ -536,7 +519,6 @@ export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
     mover: pair.mover.shape,
     obstacle: pair.obstacle.shape,
     from: relativeAt(pair, start),
-    to: relativeAt(pair, end),
     reach: pair.pace * (end - start),
     floor: pair.floor,
     step,
