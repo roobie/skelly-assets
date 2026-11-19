@@ -12,6 +12,7 @@ const HEADS_IMPORT = "import 'models/catalogue/heads.libsonnet'";
 // The jsonnet module's root is the tools folder, which it searches beside the folder above it.
 const REPOSITORY = resolve(REPOSITORY_ROOT, '..');
 const RECIPES = join(REPOSITORY, 'models/recipes');
+const DEADVOX = join(REPOSITORY, 'tools/packages/thing-authoring-tool/exports/deadvox.jsonnet');
 
 /** @type {string} */
 let scratch;
@@ -43,10 +44,13 @@ test('the heads a compile reads in place of the heads file equal the file over t
 
 // The heads are the six fields a recipe reads, and an optional one is read with std.objectHas or std.get, so a field
 // outside them would silently look absent over heads; a recipe over every field of the rows must come out the same.
-test('every recipe over the rows equals the recipe over the heads', () => {
-  const recipes = readdirSync(RECIPES)
-    .filter((name) => name.endsWith('.jsonnet'))
-    .map((name) => join(RECIPES, name));
+test('every reader of the heads, over the rows, equals the reader over the heads', () => {
+  const recipes = [
+    ...readdirSync(RECIPES)
+      .filter((name) => name.endsWith('.jsonnet'))
+      .map((name) => join(RECIPES, name)),
+    DEADVOX,
+  ];
   const overlay = (name, text) => {
     const folder = join(scratch, name, 'models/catalogue');
     mkdirSync(folder, { recursive: true });

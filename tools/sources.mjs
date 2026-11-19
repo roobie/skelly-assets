@@ -18,7 +18,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { availableParallelism } from 'node:os';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, join, posix, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -30,13 +30,14 @@ import { HEADS, INDEX, ROW_DIRS } from './row-index.mjs';
 /** @import { EntryFolder } from './entryFolder.mjs' */
 /** @typedef {{ rows: EntryFolder, twins: EntryFolder }} StoreFolders */
 /** @typedef {{ path: string, closure: string[], key: string }} Unit A row file, keyed by its whole import closure. */
-/** @typedef {{ path: string, closure: string[], standIns: string[] }} Scan A twin's own files and the stood-in files it reads. */
+/** @typedef {{ path: string, closure: string[], standIns: string[] }} Scan A twin's files and the stand-ins it reads. */
 /** @typedef {Scan & { key: string }} Twin A twin, keyed by its own files and the digest of each stand-in. */
 /** @typedef {{ fragment: string, heads: string }} RowOutput A row file's rows and their heads, as JSON text. */
 /** @typedef {{ root: string, code: readonly string[] }} KeyOptions */
 /** @typedef {KeyOptions & { rowIndexes: readonly string[], heads?: string | undefined }} PlanOptions */
 /** @typedef {PlanOptions & { folders: StoreFolders }} CompileOptions */
-/** @typedef {{ rows: Record<string, [string, string]>, heads?: string, twins: Record<string, string> }} Stamp */
+/** @typedef {[key: string, fragment: string, heads: string]} StampedRow A row file's key and the digests of its output. */
+/** @typedef {{ rows: Record<string, StampedRow>, twins: Record<string, string> }} Stamp */
 /**
  * @typedef {object} RefreshOptions
  * @property {string} root
@@ -84,14 +85,16 @@ const TEXT_BLOCK_IMPORT = /\bimport(?:str|bin)?\s*\|\|\|/;
 // is resolved as go-jsonnet does: beside the importer first, then through the library paths. A match the compiler
 // would never import, such as one in a comment, at most widens a closure; only a text-block path could hide one.
 //
-// A compile replaces each stand-in file by another through the overlay, which only the library paths see, so an import
-// that resolves beside its importer, or by an absolute path, reads the file itself while its importer's key holds the
-// stand-in's digest. The scan refuses it: import a stand-in by its root-relative path.
+// A compile replaces each stand-in file by another through the overlay, which mirrors only the paths below the root and
+// is searched only as a library path, so any other way to a stand-in reads the file itself while its importer's key
+// holds the stand-in's digest: from beside the importer, by an absolute path, or through another library path or a
+// `..`. The scan refuses them: import a stand-in by its plain root-relative path.
 /**
+ * @param {string} root
  * @param {readonly string[]} searchPaths
  * @param {ReadonlySet<string>} standIns
  */
-const importScanner = (searchPaths, standIns) => {
+const importScanner = (root, searchPaths, standIns) => {
   /** @type {Map<string, string[]>} */
   const direct = new Map();
   /**
@@ -100,13 +103,19 @@ const importScanner = (searchPaths, standIns) => {
    */
   const resolveImport = (importer, path) => {
     const beside = isAbsolute(path) ? path : join(dirname(importer), path);
-    if (standIns.has(resolve(beside)) && existsSync(beside))
-      throw new Error(
-        `${importer}: imports ${path}, a file a compile stands in for, from beside it; import it by its root-relative path`,
-      );
-    return [beside, ...(isAbsolute(path) ? [] : searchPaths.map((folder) => join(folder, path)))].find((candidate) =>
-      existsSync(candidate),
+    const found = [beside, ...(isAbsolute(path) ? [] : searchPaths.map((folder) => join(folder, path)))].find(
+      (candidate) => existsSync(candidate),
     );
+    const mirrored = !isAbsolute(path) && posix.normalize(path) === path && !path.startsWith('..');
+    if (
+      found !== undefined &&
+      standIns.has(resolve(found)) &&
+      !(mirrored && found !== beside && found === join(root, path))
+    )
+      throw new Error(
+        `${importer}: imports ${path}, a file a compile stands in for, other than by its plain root-relative path`,
+      );
+    return found;
   };
   /**
    * @param {string} file
@@ -198,10 +207,14 @@ const unitKeys = (root, code) => {
 /** @param {PlanOptions} options */
 const planNow = ({ root, code, rowIndexes, heads }) => {
   const searchPaths = libraryPaths(compileRoot(root));
-  const indexes = importScanner(searchPaths, new Set());
+  const indexes = importScanner(root, searchPaths, new Set());
   const rowPaths = [...new Set(rowIndexes.flatMap((index) => indexes.importsOf(resolve(index))))];
   const headsPath = heads === undefined ? undefined : resolve(heads);
-  const scanner = importScanner(searchPaths, new Set(headsPath === undefined ? rowPaths : [...rowPaths, headsPath]));
+  const scanner = importScanner(
+    root,
+    searchPaths,
+    new Set(headsPath === undefined ? rowPaths : [...rowPaths, headsPath]),
+  );
   const keyOf = unitKeys(root, code);
   /**
    * @param {string} path
@@ -324,12 +337,24 @@ const storeUnchanged = (folder, names, compiled, keyNow) => {
  * @param {(item: T) => Promise<void>} work
  */
 const forEachConcurrently = async (items, work) => {
-  // The workers share one iterator, so each item goes to whichever worker is free first.
+  // The workers share one iterator, so each item goes to whichever worker is free first. After a failure they start
+  // no more, and the first failure is thrown once the running ones end, so the caller's cleanup never pulls files from
+  // under a compile.
   const queue = items.values();
+  /** @type {{ error: unknown } | undefined} */
+  let failure;
   const worker = async () => {
-    for (const item of queue) await work(item);
+    for (const item of queue) {
+      if (failure) return;
+      try {
+        await work(item);
+      } catch (error) {
+        failure ??= { error };
+      }
+    }
   };
   await Promise.all(Array.from({ length: Math.min(availableParallelism(), items.length) }, worker));
+  if (failure) throw failure.error;
 };
 
 // A fragment stands in for its row file only when the two cannot differ, so each compile holds its row file to plain
@@ -485,8 +510,8 @@ const withOverlay = async (rows, fragments, { root, folders }, use, files = {}) 
  * @returns {Stamp}
  */
 const readStamp = (stamp) => {
-  const { rows = {}, heads, twins = {} } = existsSync(stamp) ? JSON.parse(readFileSync(stamp, 'utf8')) : {};
-  return { rows, heads, twins };
+  const { rows = {}, twins = {} } = existsSync(stamp) ? JSON.parse(readFileSync(stamp, 'utf8')) : {};
+  return { rows, twins };
 };
 
 // The row files a refresh needs: those a twin reads as stand-ins, with the row files they reach, and all of them when a
@@ -517,12 +542,27 @@ const assembledHeads = (root, headsOfRows) =>
     ),
   );
 
-// The stamp maps each row file to the key it compiled under and the digest of its fragment, the heads to their digest and each twin to the key
-// it was written under, so a refresh with nothing changed reads no store. A row file edited without changing its
-// fragment recompiles one fragment and no twin. Twins whose keys the store lacks compile in parallel processes. A twin
-// whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then,
-// and so is a row file that changed during its. A twin left unwritten because its bytes are unchanged is stamped like
-// any other: its key is current.
+// The digest the heads file stands in under: that of each row file's heads digest by path, so a row file added or
+// deleted changes it though no twin's own files did.
+/**
+ * @param {string} root
+ * @param {readonly (readonly [Unit, string])[]} digests Each row file and the digest of its heads.
+ */
+const headsDigest = (root, digests) =>
+  digestOf(
+    JSON.stringify(
+      digests
+        .map(([{ path }, digest]) => /** @type {[string, string]} */ ([relative(root, path), digest]))
+        .sort(([one], [other]) => (one < other ? -1 : 1)),
+    ),
+  );
+
+// The stamp maps each row file to its key and the digests of its fragment and heads, and each twin to its key, so a
+// refresh with nothing changed reads no store and still sees every row file added or deleted. A row file edited without
+// changing its fragment recompiles one fragment and no twin. Twins whose keys the store lacks compile in parallel
+// processes. A twin whose files changed during its compile is left unstamped, so the next refresh compiles it from what
+// they are then, and so is a row file that changed during its. A twin left unwritten because its bytes are unchanged
+// is stamped like any other: its key is current.
 /**
  * @param {readonly string[]} sources
  * @param {RefreshOptions} options
@@ -537,9 +577,9 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   const needed = neededRows(plan.rows, reached, readsHeads);
   const options = { root, code, rowIndexes, heads, folders: storeFolders(resolve(store)) };
   /** @param {Unit} row */
-  const stampedDigest = (row) => {
-    const [key, digest] = stamped.rows[relative(root, row.path)] ?? [];
-    return key === row.key ? digest : undefined;
+  const stampedOutput = (row) => {
+    const [key, fragment, heads] = stamped.rows[relative(root, row.path)] ?? [];
+    return key === row.key && fragment !== undefined && heads !== undefined ? { fragment, heads } : undefined;
   };
 
   // The fragments the store lacks compile once, when the first reader of them asks.
@@ -551,33 +591,36 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   };
   /** @type {Map<string, string>} */
   const digests = new Map();
+  /** @type {Map<Unit, string>} */
+  const headsDigests = new Map();
   /** @type {string | undefined} */
   let headsText;
-  const settled = needed.every((row) => stampedDigest(row) !== undefined) && (!readsHeads || stamped.heads);
-  if (settled) {
-    for (const row of needed) digests.set(row.path, /** @type {string} */ (stampedDigest(row)));
-    if (plan.headsPath !== undefined && stamped.heads !== undefined) digests.set(plan.headsPath, stamped.heads);
+  if (needed.every((row) => stampedOutput(row) !== undefined)) {
+    for (const row of needed) {
+      const output = /** @type {NonNullable<ReturnType<typeof stampedOutput>>} */ (stampedOutput(row));
+      digests.set(row.path, output.fragment);
+      headsDigests.set(row, output.heads);
+    }
   } else {
     const { outputs } = await fragments();
     /** @type {[Unit, string][]} */
     const headsOfRows = [];
     for (const row of needed) {
       const made = outputs.get(row);
-      if (made) {
-        digests.set(row.path, digestOf(made.fragment));
-        headsOfRows.push([row, made.heads]);
-        continue;
-      }
-      const stored = options.folders.rows.read(row.key, stampedDigest(row) === undefined ? ROW_ENTRY : [HEADS_FILE]);
-      if (stored === undefined) throw new Error(`${relative(root, row.path)}: its fragment is in no store`);
-      digests.set(row.path, stampedDigest(row) ?? digestOf(/** @type {Buffer} */ (stored[FRAGMENT])));
-      headsOfRows.push([row, /** @type {Buffer} */ (stored[HEADS_FILE]).toString()]);
+      const stampedRow = stampedOutput(row);
+      const stored = made ? undefined : options.folders.rows.read(row.key, stampedRow ? [HEADS_FILE] : ROW_ENTRY);
+      if (!made && stored === undefined) throw new Error(`${relative(root, row.path)}: its fragment is in no store`);
+      const heads = made ? made.heads : String(stored?.[HEADS_FILE]);
+      digests.set(
+        row.path,
+        made ? digestOf(made.fragment) : (stampedRow?.fragment ?? digestOf(/** @type {Buffer} */ (stored?.[FRAGMENT]))),
+      );
+      headsDigests.set(row, digestOf(heads));
+      headsOfRows.push([row, heads]);
     }
-    if (plan.headsPath !== undefined && readsHeads) {
-      headsText = assembledHeads(root, headsOfRows);
-      digests.set(plan.headsPath, digestOf(headsText));
-    }
+    if (readsHeads) headsText = assembledHeads(root, headsOfRows);
   }
+  if (plan.headsPath !== undefined && readsHeads) digests.set(plan.headsPath, headsDigest(root, [...headsDigests]));
   /** @param {string} standIn */
   const digestOfStandIn = (standIn) => {
     const digest = digests.get(standIn);
@@ -601,12 +644,34 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
   let changed = new Set();
   const unstored = stale.filter((twin) => !stored.has(twin));
   if (unstored.length > 0) {
-    const { outputs } = await fragments();
+    const { outputs, changed: editedRows } = await fragments();
+    // A row file edited since its key was taken compiled to what its key does not name; the twins over it are served
+    // to this checkout and stored nowhere.
     for (const [row, { fragment }] of outputs)
-      if (digests.get(row.path) !== digestOf(fragment))
+      if (!editedRows.has(row) && digests.get(row.path) !== digestOf(fragment))
         throw new Error(`${relative(root, row.path)}: compiled to another fragment than the one stamped for its key`);
-    if (readsHeads) headsText ??= currentHeads(needed, outputs, options, root);
-    ({ compiled, changed } = await compileTwins(unstored, needed, outputs, headsText, options, digestOfStandIn));
+    /** @type {Set<string>} */
+    const unsettled = new Set([...editedRows].map(({ path }) => path));
+    if (readsHeads && plan.headsPath !== undefined) {
+      const headsOfRows = currentHeads(needed, outputs, options, root);
+      headsText ??= assembledHeads(root, headsOfRows);
+      const compiledOver = headsDigest(
+        root,
+        headsOfRows.map(([row, heads]) => [row, digestOf(heads)]),
+      );
+      if (editedRows.size > 0) unsettled.add(plan.headsPath);
+      else if (compiledOver !== digests.get(plan.headsPath))
+        throw new Error('the heads the twins compile over are not the ones their keys name');
+    }
+    ({ compiled, changed } = await compileTwins(
+      unstored,
+      needed,
+      outputs,
+      headsText,
+      options,
+      digestOfStandIn,
+      unsettled,
+    ));
   }
   for (const [twin, json] of [...stored, ...compiled]) replaceFileIfChanged(twinOf(twin.path), json);
 
@@ -617,9 +682,11 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
     rows: Object.fromEntries(
       needed
         .filter((row) => !changedRows.has(row))
-        .map((row) => [relative(root, row.path), [row.key, digestOfStandIn(row.path)]]),
+        .map((row) => [
+          relative(root, row.path),
+          [row.key, digestOfStandIn(row.path), /** @type {string} */ (headsDigests.get(row))],
+        ]),
     ),
-    ...(readsHeads && plan.headsPath !== undefined ? { heads: digestOfStandIn(plan.headsPath) } : {}),
     twins: Object.fromEntries(current.map(({ path, key }) => [relative(root, path), key])),
   };
   const text = JSON.stringify(next);
@@ -638,16 +705,14 @@ export async function refreshJsonnetTwins(sources, { root, stamp, store, code = 
  * @param {ReadonlyMap<Unit, RowOutput>} outputs
  * @param {CompileOptions} options
  * @param {string} root
+ * @returns {[Unit, string][]} Each row file and its heads as JSON text.
  */
 const currentHeads = (rows, outputs, { folders }, root) =>
-  assembledHeads(
-    root,
-    rows.map((row) => {
-      const heads = outputs.get(row)?.heads ?? folders.rows.read(row.key, [HEADS_FILE])?.[HEADS_FILE]?.toString();
-      if (heads === undefined) throw new Error(`${relative(root, row.path)}: its heads are in no store`);
-      return [row, heads];
-    }),
-  );
+  rows.map((row) => {
+    const heads = outputs.get(row)?.heads ?? folders.rows.read(row.key, [HEADS_FILE])?.[HEADS_FILE]?.toString();
+    if (heads === undefined) throw new Error(`${relative(root, row.path)}: its heads are in no store`);
+    return [row, heads];
+  });
 
 // Compiles `twins` over the stand-ins they read, storing each twin whose files held still. Returns each twin's JSON by
 // its twin, and the twins whose files changed during the compile.
@@ -658,9 +723,11 @@ const currentHeads = (rows, outputs, { folders }, root) =>
  * @param {string | undefined} headsText
  * @param {CompileOptions} options
  * @param {(standIn: string) => string} digest
+ * @param {ReadonlySet<string>} unsettled The stand-ins that are not what the twins' keys name; a twin over one is served
+ * to this checkout and stored nowhere.
  * @returns {Promise<{ compiled: Map<Twin, string>, changed: Set<Twin> }>}
  */
-const compileTwins = async (twins, rows, outputs, headsText, options, digest) => {
+const compileTwins = async (twins, rows, outputs, headsText, options, digest, unsettled) => {
   const reached = new Set(twins.flatMap(({ standIns }) => standIns));
   const standingIn = rows.filter(({ path }) => reached.has(path));
   const headsFile = options.heads === undefined ? undefined : resolve(options.heads);
@@ -686,12 +753,18 @@ const compileTwins = async (twins, rows, outputs, headsText, options, digest) =>
     files,
   );
   const fresh = planNow(options);
+  const overUnsettled = twins.filter(({ standIns }) => standIns.some((standIn) => unsettled.has(standIn)));
   const changed = storeUnchanged(
     options.folders.twins,
     ENTRY,
-    new Map([...compiled].map(([twin, json]) => [twin, { key: twin.key, files: { [FRAGMENT]: json } }])),
+    new Map(
+      [...compiled]
+        .filter(([twin]) => !overUnsettled.includes(twin))
+        .map(([twin, json]) => [twin, { key: twin.key, files: { [FRAGMENT]: json } }]),
+    ),
     (twin) => fresh.twin(fresh.scan(twin.path), digest).key,
   );
+  for (const twin of overUnsettled) changed.add(twin);
   return { compiled, changed };
 };
 

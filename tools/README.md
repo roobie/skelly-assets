@@ -31,11 +31,12 @@ row file, so each row file compiles on its own into a fragment and the heads of 
 keyed by the row files it reads but by the digest of what stands in for them, so an edit that leaves a fragment as it
 was recompiles no twin: the scan of its closure stops at a row file and at `models/catalogue/heads.libsonnet`, which a
 compile replaces by the heads of every row file. The heads are the six fields of a row that packs, recipes and the
-Deadvox export read, so a geometry edit reaches the items and no recipe; see `jsonnet/heads.libsonnet`. Only the
-library paths see what a compile stands in for, so a file imports a stood-in file by its root-relative path and the scan
-refuses it from beside the importer, where the compile would read the file itself under a key that holds the stand-in's
-digest. CI keys its store by the digest of every input's whole closure, because it names the store before any fragment
-exists. Every row source is a row file: the
+Deadvox export read, so a geometry edit reaches the items and no recipe; see `jsonnet/heads.libsonnet`. Only a library path
+mirrored by the overlay sees what a compile stands in for, so a file imports a stood-in file by its plain
+root-relative path and the scan refuses any other way to it (from beside the importer, by an absolute path, or through
+a `..`), because the compile would read the file itself under a key that holds the stand-in's digest. A row file added
+or deleted changes the heads' digest, so it reaches every twin over the heads. CI keys its store by the digest of every
+input's whole closure, because it names the store before any fragment exists. Every row source is a row file: the
 catalogue sets, the vehicles, and the code-built kits in `../models/kits/`, each a list of finished rows, so that the
 catalogue is their rows in path order and `models/` itself holds no row sources; see `row-index.mjs`,
 `catalogueIndex`. A row file that imports another, as a worn kit imports the one set file whose ground row it reuses

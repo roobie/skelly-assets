@@ -502,32 +502,61 @@ fixtureTest('an unchanged tree reads no store entry', async ({ store, refresh, k
 });
 
 fixtureTest(
-  'the stamp names each row file by its key and fragment digest, and the heads by theirs',
+  'the stamp names each row file by its key and the digests of its fragment and its heads',
   async ({ stamp, entry }) => {
-    const { rows, heads } = JSON.parse(readFileSync(stamp, 'utf8'));
-    const [key, digest] = rows['rows/a.libsonnet'];
+    const { rows } = JSON.parse(readFileSync(stamp, 'utf8'));
+    const [key, fragmentDigest, headsDigest] = rows['rows/a.libsonnet'];
     const fragment = entry('rows', ([row]) => row.id === 'a');
+    const digest = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
     assert.equal(basename(fragment), `${key}.json`);
-    assert.equal(createHash('sha256').update(readFileSync(fragment)).digest('hex'), digest);
-    assert.match(heads, /^[0-9a-f]{64}$/);
+    assert.equal(digest(fragment), fragmentDigest);
+    assert.equal(digest(fragment.replace(/\.json$/, '.heads')), headsDigest);
   },
 );
 
-// A compile stands in for a row file through the overlay, which only the library paths see: an import beside the
-// importer, or the file's own path, would read the file under a key that holds the stand-in's digest.
-for (const [name, path, text] of [
-  ['from the root beside it', 'source.jsonnet', "import 'rows/a.libsonnet'"],
-  ['from the folder beside it', 'rows/c.libsonnet', "[{ id: 'c', from: (import 'a.libsonnet')[0].id }]"],
-  ['by its absolute path', 'source.jsonnet', (root) => `import '${join(root, 'rows/a.libsonnet')}'`],
-  ['the heads by a relative path', 'pkg/reader.jsonnet', "import '../rows/heads.libsonnet'"],
+// The stamp spares the refresh from reading the heads, so a row file added or deleted must still reach the twins over
+// them, though no file of theirs changed.
+fixtureTest('a row file deleted reaches the twins over the heads', async ({ root, write, refresh, value }) => {
+  write('rows/index.libsonnet', "{ a: import 'rows/a.libsonnet' }");
+  rmSync(join(root, 'rows/b.libsonnet'));
+  await refresh();
+  assert.deepEqual(value('pkg/reader'), [{ id: 'a' }]);
+});
+
+fixtureTest('a row file added reaches the twins over the heads', async ({ write, refresh, value }) => {
+  write('rows/c.libsonnet', "[{ id: 'c' }]");
+  write(
+    'rows/index.libsonnet',
+    "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+  );
+  await refresh();
+  assert.deepEqual(value('pkg/reader'), [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+});
+
+// A compile stands in for a row file through the overlay, which mirrors only the plain paths below the root and is only
+// a library path: any other way to the file would read it under a key that holds the stand-in's digest.
+for (const [name, files] of [
+  ['from the root beside it', { 'source.jsonnet': "import 'rows/a.libsonnet'" }],
+  [
+    'from the folder beside it',
+    {
+      'rows/c.libsonnet': "[{ id: 'c', from: (import 'a.libsonnet')[0].id }]",
+      'rows/index.libsonnet':
+        "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+    },
+  ],
+  ['by its absolute path', { 'source.jsonnet': (root) => `import '${join(root, 'rows/a.libsonnet')}'` }],
+  ['by a path up from beside the heads', { 'pkg/reader.jsonnet': "import '../rows/heads.libsonnet'" }],
+  [
+    'through a library path and a path up',
+    {
+      'pkg/nested.jsonnet': "import 'pkg/deep/x.libsonnet'",
+      'pkg/deep/x.libsonnet': "import '../rows/a.libsonnet'",
+    },
+  ],
 ]) {
   fixtureTest(`a file that imports a stand-in ${name} is refused`, async ({ root, write, refresh }) => {
-    write(path, typeof text === 'function' ? text(root) : text);
-    if (path === 'rows/c.libsonnet')
-      write(
-        'rows/index.libsonnet',
-        "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
-      );
+    for (const [path, text] of Object.entries(files)) write(path, typeof text === 'function' ? text(root) : text);
     await assert.rejects(refresh(), /a file a compile stands in for/);
   });
 }
