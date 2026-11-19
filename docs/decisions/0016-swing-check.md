@@ -29,9 +29,12 @@ open at once, so twins that clear alone but meet open are caught too. See `tools
   swing check judges what the motion adds. The rest depth is one number per pair of pieces, taken at its deepest
   point, not per place: a pair seated deeply at rest, as an engine in its bonnet, may reach that depth anywhere in its
   swing without being reported. Those fits exist because the two parts interlock by design, and a per-place cap would
-  need the shape of the rest overlap, which no allowance records. Contact is the depth shared by a point inside both
-  solids, as in the overlap check, so a part thinner than a quarter grain on both sides cannot register; the vehicle
-  grain makes such a part unbuildable anyway.
+  need the shape of the rest overlap, which no allowance records. A contact's depth is the deepest any point of
+  either solid lies inside the other. No move shorter than its depth frees such a point, so the reading never exceeds
+  the move that parts the two, and a corner, an edge or a face pressed in reads as far as it is pressed, however thin
+  its piece: the depth a point shares with both solids read a pressed corner at 0.41 of its press and never saw a piece
+  thinner than half a grain, and 1 cm stripes are authored. Two pieces that pass through each other read half the
+  thicker one's thickness, so a pair both thinner than half a grain can still cross unseen.
 - A part that rides another (`rides` on its site) moves with it. A rider that does not move belongs to its carrier's
   body and is not tested against it, so a handle or a hinge dressing does not collide with the part it is on. A rider
   with a motion of its own moves nested inside its carrier's on the same clock, as

@@ -15,6 +15,7 @@ local s = import 'hearse.spec.libsonnet';
       site.one('deck', 'hearse_deck'),
       site.one('partition', 'hearse_partition'),
       site.one('brightwork', 'hearse_brightwork'),
-    ],
+    ]
+    + site.pair('front_door_brightwork', 'hearse_front_door_brightwork', rides='front_door'),
   }),
 }
