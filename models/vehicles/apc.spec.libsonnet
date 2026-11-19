@@ -18,5 +18,8 @@
   // The squad's hatches are a pair, the near one at `squadHatch`.
   hatch: { radius: 0.3, thickness: 0.05, open: 105 },
   squadHatch: { x: -2.2, z: 0.72 },
+  // The commander's cupola behind the turret: a ring of outer `radius` and `height` in metres, closed by a roof
+  // hatch's lid.
+  cupola: { x: -1.2, z: 0.6, radius: 0.36, height: 0.14 },
   paint: 'paint-olive',
 }

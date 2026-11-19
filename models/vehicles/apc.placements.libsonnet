@@ -14,7 +14,8 @@ local axlePart(i) = if i < 2 then 'apc_axle_steered' else 'apc_axle_driven';
     one('ramp', 'apc_ramp'),
     one('turret_ring', 'apc_turret_ring', [s.turretX, s.roofTop, 0]),
   ] + turret.sites('apc_turret', [s.turretX, s.roofTop + s.ring.height, 0], 'assembly') + [
-    one('cupola', 'apc_cupola', [-1.2, s.roofTop, 0.6]),
+    one('cupola', 'apc_cupola', [s.cupola.x, s.roofTop, s.cupola.z]),
+    one('cupola_lid', 'apc_hatch', [s.cupola.x, s.roofTop + s.cupola.height, s.cupola.z]),
     one('driver_hatch', 'apc_hatch', [s.driverX, s.roofTop, s.driverZ]),
     one('engine_deck', 'apc_engine_deck'),
     one('engine', 'engine_v8_turbo_diesel', [1.95, 0.85, 0.47]),
