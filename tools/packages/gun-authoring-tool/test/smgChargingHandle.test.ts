@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { clockOf } from '../src/gun/actionMotion.ts';
-import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { advanceCycleClock, cycleMotion, sweepMovingPart } from '../src/gun/cycle.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { sweepStops } from '../src/gun/stopSweep.ts';
 import { designText, loadCorpus } from './helpers.ts';
 
 const smgCases = loadCorpus().filter(({ label }) => label.includes('smg'));
@@ -37,7 +37,7 @@ describe('SMG charging handle', () => {
 
   it.each(smgCases)('clears every mover over its travel and the handle into the notch: $label', ({ assembly }) => {
     const { resolved, action } = smgAction(assembly);
-    expect(sweepTurningAction(resolved)).toEqual([]);
+    expect(sweepStops(resolved)).toEqual([]);
     for (const part of Object.values(action.parts)) {
       const sweep = sweepMovingPart(resolved, part.id, length(part.travel));
       expect(sweep.clashes, part.id).toEqual([]);
