@@ -70,7 +70,12 @@ const placedCoordinates = (positions: ArrayLike<number>, transform: Matrix4): nu
     new Vector3(positions[3 * i]!, positions[3 * i + 1]!, positions[3 * i + 2]!).applyMatrix4(transform).toArray(),
   ).flat();
 
-/** A gun family's part built with its default params, or none for a family outside the gun catalogue. */
+/**
+ * A gun family's part built with its default params, or none for a family outside the gun catalogue. A row's export
+ * builds its parts with the row's own params, which reach the test only by replaying each kind's export; the default
+ * build stands in, since the export drew each mesh by its own build, so a family whose smoothness changed with its
+ * params would fail the grain check rather than pass it.
+ */
 const defaultPart = (name: string): PartDef | undefined => {
   const family = FAMILIES[name];
   return family?.build(Object.fromEntries(Object.entries(family.params).map(([param, spec]) => [param, spec.default])));
