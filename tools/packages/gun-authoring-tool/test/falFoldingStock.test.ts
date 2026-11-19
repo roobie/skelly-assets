@@ -1,10 +1,11 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { applyPoint } from '@skelly/construct/foundation/math.ts';
+import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { stopClock } from '@skelly/motion/motion';
 import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
-import { FOLDED_STOP, falFoldingStockSolids } from '../src/gun/falFoldingStock.ts';
+import { EXTENDED_STOP, FAL_FOLDING_STOCK, FOLDED_STOP } from '../src/gun/falFoldingStock.ts';
 import { sweepStops } from '../src/gun/stopSweep.ts';
 import { loadFixture } from './helpers.ts';
 
@@ -14,27 +15,36 @@ const folding = resolve(
   gunDomain,
 );
 const motion = folding.motions.get('stock')!;
-// The stock's rear tip, the buttplate's centre, at a stop.
-const buttAt = (name: string) =>
-  applyPoint(motionTransform(folding.placed.get('stock')!, motion, stopClock(motion, name)), [-16.5, 0, 0]);
+const solids = folding.defs.get('stock')!.solids;
+// The stock is placed with its origin on the receiver's rear face.
+const rearFace = folding.placed.get('stock')!.t[0];
+const buttplate = solids.find(({ id }) => id === 'buttplate')!;
+const [buttMin, buttMax] = localSolidBounds(buttplate);
+const buttCentre = buttMin.map((low, axis) => (low + buttMax[axis]!) / 2) as [number, number, number];
+const buttAt = (stop: string) =>
+  applyPoint(motionTransform(folding.placed.get('stock')!, motion, stopClock(motion, stop)), buttCentre);
 
 describe('the FAL folding stock', () => {
-  it('is a hinge with an open stop at rest and a folded stop', () => {
+  it('is a hinge that stands extended at rest and folds', () => {
     expect(motion.stages.map(({ kind }) => kind)).toEqual(['hinge']);
-    expect(motion.stops.map(({ name }) => name)).toEqual(['open', FOLDED_STOP]);
-    expect(folding.defs.get('stock')!.solids).toEqual(falFoldingStockSolids(16));
+    expect(motion.stops.map(({ name }) => name)).toEqual([EXTENDED_STOP, FOLDED_STOP]);
   });
 
-  it('folds the butt from behind the receiver to its right side, forward of the rear face', () => {
-    const receiverRear = folding.placed.get('receiver')!.t[0] - 16;
-    const open = buttAt('open');
+  it('sits flush against the receiver rear face', () => {
+    const reach = solids.map((solid) => localSolidBounds(solid)[1][0]);
+    expect(Math.max(...reach)).toBe(0);
+    expect(folding.placed.get('stock')!.t[0]).toBe(rearFace);
+  });
+
+  it('turns the butt about the pin to the far side of it, forward of the rear face', () => {
+    const extended = buttAt(EXTENDED_STOP);
     const folded = buttAt(FOLDED_STOP);
-    expect(open[0]).toBeLessThan(receiverRear);
-    expect(folded[0]).toBeGreaterThan(receiverRear);
-    expect(folded[2]).toBeGreaterThan(2);
+    expect(folded[0]).toBeCloseTo(2 * rearFace - extended[0], 9);
+    expect(folded[2]).toBeCloseTo(2 * FAL_FOLDING_STOCK.hingeZU - extended[2], 9);
+    expect(folded[1]).toBeCloseTo(extended[1], 9);
   });
 
-  it('clears the rest of the rifle at both stops and on the way between them', () => {
+  it('clears the rest of the rifle and its keep-outs at both stops and on the way between them', () => {
     expect(sweepStops(folding)).toEqual([]);
   });
 });
