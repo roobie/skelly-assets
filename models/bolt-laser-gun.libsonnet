@@ -128,7 +128,8 @@ local batteryPieces =
   [onFront('battery-ridge-%d' % i, 'grip', ridgeYs[i], ridgeYs[i] + r.thick, r.proud, b.half) for i in std.range(0, r.count - 1)] + [
     h.prism('battery', 'metal', 'z', [[b.back, b.top], [b.front, b.top], [b.front - b.rake, foot], [b.back, foot]], -b.half, b.half),
     box('battery-pad', 'grip', [b.back, b.bottom, -b.half - 0.002], [b.front - b.rake, foot, b.half + 0.002]),
-    box('battery-contact', 'trim', [b.back - bolt.bandProud, underside - b.contact, -b.half - bolt.bandProud], [b.front + bolt.bandProud, underside, b.half + bolt.bandProud]),
+    // The contact plate grows only forwards and sideways, so it keeps the battery's clearance from the guard.
+    box('battery-contact', 'trim', [b.back, underside - b.contact, -b.half - bolt.bandProud], [b.front + bolt.bandProud, underside, b.half + bolt.bandProud]),
     onFront('battery-latch', 'accent', b.latch.y0, b.latch.y1, b.latch.proud, b.latch.half),
   ] + std.flattenArrays([
     [onSide(b.half, 'battery-charge-%s' % s, 'vent', s, [window.x0, c.y0], [window.x1, c.y1], -weld, 0.002)] + [
