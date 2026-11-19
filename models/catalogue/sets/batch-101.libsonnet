@@ -1,5 +1,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
+// The height of a shoe's heel seat, where the bare heel stands: the sole over any heel lift, from a sole bottom at y0.
+local heelSeat(b, y0) = y0 + b.H + b.s;
 // One low shoe standing with its toe on +z, centred on x = `xc`, its sole bottom at `y0`. `b` holds length `l`,
 // width `w`, sole `s`, heel lift `H` (0 for a flat shoe), and the upper's heights above the sole: `back` at the heel
 // counter, `ball` across the ball of the foot and `toe` at the toe; `laces` counts lace rungs (0 for a slip-on).
@@ -7,9 +9,9 @@ local box = h.box;
 // Slots: sole, heel, upper, toe, collar, lining, laces.
 local shoe(p, xc, b, y0=0) =
   local z0 = -b.l / 2, zt = b.l / 2 - b.w / 2, zh = z0 + 0.3 * b.l, zb = z0 + 0.62 * b.l;
-  local sw = b.w / 2 + 0.004, uw = b.w / 2 * 0.92, s = b.s, H = b.H;
-  local seat = y0 + H + s, top = seat + b.back, ballTop = y0 + s + b.ball;
-  (if H > 0 then [
+  local sw = b.w / 2 + 0.004, uw = b.w / 2 * 0.92, s = b.s;
+  local seat = heelSeat(b, y0), top = seat + b.back, ballTop = y0 + s + b.ball;
+  (if b.H > 0 then [
      h.prism(p + '-heel', 'heel', 'x', [[y0, z0 + 0.02], [y0, z0 + 0.2 * b.l], [seat - s, z0 + 0.22 * b.l], [seat - s, z0]], xc - b.w * 0.3, xc + b.w * 0.3),
    ] else []) + [
     box(p + '-seat', 'sole', [xc - sw * 0.9, seat - s, z0 - 0.002], [xc + sw * 0.9, seat, zh]),
@@ -39,7 +41,7 @@ local shoePair(id, massKg, b, gap, finish, extra=function(p, xc) [], y0=0) =
     shoe(p, x, b, y0) + extra(p, x)
     for p in ['left', 'right']
     for x in [if p == 'left' then -xc else xc]
-  ]), { lining: 'paint-charcoal', heel: 'rubber-black' } + finish) + { voxelGrain: 0.004 };
+  ]), { lining: 'paint-charcoal', heel: 'rubber-black' } + finish) + { voxelGrain: 0.004, soleLift: heelSeat(b, y0) };
 // A convex foot-shaped outline `l` long and `w` wide centred on (xc, zc), as [z, x] points for a prism on y.
 local footOutline(l, w, xc, zc=0) =
   local fr = [[-0.5, 0.55], [-0.45, 0.8], [-0.3, 0.88], [0.1, 0.97], [0.25, 1.0], [0.38, 0.9], [0.46, 0.65], [0.5, 0.3]];
@@ -68,7 +70,7 @@ local flipFlops(id, massKg, l, w, s, bed, sw, ht, finish) =
     ] + thong(p, x, 0.3 * l, -0.05 * l, 0.4 * w, sw, s + bed, ht)
     for p in ['left', 'right']
     for x in [if p == 'left' then -xc else xc]
-  ]), finish) + { voxelGrain: 0.004 };
+  ]), finish) + { voxelGrain: 0.004, soleLift: s + bed };
 // A pair of foot wraps lying flat side by side: each a cloth square folded into a pad `w` wide and `l` long, its
 // two layers `t` thick each, tied across with a cord; `tufts` adds rows of fur tufts on top. Slots: cloth, cord, fur.
 local footWraps(id, massKg, w, l, t, finish, tufts=false) =
@@ -215,13 +217,14 @@ local footWraps(id, massKg, w, l, t, finish, tufts=false) =
 
   // A pair of wooden geta, each board 240 mm long, 100 mm wide and 17 mm thick on two 45 mm teeth, with a padded
   // cloth thong.
+  local tooth = 0.045, board = 0.017;
   h.compound('geta', 0.51, std.flattenArrays([
     [
-      h.prism(p + '-board', 'wood', 'y', [[-0.12, x - 0.042], [-0.112, x - 0.05], [0.112, x - 0.05], [0.12, x - 0.042], [0.12, x + 0.042], [0.112, x + 0.05], [-0.112, x + 0.05], [-0.12, x + 0.042]], 0.045, 0.062),
-      box(p + '-tooth-front', 'wood', [x - 0.05, 0, 0.055], [x + 0.05, 0.045, 0.075]),
-      box(p + '-tooth-back', 'wood', [x - 0.05, 0, -0.085], [x + 0.05, 0.045, -0.065]),
-    ] + thong(p, x, 0.07, -0.03, 0.048, 0.012, 0.062, 0.028)
+      h.prism(p + '-board', 'wood', 'y', [[-0.12, x - 0.042], [-0.112, x - 0.05], [0.112, x - 0.05], [0.12, x - 0.042], [0.12, x + 0.042], [0.112, x + 0.05], [-0.112, x + 0.05], [-0.12, x + 0.042]], tooth, tooth + board),
+      box(p + '-tooth-front', 'wood', [x - 0.05, 0, 0.055], [x + 0.05, tooth, 0.075]),
+      box(p + '-tooth-back', 'wood', [x - 0.05, 0, -0.085], [x + 0.05, tooth, -0.065]),
+    ] + thong(p, x, 0.07, -0.03, 0.048, 0.012, tooth + board, 0.028)
     for p in ['left', 'right']
     for x in [if p == 'left' then -0.06 else 0.06]
-  ]), { wood: 'wood-pine', strap: 'cloth-red' }) + { title: 'Geta' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['wood'], slot: ['feet'] } } },
+  ]), { wood: 'wood-pine', strap: 'cloth-red' }) + { title: 'Geta', soleLift: tooth + board } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['wood'], slot: ['feet'] } } },
 ]

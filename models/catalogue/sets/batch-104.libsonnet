@@ -47,10 +47,13 @@ local tabi(p, cx, s) =
     box(p + 'clasp-%d' % i, 'clasp', [std.min(ox, ox - s * 0.006), 0.004, -0.218 + i * 0.026], [std.max(ox, ox - s * 0.006), 0.01, -0.206 + i * 0.026])
     for i in std.range(0, 3)
   ];
+// A straw sandal's sole, `l` long, `w` across and `t` thick. The weave ridged across its top is texture, not a footbed,
+// so the bare foot stands on the sole alone.
+local strawSole = { l: 0.24, w: 0.085, t: 0.012 };
 // A straw sandal lying sole down, toe to +z: a woven oval sole ridged across, a rope thong rising from the toe, two
 // side loops each side and one at the heel, and the long ties laid back along both sides. Slots: sole, weave, rope.
 local sandal(p, cx) =
-  local l = 0.24, w = 0.085, t = 0.012;
+  local l = strawSole.l, w = strawSole.w, t = strawSole.t;
   [
     h.prism(p + 'sole', 'sole', 'y', f.place(f.foot(l, w), cx, 0, 0.92, 1), 0, t),
   ] + [
@@ -142,7 +145,7 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
   // A pair of straw rope sandals lying sole down, 240 mm long and 85 mm across, the woven soles ridged across, rope
   // loops along the sides and the long ties laid out beside them.
   h.compound('straw_sandals', 0.12, sandal('l-', -0.07) + sandal('r-', 0.07),
-    { sole: 'straw-wicker', weave: 'paperboard-tan', rope: 'paperboard-tan' }) + { title: 'Straw sandals' }
+    { sole: 'straw-wicker', weave: 'paperboard-tan', rope: 'paperboard-tan' }) + { title: 'Straw sandals', soleLift: strawSole.t }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant'], slot: ['feet'] } } },
 
   // A pair of black split-toe socks lying sole down, 250 mm long, each ankle cuff laid flat behind the heel and closed
@@ -157,17 +160,17 @@ local toecap = { l: 0.29, w: 0.11, t: 0.012, layers: 5, ankle: 0.07, top: 0, rx:
     f.band(p + 'thigh', 'shaft', thighHigh, cx, 0.4, 0.63, 0.006),
     f.band(p + 'knee', 'collar', thighHigh, cx, 0.39, 0.4, 0.008),
     box(p + 'zip', 'zip', [if cx < 0 then cx + thighHigh.rx - 0.002 else cx - thighHigh.rx - 0.003, 0.04, f.shaftZ(thighHigh) - 0.005], [if cx < 0 then cx + thighHigh.rx + 0.003 else cx - thighHigh.rx + 0.002, 0.62, f.shaftZ(thighHigh) + 0.005]),
-  ]), { sole: 'rubber-black', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', zip: 'steel' }) + { title: 'Thigh high boots' }
+  ]), { sole: 'rubber-black', upper: 'leather-black', shaft: 'leather-black', collar: 'leather-black', lining: 'paint-charcoal', zip: 'steel' }) + { title: 'Thigh high boots', soleLift: f.soleLift(thighHigh) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'rubber'], slot: ['feet'] } } },
 
   // A pair of rubber overshoes standing, each a 170 mm shell over the front of a 290 mm foot with a steel cap over
-  // the toes, its heel strap lying slack behind.
+  // the toes and a rubber heel piece under the heel, its heel strap lying slack behind.
   h.compound('toecaps', 0.88, f.pair(toecap, 0.03, function(p, cx) [
     box(p + 'hollow', 'lining', [cx - toecap.w * 0.36, toecap.t, toecap.from - 0.002], [cx + toecap.w * 0.36, toecap.ankle * 0.75, toecap.from + 0.004]),
     box(p + 'heel-strap', 'strap', [cx - toecap.w * 0.48, 0, -toecap.l / 2], [cx + toecap.w * 0.48, 0.006, -toecap.l / 2 + 0.006]),
     box(p + 'heel-strap-l', 'strap', [cx - toecap.w * 0.48, 0, -toecap.l / 2], [cx - toecap.w * 0.48 + 0.006, 0.006, toecap.from + 0.01]),
     box(p + 'heel-strap-r', 'strap', [cx + toecap.w * 0.48 - 0.006, 0, -toecap.l / 2], [cx + toecap.w * 0.48, 0.006, toecap.from + 0.01]),
     box(p + 'buckle', 'buckle', [cx + toecap.w * 0.48, 0.026, toecap.from - 0.02], [cx + toecap.w * 0.48 + 0.004, 0.048, toecap.from - 0.004]),
-  ]), { sole: 'rubber-black', upper: 'rubber-black', steel: 'steel-grey', lining: 'paint-charcoal', strap: 'rubber-black', buckle: 'steel' }) + { title: 'Toecaps' }
+  ]), { sole: 'rubber-black', upper: 'rubber-black', steel: 'steel-grey', lining: 'paint-charcoal', strap: 'rubber-black', buckle: 'steel' }) + { title: 'Toecaps', soleLift: f.soleLift(toecap) }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'metal'], slot: ['feet'] } } },
 ]

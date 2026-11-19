@@ -22,8 +22,8 @@ local ellipse(rx, rz) = [[rz * std.cos(2 * std.pi * i / 14), rx * std.sin(2 * st
 // One boot on a foot `b.l` long and `b.w` across, centred at x = cx. Its sole is `b.t` thick, a heel adds `b.heel`
 // under the back, the toe climbs in `b.layers` steps to the instep at `b.ankle`, and the shaft, an ellipse `b.rx` by
 // `b.rz` at the back of the foot, rises to `b.top` with a collar `b.collar` deep. A shaft of `b.top` 0 leaves a low
-// shell with no shaft, and `b.from` cuts away the foot behind that z, for a shell over the front of the foot.
-// `b.laneSlots` gives the toe steps two alternating slots, for lames. Slots: sole, upper, shaft, collar, lining, and
+// shell with no shaft, and `b.from` cuts away the foot behind that z, for a shell over the front of the foot, with a
+// heel piece as thick as the sole left under the heel, since the sole lifts the heel too. `b.laneSlots` gives the toe steps two alternating slots, for lames. Slots: sole, upper, shaft, collar, lining, and
 // the toe slot named by `b.toeSlot`.
 local boot(p, b, cx) =
   local l = b.l, w = b.w, t = b.t, n = b.layers;
@@ -44,6 +44,8 @@ local boot(p, b, cx) =
     h.prism(p + 'sole', 'sole', 'y', place(outline, cx, 0, 1.06, 1.03), 0, t),
   ] + (if heel > 0 then [
          h.prism(p + 'heel', 'sole', 'y', place(h.clipX(outline, -l * 0.24, false), cx, -0.004, 0.86, 1), t, t + heel),
+       ] else []) + (if std.objectHas(b, 'from') then [
+         h.prism(p + 'heel-piece', 'sole', 'y', place(h.clipX(whole, -l * 0.24, false), cx, -0.004, 0.86, 1), 0, t),
        ] else []) + [
     local s = layer(i);
     h.prism(p + 'vamp-%d' % i, if std.objectHas(b, 'laneSlots') then b.laneSlots[i % 2] else 'upper', 'y', s.poly, s.y0, s.y1 + 0.001)
@@ -57,6 +59,9 @@ local boot(p, b, cx) =
          h.prism(p + 'collar', 'collar', 'y', place(ellipse(b.rx + std.get(b, 'collarOut', 0.003), b.rz + std.get(b, 'collarOut', 0.003)), cx, sc), b.top - b.collar, b.top),
          h.prism(p + 'opening', 'lining', 'y', place(ellipse(b.rx * 0.72, b.rz * 0.72), cx, sc), b.top, b.top + 0.002),
        ] else []);
+// How far the boot stands the bare foot off the ground: the heel stands on the heel block inside the boot, so the foot
+// rises by the sole and the heel.
+local soleLift(b) = b.t + std.get(b, 'heel', 0);
 // The shaft's middle along z and its front face, for laces, straps and trim.
 local shaftZ(b) = -b.l / 2 + b.rz + 0.008;
 // Laces up the shaft's front from y0 to y1: a tongue strip with crossed lace bars every `pitch`. Slots: tongue, lace.
@@ -80,6 +85,7 @@ local pair(b, gap, extra=function(p, cx) []) = std.flattenArrays([
   place: place,
   ellipse: ellipse,
   boot: boot,
+  soleLift: soleLift,
   shaftZ: shaftZ,
   laces: laces,
   band: band,
