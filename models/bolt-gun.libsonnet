@@ -2,8 +2,8 @@ local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
 // The body the bolt guns share: a bevelled slab receiver, the pistol grip and trigger group, the skeleton stock, the
-// paints and the row around them. One source keeps the three guns one family, so a change to the shared body reaches
-// all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x, the axis `gripOn` names.
+// energy guns' power cell, the paints and the row around them. One source keeps the guns one family, so a change to
+// the shared body reaches all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x, the axis `gripOn` names.
 {
   // Where the receiver's back meets the stock.
   joint: -0.18,
@@ -45,6 +45,23 @@ local box = h.box;
       h.prism('trigger', 'metal', 'z', [
         [blade, top], [blade + t.width, top], [blade + t.width + t.sweep, top - t.length], [blade + t.sweep, top - t.length],
       ], -t.halfWidth, t.halfWidth),
+    ],
+
+  // The energy guns' power cell, hung under the receiver from `back` to `front` and seated up into it at `top`, an
+  // octagonal block on a brass foot with a glowing window down each side. Slot `glow` must be in the gun's finish.
+  cell(back, front, top):
+    local half = 0.055, foot = 0.02, windows = [0.05, 0.12];
+    // The cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
+    // is [z, x].
+    local plan(half, x0, x1, cut) = [
+      [-half, x0 + cut], [-half + cut, x0], [half - cut, x0], [half, x0 + cut],
+      [half, x1 - cut], [half - cut, x1], [-half + cut, x1], [-half, x1 - cut],
+    ];
+    [
+      h.prism('cell', 'body', 'y', plan(half, back, front, 0.012), foot, top),
+      h.prism('cell-cap', 'trim', 'y', plan(half + 0.003, back - 0.005, front + 0.005, 0.014), foot - 0.01, foot + 0.01),
+      box('cell-window-l', 'glow', [back + 0.02, windows[0], -half - 0.0025], [front - 0.02, windows[1], -half]),
+      box('cell-window-r', 'glow', [back + 0.02, windows[0], half], [front - 0.02, windows[1], half + 0.0025]),
     ],
 
   // The stock's size against its outline, so the stock is resized in one place without redrawing it.
