@@ -18,9 +18,10 @@ import {
   boolean as vBoolean,
 } from 'valibot';
 import { ModelPointSchema as Point } from './modelPoint.ts';
-import { MotionSchema, Name } from './motionSchema.ts';
+import { MotionSchema } from './motionSchema.ts';
 import { OpticApertureSchema } from './opticAperture.ts';
 import { ReticleSchema } from './reticle.ts';
+import { Name } from './schemaPrimitives.ts';
 
 /** Callers own temporal brands; the firearm contract owns their structure and relations. */
 export interface FirearmPrimitives<PositiveSeconds extends number = number, PerMinute extends number = number> {
@@ -80,6 +81,7 @@ export function firearmModelSchema<PositiveSeconds extends number, PerMinute ext
       ),
       fire: optional(ActionCycleSchema),
       hand: ActionCycleSchema,
+      // A fraction of the first leg of the hand timeline that goes to `open`: the case leaves that far into the stroke.
       ejectAt: Fraction,
       ejectDirection: UnitVector,
       holdOpen: vBoolean(),

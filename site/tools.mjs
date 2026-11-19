@@ -27,6 +27,7 @@ export const SITE_FILES = [
   'poseFile.mjs',
   'clearance.mjs',
   'fingers.mjs',
+  'heldMotion.mjs',
   'hiding.mjs',
   'motionPose.mjs',
   'skin.mjs',

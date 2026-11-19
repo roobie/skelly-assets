@@ -6,7 +6,7 @@ import golden from './fixtures/action-before-shared-motion.json' with { type: 'j
 import { designText } from './helpers.ts';
 
 /*
- * The fixture holds each action of the designs that have one as the sidecars carried it before a part's motion was
+ * The fixture, captured at 897c2e04, holds each action of the designs that have one as the sidecars carried it before a part's motion was
  * exported whole: an axis, a stroke and a turn per part, and phase seconds per timeline. The tests pose those parts by
  * the math the games then read them with and compare the poses the exported motions give, by their stops, to 1 um.
  */

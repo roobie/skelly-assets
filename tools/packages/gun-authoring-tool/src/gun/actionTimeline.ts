@@ -42,8 +42,8 @@ export const cycleLegs = (cycle: CycleTimeline, followers: readonly Motion[]): r
     throw new Error('the parts of one timeline either all turn free before they are drawn, or none do');
   }
   const freed = turning.length === 0 ? REST_STOP : UNLOCKED_STOP;
-  if (freed !== REST_STOP && !cycle.lockSeconds) {
-    throw new Error('a timeline that turns its parts free needs a lock phase to turn them home');
+  if (freed !== REST_STOP && !(cycle.unlockSeconds && cycle.lockSeconds)) {
+    throw new Error('a timeline that turns its parts free needs an unlock phase and a lock phase to turn them');
   }
   return [
     ...(cycle.unlockSeconds ? [{ to: freed, seconds: cycle.unlockSeconds }] : []),

@@ -12,9 +12,9 @@
 // figure with its controls, and `window.showPose` loads a fixture by name or a pose file object into them.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { poseAt } from '../tools/packages/motion/src/motion.ts';
 import { clearanceProbe, coveredSurface } from './clearance.mjs';
 import { clipKeys, clipSpanSeconds, decodeFrame, sampleClip, slerp } from './clipFrames.mjs';
+import { heldItem } from './heldMotion.mjs';
 import { add, boneTransforms, jointAngles, jointRotation, solveTwoBone, sub } from './kinematics.mjs';
 import { viewSet } from './lookOptions.mjs';
 import { FRONT_QUARTER } from './modelFrame.mjs';
@@ -322,46 +322,6 @@ function drawEyeTile(obj, size, figure) {
   drawer.stage.remove(obj, grid);
   ruleAt(g, { x: size }, tile.height);
   return tile.toDataURL('image/png');
-}
-
-// The node of `obj` marked as the part `part`; the model needs exactly one.
-function partNode(obj, model, part) {
-  const found = [];
-  obj.traverse((node) => {
-    if (node.userData.part === part) found.push(node);
-  });
-  if (found.length !== 1) throw new Error(`moved.${model}: ${found.length} ${part} nodes in ${model}; it needs one`);
-  return found[0];
-}
-
-// A copy of a held model at rest, `obj`, and `move(moved)`, which stands each moving part at the clock `moved` gives it
-// (a pose file's `moved` for the model) of its motion and the rest at rest. A part's motion is the one the model's
-// sidecar gives the action part that drives its node (`gun.action.parts`), in the model's own axes and in metres.
-function heldItem({ scene, action }, model) {
-  const obj = scene.clone(true);
-  const rests = new Map();
-  const restOf = (part) => {
-    if (!rests.has(part)) {
-      const node = partNode(obj, model, part);
-      const driver = Object.values(action?.parts ?? {}).find(({ node: name }) => name === node.name);
-      if (!driver) throw new Error(`moved.${model}.${part}: ${model}'s action has no motion for ${part}`);
-      const matrix = new THREE.Matrix4().compose(node.position, node.quaternion, node.scale);
-      rests.set(part, { node, motion: driver.motion, matrix });
-    }
-    return rests.get(part);
-  };
-  const move = (moved = {}) => {
-    for (const part of Object.keys(moved)) restOf(part);
-    for (const [part, { node, motion, matrix }] of rests) {
-      const {
-        rotation: [x, y, z],
-        shift,
-      } = poseAt(motion, moved[part] ?? 0);
-      const pose = new THREE.Matrix4().set(...x, shift[0], ...y, shift[1], ...z, shift[2], 0, 0, 0, 1);
-      node.matrix.multiplyMatrices(pose, matrix).decompose(node.position, node.quaternion, node.scale);
-    }
-  };
-  return { obj, move };
 }
 
 // Each held model's scene, loaded once at the origin, with the action its sidecar gives it.

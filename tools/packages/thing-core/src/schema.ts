@@ -22,9 +22,11 @@ import {
 } from 'valibot';
 import { BuildingReaderSchema } from './building.ts';
 import { ModelPointSchema } from './modelPoint.ts';
-import { MotionSchema, Name, PositiveSchema, UnitVectorSchema } from './motionSchema.ts';
+import { MotionSchema } from './motionSchema.ts';
+import { Name, PositiveSchema, UnitVectorSchema } from './schemaPrimitives.ts';
 
-export { MotionSchema, Name, OpenAngleSchema, StopsSchema } from './motionSchema.ts';
+export { MotionSchema, OpenAngleSchema, StopsSchema } from './motionSchema.ts';
+export { Name } from './schemaPrimitives.ts';
 export { ModelPointSchema };
 
 const dotOf = (a: readonly number[], b: readonly number[]) => a.reduce((sum, value, axis) => sum + value * b[axis]!, 0);

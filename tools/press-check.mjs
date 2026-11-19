@@ -11,7 +11,6 @@ import { dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, poseJson, r4, shoulderPoints, standing } from './keyFrames.mjs';
-import { poseAt } from './packages/motion/src/motion.ts';
 import { graspOf, handSocket, heldItems, heldWeapon } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
@@ -20,10 +19,13 @@ const POSES = 'models/poses';
 export const readPressCheck = (root = repo) =>
   JSON.parse(evaluateJsonnet(`import '${POSES}/press-check.libsonnet'`, root));
 
-/** How far each moving part of a gun slides at the end of its motion, in metres in the model's frame, keyed by part. */
+/** How far each moving part of a gun slides along its slide stage, in metres in the model's frame, keyed by part. */
 export const partStrokes = (entry) =>
   Object.fromEntries(
-    Object.values(entry.gun.action.parts).map(({ node, motion }) => [node.split(':')[0], poseAt(motion, 1).shift]),
+    Object.values(entry.gun.action.parts).map(({ node, motion }) => {
+      const { direction, travel } = motion.stages.find(({ kind }) => kind === 'slide');
+      return [node.split(':')[0], direction.map((x) => x * travel)];
+    }),
   );
 
 /**
