@@ -2,6 +2,7 @@ import { CORE_RULES } from '@skelly/construct/assembly/rules.ts';
 import type { Assembly, Domain, FeatureDisposition, PartFeature } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { CORE_RULE_IDS } from '@skelly/construct/foundation/issue.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { FEATURE_VOXELS } from '@skelly/thing-export/featureFit.ts';
 import { SMOOTH, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { describe, expect, it } from 'vitest';
@@ -232,7 +233,7 @@ describe('min-feature', () => {
   const fitsDetailOnly = (detailMinimum * 1.5) / metresPerUnit;
   const thinForDetail = (detailMinimum * 0.5) / metresPerUnit;
 
-  const withFeature = (feature: PartFeature, tags?: readonly string[]): Domain => {
+  const withFeature = (feature: PartFeature, tags?: readonly string[], solids: readonly Solid[] = []): Domain => {
     const barrel = gunDomain.families.barrel!;
     return {
       ...gunDomain,
@@ -242,7 +243,12 @@ describe('min-feature', () => {
           ...barrel,
           build: (p) => {
             const def = barrel.build(p);
-            return { ...def, tags: [...(def.tags ?? []), ...(tags ?? [])], features: [feature] };
+            return {
+              ...def,
+              solids: [...def.solids, ...solids],
+              tags: [...(def.tags ?? []), ...(tags ?? [])],
+              features: [feature],
+            };
           },
         },
       },
@@ -282,6 +288,26 @@ describe('min-feature', () => {
     const messages = minFeatureMessages(withFeature(feature));
     expect(messages).toHaveLength(1);
     expect(messages[0]).toContain(`exports at the ${gunVoxel.grain} m grain; tag the part ${VOXEL_DETAIL}`);
+  });
+
+  describe('disposed as smooth', () => {
+    const feature = { name: 'rib', size: thinForDetail, disposition: { kind: 'smooth' } } as const;
+    const smoothPiece = (id: string): Solid => ({
+      id,
+      kind: 'box',
+      box: { center: [0, 0, 0], half: [0.1, 0.1, 0.1] },
+      display: { smooth: {} },
+    });
+
+    it('passes on a part with smooth pieces named after it', () => {
+      expect(minFeatureMessages(withFeature(feature, [], [smoothPiece('rib-0'), smoothPiece('rib-1')]))).toEqual([]);
+    });
+
+    it('fails on a part whose smooth pieces are named after another feature', () => {
+      expect(minFeatureMessages(withFeature(feature, [], [smoothPiece('ribbon')]))).toEqual([
+        expect.stringContaining('feature "rib" is disposed as smooth but the part has no smooth piece named after it'),
+      ]);
+    });
   });
 
   it('fails a detail feature the detail grain cannot carry either', () => {

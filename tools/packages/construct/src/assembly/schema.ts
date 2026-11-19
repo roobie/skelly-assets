@@ -101,7 +101,8 @@ export interface PartMotion {
 
 /**
  * What a part does with a feature too thin for the export grain; the reason of an exaggeration is the part's to give.
- * A smooth feature is drawn by a smooth piece of the part (`SolidDisplayHints.smooth`), which no grain reaches.
+ * A smooth feature is drawn by the smooth pieces of the part (`SolidDisplayHints.smooth`) named after it, by its name
+ * alone or its name and a dashed suffix, which no grain reaches.
  */
 export type FeatureDisposition =
   | { readonly kind: 'exaggerated'; readonly reason: string }

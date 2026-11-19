@@ -1,6 +1,13 @@
 // Gun-specific rules, added to the core rules through the domain.
 
-import type { PartDef, PortRef, Resolved, ResolvedConnection, Rule } from '@skelly/construct/assembly/schema.ts';
+import type {
+  PartDef,
+  PartFeature,
+  PortRef,
+  Resolved,
+  ResolvedConnection,
+  Rule,
+} from '@skelly/construct/assembly/schema.ts';
 import type { Issue } from '@skelly/construct/foundation/issue.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
@@ -986,12 +993,15 @@ export const feedMatch: Rule = {
 
 const gunGrains = recipeVoxel({ voxel: gunVoxel });
 
+/** Whether the solid is one of those named after the feature: its name alone, or its name and a dashed suffix. */
+const drawsFeature = ({ id }: Solid, { name }: PartFeature): boolean => id === name || id.startsWith(`${name}-`);
+
 /**
  * A part authored at real size may hold a feature the grain its export gives it cannot carry. Such a feature has to
  * say what becomes of it, or it is lost to the voxelization unannounced. A feature disposed as detail holds only on a
- * part the export already gives the detail grain, and only if it fits that grain; a feature disposed as smooth, only on
- * a part that keeps a smooth piece to draw it. A part exported smooth is not
- * voxelized, so its features are not judged.
+ * part the export already gives the detail grain, and only if it fits that grain; a feature disposed as smooth, only if
+ * the part keeps smooth pieces named after it to draw it. A part exported smooth is not voxelized, so its features are
+ * not judged.
  */
 export const minFeature: Rule = {
   id: 'min-feature',
@@ -1011,10 +1021,12 @@ export const minFeature: Rule = {
         }
         const label = `${part} feature "${feature.name}"`;
         if (kind === 'smooth') {
-          if (!(def.displaySolids ?? def.solids).some(isSmoothPiece)) {
+          if (
+            !(def.displaySolids ?? def.solids).some((solid) => isSmoothPiece(solid) && drawsFeature(solid, feature))
+          ) {
             issues.push({
               rule: 'min-feature',
-              message: `${label} is disposed as smooth but the part has no smooth piece to draw it.`,
+              message: `${label} is disposed as smooth but the part has no smooth piece named after it to draw it.`,
               parts: [part],
             });
           }
