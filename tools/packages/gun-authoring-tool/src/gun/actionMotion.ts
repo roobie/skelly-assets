@@ -17,7 +17,7 @@ export const slideOf = (motion: Motion): SlideStage => {
   return slides[0]!;
 };
 
-/** The turn of a bolt part or an SMG handle, if it has one. */
+/** The turn of a part that has one, a bolt's or an SMG handle's or a stock's fold. */
 export const hingeOf = (motion: Motion): HingeStage | undefined =>
   motion.stages.find((stage): stage is HingeStage => stage.kind === 'hinge');
 

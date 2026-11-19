@@ -141,8 +141,8 @@ const ownCopy = (material, copies) => {
   return copy;
 };
 
-// Carries every part of `moving` the share `clock` of the way from rest (0) to its stop (1), and hides what a slide has
-// stowed into its carrier.
+// Carries every part of `moving` to `clock` on its motion, a number for every layer or one for each (motionPose.mjs,
+// `Clocks`), and hides what a slide has stowed into its carrier.
 export function swing(moving, clock) {
   for (const { carrier, layers, materials } of moving) {
     const m = poseAt(layers, clock);
@@ -171,8 +171,8 @@ export function atStop(obj, loaded, entry, name) {
     return held.obj;
   }
   for (const mover of loaded.moving ? movers(obj, loaded) : []) {
-    const clock = stopOf(mover.layers.at(-1), name);
-    if (clock !== undefined) swing([mover], clock);
+    const clocks = mover.layers.map((layer) => stopOf(layer, name));
+    if (clocks.some((clock) => clock !== undefined)) swing([mover], clocks.map((clock) => clock ?? 0));
   }
   return obj;
 }

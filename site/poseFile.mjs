@@ -20,8 +20,8 @@
 // `hold: { <hand bone>: { model, at?, turn?, pole?, socket, grip?, pinch?, close? } }`, is placed after the reach: the
 // palm is set on the item's socket, the digits `pinch` names set their pads on its points, and the others then closed
 // on the item by contact, so the grip is read off the item, not drawn by hand.
-// A held item's moving parts, `moved: { <model>: { <part>: share } }`, stand that share of the way from rest to the far
-// end of their motion (the part's `motion` extras, from tools/packages/thing-export/src/glb.ts) before the hand closes,
+// A held item's moving parts, `moved: { <model>: { <part>: clock } }`, stand at that clock of their motion (the part's
+// `motion` extras, from tools/packages/thing-export/src/glb.ts; its stops name the places on it) before the hand closes,
 // so a hand on a retracted charging handle closes on it where it is; the page moves them, since only it has the meshes.
 
 import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pinchItem } from './fingers.mjs';
@@ -83,11 +83,11 @@ export function poseIssues(rig, file) {
       for (const [model, parts] of Object.entries(file.moved)) {
         if (!Object.values(file.hold ?? {}).some((hold) => hold?.model === model))
           issues.push(`moved.${model}: no hand holds ${model}`);
-        if (!isObject(parts)) issues.push(`moved.${model} maps part names to shares 0..1`);
+        if (!isObject(parts)) issues.push(`moved.${model} maps part names to clocks 0..1`);
         else
           for (const [part, share] of Object.entries(parts))
             if (!(Number.isFinite(share) && share >= 0 && share <= 1))
-              issues.push(`moved.${model}.${part} is a share 0..1`);
+              issues.push(`moved.${model}.${part} is a clock 0..1`);
       }
   }
   if (file.level !== undefined) {
