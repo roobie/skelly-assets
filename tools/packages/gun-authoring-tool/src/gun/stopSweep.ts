@@ -67,14 +67,20 @@ const restHull = (solid: Solid): Vec3[] => {
   return [min[0], max[0]].flatMap((x) => [min[1], max[1]].flatMap((y) => [min[2], max[2]].map((z): Vec3 => [x, y, z])));
 };
 
-/** The most a point of `solid` moves while the clock runs from `from` to `to`: each stage's reach for the part of it that falls in the span. */
+/**
+ * The most a point of `solid` moves per unit of the span's phase, as the clock runs from `from` to `to`. At any phase only
+ * one stage is running, so the bound is that of the fastest stage the span overlaps: its reach over its whole share,
+ * scaled to the span's length.
+ */
 const spanSpeedBound = (motion: Motion, solid: Solid, from: number, to: number): number => {
   const hull = restHull(solid);
   let start = 0;
   let bound = 0;
   for (const stage of motion.stages) {
-    const overlap = Math.max(0, Math.min(start + stage.share, to) - Math.max(start, from));
-    bound += (stageDistance(stage, hull) * overlap) / stage.share;
+    const overlaps = Math.min(start + stage.share, to) > Math.max(start, from);
+    if (overlaps) {
+      bound = Math.max(bound, (stageDistance(stage, hull) * (to - from)) / stage.share);
+    }
     start += stage.share;
   }
   return bound;

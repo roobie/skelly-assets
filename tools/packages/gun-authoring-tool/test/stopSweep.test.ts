@@ -1,6 +1,7 @@
 import { motionTransform, resolveMotion } from '@skelly/construct/assembly/motion.ts';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, PartFamily, Resolved } from '@skelly/construct/assembly/schema.ts';
+import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import { applyDir, applyPoint, IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
@@ -111,6 +112,74 @@ describe('the stop sweep', () => {
     const obstacle = { id: 'wall', shape: worldSolid(IDENTITY, wall) };
     expect(penetrationWorld(worldSolid(IDENTITY, solid), obstacle.shape)).toBeLessThan(1e-9);
     expect(sweepPartStops(part, [obstacle])).toEqual([]);
+  });
+
+  it('certifies a span over stages of unequal pace by the fastest of them', () => {
+    const near: BoxSolid = { id: 'near', kind: 'box', box: { center: [0, 0, 0], half: [0.05, 0.05, 0.05] } };
+    const far: BoxSolid = { id: 'far', kind: 'box', box: { center: [0, 10, 0], half: [0.05, 0.05, 0.05] } };
+    const motion = resolveMotion(
+      {
+        stages: [
+          { kind: 'slide', direction: [1, 0, 0], travel: 1 },
+          { kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 0, 1] }, angle: 90 },
+        ],
+      },
+      () => 0,
+      [near, far],
+    );
+    const blocker: BoxSolid = { id: 'blocker', kind: 'box', box: { center: [0.5, 0, 0], half: [0.02, 0.02, 0.02] } };
+    const part = { id: 'p', placed: IDENTITY, solids: [near, far], motion };
+    expect(sweepPartStops(part, [{ id: 'blocker', shape: worldSolid(IDENTITY, blocker) }])).toEqual([
+      'p.near vs blocker from rest to open',
+    ]);
+  });
+
+  describe('the position allowance', () => {
+    const slideThrough = (plate: BoxSolid, partHalf: number) => {
+      const solid: BoxSolid = { id: 'p', kind: 'box', box: { center: [0, 0, 0], half: [partHalf, 0.5, 0.5] } };
+      const motion = resolveMotion(
+        {
+          stages: [{ kind: 'slide', direction: [1, 0, 0], travel: 3 }],
+          stops: [
+            { name: 'a', stage: 0, at: 0 },
+            { name: 'b', stage: 0 },
+          ],
+        },
+        () => 0,
+        [solid],
+      );
+      return sweepPartStops({ id: 'p', placed: IDENTITY, solids: [solid], motion }, [
+        { id: 'plate', shape: worldSolid(IDENTITY, plate) },
+      ]);
+    };
+    const plateAt = (x: number, half: number): BoxSolid => ({
+      id: 'plate',
+      kind: 'box',
+      box: { center: [x, 0, 0], half: [half, 1, 1] },
+    });
+
+    it('fails a thin plate that the coarse samples step over, which a tenfold allowance would let through', () => {
+      // The part's samples fall 0.094 apart on its way and the plate sits between two of them; only a finer sample finds it.
+      expect(slideThrough(plateAt(0.047, 0.025), 0.01)).toEqual(['p.p vs plate from a to b']);
+    });
+
+    it('lets a clash no deeper than the position allowance pass between samples', () => {
+      // The needle crosses the plate between two samples and sinks 0.002 into it: far under TOLERANCE.position.
+      expect(0.002).toBeLessThan(TOLERANCE.position);
+      expect(slideThrough(plateAt(0.3, 0.003), 0.001)).toEqual([]);
+    });
+  });
+
+  it('checks the action parts at every stop: the bolt carrier in the stock clearance fails once it is not allowed', () => {
+    const rifle = resolve(loadCorpus().find(({ label }) => label.includes('hunting-rifle'))!.assembly, gunDomain);
+    expect(sweepStops(rifle)).toEqual([]);
+    const receiver = [...rifle.defs].find(([, def]) => def.family === 'receiver')!;
+    const stripped = receiver[1].keepOuts.map((keepOut) => {
+      const { allowPort: _port, allowFamilies: _families, ...unallowed } = keepOut;
+      return keepOut.id === 'bolt-stock-clearance' ? unallowed : keepOut;
+    });
+    const strict = { ...rifle, defs: new Map(rifle.defs).set(receiver[0], { ...receiver[1], keepOuts: stripped }) };
+    expect(sweepStops(strict).some((issue) => /^bolt-carrier at open: .*bolt-stock-clearance/.test(issue))).toBe(true);
   });
 
   it('fails a stop that sits in a keep-out, naming the stop and the volume', () => {

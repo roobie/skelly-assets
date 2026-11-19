@@ -272,7 +272,7 @@ const keepOut = (
     ...(options?.allowFamilies ? { allowFamilies: options.allowFamilies } : {}),
   };
 };
-/** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and its bolt handle. */
+/** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and any bolt-handle part. */
 const ACTION_ALLOWANCE = { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] } as const;
 /** Tag for parts the firing hand can hold (see rules.ts). */
 export const FIRING_GRIP = 'firing-grip';
@@ -1666,14 +1666,11 @@ const addFeedKeepOuts = (context: ReceiverContext, keepOuts: KeepOut[]): void =>
   const { params, receiverDrop, receiverBottom, receiverTop } = context;
   switch (params.feed) {
     case 'top':
-      // The roof-mouth is closed to every family. Above it, opticLoadingClearance permits only bodies.
+      // The roof-mouth is closed to every family but the carrier that cycles through it. Above it, opticLoadingClearance permits only bodies.
       keepOuts.push(
-        keepOut(
-          'loading-mouth',
-          [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5],
-          [-4, receiverTop, 1.5],
-          ACTION_ALLOWANCE,
-        ),
+        keepOut('loading-mouth', [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5], [-4, receiverTop, 1.5], {
+          allowPort: ACTION_ALLOWANCE.allowPort,
+        }),
         keepOut('loading-port', [-4 - carrierTravelLength(params), receiverTop, -1.5], [-4, 9, 1.5], {
           allowPort: ACTION_ALLOWANCE.allowPort,
           allowFamilies: ['sight', ...ACTION_ALLOWANCE.allowFamilies],
@@ -2863,10 +2860,12 @@ const compactSmgLower = (top: PortDef, withGuard: boolean): PartDef => {
         [traced.triggerFinger.x[0], traced.triggerFinger.y[0] - origin[1], -1],
         [traced.triggerFinger.x[1], traced.triggerFinger.y[1] - origin[1], 1],
       ),
-      keepOut('magazine-path', [wellRearX, -40, -wellInner], [wellFrontX, magazine.port[1] - origin[1], wellInner], {
-        allowPort: 'magazine',
-        allowFamilies: ['bolt-carrier'],
-      }),
+      keepOut(
+        'magazine-path',
+        [wellRearX, -40, -wellInner],
+        [wellFrontX, magazine.port[1] - origin[1], wellInner],
+        'magazine',
+      ),
     ],
     axes: [],
   };
@@ -2986,7 +2985,8 @@ const lower: PartFamily = {
         'magazine-path',
         [x - wellDepth / 2, -40, -wellWidth / 2],
         [x + wellDepth / 2, pathTop, wellWidth / 2],
-        { allowPort: 'magazine', allowFamilies: ['bolt-carrier'] },
+        // A recessed well rises into the carrier's turn, which the bolt's stop sweep reaches; no other lower is entered.
+        params.magazineWell === 'recessed' ? { allowPort: 'magazine', allowFamilies: ['bolt-carrier'] } : 'magazine',
       );
       if (tilt === 0) {
         return { port, path };

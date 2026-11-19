@@ -370,7 +370,7 @@ export const keepOutForPart = (r: Resolved, part: string): Issue[] => checkKeepO
 
 /** The keep-outs of every other part that `part` occupies where it stands: its own keep-outs are none of its business. */
 export const keepOutsMetBy = (r: Resolved, part: string): Issue[] => {
-  const solids = placedSolids(r);
+  const solids = placedSolids(r, [part]);
   return [...r.placed]
     .filter(([owner]) => owner !== part)
     .flatMap(([owner, ownerT]) => keepOutIssuesForOwner({ r, solids, owner, ownerT, focusPart: part }));
