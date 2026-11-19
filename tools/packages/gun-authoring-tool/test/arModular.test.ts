@@ -5,7 +5,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { distanceWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { AR15_FRAME, u } from '../src/gun/arModular/frame.ts';
+import { AR15_FRAME, checkFrameTable, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { loadDesignAssembly } from './helpers.ts';
@@ -15,10 +15,27 @@ const AR15 = AR15_FRAME.table;
 
 describe('modular AR', () => {
   it('imports nothing from the first AR', () => {
-    const offenders = readdirSync(FOLDER).filter((file) =>
-      /from '\.\.\/(arLayout|arFrames|templates)\.ts'/.test(readFileSync(join(FOLDER, file), 'utf8')),
-    );
+    // Any specifier naming the module, at any depth, whether imported, re-exported or loaded on demand.
+    const firstAr = /(?:from\s*|import\s*\(\s*)['"](?:[^'"]*\/)?(?:arLayout|arFrames|templates)(?:\.ts)?['"]/;
+    const offenders = readdirSync(FOLDER, { recursive: true, encoding: 'utf8' })
+      .filter((file) => file.endsWith('.ts'))
+      .filter((file) => firstAr.test(readFileSync(join(FOLDER, file), 'utf8')));
     expect(offenders).toEqual([]);
+    for (const specifier of [
+      "import { a } from '../arLayout.ts'",
+      "import { a } from '../../gun/arFrames'",
+      "export * from '../templates.ts'",
+      "await import('../arLayout.ts')",
+    ]) {
+      expect(firstAr.test(specifier), specifier).toBe(true);
+    }
+  });
+
+  it('refuses a frame table with an unsourced measurement', () => {
+    expect(() => checkFrameTable('t', { a: { mm: 1, source: 'sourced: x' } })).not.toThrow();
+    expect(() => checkFrameTable('t', { a: { mm: 1 } })).toThrow(/t\.a/);
+    expect(() => checkFrameTable('t', { a: { mm: 1, source: 'a guess' } })).toThrow();
+    expect(() => checkFrameTable('t', { a: 1 })).toThrow(/t\.a/);
   });
 
   it('gives every item the sourced mass of its frame table', () => {

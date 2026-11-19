@@ -28,7 +28,7 @@ const checkMeasured = (node: unknown, path: string): void => {
 };
 
 /** A table as loaded, checked that every leaf is sourced; `name` heads the path a failure reports. */
-const checkFrameTable = <T>(name: string, raw: T): T => {
+export const checkFrameTable = <T>(name: string, raw: T): T => {
   checkMeasured(raw, name);
   return raw;
 };
