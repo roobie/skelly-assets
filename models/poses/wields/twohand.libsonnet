@@ -1,5 +1,6 @@
 // Both hands on a heavy club or long blade, the left by the end of the handle and the right above it, the left foot
-// leading. The guard holds the weapon up before the body; the overhead comes down from over the head, the side swing
+// leading. The guard holds the weapon cocked, the hands up by the right shoulder and the end tipped back, loaded to
+// swing, the hands and the handle in a first-person view; the overhead comes down from over the head, the side swing
 // cuts across from the right, the thrust drives the end straight out. Heavy strikes wind up longer than one hand's.
 local body = import 'body.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
@@ -10,7 +11,7 @@ local held(at, pitch, yaw, roll=0, right=[-0.6, -1, 0], left=[0.6, -1, 0]) = {
   aim: { pitch: pitch, yaw: yaw, roll: roll },
   poles: { 'hand.R': right, 'hand.L': left },
 };
-local guard = { body: legs { spine: [6, -10, 0] }, weapon: held([0.2, -0.25, 0.3], -55, 10, 60) };
+local guard = { body: legs { spine: [6, -10, 0] }, weapon: held([0.25, 0.14, 0.32], -105, 10, 60) };
 local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, seconds: 1.1 };
 {
   look: [0, 1.4, 4],
