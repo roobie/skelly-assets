@@ -135,14 +135,18 @@ export function evaluateJsonnet(expression, repositoryRoot = REPOSITORY_ROOT) {
 
 /**
  * evaluateJsonnet in a child process that leaves the caller free, so many expressions evaluate at once; `label` names
- * the expression in a failure.
+ * the expression in a failure, and an `overlay` is searched before the repository as compileJsonnetFile's is.
  * @param {string} expression
  * @param {string} [repositoryRoot]
- * @param {{ label?: string }} [options]
+ * @param {OverlayOptions & { label?: string }} [options]
  * @returns {Promise<string>}
  */
-export function evaluateJsonnetAsync(expression, repositoryRoot = REPOSITORY_ROOT, { label = expression } = {}) {
-  return runJsonnetAsync([...libraryArgs(repositoryRoot), '-e', expression], repositoryRoot, label);
+export function evaluateJsonnetAsync(
+  expression,
+  repositoryRoot = REPOSITORY_ROOT,
+  { label = expression, overlay } = {},
+) {
+  return runJsonnetAsync([...libraryArgs(repositoryRoot, overlay), '-e', expression], repositoryRoot, label);
 }
 
 /**

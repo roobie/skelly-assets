@@ -189,6 +189,39 @@ fixtureTest(
   },
 );
 
+fixtureTest(
+  "a row file over another row file compiles over that file's fragment, which an edit of either recompiles",
+  async ({ write, refresh, value, entry }) => {
+    write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].value }]");
+    write(
+      'rows/index.libsonnet',
+      "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+    );
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 1 });
+    writeFileSync(
+      entry('rows', ([row]) => row.id === 'a'),
+      JSON.stringify([{ id: 'a', value: 5 }]),
+    );
+    write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].value, edited: true }]");
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 5, edited: true });
+    write('rows/a.libsonnet', "[{ id: 'a', value: 7 }]");
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 7, edited: true });
+  },
+);
+
+fixtureTest('row files that import each other fail naming their order', async ({ write, refresh }) => {
+  write('rows/a.libsonnet', "[{ id: 'a', from: (import 'rows/c.libsonnet')[0].id }]");
+  write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].id }]");
+  write(
+    'rows/index.libsonnet',
+    "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+  );
+  await assert.rejects(refresh(), /row files that import each other have no order to compile in/);
+});
+
 // A fragment is its row file's manifested JSON, so a row file that is not plain data would build differently from its
 // source; the compile refuses it, naming the file and the field.
 for (const [problem, row, message] of [

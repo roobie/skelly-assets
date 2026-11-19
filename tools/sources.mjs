@@ -280,20 +280,73 @@ const PLAIN_DATA = join(here, 'jsonnet', 'plain-data.libsonnet');
 const plainRows = (path) => `(import ${JSON.stringify(PLAIN_DATA)}).rows(import ${JSON.stringify(resolve(path))})`;
 
 /**
+ * The rows in tiers: a row file that reaches another row file is a tier above it, so it compiles over that file's
+ * fragment instead of evaluating it again. A cycle of row files has no tier to compile first.
+ * @param {readonly Unit[]} rows
+ * @returns {Unit[][]}
+ */
+const rowTiers = (rows) => {
+  const byPath = new Map(rows.map((row) => [row.path, row]));
+  /** @type {Map<Unit, number>} */
+  const tierOf = new Map();
+  /** @type {Set<Unit>} */
+  const visiting = new Set();
+  /**
+   * @param {Unit} row
+   * @returns {number}
+   */
+  const tier = (row) => {
+    const known = tierOf.get(row);
+    if (known !== undefined) return known;
+    if (visiting.has(row)) throw new Error(`${row.path}: row files that import each other have no order to compile in`);
+    visiting.add(row);
+    const reached = row.closure.filter((path) => path !== row.path).flatMap((path) => byPath.get(path) ?? []);
+    /** @type {number} */
+    const above = reached.reduce((highest, other) => Math.max(highest, tier(other) + 1), 0);
+    visiting.delete(row);
+    tierOf.set(row, above);
+    return above;
+  };
+  const levels = rows.map(tier);
+  return Array.from({ length: Math.max(-1, ...levels) + 1 }, (_, level) =>
+    rows.filter((_row, i) => levels[i] === level),
+  );
+};
+
+// A tier compiles over the fragments of the tiers below it, the stored ones or those just compiled, so a kit that reads
+// a set costs its own evaluation and not the set's, and a set file's edit recompiles only the kits that name it.
+/**
  * The fragments of the rows the store lacks, each by its row.
  * @param {readonly Unit[]} rows
  * @param {CompileOptions} options
  */
-const compileFragments = async (rows, { root, folders }) => {
+const compileFragments = async (rows, options) => {
+  const { root, folders } = options;
   /** @type {Map<Unit, string>} */
   const fragments = new Map();
-  await forEachConcurrently(
-    rows.filter(({ key }) => !existsSync(folders.rows.path(key, ENTRY_FILE))),
-    async (row) => {
-      const label = relative(root, row.path);
-      fragments.set(row, await evaluateJsonnetAsync(plainRows(row.path), compileRoot(root), { label }));
-    },
-  );
+  /** @type {Unit[]} */
+  const below = [];
+  for (const tier of rowTiers(rows)) {
+    const missing = tier.filter(({ key }) => !existsSync(folders.rows.path(key, ENTRY_FILE)));
+    const reached = new Set(missing.flatMap(({ closure }) => closure));
+    /** @type {Map<Unit, string>} */
+    const compiled = new Map();
+    if (missing.length > 0) {
+      await withOverlay(
+        below.filter(({ path }) => reached.has(path)),
+        fragments,
+        options,
+        (overlay) =>
+          forEachConcurrently(missing, async (row) => {
+            const label = relative(root, row.path);
+            compiled.set(row, await evaluateJsonnetAsync(plainRows(row.path), compileRoot(root), { label, overlay }));
+          }),
+      );
+    }
+    storeUnchanged(folders.rows, compiled, options);
+    for (const [row, fragment] of compiled) fragments.set(row, fragment);
+    below.push(...tier);
+  }
   return fragments;
 };
 
@@ -306,10 +359,10 @@ const compileFragments = async (rows, { root, folders }) => {
  * @param {readonly Unit[]} rows
  * @param {ReadonlyMap<Unit, string>} fragments
  * @param {CompileOptions} options
- * @param {(overlay: string) => T} use
- * @returns {T}
+ * @param {(overlay: string) => T | Promise<T>} use
+ * @returns {Promise<T>}
  */
-const withOverlay = (rows, fragments, { root, folders }, use) => {
+const withOverlay = async (rows, fragments, { root, folders }, use) => {
   const overlay = makeBuildDir('jsonnet-overlay');
   try {
     for (const row of rows) {
@@ -319,7 +372,7 @@ const withOverlay = (rows, fragments, { root, folders }, use) => {
       if (fragment === undefined) symlinkSync(folders.rows.path(row.key, ENTRY_FILE), at);
       else writeFileSync(at, fragment);
     }
-    return use(overlay);
+    return await use(overlay);
   } finally {
     rmSync(overlay, { recursive: true, force: true });
   }
@@ -338,8 +391,7 @@ const compileTwins = async (twins, rows, options) => {
   const reached = new Set(twins.flatMap(({ closure }) => closure));
   const needed = rows.filter(({ path }) => reached.has(path));
   const fragments = await compileFragments(needed, options);
-  storeUnchanged(options.folders.rows, fragments, options);
-  const outputs = withOverlay(needed, fragments, options, (overlay) =>
+  const outputs = await withOverlay(needed, fragments, options, (overlay) =>
     compileJsonnetFiles(
       twins.map(({ path }) => path),
       compileRoot(options.root),
