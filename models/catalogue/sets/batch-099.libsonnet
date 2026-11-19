@@ -2,6 +2,8 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 // A flat ring lying on the floor, centred at (x, z), from radius r0 to r1 and `t` thick.
 local ringFlat(id, slot, r0, r1, t, x, y, z) = h.turned(id, slot, 'y', [[0, r0], [0, r1], [t, r1], [t, r0], [0, r0]], [x, y, z]);
+// How far a boot's heel block rises above its sole, under the bare heel.
+local bootHeel = 0.01;
 // One boot standing with its toe on +z, centred on x = `xc`. `b` holds length `l`, width `w`, sole `s`, toe height
 // `toe`, instep height `instep`, shaft top `top` and shaft depth `shaft` along z, and `laces`, the lace rungs on the
 // shaft front (0 for a pull-on boot). Slots: upper, toe, sole, collar, lining, laces.
@@ -11,7 +13,7 @@ local boot(p, xc, b) =
   [
     box(p + '-sole', 'sole', [xc - b.w / 2 - 0.004, 0, z0 - 0.004], [xc + b.w / 2 + 0.004, s, zt]),
     h.disc(p + '-sole-toe', 'sole', b.w / 2 + 0.004, 0, s, xc, zt),
-    box(p + '-heel', 'sole', [xc - b.w / 2 - 0.004, 0, z0 - 0.006], [xc + b.w / 2 + 0.004, s + 0.01, z0 + 0.07]),
+    box(p + '-heel', 'sole', [xc - b.w / 2 - 0.004, 0, z0 - 0.006], [xc + b.w / 2 + 0.004, s + bootHeel, z0 + 0.07]),
     h.prism(p + '-vamp', 'upper', 'x', [[s, z0], [s, zt], [s + b.toe, zt], [s + b.instep, zs], [s + b.instep, z0]], xc - b.w / 2, xc + b.w / 2),
     h.turned(p + '-toe', 'toe', 'y', [[0, 0], [0, b.w / 2], [b.toe * 0.6, b.w / 2], [b.toe, b.w * 0.3], [b.toe, 0]], [xc, s, zt]),
     box(p + '-shaft', 'upper', [xc - b.w * 0.46, shaftY, z0 + 0.004], [xc + b.w * 0.46, top - 0.02, zs]),
@@ -85,39 +87,42 @@ local beltStrap(len, w, t=0.004) = [
 
   // A pair of sandals woven from cord, each sole 260 mm long and 95 mm wide, with a cord strap over the toes and a
   // heel loop.
+  local sole = 0.008;
   h.compound('bast_sandals', 0.076, std.flattenArrays([
     [
-      box(p + '-sole', 'sole', [xc - 0.0475, 0, -0.13], [xc + 0.0475, 0.008, 0.08]),
-      h.disc(p + '-sole-toe', 'sole', 0.0475, 0, 0.008, xc, 0.08),
+      box(p + '-sole', 'sole', [xc - 0.0475, 0, -0.13], [xc + 0.0475, sole, 0.08]),
+      h.disc(p + '-sole-toe', 'sole', 0.0475, 0, sole, xc, 0.08),
     ] + [
-      box('%s-weave-%d' % [p, i], 'weave', [xc - 0.044, 0.008, -0.12 + i * 0.03], [xc + 0.044, 0.01, -0.108 + i * 0.03])
+      box('%s-weave-%d' % [p, i], 'weave', [xc - 0.044, sole, -0.12 + i * 0.03], [xc + 0.044, 0.01, -0.108 + i * 0.03])
       for i in std.range(0, 6)
     ] + [
       box(p + '-toe-strap', 'strap', [xc - 0.05, 0.03, 0.04], [xc + 0.05, 0.036, 0.055]),
-      box(p + '-toe-post-l', 'strap', [xc - 0.05, 0.008, 0.04], [xc - 0.044, 0.036, 0.055]),
-      box(p + '-toe-post-r', 'strap', [xc + 0.044, 0.008, 0.04], [xc + 0.05, 0.036, 0.055]),
-      box(p + '-ankle-l', 'strap', [xc - 0.05, 0.008, -0.1], [xc - 0.044, 0.05, -0.088]),
-      box(p + '-ankle-r', 'strap', [xc + 0.044, 0.008, -0.1], [xc + 0.05, 0.05, -0.088]),
+      box(p + '-toe-post-l', 'strap', [xc - 0.05, sole, 0.04], [xc - 0.044, 0.036, 0.055]),
+      box(p + '-toe-post-r', 'strap', [xc + 0.044, sole, 0.04], [xc + 0.05, 0.036, 0.055]),
+      box(p + '-ankle-l', 'strap', [xc - 0.05, sole, -0.1], [xc - 0.044, 0.05, -0.088]),
+      box(p + '-ankle-r', 'strap', [xc + 0.044, sole, -0.1], [xc + 0.05, 0.05, -0.088]),
       box(p + '-heel-cord-l', 'strap', [xc - 0.05, 0.044, -0.136], [xc - 0.044, 0.05, -0.088]),
       box(p + '-heel-cord-r', 'strap', [xc + 0.044, 0.044, -0.136], [xc + 0.05, 0.05, -0.088]),
       box(p + '-heel-back', 'strap', [xc - 0.05, 0.03, -0.136], [xc + 0.05, 0.05, -0.13]),
     ]
     for p in ['left', 'right']
     for xc in [if p == 'left' then -0.055 else 0.055]
-  ]), { sole: 'straw-wicker', weave: 'plant-dried', strap: 'cord-olive' }) + { title: 'Bast sandals' }
+  ]), { sole: 'straw-wicker', weave: 'plant-dried', strap: 'cord-olive' }) + { title: 'Bast sandals', soleLift: sole }
   + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['plant', 'fabric'], slot: ['feet'] } } },
 
   // A pair of brown leather work boots, each 300 mm long, 105 mm wide and 170 mm tall, laced to the top.
-  bootPair('boots', 1, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.17, shaft: 0.12, laces: 4 }, 0.02, {
+  local work = { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.17, shaft: 0.12, laces: 4 };
+  bootPair('boots', 1, work, 0.02, {
     upper: 'leather-brown',
     toe: 'leather-brown',
     sole: 'rubber-black',
     collar: 'paperboard-brown',
     laces: 'paperboard-tan',
-  }) + { title: 'Boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'Boots', soleLift: work.s + bootHeel } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // The same work boots, 190 mm tall, studded all over with small carved bones and a bone ring at each collar.
-  bootPair('bone_studded_boots', 1.2, { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.19, shaft: 0.12, laces: 4 }, 0.03, {
+  local studded = { l: 0.3, w: 0.105, s: 0.022, toe: 0.06, instep: 0.085, top: 0.19, shaft: 0.12, laces: 4 };
+  bootPair('bone_studded_boots', 1.2, studded, 0.03, {
     upper: 'leather-black',
     toe: 'leather-black',
     sole: 'rubber-black',
@@ -134,11 +139,12 @@ local beltStrap(len, w, t=0.004) = [
     for i in std.range(0, 3)
   ] + [
     box(p + '-bone-heel', 'bone', [xc - 0.03, 0.04, -0.158], [xc + 0.03, 0.05, -0.15]),
-  ]) + { title: 'Bone studded boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'bone'], slot: ['feet'] } } },
+  ]) + { title: 'Bone studded boots', soleLift: studded.s + bootHeel } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather', 'bone'], slot: ['feet'] } } },
 
   // A pair of black rubber firefighter's boots, each 310 mm long, 110 mm wide and 380 mm tall, pull-on, with a
   // reflective band, a steel toe cap and pull loops at the top.
-  bootPair('turnout_boots', 2.1, { l: 0.31, w: 0.11, s: 0.025, toe: 0.065, instep: 0.09, top: 0.38, shaft: 0.14, laces: 0 }, 0.02, {
+  local turnout = { l: 0.31, w: 0.11, s: 0.025, toe: 0.065, instep: 0.09, top: 0.38, shaft: 0.14, laces: 0 };
+  bootPair('turnout_boots', 2.1, turnout, 0.02, {
     upper: 'rubber-black',
     toe: 'steel-grey',
     sole: 'paint-oxblood',
@@ -148,10 +154,11 @@ local beltStrap(len, w, t=0.004) = [
     box(p + '-band', 'band', [xc - 0.0546, 0.2, -0.159], [xc + 0.0546, 0.225, -0.011]),
     box(p + '-loop-l', 'collar', [xc - 0.0546, 0.36, -0.1], [xc - 0.05, 0.41, -0.07]),
     box(p + '-loop-r', 'collar', [xc + 0.05, 0.36, -0.1], [xc + 0.0546, 0.41, -0.07]),
-  ]) + { title: 'Turnout boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
+  ]) + { title: 'Turnout boots', soleLift: turnout.s + bootHeel } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', keywords: ['firefighting'], tags: { material: ['rubber', 'metal'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of boots 300 mm long, 105 mm wide and 220 mm tall, sheathed in overlapping bands of insect shell.
-  bootPair('chitin_boots', 1.7, { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 }, 0.03, {
+  local chitin = { l: 0.3, w: 0.105, s: 0.022, toe: 0.065, instep: 0.09, top: 0.22, shaft: 0.13, laces: 0 };
+  bootPair('chitin_boots', 1.7, chitin, 0.03, {
     upper: 'leather-black',
     toe: 'paint-oxblood',
     sole: 'paint-oxblood',
@@ -163,7 +170,7 @@ local beltStrap(len, w, t=0.004) = [
   ] + [
     h.prism(p + '-shin', 'shell', 'x', [[0.1, -0.02], [0.215, -0.02], [0.215, -0.008], [0.12, 0.0]], xc - 0.035, xc + 0.035),
     h.prism(p + '-vamp-plate', 'shell', 'x', [[0.108, -0.02], [0.12, -0.02], [0.1, 0.085], [0.088, 0.085]], xc - 0.05, xc + 0.05),
-  ]) + { title: 'Chitin boots' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['bone'], slot: ['feet'] } } },
+  ]) + { title: 'Chitin boots', soleLift: chitin.s + bootHeel } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['bone'], slot: ['feet'] } } },
 
   // A pair of coyote-tan combat boots, each 300 mm long, 105 mm wide and 220 mm tall, with a black lugged sole, a
   // reinforced toe and heel and laces to the top.

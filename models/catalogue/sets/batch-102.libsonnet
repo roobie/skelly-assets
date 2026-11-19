@@ -2,13 +2,19 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 // Which way a shoe at `xc` turns toward its partner: +1 for the left shoe, -1 for the right.
 local inward(xc) = if xc < 0 then 1 else -1;
+// What a shoe's `b` may leave out: standing on the floor, a 10 mm heel block and the toes in one.
+local shoeDefaults = { y0: 0, heel: 0.01, split: false };
+// The top of a shoe's heel block, where the bare heel stands: the sole and the heel over it, off the floor by y0.
+local heelTop(given) =
+  local b = shoeDefaults + given;
+  b.y0 + b.s + b.heel;
 // One shoe standing with its toe on +z, centred on x = `xc`, its sole lifted `b.y0` off the floor. `b` holds length
 // `l`, width `w`, sole `s`, heel block height `heel` above the sole, toe height `toe`, instep height `instep`, collar
 // top `top`, opening length `shaft` along z from the heel and `laces`, the lace rungs up the opening's front (0 for a
 // pull-on shoe). `split` parts the big toe from the rest, as tabi have. Slots: upper, toe, sole, collar, lining,
 // laces.
-local shoe(p, xc, b) =
-  local y0 = std.get(b, 'y0', 0), heel = std.get(b, 'heel', 0.01), split = std.get(b, 'split', false);
+local shoe(p, xc, given) =
+  local b = shoeDefaults + given, y0 = b.y0, split = b.split;
   local z0 = -b.l / 2, zt = b.l / 2 - b.w / 2, zs = z0 + b.shaft, s = y0 + b.s, top = y0 + b.top;
   local shaftY = s + b.instep - 0.01, rise = top - 0.02 - (s + b.instep), cw = b.w * 0.46;
   local dir = inward(xc), big = [xc + dir * b.w * 0.33, zt + 0.012], rest = [xc - dir * b.w * 0.2, zt];
@@ -16,7 +22,7 @@ local shoe(p, xc, b) =
   local dome(id, slot, r, c, ht) = h.turned(id, slot, 'y', [[0, 0], [0, r], [ht * 0.6, r], [ht, r * 0.6], [ht, 0]], [c[0], s, c[1]]);
   [
     box(p + '-sole', 'sole', [xc - b.w / 2 - 0.004, y0, z0 - 0.004], [xc + b.w / 2 + 0.004, s, zt]),
-    box(p + '-heel', 'sole', [xc - b.w / 2 - 0.004, y0, z0 - 0.006], [xc + b.w / 2 + 0.004, s + heel, z0 + 0.07]),
+    box(p + '-heel', 'sole', [xc - b.w / 2 - 0.004, y0, z0 - 0.006], [xc + b.w / 2 + 0.004, heelTop(b), z0 + 0.07]),
     h.prism(p + '-vamp', 'upper', 'x', [[s, z0], [s, zt], [s + b.toe, zt], [s + b.instep, zs], [s + b.instep, z0]], xc - b.w / 2, xc + b.w / 2),
     box(p + '-shaft', 'upper', [xc - cw, shaftY, z0 + 0.004], [xc + cw, top - 0.02, zs]),
     // The opening: a dark lining inside a collar ring.
@@ -48,7 +54,7 @@ local shoe(p, xc, b) =
 // A standing pair of shoes `gap` apart; `extra(p, xc)` adds each shoe's own pieces.
 local shoePair(id, massKg, b, gap, finish, extra=function(p, xc) []) =
   local xc = b.w / 2 + 0.004 + gap / 2;
-  h.compound(id, massKg, shoe('left', -xc, b) + extra('left', -xc) + shoe('right', xc, b) + extra('right', xc), { lining: 'paint-charcoal' } + finish);
+  h.compound(id, massKg, shoe('left', -xc, b) + extra('left', -xc) + shoe('right', xc, b) + extra('right', xc), { lining: 'paint-charcoal' } + finish) + { soleLift: heelTop(b) };
 // Each shoe of a pair `w` wide and `gap` apart: its prefix and centre x.
 local pairOf(w, gap, f) = std.flattenArrays([f(p, (if p == 'left' then -1 else 1) * (w / 2 + gap / 2)) for p in ['left', 'right']]);
 // A strap buckle standing proud of a shoe's outer side at height y and depth z.
@@ -64,6 +70,8 @@ local wrapStrap(id, slot, xc, cw, y0, y1, z0, z1, t=0.004) = [
   box(id + '-left', slot, [xc - cw - t, y0, z0], [xc - cw, y1, z1]),
   box(id + '-right', slot, [xc + cw, y0, z0], [xc + cw + t, y1, z1]),
 ];
+// The sole of the shoe a sabaton is strapped over: the plates stand on it and the heel strap runs under it.
+local sabatonSole = 0.012;
 // A sabaton over a shoe that is not there: lames stepping down from the ankle to a toe cap, side plates and a heel
 // cup, strapped under the instep. Slots: plate, toe, strap, buckle.
 local sabaton(p, xc) =
@@ -76,31 +84,33 @@ local sabaton(p, xc) =
       box('%s-lame-%d-right' % [p, i], 'plate', [xc + w * 0.3, yt - 0.02, zl], [xc + w / 2, yt - 0.008, zl + 0.03]),
       box('%s-lame-%d-shoulder-left' % [p, i], 'plate', [xc - w * 0.4, yt - 0.01, zl], [xc - w * 0.28, yt - 0.002, zl + 0.03]),
       box('%s-lame-%d-shoulder-right' % [p, i], 'plate', [xc + w * 0.28, yt - 0.01, zl], [xc + w * 0.4, yt - 0.002, zl + 0.03]),
-      box('%s-lame-%d-side-left' % [p, i], 'plate', [xc - w / 2, 0.012, zl], [xc - w / 2 + 0.004, yt - 0.016, zl + 0.03]),
-      box('%s-lame-%d-side-right' % [p, i], 'plate', [xc + w / 2 - 0.004, 0.012, zl], [xc + w / 2, yt - 0.016, zl + 0.03]),
+      box('%s-lame-%d-side-left' % [p, i], 'plate', [xc - w / 2, sabatonSole, zl], [xc - w / 2 + 0.004, yt - 0.016, zl + 0.03]),
+      box('%s-lame-%d-side-right' % [p, i], 'plate', [xc + w / 2 - 0.004, sabatonSole, zl], [xc + w / 2, yt - 0.016, zl + 0.03]),
     ];
   // The lames, each overlapping the next toward the toe.
   std.flattenArrays([lame(i) for i in std.range(0, n - 1)]) + [
     // A pointed toe cap riding over the last lame.
-    h.prism(p + '-toe-top', 'toe', 'x', [[0.05, 0.095], [0.012, l / 2 + 0.01], [0.012, 0.095]], xc - w * 0.42, xc + w * 0.42),
-    h.prism(p + '-toe-left', 'toe', 'y', [[0.095, xc - w / 2], [l / 2 + 0.01, xc - 0.004], [l / 2 + 0.01, xc + 0.004], [0.095, xc - w * 0.42]], 0.012, 0.05),
-    h.prism(p + '-toe-right', 'toe', 'y', [[0.095, xc + w * 0.42], [l / 2 + 0.01, xc - 0.004], [l / 2 + 0.01, xc + 0.004], [0.095, xc + w / 2]], 0.012, 0.05),
+    h.prism(p + '-toe-top', 'toe', 'x', [[0.05, 0.095], [sabatonSole, l / 2 + 0.01], [sabatonSole, 0.095]], xc - w * 0.42, xc + w * 0.42),
+    h.prism(p + '-toe-left', 'toe', 'y', [[0.095, xc - w / 2], [l / 2 + 0.01, xc - 0.004], [l / 2 + 0.01, xc + 0.004], [0.095, xc - w * 0.42]], sabatonSole, 0.05),
+    h.prism(p + '-toe-right', 'toe', 'y', [[0.095, xc + w * 0.42], [l / 2 + 0.01, xc - 0.004], [l / 2 + 0.01, xc + 0.004], [0.095, xc + w / 2]], sabatonSole, 0.05),
     // The heel cup and ankle plate.
-    box(p + '-heel-back', 'plate', [xc - w * 0.4, 0.012, z0 - 0.004], [xc + w * 0.4, 0.1, z0]),
-    box(p + '-heel-left', 'plate', [xc - w / 2, 0.012, z0], [xc - w / 2 + 0.004, 0.09, -0.045]),
-    box(p + '-heel-right', 'plate', [xc + w / 2 - 0.004, 0.012, z0], [xc + w / 2, 0.09, -0.045]),
+    box(p + '-heel-back', 'plate', [xc - w * 0.4, sabatonSole, z0 - 0.004], [xc + w * 0.4, 0.1, z0]),
+    box(p + '-heel-left', 'plate', [xc - w / 2, sabatonSole, z0], [xc - w / 2 + 0.004, 0.09, -0.045]),
+    box(p + '-heel-right', 'plate', [xc + w / 2 - 0.004, sabatonSole, z0], [xc + w / 2, 0.09, -0.045]),
   ] + wrapStrap(p + '-ankle', 'plate', xc, w * 0.42, 0.1, 0.14, z0, -0.05) + [
-    box(p + '-inside', 'lining', [xc - w * 0.42, 0.012, z0], [xc + w * 0.42, 0.1, -0.05]),
+    box(p + '-inside', 'lining', [xc - w * 0.42, sabatonSole, z0], [xc + w * 0.42, 0.1, -0.05]),
     // The strap passing under the arch, buckled on the outer side.
     box(p + '-strap-under', 'strap', [xc - w / 2 - 0.004, 0, -0.01], [xc + w / 2 + 0.004, 0.006, 0.015]),
     box(p + '-strap-left', 'strap', [xc - w / 2 - 0.004, 0.006, -0.01], [xc - w / 2, 0.06, 0.015]),
     box(p + '-strap-right', 'strap', [xc + w / 2, 0.006, -0.01], [xc + w / 2 + 0.004, 0.06, 0.015]),
-    box(p + '-heel-strap', 'strap', [xc - w / 2 - 0.004, 0, z0 + 0.01], [xc + w / 2 + 0.004, 0.012, z0 + 0.035]),
+    box(p + '-heel-strap', 'strap', [xc - w / 2 - 0.004, 0, z0 + 0.01], [xc + w / 2 + 0.004, sabatonSole, z0 + 0.035]),
   ] + sideBuckle(p + '-buckle', xc, w, 0.04, 0.0025);
+// A pump's length `l`, width `w`, heel height `hh` and sloping sole `t`: the bare heel stands on hh + t.
+local pumpShape = { l: 0.24, w: 0.075, hh: 0.085, t: 0.006 };
 // A high-heeled pump with its toe on +z: a sole sloping from a heel `hh` high down to the ball, a stiletto heel, a
 // closed toe and low sides. Slots: upper, sole, heel, insole.
 local pump(p, xc) =
-  local l = 0.24, w = 0.075, hh = 0.085, z0 = -l / 2, zb = z0 + 0.14, zt = l / 2 - w / 2, t = 0.006;
+  local l = pumpShape.l, w = pumpShape.w, hh = pumpShape.hh, t = pumpShape.t, z0 = -l / 2, zb = z0 + 0.14, zt = l / 2 - w / 2;
   local ys(z) = if z >= zb then 0.008 else 0.008 + (zb - z) / (zb - z0) * (hh - 0.008);
   local zv = zb - 0.035;
   [
@@ -120,10 +130,12 @@ local pump(p, xc) =
     h.prism(p + '-quarter-right', 'upper', 'x', [[hh + t, z0], [ys(zv) + t, zv], [ys(zv) + 0.03, zv], [hh + 0.045, z0]], xc + w / 2 - 0.004, xc + w / 2),
     box(p + '-counter', 'upper', [xc - w / 2, hh + t, z0 - 0.004], [xc + w / 2, hh + 0.05, z0]),
   ];
+// The top of a hiking sandal's footbed over its sole, where the bare foot stands.
+local sandalSole = 0.026;
 // A hiking sandal with its toe on +z: a thick treaded sole, a leather footbed, straps over the toes and instep, an
 // ankle strap with a buckle and a heel strap. Slots: sole, footbed, strap, buckle.
 local sandal(p, xc) =
-  local l = 0.28, w = 0.1, z0 = -l / 2, zt = l / 2 - w / 2, s = 0.026, side = -inward(xc);
+  local l = 0.28, w = 0.1, z0 = -l / 2, zt = l / 2 - w / 2, s = sandalSole, side = -inward(xc);
   local arch(id, z, y, d) = [
     box(id + '-top', 'strap', [xc - w / 2 - 0.004, y, z], [xc + w / 2 + 0.004, y + 0.006, z + d]),
     box(id + '-left', 'strap', [xc - w / 2 - 0.004, s, z], [xc - w / 2, y, z + d]),
@@ -200,15 +212,15 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     lining: 'leather-brown',
     strap: 'leather-brown',
     buckle: 'brass-dull',
-  }) + { title: 'Sabaton' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
+  }) + { title: 'Sabaton', soleLift: sabatonSole } + { voxelGrain: 0.004 } + { taxonomy: { category: 'armour', tags: { material: ['metal'], setting: ['medieval'], slot: ['feet'] } } },
 
   // A pair of high-heeled pumps, each 240 mm long and 75 mm wide, on 85 mm stiletto heels, in glossy red leather.
-  h.compound('heels', 0.5, pairOf(0.075, 0.03, pump), {
+  h.compound('heels', 0.5, pairOf(pumpShape.w, 0.03, pump), {
     upper: 'paint-red',
     sole: 'leather-black',
     heel: 'leather-black',
     insole: 'leather-brown',
-  }) + { title: 'High heels' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'High heels', soleLift: pumpShape.hh + pumpShape.t } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of split-toe work boots in thin black leather, each 270 mm long, 95 mm wide and 200 mm tall, closed down
   // the inner side by a row of small brass clasps.
@@ -254,7 +266,7 @@ local knee = { l: 0.29, w: 0.1, s: 0.022, heel: 0.03, toe: 0.055, instep: 0.085,
     footbed: 'leather-brown',
     strap: 'leather-brown',
     buckle: 'brass-dull',
-  }) + { title: 'Leather sandals' } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
+  }) + { title: 'Leather sandals', soleLift: sandalSole } + { voxelGrain: 0.004 } + { taxonomy: { category: 'clothing', tags: { material: ['rubber', 'leather'], setting: ['modern'], slot: ['feet'] } } },
 
   // A pair of red canvas low-top tennis shoes, each 280 mm long and 95 mm wide, with white rubber soles and toe caps
   // and white laces.
