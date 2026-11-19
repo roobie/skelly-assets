@@ -1,6 +1,9 @@
-// Regenerates the index.libsonnet of each folder of row files, the vehicles and the catalogue sets, and
-// models/vehicles/placements.libsonnet. Jsonnet imports must be literal, so a file's rows and a vehicle's placements
-// reach the build only through generated lists; parallel authors each add their own files and never touch a shared one.
+// Regenerates the index.libsonnet of each folder of row files (the catalogue sets, the kits and the vehicles),
+// models/index.libsonnet, the whole catalogue those indexes make, and models/vehicles/placements.libsonnet. Jsonnet
+// imports must be literal, so a file's rows and a vehicle's placements reach the build only through generated lists;
+// parallel authors each add their own files and never touch a shared one. Every row source is a row file: a list of
+// finished rows as plain data, a code-built one in models/kits/ beside the sets and vehicles, so the
+// catalogue is these files' rows in path order and models/ itself stays a folder of libraries.
 // Usage: node tools/row-index.mjs
 import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -12,7 +15,9 @@ import { compileJsonnetFile } from './jsonnet/index.mjs';
 const repository = resolve(import.meta.dirname, '..');
 const models = join(repository, 'models');
 export const VEHICLES_DIR = join(models, 'vehicles');
-export const ROW_DIRS = [VEHICLES_DIR, join(models, 'catalogue/sets')];
+// In path order, which is the order of the catalogue's rows.
+export const ROW_DIRS = [join(models, 'catalogue/sets'), join(models, 'kits'), VEHICLES_DIR];
+export const CATALOGUE = join(models, 'index.libsonnet');
 export const INDEX = 'index.libsonnet';
 export const PLACEMENTS = 'placements.libsonnet';
 const PLACEMENTS_SUFFIX = '.placements.libsonnet';
@@ -22,8 +27,8 @@ const sources = (dir) =>
     .filter((file) => file.endsWith('.libsonnet') && file !== INDEX && file !== PLACEMENTS)
     .sort();
 
-// Spec files are measures and placement files place rows, not rows; a kit is a function or an object of functions, so
-// only a row file is an array.
+// Spec files are measures and placement files place rows, not rows; a library such as vehicles/kit.libsonnet is a
+// function or an object, so only a row file is an array.
 function rowFiles(dir) {
   const candidates = sources(dir).filter(
     (file) => !file.endsWith('.spec.libsonnet') && !file.endsWith(PLACEMENTS_SUFFIX),
@@ -49,13 +54,24 @@ const generated = (entries) => `${HEADER}{\n${entries.join('\n')}\n}\n`;
 // imports are root-relative so they miss beside the index and resolve through the library paths, where the twin
 // compile's overlay puts each row file's compiled fragment first; see tools/sources.mjs, refreshJsonnetTwins. A row
 // file must therefore be plain data: its fragment is its manifested JSON, so a hidden field, a function or a late-bound
-// `self` an importer extends would differ from the source. Anything that is not plain data belongs in a kit or library.
+// `self` an importer extends would differ from the source. Anything that is not plain data belongs in a library, which
+// a kit builds its finished rows from.
 export function rowIndex(dir) {
   return generated(
     rowFiles(dir).map(
       (file) => `  '${file.slice(0, -'.libsonnet'.length)}': import '${relative(repository, join(dir, file))}',`,
     ),
   );
+}
+
+// The catalogue's text: every row file's rows, folder by folder, each folder's files in name order. The model sources
+// the build installs are the rows of this list, each under its own id; models/export.json or a pack's recipe in
+// models/recipes/ selects which, and the rest, such as ground models, are built only on request.
+export function catalogueIndex() {
+  const folders = ROW_DIRS.map(
+    (dir) => `std.flattenArrays(std.objectValues(import '${relative(repository, join(dir, INDEX))}'))`,
+  );
+  return `${HEADER}${folders.join('\n+ ')}\n`;
 }
 
 // The placements index text: each vehicle's placements under its name, with variants laid out from their parents'
@@ -69,5 +85,6 @@ export function placementsIndex(dir = VEHICLES_DIR) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   for (const dir of ROW_DIRS) writeFileSync(join(dir, INDEX), rowIndex(dir));
+  writeFileSync(CATALOGUE, catalogueIndex());
   writeFileSync(join(VEHICLES_DIR, PLACEMENTS), placementsIndex());
 }

@@ -1,7 +1,9 @@
 // @ts-check
 // Compile the packages' and the models' Jsonnet into ignored JSON twins so Node, TypeScript and Vite read the same files.
 // Await installJsonnetSources before importing package code, or run this module directly to refresh the twins (with
-// --digest, to print the digest of their inputs instead).
+// --digest, to print the digest of their inputs instead). Each row file, the finished rows of the sets, the kits and the
+// vehicles that tools/row-index.mjs lists, compiles first into a fragment, in tiers when one row file imports another,
+// and the twins compile over the fragments, so an edit costs its fragment and the units that name it.
 import { createHash } from 'node:crypto';
 import {
   existsSync,

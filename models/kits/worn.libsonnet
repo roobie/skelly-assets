@@ -13,7 +13,7 @@ local title(model) = worn.groundTitle(ground[model], model);
 // A fitted template with its shells tagged as the garment they belong to.
 local tagged(own, template) = template + { rows: worn.shells(own, template.rows) };
 local clothing(material, setting=['modern']) = { category: 'clothing', tags: { material: material, setting: setting } };
-{
+local items = {
   leather_jacket: tagged(clothing(['leather']), fit.torso('leather_jacket', finish('leather_jacket'), {
     collar: 'lapel', zipX: 0.035, belt: true, slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' },
   }, title('leather_jacket'))),
@@ -27,4 +27,5 @@ local clothing(material, setting=['modern']) = { category: 'clothing', tags: { m
   wizard_robe: tagged(clothing(['fabric'], ['fantasy']), fit.robe('wizard_robe', finish('wizard_robe'), {
     stars: [[0.07, 0.56], [0.14, 0.5], [-0.13, 0.49]], moon: [-0.06, 0.53, 0.04],
   }, title('wizard_robe'))),
-}
+};
+std.flattenArrays([items[k].rows for k in std.objectFields(items)])

@@ -93,7 +93,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them; the yoke reaches past the
   // deltoids and rises over the shoulders. Gear worn over a torso shell is seated on these
-  // (models/worn-carry.libsonnet), so it follows the shell as the body changes.
+  // (models/kits/worn-carry.libsonnet), so it follows the shell as the body changes.
   torsoLevels(layer, round=0)::
     local g = layers[layer];
     local waistTop = bust.pelvisHeight + bust.waistHeight;

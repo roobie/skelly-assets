@@ -4,7 +4,7 @@ local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 // The ground rows these shells reuse the titles of.
 local ground = import 'models/catalogue/sets/clothing-bags.libsonnet';
-local jacket = import 'measures/jacket.libsonnet';
+local jacket = import 'models/measures/jacket.libsonnet';
 local clothing(material) = { category: 'clothing', tags: { material: material, setting: ['modern'] } };
 local jacketShells = fit.torso('jacket', { cloth: 'cloth-shirt-player', trim: 'cloth-charcoal', fastener: 'steel-grey' }, jacket, worn.groundTitle(ground, 'jacket'));
 // Soft cloth under the jacket, its hood lying flat enough on the back that the over-jacket gear clears it.

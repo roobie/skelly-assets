@@ -1,6 +1,6 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'models/vehicles/frame.libsonnet';
 // Vehicle parts in the vehicle frame, models/vehicles/frame.libsonnet.
-local kit = import 'vehicles/kit.libsonnet';
+local kit = import 'models/vehicles/kit.libsonnet';
 local part = kit.part;
 local tray(id, massKg, width, height, depth, exportMass) = part(id, 'block', massKg, { width: width, height: height, depth: depth }, { body: 'steel-grey' }, {
   seat: ['body', [0.5, 1, 0.5]],
@@ -554,10 +554,10 @@ local vehicles = [
   { prefix: 'hoist_', tags: { 'vehicle-body': ['truck'], 'vehicle-role': ['construction'] } },
 ];
 local vehicleOf(row) = [v for v in vehicles if std.startsWith(row.id, v.prefix)];
-taxonomy.inherit({ category: 'vehicle-parts' }, (import 'vehicles/frame.libsonnet').rows([
+frame.vehicleRows({}, [
   row + (
     local own = vehicleOf(row);
     if std.length(own) > 0 then { taxonomy: { tags: own[0].tags } } else {}
   )
   for row in rows
-]))
+])

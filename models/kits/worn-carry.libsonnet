@@ -1,9 +1,9 @@
 // Shared under-layer measures keep outer shells snug without burying them; straps clear the vest and its pouches.
 local carry(overJacket, suffix) =
-local bust = import 'measures/bust.libsonnet';
-local jacket = import 'measures/jacket.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local jacket = import 'models/measures/jacket.libsonnet';
 local wornFit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
-local bags = import 'measures/bags.libsonnet';
+local bags = import 'models/measures/bags.libsonnet';
 local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 // The ground rows these shells reuse the titles of.
 local ground = import 'models/catalogue/sets/clothing-bags.libsonnet';

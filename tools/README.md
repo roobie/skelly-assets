@@ -27,7 +27,12 @@ of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script a
 catalogue is costly to compile, so a refresh recompiles only what an edit reaches; see `sources.mjs`,
 `refreshJsonnetTwins`. Each twin is keyed by its import closure, found by scanning the import literals rather than
 evaluating, so an edit invalidates exactly the twins that can see it. The catalogue and the recipes evaluate every
-row file, so each row file compiles on its own into a fragment, in parallel, and the stale twins compile in one run
+row file, so each row file compiles on its own into a fragment, in parallel. Every row source is a row file: the
+catalogue sets, the vehicles, and the code-built kits in `../models/kits/`, each a list of finished rows, so that the
+catalogue is their rows in path order and `models/` itself holds no row sources; see `row-index.mjs`,
+`catalogueIndex`. A row file that imports another, as a worn kit imports the one set file whose ground row it reuses
+instead of scanning every set, compiles over that file's fragment, so a set's edit recompiles the set and the kits that
+name it and no other kit; see `sources.mjs`, `compileFragments`. The stale twins compile in one run
 over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
 twins over it, not every row again, and one run evaluates the catalogue the recipes share once. A twin is written only
 when its bytes differ from the file on disk, so an edit that leaves a recipe's output as it was leaves the file and its
@@ -44,8 +49,9 @@ refresh stores a unit only if its files still hold the content it was keyed by o
 compiler reads them again after the refresh took their keys, and an edit in between would otherwise put one content's
 twin under another's key.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
-late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
-library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would
+late-bound `self` that an importer extends would differ from the source, so anything else belongs in a library,
+and a kit builds its rows from one and exports them finished. Each fragment compile holds its row file to that, failing
+with the file and field, because the difference would
 otherwise build silently and a mod's row file should fail where it is written; see `jsonnet/plain-data.libsonnet`,
 `rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
 exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release

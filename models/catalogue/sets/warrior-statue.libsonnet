@@ -1,7 +1,7 @@
 // A stone statue of an armoured warrior on a plinth, larger than life: the right hand rests on the pommel of a sword
 // planted point-down before him, the left holds a heater shield standing on its point at his side. The figure is
 // the player's doll cut k times larger and dressed in the medieval plate harness a player can wear
-// (models/plate.libsonnet), all in one stone, so the statue stands in the player's own proportions.
+// (models/kits/plate.libsonnet), all in one stone, so the statue stands in the player's own proportions.
 //
 // The assembly check lets only parts joined to each other nest, so wherever plate covers the doll the plate stands
 // in for that segment and carries a core where its lames part; the doll's own thighs and hands show between the
@@ -15,7 +15,7 @@ local band = import 'models/head-band.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
-local plate = std.flattenArrays([item.rows for item in std.objectValues(import 'models/plate.libsonnet')]);
+local plate = import 'models/kits/plate.libsonnet';
 
 // How much larger than life the figure is cut.
 local k = 1.25;
