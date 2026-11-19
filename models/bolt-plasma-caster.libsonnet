@@ -17,6 +17,8 @@ local coreY = 0.25;
 local muzzleX = 0.49;
 local emitterX = 0.40;  // the emitter's back
 local emitterFlare = 0.05;  // how far the emitter's cone runs from its back before it reaches full width
+local emitterLength = 0.08;
+local lensX = emitterX + emitterLength;  // the lens's back, set in the emitter's mouth
 // The collars, `count` of them `pitch` apart from `x0`, each `length` long. Their radius is where an eight-sided turned
 // shape has its flats. The fins stand between them, half a pitch on from each.
 local collars = { count: 3, x0: 0.17, pitch: 0.08, length: 0.03, radius: 0.08 };
@@ -38,8 +40,8 @@ local finLength = 0.015;
   bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(receiverFront, underside, top, w, ridge) + [
     // The coil: a glowing core with collars round it, then the emitter cup and its lens.
     h.rod('core', 'glow', 0.045, receiverFront, 0.47, coreY) + { sides: 16 },
-    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [emitterFlare, 0.09], [0.08, 0.09], [0.08, 0]], [emitterX, coreY, 0]) + { sides: 8 },
-    h.turned('lens', 'glow', 'x', [[0, 0], [0, 0.064], [muzzleX - 0.48, 0.06], [muzzleX - 0.48, 0]], [0.48, coreY, 0]) + { sides: 8 },
+    h.turned('emitter', 'trim', 'x', [[0, 0], [0, 0.065], [emitterFlare, 0.09], [emitterLength, 0.09], [emitterLength, 0]], [emitterX, coreY, 0]) + { sides: 8 },
+    h.turned('lens', 'glow', 'x', [[0, 0], [0, 0.064], [muzzleX - lensX, 0.06], [muzzleX - lensX, 0]], [lensX, coreY, 0]) + { sides: 8 },
     h.prism('rail-top', 'metal', 'x', bolt.bevel(coreY + railInner, coreY + railOuter, railHalf, 0.004), railStart, railEnd),
     h.prism('rail-bottom', 'metal', 'x', bolt.bevel(coreY - railOuter, coreY - railInner, railHalf, 0.004), railStart, railEnd),
   ] + [
