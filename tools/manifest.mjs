@@ -26,6 +26,7 @@ import { manifestTaxonomy } from './taxonomy.mjs';
  * @property {{ pack: string; path: string } | undefined} [smooth]
  * @property {unknown} [taxonomy]
  * @property {readonly string[] | undefined} [nodes]
+ * @property {{ path: string; kit: { id: string; revision: number } } | undefined} [building]
  * @property {unknown} [label]
  * @property {object | undefined} [wornOn]
  * @property {readonly string[] | undefined} [covers]
@@ -48,6 +49,7 @@ import { manifestTaxonomy } from './taxonomy.mjs';
 /** @typedef {ReturnType<typeof soundManifest>['sounds'][number]} ManifestSound */
 /** @typedef {{ id: string; title: unknown; pack: string; path: string; tags: unknown }} ManifestVehicle */
 /** @typedef {{ id: string; pack: string; path: string; rig: string }} ManifestMotion */
+/** @typedef {{ id: string; revision: number; pack: string; path: string }} ManifestBuildingKit */
 /**
  * What of a manifest its file list and the tree check read.
  * @typedef {object} ManifestFiles
@@ -264,6 +266,7 @@ const MODEL_FILES = /** @type {const} */ (['clips', 'body', 'genome']);
 /**
  * @param {object} manifest
  * @param {readonly ManifestModel[]} manifest.models
+ * @param {readonly ManifestBuildingKit[]} [manifest.buildingKits] each kit a building module names
  * @param {readonly ManifestVehicle[]} [manifest.vehicles] each vehicle's placements
  * @param {readonly ManifestMotion[]} [manifest.motions] each baked clip set
  * @param {readonly ManifestSound[]} [manifest.sounds] as soundManifest gives them
@@ -275,6 +278,7 @@ const MODEL_FILES = /** @type {const} */ (['clips', 'body', 'genome']);
  */
 export function buildManifest({
   models,
+  buildingKits = [],
   vehicles = [],
   motions = [],
   sounds = [],
@@ -297,6 +301,13 @@ export function buildManifest({
       if (!Object.hasOwn(packs, target)) throw new Error(`${pack}: depends on ${target}, which the tree does not hold`);
   }
   const known = new Set(files);
+  const kits = new Map();
+  for (const kit of buildingKits) {
+    const key = `${kit.id}@${kit.revision}`;
+    if (kits.has(key)) throw new Error(`duplicate building kit ${key}`);
+    if (!known.has(outputPath(kit.pack, kit.path))) throw new Error(`building kit ${key}: not a produced file`);
+    kits.set(key, kit);
+  }
   const ids = new Set();
   const entries = [...models]
     .sort((a, b) => byText(a.pack, b.pack) || byText(a.id, b.id))
@@ -312,6 +323,13 @@ export function buildManifest({
         throw new Error(`${model.id}: its severed index is not a produced file`);
       if (model.smooth !== undefined && !known.has(outputPath(model.smooth.pack, model.smooth.path)))
         throw new Error(`${model.id}: its smooth copy is not a produced file`);
+      if (model.building !== undefined) {
+        if (!known.has(outputPath(model.pack, model.building.path)))
+          throw new Error(`${model.id}: building sidecar is not a produced file`);
+        const { id, revision } = model.building.kit;
+        const kit = kits.get(`${id}@${revision}`);
+        if (!kit || kit.pack !== model.pack) throw new Error(`${model.id}: unknown building kit ${id}@${revision}`);
+      }
       const key = `${model.pack}/${model.id}`;
       if (ids.has(key)) throw new Error(`${model.id}: two models of one id in ${model.pack}`);
       ids.add(key);
@@ -324,6 +342,7 @@ export function buildManifest({
         ...(model.smooth === undefined ? {} : { smooth: { pack: model.smooth.pack, path: model.smooth.path } }),
         ...manifestTaxonomy(model.taxonomy),
         ...(model.nodes === undefined ? {} : { nodes: [...model.nodes] }),
+        ...(model.building === undefined ? {} : { building: model.building }),
         ...(model.label === undefined ? {} : { label: model.label }),
         ...(model.wornOn === undefined ? {} : { wornOn: { ...model.wornOn } }),
         ...(model.covers === undefined ? {} : { covers: [...model.covers] }),
@@ -372,9 +391,12 @@ export function buildManifest({
   const stale = renameProblems(renames, models);
   if (stale.length) throw new Error(`${RENAMES}: ${stale.join('; ')}`);
   return {
-    _doc: "Every model the built tree holds, every vehicle's placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. smooth: the same model drawn as its authored meshes rather than voxels, the GLB at path under its pack, a pack of its own that depends on the model's; every other field of the entry, and the sidecar, is the voxel file's, so massKg and volumeM3 weigh the voxels and every anchor, grip, collision shape and datum is placed on them, within half the model's voxel grain of the smooth surface; the copy has the same part nodes, skin and piece regions. A model drawn only as voxels, such as a mob or a severed part, has none. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model's shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model's authored mass, the sum of its parts'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. genome: on a mob, its genome file, every value the generator drew for it after its row narrowed the template, so two releases' bodies of one id can be told re-rolled from rebuilt. cut: on a severed part, the mob type and bone it is cut at, the cut points below it already gone when it is cut, given by their top-most ones, and its pack's severed index, which holds every cut point's parts by mob type and bone, each with those cut points and its neutral model sidecar, so a game finds the item each cut leaves from the bone it severs and the cut points already gone below it, and no mass that already left as another part is counted twice; every variant of the type shares the type's parts. wornOn: on a worn piece and on a wearable with no worn pieces, the doll part it sits on, which a bone of the motions' rig binds (bones[].bind.part, with its side and its site in the rig's doll), so a consumer seats it on that bone. A worn piece is drawn in the part's frame, in every copy of the part, the left one mirrored; a piece fitted over other clothing, <item>_worn_<layer> such as a vest over a jacket, sits where its <item>_worn twin does, one layer out. A wearable with no worn pieces sits whole on one copy of the part, which side names where the doll has two (the bind.side of that copy's bone), or across both copies with both: true; with anchor, its own anchor of that name, or its origin if it has none, goes to the anchor of that name on the doll's bust, the model at the rig's first doll site, an anchor that lies on the part. covers: on a worn shell, what of the doll a consumer stops drawing while it is worn, so skin under the shell never shows through: the doll part it is drawn on, or regions of that part, each drawn on the doll's copy of the part as the GLB primitives whose extras.piece names it. The torso is cut into trunk and shoulders and the foot into ankle and sole; models/dressing.libsonnet, regions, holds the cut. A consumer hides what every shell it wears declares, on the copy each shell is fitted to. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle's title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body's tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips' frames turn and the site of each model on them. sounds: each sound row, the object and surface it is the sound of, so a consumer picks it by the surface an object lands on, its row as data, which the impact synth renders to the same samples at the same sample rate, and one Ogg Vorbis file per seed, a take of it baked at that rate. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.",
+    _doc: "Every model the built tree holds, every vehicle's placements and every produced file under its pack, written by tools/build.mjs; paths are logical under <pack>/. smooth: the same model drawn as its authored meshes rather than voxels, the GLB at path under its pack, a pack of its own that depends on the model's; every other field of the entry, and the sidecar, is the voxel file's, so massKg and volumeM3 weigh the voxels and every solid-derived anchor, grip and collision shape is placed on them, within half the model's voxel grain of the smooth surface; building placement datums are instead authored coordinates shared by both representations; the copy has the same part nodes, skin and piece regions. A model drawn only as voxels, such as a mob or a severed part, has none. title: what the model is called wherever it is listed or printed, authored with the model. category and tags: the model's shelf and facet terms, defined in models/taxonomy.json. keywords: further search words for the model, kebab-case, of which models/taxonomy.json lists the curated ones. nodes: the GLB part node names of the resolved assembly. building: a locator for the canonical model sidecar and its kit id/revision; coordinates in its building block are authored placement facts shared by voxel and smooth files, not voxel-derived datums. buildingKits: each referenced kit's id, revision, pack and path, whose grid conventions and qualified join profiles the module names; these are geometric assembly semantics, not navigation or interaction. label: the text printed on the model and the rectangle it fills, in metres in the GLB frame; consumers draw it, the GLB has no lettering. massKg: a model's authored mass, the sum of its parts'. volumeM3: the volume of the voxels it is drawn with, in cubic metres, from which a density follows, left out by a tool that does not measure it. A model whose parts are not all weighed has neither. genome: on a mob, its genome file, every value the generator drew for it after its row narrowed the template, so two releases' bodies of one id can be told re-rolled from rebuilt. cut: on a severed part, the mob type and bone it is cut at, the cut points below it already gone when it is cut, given by their top-most ones, and its pack's severed index, which holds every cut point's parts by mob type and bone, each with those cut points and its neutral model sidecar, so a game finds the item each cut leaves from the bone it severs and the cut points already gone below it, and no mass that already left as another part is counted twice; every variant of the type shares the type's parts. wornOn: on a worn piece and on a wearable with no worn pieces, the doll part it sits on, which a bone of the motions' rig binds (bones[].bind.part, with its side and its site in the rig's doll), so a consumer seats it on that bone. A worn piece is drawn in the part's frame, in every copy of the part, the left one mirrored; a piece fitted over other clothing, <item>_worn_<layer> such as a vest over a jacket, sits where its <item>_worn twin does, one layer out. A wearable with no worn pieces sits whole on one copy of the part, which side names where the doll has two (the bind.side of that copy's bone), or across both copies with both: true; with anchor, its own anchor of that name, or its origin if it has none, goes to the anchor of that name on the doll's bust, the model at the rig's first doll site, an anchor that lies on the part. covers: on a worn shell, what of the doll a consumer stops drawing while it is worn, so skin under the shell never shows through: the doll part it is drawn on, or regions of that part, each drawn on the doll's copy of the part as the GLB primitives whose extras.piece names it. The torso is cut into trunk and shoulders and the foot into ankle and sole; models/dressing.libsonnet, regions, holds the cut. A consumer hides what every shell it wears declares, on the copy each shell is fitted to. soleLift: on footwear, in metres, how far its sole stands the bare foot above the ground, since the sole lies under the foot; a consumer stands a figure that much higher, by the largest lift among what it wears. dependsOn: the packs a pack refers to, which a consumer loads with it. vehicles: each vehicle's title, pack and placements file, which holds its sites, the model id of the part at each site, its position in the vehicle frame, whether it is a mirrored far-side twin and the finish its copy is painted when the part takes paint, a key of finishes; tags: its body's tags with its own added. motions: each set of clips baked for a figure built of several models, its pack, its clips file and its rig file, the bones its clips' frames turn and the site of each model on them. sounds: each sound row, the object and surface it is the sound of, so a consumer picks it by the surface an object lands on, its row as data, which the impact synth renders to the same samples at the same sample rate, and one Ogg Vorbis file per seed, a take of it baked at that rate. credits: from REUSE.toml. renames: every model id an earlier release held and this one does not, mapped to the current id that replaces it, so one lookup moves an id across any number of releases. finishes: every finish a site may name, as the glTF material a paintable surface in that finish carries, which a consumer puts in place of each material the copy marks paintable.",
     packs: Object.fromEntries(Object.entries(packs).sort(([a], [b]) => byText(a, b))),
     models: entries,
+    ...(buildingKits.length === 0
+      ? {}
+      : { buildingKits: [...buildingKits].sort((a, b) => byText(a.id, b.id) || a.revision - b.revision) }),
     vehicles: vehicleEntries,
     motions: motionEntries,
     sounds: soundEntries,

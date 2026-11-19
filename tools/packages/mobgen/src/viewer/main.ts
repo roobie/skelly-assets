@@ -54,7 +54,7 @@ import { QUADRUPED_SEVERABLE_PARTS, quadrupedGaitPose, quadrupedHitPose, quadrup
 import { dogTemplate } from '../mob/quadrupedTemplate.ts';
 import { flinchPose, HIT_FLINCH } from '../mob/reactions.ts';
 import { skeletonTemplate } from '../mob/skeletonTemplate.ts';
-import { walkerClip, walkerFrame } from '../mob/walker/motion.ts';
+import { walkerClip, walkerFrame, walkerGaitFor, walkerStumps } from '../mob/walker/motion.ts';
 import { WALKER_TEMPLATE } from '../mob/walker/plan.ts';
 import { type Actor, buildActor, buildShambler, disposeActor } from './scene.ts';
 
@@ -889,19 +889,30 @@ const applyLeaperFrame = (loaded: Loaded, dt: number): void => {
   applyLookAt(loaded, shown.pose, dt);
 };
 
-/** The walker plays its clips on its own rig: the fire pose over the stomp, or the idle when it stands. */
+/** The walker plays its clips on its own rig: a flinch over the fire pose over its gait, the limp once a
+ * leg is lost from the heel down, or the idle when it stands. */
 const applyWalkerFrame = (loaded: Loaded, dt: number): void => {
   const speed = walkOn.checked ? Number(speedInput.value) : 0;
   advanceWalk(dt, walkOn.checked, speed);
   const fire = walkerClip('fire');
   advanceAttack(dt, fire.seconds);
+  const flinch = walkerClip('flinch');
+  if (hitTime !== undefined) {
+    hitTime += dt;
+    if (hitTime > flinch.seconds) {
+      hitTime = undefined;
+    }
+  }
   const cuts = { cuts: severedCuts };
   let shown: ReturnType<typeof walkerFrame>;
-  if (attackTime !== undefined) {
+  if (hitTime !== undefined) {
+    shown = walkerFrame(loaded.realized, flinch.name, hitTime / flinch.seconds, cuts);
+  } else if (attackTime !== undefined) {
     shown = walkerFrame(loaded.realized, fire.name, attackTime / fire.seconds, cuts);
   } else if (speed > 0) {
-    const stride = walkerClip('stomp').travel!.at(-1)![1];
-    const { pose, ...rest } = walkerFrame(loaded.realized, 'stomp', (gaitDistance / stride) % 1, cuts);
+    const gait = walkerClip(walkerGaitFor(walkerStumps(loaded.realized, severedCuts)));
+    const stride = gait.travel!.at(-1)![1];
+    const { pose, ...rest } = walkerFrame(loaded.realized, gait.name, (gaitDistance / stride) % 1, cuts);
     // The grid carries the travel, so the gait plays in place.
     shown = { ...rest, pose: { ...pose, root: [pose.root[0], pose.root[1], 0] as const } };
   } else {

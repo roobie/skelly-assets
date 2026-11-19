@@ -2,17 +2,28 @@ import { describe, expect, it } from 'vitest';
 import ragdoll from '../../../../models/mobs/walker/ragdoll.json' with { type: 'json' };
 import type { Realized } from '../src/core/generate.ts';
 import { generateValid, planOf } from '../src/core/generate.ts';
-import { applyPoint } from '../src/core/math.ts';
+import { applyPoint, mulMV, sub, type Vec3 } from '../src/core/math.ts';
 import { boneTransforms } from '../src/core/pose.ts';
 import { posedVoxelSurfaceBoundsForBones } from '../src/core/voxelBounds.ts';
 import { severableParts, severedBoneSet } from '../src/mob/dismember.ts';
-import { WALKER_CLIPS, walkerAngles, walkerClip, walkerFrame } from '../src/mob/walker/motion.ts';
+import {
+  WALKER_CLIPS,
+  WALKER_DAMAGE,
+  walkerAngles,
+  walkerClip,
+  walkerFrame,
+  walkerGaitFor,
+  walkerStumps,
+} from '../src/mob/walker/motion.ts';
 import { WALKER_TEMPLATE } from '../src/mob/walker/plan.ts';
 import { sweepGroup } from './sweeps.ts';
 
 const FRAMES = 32;
 const FEET = ['foot.L', 'foot.R'];
+/** A leg lost from the heel down is cut at its foot. */
+const STUMP_CUTS = FEET;
 const UNKNOWN_CLIP = /unknown walker clip/;
+const ONE_STUMP = /keyed for one stump/;
 /** A planted foot holds its place to within a millimetre. */
 const PLANTED = 1e-3;
 
@@ -27,28 +38,65 @@ const walker = searched(0).realized;
 const { bones } = walker.body;
 const regions = planOf('walker').regionBones!;
 
-const frames = (realized: Realized, clip: string) =>
-  Array.from({ length: FRAMES + 1 }, (_, i) => ({ u: i / FRAMES, ...walkerFrame(realized, clip, i / FRAMES) }));
+/** A clip played on a body it is keyed for: a clip keyed for a stump plays on either leg lost from the heel
+ * down, every other clip on the whole body. */
+interface Played {
+  readonly clip: string;
+  readonly cuts: readonly string[];
+}
+const PLAYED: readonly Played[] = WALKER_CLIPS.flatMap((clip) =>
+  walkerClip(clip).stump ? STUMP_CUTS.map((cut) => ({ clip, cuts: [cut] })) : [{ clip, cuts: [] }],
+);
+const named = ({ clip, cuts }: Played) => (cuts.length ? `${clip} without ${cuts.join(', ')}` : clip);
 
-/** Every clip stands on the feet: the lowest voxel of each frame belongs to a foot. */
+const frames = (realized: Realized, { clip, cuts }: Played) =>
+  Array.from({ length: FRAMES + 1 }, (_, i) => ({
+    u: i / FRAMES,
+    ...walkerFrame(realized, clip, i / FRAMES, { cuts }),
+  }));
+
+/** The bones a body may stand on: its feet, or the tarsus a lost foot leaves as a stump. */
+const supportsOf = (cuts: readonly string[]) =>
+  FEET.map((foot) => (cuts.includes(foot) ? foot.replace('foot', 'tarsus') : foot));
+const visibleOf = (realized: Realized, cuts: readonly string[]) => {
+  const hidden = severedBoneSet(realized.body.bones, cuts);
+  return realized.body.bones.map((bone) => bone.id).filter((id) => !hidden.has(id));
+};
+
+/** Every clip stands on what its body keeps: the lowest voxel of each frame belongs to a foot or a stump. */
 const restFailures = (realized: Realized): string[] =>
-  WALKER_CLIPS.flatMap((clip) =>
-    frames(realized, clip).flatMap(({ u, pose }) => {
-      const ids = realized.body.bones.map((bone) => bone.id);
-      const [lowest] = [...posedVoxelSurfaceBoundsForBones(realized, pose, ids)].reduce((low, entry) =>
-        entry[1] < low[1] ? entry : low,
-      );
-      return FEET.includes(lowest) ? [] : [`${clip} at ${u.toFixed(3)} rests on ${lowest}`];
+  PLAYED.flatMap((played) =>
+    frames(realized, played).flatMap(({ u, pose }) => {
+      const bounds = posedVoxelSurfaceBoundsForBones(realized, pose, visibleOf(realized, played.cuts));
+      const [lowest] = [...bounds].reduce((low, entry) => (entry[1] < low[1] ? entry : low));
+      return supportsOf(played.cuts).includes(lowest) ? [] : [`${named(played)} at ${u.toFixed(3)} rests on ${lowest}`];
     }),
   );
 
-/** Where each foot's ball is in the world, frame by frame, through the stomp with its travel applied. */
-const ballTrack = (realized: Realized, foot: string) => {
-  const bone = realized.body.bones.find((candidate) => candidate.id === foot)!;
-  return frames(realized, 'stomp').map(({ pose }) =>
-    applyPoint(boneTransforms(realized.body.bones, pose).get(foot)!, bone.head),
+/** Where a bone's end is in the world, frame by frame, with the clip's travel applied. */
+const pointTrack = (realized: Realized, played: Played, id: string, end: 'head' | 'tail') => {
+  const bone = realized.body.bones.find((candidate) => candidate.id === id)!;
+  return frames(realized, played).map(({ pose }) =>
+    applyPoint(boneTransforms(realized.body.bones, pose).get(id)!, bone[end]),
   );
 };
+
+/** A support is planted while its point is at its lowest; a planted support that moves across the ground
+ * slides. Returns the planted frames and the slides. */
+const planting = (track: readonly Vec3[]) => {
+  const ground = Math.min(...track.map(([, y]) => y));
+  const planted = track.map(([, y]) => y - ground < PLANTED);
+  const slid = (i: number) => {
+    const [x, , z] = sub(track[i]!, track[i - 1]!);
+    return Math.hypot(x, z) > PLANTED;
+  };
+  const slides = track.flatMap((_, i) => (i > 0 && planted[i] && planted[i - 1] && slid(i) ? [i] : []));
+  return { planted, slides };
+};
+
+/** Each support's planted point: a foot's ball, or the stump's end where the ball was. */
+const contactPoints = (cuts: readonly string[]) =>
+  supportsOf(cuts).map((id) => ({ id, end: id.startsWith('foot') ? ('head' as const) : ('tail' as const) }));
 
 describe('walker body', () => {
   it('validates at the template grid', () => {
@@ -60,15 +108,16 @@ describe('walker body', () => {
     expect(owners.map((owner) => owner.length)).toEqual(bones.map(() => 1));
   });
 
-  it('cuts only at limb roots and the head, each cut staying inside its region, never the hull', () => {
+  it('cuts at limb roots, the head and the feet, each cut staying inside its region, never the hull', () => {
     const parts = severableParts(bones);
-    expect(parts.length).toBeGreaterThan(0);
+    const roots = parts.filter((part) => bones.find((bone) => bone.id === part)!.parent === 'hull');
+    expect(parts.filter((part) => !roots.includes(part)).toSorted()).toEqual(STUMP_CUTS.toSorted());
+    expect(roots.length).toBeGreaterThan(0);
     for (const part of parts) {
-      expect(bones.find((bone) => bone.id === part)!.parent).toBe('hull');
       const region = Object.values(regions).find((members) => members.includes(part))!;
       expect([...severedBoneSet(bones, [part])].every((id) => region.includes(id))).toBe(true);
     }
-    expect(severedBoneSet(bones, parts).size).toBe(bones.length - regions.torso.length);
+    expect(severedBoneSet(bones, roots).size).toBe(bones.length - regions.torso.length);
   });
 
   it('gives the corpse solver ragdoll groups holding every bone exactly once', () => {
@@ -85,12 +134,15 @@ describe('walker motion', () => {
   it('keeps every clip, solved legs included, inside the rig joint ranges', () => {
     const inside = (value: number, [lo, hi]: readonly [number, number]) => value >= lo - 1e-9 && value <= hi + 1e-9;
     const outside: string[] = [];
-    for (const clip of WALKER_CLIPS) {
+    for (const played of PLAYED) {
+      const stumps = walkerStumps(walker, played.cuts);
       for (let i = 0; i <= FRAMES; i++) {
-        for (const [id, [flex, twist, abduct]] of Object.entries(walkerAngles(bones, clip, i / FRAMES))) {
+        for (const [id, [flex, twist, abduct]] of Object.entries(
+          walkerAngles(bones, played.clip, i / FRAMES, stumps),
+        )) {
           const limits = bones.find((bone) => bone.id === id)!.limits!;
           if (!(inside(flex, limits.flex) && inside(twist, limits.twist) && inside(abduct, limits.abduct))) {
-            outside.push(`${clip} ${id} at ${(i / FRAMES).toFixed(3)}`);
+            outside.push(`${named(played)} ${id} at ${(i / FRAMES).toFixed(3)}`);
           }
         }
       }
@@ -98,23 +150,72 @@ describe('walker motion', () => {
     expect(outside).toEqual([]);
   });
 
-  it('plants each foot while it carries the stomp, so a foot on the ground never slides', () => {
-    for (const foot of FEET) {
-      const track = ballTrack(walker, foot);
-      const ground = Math.min(...track.map(([, y]) => y));
-      const planted = track.map(([, y]) => y - ground < PLANTED);
-      const slides = track.flatMap((at, i) =>
-        i > 0 &&
-        planted[i] &&
-        planted[i - 1] &&
-        Math.hypot(at[0] - track[i - 1]![0], at[2] - track[i - 1]![2]) > PLANTED
-          ? [`${foot} slides at frame ${i}`]
-          : [],
-      );
-      expect(slides).toEqual([]);
-      // Not vacuous: the foot both stands for a stretch and travels with the body over the cycle.
-      expect(planted.filter(Boolean).length).toBeGreaterThan(FRAMES / 4);
-      expect(Math.abs(track.at(-1)![2] - track[0]![2])).toBeGreaterThan(0.5);
+  it('plants each foot and stump while it carries a walk, so nothing on the ground slides', () => {
+    for (const played of PLAYED.filter(({ clip }) => walkerClip(clip).travel)) {
+      for (const { id, end } of contactPoints(played.cuts)) {
+        const track = pointTrack(walker, played, id, end);
+        const { planted, slides } = planting(track);
+        expect(slides, `${named(played)}: ${id} slides`).toEqual([]);
+        // Not vacuous: each support both stands for a stretch and travels with the body over the cycle.
+        expect(planted.filter(Boolean).length, `${named(played)}: ${id} stands`).toBeGreaterThan(FRAMES / 4);
+        expect(Math.abs(track.at(-1)![2] - track[0]![2])).toBeGreaterThan(0.5);
+      }
+    }
+  });
+
+  it('sets a stump down on the ground where its heel stood', () => {
+    const voxel = walker.voxels.size;
+    for (const cut of STUMP_CUTS) {
+      const tarsus = cut.replace('foot', 'tarsus');
+      const limp = { clip: 'limp', cuts: [cut] };
+      const track = pointTrack(walker, limp, tarsus, 'tail');
+      const { planted } = planting(track);
+      // Wherever the stump is planted, its lowest voxel bears on the ground.
+      frames(walker, limp).forEach(({ pose }, i) => {
+        if (planted[i]) {
+          const low = posedVoxelSurfaceBoundsForBones(walker, pose, [tarsus]).get(tarsus)!;
+          expect(Math.abs(low), `${cut} stump at frame ${i}`).toBeLessThan(voxel / 2);
+        }
+      });
+      // Standing, the stump's end is over the place its heel held on the whole body, and its lowest voxel is on the ground.
+      const stood = walkerFrame(walker, 'idle', 0, { cuts: [cut] }).pose;
+      const whole = walkerFrame(walker, 'idle', 0).pose;
+      const end = (pose: typeof stood) =>
+        applyPoint(boneTransforms(bones, pose).get(tarsus)!, bones.find((bone) => bone.id === tarsus)!.tail);
+      expect(Math.abs(end(stood)[2] - end(whole)[2])).toBeLessThan(PLANTED);
+      expect(Math.abs(posedVoxelSurfaceBoundsForBones(walker, stood, [tarsus]).get(tarsus)!)).toBeLessThan(voxel / 2);
+    }
+  });
+
+  it('walks a body that lost one foot on the limp, and a whole one on the stomp', () => {
+    expect(walkerGaitFor(walkerStumps(walker, []))).toBe('stomp');
+    for (const cut of STUMP_CUTS) {
+      expect(walkerGaitFor(walkerStumps(walker, [cut]))).toBe('limp');
+    }
+  });
+
+  it('refuses to play the limp on a body without exactly one stump', () => {
+    expect(() => walkerFrame(walker, 'limp', 0)).toThrow(ONE_STUMP);
+    expect(() => walkerFrame(walker, 'limp', 0, { cuts: STUMP_CUTS })).toThrow(ONE_STUMP);
+  });
+
+  it('tilts the hull by a flinch inside its content band, the feet standing where they stood', () => {
+    const flinch = { clip: 'flinch', cuts: [] };
+    const hull = bones.find((bone) => bone.id === 'hull')!;
+    const along = sub(hull.tail, hull.head);
+    // The hull's pitch in the world, from how far its line turns out of the ground plane's level.
+    const pitches = frames(walker, flinch).map(({ pose }) => {
+      const turned = mulMV(boneTransforms(bones, pose).get('hull')!.r, along);
+      const rise = ([x, y, z]: Vec3) => Math.atan2(y, Math.hypot(x, z));
+      return Math.abs(rise(turned) - rise(along));
+    });
+    const tilt = (Math.max(...pitches) * 180) / Math.PI;
+    expect(tilt).toBeGreaterThanOrEqual(WALKER_DAMAGE.tiltBounds.min);
+    expect(tilt).toBeLessThanOrEqual(WALKER_DAMAGE.tiltBounds.max);
+    for (const { id, end } of contactPoints([])) {
+      const track = pointTrack(walker, flinch, id, end);
+      const moved = Math.max(...track.map((at) => Math.hypot(...sub(at, track[0]!))));
+      expect(moved, id).toBeLessThan(PLANTED);
     }
   });
 

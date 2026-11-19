@@ -165,6 +165,11 @@ test('an open look is a look of its own, so its rows never mix with the closed o
   assert.notEqual(lookName({ open: true }), lookName());
 });
 
+test('a smooth look is a look of its own, so its rows never mix with the voxel ones', () => {
+  assert.notEqual(lookName({ smooth: true }), lookName());
+  assert.notEqual(lookName({ smooth: true }), lookName({ open: true }));
+});
+
 test('a look keeps only the sites it names by prefix, under an id of its own, and refuses one it cannot keep', () => {
   const van = {
     id: 'fixture_van',

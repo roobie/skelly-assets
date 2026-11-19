@@ -10,7 +10,8 @@
 // built/manifest.json over them,
 // the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files), with each pack's
 // dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
-// rows, from the roster source or a recipe file, with no pack index, placements or manifest, so one model builds
+// rows, from the roster source or a recipe file, with no pack index, placements or manifest; referenced building-kit
+// definitions still accompany their sidecars, so one model builds
 // without the rest. Each model is written into --out (by default built/)
 // at its pack's path (tools/layout.mjs, outputPath), with its sidecar; a roster-source id outside the roster is written
 // flat, as its GLB alone, for comparison builds into a scratch folder. Needs the node in .node-version, which runs the TypeScript directly, and
@@ -26,6 +27,7 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { exportBuildingKits } from './buildingKits.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
 import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { entryFolder } from './entryFolder.mjs';
@@ -333,20 +335,23 @@ async function writePack(out, packId, tool, generated, { index }) {
     smoothBase: base(smooth),
   });
   return {
-    models: written.models.map(({ id, kind, path, partNodes, label, paintable, covers, soleLift, physical }) => ({
-      id,
-      kind,
-      pack: packId,
-      path,
-      smooth: { pack: smooth, path },
-      nodes: partNodes,
-      label,
-      paintable,
-      covers,
-      soleLift,
-      massKg: physical?.massKg,
-      volumeM3: physical?.volumeM3,
-    })),
+    models: written.models.map(
+      ({ id, kind, path, partNodes, label, paintable, covers, soleLift, building, physical }) => ({
+        id,
+        kind,
+        pack: packId,
+        path,
+        smooth: { pack: smooth, path },
+        nodes: partNodes,
+        label,
+        paintable,
+        covers,
+        soleLift,
+        ...(building === undefined ? {} : { building }),
+        massKg: physical?.massKg,
+        volumeM3: physical?.volumeM3,
+      }),
+    ),
     files: [
       ...written.files.map((file) => outputPath(packId, file)),
       ...written.smoothFiles.map((file) => outputPath(smooth, file)),
@@ -583,6 +588,12 @@ async function main() {
       failed = true;
     }
     for (const file of recipes.files) console.log(`built ${file}`);
+    const kits = exportBuildingKits({
+      models: [...built.models, ...recipes.models],
+      out,
+      complete: positionals.length === 0,
+    });
+    for (const file of kits.files) console.log(`built ${file}`);
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
@@ -617,6 +628,7 @@ async function main() {
       const files = [
         ...built.files,
         ...recipes.files,
+        ...kits.files,
         ...mobs.files,
         ...sounds.files,
         ...placed.files,
@@ -627,6 +639,7 @@ async function main() {
       if (dangling.length > 0) throw new Error(dangling.join('\n'));
       const manifest = buildManifest({
         models,
+        buildingKits: kits.buildingKits,
         vehicles: placed.vehicles,
         motions: [...wields.motions, ...locomotion.motions],
         sounds: sounds.sounds,

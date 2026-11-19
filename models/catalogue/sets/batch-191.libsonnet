@@ -98,13 +98,6 @@ local buletteOutline = [[-0.42, -0.1], [-0.3, -0.27], [0.0, -0.32], [0.3, -0.27]
     for i in [0, 1, 2]
   ], { bark: 'bark', heart: 'wood-pine', rune: 'gem-aquamarine' }) + { title: 'Rune-carved branch' } + h.gripOn('rune_carved_branch', 'branch') + { voxelGrain: 0.004 } + { taxonomy: { category: 'materials', tags: { material: ['wood'], setting: ['fantasy'] } } },
 
-  // A corked glass vial 64 mm tall and 26 mm across, two thirds full of a pale green powder that glows.
-  h.compound('glow_dust', 0.035, [
-    h.turned('vial', 'glass', 'y', [[0, 0], [0, 0.013], [0.05, 0.013], [0.054, 0.009], [0.056, 0.009], [0.056, 0]], [0, 0, 0]),
-    h.disc('powder', 'dust', 0.0132, 0.002, 0.034),
-    h.turned('cork', 'cork', 'y', [[0, 0], [0, 0.0085], [0.012, 0.0095], [0.012, 0]], [0, 0.052, 0]),
-  ], { glass: 'glass-clear', dust: 'gem-peridot', cork: 'cork' }) + { title: 'Glow dust' } + h.inHand('glow_dust', 'vial') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['glass'], setting: ['fantasy'] } } },
-
   // A brass-footed glass globe 120 mm tall and 84 mm across with a glowing ball inside, its domed brass cover swung
   // back on a rear hinge.
   h.compound('glow_light', 0.52, lampBody + [

@@ -21,6 +21,7 @@ import {
   tuple,
   variant,
 } from 'valibot';
+import { BuildingReaderSchema } from './building.ts';
 import { ModelPointSchema } from './modelPoint.ts';
 
 export { ModelPointSchema };
@@ -170,6 +171,41 @@ export const MotionSchema = pipe(
   ),
 );
 
+/** A stowage port's frame: its origin, x along its normal, y along its up and z = normal × up. */
+const StowageFrameSchema = pipe(
+  strictObject({ position: ModelPointSchema, normal: UnitVectorSchema, up: UnitVectorSchema }),
+  check(({ normal, up }) => Math.abs(dotOf(normal, up)) <= 1e-6, 'stowage frame up must be across its normal'),
+);
+
+/**
+ * The model's stowage ports, in the model frame and metres; why they are slots and seats is in
+ * `docs/decisions/0017-stowage-slots.md`. A slot is named by its port id alone, as a vehicle site's load-out names
+ * it; whatever is stowed in it stays inside its envelope, given in its frame, and is seated by a word it accepts. A
+ * seat is how an item stows: its `standard` is its word, and it meets a slot's frame as ports mate.
+ */
+const StowageSchema = pipe(
+  strictObject({
+    slots: optional(
+      pipe(
+        array(
+          strictObject({
+            id: Id,
+            accepts: pipe(array(Name), nonEmpty('accepts no word')),
+            envelope: ModelBoxSchema,
+            frame: StowageFrameSchema,
+          }),
+        ),
+        nonEmpty('lists no slot'),
+        check((slots) => new Set(slots.map(({ id }) => id)).size === slots.length, 'two slots of one id'),
+      ),
+    ),
+    seats: optional(
+      pipe(array(strictObject({ standard: Name, frame: StowageFrameSchema })), nonEmpty('lists no seat')),
+    ),
+  }),
+  check(({ slots, seats }) => slots !== undefined || seats !== undefined, 'stowage has no slot or seat'),
+);
+
 export const NeutralModelSchema = strictObject({
   id: Id,
   file: pipe(string(), regex(/^assets\/models\/[a-z0-9_-]+\.glb$/, 'expected "assets/models/<name>.glb"')),
@@ -212,8 +248,12 @@ export const NeutralModelSchema = strictObject({
   /** Degrees about +z, the working end, applied to the model before its grip turn. */
   roll: optional(pipe(number(), finite(), minValue(-180), maxValue(180))),
   anchors: optional(record(Id, ModelPointSchema)),
+  /** Optional assembly semantics: unknown/invalid blocks disable assembly, not rendering. Producers validate strictly. */
+  building: optional(BuildingReaderSchema),
   /** How the part moves on whatever carries it, the same wherever it is placed. */
   motion: optional(MotionSchema),
+  /** What the model holds and how it is held, beside the GLB's port nodes so a consumer need not read the file. */
+  stowage: optional(StowageSchema),
   /** The screen of an item that shows something. */
   display: optional(
     pipe(
@@ -247,5 +287,6 @@ export type NeutralModel = DeepReadonly<InferOutput<typeof NeutralModelSchema>>;
 export type ModelParts = NonNullable<NeutralModel['parts']>;
 export type ModelBox = DeepReadonly<InferOutput<typeof ModelBoxSchema>>;
 export type Motion = DeepReadonly<InferOutput<typeof MotionSchema>>;
+export type Stowage = DeepReadonly<InferOutput<typeof StowageSchema>>;
 export type MotionStage = Motion[number];
 export type HingeAxis = Extract<MotionStage, { kind: 'hinge' }>['axis'];

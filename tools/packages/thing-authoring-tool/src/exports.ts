@@ -3,11 +3,13 @@ import type { VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
 import { exportModelGlbs, paintMaterials } from '@skelly/thing-export/glb.ts';
 import { assemblyProperties, drawnVolumeM3, modelParts } from '@skelly/thing-export/physical.ts';
 import { loadRecipe, type RecipeRow, recipeAsset, recipeOptions, recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import { modelStowage } from '@skelly/thing-export/stowage.ts';
 import { literal, optional, parse, picklist, strictObject } from 'valibot';
 import {
   buildItem,
   type Catalogue,
   type CatalogueSettings,
+  itemBuilding,
   itemMotion,
   itemPalette,
   type ToolItem,
@@ -49,6 +51,7 @@ export const exportItem = (
   voxel: VoxelGrains,
   { collision = false, density }: { readonly collision?: boolean; readonly density?: DensityBounds | undefined } = {},
 ) => {
+  const building = itemBuilding(item, settings);
   const built = buildItem(item, settings, voxel);
   const { report, masses, handling, label, drawn, glow, paintable } = built;
   if (density) {
@@ -88,15 +91,18 @@ export const exportItem = (
     throw new Error(`${item.id}: baked collision travels with exported parts`);
   }
   const motion = itemMotion(item, settings, built, voxel.voxelGrain);
+  const stowage = modelStowage(out.ports, settings.units.metresPerUnit);
   return {
     glb: out.glb,
     smoothGlb: out.smoothGlb,
     partNodes: out.partNodes,
     modelEntry: {
       ...asset,
+      ...(building ? { building } : {}),
       ...(item.exportMass === 'parts' ? { parts } : {}),
       ...handling,
       ...(motion ? { motion } : {}),
+      ...(stowage ? { stowage } : {}),
       ...(glow ? { emissiveMaterial: glow } : {}),
       ...(paintable.length > 0 ? { paintable } : {}),
       ...(item.covers ? { covers: item.covers } : {}),

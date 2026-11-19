@@ -112,18 +112,6 @@ local flatCarton(length, width, height, thickness, crease) =
   ], { bottle: 'plastic-clear-blue', label: 'plastic-blue', cap: 'plastic-white' }) + { title: 'Plastic bottle' }
   + h.inHand('plastic_bottle', 'bottle') + { voxelGrain: 0.004 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'] } } },
 
-  // An empty pharmacy prescription bottle, 50 mm across and 104 mm tall, amber with a white paper label
-  // and a wide white ribbed push-and-turn cap.
-  h.compound('pill_bottle', 0.015, [
-    turned('bottle', 'bottle', 'y', [[0, 0], [0, 0.022], [0.002, 0.024], [0.086, 0.024], [0.086, 0]]),
-    turned('label', 'label', 'y', [[0, 0], [0, 0.0244], [0.05, 0.0244], [0.05, 0]], [0, 0.016, 0]),
-    turned('cap', 'cap', 'y', [[0, 0], [0, 0.026], [0.016, 0.026], [0.018, 0.024], [0.018, 0]], [0, 0.086, 0]),
-  ] + [
-    box('grip-%d' % i, 'cap', [0.0255 * std.cos(i * std.pi / 6) - 0.0015, 0.088, 0.0255 * std.sin(i * std.pi / 6) - 0.0015], [0.0255 * std.cos(i * std.pi / 6) + 0.0015, 0.102, 0.0255 * std.sin(i * std.pi / 6) + 0.0015])
-    for i in std.range(0, 11)
-  ], { bottle: 'plastic-amber', label: 'paper-white', cap: 'plastic-white' }) + { title: 'Pill bottle' }
-  + h.inHand('pill_bottle', 'bottle') + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['plastic'], setting: ['modern'], state: ['empty'] } } },
-
   // A knocked-down large shipping carton lying flat, 1.5 m by 1.2 m and 10 mm thick: an 800 by 700 by
   // 500 mm box with its flaps above and below the panels and a glue tab at one end.
   h.compound('flattened_large_box', 3.7, flatCarton(0.8, 0.7, 0.5, 0.01, 0.01), { board: 'paperboard-tan', crease: 'paperboard-brown' }) + { title: 'Flattened large box' } + { taxonomy: { category: 'containers', tags: { material: ['paper'], setting: ['modern'], state: ['folded'] } } },

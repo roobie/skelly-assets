@@ -1,30 +1,10 @@
 // Revolve profiles (axial, radius) in millimetres, derived from sourced metallic-cartridge data.
-// Unspecified internal construction is explicit here as a named modelling assumption.
+// What the data does not give, the round's modelling assumptions do; see roundShape.ts.
 
 import type { Measure, MetallicCartridge } from './cartridge.ts';
+import { type PrimerShape, type RoundShape, roundShape } from './roundShape.ts';
 
 type ProfilePoint = readonly [axialMm: number, radiusMm: number];
-
-/** C.I.P. 7.62x39 base-edge chamfer f; the data file records it in its notes, not as a field. */
-const CASE_BASE_CHAMFER_MM = 0.25;
-/** Modelling assumption: a large-rifle primer is about 5.4 mm across; cartridge data has no diameter. */
-const PRIMER_DIAMETER_MM = 5.4;
-/** Modelling assumption: primer-pocket depth and the rear of the pocket floor. */
-const PRIMER_POCKET_DEPTH_MM = 0.4;
-/** Modelling assumption: primer face sits below the case head. */
-const PRIMER_RECESS_MM = 0.1;
-/** Modelling assumption: radial clearance between primer and pocket wall. */
-const PRIMER_CLEARANCE_MM = 0.05;
-/** Modelling assumption: uniform fired-case wall thickness; the source data gives no wall thickness. */
-export const CASE_WALL_MM = 0.4;
-/** Modelling assumption: inside floor depth of the open fired case. */
-const FIRED_FLOOR_MM = 3;
-/** Modelling assumption: tangent-ogive length in calibres; source data gives no projectile profile. */
-const OGIVE_LENGTH_CALIBRES = 1.2;
-/** Modelling assumption used only when source bullet length is null: seated depth in calibres. */
-export const ASSUMED_BULLET_SEATING_DEPTH_CALIBRES = 1.5;
-/** Number of linear segments used to represent the ogive. */
-const OGIVE_SEGMENTS = 8;
 
 export interface RoundProfiles {
   /** Case closed around its seated projectile. */
@@ -32,6 +12,8 @@ export interface RoundProfiles {
   /** Open fired case with a visible wall and closed internal floor. */
   readonly firedCase: readonly ProfilePoint[];
   readonly bullet: readonly ProfilePoint[];
+  /** The projectile's driving band, on a round whose shape gives it one. */
+  readonly band?: readonly ProfilePoint[];
   readonly primer: readonly ProfilePoint[];
 }
 
@@ -43,15 +25,15 @@ const required = (measure: Measure, label: string): number => {
 };
 
 /** Sourced outer case outline, from the head face toward the mouth. */
-const caseOutline = (cartridge: MetallicCartridge): ProfilePoint[] => {
+const caseOutline = (cartridge: MetallicCartridge, baseChamfer: number): ProfilePoint[] => {
   const cartridgeCase = cartridge.case;
   const rimRadius = required(cartridgeCase.rim.diameter, 'rim diameter') / 2;
   const rimThickness = required(cartridgeCase.rim.thickness, 'rim thickness');
   const bodyRadius = required(cartridgeCase.body.diameterAtHead, 'body diameter at head') / 2;
   const length = required(cartridgeCase.length, 'case length');
   const head: ProfilePoint[] = [
-    [0, rimRadius - CASE_BASE_CHAMFER_MM],
-    [CASE_BASE_CHAMFER_MM, rimRadius],
+    [0, rimRadius - baseChamfer],
+    [baseChamfer, rimRadius],
     [rimThickness, rimRadius],
   ];
   if (cartridgeCase.head.type === 'rimless') {
@@ -92,52 +74,70 @@ const radiusAt = (outline: readonly ProfilePoint[], axial: number): number => {
   throw new Error(`no case wall at axial position ${axial} mm`);
 };
 
-const primerRadius = PRIMER_DIAMETER_MM / 2;
-const pocketRadius = primerRadius + PRIMER_CLEARANCE_MM;
-
-/** Primer pocket floor, pocket wall, head face, then the external outline. */
-const caseBase = (outline: readonly ProfilePoint[]): ProfilePoint[] => [
-  [PRIMER_POCKET_DEPTH_MM, 0],
-  [PRIMER_POCKET_DEPTH_MM, pocketRadius],
-  [0, pocketRadius],
-  ...outline,
-];
-
-const loadedCaseProfile = (outline: readonly ProfilePoint[], mouth: number): ProfilePoint[] => [
-  ...caseBase(outline),
-  [mouth, 0],
-];
-
-const firedCaseProfile = (outline: readonly ProfilePoint[], mouth: number): ProfilePoint[] => {
-  const [, mouthRadius] = outline.at(-1)!;
-  const inner = outline
-    .filter(([axial]) => axial > FIRED_FLOOR_MM)
-    .map(([axial, radius]): ProfilePoint => [axial, Math.max(radius - CASE_WALL_MM, 0)])
-    .reverse();
-  const floorRadius = radiusAt(outline, FIRED_FLOOR_MM) - CASE_WALL_MM;
+/** A head's primer pocket, from its floor on the axis out to the head face: where a head profile starts. */
+export const primerPocket = (primer: PrimerShape): ProfilePoint[] => {
+  const pocketRadius = primer.diameter / 2 + primer.clearance;
   return [
-    ...caseBase(outline),
-    [mouth, mouthRadius - CASE_WALL_MM],
-    ...inner.slice(1),
-    [FIRED_FLOOR_MM, floorRadius],
-    [FIRED_FLOOR_MM, 0],
+    [primer.pocketDepth, 0],
+    [primer.pocketDepth, pocketRadius],
+    [0, pocketRadius],
   ];
 };
 
-/** Tangent-ogive points between a cylindrical projectile section and its tip. */
-const ogive = (start: number, tip: number, radius: number): ProfilePoint[] => {
-  const length = tip - start;
-  const circleRadius = (radius * radius + length * length) / (2 * radius);
-  const maximumAngle = Math.asin(length / circleRadius);
-  const points: ProfilePoint[] = [];
-  for (let step = 1; step < OGIVE_SEGMENTS; step++) {
-    const angle = (maximumAngle * step) / OGIVE_SEGMENTS;
-    points.push([start + circleRadius * Math.sin(angle), circleRadius * Math.cos(angle) + radius - circleRadius]);
-  }
-  return points;
+/** Primer pocket, then the external outline. */
+const caseBase = (outline: readonly ProfilePoint[], primer: PrimerShape): ProfilePoint[] => [
+  ...primerPocket(primer),
+  ...outline,
+];
+
+const loadedCaseProfile = (outline: readonly ProfilePoint[], mouth: number, shape: RoundShape): ProfilePoint[] => [
+  ...caseBase(outline, shape.primer),
+  [mouth, 0],
+];
+
+const firedCaseProfile = (outline: readonly ProfilePoint[], mouth: number, shape: RoundShape): ProfilePoint[] => {
+  const { wall, firedFloor } = shape.case;
+  const [, mouthRadius] = outline.at(-1)!;
+  const inner = outline
+    .filter(([axial]) => axial > firedFloor)
+    .map(([axial, radius]): ProfilePoint => [axial, Math.max(radius - wall, 0)])
+    .reverse();
+  const floorRadius = radiusAt(outline, firedFloor) - wall;
+  return [
+    ...caseBase(outline, shape.primer),
+    [mouth, mouthRadius - wall],
+    ...inner.slice(1),
+    [firedFloor, floorRadius],
+    [firedFloor, 0],
+  ];
 };
 
-const bulletProfile = (cartridge: MetallicCartridge): ProfilePoint[] => {
+/**
+ * Tangent-ogive points after a cylindrical section of `radius` ending at `start`, up to the nose of `noseRadius` at
+ * `tip`: an arc whose centre lies on the radius through `start`, so it leaves the body without a crease.
+ */
+const ogive = (start: number, tip: number, radius: number, noseRadius: number, segments: number): ProfilePoint[] => {
+  const length = tip - start;
+  const fall = radius - noseRadius;
+  const circleRadius = (fall * fall + length * length) / (2 * fall);
+  const maximumAngle = Math.asin(length / circleRadius);
+  const points: ProfilePoint[] = [];
+  for (let step = 1; step < segments; step++) {
+    const angle = (maximumAngle * step) / segments;
+    points.push([start + circleRadius * Math.sin(angle), circleRadius * Math.cos(angle) + radius - circleRadius]);
+  }
+  return [...points, [tip, noseRadius]];
+};
+
+/** Where the projectile sits: its base, the start of its ogive and its tip. */
+interface ProjectileStations {
+  readonly radius: number;
+  readonly base: number;
+  readonly ogiveStart: number;
+  readonly tip: number;
+}
+
+const projectileStations = (cartridge: MetallicCartridge, projectile: RoundShape['projectile']): ProjectileStations => {
   const radius = required(cartridge.payload.diameter, 'bullet diameter') / 2;
   const tip = required(
     cartridge.overallLength.typical.value === null ? cartridge.overallLength.max : cartridge.overallLength.typical,
@@ -145,36 +145,102 @@ const bulletProfile = (cartridge: MetallicCartridge): ProfilePoint[] => {
   );
   const caseLength = required(cartridge.case.length, 'case length');
   const sourcedLength = cartridge.payload.length.min.value;
-  const bulletLength = sourcedLength ?? tip - caseLength + ASSUMED_BULLET_SEATING_DEPTH_CALIBRES * radius * 2;
-  const base = tip - bulletLength;
-  const ogiveStart = tip - OGIVE_LENGTH_CALIBRES * radius * 2;
-  return [[base, 0], [base, radius], [ogiveStart, radius], ...ogive(ogiveStart, tip, radius), [tip, 0]];
+  const bulletLength = sourcedLength ?? tip - caseLength + projectile.seatingCalibres * radius * 2;
+  return { radius, base: tip - bulletLength, ogiveStart: tip - projectile.ogive.calibres * radius * 2, tip };
 };
 
-const primerProfile = (): ProfilePoint[] => {
-  const chamfer = 0.2;
-  const face = PRIMER_RECESS_MM;
+const bulletProfile = (stations: ProjectileStations, ogiveShape: RoundShape['projectile']['ogive']): ProfilePoint[] => {
+  const { radius, base, ogiveStart, tip } = stations;
+  const noseRadius = ogiveShape.meplatCalibres * radius;
+  if (noseRadius >= radius) {
+    throw new Error('projectile meplat is as wide as its body');
+  }
   return [
-    [face, 0],
-    [face, primerRadius - chamfer],
-    [face + chamfer, primerRadius],
-    [PRIMER_POCKET_DEPTH_MM, primerRadius],
-    [PRIMER_POCKET_DEPTH_MM, 0],
+    [base, 0],
+    [base, radius],
+    [ogiveStart, radius],
+    ...ogive(ogiveStart, tip, radius, noseRadius, ogiveShape.segments),
+    ...(noseRadius > 0 ? [[tip, 0] as const] : []),
   ];
 };
 
-/** Build sourced outer profiles plus clearly named internal/projectile assumptions, all in millimetres. */
-export const roundProfiles = (cartridge: MetallicCartridge): RoundProfiles => {
-  const outline = caseOutline(cartridge);
+/** A ring standing proud of the projectile body ahead of the case mouth, its inside on the body. */
+const bandProfile = (
+  stations: ProjectileStations,
+  mouth: number,
+  band: NonNullable<RoundShape['projectile']['band']>,
+): ProfilePoint[] => {
+  const outer = band.diameter / 2;
+  const rear = mouth + band.fromMouth;
+  const front = rear + band.width;
+  if (outer <= stations.radius) {
+    throw new Error('driving band is no wider than the projectile body');
+  }
+  if (front > stations.ogiveStart) {
+    throw new Error('driving band runs onto the ogive');
+  }
+  return [
+    [rear, stations.radius],
+    [rear, outer],
+    [front, outer],
+    [front, stations.radius],
+    [rear, stations.radius],
+  ];
+};
+
+/**
+ * The primer seated in its pocket, its face `recess` below the head face. A cupped primer sinks its cup into that
+ * face, leaving the ring around it standing, so the primer reads as a cup in a ring rather than a flat disc.
+ */
+export const primerProfile = (primer: PrimerShape): ProfilePoint[] => {
+  const radius = primer.diameter / 2;
+  const { recess: face, chamfer, pocketDepth, cup } = primer;
+  if (face + chamfer >= pocketDepth) {
+    throw new Error('primer face and chamfer leave it no depth in its pocket');
+  }
+  const centre: ProfilePoint[] = [];
+  if (cup !== null) {
+    if (cup.diameter / 2 >= radius - chamfer) {
+      throw new Error('primer cup leaves no ring around it');
+    }
+    if (face + cup.depth >= pocketDepth) {
+      throw new Error('primer cup is as deep as its pocket');
+    }
+    centre.push([face + cup.depth, 0], [face + cup.depth, cup.diameter / 2], [face, cup.diameter / 2]);
+  } else {
+    centre.push([face, 0]);
+  }
+  return [...centre, [face, radius - chamfer], [face + chamfer, radius], [pocketDepth, radius], [pocketDepth, 0]];
+};
+
+/** Build sourced outer profiles plus the round's modelling assumptions, all in millimetres. */
+export const roundProfiles = (
+  cartridge: MetallicCartridge,
+  shape: RoundShape = roundShape(cartridge.id),
+): RoundProfiles => {
+  const outline = caseOutline(cartridge, shape.case.baseChamfer);
   const [mouth, mouthRadius] = outline.at(-1)!;
-  const bulletRadius = required(cartridge.payload.diameter, 'bullet diameter') / 2;
-  if (mouthRadius <= bulletRadius) {
+  const stations = projectileStations(cartridge, shape.projectile);
+  if (mouthRadius <= stations.radius) {
     throw new Error('bullet is as wide as the case mouth');
   }
+  const { pocketDepth } = shape.primer;
+  if (pocketDepth >= shape.case.firedFloor) {
+    throw new Error('primer pocket reaches through the fired case floor');
+  }
+  const headRadius = Math.min(
+    radiusAt(outline, pocketDepth),
+    ...outline.filter(([axial]) => axial <= pocketDepth).map(([, radius]) => radius),
+  );
+  if (primerPocket(shape.primer)[1]![1] >= headRadius) {
+    throw new Error('primer pocket is as wide as the case head');
+  }
+  const { band } = shape.projectile;
   return {
-    loadedCase: loadedCaseProfile(outline, mouth),
-    firedCase: firedCaseProfile(outline, mouth),
-    bullet: bulletProfile(cartridge),
-    primer: primerProfile(),
+    loadedCase: loadedCaseProfile(outline, mouth, shape),
+    firedCase: firedCaseProfile(outline, mouth, shape),
+    bullet: bulletProfile(stations, shape.projectile.ogive),
+    ...(band === null ? {} : { band: bandProfile(stations, mouth, band) }),
+    primer: primerProfile(shape.primer),
   };
 };

@@ -25,9 +25,9 @@ local cartridge(row) = [
   } + taxonomy('ammunition', row.weapon, std.get(row, 'keywords', []))
   for component in ['round', 'case']
 ];
-// A case for a cartridge no row exports is a misspelt id, not an unused entry.
-local strayCases = std.setDiff(std.objectFields(appearance.cartridgeCases), std.set([row.source for row in roster.cartridges]));
-assert std.length(strayCases) == 0 : 'cartridge cases with no export row: %s' % [strayCases];
+// A finish for a cartridge no row exports is a misspelt id, not an unused entry.
+local strayFinishes = std.setDiff(std.objectFields(appearance.cartridgeFinishes), std.set([row.source for row in roster.cartridges]));
+assert std.length(strayFinishes) == 0 : 'cartridge finishes with no export row: %s' % [strayFinishes];
 local attachment(row) = {
   id: std.strReplace(row.source, '-', '_'), kind: 'attachment', source: row.source,
   voxel: voxel.of(voxel.item, std.get(looks, row.source, {})),

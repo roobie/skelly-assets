@@ -121,6 +121,12 @@ are owned by `packages/thing-export/src/files.ts`, `writeRecipeExports`; pack co
 `layout.mjs`, `outputPath`. For a thing-only recipe export into an alternate output root, see
 `packages/thing-authoring-tool/src/cli/export.ts`, `exportThingRecipes`.
 
+Building modules additionally reference kit definitions. The production driver calls `buildingKits.mjs`,
+`exportBuildingKits`, to validate the written sidecars and ship those documents, including on targeted builds.
+Low-level `exportRecipes`/tool-local writers do not by themselves produce a complete building-metadata tree;
+callers also export the kits and pass their file accounting/registry to `buildManifest`. See the
+[building contract](../docs/building-metadata.md) for frames, qualified joins and forward-compatible reader rules.
+
 Generated actors are a separate source family, not another recipe partition. A mob row selects a registered
 template and body-plan pose mechanism; see `mobTemplates.mjs`, `templateFor`, and `mobs.mjs`, `exportMob`. The GLB,
 body, pose clips and genome form one consumer contract; see `layout.mjs`, `readMobRows`, and `actorBake.mjs`, `bakeActor`.

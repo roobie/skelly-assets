@@ -15,4 +15,6 @@ Real dimensions are an exception for ammunition, not a change to Gungen's styliz
 
 Shotshell presentation may use explicit visual proxies where source data is absent, but those proxies do not become cartridge measurements; see `tools/packages/gun-authoring-tool/docs/shotshell-export.md`. The pump-action fit uses the sourced loaded envelope; see `tools/packages/gun-authoring-tool/docs/pump-action-export.md`.
 
-A cartridge's sourced `materials` record which cases exist; the one the game draws is a look, chosen apart from them in `models/guns/tables/appearance.jsonnet`, "cartridgeCases", so a look can change without touching sourced data and one row of sources need not pick a single finish.
+What a drawn round needs beyond its sources, such as its primer, case wall and projectile nose, is a modelling assumption, so it lives in `models/guns/tables/roundShapes.jsonnet` rather than here, where it would read as a measurement.
+
+A cartridge's sourced `materials` record which cases exist; the one the game draws is a look, chosen apart from them in `models/guns/tables/appearance.jsonnet`, "cartridgeFinishes", so a look can change without touching sourced data and one row of sources need not pick a single finish.

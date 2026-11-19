@@ -161,15 +161,6 @@ local wireTurn(id, slot, r, w, x0, y, z) = turned(id, slot, 'x', [[0, r], [w, r 
   ], { brass: 'brass', steel: 'steel-grey' }) + { title: 'Clockworks' }
   + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['metal'] } } },
 
-  // A small kraft paper sack of dry concrete mix, 80 by 50 mm and 96 mm tall, its top rolled down into a roll across
-  // the top edge and a printed band round the middle.
-  h.compound('concrete', 0.47, [
-    box('sack', 'paper', [-0.040, 0, -0.025], [0.040, 0.070, 0.025]),
-    h.prism('shoulder', 'paper', 'x', [[0.070, -0.025], [0.070, 0.025], [0.080, 0.010], [0.080, -0.010]], -0.040, 0.040),
-    turned('roll', 'roll', 'x', [[0, 0], [0, 0.010], [0.082, 0.010], [0.082, 0]], [-0.041, 0.086, 0]),
-    box('band', 'print', [-0.0405, 0.028, -0.0255], [0.0405, 0.048, 0.0255]),
-  ], { paper: 'cardboard-corrugated', roll: 'paperboard-tan', print: 'paint-red' }) + { title: 'Concrete' }
-  + h.label('band', '+z') + { voxelGrain: 0.002 } + { taxonomy: { category: 'materials', tags: { material: ['paper', 'stone'] } } },
   // A refrigeration condensing unit on a 400 by 260 mm base: a domed compressor, a fan in its shroud and a finned
   // coil with copper tubes, about 300 mm tall. The two copper lines rise from the compressor and pass over the fan.
   h.compound('condensing_unit', 13, [

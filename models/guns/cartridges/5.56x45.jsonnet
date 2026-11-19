@@ -259,7 +259,7 @@
   "notes": [
     "AOP-4172 Annex A, Sheet 1 is explicitly reference-only, says not to scale, and directs readers to AEP-97 Volume 6 for manufacturing dimensions. NATO overall length, case length and the legible case callouts are recorded from it.",
     "Where AOP-4172's public drawing lacks or ambiguously maps an external case callout, the cited C.I.P. 223 Rem maximum is a visual case-profile proxy. These proxy values are estimates for rendering; they do not assert 5.56 NATO and .223 Remington chamber interchangeability.",
-    "AOP-4172 deliberately omits primer-pocket details and does not specify a representative projectile mass or bullet length. Those values remain null/empty rather than being invented. roundProfile.ts uses a separately documented seating-depth assumption only to render a generic projectile when source bullet length is null.",
+    "AOP-4172 deliberately omits primer-pocket details and does not specify a representative projectile mass or bullet length. Those values remain null/empty rather than being invented. models/guns/tables/roundShapes.jsonnet holds a separately documented seating-depth assumption, used only to render a generic projectile when source bullet length is null.",
     "No relatedTo chamber-safety relation is asserted until a sourced 223 Rem entry and an authoritative citation for the relation are available."
   ]
 }

@@ -108,3 +108,39 @@ describe('a shipped model’s smooth copy', () => {
     expect(file.ok && primitivesOf(file.glb).map(({ extras }) => extras.solid)).toEqual(['a', 'b', 'c', 'd']);
   });
 });
+
+describe('a voxel-only solid', () => {
+  const filled: Domain = {
+    ...domain,
+    families: {
+      block: {
+        name: 'block',
+        params: {},
+        build: () => ({
+          family: 'block',
+          keepOuts: [],
+          axes: [],
+          ports: [],
+          solids: [box('a', 0, undefined), box('fill', 1, { voxelOnly: true })],
+        }),
+      },
+    },
+  };
+  const models = exportModelGlbs({ ...input, resolved: resolve(input.resolved.assembly, filled) });
+  if (!models.ok) {
+    throw new Error(JSON.stringify(models.error));
+  }
+  const reach = (glb: Uint8Array) => {
+    const { accessors } = jsonOf(glb);
+    return Math.max(...primitivesOf(glb).map(({ attributes }) => accessors[attributes.POSITION]!.max![0]!));
+  };
+
+  it('is drawn by the voxel copy', () => {
+    expect(reach(models.glb)).toBeCloseTo(1.5);
+  });
+
+  it('is left out of the smooth copy', () => {
+    expect(primitivesOf(models.smoothGlb).map(({ extras }) => extras.solids)).toEqual([['a']]);
+    expect(reach(models.smoothGlb)).toBeCloseTo(0.5);
+  });
+});

@@ -2,6 +2,7 @@ import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/as
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { BuildingSchema } from '@skelly/thing-core/building';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
 import {
@@ -26,7 +27,7 @@ import {
 import { singlePart } from '@skelly/thing-core/single-part';
 import { drawnGeometry } from '@skelly/thing-export/drawn.ts';
 import type { Palette, VoxelGrains } from '@skelly/thing-export/exportTypes.ts';
-import { hex } from '@skelly/thing-export/glb.ts';
+import { hex, SMOOTH } from '@skelly/thing-export/glb.ts';
 import { TitleSchema } from '@skelly/thing-export/title.ts';
 import {
   array,
@@ -63,6 +64,7 @@ import { drinkCup, foodPortion, stemmedFruit, woundRoll } from './families/food-
 import { fuse } from './families/fuse.ts';
 import { foldedGarment } from './families/garment.ts';
 import { grenade } from './families/grenade.ts';
+import { grown } from './families/grown.ts';
 import { compass, keycard, key as keyFamily, lighter, matchbox } from './families/handheld.ts';
 import { handOpener } from './families/handOpener.ts';
 import { bottleJack, engineHoist, scissorJack } from './families/jacks.ts';
@@ -145,6 +147,8 @@ const PartSchema = strictObject({
     ),
   ),
   ports: array(PortSchema),
+  /** Keeps the part's authored mesh in the voxel file; see `tools/packages/thing-export/README.md`, "Voxelized export". */
+  smooth: optional(literal(true)),
 });
 const ItemSchema = pipe(
   strictObject({
@@ -175,6 +179,7 @@ const ItemSchema = pipe(
     ),
     covers: optional(NeutralModelSchema.entries.covers),
     soleLift: NeutralModelSchema.entries.soleLift,
+    building: optional(BuildingSchema),
     /** Named datums on solids, exported as the model's anchors. */
     anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
     /**
@@ -264,6 +269,7 @@ const builders = {
   spool,
   coil,
   compound,
+  grown,
   fuse,
   crowbar,
   hammer,
@@ -362,7 +368,14 @@ const buildPart = (part: ToolPart, params = part.params, turnedSides?: number): 
       throw new Error(`${part.id}: paintable slot ${slot} colours no solid`);
     }
   }
-  return { family: part.family, solids, ports: part.ports, axes: [], keepOuts: [] };
+  return {
+    family: part.family,
+    solids,
+    ports: part.ports,
+    axes: [],
+    keepOuts: [],
+    ...(part.smooth ? { tags: [SMOOTH] } : {}),
+  };
 };
 export const loadCatalogue = (value: unknown): Catalogue => {
   const data = parse(CatalogueSchema, value);
@@ -466,7 +479,17 @@ export const itemMotion = (
   }
 };
 
-/** Builds an item; with a model export's grains its datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
+/** Building datums are authored, not sampled from solids. Reject unsupported source conversions explicitly. */
+export const itemBuilding = (item: ToolItem, settings: CatalogueSettings) => {
+  if (!item.building) return undefined;
+  const forward = item.forward ?? FAMILY_FORWARDS[item.parts[0]!.family] ?? '+z';
+  if (settings.units.metresPerUnit !== 1 || forward !== '+z') {
+    throw new Error(`${item.id}: building metadata requires a metre, +z-forward source frame`);
+  }
+  return item.building;
+};
+
+/** Builds an item; with a model export's grains its solid datums read off the drawn voxels (see `tools/packages/thing-export/src/drawn.ts`). */
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
   const forward = item.forward ?? FAMILY_FORWARDS[first.family] ?? '+z';

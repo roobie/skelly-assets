@@ -90,8 +90,8 @@ describe('standalone cartridge GLBs', () => {
     expect(kinds).toEqual(new Set(['metallic', 'shotshell']));
   });
 
-  it('lets a cartridge named in the case table override the shared case, and no other', () => {
-    const table = { [cartridge.id]: 'steel' };
+  it('lets a cartridge named in the finish table override the shared case, and no other', () => {
+    const table = { [cartridge.id]: { case: 'steel' } };
     expect(cartridgeFinish(cartridge, table).case).toBe('steel');
     expect(cartridgeFinish({ ...cartridge, id: 'fixture.other' }, table).case).toBe(
       GUN_APPEARANCE.cartridgeFinish.case,

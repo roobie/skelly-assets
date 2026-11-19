@@ -88,11 +88,19 @@ exhaust is fused or split along its run into salvageable parts; why is in `docs/
 Ordinary world items are authored the same way, as set files of rows in `models/catalogue/sets/`. A set is an
 authoring unit, not a pack: each row's category chooses its pack, so a pack stays one shelf a product can load
 whole and a new set needs no recipe edit. See `models/catalogue/packs.libsonnet`, `byCategory`.
+The medieval timber and stone building kits' shared grid, placement origins and source cottage, vaulted passage
+and wall-walk examples are described in `models/architecture/README.md`; modules belong to `skelly.structures`,
+not a whole-building producer. Their optional [building metadata contract](docs/building-metadata.md) exports
+qualified joins, placement datums and nominal openings through model sidecars and a manifest-discovered kit registry.
+The [temperate woodland starter kit](models/nature/README.md) adds outdoor-scale trees, deadwood, understorey
+and boulders to `skelly.nature`, with a source grove and common-scale lineup rather than a terrain generator.
 
 The item drafts in `models/catalogue/drafts/` are Deadvox gameplay data for the catalogue models: what each
 thing is called, carries, protects and does in play. They wait here until skelly's framework refactor gives item
 content its new layout, and are applied then. Each set's drafts sit in a file named after it, so a draft is found
-beside its model. Several items may share one model when they differ only in colour, grade or size. The values
+beside its model. Several items may share one model when they differ only in colour, grade or size. Solid
+contents share one heap model per form and name the generic holder they are packed in, which wears their label
+finish on its one paintable label, so no content needs a model of its own. The values
 are our own: the catalogue was drawn against another game's item data, whose share-alike licence and database
 rights would follow a copied table, so drafts keep no link to it and leave out the fields that matched it value
 for value until they are derived from our own models. See `tools/test/catalogue-drafts.test.mjs`.
@@ -231,6 +239,10 @@ jump over several releases is one lookup; a retired id never names a new model, 
 A vehicle site's `finish` names an entry of the release's `finishes.json`, the manifest's `finishes`: the glTF
 material a painted surface in that finish carries. Why the library ships and how a copy takes it is in
 `docs/decisions/0003-vehicle-paint.md`.
+
+A thing's model entry repeats its stowage ports as `stowage`, the slots a locker part holds kit in and the seat a
+stowable item stows by, so a game can open a locker as a container from the entry alone, without parsing the GLB's
+port nodes; what a slot and a seat are is in `docs/decisions/0017-stowage-slots.md`.
 
 The `.glb` files load in any engine or tool that reads glTF 2.0. Engine-specific sidecar files, such as Godot's
 `*.import`, are ignored here, so each game generates its own.
