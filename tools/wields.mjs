@@ -248,7 +248,7 @@ export function wieldWeapons(wields, entryOf, meshOf) {
   });
 }
 
-/** Every wield's pose files by name: each stance, and each strike's key frames (`ENDS`). */
+/** Every wield's pose files by name: each stance, and each strike's key frames (`strikeMoves`). */
 export function wieldPoses(rig, wields, weapons) {
   const poses = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
@@ -256,7 +256,7 @@ export function wieldPoses(rig, wields, weapons) {
     for (const [stance, key] of Object.entries(cls.stances))
       poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
     for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
-      for (const key of Object.values(ENDS))
+      for (const { key } of strikeMoves(wields, spec).filter(({ key }) => key))
         poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
     }
   }
@@ -266,23 +266,40 @@ export function wieldPoses(rig, wields, weapons) {
 // Each phase's easing, the wields' own unless the strike names one.
 const easings = (wields, strike) => PHASES.map((phase) => strike.easing?.[phase] ?? wields.easing[phase]);
 
-/** Each strike as a sequence of its pose files for the pose page: guard, the three keys and back, at their seconds. */
+/**
+ * The key frames a strike moves through from its guard, in turn, each `{ key, at, easing }`: the key's name in the
+ * strike, none for the guard; where it falls, as a share of the strike's span; and how the move into it eases. Each
+ * phase but the last ends in its key (`ENDS`) and the recovery in the guard. A strike that names a `drawn` key recovers
+ * through it, halfway through the recovery: from the follow's rest it gathers speed into the drawn key and slows from
+ * there into the guard, so a guard held high takes the weapon back by where the strike draws it rather than swinging
+ * its end out past the hit.
+ */
+export function strikeMoves(wields, spec) {
+  const eases = easings(wields, spec);
+  return [
+    { at: 0 },
+    ...strikePhases(spec).flatMap(({ phase, from, to }, i) =>
+      phase === 'recovery' && spec.drawn
+        ? [
+            { key: 'drawn', at: (from + to) / 2, easing: 'ease-in' },
+            { at: to, easing: 'ease-out' },
+          ]
+        : [{ key: ENDS[phase], at: to, easing: eases[i] }],
+    ),
+  ];
+}
+
+/** Each strike as a sequence of its pose files for the pose page: guard, its keys (`strikeMoves`) and back. */
 export function wieldSequences(wields) {
   const sequences = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
     for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const guard = clipName(name, 'stance', 'guard');
-      const phases = strikePhases(spec);
+      const moves = strikeMoves(wields, spec);
       sequences[clip] = {
-        keys: [
-          { fixture: guard, at: 0 },
-          ...phases.map(({ phase, to }) => ({
-            fixture: ENDS[phase] ? keyName(clip, ENDS[phase]) : guard,
-            at: to * spec.seconds,
-          })),
-        ],
-        easing: easings(wields, spec),
+        keys: moves.map(({ key, at }) => ({ fixture: key ? keyName(clip, key) : guard, at: at * spec.seconds })),
+        easing: moves.slice(1).map(({ easing }) => easing),
       };
     }
   }
@@ -467,15 +484,14 @@ function classClips(rig, wields, gait, name, cls, carried, meshOf) {
   }
   for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
     const clip = clipName(name, 'strike', strike);
-    const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
-    const phases = strikePhases(spec);
-    const eases = easings(wields, spec);
+    const moves = strikeMoves(wields, spec);
+    const keys = moves.map(({ key }) => (key ? compileKey(spec[key]) : guard));
     const count = Math.max(2, Math.round(spec.seconds * wields.framesPerSecond) + 1);
     const baked = Array.from({ length: count }, (_, k) => {
       const at = k / (count - 1);
-      const i = phases.findLastIndex(({ from }) => from <= at);
-      const { from, to } = phases[i];
-      return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
+      const i = moves.slice(0, -1).findLastIndex(({ at: from }) => from <= at);
+      const [from, to] = [moves[i].at, moves[i + 1].at];
+      return between(keys[i], keys[i + 1], easingOf(moves[i + 1].easing)((at - from) / (to - from)));
     });
     clips[clip] = {
       kind: 'pose',

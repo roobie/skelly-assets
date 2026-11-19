@@ -28,6 +28,7 @@ import {
   exportWields,
   graspOf,
   heldWeapon,
+  strikeMoves,
   strikePhases,
   strikeTiming,
   WIELD_SETS,
@@ -189,6 +190,21 @@ test("every strike's phases end one after another, the last with the clip, and i
     assert.equal(ends.at(-1), durationSimSeconds, `${name}: the last phase ends with the clip`);
     assert.equal(hitAtSimSeconds, phases.find(({ phase }) => phase === 'strike').endsAtSimSeconds, name);
   }
+});
+
+test('a strike that names a drawn key recovers through it halfway, gathering speed into it and slowing out of it', () => {
+  const spec = { shares: { windup: 20, strike: 10, follow: 30, recovery: 40 }, seconds: 1 };
+  const plain = strikeMoves(wields, spec);
+  const drawn = strikeMoves(wields, { ...spec, drawn: {} });
+  assert.deepEqual(
+    plain.map(({ key }) => key),
+    [undefined, 'windup', 'hit', 'follow', undefined],
+  );
+  assert.deepEqual(drawn.slice(0, 4), plain.slice(0, 4), 'the moves up to the follow are unchanged');
+  assert.deepEqual(drawn.slice(4), [
+    { key: 'drawn', at: 0.8, easing: 'ease-in' },
+    { at: 1, easing: 'ease-out' },
+  ]);
 });
 
 test("a baked strike starts and ends in its class's guard", () => {
