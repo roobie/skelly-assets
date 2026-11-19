@@ -71,19 +71,32 @@ type Buffer = Ar15Table['receiverExtension']['buffers']['rifle'] & {
   readonly castleNut?: Ar15Table['receiverExtension']['buffers']['carbine']['castleNut'];
 };
 
+/** A pick of the table: the named choice `choice` among the group at the dot path `Of`. */
+interface TablePick<Of extends string> {
+  readonly choice: string;
+  readonly of: Of;
+}
+
+type BarrelLength = Omit<Ar15Table['barrel']['lengths']['16-mid'], 'gas'> & {
+  readonly gas: TablePick<'barrel.gasPorts'>;
+};
+
 /**
  * The shape every frame table shares, read off the AR-15's: the same groups and measurements, with the named choices
  * (gas systems, barrel lengths, journals, front sight base raises, handguard lengths, buffers) and the item masses left
- * open to each frame.
+ * open to each frame, and each pick typed by the group it names.
  */
 export type ArFrameTable = Omit<
   Ar15Table,
-  'barrel' | 'gasBlock' | 'frontSightBase' | 'handguard' | 'receiverExtension' | 'masses'
+  'barrel' | 'gasBlock' | 'frontSightBase' | 'handguard' | 'receiverExtension' | 'stock' | 'stockA2' | 'masses'
 > & {
-  readonly barrel: Omit<Ar15Table['barrel'], 'gasPorts' | 'lengths'> & {
+  readonly barrel: Omit<Ar15Table['barrel'], 'gasPorts' | 'lengths' | 'journal'> & {
     readonly gasPorts: Readonly<Record<string, Measure>>;
-    readonly lengths: Readonly<Record<string, Ar15Table['barrel']['lengths']['16-mid']>>;
+    readonly lengths: Readonly<Record<string, BarrelLength>>;
+    readonly journal: TablePick<'gasBlock.journals'>;
   };
+  readonly stock: Omit<Ar15Table['stock'], 'buffer'> & { readonly buffer: TablePick<'receiverExtension.buffers'> };
+  readonly stockA2: Omit<Ar15Table['stockA2'], 'buffer'> & { readonly buffer: TablePick<'receiverExtension.buffers'> };
   readonly gasBlock: Omit<Ar15Table['gasBlock'], 'journals'> & {
     readonly journals: Readonly<Record<string, Measure>>;
   };
@@ -109,7 +122,13 @@ export interface ArFrame {
   readonly table: ArFrameTable;
 }
 
-export const AR15_FRAME: ArFrame = { name: 'ar15', title: 'AR-15', table: checkFrameTable('ar15', ar15Table) };
+// The load check holds each pick to a choice of the group its path names, which is the group `pick` reads, so a pick is
+// typed by the group at its path.
+export const AR15_FRAME: ArFrame = {
+  name: 'ar15',
+  title: 'AR-15',
+  table: checkFrameTable('ar15', ar15Table) as ArFrameTable,
+};
 
 /** The registry name of a frame's family for one role, such as `ar15-lower`. */
 export const familyName = (frame: ArFrame, role: string): string => `${frame.name}-${role}`;
@@ -122,6 +141,25 @@ export const chosen = <T>(choices: Readonly<Record<string, T>>, key: string | un
   }
   return value;
 };
+
+/** The type of the table's node at a dot path. */
+type GroupAt<Path extends string, Node = ArFrameTable> = Path extends `${infer Head}.${infer Rest}`
+  ? Head extends keyof Node
+    ? GroupAt<Rest, Node[Head]>
+    : never
+  : Path extends keyof Node
+    ? Node[Path]
+    : never;
+
+/** What a pick among the group at `Of` picks: one of that group's choices. */
+type Picked<Of extends string> = GroupAt<Of>[keyof GroupAt<Of>];
+
+/**
+ * What a pick of the frame's table picks, read from the group the pick itself names, so the load check that holds the
+ * pick to that group guards exactly what the build uses.
+ */
+export const pick = <Of extends string>(frame: ArFrame, ref: TablePick<Of>): Picked<Of> =>
+  chosen(groupAt(frame.table, ref.of) as Readonly<Record<string, Picked<Of>>>, ref.choice);
 
 /** A length or position of the table in u. */
 export const u = (dimension: { readonly mm: number }): number => mmToU(dimension.mm);

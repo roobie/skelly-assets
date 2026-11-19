@@ -2,7 +2,7 @@ import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/sc
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrame, chosen, familyName, outlineU, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
 import { boxSleeve, roundBar } from './shapes.ts';
 
 /** The stock standard of an extension that takes the named buffer. */
@@ -55,9 +55,8 @@ export const arReceiverExtension = (frame: ArFrame): PartFamily => ({
   },
 });
 
-/** The outside radius of the extension a stock slides onto, by the buffer that extension takes. */
-const tubeRadius = (frame: ArFrame, buffer: string): number =>
-  u(chosen(frame.table.receiverExtension.buffers, buffer).radius);
+/** The outside radius of the extension a stock slides onto, by its pick of the buffer that extension takes. */
+const tubeRadius = (frame: ArFrame, buffer: ArFrameTable['stock']['buffer']): number => u(pick(frame, buffer).radius);
 
 /** The port a stock slides onto its extension by, at its frame: the end of the extension. */
 const stockPort = (buffer: string): PortDef => ({
@@ -98,7 +97,7 @@ const stockSleeve = (
 const collapsibleStock = (frame: ArFrame): PartDef => {
   const s = frame.table.stock;
   const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
-  const bore = tubeRadius(frame, s.buffer.choice) + u(s.tubeClearance);
+  const bore = tubeRadius(frame, s.buffer) + u(s.tubeClearance);
   const toeHalf = u(s.toeHalfWidth);
   const sleeve = stockSleeve(frontX, bore, [bottomY, topY], half);
   return {
@@ -125,7 +124,7 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
 const a2Stock = (frame: ArFrame): PartDef => {
   const s = frame.table.stockA2;
   const [frontX, combY, half] = [u(s.frontX), u(s.combY), u(s.halfWidth)];
-  const bore = tubeRadius(frame, s.buffer.choice) + u(s.tubeClearance);
+  const bore = tubeRadius(frame, s.buffer) + u(s.tubeClearance);
   const belly = outlineU(s.belly);
   const pieces: [string, Vec2[]][] = [
     ['butt', outlineU(s.butt)],

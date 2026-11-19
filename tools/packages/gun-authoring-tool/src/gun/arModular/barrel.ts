@@ -1,7 +1,7 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { choice, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { type ArFrame, chosen, familyName, u } from './frame.ts';
+import { type ArFrame, chosen, familyName, pick, u } from './frame.ts';
 import { journalClamp, roundBar } from './shapes.ts';
 
 /** The gas-block standard of a journal, by the name the frame table gives it. */
@@ -12,8 +12,7 @@ const journalRadiusOf = (frame: ArFrame, journal: string): number =>
   u(chosen(frame.table.gasBlock.journals, journal)) / 2;
 
 /** The radius of the journal every barrel of the frame is turned to under its gas block. */
-export const barrelJournalRadius = (frame: ArFrame): number =>
-  journalRadiusOf(frame, frame.table.barrel.journal.choice);
+export const barrelJournalRadius = (frame: ArFrame): number => u(pick(frame, frame.table.barrel.journal)) / 2;
 
 /** The gas system, by name, that a barrel of the named length is drilled for. */
 export const barrelGas = (frame: ArFrame, length: string): string =>
@@ -32,7 +31,7 @@ export const arBarrel = (frame: ArFrame): PartFamily => ({
     const length = chosen(barrel.lengths, params.length);
     const setback = u(barrel.breechSetback);
     const muzzleX = u(length.length) - setback;
-    const gasPortX = u(chosen(barrel.gasPorts, length.gas.choice)) - setback;
+    const gasPortX = u(pick(frame, length.gas)) - setback;
     return {
       family: 'barrel',
       solids: [roundBar('barrel', 0, muzzleX, u(barrel.radius))],

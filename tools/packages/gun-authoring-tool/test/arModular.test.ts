@@ -8,7 +8,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { AR15_FRAME, checkFrameTable, u } from '../src/gun/arModular/frame.ts';
+import { AR15_FRAME, checkFrameTable, pick, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { arUpper } from '../src/gun/arModular/upper.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -63,6 +63,12 @@ describe('modular AR', () => {
     expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
     expect(() => checkFrameTable('t', { a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
     expect(() => checkFrameTable('t', { a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
+  });
+
+  it('reads a pick from the group the pick names', () => {
+    const buffer = { choice: 'carbine', of: 'receiverExtension.buffers' } as const;
+    expect(pick(AR15_FRAME, buffer)).toBe(AR15.receiverExtension.buffers.carbine);
+    expect(pick(AR15_FRAME, AR15.barrel.journal)).toBe(AR15.gasBlock.journals[AR15.barrel.journal.choice]);
   });
 
   it('gives every item the sourced mass of its frame table', () => {
