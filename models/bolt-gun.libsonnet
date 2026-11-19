@@ -33,11 +33,13 @@ local box = h.box;
   // receiver's underside.
   grip(top):
     local front = -0.07, g = $.guard, t = $.trigger;
-    // The x of the grip's front at height `y`, raked back toward its foot.
-    local frontAt(y) = -0.10 + (front + 0.10) * (y - 0.03) / (top - 0.03);
+    // The front corner of the grip's foot, which its front rakes back to.
+    local foot = { x: -0.10, y: 0.03 };
+    // The x of the grip's front at height `y`.
+    local frontAt(y) = foot.x + (front - foot.x) * (y - foot.y) / (top - foot.y);
     local floor = top - g.opening, bottom = floor - g.bar, blade = front + t.gap;
     [
-      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
+      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [foot.x, foot.y], [-0.155, foot.y]], -0.026, 0.026),
       h.prism('grip-cap', 'body', 'z', [[-0.16, 0.034], [-0.096, 0.034], [-0.093, 0.024], [-0.1, 0.016], [-0.158, 0.016], [-0.164, 0.024]], -0.03, 0.03),
       // The guard's bottom bar runs back into the grip, so it reads as one with it.
       box('guard', 'metal', [frontAt(bottom) - g.bar, bottom, -g.halfWidth], [g.front, floor, g.halfWidth]),
