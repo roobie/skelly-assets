@@ -3,9 +3,10 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, invert } from '@skelly/construct/foundation/math.ts';
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
-import { loadCorpus, loadFixture, scopedArDesign } from './helpers.ts';
+import { loadCorpus, loadFixture, motionOf, scopedArDesign } from './helpers.ts';
 
 const limits = (
   box: Box,
@@ -70,10 +71,7 @@ describe('visible action details', () => {
       seen.add(label);
       expect(assembly.parts['bolt-carrier'], label).toBeDefined();
       const report = validate(assembly, gunDomain);
-      expect(report.resolved.defs.get('bolt-carrier')?.motion, label).toMatchObject({
-        kind: 'linear',
-        axis: [1, 0, 0],
-      });
+      expect(slideOf(motionOf(report.resolved, 'bolt-carrier')).direction, label).toEqual([1, 0, 0]);
     }
     expect([...seen].sort()).toEqual([...wanted].sort());
   });
@@ -96,11 +94,12 @@ describe('visible action details', () => {
     expect(handguardDef.keepOuts.some(({ id }) => id === 'smg-support-hand')).toBe(true);
     expect(movingDef.solids.map(({ id }) => id)).toContain('smg-sliding-handle');
     expect(movingDef.solids.map(({ id }) => id)).toContain('smg-handle-grip');
-    expect(movingDef.motion).toMatchObject({ kind: 'linear', axis: [1, 0, 0], start: [0, 0, 0] });
-    expect(movingDef.motion?.end[0]).toBeGreaterThan(0);
+    const handleSlide = slideOf(motionOf(resolved, 'smg-handle'));
+    expect(handleSlide.direction).toEqual([1, 0, 0]);
+    expect(handleSlide.travel).toBeGreaterThan(0);
     const hand = movingDef.keepOuts.find(({ id }) => id === 'smg-handle-hand')!.box;
     const sweep = movingDef.keepOuts.find(({ id }) => id === 'smg-handle-sweep')!.box;
-    expect(sweep.center[0] + sweep.half[0] - (hand.center[0] + hand.half[0])).toBe(movingDef.motion!.end[0]);
+    expect(sweep.center[0] + sweep.half[0] - (hand.center[0] + hand.half[0])).toBe(handleSlide.travel);
   });
 
   it('keeps receiver-shell walls at least 0.5u thick around the carrier cavity', () => {
@@ -192,7 +191,9 @@ describe('visible action details', () => {
     expect(bolt.solids.some(({ id }) => id === 'bolt-handle-seat')).toBe(true);
     expect(arm.solids[0]?.kind).toBe('extruded-polygon');
     expect(arm.keepOuts.some(({ id }) => id === 'bolt-handle-sweep')).toBe(true);
-    expect(arm.motion!.sourceKeepOut).toEqual({ port: 'base', id: 'bolt-handle-travel' });
+    expect(arm.motion!.stages).toContainEqual(
+      expect.objectContaining({ kind: 'slide', travel: { port: 'base', keepOut: 'bolt-handle-travel' } }),
+    );
   });
 
   it('rejects a built-in charging handle placed inside its own travel volume', () => {

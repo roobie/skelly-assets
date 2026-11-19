@@ -2,6 +2,7 @@
 // Everything domain-specific (which parts and mount types exist) is data
 // supplied through a Domain.
 
+import type { Motion, StageMove } from '@skelly/motion/motion';
 import type { Issue } from '../foundation/issue.ts';
 import type { ExtrusionAxis, Transform, Vec3 } from '../foundation/math.ts';
 import type { Box, DomainUnits, Solid, Vec2 } from '../shapes/solid.ts';
@@ -76,22 +77,26 @@ interface Axis {
   readonly referenceDistanceU?: number;
 }
 
-export interface PartTurn {
-  readonly pivot: Vec3;
-  readonly axis: Vec3;
-  readonly angleRadians: number;
+/** A slide's travel taken from a keep-out of the part met at one of its ports: twice the keep-out's reach along the slide. */
+export interface KeepOutTravel {
+  readonly port: string;
+  readonly keepOut: string;
 }
 
+/** A stage as a part authors it: in the part's units, and a slide may leave its travel to a keep-out. */
+export type PartStage =
+  | Extract<StageMove, { readonly kind: 'hinge' }>
+  | (Omit<Extract<StageMove, { readonly kind: 'slide' }>, 'travel'> & { readonly travel: number | KeepOutTravel });
+
+/**
+ * How a part moves, in its own frame and units, before the assembly has given every slide its travel. `resolve` turns
+ * it into the part's `Motion`.
+ */
 export interface PartMotion {
-  readonly kind: 'linear';
-  /** Rotation about a local pivot before translation; translation reverses before the turn returns. */
-  readonly turn?: PartTurn;
-  /** Local unit direction of travel from the start point to the end point. */
-  readonly axis: Vec3;
-  readonly start: Vec3;
-  readonly end: Vec3;
-  /** Internal source resolved from a connected part's named keep-out. */
-  readonly sourceKeepOut?: { readonly port: string; readonly id: string };
+  /** The stages in the order they run; every stage is given in the part's rest frame and the first carries the rest. */
+  readonly stages: readonly PartStage[];
+  /** Ends of stages that are named places on the clock besides rest and open: each names the stage it follows. */
+  readonly stops?: readonly { readonly name: string; readonly after: number }[];
 }
 
 /** What a part does with a feature too thin for the export grain; the reason of an exaggeration is the part's to give. */
@@ -119,7 +124,7 @@ export interface PartDef {
   readonly displaySolids?: readonly Solid[];
   readonly keepOuts: readonly KeepOut[];
   readonly axes: readonly Axis[];
-  /** Optional animation path, serialized to this part's glTF node extras. */
+  /** How the part moves, if it does; `Resolved.motions` holds it once resolved. */
   readonly motion?: PartMotion;
   /** Free-form labels that domain rules can look for. */
   readonly tags?: readonly string[];
@@ -254,8 +259,10 @@ export interface ResolvedConnection {
 export interface Resolved {
   readonly assembly: Assembly;
   readonly domain: Domain;
-  /** Built definitions of every valid part instance. */
-  readonly defs: ReadonlyMap<string, PartDef>;
+  /** Built definitions of every valid part instance; their `motion` has moved to `motions`. */
+  readonly defs: ReadonlyMap<string, Omit<PartDef, 'motion'>>;
+  /** The motion of each part that moves, in its own frame and units. */
+  readonly motions: ReadonlyMap<string, Motion>;
   /** The params each valid part was built with. */
   readonly params: ReadonlyMap<string, Readonly<Record<string, ResolvedParam>>>;
   /** Transforms of the parts that could be placed. */

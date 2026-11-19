@@ -23,6 +23,7 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import {
   SHROUD_HALF_HEIGHT,
   SHROUD_HALF_WIDTH,
@@ -51,7 +52,7 @@ import { HEAVY_RECEIVER_LENGTH } from '../src/gun/antiMateriel/heavyReceiver.ts'
 import { gunDomain } from '../src/gun/domain.ts';
 import { RAIL_SLOT_PITCH_U } from '../src/gun/mounts.ts';
 import { EJECTION_PORT_MARGIN_U, FAMILIES, GRIP_MOUNT_PROFILE, TRIGGER_GUARD } from '../src/gun/parts.ts';
-import { fitAntiMaterielScope, variant } from './helpers.ts';
+import { fitAntiMaterielScope, motionOf, strokeOf, variant } from './helpers.ts';
 
 const family = (key: string): PartFamily => FAMILIES[key]!;
 const solidById = (def: PartDef, id: string): Solid => {
@@ -228,7 +229,7 @@ describe('anti-materiel charging handle', () => {
     expect(
       distanceWorld(worldSolid(carrierTransform, heavyStick), worldSolid(carrierTransform, heavyPaddle)),
     ).toBeLessThanOrEqual(1e-6);
-    expect(carrier.motion).toMatchObject({ kind: 'linear', axis: [1, 0, 0] });
+    expect(slideOf(motionOf(resolved, 'bolt-carrier')).direction).toEqual([1, 0, 0]);
   });
 
   it('cuts a narrow slot through the ejection-port-side receiver wall and preserves the surrounding metal', () => {
@@ -251,7 +252,7 @@ describe('anti-materiel charging handle', () => {
   });
 
   it('clears the receiver shell through every sampled point of its full bolt travel', () => {
-    const [end] = carrier.motion!.end;
+    const [end] = strokeOf(resolved, 'bolt-carrier');
     for (let sample = 0; sample <= 32; sample++) {
       const progress = (end * sample) / 32;
       const transform = compose(carrierTransform, translation([progress, 0, 0]));
@@ -260,7 +261,7 @@ describe('anti-materiel charging handle', () => {
   });
 
   it('fails the displaced-handle canary beyond the rear end of the metal slot', () => {
-    const [travel] = carrier.motion!.end;
+    const [travel] = strokeOf(resolved, 'bolt-carrier');
     const displaced = compose(carrierTransform, translation([travel + 1, 0, 0]));
     expect(noReceiverContact(compose(carrierTransform, translation([travel, 0, 0])))).toBe(true);
     expect(noReceiverContact(displaced)).toBe(false);

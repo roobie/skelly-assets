@@ -8,6 +8,7 @@ import { compareCodeUnits } from '../../../codeUnitOrder.mjs';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { readCartridge } from '../src/cli/readCartridge.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { hingeOf } from '../src/gun/actionMotion.ts';
 import { attachmentCompatibility } from '../src/gun/attachmentCompatibility.ts';
 import { attachmentSlots } from '../src/gun/attachments.ts';
 import { BOLT_EXTRACTION_CLEARANCE_U, boltCartridge, boltStrokeUnits } from '../src/gun/boltCartridge.ts';
@@ -45,11 +46,11 @@ it('exports every bolt pattern as a hand-only action with a shared bore-parallel
     expect(Object.keys(action.parts).sort()).toEqual(['arm', 'carrier', 'knob']);
     expect(action.cycle.fire).toBeUndefined();
     const turns = Object.values(action.parts).map((part) => {
-      const turn = part.def.motion!.turn!;
+      const { axis, angle } = hingeOf(part.motion)!;
       return {
-        pivot: applyPoint(part.placed, turn.pivot),
-        axis: applyDir(part.placed, turn.axis),
-        angle: turn.angleRadians,
+        pivot: applyPoint(part.placed, axis.from),
+        axis: applyDir(part.placed, sub(axis.to, axis.from)),
+        angle,
       };
     });
     const envelope = resolved.defs.get(action.carrier.id)!.solids.find(({ id }) => id === 'carrier-body')!;
@@ -78,7 +79,7 @@ it('preserves automatic and pump action kinds without adding turn phases', () =>
     for (const { assembly } of existing) {
       const action = resolveGunAction(resolve(assembly, gunDomain))!;
       expect(action.kind).toBe(kind);
-      expect(Object.values(action.parts).every((part) => part.def.motion?.turn === undefined)).toBe(true);
+      expect(Object.values(action.parts).every((part) => hingeOf(part.motion) === undefined)).toBe(true);
       expect(action.cycle.fire === undefined).toBe(kind === 'pump');
     }
   }

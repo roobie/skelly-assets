@@ -88,13 +88,21 @@ export const composeRigid = (a: Rigid, b: Rigid): Rigid => {
 };
 
 /** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
-const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
+export const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
   if (stage.kind === 'slide') {
     return stage.travel;
   }
   const u = unit(sub(stage.axis.to, stage.axis.from));
   const radius = Math.max(...hull.map((point) => length(cross(u, sub(point, stage.axis.from)))));
   return (Math.abs(stage.angle) * Math.PI * radius) / 180;
+};
+
+/** Why `stops` cannot name places on one clock, if they cannot: every name is its own and the clocks strictly increase. */
+export const stopsError = (stops: readonly Stop[]): string | undefined => {
+  if (new Set(stops.map(({ name }) => name)).size !== stops.length) {
+    return 'two stops of one name';
+  }
+  return stops.some(({ clock }, i) => i > 0 && clock <= stops[i - 1]!.clock) ? 'clocks must increase' : undefined;
 };
 
 /**

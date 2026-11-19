@@ -1,6 +1,6 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
-import { dot, length, scale, sub, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
   distanceWorld,
   localSolidBounds,
@@ -9,7 +9,10 @@ import {
   type WorldSolid,
   worldSolid,
 } from '@skelly/construct/shapes/geometry.ts';
+import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { stageDistance } from '@skelly/motion/motion';
 import { resolveGunAction } from './actionDescription.ts';
+import { hingeOf } from './actionMotion.ts';
 
 // Every obstacle visits the same dyadic phases; a moving solid's pose is independent of the obstacle.
 const cachedPoses = (at: (phase: number) => WorldSolid): ((phase: number) => WorldSolid) => {
@@ -50,16 +53,21 @@ const clearsInterval = (
   );
 };
 
+/** The corners of the box `solid` fills at rest. */
+const restHull = (solid: Solid): Vec3[] => {
+  const [min, max] = localSolidBounds(solid);
+  return [min[0], max[0]].flatMap((x) => [min[1], max[1]].flatMap((y) => [min[2], max[2]].map((z): Vec3 => [x, y, z])));
+};
+
 /**
- * Certify every turning mover's path. A turn bolt turns at battery and then draws; the SMG handle draws to
- * its slot's rear end and then turns into the notch.
+ * Certify the path of every mover that turns, one stage at a time over the part's own clock: the turn bolt turns at
+ * battery and then draws; the SMG handle draws to its slot's rear end and then turns into the notch.
  */
 export const sweepTurningAction = (resolved: Resolved): readonly string[] => {
   const action = resolveGunAction(resolved);
   if (!action) {
     return [];
   }
-  const turnFirst = action.kind === 'bolt';
   const moving = new Set(Object.values(action.parts).map(({ id }) => id));
   const obstacles = [...resolved.defs]
     .filter(([id]) => !moving.has(id))
@@ -67,39 +75,22 @@ export const sweepTurningAction = (resolved: Resolved): readonly string[] => {
       def.solids.map((solid) => ({ id: `${id}.${solid.id}`, shape: worldSolid(resolved.placed.get(id)!, solid) })),
     );
   return Object.values(action.parts).flatMap((part) => {
-    const motion = part.def.motion!;
-    const { turn } = motion;
-    if (!turn) {
+    const { motion } = part;
+    if (!hingeOf(motion)) {
       return [];
     }
     return part.def.solids.flatMap((solid) => {
-      const [min, max] = localSolidBounds(solid);
-      // Axial length does not contribute to turn speed, especially for the long rear bolt tail.
-      const radius = Math.max(
-        ...[min[0], max[0]].flatMap((x) =>
-          [min[1], max[1]].flatMap((y) =>
-            [min[2], max[2]].map((z) => {
-              const offset = sub([x, y, z] as Vec3, turn.pivot);
-              const axial = scale(turn.axis, dot(offset, turn.axis) / dot(turn.axis, turn.axis));
-              return length(sub(offset, axial));
-            }),
+      const paths = motion.stages.map((stage, i) => {
+        const from = motion.stages.slice(0, i).reduce((clock, { share }) => clock + share, 0);
+        return {
+          at: cachedPoses((phase) =>
+            worldSolid(motionTransform(part.placed, motion, from + phase * stage.share), solid),
           ),
-        ),
-      );
-      const turnAt = cachedPoses((phase) =>
-        worldSolid(motionTransform(part.placed, motion, turnFirst ? 0 : 1, phase), solid),
-      );
-      const drawAt = cachedPoses((phase) =>
-        worldSolid(motionTransform(part.placed, motion, phase, turnFirst ? 1 : 0), solid),
-      );
+          speedBound: stageDistance(stage, restHull(solid)),
+        };
+      });
       return obstacles
-        .filter(
-          ({ shape }) =>
-            !(
-              clearsInterval(turnAt, shape, radius * Math.abs(turn.angleRadians)) &&
-              clearsInterval(drawAt, shape, length(sub(motion.end, motion.start)))
-            ),
-        )
+        .filter(({ shape }) => !paths.every(({ at, speedBound }) => clearsInterval(at, shape, speedBound)))
         .map(({ id }) => `${part.id}.${solid.id} vs ${id}`);
     });
   });

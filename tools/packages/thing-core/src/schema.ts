@@ -1,4 +1,4 @@
-import type { Motion } from '@skelly/motion/motion';
+import { type Motion, stopsError } from '@skelly/motion/motion';
 import {
   array,
   type BaseIssue,
@@ -17,6 +17,7 @@ import {
   optional,
   picklist,
   pipe,
+  rawCheck,
   record,
   regex,
   strictObject,
@@ -139,8 +140,10 @@ export const StopsSchema = pipe(
   array(strictObject({ name: Name, clock: pipe(number(), finite(), minValue(0), maxValue(1)) })),
   minLength(2, 'needs a stop at rest and one at the end'),
   check((stops) => stops[0]?.clock === 0 && stops.at(-1)?.clock === 1, 'must run from clock 0 to 1'),
-  check((stops) => stops.every(({ clock }, i) => i === 0 || clock > stops[i - 1]!.clock), 'clocks must increase'),
-  check((stops) => new Set(stops.map(({ name }) => name)).size === stops.length, 'two stops of one name'),
+  rawCheck(({ dataset, addIssue }) => {
+    const error = dataset.typed ? stopsError(dataset.value) : undefined;
+    if (error !== undefined) addIssue({ message: error });
+  }),
 );
 
 /**

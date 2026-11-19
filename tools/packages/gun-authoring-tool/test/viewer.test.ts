@@ -17,7 +17,7 @@ import { GUN_PALETTE } from '../src/gun/palette.ts';
 import { TEMPLATES } from '../src/gun/templates.ts';
 import { GUN_UNITS } from '../src/gun/units.ts';
 import { buildLayers, disposeGroup } from '../src/viewer/scene.ts';
-import { loadFixture } from './helpers.ts';
+import { loadFixture, strokeOf } from './helpers.ts';
 
 describe('viewer geometry', () => {
   // Builds viewer representations for the authored design corpus.
@@ -135,7 +135,7 @@ describe('viewer geometry', () => {
 
   it('renders a view-only pump action-open pose by moving the carrier and forend together', () => {
     const report = validate(loadFixture('archetype-pump-shotgun'), gunDomain);
-    const travel = report.resolved.defs.get('bolt-carrier')?.motion?.end[0] ?? 0;
+    const [travel] = strokeOf(report.resolved, 'bolt-carrier');
     const offsets = new Map<string, Vec3>([
       ['bolt-carrier', [-travel, 0, 0]],
       ['forend', [-travel, 0, 0]],
