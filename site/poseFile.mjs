@@ -85,8 +85,8 @@ export function poseIssues(rig, file) {
           issues.push(`moved.${model}: no hand holds ${model}`);
         if (!isObject(parts)) issues.push(`moved.${model} maps part names to clocks 0..1`);
         else
-          for (const [part, share] of Object.entries(parts))
-            if (!(Number.isFinite(share) && share >= 0 && share <= 1))
+          for (const [part, clock] of Object.entries(parts))
+            if (!(Number.isFinite(clock) && clock >= 0 && clock <= 1))
               issues.push(`moved.${model}.${part} is a clock 0..1`);
       }
   }

@@ -99,8 +99,22 @@ export function paceOf(layers, bounds, first = 0) {
  */
 const stowsOver = (planes, start, end, frame = IDENTITY) =>
   planes.map(({ layers, first, direction, stow, pace = 0 }) => ({
-    from: compose(poseAt(layers, start, first), frame),
-    to: compose(poseAt(layers, end, first), frame),
+    from: compose(
+      poseAt(
+        layers,
+        layers.map(() => start),
+        first,
+      ),
+      frame,
+    ),
+    to: compose(
+      poseAt(
+        layers,
+        layers.map(() => end),
+        first,
+      ),
+      frame,
+    ),
     direction,
     stow,
     reach: pace * (end - start),
@@ -165,7 +179,10 @@ export function sweptBounds(shape, layers, pace) {
   const out = [0, 0, 0];
   const corners = cornersOf(shape);
   for (let i = 0; i <= SWEPT_CLOCKS; i++) {
-    const pose = poseAt(layers, i / SWEPT_CLOCKS);
+    const pose = poseAt(
+      layers,
+      layers.map(() => i / SWEPT_CLOCKS),
+    );
     for (const corner of corners) {
       apply(pose, corner, out);
       for (const axis of AXES) {
@@ -459,7 +476,10 @@ export function sweepBody({ layers, movers, obstacles, step, tolerance }) {
     }
     let pose = known.get(c);
     if (pose === undefined) {
-      pose = poseAt(list, c);
+      pose = poseAt(
+        list,
+        list.map(() => c),
+      );
       known.set(c, pose);
     }
     return pose;

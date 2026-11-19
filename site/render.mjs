@@ -141,14 +141,15 @@ const ownCopy = (material, copies) => {
   return copy;
 };
 
-// Carries every part of `moving` to `clock` on its motion, a number for every layer or one for each (motionPose.mjs,
-// `Clocks`), and hides what a slide has stowed into its carrier.
+// Carries every part of `moving` to `clock` on its motion, a number for every layer or a list with one for each layer
+// of every part, and hides what a slide has stowed into its carrier.
 export function swing(moving, clock) {
   for (const { carrier, layers, materials } of moving) {
-    const m = poseAt(layers, clock);
+    const clocks = typeof clock === 'number' ? layers.map(() => clock) : clock;
+    const m = poseAt(layers, clocks);
     carrier.matrix.set(m[0], m[1], m[2], m[9], m[3], m[4], m[5], m[10], m[6], m[7], m[8], m[11], 0, 0, 0, 1);
     carrier.matrixWorldNeedsUpdate = true;
-    const planes = stowClips(layers, clock).map(
+    const planes = stowClips(layers, clocks).map(
       ({ normal, constant }) => new THREE.Plane(new THREE.Vector3(...normal), constant),
     );
     for (const material of materials) material.clippingPlanes = planes;
@@ -172,7 +173,11 @@ export function atStop(obj, loaded, entry, name) {
   }
   for (const mover of loaded.moving ? movers(obj, loaded) : []) {
     const clocks = mover.layers.map((layer) => stopOf(layer, name));
-    if (clocks.some((clock) => clock !== undefined)) swing([mover], clocks.map((clock) => clock ?? 0));
+    if (clocks.some((clock) => clock !== undefined))
+      swing(
+        [mover],
+        clocks.map((clock) => clock ?? 0),
+      );
   }
   return obj;
 }

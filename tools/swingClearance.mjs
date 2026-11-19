@@ -272,7 +272,10 @@ export function sweepVehicle({ grain, forward, motions, sites, adjust = {}, only
   const posed = bodies.map(({ site, layers, members, carriers }) => ({
     site,
     carriers,
-    pose: poseAt(layers, 1),
+    pose: poseAt(
+      layers,
+      layers.map(() => 1),
+    ),
     planes: stowPlanesOf(layers),
     shapes: members.flatMap(shapesOf),
     members,

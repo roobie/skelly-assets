@@ -90,14 +90,14 @@ export const invert = (m) => [
 const poseOf = ({ rotation: [x, y, z], shift }) => [...x, ...y, ...z, ...shift];
 
 /**
- * A clock for every layer: one number runs them all on that clock, a list gives each layer its own, as a stop one layer
- * names at a clock other than another layer's does.
- * @typedef {number | readonly number[]} Clocks
+ * A clock for every layer, each its own, as a stop one layer names at a clock other than another layer's does.
+ * @typedef {readonly number[]} Clocks
  */
-const layerClock = (/** @type {Clocks} */ clock, /** @type {number} */ layer) =>
-  typeof clock === 'number' ? clock : clock[layer] ?? 0;
-const fromLayer = (/** @type {Clocks} */ clock, /** @type {number} */ layer) =>
-  typeof clock === 'number' ? clock : clock.slice(layer);
+const layerClock = (/** @type {Clocks} */ clocks, /** @type {number} */ layer) => {
+  const clock = clocks[layer];
+  if (clock === undefined) throw new Error(`no clock for layer ${layer}: ${clocks.length} given`);
+  return clock;
+};
 
 /**
  * Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
@@ -138,7 +138,7 @@ export const stowPlanesOf = (layers) =>
 export function stowClips(layers, clock) {
   const body = invert(poseAt(layers, clock));
   return stowPlanesOf(layers).map(({ layers: outer, from, first, direction: [dx, dy, dz], stow }) => {
-    const m = compose(poseAt(outer, fromLayer(clock, from), first), body);
+    const m = compose(poseAt(outer, clock.slice(from), first), body);
     return {
       normal: [
         -(m[0] * dx + m[3] * dy + m[6] * dz),
