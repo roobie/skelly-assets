@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2880"><title>M16A4 side profile trace, image-pixel coordinates</title><desc>Manual visible-edge trace of the carry handle, front sight base and stock comb. Calibration and provenance belong to the adjacent trace record.</desc><g fill="none" stroke-width="3" stroke-linejoin="round"><path id="carry-handle" stroke="#147cf3" d="M1212,1240 L1212,1222 L1240,1151 L1260,1151 L1260,1092 L1272,1079 L1358,1079 L1358,1082.8 L1405,1088.4 L1405,1093 L1800,1132.5 L1820,1138 L1832,1148 L1838.5,1165 L1838.5,1240"/>
+<path id="carry-handle-window" stroke="#147cf3" d="M1405,1203 L1405,1137.5 L1809.5,1137.5 L1809.5,1203 L1405,1203"/>
+<path id="front-sight-base" stroke="#db2763" d="M3013,1300 L3013,1262 L3089,1140 L3096,1130 L3102,1124 L3123,1112 L3130,1109 L3146,1109 L3151,1112 L3157,1118 L3161,1124 L3164,1130 L3166,1140 L3178,1300"/>
+<path id="front-sight-base-window" stroke="#db2763" d="M3090.25,1162 L3159,1162 L3163,1282 L3044,1282 L3027,1254 L3090.25,1162"/>
+<path id="a2-stock-comb" stroke="#ee7400" d="M920,1281 L1080,1281"/>
+</g></svg>
