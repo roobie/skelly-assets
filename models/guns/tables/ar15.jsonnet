@@ -122,6 +122,9 @@ local m4Lengths = { extended: 838.2, collapsed: 755.65 };
 // The carrier's gas key, which the charging handle draws it back by, and the room the handle has behind it, from the
 // technical data package figures a gas key patent quotes.
 local gasKeyPatent = 'https://patents.google.com/patent/US10982916B1/en';
+// A mil-spec-size billet dust cover as a shop lists it, 3.13 in long and 0.885 in high; Brownells lists the Luth-AR
+// cover at 3.133 in by 0.882 in.
+local fortisDustCover = 'https://armsagora.com/fortis-manufacturing-billet-dust-cover-for-850015927034';
 
 // The A2 parts are traced off the M16A4 side photos, each scaled by the rifle's published overall length. The side
 // photo's heights are over its bore, which the sight line is measured from.
@@ -343,11 +346,21 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       bottomY: tracedY(97, 'brassDeflector'),
       stand: dim(6, 'derived: a hump standing out of the right side'),
     },
+    // The port is cut to the cover that closes it, whose size a shop lists. The trace of the cover reads 83.6 mm by
+    // 13.1 mm and stands 10.3 mm ahead of the bolt face, so only its bottom edge is kept.
     ejectionPort: {
-      rearX: tracedX(459, 'ejectionPortCover'),
-      frontX: tracedX(529, 'ejectionPortCover'),
-      topY: tracedY(110, 'ejectionPortCover'),
+      frontX: dim(-breechSetback, "derived: on the bolt face, so the bolt's head ejects through the port's front"),
+      rearX: dim(self.frontX.mm - $.portCover.length.mm, 'derived: as long as the cover'),
       bottomY: tracedY(121, 'ejectionPortCover'),
+      // The cover is drawn thicker than it is, inward into the port, so its inner top edge swings out above the cover's
+      // top; the port is cut that much taller.
+      topY: dim(
+        self.bottomY.mm - $.portCover.rodDrop.mm + std.sqrt(
+          std.pow($.portCover.rodDrop.mm + $.portCover.height.mm, 2)
+          + std.pow($.portCover.rodStandoff.mm + $.portCover.drawnThickness.mm, 2)
+        ),
+        "derived: as far over the cover's rod as its drawn inner top edge swings",
+      ),
       lane: dim(100, 'derived: room for a spent case to leave the port'),
     },
     wall: detailWall('an aluminium receiver'),
@@ -385,10 +398,21 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     },
   },
 
-  // The ejection port's dust cover, hung on its rod along the port's bottom edge.
+  // The ejection port's dust cover, closing the port flush with its outer face standing its thickness off the upper's
+  // side, and hung on a rod under the port's bottom edge and outboard of the cover. It turns out and down about the rod
+  // until its outer face comes to rest on the magazine well's top outer edge, which stands out past the upper's side.
   portCover: {
-    thickness: dim(detailFeature, 'derived: the ~1 mm sheet exaggerated to two detail voxels, so the cover reads as a lid that moves'),
-    openAngle: angle(63, "derived: the cover turns down about its rod until it meets the magazine well's flank"),
+    length: dim(79.502, 'sourced: 3.13 in, ' + fortisDustCover),
+    height: dim(22.479, 'sourced: 0.885 in, ' + fortisDustCover),
+    thickness: dim(1, 'derived: a stamped steel sheet'),
+    drawnThickness: dim(detailFeature, 'derived: two detail voxels, drawn inward of the outer face into the port'),
+    rodDrop: dim(0.75, "derived: the rod's centre under the port's bottom edge, in the upper's hinge lugs"),
+    rodStandoff: dim(0.85, "derived: the rod's centre outboard of the cover's outer face, inside the knuckle rolled round it"),
+    // Where the well's top outer edge stands from the rod, and the turn that brings the outer face onto it.
+    local rod = [$.upper.ejectionPort.bottomY.mm - self.rodDrop.mm, $.upper.halfWidth.mm + self.thickness.mm + self.rodStandoff.mm],
+    local edge = [$.lower.partingY.mm - rod[0], $.lower.well.outerHalfWidth.mm - rod[1]],
+    local turn = std.atan2(-edge[0], edge[1]) + std.acos(-self.rodStandoff.mm / std.sqrt(edge[0] * edge[0] + edge[1] * edge[1])),
+    openAngle: angle(turn * 180 / std.pi, "derived: the turn that rests the cover's outer face on the magazine well's top outer edge"),
   },
 
   barrel: {

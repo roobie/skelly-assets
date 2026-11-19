@@ -248,12 +248,16 @@ describe('the stop sweep', () => {
       return { ...carbine, motions: new Map(carbine.motions).set(id, { ...motion, stages: motion.stages.map(by) }) };
     };
 
-    it('opens the port cover to the magazine well and no further', () => {
+    it('opens the port cover down to the magazine well, out of the ejection lane, and no further', () => {
       expect(sweepStops(carbine)).toEqual([]);
-      const past = overrun('port-cover', (stage) =>
-        stage.kind === 'hinge' ? { ...stage, angle: stage.angle + 2 } : stage,
+      const turnedTo = (angle: (open: number) => number) =>
+        sweepStops(
+          overrun('port-cover', (stage) => (stage.kind === 'hinge' ? { ...stage, angle: angle(stage.angle) } : stage)),
+        );
+      expect(turnedTo((open) => open + 2).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
+      expect(turnedTo(() => 90).some((issue) => /^port-cover at open: .*ejection volume of upper/.test(issue))).toBe(
+        true,
       );
-      expect(sweepStops(past).some((issue) => /^port-cover\.cover vs lower\./.test(issue))).toBe(true);
     });
 
     const { chargingHandle, stock, stockA2 } = AR15_FRAME.table;
