@@ -272,6 +272,8 @@ const keepOut = (
     ...(options?.allowFamilies ? { allowFamilies: options.allowFamilies } : {}),
   };
 };
+/** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and its bolt handle. */
+const ACTION_ALLOWANCE = { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] } as const;
 /** Tag for parts the firing hand can hold (see rules.ts). */
 export const FIRING_GRIP = 'firing-grip';
 /** A front post built into another part, which a built-in rear sight's drawn line aims at; see `exportGlb.ts`. */
@@ -1601,6 +1603,7 @@ const addActionKeepOuts = (params: Readonly<Record<string, string>>, keepOuts: K
           'bolt-stock-clearance',
           [-26, params.section === 'sporter' ? SPORTER_PROPORTIONS.stock.joinTopU : -1.5, -1.5],
           [-16, 1.5, 1.5],
+          ACTION_ALLOWANCE,
         ),
       );
       break;
@@ -1665,9 +1668,15 @@ const addFeedKeepOuts = (context: ReceiverContext, keepOuts: KeepOut[]): void =>
     case 'top':
       // The roof-mouth is closed to every family. Above it, opticLoadingClearance permits only bodies.
       keepOuts.push(
-        keepOut('loading-mouth', [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5], [-4, receiverTop, 1.5]),
+        keepOut(
+          'loading-mouth',
+          [-4 - carrierTravelLength(params), receiverTop - 0.5, -1.5],
+          [-4, receiverTop, 1.5],
+          ACTION_ALLOWANCE,
+        ),
         keepOut('loading-port', [-4 - carrierTravelLength(params), receiverTop, -1.5], [-4, 9, 1.5], {
-          allowFamilies: ['sight'],
+          allowPort: ACTION_ALLOWANCE.allowPort,
+          allowFamilies: ['sight', ...ACTION_ALLOWANCE.allowFamilies],
         }),
       );
       break;
@@ -1694,7 +1703,7 @@ const receiverKeepOuts = (context: ReceiverContext): KeepOut[] => {
       'ejection',
       [portWindow.x[0], portWindow.y[0], sectionData?.faces.portSide ?? 2],
       [portWindow.x[1], portWindow.y[1], 10],
-      { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] },
+      ACTION_ALLOWANCE,
     ),
   ];
   keepOuts.push(
@@ -2854,12 +2863,10 @@ const compactSmgLower = (top: PortDef, withGuard: boolean): PartDef => {
         [traced.triggerFinger.x[0], traced.triggerFinger.y[0] - origin[1], -1],
         [traced.triggerFinger.x[1], traced.triggerFinger.y[1] - origin[1], 1],
       ),
-      keepOut(
-        'magazine-path',
-        [wellRearX, -40, -wellInner],
-        [wellFrontX, magazine.port[1] - origin[1], wellInner],
-        'magazine',
-      ),
+      keepOut('magazine-path', [wellRearX, -40, -wellInner], [wellFrontX, magazine.port[1] - origin[1], wellInner], {
+        allowPort: 'magazine',
+        allowFamilies: ['bolt-carrier'],
+      }),
     ],
     axes: [],
   };
@@ -2979,7 +2986,7 @@ const lower: PartFamily = {
         'magazine-path',
         [x - wellDepth / 2, -40, -wellWidth / 2],
         [x + wellDepth / 2, pathTop, wellWidth / 2],
-        'magazine',
+        { allowPort: 'magazine', allowFamilies: ['bolt-carrier'] },
       );
       if (tilt === 0) {
         return { port, path };

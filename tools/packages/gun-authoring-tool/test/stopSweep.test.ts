@@ -7,6 +7,7 @@ import type { BoxSolid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { gunDomain } from '../src/gun/domain.ts';
+import { FAL_FOLDING_STOCK } from '../src/gun/falFoldingStock.ts';
 import { sweepPartStops, sweepStops } from '../src/gun/stopSweep.ts';
 import { loadCorpus, loadFixture } from './helpers.ts';
 
@@ -89,11 +90,14 @@ describe('the stop sweep', () => {
     expect(issues.some((issue) => issue.endsWith('vs blocker from open to notched'))).toBe(true);
   });
 
-  it('passes a part that rests flush against an obstacle and draws away from it', () => {
+  it.each([
+    ['rests flush against an obstacle and draws away from it', [-1, 0, 0]],
+    ['slides flush along an obstacle the whole way', [0, 0, 1]],
+  ] as const)('passes a part that %s', (_, direction) => {
     const solid: BoxSolid = { id: 'slab', kind: 'box', box: { center: [0.5, 0.5, 0.5], half: [0.5, 0.5, 0.5] } };
     const motion = resolveMotion(
       {
-        stages: [{ kind: 'slide', direction: [-1, 0, 0], travel: 3 }],
+        stages: [{ kind: 'slide', direction, travel: 3 }],
         stops: [
           { name: 'a', stage: 0, at: 0 },
           { name: 'b', stage: 0 },
@@ -120,12 +124,16 @@ describe('the stop sweep', () => {
     );
     expect(sweepStops(folding)).toEqual([]);
     // The upper tube raised by its own thickness lies in the ejection volume once the stock is folded.
+    const [tubeBottom, tubeTop] = FAL_FOLDING_STOCK.tube.upperYU;
     const stock = folding.defs.get('stock')!;
     const raised = stock.solids.map((solid) =>
       solid.id === 'tube-upper' && solid.kind === 'box'
         ? {
             ...solid,
-            box: { ...solid.box, center: [solid.box.center[0], solid.box.center[1] + 1, solid.box.center[2]] as Vec3 },
+            box: {
+              ...solid.box,
+              center: [solid.box.center[0], solid.box.center[1] + (tubeTop - tubeBottom), solid.box.center[2]] as Vec3,
+            },
           }
         : solid,
     );

@@ -1,5 +1,5 @@
 import { motionTransform } from '@skelly/construct/assembly/motion.ts';
-import { keepOutForPart } from '@skelly/construct/assembly/rules.ts';
+import { keepOutsMetBy } from '@skelly/construct/assembly/rules.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
 import type { Transform, Vec3 } from '@skelly/construct/foundation/math.ts';
@@ -13,7 +13,6 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { type Motion, stageDistance } from '@skelly/motion/motion';
-import { resolveGunAction } from './actionDescription.ts';
 import { hingeOf } from './actionMotion.ts';
 
 /** A moving solid's pose along a path, by the path's phase from 0 to 1. */
@@ -33,34 +32,32 @@ const cachedPoses = (at: Path): Path => {
   };
 };
 
-const MAX_DEPTH = 20;
-
-/** Certify continuous intervals by bounding each vertex's maximum displacement from the midpoint. */
-const clearsInterval = (
-  at: Path,
-  obstacle: WorldSolid,
-  speedBound: number,
-  interval = { lo: 0, hi: 1, depth: 0 },
-): boolean => {
-  const { lo, hi, depth } = interval;
+/**
+ * Certify continuous intervals by bounding each vertex's maximum displacement from the midpoint. Parts that only touch
+ * never part by distance however finely an interval is split, so a touching interval is accepted once the part cannot
+ * move more than the position allowance within it: the guarantee is in units, not in how deep the search went.
+ */
+const clearsInterval = (at: Path, obstacle: WorldSolid, speedBound: number, interval = { lo: 0, hi: 1 }): boolean => {
+  const { lo, hi } = interval;
   const middle = (lo + hi) / 2;
   const shape = at(middle);
-  if (lowerBoundDistanceWorld(shape, obstacle) > (speedBound * (hi - lo)) / 2 + 1e-9) {
+  const reach = (speedBound * (hi - lo)) / 2;
+  if (lowerBoundDistanceWorld(shape, obstacle) > reach + 1e-9) {
     return true;
   }
-  if (distanceWorld(shape, obstacle) > (speedBound * (hi - lo)) / 2 + 1e-9) {
+  if (distanceWorld(shape, obstacle) > reach + 1e-9) {
     return true;
   }
-  if (penetrationWorld(shape, obstacle) > TOLERANCE.contact) {
+  const penetration = penetrationWorld(shape, obstacle);
+  if (penetration > TOLERANCE.contact) {
     return false;
   }
-  // Parts that only touch, flush, never part from the obstacle however finely the interval is split.
-  if (depth >= MAX_DEPTH) {
+  if (penetration + reach <= TOLERANCE.position) {
     return true;
   }
   return (
-    clearsInterval(at, obstacle, speedBound, { lo, hi: middle, depth: depth + 1 }) &&
-    clearsInterval(at, obstacle, speedBound, { lo: middle, hi, depth: depth + 1 })
+    clearsInterval(at, obstacle, speedBound, { lo, hi: middle }) &&
+    clearsInterval(at, obstacle, speedBound, { lo: middle, hi })
   );
 };
 
@@ -119,25 +116,24 @@ export const sweepPartStops = (part: SweptPart, obstacles: readonly Obstacle[]):
   );
 };
 
-/** Every keep-out `id` meets when it stands at each named stop of `motion`, as `id at stop: what intrudes`. */
+/**
+ * The keep-outs of other parts that `id` occupies at each named stop of `motion`, as `id at stop: what intrudes`. Its own
+ * keep-outs describe its whole travel from rest, so carrying them to a stop would mean nothing.
+ */
 const keepOutsAtStops = (resolved: Resolved, id: string, motion: Motion): readonly string[] =>
   motion.stops.flatMap(({ name, clock }) => {
     const placed = new Map(resolved.placed).set(id, motionTransform(resolved.placed.get(id)!, motion, clock));
-    return keepOutForPart({ ...resolved, placed }, id).map(({ message }) => `${id} at ${name}: ${message}`);
+    return keepOutsMetBy({ ...resolved, placed }, id).map(({ message }) => `${id} at ${name}: ${message}`);
   });
 
 /**
  * Certify every stop and every span between stops of every part of the gun that turns, a bolt's or a handle's turn and
- * a stock's fold alike: each span against everything that does not move, and each stop against the keep-outs. The
- * action's own parts are no judge of keep-outs, which are made room for them: a bolt rides through the receiver's
- * loading and clearance volumes by design. A part that only slides is left to `sweepMovingPart`, which certifies it
- * against its keep-outs: a pistol's slide rides inside its frame's rails by design, so solids that overlap there are no
- * clash. A slide part with stops of its own would need adding here.
+ * a stock's fold alike: each span against everything that does not move, and each stop against the keep-outs of the
+ * other parts. A part that only slides is not swept here, and no gate certifies its stops yet: a pistol's slide rides
+ * inside its frame's rails by design, so solids that overlap there are no clash. A slide part with stops of its own
+ * would need adding here.
  */
 export const sweepStops = (resolved: Resolved): readonly string[] => {
-  const actionParts = new Set(
-    Object.values(resolveGunAction(resolved)?.parts ?? {}).flatMap((part) => (part ? [part.id] : [])),
-  );
   const obstacles = [...resolved.defs]
     .filter(([id]) => !resolved.motions.has(id))
     .flatMap(([id, def]) =>
@@ -150,6 +146,6 @@ export const sweepStops = (resolved: Resolved): readonly string[] => {
         { id, placed: resolved.placed.get(id)!, solids: resolved.defs.get(id)!.solids, motion },
         obstacles,
       ),
-      ...(actionParts.has(id) ? [] : keepOutsAtStops(resolved, id, motion)),
+      ...keepOutsAtStops(resolved, id, motion),
     ]);
 };
