@@ -1,0 +1,44 @@
+{
+  "name": "broken-action-role-unique",
+  "description": "AR rifle with a second charging handle on the same port, so two parts claim the charging-handle action role; the shared port also fails port-compat and the handles overlap.",
+  "expect": ["action-role-unique", "port-compat", "solid-overlap"],
+  "root": "receiver",
+  "parts": {
+    "receiver": {
+      "family": "receiver",
+      "params": {
+        "action": "auto",
+        "feed": "box",
+        "bore": "M",
+        "chargingHandle": "rear-top",
+        "rail": "full",
+        "section": "ar"
+      }
+    },
+    "charging-handle": { "family": "ar-charging-handle" },
+    "spare-charging-handle": { "family": "ar-charging-handle" },
+    "bolt-carrier": { "family": "bolt-carrier", "params": { "pattern": "ar" } },
+    "lower": { "family": "lower", "params": { "layout": "ar" } },
+    "barrel": { "family": "barrel", "params": { "length": "M" } },
+    "handguard": { "family": "handguard", "params": { "layout": "ar" } },
+    "grip": { "family": "grip", "params": { "length": "M" } },
+    "magazine": { "family": "magazine", "params": { "length": "M", "profile": "stanag-straight" } },
+    "stock": { "family": "stock", "params": { "length": "M", "style": "m4" } },
+    "front-sight": { "family": "front-sight", "params": { "style": "ar" } },
+    "rear-sight": { "family": "rail-rear-sight" }
+  },
+  "connections": [
+    { "from": "receiver.charging-handle", "to": "charging-handle.mount" },
+    { "from": "receiver.charging-handle", "to": "spare-charging-handle.mount" },
+    { "from": "receiver.lower", "to": "lower.top" },
+    { "from": "receiver.barrel", "to": "barrel.rear" },
+    { "from": "receiver.bolt-carrier", "to": "bolt-carrier.mount" },
+    { "from": "receiver.handguard", "to": "handguard.rear" },
+    { "from": "handguard.front", "to": "barrel.clamp" },
+    { "from": "lower.grip", "to": "grip.top" },
+    { "from": "lower.magazine", "to": "magazine.top" },
+    { "from": "receiver.stock", "to": "stock.front" },
+    { "from": "barrel.front-sight", "to": "front-sight.base" },
+    { "from": "receiver.rail", "to": "rear-sight.base", "slot": 1 }
+  ]
+}

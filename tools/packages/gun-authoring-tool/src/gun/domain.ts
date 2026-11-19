@@ -5,6 +5,7 @@ import { revolverRules } from './revolver.ts';
 import {
   actionFrameMatch,
   actionHandleRest,
+  actionRoleUnique,
   feedMatch,
   firingGrip,
   freeFloatClearance,
@@ -35,6 +36,7 @@ export const gunDomain: Domain = {
   rules: [
     firingGrip,
     actionHandleRest,
+    actionRoleUnique,
     thumbholeGripMatch,
     feedMatch,
     actionFrameMatch,

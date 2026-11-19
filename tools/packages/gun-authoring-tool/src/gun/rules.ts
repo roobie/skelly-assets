@@ -27,6 +27,7 @@ import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { FEATURE_VOXELS, featureFitsGrain } from '@skelly/thing-export/featureFit.ts';
 import { partVoxelGrain, VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
+import { ACTION_ROLE_TAGS } from './actionRoles.ts';
 import gunVoxel from './gunVoxel.json' with { type: 'json' };
 import { mountCanAccept } from './mounts.ts';
 import { getOptic, opticRailContactSolids } from './optics.ts';
@@ -138,6 +139,28 @@ export const actionHandleRest: Rule = {
       }
     }
     return issues;
+  },
+};
+
+/** The action description couples one part per role, so a second claimant would be silently ignored. */
+export const actionRoleUnique: Rule = {
+  id: 'action-role-unique',
+  title: 'Each action role belongs to one part',
+  check(r) {
+    return ACTION_ROLE_TAGS.flatMap((tag) => {
+      const claimants = placedParts(r)
+        .filter(([, def]) => def.tags?.includes(tag))
+        .map(([part]) => part);
+      return claimants.length > 1
+        ? [
+            {
+              rule: 'action-role-unique',
+              message: `${claimants.join(' and ')} both claim the "${tag}" action role.`,
+              parts: claimants,
+            },
+          ]
+        : [];
+    });
   },
 };
 
