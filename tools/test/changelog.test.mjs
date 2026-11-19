@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
-import { addedNotes, NOTES_DIR, parseNote, readNotes, release, versionSection } from '../changelog.mjs';
+import { addedNotes, NOTES_DIR, parseNote, readNotes, release, upgradesSince, versionSection } from '../changelog.mjs';
 
 const note = (type, body) => `---\ntype: ${type}\n---\n${body}\n`;
 const breaking = (change, upgrade) => note('breaking', `${change}\n\nUpgrade:\n${upgrade}`);
@@ -113,4 +113,18 @@ test('only notes a range adds count for a PR, not edits to pending notes or to t
     git('commit', '-qm', 'note');
     assert.deepEqual(addedNotes(root, 'HEAD~2', env), ['new.md']);
   });
+});
+
+test('the upgrade steps since a release are the pending notes and the sections gathered after it', () => {
+  const changelog = [
+    '# Changelog\n',
+    '## 0.3.0 - 2000-03-03\n\n### Breaking\n\n- B.\n\n### Upgrading from 0.2.0\n\n- Step three.\n\n### Added\n\n- A.\n',
+    '## 0.2.0 - 2000-02-02\n\n### Breaking\n\n- B.\n\n### Upgrading from 0.1.0\n\n- Step two.\n',
+    '## 0.1.0 - 2000-01-01\n\n### Added\n\n- A.\n',
+  ].join('\n');
+  const pending = [parseNote(breaking('C.', '- Step four.'), 'c.md'), parseNote(note('fixed', 'F.'), 'f.md')];
+  assert.deepEqual(upgradesSince(changelog, pending, 'v0.2.0'), ['- Step three.', '- Step four.']);
+  assert.deepEqual(upgradesSince(changelog, [], 'v0.1.0'), ['- Step three.', '- Step two.']);
+  assert.deepEqual(upgradesSince(changelog, [], '0.3.0'), []);
+  assert.throws(() => upgradesSince(changelog, [], 'v0.0.1'), /no section for 0\.0\.1/);
 });

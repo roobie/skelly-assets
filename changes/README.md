@@ -19,7 +19,8 @@ Name the file `changes/<short-slug>.md`. Its front matter holds only a `type`: `
 A breaking note also says what a consumer must do, after a line `Upgrade:`. A consumer moves its pin over one or
 more releases in a single commit, with the changes the new assets need, so each release gathers its notes' steps
 into one "Upgrading from" list rather than leaving them to be dug out of the changes. A renamed id needs no step of
-its own beyond applying the release's `renames.json`, which maps every retired id to its current one.
+its own beyond applying the release's `renames.json`, which maps every retired id to its current one. A released id
+with no successor is named in a step that drops it, which CI holds every build to.
 
 ```md
 ---

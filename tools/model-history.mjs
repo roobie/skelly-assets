@@ -12,6 +12,8 @@
 //          the latest release's history, for the showcase
 //        node tools/model-history.mjs backfill --out <file> --work <dir>
 //          rebuild it by walking every release
+//        node tools/model-history.mjs retired --history <file> --built <dir>
+//          fail on a model the history's release held that the build drops unannounced
 // The release commands read GitHub through `gh`.
 
 import { execFileSync } from 'node:child_process';
@@ -21,7 +23,8 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { MANIFEST } from './manifest.mjs';
+import { ROOT, repoUpgradesSince } from './changelog.mjs';
+import { MANIFEST, RENAMES } from './manifest.mjs';
 
 export const HISTORY_ASSET = 'model-history.json';
 
@@ -117,6 +120,18 @@ export function standings(history, hashes, renames = {}) {
 }
 
 /**
+ * The ids a release's history holds that a later build drops unannounced: neither held, renamed, nor named in one of
+ * `upgrades`, the upgrade steps told since that release. A consumer's saved id must keep resolving or be told it no
+ * longer will, and a model with no successor is a step the consumer takes.
+ */
+export function silentRetirements(history, hashes, renames, upgrades) {
+  const told = (id) => upgrades.some((step) => step.includes(`\`${id}\``));
+  return Object.keys(history.models)
+    .filter((id) => !Object.hasOwn(hashes, renames[id] ?? id) && !told(id))
+    .sort();
+}
+
+/**
  * A vehicle stands by its placements file and the models at its sites: it was introduced with its placements file, a
  * part's introduction says nothing of the vehicle, and it last changed when its placements or any part did. A part no
  * release holds is a change.
@@ -202,20 +217,42 @@ function backfillCommand({ out, work }) {
   write(out, history);
 }
 
+function retiredCommand({ history: file, built }) {
+  const history = readJson(file);
+  const manifest = readJson(join(built, MANIFEST));
+  const upgrades = repoUpgradesSince(ROOT, history.version);
+  const silent = silentRetirements(history, hashModels(built, manifest), manifest.renames, upgrades);
+  if (silent.length) {
+    const fix = `rename each in ${RENAMES}, or name it in a change note's upgrade step if it has no successor`;
+    throw new Error(`${history.version} held ${silent.join(', ')}, which this build drops unannounced; ${fix}`);
+  }
+  console.log(`every model ${history.version} held is still held, renamed or told dropped`);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const [command, ...rest] = process.argv.slice(2);
   const text = { type: 'string' };
-  const options = { tag: text, built: text, out: text, work: text, optional: { type: 'boolean', default: false } };
+  const options = {
+    tag: text,
+    built: text,
+    out: text,
+    work: text,
+    history: text,
+    optional: { type: 'boolean', default: false },
+  };
   const { values } = parseArgs({ args: rest, options });
-  const commands = { release: releaseCommand, fetch: fetchCommand, backfill: backfillCommand };
-  if (!commands[command] || !values.out) {
-    throw new Error('usage: node tools/model-history.mjs release|fetch|backfill --out <file> (see the file header)');
+  // Each command and the options it needs.
+  const commands = {
+    release: [releaseCommand, ['tag', 'built', 'out']],
+    fetch: [fetchCommand, ['out']],
+    backfill: [backfillCommand, ['out', 'work']],
+    retired: [retiredCommand, ['history', 'built']],
+  };
+  if (!Object.hasOwn(commands, command)) {
+    throw new Error(`usage: node tools/model-history.mjs ${Object.keys(commands).join('|')} (see the file header)`);
   }
-  if (command === 'backfill' && !values.work) {
-    throw new Error('backfill needs --work <dir>, where it downloads each release and deletes it again');
-  }
-  if (command === 'release' && !(values.tag && values.built)) {
-    throw new Error('release needs --tag <v*> and --built <dir>');
-  }
-  commands[command]({ ...values, out: resolve(values.out) });
+  const [run, needs] = commands[command];
+  const missing = needs.filter((option) => !values[option]).map((option) => `--${option}`);
+  if (missing.length) throw new Error(`${command} needs ${missing.join(' and ')}`);
+  run(values.out === undefined ? values : { ...values, out: resolve(values.out) });
 }

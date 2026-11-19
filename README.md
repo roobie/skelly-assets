@@ -171,7 +171,9 @@ shown or released; see `tools/check-built.mjs` and `tools/manifest.mjs`, `treeDi
 Renaming or merging a released model id adds the old id to `models/renames.json`, pointing at its current id, and
 repoints any entry that named it, so a consumer's saved ids keep resolving after it moves its pin. The build refuses
 a map whose retired id names a model again or whose target is no current model; see `tools/manifest.mjs`,
-`buildManifest`.
+`buildManifest`. A released model with no successor is dropped instead, named in a change note's upgrade step, since
+a consumer holding its id must act. CI fails a build that drops a model the latest release held without either; see
+`tools/model-history.mjs`, `silentRetirements`.
 
 ### Cues into skelly
 
