@@ -193,7 +193,11 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
         "derived: the detachable A2 handle's 1.63 in (" + wingCarryHandle + ') over the flat-top rail, the fixed one standing as tall',
       ),
       apertureY: dim(sightPlane.mm - flatTopExtra, 'derived: the sight plane less the ar-flat-top extra height, level with the carry-handle front post'),
-      apertureHalfHeight: dim(3, 'derived: a flip aperture plate between the ears'),
+      apertureHalfHeight: dim(5, 'derived: a flip aperture plate between the ears, a rim round its hole'),
+      apertureRadius: dim(
+        2.54,
+        "sourced: the large 0-2 aperture's 0.200 in (https://www.opticsplanet.com/luth-ar-a2-rear-sight-aperture.html)",
+      ),
       apertureThickness: dim(1.5, 'derived: a stamped aperture plate, drawn smooth'),
       slotHalfWidth: dim(3.5, 'derived: the slot between the ears the aperture flips in'),
       halfWidth: dim(9, 'derived: a forged handle narrower than the receiver'),

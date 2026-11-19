@@ -64,16 +64,26 @@ const carryHandle = (frame: ArFrame): UpperTop => {
   const apertureX = (rearX + sightFrontX) / 2;
   const apertureHalfThickness = u(h.apertureThickness) / 2;
   const earBottomY = apertureY - apertureHalf;
+  // The plate round the hole the eye looks through: above, below, and either side of it.
+  const hole = u(h.apertureRadius);
+  const apertureFrame: [string, [number, number], [number, number]][] = [
+    ['top', [apertureY + hole, apertureY + apertureHalf], [-slotHalf, slotHalf]],
+    ['bottom', [earBottomY, apertureY - hole], [-slotHalf, slotHalf]],
+    ['right', [apertureY - hole, apertureY + hole], [hole, slotHalf]],
+    ['left', [apertureY - hole, apertureY + hole], [-slotHalf, -hole]],
+  ];
   return {
     solids: [
       box('rear-sight-housing', [rearX, baseY, -half], [sightFrontX, earBottomY, half]),
       box('rear-sight-ear-right', [rearX, earBottomY, slotHalf], [sightFrontX, topY, half]),
       box('rear-sight-ear-left', [rearX, earBottomY, -half], [sightFrontX, topY, -slotHalf]),
-      box(
-        'rear-sight-aperture',
-        [apertureX - apertureHalfThickness, earBottomY, -slotHalf],
-        [apertureX + apertureHalfThickness, apertureY + apertureHalf, slotHalf],
-        { display: { smooth: { seat: Y } } },
+      ...apertureFrame.map(([id, [bottom, top], [right, left]]) =>
+        box(
+          `rear-sight-aperture-${id}`,
+          [apertureX - apertureHalfThickness, bottom, right],
+          [apertureX + apertureHalfThickness, top, left],
+          { display: { smooth: { seat: Y } } },
+        ),
       ),
       box('handle-bar', [sightFrontX, topY - u(h.barDepth), -half], [frontX - u(h.frontLegLength), topY, half]),
       box('handle-front-leg', [frontX - u(h.frontLegLength), baseY, -half], [frontX, topY, half]),

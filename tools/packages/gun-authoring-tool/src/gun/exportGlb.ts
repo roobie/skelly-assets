@@ -299,13 +299,15 @@ const sightCandidate = (resolved: Resolved, id: string, part: PartDef): SightCan
   if (eyeReliefU === undefined) {
     throw new Error(`Sight part ${id} needs exported eye relief`);
   }
-  let priority = 3;
+  // The eye is behind a rear sight, so a rear sight built into another part, such as a receiver or carry handle,
+  // outranks a front sight.
+  let priority = 2;
   if (optic) {
     priority = 0;
   } else if (family.includes('rear-sight')) {
     priority = 1;
   } else if (family.includes('front-sight')) {
-    priority = 2;
+    priority = 3;
   }
   return {
     id,
