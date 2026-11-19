@@ -36,6 +36,7 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
+import { ACTION_CARRIER_ROLES, ACTION_PART_ROLES, type GunPartFamily } from './actionRoles.ts';
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
 import { SHROUD_HALF_HEIGHT } from './antiMateriel/barrelShroud.ts';
@@ -43,6 +44,7 @@ import { ANTI_MATERIEL_FAMILIES } from './antiMateriel/index.ts';
 import { arChargingHandle, arChargingHandleSolidsFor, arHandleChannel } from './arChargingHandle.ts';
 import {
   AR_CARRIER_HEIGHTS,
+  AR_CYCLIC_RPM,
   AR_EJECTION_PORT_CENTERS,
   AR_FREE_FLOAT_HANDGUARDS,
   AR_LOWER_PROPORTIONS,
@@ -2307,6 +2309,7 @@ const boltHandleArm: PartFamily = {
       ],
       keepOuts: [boltHandleSweep(solids[0]!, basis.motionAxis, travel)],
       axes: [],
+      tags: [ACTION_PART_ROLES.arm],
       motion: {
         kind: 'linear',
         axis: basis.motionAxis,
@@ -2345,6 +2348,7 @@ const boltHandleKnob: PartFamily = {
       ],
       keepOuts: [boltHandleSweep(solids[0]!, basis.knobMotionAxis, travel)],
       axes: [],
+      tags: [ACTION_PART_ROLES.knob],
       motion: {
         kind: 'linear',
         axis: basis.knobMotionAxis,
@@ -2589,6 +2593,7 @@ const smgSlidingHandle: PartFamily = {
         ),
       ],
       axes: [],
+      tags: [ACTION_PART_ROLES.handle],
       motion: {
         kind: 'linear',
         axis: [1, 0, 0],
@@ -2604,7 +2609,7 @@ const smgSlidingHandle: PartFamily = {
 
 // ---- procedural bolt-carrier group ----
 
-const boltCarrier: PartFamily = {
+const boltCarrier: GunPartFamily = {
   name: 'bolt-carrier',
   params: {
     boltCalibre: { ...boltCalibreParam, from: [{ port: 'mount', param: 'boltCalibre' }] },
@@ -2751,8 +2756,12 @@ const boltCarrier: PartFamily = {
         sourceKeepOut: { port: 'mount', id: 'bolt-travel' },
         ...(pattern === 'bolt' ? { turn: boltTurn((params.handleProfile ?? 'standard') as BoltHandleProfile) } : {}),
       },
+      // The barrett pattern has no action description.
+      tags: pattern === 'barrett' ? [] : [ACTION_CARRIER_ROLES[pattern]],
     };
   },
+  // Only the AR pattern's frame table carries a cyclic rate.
+  cyclicRpm: (params) => (params.pattern === 'ar' ? AR_CYCLIC_RPM[arLayoutFor(params.actionFrame).frameId] : undefined),
 };
 
 // ---- lower ----
@@ -4656,6 +4665,7 @@ const forend: PartFamily = {
         },
       ],
       axes: [],
+      tags: [ACTION_PART_ROLES.forend],
       motion: {
         kind: 'linear',
         axis: NEG_X,
@@ -5075,6 +5085,7 @@ const pistolSlide: PartFamily = {
         start: [0, 0, 0],
         end: [-Math.ceil(mmToU(pistolAction.strokeMm) / GRID) * GRID, 0, 0],
       },
+      tags: [ACTION_CARRIER_ROLES.slide],
     };
   },
 };

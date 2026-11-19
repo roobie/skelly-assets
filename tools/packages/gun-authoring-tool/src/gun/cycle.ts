@@ -10,7 +10,6 @@ import {
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
-import { AR_CYCLIC_RPM, SMALL_AR_FRAME } from './arFrames.ts';
 
 export type GunAction = 'ak' | 'ar' | 'smg' | 'slide';
 export type CycleMode = 'fire' | 'hand';
@@ -33,6 +32,9 @@ export interface ActionCycleProfile {
 
 const unit = (v: Vec3): Vec3 => scale(v, 1 / length(v));
 
+/** A middling rate for an automatic carrier whose family reports none. */
+const GENERIC_FALLBACK_RPM = 600;
+
 /**
  * All cycle values are visual estimates. AK cyclic rate: about 600 rpm (Soviet/Russian AKM technical data).
  * SMG cyclic rate: about 800 rpm (HK MP5 specification); its bolt does not hold open on an empty magazine.
@@ -48,8 +50,8 @@ export const ACTION_CYCLE_PROFILES: Readonly<Record<GunAction, ActionCycleProfil
     dwellSeconds: 0.006,
   },
   ar: {
-    // A frame passes its own rate to `cycleMotion`; this default is the small frame's.
-    rpm: AR_CYCLIC_RPM[SMALL_AR_FRAME.id]!,
+    // Every AR carrier family reports its own rate; this is only the fallback for one that does not.
+    rpm: GENERIC_FALLBACK_RPM,
     holdOpenOnEmpty: true,
     ejectAt: 0.76,
     ejectDirection: unit([-0.16, 0.16, 0.97]),

@@ -1,12 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { expect, it } from 'vitest';
 import { actionOpenOffsets, resolveGunAction } from '../src/gun/actionDescription.ts';
+import { ACTION_PART_ROLES, type GunPartFamily } from '../src/gun/actionRoles.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import { buildLayers, disposeGroup } from '../src/viewer/scene.ts';
-import { loadFixture } from './helpers.ts';
+import { loadDesignAssembly, loadFixture } from './helpers.ts';
 
 it('discovers the pump open-pose pair after receiver/carrier/forend renames without moving validation or export', () => {
   const original = loadFixture('archetype-pump-shotgun');
@@ -54,5 +57,56 @@ it('discovers the pump open-pose pair after receiver/carrier/forend renames with
     for (const group of Object.values(layers)) {
       disposeGroup(group);
     }
+  }
+});
+
+it("couples the AR charging handle by role and fires at the carrier's own cyclic rate", () => {
+  for (const [design, rpm] of [
+    ['archetype-ar', 800],
+    ['archetype-ar-large', 700],
+  ] as const) {
+    const assembly = loadDesignAssembly(design);
+    const action = resolveGunAction(validate(assembly, gunDomain).resolved)!;
+    expect(action.parts.handle?.def.tags).toContain(ACTION_PART_ROLES.handle);
+    expect(action.cycle.rpm).toBe(rpm);
+  }
+});
+
+it('finds the handle and the carrier by their tags, whatever their family is named', () => {
+  const handle = gunDomain.families['ar-charging-handle']!;
+  const carrier = gunDomain.families['bolt-carrier']!;
+  const families: Record<string, GunPartFamily> = {
+    ...gunDomain.families,
+    'test-handle': {
+      ...handle,
+      name: 'test-handle',
+      build: (params) => ({ ...handle.build(params), family: 'test-handle' }),
+    },
+    'test-carrier': {
+      ...carrier,
+      name: 'test-carrier',
+      build: (params) => ({ ...carrier.build(params), family: 'test-carrier' }),
+      cyclicRpm: () => 650,
+    },
+  };
+  const original = loadDesignAssembly('archetype-ar');
+  const assembly: Assembly = {
+    ...original,
+    parts: {
+      ...original.parts,
+      'charging-handle': { family: 'test-handle' },
+      'bolt-carrier': { ...original.parts['bolt-carrier']!, family: 'test-carrier' },
+    },
+  };
+  const action = resolveGunAction(resolve(assembly, { ...gunDomain, families }))!;
+  expect(action.kind).toBe('ar');
+  expect(action.carrier.id).toBe('bolt-carrier');
+  expect(action.parts.handle?.id).toBe('charging-handle');
+  expect(action.cycle.rpm).toBe(650);
+});
+
+it('names no AR frame table in the action description or the cycle', () => {
+  for (const file of ['actionDescription.ts', 'cycle.ts']) {
+    expect(readFileSync(join(import.meta.dirname, '..', 'src', 'gun', file), 'utf8')).not.toContain('arFrames');
   }
 });

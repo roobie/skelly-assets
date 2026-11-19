@@ -952,13 +952,14 @@ describe('glb export: deadvox model entry', () => {
   });
 
   it.each([
-    ['archetype-ak', 'ak', false, { carrier: ['fire', 'hand'] }],
-    ['archetype-ar', 'ar', true, { carrier: ['fire', 'hand'], handle: ['hand'] }],
+    // The AK keeps its action profile's rate; the AR's comes from its frame's content.
+    ['archetype-ak', ACTION_CYCLE_PROFILES.ak.rpm, false, { carrier: ['fire', 'hand'] }],
+    ['archetype-ar', 800, true, { carrier: ['fire', 'hand'], handle: ['hand'] }],
   ] as const)(
     'exports action nodes, estimated cycles and ejection metadata for %s without changing GLB bytes',
-    (name, expectedAction, holdOpen, expectedModes) => {
+    (name, expectedRpm, holdOpen, expectedModes) => {
       const facts = actionExportFacts(name);
-      expect(facts.rpm).toBe(ACTION_CYCLE_PROFILES[expectedAction].rpm);
+      expect(facts.rpm).toBe(expectedRpm);
       expect(facts.holdOpen).toBe(holdOpen);
       expect(facts.fireDuration).toBeCloseTo(60 / facts.rpm, 9);
       expect(facts.handDuration).toBeGreaterThan(facts.fireDuration);
