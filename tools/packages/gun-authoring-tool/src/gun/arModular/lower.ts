@@ -1,11 +1,10 @@
 import type { KeepOut, PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
-import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
+import { boxFromMinMax, validateExtrudedPolygon } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, NEG_X, NEG_Y, X, Y } from '../antiMateriel/common.ts';
-import { triggerBlade } from '../roundedTriggerGuard.ts';
-import { TRIGGER_BLADE } from '../triggerGuards.ts';
-import { type ArFrame, type ArFrameTable, familyName, u } from './frame.ts';
+import { TRIGGER_BLADE_ID } from '../roundedTriggerGuard.ts';
+import { type ArFrame, type ArFrameTable, familyName, outlineU, u } from './frame.ts';
 
 type LowerTable = ArFrameTable['lower'];
 
@@ -30,22 +29,32 @@ const lowerLayout = (L: LowerTable) => ({
 });
 type LowerLayout = ReturnType<typeof lowerLayout>;
 
-/** The buffer tower and the body behind the magazine well, under the upper's parting line. */
+/**
+ * The buffer tower and the body behind the magazine well, under the upper's parting line. Over the trigger guard the
+ * body's floor is the guard's top bar, so the opening reaches up to the body's traced lower edge as the forging's does;
+ * the sides come down past the bar.
+ */
 const frameSolids = (L: LowerTable, at: LowerLayout): Solid[] => {
   const towerHalf = u(L.towerHalfWidth);
+  const [guardRearX, guardHalf, bar] = [u(L.triggerGuard.rearX), u(L.triggerGuard.halfWidth), u(L.triggerGuard.bar)];
+  const { bodyBottomY, halfWidth } = at;
   const body: Vec2[] = [
     [at.bodyRearX, u(L.towerBottomY)],
-    [u(L.bodyChamferX), at.bodyBottomY],
-    [at.well.rearX, at.bodyBottomY],
-    [at.well.rearX, at.partingY],
+    [u(L.bodyChamferX), bodyBottomY],
+    [guardRearX, bodyBottomY],
+    [guardRearX, at.partingY],
     [at.bodyRearX, at.partingY],
   ];
   const grip = at.gripMount;
+  const floorY = bodyBottomY + bar;
   return [
     box('tower', [at.towerRearX, u(L.towerBottomY), -towerHalf], [at.bodyRearX, u(L.towerTopY), towerHalf]),
-    { id: 'body', kind: 'extruded-polygon', profile: body, z: [-at.halfWidth, at.halfWidth] },
+    { id: 'body', kind: 'extruded-polygon', profile: body, z: [-halfWidth, halfWidth] },
+    box('body-over-guard', [guardRearX, floorY, -halfWidth], [at.well.rearX, at.partingY, halfWidth]),
+    box('body-over-guard-right', [guardRearX, bodyBottomY, guardHalf], [at.well.rearX, floorY, halfWidth]),
+    box('body-over-guard-left', [guardRearX, bodyBottomY, -halfWidth], [at.well.rearX, floorY, -guardHalf]),
     // The grip screws into this boss, level with the grip's top.
-    box('grip-boss', [grip.bossRearX, grip.y, -at.halfWidth], [grip.x, at.bodyBottomY, at.halfWidth]),
+    box('grip-boss', [grip.bossRearX, grip.y, -halfWidth], [grip.x, bodyBottomY, halfWidth]),
   ];
 };
 
@@ -67,7 +76,10 @@ const wellSolids = (at: LowerLayout): Solid[] => {
   ];
 };
 
-/** The finger's room inside the guard, and the four bars around it in the shape `trigger-guard` (gun/rules.ts) measures. */
+/**
+ * The finger's room inside the guard, and the four bars around it in the shape `trigger-guard` (gun/rules.ts) measures.
+ * The opening's top is the table's `topY`; the top bar stands above it, in the body's floor.
+ */
 const triggerGuard = (g: LowerTable['triggerGuard']): { readonly finger: KeepOut; readonly solids: Solid[] } => {
   const [rearX, frontX, bottomY, topY] = [u(g.rearX), u(g.frontX), u(g.bottomY), u(g.topY)];
   const [bar, clearance, half, fingerHalf] = [u(g.bar), u(g.fingerClearance), u(g.halfWidth), u(g.fingerHalfWidth)];
@@ -76,20 +88,52 @@ const triggerGuard = (g: LowerTable['triggerGuard']): { readonly finger: KeepOut
     kind: 'trigger-finger',
     box: boxFromMinMax(
       [rearX + bar + clearance, bottomY + bar, -fingerHalf],
-      [frontX - bar - clearance, topY - bar, fingerHalf],
+      [frontX - bar - clearance, topY, fingerHalf],
     ),
   };
   return {
     finger,
     solids: [
-      box('trigger-guard-top', [rearX, topY - bar, -half], [frontX, topY, half]),
-      box('trigger-guard-rear', [rearX, bottomY, -half], [rearX + bar, topY, half]),
-      box('trigger-guard-front', [frontX - bar, bottomY, -half], [frontX, topY, half]),
+      box('trigger-guard-top', [rearX, topY, -half], [frontX, topY + bar, half]),
+      box('trigger-guard-rear', [rearX, bottomY, -half], [rearX + bar, topY + bar, half]),
+      box('trigger-guard-front', [frontX - bar, bottomY, -half], [frontX, topY + bar, half]),
       box('trigger-guard-bottom', [rearX, bottomY, -half], [frontX, bottomY + bar, half]),
-      // The blade hangs from the guard's top bar, which closes the finger space from above.
-      triggerBlade(finger.box, TRIGGER_BLADE, topY - bar),
     ],
   };
+};
+
+/**
+ * The trigger blade swept along its midline from where it leaves the receiver to its tip, one convex segment per stretch
+ * of the midline, so the curve the finger pulls on keeps its bow.
+ */
+const triggerBlade = (t: LowerTable['trigger']): Solid[] => {
+  const midline = outlineU(t.midline);
+  const halfThickness = u(t.thickness) / 2;
+  const half = u(t.halfWidth);
+  const unit = ([x, y]: Vec2): Vec2 => [x / Math.hypot(x, y), y / Math.hypot(x, y)];
+  // The normal on the right of each stretch, walking from the receiver to the tip.
+  const stretchRights = midline.slice(1).map(([x, y], i) => unit([y - midline[i]![1], midline[i]![0] - x]));
+  // At each joint the side lines of the two stretches meet, so the blade stays as thick through its bends; it leaves
+  // the receiver level, flush under the guard's top bar.
+  const sides = midline.map(([x, y], i) => {
+    const before = stretchRights[Math.max(i - 1, 0)]!;
+    const after = stretchRights[Math.min(i, stretchRights.length - 1)]!;
+    const joint: Vec2 = i === 0 ? [Math.sign(after[0]), 0] : unit([before[0] + after[0], before[1] + after[1]]);
+    const reach = halfThickness / (joint[0] * after[0] + joint[1] * after[1]);
+    return {
+      right: [x + joint[0] * reach, y + joint[1] * reach] as Vec2,
+      left: [x - joint[0] * reach, y - joint[1] * reach] as Vec2,
+    };
+  });
+  return sides.slice(1).map((end, i): Solid => {
+    const start = sides[i]!;
+    const profile: Vec2[] = [start.right, end.right, end.left, start.left];
+    const error = validateExtrudedPolygon(profile, [-half, half]);
+    if (error) {
+      throw new Error(`Trigger blade segment ${i}: ${error}`);
+    }
+    return { id: `${TRIGGER_BLADE_ID}-${i}`, kind: 'extruded-polygon', profile, z: [-half, half] };
+  });
 };
 
 /**
@@ -145,7 +189,7 @@ export const arLower = (frame: ArFrame): PartFamily => ({
     };
     return {
       family: 'lower',
-      solids: [...frameSolids(L, at), ...wellSolids(at), ...guard.solids],
+      solids: [...frameSolids(L, at), ...wellSolids(at), ...guard.solids, ...triggerBlade(L.trigger)],
       ports,
       keepOuts: [guard.finger, magazinePath],
       axes: [],
@@ -153,6 +197,11 @@ export const arLower = (frame: ArFrame): PartFamily => ({
       features: [
         { name: 'well-wall', size: u(L.well.wall), disposition: { kind: 'detail' } },
         { name: 'trigger-guard-bar', size: u(L.triggerGuard.bar), disposition: { kind: 'detail' } },
+        {
+          name: 'trigger-blade',
+          size: u(L.trigger.thickness),
+          disposition: { kind: 'exaggerated', reason: 'drawn two detail voxels thick, so the blade exports whole' },
+        },
       ],
     };
   },

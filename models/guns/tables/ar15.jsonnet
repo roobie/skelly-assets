@@ -59,6 +59,18 @@ local handguardClearance = { top: 2, side: 2.5 };
 // The grip seats level on the lower: its top is taken at the traced front corner, the 4 px rise behind it being tilt.
 local gripMount = [xOf(418), yOf(162)];
 local guardTopY = yOf(145);
+// The trigger blade's shape is read off the receiver close-up, the only reference that resolves it, at that photo's
+// rail-pitch scale: the midline between its traced rear and front edges, level by level from where it leaves the
+// receiver to its tip. It hangs from the top of the profile's trigger trace. The profile's coarser trace bows the same
+// way but runs 5 mm longer, which would put the tip into the guard's floor bar.
+local closeUp = import '../references/ar15-receiver.trace.jsonnet';
+local closeUpCalibration = closeUp.reference.calibration;
+local closeUpMmPerPx =
+  closeUpCalibration.lengthMm.value / (closeUpCalibration.pixels.value[1][0] - closeUpCalibration.pixels.value[0][0]);
+local bladeRear = [[1795, 2120], [1770, 2300], [1800, 2420], [1890, 2520]];
+local bladeFront = [[1850, 2120], [1805, 2300], [1830, 2400], [1900, 2490]];
+local bladeMid = [[(bladeRear[i][0] + bladeFront[i][0]) / 2, (bladeRear[i][1] + bladeFront[i][1]) / 2] for i in std.range(0, 3)];
+local bladeHang = [xOf(440), guardTopY];
 // The barrel's breech sits this far behind the upper front face: the listing's 457 mm barrel ends at the traced muzzle
 // shoulder.
 local breechSetback = profile.values.barrelMm.value - xOf(903);
@@ -112,6 +124,18 @@ local stockMount = [tubeEndX, 0];
       fingerClearance: dim(4, 'derived: room around the finger on the trigger'),
       halfWidth: dim(5, 'derived: a forged guard a little under the lower half width'),
       fingerHalfWidth: dim(8, 'derived: a finger across the guard'),
+    },
+    trigger: {
+      midline: outline(
+        [
+          [bladeHang[0] + (p[0] - bladeMid[0][0]) * closeUpMmPerPx, bladeHang[1] - (p[1] - bladeMid[0][1]) * closeUpMmPerPx]
+          for p in bladeMid
+        ],
+        'derived: the midline of the ar15-receiver/trigger trace at its rail-pitch scale, hung from the top of the ar15-profile/trigger trace',
+      ),
+      // The forged blade is about 2 mm thick at its middle, under what the detail grain carries.
+      thickness: detailWall('trigger blade'),
+      halfWidth: dim(3, 'derived: a blade narrower than the guard'),
     },
     gripMount: {
       x: dim(gripMount[0], traced('moduleGripToLower')),
