@@ -86,6 +86,13 @@ import {
   STANAG30_BODY,
 } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
+import {
+  OCTAGON_CORNER,
+  octagonalPrism,
+  octagonalProfile,
+  octagonalSectionChamfered,
+  octagonalTubeWalls,
+} from './octagon.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import { gunPort } from './portData.ts';
@@ -947,24 +954,11 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
 
 export const RECEIVER_SECTION = {
   sporter: {
-    outline: (() => {
-      const radius = SPORTER_PROPORTIONS.receiver.flatRadiusU;
-      const corner = radius * (Math.SQRT2 - 1);
-      return [
-        [-radius, -corner],
-        [-corner, -radius],
-        [corner, -radius],
-        [radius, -corner],
-        [radius, corner],
-        [corner, radius],
-        [-corner, radius],
-        [-radius, corner],
-      ] as readonly Vec2[];
-    })(),
+    outline: octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
     faces: {
       top: {
         y: SPORTER_PROPORTIONS.receiver.flatRadiusU,
-        halfWidth: SPORTER_PROPORTIONS.receiver.flatRadiusU * (Math.SQRT2 - 1),
+        halfWidth: SPORTER_PROPORTIONS.receiver.flatRadiusU * OCTAGON_CORNER,
       },
       portSide: SPORTER_PROPORTIONS.receiver.flatRadiusU,
       handleSides: [-SPORTER_PROPORTIONS.receiver.flatRadiusU, SPORTER_PROPORTIONS.receiver.flatRadiusU],
@@ -1114,8 +1108,8 @@ const receiverShellSolids = ({
     return cutSporterAction({
       solids: octagonalTubeWalls(
         'receiver-sporter',
-        SPORTER_PROPORTIONS.receiver.flatRadiusU,
-        Math.max(...cavity.y.map(Math.abs)),
+        octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
+        octagonalProfile(Math.max(...cavity.y.map(Math.abs))),
         [xMin, xMax],
       ),
       port: portWindow,
@@ -1861,8 +1855,8 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
           ...cutSporterAction({
             solids: octagonalTubeWalls(
               'receiver-action-ring',
-              SPORTER_PROPORTIONS.receiver.ringRadiusU,
-              SPORTER_PROPORTIONS.receiver.flatRadiusU,
+              octagonalProfile(SPORTER_PROPORTIONS.receiver.ringRadiusU),
+              octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
               [SPORTER_PROPORTIONS.receiver.ringRearX, frontFaceX],
             ),
             port: portWindow,
@@ -3490,76 +3484,19 @@ const barrelLength = (params: Readonly<Record<string, string>>): number => {
   return params.section === 'ak' ? akBarrelLength(sizeClass) : { S: 26, M: 36, L: 46 }[sizeClass];
 };
 
-/** Regular octagon with horizontal and vertical flats at the requested half-width. */
-const octagonalProfile = (flatRadius: number): readonly Vec2[] => {
-  const corner = flatRadius * (Math.SQRT2 - 1);
-  return [
-    [flatRadius, corner],
-    [corner, flatRadius],
-    [-corner, flatRadius],
-    [-flatRadius, corner],
-    [-flatRadius, -corner],
-    [-corner, -flatRadius],
-    [corner, -flatRadius],
-    [flatRadius, -corner],
-  ];
-};
-
-const octagonalPrism = (id: string, flatRadius: number, along: readonly [number, number]): Solid => ({
-  id,
-  kind: 'extruded-polygon',
-  profile: octagonalProfile(flatRadius),
-  axis: 'x',
-  z: along,
-});
-
-const octagonalTubeWalls = (
-  id: string,
-  outerFlatRadius: number,
-  innerFlatRadius: number,
-  along: readonly [number, number],
-): Solid[] => {
-  const outer = octagonalProfile(outerFlatRadius);
-  const inner = octagonalProfile(innerFlatRadius);
-  return outer.map((point, index) => {
-    const next = (index + 1) % outer.length;
-    return {
-      id: `${id}-wall-${index}`,
-      kind: 'extruded-polygon',
-      profile: [point, outer[next]!, inner[next]!, inner[index]!] as const,
-      axis: 'x',
-      z: along,
-    };
-  });
-};
-
 /** Eight-sided extrusion inscribed in its rectangular bounds, with 45-degree corner chamfers. */
 const octagonalRectanglePrism = (
   id: string,
   along: readonly [number, number],
   vertical: readonly [number, number],
   lateral: readonly [number, number],
-): Solid => {
-  const [y0, y1] = vertical;
-  const [z0, z1] = lateral;
-  const chamfer = OCTAGONAL_RECTANGLE_CHAMFER;
-  return {
-    id,
-    kind: 'extruded-polygon',
-    profile: [
-      [y0 + chamfer, z0],
-      [y1 - chamfer, z0],
-      [y1, z0 + chamfer],
-      [y1, z1 - chamfer],
-      [y1 - chamfer, z1],
-      [y0 + chamfer, z1],
-      [y0, z1 - chamfer],
-      [y0, z0 + chamfer],
-    ],
-    axis: 'x',
-    z: along,
-  };
-};
+): Solid => ({
+  id,
+  kind: 'extruded-polygon',
+  profile: octagonalSectionChamfered(vertical, lateral, OCTAGONAL_RECTANGLE_CHAMFER),
+  axis: 'x',
+  z: along,
+});
 
 /** The gas station of a non-AK barrel: the AR's fixed front sight and gas port. */
 const gasStationX = (length: SizeClass): number => {
@@ -5588,8 +5525,8 @@ const m4StockSolids = (len: number): Solid[] => {
   return [
     ...octagonalTubeWalls(
       'buffer-tube',
-      M4_STOCK_GEOMETRY.bufferTubeAcrossFlats / 2,
-      M4_STOCK_GEOMETRY.bufferTubeBoreAcrossFlats / 2,
+      octagonalProfile(M4_STOCK_GEOMETRY.bufferTubeAcrossFlats / 2),
+      octagonalProfile(M4_STOCK_GEOMETRY.bufferTubeBoreAcrossFlats / 2),
       [-len, 0],
     ),
     ...bodySolids,

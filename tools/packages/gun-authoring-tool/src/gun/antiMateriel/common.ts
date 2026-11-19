@@ -6,7 +6,7 @@ import type { ParamSpec } from '@skelly/construct/assembly/schema.ts';
 import { SIZE_CLASSES, type SizeClass } from '@skelly/construct/foundation/conventions.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
-import type { BoxSolid, Solid, SolidDisplayHints, SolidFinish, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { BoxSolid, SolidDisplayHints, SolidFinish } from '@skelly/construct/shapes/solid.ts';
 import physical from '../../../../../../models/guns/tables/physical.json' with { type: 'json' };
 
 export const X: Vec3 = [1, 0, 0];
@@ -31,22 +31,6 @@ export const box = (
   box: boxFromMinMax(min, max),
   ...extra,
 });
-
-/** Regular octagon (flat-to-flat half-width `flatRadius`) extruded along X; the barrel's own section. */
-export const octagonPrism = (id: string, flatRadius: number, along: readonly [number, number]): Solid => {
-  const corner = flatRadius * (Math.SQRT2 - 1);
-  const profile: readonly Vec2[] = [
-    [flatRadius, corner],
-    [corner, flatRadius],
-    [-corner, flatRadius],
-    [-flatRadius, corner],
-    [-flatRadius, -corner],
-    [-corner, -flatRadius],
-    [corner, -flatRadius],
-    [flatRadius, -corner],
-  ];
-  return { id, kind: 'extruded-polygon', profile, axis: 'x', z: along };
-};
 
 /** Solid black rubber, shared by recoil pads and the dark perforation panels. */
 export const RUBBER: SolidFinish = physical.solidFinishes.rubber;
