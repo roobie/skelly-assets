@@ -21,19 +21,24 @@ local collar = 0.006;  // the magwell's lip behind and ahead of the magazine
 local magBack = bolt.feedBack + collar;
 local magFront = magBack + roundLength + 2 * wall;
 local magTop = underside;
+local magHalf = 0.045;  // half the magazine's width
+local rimHalf = magHalf + 0.004;  // half the width of the magwell and base plate standing round it
 
 // The metal magwell collar either magazine seats in.
 local magwell = h.prism('magwell', 'metal', 'z', [
   [magBack - collar, magTop], [magBack - collar, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + collar, 0.136], [magFront + collar, magTop],
-], -0.049, 0.049);
+], -rimHalf, rimHalf);
 
 // A straight box magazine square to the bore, with a bevelled brass base plate and a narrow slot cut into its right
 // side, through which the brass of the stacked bolts shows. The slot is built round rather than cut, since pieces only
 // add: the body stops short of the right face, and a skin around the slot makes up the face. The slot's floor is dark
 // and the bolts stand just off it, below the face, so they read as inside the magazine rather than laid on it.
-local magHalf = 0.045;
 local magFoot = 0.012;
-local slot = { back: 0.079, front: 0.107, bottom: 0.032, top: 0.12, depth: 0.008 };
+// The slot, centred fore and aft on the magazine, and the bolts seen through it, each centred in an equal share of the
+// slot's height.
+local slotSize = { width: 0.028, bottom: 0.032, top: 0.12, depth: 0.008 };
+local slot = slotSize + { back: (magBack + magFront - slotSize.width) / 2, front: self.back + slotSize.width };
+local rounds = { count: 5, thick: 0.012, pitch: (slot.top - slot.bottom) / self.count };
 local slotFloor = magHalf - slot.depth;
 local skinBack = slotFloor - 0.004;
 local boxMagazine = [
@@ -46,10 +51,11 @@ local boxMagazine = [
   magwell,
   h.prism('mag-base', 'trim', 'z', [
     [magBack - 0.004, 0.004], [magBack, 0], [magFront, 0], [magFront + 0.004, 0.004], [magFront + 0.004, 0.014], [magBack - 0.004, 0.014],
-  ], -0.049, 0.049),
+  ], -rimHalf, rimHalf),
 ] + [
-  box('round-%d' % i, 'round', [slot.back, 0.028 + i * 0.02, slotFloor], [slot.front, 0.04 + i * 0.02, slotFloor + 0.004])
-  for i in [0, 1, 2, 3, 4]
+  local y = slot.bottom + i * rounds.pitch + (rounds.pitch - rounds.thick) / 2;
+  box('round-%d' % i, 'round', [slot.back, y, slotFloor], [slot.front, y + rounds.thick, slotFloor + 0.004])
+  for i in std.range(0, rounds.count - 1)
 ];
 
 // A rotary drum, a revolver cylinder hung on a neck below the magwell: its chambers lie along the bore around its
