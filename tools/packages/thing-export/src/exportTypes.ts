@@ -72,9 +72,15 @@ export interface ExportPortMetadata {
   readonly sizeClass?: string;
   /** How the part met here comes off and goes on. */
   readonly swap?: SwapPath;
-  /** What the interface is built for within its mount type; both sides of a joint declare the same one or neither. */
+  /**
+   * What the interface is built for within its mount type; both sides of a joint declare the same one or neither,
+   * unless one side accepts standards instead.
+   */
   readonly standard?: string;
-  /** The standards a port that holds whatever is put in it takes; see `docs/decisions/0017-stowage-slots.md`. */
+  /**
+   * The standards a port that holds whatever is put in it takes; it meets a mate declaring one of them or none. See
+   * `docs/decisions/0017-stowage-slots.md`.
+   */
   readonly accepts?: readonly string[];
   /** The space, in the port frame and domain units, that whatever is met at the port must stay inside. */
   readonly envelope?: { readonly min: Vec3; readonly max: Vec3 };
