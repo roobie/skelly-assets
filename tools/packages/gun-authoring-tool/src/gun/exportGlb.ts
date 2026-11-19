@@ -24,6 +24,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
+import { hingeOf } from './actionMotion.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
 import {
@@ -223,30 +224,30 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
     return undefined;
   }
   const parts = Object.fromEntries(
-    Object.entries(description.parts).map(([role, part]) => [
-      role,
-      {
-        node: part.node,
-        axis: toFileAxes(part.axis),
-        strokeMetres: round6(length(part.travel) * resolved.domain.units.metresPerUnit),
-        modes: part.modes,
-        ...handGripMetadata(part, resolved.domain.units.metresPerUnit),
-        // A turn without unlock and lock phases, such as the SMG handle's notch, is a held state, not a cycle step.
-        ...(part.def.motion?.turn &&
-        part.modes.every((mode) => cycle[mode]?.unlockSeconds !== undefined && cycle[mode]?.lockSeconds !== undefined)
-          ? {
-              turn: {
-                pivot: modelPoint(
-                  applyPoint(part.placed, part.def.motion.turn.pivot),
-                  resolved.domain.units.metresPerUnit,
-                ),
-                axis: toFileAxes(applyDir(part.placed, part.def.motion.turn.axis)),
-                angleRadians: part.def.motion.turn.angleRadians,
-              },
-            }
-          : {}),
-      },
-    ]),
+    Object.entries(description.parts).map(([role, part]) => {
+      const hinge = hingeOf(part.motion);
+      return [
+        role,
+        {
+          node: part.node,
+          axis: toFileAxes(part.axis),
+          strokeMetres: round6(length(part.travel) * resolved.domain.units.metresPerUnit),
+          modes: part.modes,
+          ...handGripMetadata(part, resolved.domain.units.metresPerUnit),
+          // A turn without unlock and lock phases, such as the SMG handle's notch, is a held state, not a cycle step.
+          ...(hinge &&
+          part.modes.every((mode) => cycle[mode]?.unlockSeconds !== undefined && cycle[mode]?.lockSeconds !== undefined)
+            ? {
+                turn: {
+                  pivot: modelPoint(applyPoint(part.placed, hinge.axis.from), resolved.domain.units.metresPerUnit),
+                  axis: toFileAxes(applyDir(part.placed, sub(hinge.axis.to, hinge.axis.from))),
+                  angleRadians: (hinge.angle * Math.PI) / 180,
+                },
+              }
+            : {}),
+        },
+      ];
+    }),
   );
   return {
     ejection: description.ejection,

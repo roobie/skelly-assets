@@ -1,5 +1,5 @@
-import type { PartMotion, Resolved } from '@skelly/construct/assembly/schema.ts';
-import { compose, length, scale, sub, translation, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import type { Resolved } from '@skelly/construct/assembly/schema.ts';
+import { compose, length, scale, translation, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import {
   boundsOfPoints,
   lowerBoundDistanceWorld,
@@ -9,7 +9,9 @@ import {
   worldSolid,
 } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { Motion } from '@skelly/motion/motion';
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
+import { slideOf } from './actionMotion.ts';
 
 export type GunAction = 'ak' | 'ar' | 'smg' | 'slide';
 export type CycleMode = 'fire' | 'hand';
@@ -292,9 +294,9 @@ const BOLT_HAND_TIMING = {
   restSeconds: 0.35,
 };
 
-export const boltCycleMotion = (motion: PartMotion, metresPerUnit: number, ejectAt: number): CycleMotion => {
+export const boltCycleMotion = (motion: Motion, metresPerUnit: number, ejectAt: number): CycleMotion => {
   const { unlockSeconds, rearwardSeconds, dwellSeconds, forwardSeconds, lockSeconds, restSeconds } = BOLT_HAND_TIMING;
-  const strokeUnits = length(sub(motion.end, motion.start));
+  const strokeUnits = slideOf(motion).travel;
   if (!(strokeUnits > 0 && metresPerUnit > 0 && ejectAt > 0 && ejectAt < 1)) {
     throw new Error('Bolt stroke must clear the ejection port');
   }
@@ -344,8 +346,8 @@ export const boltCycleMotion = (motion: PartMotion, metresPerUnit: number, eject
   };
 };
 
-export const pumpCycleMotion = (motion: PartMotion, metresPerUnit: number): CycleMotion => {
-  const strokeUnits = length(sub(motion.end, motion.start));
+export const pumpCycleMotion = (motion: Motion, metresPerUnit: number): CycleMotion => {
+  const strokeUnits = slideOf(motion).travel;
   if (!(Number.isFinite(metresPerUnit) && metresPerUnit > 0 && strokeUnits > 0)) {
     throw new RangeError('motion stroke and metresPerUnit must be finite and positive');
   }
@@ -384,7 +386,7 @@ export const pumpCycleMotion = (motion: PartMotion, metresPerUnit: number): Cycl
 
 export const cycleMotion = (
   action: GunAction,
-  motion: PartMotion,
+  motion: Motion,
   metresPerUnit: number,
   {
     rpm = ACTION_CYCLE_PROFILES[action].rpm,
@@ -395,7 +397,7 @@ export const cycleMotion = (
     readonly notchTurnSeconds?: number | undefined;
   } = {},
 ): AutomaticCycleMotion => {
-  const strokeUnits = length(sub(motion.end, motion.start));
+  const strokeUnits = slideOf(motion).travel;
   if (!(Number.isFinite(metresPerUnit) && metresPerUnit > 0 && strokeUnits > 0)) {
     throw new RangeError('motion stroke and metresPerUnit must be finite and positive');
   }
@@ -467,12 +469,13 @@ const overlapsAt = (
 export const sweepMovingPart = (resolved: Resolved, partId: string, limit: number, step = 0.125): SweepResult => {
   const def = resolved.defs.get(partId);
   const placed = resolved.placed.get(partId);
-  const motion = def?.motion;
+  const motion = resolved.motions.get(partId);
   if (!(def && placed && motion)) {
     return { declared: 0, clear: 0, clashes: [] };
   }
-  const delta = sub(motion.end, motion.start);
-  const declared = length(delta);
+  // The sweep runs straight along the stroke, past its end up to `limit`, so it reads the slide rather than the clock.
+  const { direction, travel: declared } = slideOf(motion);
+  const delta = scale(direction, declared);
   const end = compose(placed, translation(scale(delta, limit / (declared || 1))));
   const obstacles = obstaclesFor(resolved, partId, sweptBounds(def.solids, placed, end));
   const first = new Map<string, number>();

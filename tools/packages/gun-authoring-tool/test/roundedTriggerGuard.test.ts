@@ -72,6 +72,7 @@ const fixture = (rear: TriggerGuardDimensions['rear'] = 'open') => {
       ['lower', lower],
       ['grip', grip],
     ]),
+    motions: new Map(),
     placed: new Map([
       ['lower', IDENTITY],
       ['grip', IDENTITY],

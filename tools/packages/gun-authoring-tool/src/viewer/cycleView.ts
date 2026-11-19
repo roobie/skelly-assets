@@ -1,18 +1,20 @@
 // Presentation-only action-cycle controls. Timelines and motion profiles stay in the gun domain module.
 
+import { motionTransform } from '@skelly/construct/assembly/motion.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
-import { applyDir, applyPoint } from '@skelly/construct/foundation/math.ts';
+import { compose, invert, type Transform } from '@skelly/construct/foundation/math.ts';
+import type { Motion } from '@skelly/motion/motion';
 import {
   ArrowHelper,
   type Group,
   type Material,
-  Matrix4,
   type Mesh,
   type MeshStandardMaterial,
   type Object3D,
   Vector3,
 } from 'three';
 import type { ResolvedGunAction } from '../gun/actionDescription.ts';
+import { clockOf } from '../gun/actionMotion.ts';
 import {
   advanceCycleClock,
   type CycleMode,
@@ -21,6 +23,7 @@ import {
   sweepMovingPart,
 } from '../gun/cycle.ts';
 import { uToMm } from '../gun/units.ts';
+import { matrixOf } from './matrix.ts';
 
 const SPEEDS = [1, 0.25, 0.1, 0.02] as const;
 const XRAY_OPACITY = 0.2;
@@ -34,31 +37,22 @@ const disposeMaterials = (materials: Material | Material[]): void => {
 
 interface Mover {
   readonly meshes: readonly { readonly mesh: Mesh; readonly base: readonly number[] }[];
-  readonly world: readonly [number, number, number];
+  readonly motion: Motion;
+  readonly placed: Transform;
   readonly modes: readonly CycleMode[];
-  readonly turn?: {
-    readonly pivot: readonly [number, number, number];
-    readonly axis: readonly [number, number, number];
-    readonly angleRadians: number;
-  };
 }
 
 const poseMover = (mover: Mover, timeline: CycleTimeline, phase: number, fraction: number) => {
-  const active = mover.modes.includes(timeline.mode);
-  const movement = active ? fraction : 0;
-  const turn = new Matrix4();
-  if (mover.turn && active) {
-    const { pivot, axis, angleRadians } = mover.turn;
-    turn
-      .makeTranslation(...pivot)
-      .multiply(new Matrix4().makeRotationAxis(new Vector3(...axis), angleRadians * (timeline.turnAt?.(phase) ?? 0)))
-      .multiply(new Matrix4().makeTranslation(-pivot[0], -pivot[1], -pivot[2]));
-  }
+  const { motion, placed } = mover;
+  const clock = mover.modes.includes(timeline.mode) ? clockOf(motion, fraction, timeline.turnAt?.(phase) ?? 0) : 0;
+  // The motion moves the part in its own frame; its meshes carry the part's placement, so the move is conjugated by it.
+  const moved = matrixOf(compose(motionTransform(placed, motion, clock), invert(placed)));
   for (const { mesh, base } of mover.meshes) {
-    mesh.matrix.fromArray(base as number[]).premultiply(turn);
-    mesh.matrix.elements[12]! += mover.world[0] * movement;
-    mesh.matrix.elements[13]! += mover.world[1] * movement;
-    mesh.matrix.elements[14]! += mover.world[2] * movement;
+    mesh.matrix.fromArray(base as number[]);
+    // At rest a mesh is exactly its canonical pose, not that pose carried by a conjugated identity.
+    if (clock > 0) {
+      mesh.matrix.premultiply(moved);
+    }
     mesh.matrixWorldNeedsUpdate = true;
   }
 };
@@ -252,17 +246,9 @@ export const createCycleView = (): CycleView => {
     ({ strokeUnits } = cycle);
     movers = Object.values(action.parts).map((part) => ({
       meshes: meshesOf(solids, part.id).map((mesh) => ({ mesh, base: basePose(mesh) })),
-      world: part.travel,
+      motion: part.motion,
+      placed: part.placed,
       modes: part.modes,
-      ...(part.def.motion?.turn
-        ? {
-            turn: {
-              pivot: applyPoint(part.placed, part.def.motion.turn.pivot),
-              axis: applyDir(part.placed, part.def.motion.turn.axis),
-              angleRadians: part.def.motion.turn.angleRadians,
-            },
-          }
-        : {}),
     }));
 
     // Fire/hand switches rebind the same resolved geometry. Its full-stroke

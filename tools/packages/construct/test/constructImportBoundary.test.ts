@@ -158,8 +158,9 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
     {
       from: thingExport,
       forbids: (target) =>
-        isWithin(roots.packages, target) && ![construct, thingCore, thingExport].some((root) => isWithin(root, target)),
-      problem: 'thing-export imports a package other than the construct package or thing-core',
+        isWithin(roots.packages, target) &&
+        ![construct, motion, thingCore, thingExport].some((root) => isWithin(root, target)),
+      problem: 'thing-export imports a package other than the construct, motion or thing-core package',
     },
     {
       from: join(roots.packages, 'deadvox'),
@@ -168,8 +169,9 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
     },
     {
       from: roots.constructSrc,
-      forbids: (target) => isWithin(roots.packages, target) && !isWithin(construct, target),
-      problem: 'construct imports a package above it',
+      forbids: (target) =>
+        isWithin(roots.packages, target) && ![construct, motion].some((root) => isWithin(root, target)),
+      problem: 'construct imports a package other than the motion package',
     },
   ];
 };

@@ -78,7 +78,7 @@ export const SPORTER_PROPORTIONS = {
     axis: [1, -4, -3] as const,
     armLength: 4,
     knobFlatRadius: 0.625,
-    liftRadians: Math.PI / 3,
+    liftDegrees: 60,
     reliefX: [-16, -14.5],
     reliefBottomU: -1.75,
   },

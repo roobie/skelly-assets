@@ -4,6 +4,7 @@ import { length } from '@skelly/construct/foundation/math.ts';
 import { penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { clockOf } from '../src/gun/actionMotion.ts';
 import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { advanceCycleClock, cycleMotion, sweepMovingPart } from '../src/gun/cycle.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -46,9 +47,9 @@ describe('SMG charging handle', () => {
   it('rejects a notch turn that is not finite, not positive or does not fit inside the dwell', () => {
     const [first] = smgCases;
     const { resolved, action } = smgAction(first!.assembly);
-    const { motion } = action.carrier.def;
+    const { motion } = action.carrier;
     const { metresPerUnit } = resolved.domain.units;
-    const build = (notchTurnSeconds: number) => cycleMotion('smg', motion!, metresPerUnit, { notchTurnSeconds });
+    const build = (notchTurnSeconds: number) => cycleMotion('smg', motion, metresPerUnit, { notchTurnSeconds });
     const { dwellSeconds, rearwardSeconds } = action.cycle.hand;
     const fits = dwellSeconds / 4;
     expect(build(fits).hand.holdSeconds).toBeCloseTo(rearwardSeconds + fits, 9);
@@ -60,17 +61,25 @@ describe('SMG charging handle', () => {
   it.each(smgCases)('holds the handle in the notch until released, then returns it: $label', ({ assembly }) => {
     const { resolved, action, handle } = smgAction(assembly);
     const { hand } = action.cycle;
-    const motion = handle.def.motion!;
+    const { motion } = handle;
     const guard = [...resolved.defs].find(([, def]) => def.solids.some(({ id }) => id.startsWith('smg-cocking-tube-')));
     if (!(guard && hand.turnAt && hand.holdSeconds !== undefined)) {
       throw new Error('SMG fixture needs a cocking tube and a hand hold');
     }
     const walls = guard[1].solids.map((solid) => worldSolid(resolved.placed.get(guard[0])!, solid));
-    const blocked = (draw: number, turn: number) =>
-      handle.def.solids.some((solid) => {
-        const moved = worldSolid(motionTransform(handle.placed, motion, draw, turn), solid);
+    // A pose may turn the handle before it has drawn fully, which no clock reaches: shorten the slide, then turn.
+    const blocked = (draw: number, turn: number) => {
+      const drawn = {
+        ...motion,
+        stages: motion.stages.map((stage) =>
+          stage.kind === 'slide' ? { ...stage, travel: stage.travel * draw } : stage,
+        ),
+      };
+      return handle.def.solids.some((solid) => {
+        const moved = worldSolid(motionTransform(handle.placed, drawn, clockOf(motion, 1, turn)), solid);
         return walls.some((wall) => penetrationWorld(moved, wall) > 1e-6);
       });
+    };
     const step = hand.durationSeconds / 40;
     const run = (from: number, steps: number, hold: boolean) => {
       const poses: { readonly time: number; readonly draw: number; readonly turn: number }[] = [];

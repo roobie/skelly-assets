@@ -7,12 +7,14 @@ import {
   compose,
   extrusionPoint,
   IDENTITY,
+  scale,
   translation,
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
 import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it, vi } from 'vitest';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { AR_ACTION_LAYOUT } from '../src/gun/arLayout.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import {
@@ -28,7 +30,7 @@ import {
 } from '../src/gun/parts.ts';
 import { PUMP_SHELL_LOADED_LENGTH_U } from '../src/gun/pumpShell.ts';
 import { buildReceiverSection } from '../src/gun/receiverSection.ts';
-import { loadCorpus, loadFixture } from './helpers.ts';
+import { loadCorpus, loadFixture, motionOf, strokeOf } from './helpers.ts';
 
 // A private copy of the parts module (and, imported after it, of the domain), so a test may move an
 // envelope or catalog entry without touching the instance every other test builds from.
@@ -162,13 +164,13 @@ type TravelCase = (typeof travelCases)[number];
 
 const travelMeasurements = (resolved: ReturnType<typeof resolve>) => {
   const path = resolved.defs.get('receiver')!.keepOuts.find(({ id }) => id === 'bolt-travel')!;
-  const motion = resolved.defs.get('bolt-carrier')!.motion!;
+  const stroke = strokeOf(resolved, 'bolt-carrier');
   const transform = resolved.placed.get('bolt-carrier')!;
   const restOrigin = applyPoint(transform, [0, 0, 0]);
-  const rearOrigin = applyPoint(transform, motion.end);
+  const rearOrigin = applyPoint(transform, stroke);
   return {
     pathLength: path.box.half[0] * 2,
-    motionLength: motion.end[0],
+    motionLength: stroke[0],
     restOrigin,
     rearOrigin,
     distance: Math.hypot(...(rearOrigin.map((value, i) => value - restOrigin[i]!) as [number, number, number])),
@@ -182,7 +184,7 @@ const coreFitsCavity = (entry: TravelCase, resolved: ReturnType<typeof resolve>)
   const receiverPort = receiver.ports.find(({ id }) => id === 'bolt-carrier')!;
   const cavity = carrierCavityBounds(entry.pattern, receiverPort.pos[1]);
   const transform = resolved.placed.get('bolt-carrier')!;
-  const motion = carrier.motion!;
+  const [travel] = strokeOf(resolved, 'bolt-carrier');
   const bounds = limits(receiver.solids.flatMap(corners));
   const cavityX = [bounds[0]![0]! + 0.5, bounds[0]![1]! - (entry.pattern === 'ar' ? 0 : 0.5)];
   const pathCenter = path.box.center;
@@ -196,7 +198,7 @@ const coreFitsCavity = (entry: TravelCase, resolved: ReturnType<typeof resolve>)
   const bodyFits = corners(body)
     .flatMap((corner) => [
       applyPoint(transform, corner),
-      applyPoint(transform, [corner[0] + motion.end[0], corner[1], corner[2]]),
+      applyPoint(transform, [corner[0] + travel!, corner[1], corner[2]]),
     ])
     .every(
       (point) =>
@@ -246,11 +248,11 @@ const noCarrierReceiverIntersectionsOverTravel = (resolved: ReturnType<typeof re
   const carrier = resolved.defs.get('bolt-carrier')!;
   const receiverTransform = resolved.placed.get('receiver')!;
   const carrierTransform = resolved.placed.get('bolt-carrier')!;
-  const motion = carrier.motion!;
+  const [travel] = strokeOf(resolved, 'bolt-carrier');
   const receiverSolids = receiver.solids.map((solid) => worldSolid(receiverTransform, solid));
-  const samples = Math.ceil(motion.end[0] / 0.25);
+  const samples = Math.ceil(travel! / 0.25);
   for (let sample = 0; sample <= samples; sample++) {
-    const progress = motion.end[0] * (sample / samples);
+    const progress = travel! * (sample / samples);
     const transform = compose(carrierTransform, translation([progress, 0, 0]));
     for (const solid of carrier.solids.filter(({ id }) => !id.startsWith('action-bar-') && id !== 'bolt-handle-seat')) {
       const moved = worldSolid(transform, solid);
@@ -269,7 +271,7 @@ const allCarrierSolidsStayWithinReceiverLength = (resolved: ReturnType<typeof re
   const receiver = resolved.defs.get('receiver')!;
   const carrier = resolved.defs.get('bolt-carrier')!;
   const transform = resolved.placed.get('bolt-carrier')!;
-  const motion = carrier.motion!;
+  const [travel] = strokeOf(resolved, 'bolt-carrier');
   const bounds = limits(receiver.solids.flatMap(corners));
   const isAr = resolved.params.get('bolt-carrier')?.pattern?.value === 'ar';
   const cavityX = [bounds[0]![0]! + 0.5, bounds[0]![1]! - (isAr ? 0 : 0.5)];
@@ -279,7 +281,7 @@ const allCarrierSolidsStayWithinReceiverLength = (resolved: ReturnType<typeof re
     .flatMap((solid) =>
       corners(solid).flatMap((corner) => [
         applyPoint(transform, corner),
-        applyPoint(transform, [corner[0] + motion.end[0], corner[1], corner[2]]),
+        applyPoint(transform, [corner[0] + travel!, corner[1], corner[2]]),
       ]),
     )
     .every((point) => point[0] >= cavityX[0]! - 1e-6 && point[0] <= cavityX[1]! + 1e-6);
@@ -365,12 +367,7 @@ describe('procedural bolt carrier', () => {
         resolved.defs.get('receiver')?.solids.some(({ id }) => id === 'bolt-carrier-face'),
         label,
       ).toBe(false);
-      expect(resolved.defs.get('bolt-carrier')?.motion, label).toMatchObject({
-        kind: 'linear',
-        axis: [1, 0, 0],
-        start: [0, 0, 0],
-        end: [expectedPart.travel, 0, 0],
-      });
+      expect(strokeOf(resolved, 'bolt-carrier'), label).toEqual([expectedPart.travel, 0, 0]);
     }
   });
 
@@ -440,8 +437,7 @@ describe('procedural bolt carrier', () => {
     const localBodyBounds = limits(corners(body));
     const localStickBounds = limits(corners(stick));
     const paddleBounds = worldBounds(corners(handle).map((point) => applyPoint(transform, point)));
-    const motion = carrier.motion!;
-    const rearTransform = compose(transform, translation(motion.end));
+    const rearTransform = compose(transform, translation(strokeOf(resolved, 'bolt-carrier')));
     const rearHandleBounds = worldBounds(corners(handle).map((point) => applyPoint(rearTransform, point)));
     const portMin = port.actualX![0]!;
     const portMax = port.actualX![1]!;
@@ -562,7 +558,7 @@ describe('procedural bolt carrier', () => {
     expect(Math.abs((pivotBounds[0]![0]! + pivotBounds[0]![1]!) / 2 - -4)).toBeLessThanOrEqual(0.5);
     expect(knobBounds[2]![1]!).toBeLessThan(0);
     expect(sweep).toBeDefined();
-    expect(carrier.motion).toMatchObject({ kind: 'linear', axis: [1, 0, 0] });
+    expect(slideOf(motionOf(resolved, 'bolt-carrier')).direction).toEqual([1, 0, 0]);
     expect(
       penetrationWorld(
         stemWorld,
@@ -590,7 +586,6 @@ describe('procedural bolt carrier', () => {
     const { assembly } = loadCorpus().find((entry) => entry.label === label)!;
     const resolved = resolve(assembly, gunDomain);
     const receiver = resolved.defs.get('receiver')!;
-    const carrier = resolved.defs.get('bolt-carrier')!;
     const arm = resolved.defs.get('bolt-handle-arm')!;
     const knob = resolved.defs.get('bolt-handle-knob')!;
     const stock = resolved.defs.get('stock')!;
@@ -622,8 +617,9 @@ describe('procedural bolt carrier', () => {
       ...receiver.solids.filter(({ id }) => id.startsWith('receiver-shell-side-near')).flatMap(corners).map((point) => point[2]),
     );
     const loadingPort = receiver.keepOuts.find(({ id }) => id === 'loading-port');
-    const motion = arm.motion!;
-    const knobMotion = knob.motion!;
+    const carrierStroke = strokeOf(resolved, 'bolt-carrier');
+    const armStroke = strokeOf(resolved, 'bolt-handle-arm');
+    const knobStroke = strokeOf(resolved, 'bolt-handle-knob');
 
     expect(resolved.issues).toEqual([]);
     expect(armPortTip[0]).toBeCloseTo(knobPortRoot[0], 8);
@@ -633,17 +629,15 @@ describe('procedural bolt carrier', () => {
     expect(actualRadial).toBeCloseTo(radial, 2);
     expect(actualDiameter).toBeCloseTo(diameter, 6);
     expect(knobCenter[2] - receiverSideFace).toBeCloseTo(outstand, 6);
-    expect(motion.end).toHaveLength(3);
-    expect(knobMotion.end).toHaveLength(3);
-    expect(Math.hypot(...motion.end)).toBeCloseTo(Math.hypot(...carrier.motion!.end), 6);
-    expect(Math.hypot(...knobMotion.end)).toBeCloseTo(Math.hypot(...carrier.motion!.end), 6);
-    const carrierDisplacement = applyPoint(carrierTransform, carrier.motion!.end).map(
+    expect(Math.hypot(...armStroke)).toBeCloseTo(Math.hypot(...carrierStroke), 6);
+    expect(Math.hypot(...knobStroke)).toBeCloseTo(Math.hypot(...carrierStroke), 6);
+    const carrierDisplacement = applyPoint(carrierTransform, carrierStroke).map(
       (value, axis) => value - applyPoint(carrierTransform, [0, 0, 0])[axis]!,
     );
-    const armDisplacement = applyPoint(armTransform, motion.end).map(
+    const armDisplacement = applyPoint(armTransform, armStroke).map(
       (value, axis) => value - applyPoint(armTransform, [0, 0, 0])[axis]!,
     );
-    const knobDisplacement = applyPoint(knobTransform, knobMotion.end).map(
+    const knobDisplacement = applyPoint(knobTransform, knobStroke).map(
       (value, axis) => value - applyPoint(knobTransform, [0, 0, 0])[axis]!,
     );
     for (const axis of [0, 1, 2]) {
@@ -654,11 +648,11 @@ describe('procedural bolt carrier', () => {
     expect(knob.keepOuts.find(({ id }) => id === 'bolt-handle-sweep')).toBeDefined();
 
     for (const progress of [0, 0.5, 1]) {
-      const accessoryTransform = (transform: typeof armTransform, partMotion: typeof motion) =>
-        compose(transform, translation(partMotion.end.map((distance) => distance * progress) as unknown as Vec3));
+      const accessoryTransform = (transform: typeof armTransform, stroke: Vec3) =>
+        compose(transform, translation(scale(stroke, progress)));
       const moving = [
-        { def: arm, transform: accessoryTransform(armTransform, motion) },
-        { def: knob, transform: accessoryTransform(knobTransform, knobMotion) },
+        { def: arm, transform: accessoryTransform(armTransform, armStroke) },
+        { def: knob, transform: accessoryTransform(knobTransform, knobStroke) },
       ];
       for (const { def, transform } of moving) {
         for (const handle of def.solids) {
@@ -703,11 +697,7 @@ describe('procedural bolt carrier', () => {
     const grip = handle.solids.find(({ id }) => id === 'smg-handle-grip')!;
     const gripBounds = worldBounds(corners(grip).map((point) => applyPoint(handleTransform, point)));
     const handleBoundsAt = (progress: number) => {
-      const motion = handle.motion!;
-      const transform = compose(
-        handleTransform,
-        translation(motion.end.map((distance) => distance * progress) as unknown as Vec3),
-      );
+      const transform = compose(handleTransform, translation(scale(strokeOf(resolved, 'smg-handle'), progress)));
       return worldBounds(handle.solids.flatMap(corners).map((point) => applyPoint(transform, point)));
     };
     const handKeepOut = handle.keepOuts.find(({ id }) => id === 'smg-handle-hand')!;
@@ -738,9 +728,9 @@ describe('procedural bolt carrier', () => {
     expect(tubeBounds[2]![1]!).toBeLessThan(0);
     expect(guardBounds[2]![0]! - gripBounds[2]![0]!).toBeGreaterThanOrEqual(1.5);
     expect(handKeepOut).toBeDefined();
-    expect(handle.motion?.kind).toBe('linear');
-    expect(handle.motion?.axis).toEqual([1, 0, 0]);
-    expect(handle.motion?.end[0]).toBeGreaterThan(0);
+    const handleSlide = slideOf(motionOf(resolved, 'smg-handle'));
+    expect(handleSlide.direction).toEqual([1, 0, 0]);
+    expect(handleSlide.travel).toBeGreaterThan(0);
     expect(handleBoundsAt(0)[0]![1]!).toBeLessThanOrEqual(handguardFrontX + 1e-6);
     for (const progress of [0, 0.5, 1]) {
       expect(handleBoundsAt(progress)[0]![1]!, `progress ${progress}`).toBeLessThanOrEqual(handguardFrontX + 1e-6);
@@ -854,7 +844,7 @@ describe('procedural bolt carrier', () => {
     const stockTransform = resolved.placed.get('stock')!;
     const boltHead = carrier.solids.find(({ id }) => id === 'bolt-head')!;
     const tail = carrier.solids.find(({ id }) => id === 'carrier-tail')!;
-    const [travel] = carrier.motion!.end;
+    const [travel] = strokeOf(resolved, 'bolt-carrier');
     const [breechX] = applyPoint(receiverTransform, receiver.ports.find(({ id }) => id === 'barrel')!.pos);
     const [boltFace] = applyPoint(transform, [BOLT_CARRIER_ENVELOPES.ar.x[0], 0, 0]);
     const [receiverRearX] = applyPoint(receiverTransform, receiver.ports.find(({ id }) => id === 'stock')!.pos);
@@ -953,26 +943,22 @@ describe('procedural bolt carrier', () => {
     const receiver = resolved.defs.get('receiver')!;
     const carrierTransform = resolved.placed.get('bolt-carrier')!;
     const forendTransform = resolved.placed.get('forend')!;
-    const carrierMotion = carrier.motion!;
-    const forendMotion = forend.motion!;
+    const carrierStroke = strokeOf(resolved, 'bolt-carrier');
+    const forendStroke = strokeOf(resolved, 'forend');
     const bars = carrier.solids.filter(({ id }) => id.startsWith('action-bar-'));
     expect(bars.length).toBeGreaterThan(0);
-    expect(forendMotion.end).toEqual([-carrierMotion.end[0], 0, 0]);
+    expect(forendStroke).toEqual([-carrierStroke[0], 0, 0]);
     const receiverBounds = limits(receiver.solids.flatMap(corners));
     const receiverSolids = receiver.solids.map((solid) => worldSolid(resolved.placed.get('receiver')!, solid));
     const tubeSolids = tube.solids.map((solid) => worldSolid(resolved.placed.get('tube')!, solid));
     const barrelSolids = barrel.solids.map((solid) => worldSolid(resolved.placed.get('barrel')!, solid));
-    const [travel] = carrierMotion.end;
+    const [travel] = carrierStroke;
     const travelSteps = Math.max(1, Math.round(travel * 4));
 
     for (let step = 0; step <= travelSteps; step += 1) {
       const progress = (travel * step) / travelSteps;
       const carrierAt = compose(carrierTransform, translation([progress, 0, 0]));
-      const forendProgress = progress / carrierMotion.end[0];
-      const forendAt = compose(
-        forendTransform,
-        translation(forendMotion.end.map((distance) => distance * forendProgress) as unknown as Vec3),
-      );
+      const forendAt = compose(forendTransform, translation(scale(forendStroke, progress / carrierStroke[0]!)));
       const barWorld = worldSolid(carrierAt, bars[0]!);
       const barBounds = limits(corners(bars[0]!).map((point) => applyPoint(carrierAt, point)));
       expect(barBounds[1]![0]!).toBeGreaterThanOrEqual(receiverBounds[1]![0]! - 1e-6);
@@ -1070,7 +1056,7 @@ describe('procedural bolt carrier', () => {
       const style = CARRIER_HANDLE_STYLES[entry.handleStyle];
       const hand = carrier.keepOuts.find(({ id }) => id === `${entry.handleStyle}-handle-hand`)!.box;
       const sweep = carrier.keepOuts.find(({ id }) => id === `${entry.handleStyle}-handle-sweep`)!.box;
-      const [actualMotion] = carrier.motion!.end;
+      const [actualMotion] = strokeOf(resolved, 'carrier');
       expect(actualMotion, entry.pattern).toBeGreaterThan(0);
       expect(sweep.center[0] + sweep.half[0] - (hand.center[0] + hand.half[0]), entry.pattern).toBe(actualMotion);
       expect(style.motion).toBe('linear');

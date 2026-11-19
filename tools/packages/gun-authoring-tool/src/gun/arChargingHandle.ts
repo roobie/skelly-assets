@@ -76,12 +76,7 @@ export const arChargingHandle: PartFamily = {
       ],
       axes: [],
       tags: [ACTION_PART_ROLES.handle],
-      motion: {
-        kind: 'linear',
-        axis: [-1, 0, 0],
-        start: [0, 0, 0],
-        end: [-layout.carrierTravelU, 0, 0],
-      },
+      motion: { stages: [{ kind: 'slide', direction: [-1, 0, 0], travel: layout.carrierTravelU }] },
     };
   },
 };

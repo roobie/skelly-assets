@@ -9,6 +9,9 @@
     "pretest": "node ../../sources.mjs",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@skelly/motion": "*"
+  },
   "devDependencies": {
     "@types/node": "^26.6.2",
     "typescript": "^7.0.2",

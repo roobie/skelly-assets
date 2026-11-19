@@ -5,9 +5,10 @@ import { worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { meshForSolid } from '@skelly/construct/shapes/mesh.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { describe, expect, it } from 'vitest';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { FAMILIES, M4_STOCK_GEOMETRY } from '../src/gun/parts.ts';
-import { loadDesignAssembly, loadFixture } from './helpers.ts';
+import { loadDesignAssembly, loadFixture, motionOf } from './helpers.ts';
 
 const CLIP_BEVEL_ERROR = /set display\.bevel to false/;
 const stockSamples: readonly { readonly assembly: Assembly; readonly label: string }[] = [
@@ -126,13 +127,8 @@ describe('M4-only AR stock', () => {
       }
       expect(receiverPort.pos[1]).toBe(0);
       const carrierTransform = resolved.placed.get('bolt-carrier')!;
-      const carrierMotion = resolved.defs.get('bolt-carrier')!.motion!;
-      const carrierAxisPoint = applyPoint(carrierTransform, carrierMotion.start);
-      const carrierAxisTip = applyPoint(carrierTransform, [
-        carrierMotion.start[0] + carrierMotion.axis[0],
-        carrierMotion.start[1] + carrierMotion.axis[1],
-        carrierMotion.start[2] + carrierMotion.axis[2],
-      ]);
+      const carrierAxisPoint = applyPoint(carrierTransform, [0, 0, 0]);
+      const carrierAxisTip = applyPoint(carrierTransform, slideOf(motionOf(resolved, 'bolt-carrier')).direction);
       const carrierAxis = sub(carrierAxisTip, carrierAxisPoint);
       const tubeAxisPoint = applyPoint(stockTransform, [0, 0, 0]);
       const tubeAxisTip = applyPoint(stockTransform, [1, 0, 0]);

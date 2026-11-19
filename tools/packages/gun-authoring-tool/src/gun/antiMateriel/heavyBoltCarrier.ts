@@ -122,13 +122,7 @@ export const heavyBoltCarrier: PartFamily = {
         },
       ],
       axes: [],
-      motion: {
-        kind: 'linear',
-        axis: [1, 0, 0],
-        start: [0, 0, 0],
-        end: [0, 0, 0],
-        sourceKeepOut: { port: 'mount', id: 'bolt-travel' },
-      },
+      motion: { stages: [{ kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'bolt-travel' } }] },
     };
   },
 };

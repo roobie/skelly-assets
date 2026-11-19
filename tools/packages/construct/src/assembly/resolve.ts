@@ -1,5 +1,6 @@
 // Loop-closing connections are checked rather than solved because this package does not solve constraints.
 
+import type { Motion } from '@skelly/motion/motion';
 import type { Issue } from '../foundation/issue.ts';
 import {
   add,
@@ -17,13 +18,16 @@ import {
   scale,
   sub,
   type Transform,
+  type Vec3,
 } from '../foundation/math.ts';
 import { validateExtrudedPolygon } from '../shapes/geometry.ts';
 import { revolvedProfileError } from '../shapes/revolve.ts';
+import { resolveMotion } from './motion.ts';
 import type {
   Assembly,
   Domain,
   KeepOut,
+  KeepOutTravel,
   PartDef,
   PortDef,
   PortRef,
@@ -91,40 +95,45 @@ const placeFrom = (rc: PortConnection, toPart: Transform): Transform => {
   );
 };
 
-const resolveMotionSources = (
-  defs: Map<string, PartDef>,
+/** Moves every part's motion out of its def, with each slide's travel filled in from the keep-out it is sourced from. */
+const resolveMotions = (
+  built: ReadonlyMap<string, PartDef>,
   connections: readonly Omit<ResolvedConnection, 'role'>[],
   structure: ReportStructure,
-): void => {
-  for (const [id, def] of defs) {
-    const source = def.motion?.sourceKeepOut;
-    if (!source) {
+): { defs: Map<string, Omit<PartDef, 'motion'>>; motions: Map<string, Motion> } => {
+  const defs = new Map<string, Omit<PartDef, 'motion'>>();
+  const motions = new Map<string, Motion>();
+  for (const [id, { motion, ...def }] of built) {
+    defs.set(id, def);
+    if (!motion) {
       continue;
     }
-    const connection = connections.find(
-      (candidate) =>
-        (candidate.from.part === id && candidate.from.port.id === source.port) ||
-        (candidate.to.part === id && candidate.to.port.id === source.port),
-    );
-    const owner = connection?.from.part === id ? connection.to.part : connection?.from.part;
-    const path = owner ? defs.get(owner)?.keepOuts.find(({ id: keepOutId }) => keepOutId === source.id) : undefined;
-    if (!path) {
-      structure(`Part "${id}" motion source ${source.port} → ${source.id} is not connected.`, [id]);
-      continue;
-    }
-    const { sourceKeepOut: _sourceKeepOut, ...motion } = def.motion!;
-    let axisInOwner = motion.axis;
-    if (connection) {
-      axisInOwner =
+    const travelOf = (source: KeepOutTravel, direction: Vec3): number => {
+      const connection = connections.find(
+        (candidate) =>
+          (candidate.from.part === id && candidate.from.port.id === source.port) ||
+          (candidate.to.part === id && candidate.to.port.id === source.port),
+      );
+      const owner = connection?.from.part === id ? connection.to.part : connection?.from.part;
+      const path = owner
+        ? built.get(owner)?.keepOuts.find(({ id: keepOutId }) => keepOutId === source.keepOut)
+        : undefined;
+      if (!(connection && path)) {
+        throw new Error(`motion source ${source.port} → ${source.keepOut} is not connected`);
+      }
+      const inOwner =
         connection.from.part === owner
-          ? applyDir(placeTo(connection, IDENTITY), motion.axis)
-          : applyDir(placeFrom(connection, IDENTITY), motion.axis);
+          ? applyDir(placeTo(connection, IDENTITY), direction)
+          : applyDir(placeFrom(connection, IDENTITY), direction);
+      return 2 * inOwner.reduce((reach, component, axis) => reach + Math.abs(component) * path.box.half[axis]!, 0);
+    };
+    try {
+      motions.set(id, resolveMotion(motion, travelOf, def.solids));
+    } catch (error) {
+      structure(`Part "${id}" ${error instanceof Error ? error.message : String(error)}.`, [id]);
     }
-    const travel =
-      2 * axisInOwner.reduce((distance, component, axis) => distance + Math.abs(component) * path.box.half[axis]!, 0);
-    const end = [motion.axis[0] * travel, motion.axis[1] * travel, motion.axis[2] * travel] as const;
-    defs.set(id, { ...def, motion: { ...motion, end } });
   }
+  return { defs, motions };
 };
 
 /** How far a connection is from being mated, given where both parts are. */
@@ -388,7 +397,7 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
     pending.push({ index, conn, from, to });
   });
 
-  resolveMotionSources(defs, pending, structure);
+  const { defs: resolvedDefs, motions } = resolveMotions(defs, pending, structure);
 
   // Place parts by walking out from the root.
   const placed = new Map<string, Transform>();
@@ -443,5 +452,5 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
       parts: disconnected,
     });
   }
-  return { assembly, domain, defs, params, placed, connections, issues };
+  return { assembly, domain, defs: resolvedDefs, motions, params, placed, connections, issues };
 };

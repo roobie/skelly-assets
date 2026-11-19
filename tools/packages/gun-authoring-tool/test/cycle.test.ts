@@ -1,5 +1,5 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
-import { compose, scale, sub, translation } from '@skelly/construct/foundation/math.ts';
+import { compose, scale, translation } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,15 +11,12 @@ import {
 } from '../src/gun/cycle.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { ejectionPoint } from '../src/gun/ejection.ts';
-import { loadFixture } from './helpers.ts';
+import { loadFixture, motionOf, strokeOf } from './helpers.ts';
 
 const resolvedFixture = (name: string) => resolve(loadFixture(name), gunDomain);
 const motionFor = (name: string) => {
   const resolved = resolvedFixture(name);
-  const motion = resolved.defs.get('bolt-carrier')?.motion;
-  if (!motion) {
-    throw new Error(`${name} has no bolt-carrier motion`);
-  }
+  const motion = motionOf(resolved, 'bolt-carrier');
   return {
     resolved,
     motion,
@@ -88,21 +85,21 @@ describe('motion-derived cycle geometry', () => {
   it.each(['archetype-ak', 'archetype-ar'] as const)(
     'sweeps the %s carrier clear through its full stroke using placed solids',
     (name) => {
-      const { resolved, motion, cycle } = motionFor(name);
+      const { resolved, cycle } = motionFor(name);
       const sweep = sweepMovingPart(resolved, 'bolt-carrier', cycle.strokeUnits + 2.5);
       expect(sweep.declared).toBeCloseTo(cycle.strokeUnits, 9);
       expect(sweep.clear).toBeGreaterThanOrEqual(sweep.declared);
       expect(sweep.clashes.every(({ at }) => at >= sweep.declared)).toBe(true);
-      expect(motion.end[0]).toBeGreaterThan(motion.start[0]);
+      expect(strokeOf(resolved, 'bolt-carrier')[0]).toBeGreaterThan(0);
     },
   );
 
   it('keeps collision candidates at both ends of the swept envelope', () => {
-    const { resolved, motion, cycle } = motionFor('archetype-ar');
+    const { resolved, cycle } = motionFor('archetype-ar');
     const carrier = resolved.defs.get('bolt-carrier')!;
     const start = resolved.placed.get('bolt-carrier')!;
     const limit = cycle.strokeUnits + 2.5;
-    const end = compose(start, translation(scale(sub(motion.end, motion.start), limit / cycle.strokeUnits)));
+    const end = compose(start, translation(scale(strokeOf(resolved, 'bolt-carrier'), limit / cycle.strokeUnits)));
     const carrierTail = carrier.solids.find(({ id }) => id === 'carrier-tail');
     if (!(carrierTail?.kind === 'extruded-polygon' && carrierTail.axis === 'x')) {
       throw new Error('AR carrier has no x-extruded carrier tail');

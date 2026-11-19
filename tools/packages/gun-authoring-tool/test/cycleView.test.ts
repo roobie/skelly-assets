@@ -8,11 +8,12 @@ import { type Mesh, Vector3 } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DESIGNS } from '../src/cli/content.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { clockOf } from '../src/gun/actionMotion.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { createCycleView } from '../src/viewer/cycleView.ts';
 import { buildLayers, disposeGroup } from '../src/viewer/scene.ts';
-import { loadFixture } from './helpers.ts';
+import { loadFixture, strokeOf } from './helpers.ts';
 
 class Control extends EventTarget {
   hidden = false;
@@ -95,7 +96,7 @@ describe('action cycle viewer', () => {
       ]) {
         controls['cycle-scrub']!.value = String(seconds! * 1000);
         controls['cycle-scrub']!.dispatchEvent(new Event('input'));
-        const expected = motionTransform(knob.placed, knob.def.motion!, draw!, turn!);
+        const expected = motionTransform(knob.placed, knob.motion, clockOf(knob.motion, draw!, turn!));
         for (const point of [
           [0, 0, 0],
           [1, 0, 0],
@@ -143,8 +144,7 @@ describe('action cycle viewer', () => {
       controls['cycle-mode']!.dispatchEvent(new Event('change'));
       controls['cycle-scrub']!.value = String(action.cycle!.hand.rearwardSeconds * 1000);
       controls['cycle-scrub']!.dispatchEvent(new Event('input'));
-      const motion = action.carrier.def.motion!;
-      const expectedDisplacement = -(motion.end[0] - motion.start[0]);
+      const expectedDisplacement = -strokeOf(resolved, action.carrier.id)[0];
       const handleDisplacement = handle.matrix.elements[12]! - home[12]!;
       const carrierDisplacement = carrier.matrix.elements[12]! - carrierHome[12]!;
       expect(handleDisplacement).toBeCloseTo(expectedDisplacement, 9);
@@ -193,7 +193,7 @@ describe('action cycle viewer', () => {
         throw new Error('SMG handle mesh is missing');
       }
       const expectPose = (draw: number, turn: number, label: string) => {
-        const expected = motionTransform(handle.placed, handle.def.motion!, draw, turn);
+        const expected = motionTransform(handle.placed, handle.motion, clockOf(handle.motion, draw, turn));
         for (const point of [
           [0, 0, 0],
           [0, 0, 1],

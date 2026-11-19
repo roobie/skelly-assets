@@ -1,9 +1,12 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseAssemblyOrThrow } from '@skelly/construct/assembly/parseAssembly.ts';
-import type { Assembly } from '@skelly/construct/assembly/schema.ts';
+import type { Assembly, Resolved } from '@skelly/construct/assembly/schema.ts';
+import { scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { TriangleMesh } from '@skelly/construct/shapes/shapeTypes.ts';
+import type { Motion } from '@skelly/motion/motion';
 import { CARTRIDGES, DESIGNS } from '../src/cli/content.ts';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import type { PartItems } from '../src/gun/physical.ts';
 import type { PlatformChoice } from '../src/gun/platforms.ts';
@@ -238,4 +241,19 @@ export const partTriangles = (json: GltfJson, read: ReturnType<typeof readGlb>, 
     }
   }
   return triangles;
+};
+
+/** The motion a resolved part moves by. */
+export const motionOf = (resolved: Resolved, id: string): Motion => {
+  const motion = resolved.motions.get(id);
+  if (!motion) {
+    throw new Error(`${id} has no motion`);
+  }
+  return motion;
+};
+
+/** Where a resolved part's single slide ends up when it is fully drawn, from where it rests. */
+export const strokeOf = (resolved: Resolved, id: string): Vec3 => {
+  const { direction, travel } = slideOf(motionOf(resolved, id));
+  return scale(direction, travel);
 };

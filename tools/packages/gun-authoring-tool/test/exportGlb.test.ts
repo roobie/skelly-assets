@@ -28,6 +28,7 @@ import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import type { MetallicCartridge } from '../src/ammo/cartridge.ts';
 import { DESIGNS } from '../src/cli/content.ts';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import type { SelectedAnchors } from '../src/gun/anchors.ts';
 import { GUN_ANCHOR_POLICY, selectGunAnchors } from '../src/gun/anchors.ts';
@@ -45,7 +46,7 @@ import { FAMILIES } from '../src/gun/parts.ts';
 import { uToMm } from '../src/gun/units.ts';
 import { loadCartridgeFile } from './ammoHelpers.ts';
 import { type ReadGlb, readGlb } from './glbReader.ts';
-import { expectWatertightMesh, loadCorpus, partTriangles, variant } from './helpers.ts';
+import { expectWatertightMesh, loadCorpus, motionOf, partTriangles, strokeOf, variant } from './helpers.ts';
 import { sweepGroup } from './sweeps.ts';
 
 const design = (name: string): Assembly => {
@@ -96,16 +97,11 @@ const actionExportFacts = (name: string) => {
   const parts = Object.values(action.parts).map((part) => {
     const node = out.read.json.nodes.find(({ name: nodeName }) => nodeName === part.node)!;
     const partId = part.node.split(':')[0]!;
-    const partMotion = out.resolved.defs.get(partId)?.motion;
-    if (!partMotion) {
-      throw new Error(`${partId} has no source motion`);
-    }
     return {
       hasMesh: node.mesh !== undefined,
       axisLength: Math.hypot(...part.axis),
       strokeMetres: part.strokeMetres,
-      expectedStrokeMetres:
-        Math.hypot(...sub(partMotion.end, partMotion.start)) * out.resolved.domain.units.metresPerUnit,
+      expectedStrokeMetres: slideOf(motionOf(out.resolved, partId)).travel * out.resolved.domain.units.metresPerUnit,
     };
   });
   // The adapter paints fitted attachments in their item finish; the bytes in question are the action metadata's.
@@ -136,7 +132,7 @@ const actionExportFacts = (name: string) => {
     ejectDirectionLength: Math.hypot(...action.ejectDirection),
     exportedEjectDirection: Object.hasOwn(out.modelEntry, 'ejectDirection'),
     hasEjectionAnchor: out.modelEntry.anchors?.ejection !== undefined,
-    carrierAxis: out.resolved.defs.get('bolt-carrier')!.motion!.axis,
+    carrierAxis: slideOf(motionOf(out.resolved, 'bolt-carrier')).direction,
     coreOk: core.ok,
     sameGlb: Buffer.from(out.glb).equals(Buffer.from(core.ok ? core.glb : [])),
   };
@@ -364,14 +360,11 @@ describe('glb export: nodes', () => {
   it('emits the BCG as its own node with linear travel extras and keeps port metadata children', () => {
     const node = ar.read.json.nodes.find((entry) => entry.extras?.part === 'bolt-carrier')!;
     expect(node.name).toBe(partNodeName('bolt-carrier', 'bolt-carrier'));
-    const motion = ar.resolved.defs.get('bolt-carrier')!.motion!;
     expect(node.extras?.motion).toEqual({
-      kind: motion.kind,
-      axis: motion.axis,
-      rest: motion.start,
-      rearmost: motion.end,
-      ...(motion.turn ? { turn: motion.turn } : {}),
-      ...(motion.sourceKeepOut ? { sourceKeepOut: motion.sourceKeepOut } : {}),
+      kind: 'linear',
+      axis: slideOf(motionOf(ar.resolved, 'bolt-carrier')).direction,
+      rest: [0, 0, 0],
+      rearmost: strokeOf(ar.resolved, 'bolt-carrier'),
     });
     expect((node.children ?? []).some((index) => ar.read.json.nodes[index]!.name === 'bolt-carrier.mount')).toBe(true);
   });
