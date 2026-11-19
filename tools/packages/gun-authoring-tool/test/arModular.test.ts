@@ -8,7 +8,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
-import { AR15_FRAME, checkFrameTable, FRAME_PICKS, pick, u } from '../src/gun/arModular/frame.ts';
+import { AR15_FRAME, checkFrameTable, checkRailSeats, FRAME_PICKS, pick, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
 import { arUpper } from '../src/gun/arModular/upper.ts';
 import { gunDomain } from '../src/gun/domain.ts';
@@ -79,6 +79,16 @@ describe('modular AR', () => {
     expect(check({ a: { standard: 'ar15-magazine', mount: 'magazine' } })).not.toThrow();
     expect(check({ a: { standard: 'ar15-magzine', mount: 'magazine' } })).toThrow(/t\.a/);
     expect(check({ a: { standard: 'ar15-magazine', mount: 'stock' } })).toThrow(/t\.a/);
+  });
+
+  it('refuses a table whose rails would not stand on what carries them', () => {
+    const withUpperTop = (mm: number) => ({ ...AR15, upper: { ...AR15.upper, topY: { ...AR15.upper.topY, mm } } });
+    expect(() => checkRailSeats('ar15', AR15)).not.toThrow();
+    expect(() => checkRailSeats('ar15', withUpperTop(AR15.upper.topY.mm + 1))).toThrow(/ar15\.upper\.topY/);
+    const railTopY = { ...AR15.handguard.railTopY, mm: AR15.handguard.outerTopY.mm };
+    expect(() => checkRailSeats('ar15', { ...AR15, handguard: { ...AR15.handguard, railTopY } })).toThrow(
+      /ar15\.handguard\.outerTopY/,
+    );
   });
 
   it('refuses the AR-15 table with a pick it pins left out or turned into a measurement', () => {

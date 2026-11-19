@@ -218,13 +218,41 @@ type FieldPins = {
       : never;
 };
 
+/** How far apart two heights of the table may be and still be one height, read off the same derivation. */
+const SAME_HEIGHT_MM = 1e-6;
+
+/**
+ * The rails stand where their builder assumes: the flat-top's teeth alone on a receiver whose top is cut to the drawn
+ * slot depth, and the handguard's spine under its teeth rather than over them.
+ */
+export const checkRailSeats = (name: string, table: ArFrameTable): void => {
+  const depth = table.rail.drawnSlotDepth.mm;
+  const { upper, handguard } = table;
+  if (Math.abs(upper.rail.topY.mm - depth - upper.topY.mm) > SAME_HEIGHT_MM) {
+    throw new Error(
+      `${name}.upper.topY: the flat-top's rail is its teeth alone, so the receiver's top must stand at ` +
+        `upper.rail.topY less rail.drawnSlotDepth, ${upper.rail.topY.mm - depth} mm, not ${upper.topY.mm} mm`,
+    );
+  }
+  if (handguard.outerTopY.mm > handguard.railTopY.mm - depth) {
+    throw new Error(
+      `${name}.handguard.outerTopY: the rail's spine runs from the tube's top up to its teeth, so the top must stand ` +
+        `no higher than handguard.railTopY less rail.drawnSlotDepth, ${handguard.railTopY.mm - depth} mm, ` +
+        `not ${handguard.outerTopY.mm} mm`,
+    );
+  }
+};
+
 /**
  * A frame table as loaded. The JSON import types every pick's group as any string; the load check holds each pick to
  * the group its pin names and to a choice of that group, and the pins agree with the fields ArFrameTable types, which
  * is what this cast assumes.
  */
-const loadFrameTable = (name: string, raw: unknown, pins: FieldPins): ArFrameTable =>
-  checkFrameTable(name, raw, pins) as ArFrameTable;
+const loadFrameTable = (name: string, raw: unknown, pins: FieldPins): ArFrameTable => {
+  const table = checkFrameTable(name, raw, pins) as ArFrameTable;
+  checkRailSeats(name, table);
+  return table;
+};
 
 export const AR15_FRAME: ArFrame = {
   name: 'ar15',

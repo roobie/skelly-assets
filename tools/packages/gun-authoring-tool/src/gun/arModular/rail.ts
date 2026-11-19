@@ -4,8 +4,8 @@ import { box, X, Y } from '../antiMateriel/common.ts';
 import { type ArFrameTable, u } from './frame.ts';
 
 /**
- * What a rail stands on: a spine of its own down to `spineBaseY` under its teeth, or its teeth alone, on a part whose top is
- * cut to the slots' depth.
+ * What a rail stands on: a spine of its own down to `spineBaseY` under its teeth, or its teeth alone, on a part whose
+ * top is cut to the slots' depth. The frame's load check holds both seats to the table's heights.
  */
 type RailFoot = { readonly spineBaseY: number } | 'teeth-only';
 
