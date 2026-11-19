@@ -1,5 +1,6 @@
-// The lab's dev-server side, in Node: the built tree and its models.json, and the content compiled from Jsonnet.
-// The content goes to the page as data, pushed on change, never as modules, so a compile can never make vite reload.
+// The lab's side in Node: the content compiled from Jsonnet, which the static build writes once and the dev server
+// answers and pushes on change, and for the dev server the built tree and its models.json. The content goes to the page
+// as data, never as modules, so a compile can never make vite reload.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
@@ -7,13 +8,19 @@ import { join, resolve } from 'node:path';
 import { BUILD_ROOT } from '../../../buildDir.mjs';
 import { buildSite, sendFile, siteFiles } from '../../../reviewSite.mjs';
 import { refreshJsonnetSources } from '../../../sources.mjs';
-import { CONTENT_PATH, type ContentMessage } from '../src/protocol.ts';
+import { CONTENT_FILE, type ContentMessage } from '../src/protocol.ts';
 
 const repo = resolve(import.meta.dirname, '../../../..');
 const TWINS = { finishes: 'models/finishes.json', lab: 'models/shader-lab.json' } as const;
 
 const readTwin = (path: string): unknown => JSON.parse(readFileSync(join(repo, path), 'utf8'));
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+/** The content as it compiles now; it throws why it did not compile. */
+export const labContent = async (): Promise<Exclude<ContentMessage, { error: string }>> => {
+  await refreshJsonnetSources();
+  return { finishes: readTwin(TWINS.finishes), lab: readTwin(TWINS.lab) };
+};
 
 export interface LabServer {
   /**
@@ -48,8 +55,7 @@ export const labServer = ({ built }: { built: string }): LabServer => {
 
   const content = async (): Promise<ContentMessage> => {
     try {
-      await refreshJsonnetSources();
-      return { finishes: readTwin(TWINS.finishes), lab: readTwin(TWINS.lab) };
+      return await labContent();
     } catch (error) {
       return { error: message(error) };
     }
@@ -73,7 +79,7 @@ export const labServer = ({ built }: { built: string }): LabServer => {
   };
 
   const answer = async (pathname: string, response: ServerResponse) => {
-    if (pathname === CONTENT_PATH) {
+    if (pathname === `/${CONTENT_FILE}`) {
       response.setHeader('content-type', 'application/json');
       response.end(JSON.stringify(await content()));
       return true;

@@ -25,3 +25,7 @@ npm run dev
 ```
 
 It serves on the LAN on port 5180.
+
+The showcase site also serves the lab as one of its viewers, so a look can be judged and tuned without a checkout.
+There it draws the site's own build, and its content is fixed when the site is built: the sliders still write a
+snippet to paste, but an edit is seen only in the dev server.
