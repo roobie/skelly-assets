@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
+import { posePoint } from '@skelly/motion/motion';
 import { toModelFrame } from '@skelly/thing-core/frame';
-import { posePoint } from '@skelly/thing-core/motion';
 import { expect, it } from 'vitest';
 import { evaluateJsonnet } from '../../../jsonnet/index.mjs';
 import { buildItem, loadCatalogue } from '../src/catalogue.ts';
@@ -41,8 +41,8 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
   };
   const skin = inModel('skin');
   const motion = modelEntry.motion!;
-  expect(motion).toHaveLength(1);
-  const hinge = motion[0]!;
+  expect(motion.stages).toHaveLength(1);
+  const hinge = motion.stages[0]!;
   expect(hinge.kind).toBe('hinge');
   if (hinge.kind !== 'hinge') return;
   for (const [end, pin] of [

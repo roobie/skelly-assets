@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'tools/packages/construct/**'
+      - 'tools/packages/motion/**'
       - 'tools/packages/thing-core/**'
       - 'models/finishes.jsonnet'
       - 'tools/package.json'
@@ -20,6 +21,7 @@ on:
   pull_request:
     paths:
       - 'tools/packages/construct/**'
+      - 'tools/packages/motion/**'
       - 'tools/packages/thing-core/**'
       - 'models/finishes.jsonnet'
       - 'tools/package.json'
@@ -60,3 +62,7 @@ jobs:
         working-directory: tools/packages/construct
       - run: npm test
         working-directory: tools/packages/construct
+      - run: npm run typecheck
+        working-directory: tools/packages/motion
+      - run: npm test
+        working-directory: tools/packages/motion

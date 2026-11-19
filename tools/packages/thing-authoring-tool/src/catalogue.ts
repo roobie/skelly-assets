@@ -2,27 +2,18 @@ import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/as
 import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import { type Motion, type StageMove, shareStages } from '@skelly/motion/motion';
 import { BuildingSchema } from '@skelly/thing-core/building';
 import { FORWARDS, type Forward, FRONT_TURNS, fileGripTurn } from '@skelly/thing-core/frame';
 import { MATERIALS } from '@skelly/thing-core/materials';
-import {
-  centreOf,
-  cornersOf,
-  hingeSense,
-  piecesBounds,
-  pinAxis,
-  type StageMove,
-  shareStages,
-  TOWARD,
-  TOWARDS,
-} from '@skelly/thing-core/motion';
+import { centreOf, cornersOf, hingeSense, piecesBounds, pinAxis, TOWARD, TOWARDS } from '@skelly/thing-core/motion';
 import {
   ModelPartSchema,
   ModelPointSchema,
-  type Motion,
   type NeutralModel,
   NeutralModelSchema,
   OpenAngleSchema,
+  StopsSchema,
 } from '@skelly/thing-core/schema';
 import { singlePart } from '@skelly/thing-core/single-part';
 import { drawnGeometry } from '@skelly/thing-export/drawn.ts';
@@ -185,11 +176,12 @@ const ItemSchema = pipe(
     /**
      * How a compound part of the item moves on whatever carries it, from rest to its authored stop, in stages run one
      * after another: a hinge turning on pins drawn on the part, toward a direction, or a slide along one. Exported in
-     * the model frame; see `docs/decisions/0015-motion-as-content.md`.
+     * the model frame, with the named stops its clock runs through; see `docs/decisions/0015-motion-as-content.md`.
      */
     motion: optional(
       strictObject({
         part: name,
+        stops: StopsSchema,
         stages: pipe(
           array(
             variant('kind', [
@@ -473,7 +465,7 @@ export const itemMotion = (
     return { kind: 'hinge', axis, angle: hingeSense(axis, centre, step.toward, grain) * step.open };
   };
   try {
-    return shareStages(authored.stages.map(stage), hull);
+    return { stages: shareStages(authored.stages.map(stage), hull), stops: authored.stops };
   } catch (failure) {
     throw new Error(`${item.id}: ${failure instanceof Error ? failure.message : String(failure)}`);
   }

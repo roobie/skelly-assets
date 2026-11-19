@@ -178,8 +178,14 @@ test('the closures that open are those whose built model has a motion', () => {
       mkdirSync(join(out, 'fixture.vans', 'things'), { recursive: true });
       writeFileSync(join(out, 'fixture.vans', 'things', `${id}.model.json`), JSON.stringify({ motion }));
     };
-    sidecar('fixture_shutter', [{ kind: 'slide', direction: [0, 1, 0], travel: 1, stow: 0, share: 1 }]);
-    sidecar('fixture_body', []);
+    sidecar('fixture_shutter', {
+      stages: [{ kind: 'slide', direction: [0, 1, 0], travel: 1, stow: 0, share: 1 }],
+      stops: [
+        { name: 'rest', clock: 0 },
+        { name: 'open', clock: 1 },
+      ],
+    });
+    sidecar('fixture_body', undefined);
     const placements = {
       van: {
         sites: [

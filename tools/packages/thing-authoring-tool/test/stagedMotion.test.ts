@@ -1,13 +1,14 @@
 import { resolve } from 'node:path';
 import { applyPoint, dot, type Vec3 } from '@skelly/construct/foundation/math.ts';
-import { isStowed, mirrorMotion, posePoint, TOWARD } from '@skelly/thing-core/motion';
-import type { Motion } from '@skelly/thing-core/schema';
+import { isStowed, type Motion, posePoint, reflection, transformMotion } from '@skelly/motion/motion';
+import { TOWARD } from '@skelly/thing-core/motion';
 import { expect, it } from 'vitest';
 import { evaluateJsonnet } from '../../../jsonnet/index.mjs';
 import { buildItem, itemMotion, loadCatalogue } from '../src/catalogue.ts';
 
 const grain = 0.03125;
 const reflect = ([x, y, z]: Vec3): Vec3 => [-x, y, z];
+const mirrorMotion = (motion: Motion) => transformMotion(motion, reflection(0));
 const expectClose = (actual: Vec3, expected: Vec3) =>
   actual.forEach((value, axis) => expect(value).toBeCloseTo(expected[axis]!, 9));
 

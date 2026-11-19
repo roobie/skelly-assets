@@ -19,7 +19,10 @@ the line they gave moved whenever the drawing snapped differently, while the par
 
 A part row declares its motion beside its anchors, and the build exports it on the part's model; see
 `tools/packages/thing-core/src/schema.ts`, `MotionSchema`. Consumers play that record and invent no motion of their
-own.
+own. The record's type and the math that poses and reflects it live in `tools/packages/motion/src/motion.ts`, which
+imports nothing, so the vehicle, gun and showcase code share one implementation instead of each carrying its own.
+Its stops name clock positions, rest and open for every vehicle part, so a consumer asks for a named place on the
+clock and not a number.
 
 - **The axis is drawn, never written.** A hinge names the pins it turns on, pieces drawn on the part, and the axis is
   derived from their authored shape, not their voxels, so voxel snapping changes how a pin looks but never where the
@@ -38,15 +41,15 @@ own.
   the template that owns the family, never solved into source and never held by a tool. A part shared across vehicles
   has one stop; a vehicle that needs another uses a variant row.
 - **Mirroring is not stored.** A far twin is the near part reflected, so its motion is the reflected motion, stage by
-  stage; see `tools/packages/thing-core/src/motion.ts`, `mirrorMotion`. Storing both would let them disagree.
+  stage; see `tools/packages/motion/src/motion.ts`, `transformMotion`. Storing both would let them disagree.
 - **A motion is a sequence of rigid stages.** Each stage is a hinge or a slide, so a plug door is a slide out then a
   slide along, with no new kind for each mechanism, which would each need its own schema, sense rule, check and
   reader. Every stage is given in the part's rest frame and the first carries the rest, so a consumer nests one group
   per stage, the first outermost, and the build never poses pins through earlier stages; see
-  `tools/packages/thing-core/src/motion.ts`, `posePoint`.
+  `tools/packages/motion/src/motion.ts`, `posePoint`.
 - **The clock is shared by distance.** Stages run one after another on one clock from rest to stop, and the build
   gives each the share its distance is of the whole, a slide its travel and a hinge the arc its part's furthest rest
-  corner sweeps; see `tools/packages/thing-core/src/motion.ts`, `shareStages`. Equal shares would give a few centimetres
+  corner sweeps; see `tools/packages/motion/src/motion.ts`, `shareStages`. Equal shares would give a few centimetres
   of plug-out the same time as a metre of slide. Only the build has the pins and bounds, so it exports the shares and
   no consumer can derive different ones.
 - **A slide may stow.** A shutter rises into its head, so what it carries past the leading face of the part's rest
@@ -55,7 +58,7 @@ own.
   build exports it as one offset along the slide's own direction, never a separate plane normal, which would always
   equal the direction and could disagree with it. The plane stays where it is while the slide moves, and a mirrored
   twin keeps the same offset along its reflected direction. The plane is fixed in its carrier's frame, so it hides the
-  carrier's riders too. See `tools/packages/thing-core/src/motion.ts`, `isStowed`.
+  carrier's riders too. See `tools/packages/motion/src/motion.ts`, `isStowed`.
 - **A rider names its carrier once.** A part that moves with another and then on its own, such as the free panel of a
   folding door, is a site that `rides` the carrier's site, so the carrier is stated in the placements and nowhere
   else. Its stages are in its own rest frame and its own motion is nested inside its carrier's, so it runs on its

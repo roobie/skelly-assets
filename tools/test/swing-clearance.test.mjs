@@ -8,6 +8,11 @@ import { foundContacts, sweepVehicle, swingReport, swingResults } from '../swing
 import { shapeOf, sweepBody } from '../swingSweep.mjs';
 
 const GRAIN = 0.03125;
+const stops = [
+  { name: 'rest', clock: 0 },
+  { name: 'open', clock: 1 },
+];
+const slide = (direction, travel) => ({ stages: [{ kind: 'slide', direction, travel, share: 1 }], stops });
 const box = (id, min, max) => ({ id, kind: 'box', slot: 'paint', min, max });
 const pin = (id, z, y = 0) => ({
   id,
@@ -27,6 +32,7 @@ const pin = (id, z, y = 0) => ({
 const flap = (length, { open = 90, toward = 'up', y = 0 } = {}) => ({
   pieces: [box('skin', [0, y, -0.5], [length, y + GRAIN, 0.5]), pin('pin_a', 0.5, y), pin('pin_b', -0.5, y)],
   stages: [{ kind: 'hinge', pins: ['pin_a', 'pin_b'], open, toward }],
+  stops,
 });
 const site = (id, part, pieces, extra = {}) => ({ id, part, at: [0, 0, 0], mirror: false, pieces, ...extra });
 const task = (motions, sites) => ({ grain: GRAIN, forward: '+x', motions, sites });
@@ -60,7 +66,7 @@ test('a plate that slides through a plate as thin as itself is reported, whereve
   for (const offset of [0, 0.25, 0.5, 0.75]) {
     const x = (1 + offset) * GRAIN;
     const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
-    const layers = [[{ kind: 'slide', direction: [1, 0, 0], travel: 0.2, share: 1 }]];
+    const layers = [slide([1, 0, 0], 0.2)];
     const { contacts } = sweepBody({
       layers,
       movers: [{ site: 'plate', shape: plate('a', 0) }],
@@ -74,7 +80,6 @@ test('a plate that slides through a plate as thin as itself is reported, whereve
 
 test('a plate that a faster part carries through a nearly still one is reported, whichever of the two moves most', () => {
   const plate = (id, from) => shapeOf(box(id, [from, 0, 0], [from + GRAIN, 0.2, 0.2]));
-  const slide = (direction, travel) => [{ kind: 'slide', direction, travel, share: 1 }];
   const [still, fast] = [slide([1, 0, 0], 0.01), slide([-1, 0, 0], 0.3)];
   const { contacts } = sweepBody({
     layers: [still],
@@ -127,6 +132,7 @@ test('a rider is carried with its carrier and meets what the carrier alone never
 const hinged = (skin, [x, y], { toward = 'up', open = 90 } = {}) => ({
   pieces: [skin, { ...pin('pin_a', 0.5, y), origin: [x, y, 0.5] }, { ...pin('pin_b', -0.5, y), origin: [x, y, -0.5] }],
   stages: [{ kind: 'hinge', pins: ['pin_a', 'pin_b'], open, toward }],
+  stops,
 });
 // A flap one grain thick lying along x from its hinge at x0, `length` long (negative to lie back along -x), on the hinge
 // line at height y0.
@@ -233,6 +239,7 @@ test('two lids that clear alone but collide once both are open are caught by the
 const curtain = ({ stow }) => ({
   pieces: [box('slats', [-0.2, 0, -0.5], [-0.2 + GRAIN, 1, 0.5])],
   stages: [{ kind: 'slide', toward: 'up', travel: 0.8, ...(stow ? { stow: true } : {}) }],
+  stops,
 });
 // The curtain's part is drawn at the origin, and the vehicle places it, and what stands around it, a way up from there:
 // its stow plane is the part's, carried by the same `at`.

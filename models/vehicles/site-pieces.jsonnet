@@ -14,7 +14,7 @@ local placed(site) = [
 local moving = [row for row in rows if std.objectHas(row, 'motion')];
 {
   grain: voxel.vehicle.grain,
-  motions: { [row.id]: { stages: row.motion.stages, pieces: drawn[row.id] } for row in moving },
+  motions: { [row.id]: { stages: row.motion.stages, stops: row.motion.stops, pieces: drawn[row.id] } for row in moving },
   fits: (import 'models/vehicles/seating.libsonnet').fits,
   roles: std.set(std.flattenArrays([
     [site.id for site in placements[vehicle].sites if std.objectHas(drawn, site.part)]

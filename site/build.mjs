@@ -13,7 +13,9 @@
 // shows the release that introduced it, the one that last changed it and whether this build differs; without it the
 // models show no versions.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
@@ -336,10 +338,27 @@ const plainClips = (clips, body) => ({
   ...(!clips.standing && !clips.crawling ? plainSet(clips, body, 'standing') : {}),
 });
 
+// Node flags stripTypeScriptTypes as experimental on every call; that one warning is dropped, any other still shows.
+function strippedTypes(source) {
+  const emit = process.emitWarning;
+  process.emitWarning = (warning, ...rest) => {
+    if (!String(warning).includes('stripTypeScriptTypes')) emit.call(process, warning, ...rest);
+  };
+  try {
+    return stripTypeScriptTypes(source);
+  } finally {
+    process.emitWarning = emit;
+  }
+}
+
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 for (const f of SITE_FILES) cpSync(join(here, f), join(out, f));
 for (const f of TOOLS_FILES) cpSync(join(root, 'tools', f), join(out, f));
+// The motion package is TypeScript, which a browser cannot load, so it ships as a copy with its types stripped, and
+// each page's import map points the source path the modules import it by (which node and tsc resolve) at that copy.
+const MOTION_SOURCE = '../tools/packages/motion/src/motion.ts';
+writeFileSync(join(out, 'motion.mjs'), strippedTypes(readFileSync(join(root, MOTION_SOURCE.slice(3)), 'utf8')));
 // The doll's rig and the shared poses, for the pose page (site/pose.mjs) and the pose sheets (tools/pose-sheet.mjs).
 if (doll) {
   const poses = readdirSync(join(root, POSES))
@@ -419,6 +438,13 @@ for (const { page, viewer } of tools)
 const index = readFileSync(join(out, 'index.html'), 'utf8');
 if (!index.includes(NAV_MARK)) throw new Error(`site/index.html has no ${NAV_MARK} for the tool links`);
 writeFileSync(join(out, 'index.html'), index.replace(NAV_MARK, toolLinks(tools)));
+for (const page of readdirSync(out).filter((f) => f.endsWith('.html'))) {
+  const html = readFileSync(join(out, page), 'utf8');
+  writeFileSync(
+    join(out, page),
+    html.replace('"imports": {', `"imports": {\n        "${MOTION_SOURCE}": "./motion.mjs",`),
+  );
+}
 const unlinked = unlinkedTools(out, tools);
 if (unlinked.length > 0)
   throw new Error(`the site serves tool pages that site/tools.json does not list: ${unlinked.join(' ')}`);

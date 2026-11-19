@@ -6,6 +6,8 @@ local paintable(dimensions, finish) =
   local pieces = std.get(dimensions, 'pieces', []);
   if std.objectHas(finish, 'paint') && std.any([std.get(p, 'slot') == 'paint' && !std.objectHas(p, 'material') for p in pieces])
   then { paintable: ['paint'] } else {};
+// A vehicle part rests and opens; a motion with more places to stop on its clock would name them here.
+local motionStops = [{ name: 'rest', clock: 0 }, { name: 'open', clock: 1 }];
 // A part that moves turns on the pins its motion names, so a hinge anchor would be a second, unchecked claim about
 // where it turns; docs/decisions/0015-motion-as-content.md.
 local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', motion=null) =
@@ -17,7 +19,7 @@ local part(id, family, massKg, dimensions, finish, anchors, exportMass='parts', 
     parts: [{ id: 'body', family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: [] } + paintable(dimensions, finish)],
     connections: [],
     anchors: { [name]: { part: 'body', solid: anchors[name][0], fraction: anchors[name][1] } for name in std.objectFields(anchors) },
-  } + (if motion == null then {} else { motion: { part: 'body', stages: motion } });
+  } + (if motion == null then {} else { motion: { part: 'body', stages: motion, stops: motionStops } });
 local towards = ['up', 'down', 'fore', 'rear', 'near', 'far'];
 local vehicleGrain = (import '../voxel-grains.libsonnet').classes.vehicle.grain;
 // A z prism's profile is (x, y), an x prism's (y, z), a y prism's (z, x); a turned profile is (axial, radial) and closes on itself.

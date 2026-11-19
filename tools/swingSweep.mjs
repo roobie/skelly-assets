@@ -8,7 +8,7 @@
 /** @import { Point, Pose, StowPlane } from '../site/motionPose.mjs' */
 /** @import { AxisIndex, Vec3 } from './packages/construct/src/foundation/math.ts' */
 /** @import { Bounds } from './packages/thing-core/src/motion.ts' */
-/** @import { HingeAxis, Motion } from './packages/thing-core/src/schema.ts' */
+/** @import { HingeStage, Motion } from './packages/motion/src/motion.ts' */
 /** @import { Distance, Piece } from './pieceSolid.mjs' */
 
 import { apply, compose, IDENTITY, invert, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
@@ -36,7 +36,7 @@ import { solid } from './pieceSolid.mjs';
 
 /**
  * @param {Vec3} point
- * @param {HingeAxis} axis
+ * @param {HingeStage['axis']} axis
  */
 const distanceFromLine = ([px, py, pz], { from, to }) => {
   /** @type {Vec3} */
@@ -58,7 +58,7 @@ const distanceFromLine = ([px, py, pz], { from, to }) => {
  */
 function pacesOf(motion, corners, carried, first = 0) {
   let pace = 0;
-  for (const stage of motion.slice(first).reverse()) {
+  for (const stage of motion.stages.slice(first).reverse()) {
     const radius =
       stage.kind === 'slide' ? 0 : Math.max(...corners.map((c) => distanceFromLine(c, stage.axis))) + carried;
     const reach = stage.kind === 'slide' ? stage.travel : ((Math.abs(stage.angle) * Math.PI) / 180) * radius;

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@skelly/construct": "*",
+    "@skelly/motion": "*",
     "valibot": "^1.5.0"
   },
   "devDependencies": {

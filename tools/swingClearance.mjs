@@ -14,8 +14,7 @@
 // the rules and the cost strategy are in `docs/decisions/0016-swing-check.md`.
 /** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
 /** @import { Forward } from './packages/thing-core/src/frame.ts' */
-/** @import { StageMove } from './packages/thing-core/src/motion.ts' */
-/** @import { Motion } from './packages/thing-core/src/schema.ts' */
+/** @import { Motion, StageMove } from './packages/motion/src/motion.ts' */
 /** @import { ResultFolder } from './packages/thing-export/src/cache.ts' */
 /** @import { Shard } from './generation.mjs' */
 /** @import { Piece } from './pieceSolid.mjs' */
@@ -28,6 +27,7 @@ import { resolve } from 'node:path';
 import { AUTHORED_LATERAL, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { shardUnits } from './generation.mjs';
 import { column, dot, perAxis } from './packages/construct/src/foundation/math.ts';
+import { shareStages } from './packages/motion/src/motion.ts';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
 import {
   centreOf,
@@ -35,7 +35,6 @@ import {
   hingeSense,
   piecesBounds,
   pinAxis,
-  shareStages,
   shiftPiece,
   TOWARD,
 } from './packages/thing-core/src/motion.ts';
@@ -122,7 +121,7 @@ const fromModelFrame = (forward, direction) => perAxis((j) => dot(column(FRONT_T
  * @param {number} grain
  * @returns {Motion}
  */
-export function resolveMotion({ stages, pieces }, forward, grain) {
+export function resolveMotion({ stages, stops, pieces }, forward, grain) {
   const bounds = piecesBounds(pieces);
   const centre = toModelFrame(forward, centreOf(bounds));
   const moves = stages.map((stage) => {
@@ -149,7 +148,7 @@ export function resolveMotion({ stages, pieces }, forward, grain) {
     const hinge = { kind: 'hinge', axis, angle: sense * stage.open };
     return hinge;
   });
-  return shareStages(moves, cornersOf(bounds));
+  return { stages: shareStages(moves, cornersOf(bounds)), stops };
 }
 
 /**
@@ -158,7 +157,7 @@ export function resolveMotion({ stages, pieces }, forward, grain) {
  * @returns {Extent}
  */
 const extentOf = (layers) => {
-  const stage = layers.length === 1 && layers[0]?.length === 1 ? layers[0][0] : undefined;
+  const stage = layers.length === 1 && layers[0]?.stages.length === 1 ? layers[0].stages[0] : undefined;
   if (stage === undefined) return null;
   return stage.kind === 'slide'
     ? { unit: 'mm', total: millimetres(stage.travel) }
@@ -181,9 +180,13 @@ export function adjustedMotion(part, { offset, scale = 1 }, forward, grain) {
   const moved = offset
     ? { ...part, pieces: part.pieces.map((piece) => (pins.has(piece.id) ? shiftPiece(piece, offset) : piece)) }
     : part;
-  return resolveMotion(moved, forward, grain).map((stage) =>
-    stage.kind === 'slide' ? { ...stage, travel: stage.travel * scale } : { ...stage, angle: stage.angle * scale },
-  );
+  const resolved = resolveMotion(moved, forward, grain);
+  return {
+    ...resolved,
+    stages: resolved.stages.map((stage) =>
+      stage.kind === 'slide' ? { ...stage, travel: stage.travel * scale } : { ...stage, angle: stage.angle * scale },
+    ),
+  };
 }
 
 /**
