@@ -11,7 +11,7 @@ import { readRecipes } from '../recipes.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 await installJsonnetSources();
-const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
+const catalogue = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 const gunRows = JSON.parse(
   readFileSync(join(import.meta.dirname, '../packages/gun-authoring-tool/exports/deadvox.json'), 'utf8'),
 );

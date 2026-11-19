@@ -8,14 +8,14 @@ import { installJsonnetSources } from '../sources.mjs';
 
 await installJsonnetSources();
 const { finishLibrary, loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
-const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
+const { settings } = await import('../packages/thing-authoring-tool/src/settings.ts');
 
 const repo = resolve(import.meta.dirname, '../..');
 const shipped = buildManifest({
   models: [],
   files: [],
   credit: () => ({}),
-  finishes: finishLibrary(catalogue),
+  finishes: finishLibrary(settings),
 }).finishes;
 const named = [
   ...new Set(Object.values(readPlacements(repo)).flatMap(({ sites }) => sites.flatMap(({ finish }) => finish ?? []))),
@@ -33,7 +33,7 @@ const paintedMaterials = (finish) => {
     ...fixture.item,
     parts: fixture.item.parts.map((part) => ({ ...part, finish: { surface: finish }, paintable: ['surface'] })),
   };
-  const [row] = loadThingRecipe(fixture.recipe, { ...catalogue, items: [item] });
+  const [row] = loadThingRecipe(fixture.recipe, { ...settings, items: [item] });
   return glbJson(row.generate().glb).materials.filter(({ extras }) => extras?.paintable);
 };
 
@@ -48,7 +48,7 @@ test('every finish a vehicle site names is in the shipped finish library', () =>
 // A consumer puts the shipped entry in place of a paintable material, so it must be what an export in that finish
 // writes; the default material is skipped, so an exporter falling back to it cannot pass.
 test('a shipped finish is the material an export painted in it carries', () => {
-  const finish = named.find((id) => id !== catalogue.defaultMaterial);
+  const finish = named.find((id) => id !== settings.defaultMaterial);
   const materials = paintedMaterials(finish);
   assert.ok(materials.length > 0, 'the fixture exports no paintable material');
   for (const material of materials) assert.deepEqual(material, shipped[finish]);

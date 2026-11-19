@@ -17,7 +17,7 @@ import { installJsonnetSources } from '../sources.mjs';
 import { close, glbBounds } from './architecture-helpers.mjs';
 
 await installJsonnetSources();
-const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
+const catalogue = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 const pack = 'skelly.structures';
 const definitions = readBuildingKits();
 const items = catalogue.items.filter(({ building }) =>

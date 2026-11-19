@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { coversProblems, readDressing } from '../dress.mjs';
@@ -30,7 +29,7 @@ test('a covers name is the part its piece is drawn on or a region the dressing c
 
 // The authored items, which carry what each worn shell covers into its export.
 await installJsonnetSources();
-const { items } = JSON.parse(readFileSync(resolve(repo, 'tools/packages/thing-authoring-tool/items.json'), 'utf8'));
+const { items } = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 
 test('every worn shell names in covers only its doll part or the regions the dressing cuts it into', () => {
   assert.ok(

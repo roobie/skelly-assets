@@ -7,7 +7,7 @@ import { installJsonnetSources } from '../sources.mjs';
 
 await installJsonnetSources();
 const { loadThingRecipe } = await import('../packages/thing-authoring-tool/src/exports.ts');
-const { catalogue } = await import('../packages/thing-authoring-tool/src/content.ts');
+const { settings } = await import('../packages/thing-authoring-tool/src/settings.ts');
 const { MATERIALS } = await import('../packages/thing-core/src/materials.ts');
 const { exportCache } = await import('../packages/thing-export/src/cache.ts');
 const compiled = JSON.parse(readFileSync(new URL('../../models/finishes.json', import.meta.url)));
@@ -23,12 +23,12 @@ const withFixture = (finish, work) => {
   const fixture = JSON.parse(readFileSync(new URL('./fixtures/unknown-material.json', import.meta.url)));
   const item = { ...fixture.item, parts: fixture.item.parts.map((part) => ({ ...part, finish })) };
   // Bypass catalogue admission deliberately: even an unvalidated caller must not get a fallback surface.
-  const [row] = loadThingRecipe(fixture.recipe, { ...catalogue, items: [item] });
+  const [row] = loadThingRecipe(fixture.recipe, { ...settings, items: [item] });
   return work(row);
 };
 
 // Not the default, so an exporter that labels a surface with its fallback cannot pass.
-const chosen = Object.keys(MATERIALS).find((id) => id !== catalogue.defaultMaterial);
+const chosen = Object.keys(MATERIALS).find((id) => id !== settings.defaultMaterial);
 
 test('every surface an item exports names the material its finish chose', () => {
   assert.deepEqual(MATERIALS, compiled);

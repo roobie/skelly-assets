@@ -5,12 +5,13 @@ import { expect, it } from 'vitest';
 import { exportRecipes } from '../../../build.mjs';
 import { generateRow } from '../../../recipeTools.mjs';
 import { installJsonnetSources } from '../../../sources.mjs';
+import { readCatalogue } from '../src/cli/content.ts';
 import { exportThingRecipes } from '../src/cli/export.ts';
-import { catalogue } from '../src/content.ts';
 import { loadThingRecipe, loadThingRecipeFiles } from '../src/exports.ts';
 import { sweepGroup } from './sweeps.ts';
 
 await installJsonnetSources();
+const catalogue = readCatalogue();
 
 it('exports one recipe file into its pack output without changing its source root', async () => {
   const root = mkdtempSync(join(tmpdir(), 'thing-recipes-'));

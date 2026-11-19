@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
@@ -15,7 +14,7 @@ const unworn = {
 };
 
 await installJsonnetSources();
-const { items } = JSON.parse(readFileSync(resolve(repo, 'tools/packages/thing-authoring-tool/items.json'), 'utf8'));
+const { items } = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 const models = items.map((item) => ({ ...item, tags: item.taxonomy?.tags }));
 const dressing = readDressing(repo);
 
