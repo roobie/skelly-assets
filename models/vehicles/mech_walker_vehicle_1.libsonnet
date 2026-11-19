@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'mech_walker_vehicle_1.spec.libsonnet';
@@ -189,7 +189,7 @@ local trunnion = { z: [1.1, 1.14], boss: [1.14, 1.18], radius: 0.12 };
 local belly = { y: hull.profile[0][1], rear: hull.profile[0][0] + 0.15, front: hull.profile[1][0] - 0.1, ribs: [-0.85, -0.25, 0.4] };
 local tubes = [[y, z] for y in [4.0, 4.25] for z in [podMid - 0.15, podMid, podMid + 0.15]];
 
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sci-fi'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'], setting: ['modern', 'sci-fi'] } }, [
   k.compound('security_walker_hull', 3400, [
     prism('plate_%d' % i, 'paint', [hull.profile[i], hull.profile[(i + 1) % edges], inner[(i + 1) % edges], inner[i]], [hull.plate - hull.half, hull.half - hull.plate])
     for i in std.range(0, edges - 1)

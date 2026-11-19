@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'camper_van.spec.libsonnet';
 local vehicle = import 'camper_van.placements.libsonnet';
@@ -9,7 +9,7 @@ local low = s.roof + 0.05;
 local high = 2.82;
 local rearX = -2.3;
 local frontX = -0.15;
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('camper_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('camper_van', vehicle.title, s) + [
   k.compound('camper_van_pop_top', 85, [
     box('frame', 'lid', [rearX, s.roof, -0.72], [frontX, s.roof + 0.05, 0.72]),
     prism('tent', 'tent', [[rearX + 0.04, s.roof + 0.05], [frontX - 0.04, s.roof + 0.05], [rearX + 0.04, high]], [-0.68, 0.68]),

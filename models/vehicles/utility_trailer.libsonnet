@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'utility_trailer.spec.libsonnet';
@@ -7,7 +7,7 @@ local bothSides = k.bothSides;
 local finish = { paint: s.paint, frame: 'paint-charcoal' };
 local grain = k.grain;
 local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain, s.deck, 0.7 * s.side], [s.rear - grain, s.deck, -0.7 * s.side], 'frame');
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('utility_trailer_chassis', 165, [
     box('front_rail', 'frame', [s.front - 0.04, s.frameLow, -0.55], [s.front, s.frameHigh, 0.55]),
     box('mid_rail', 'frame', [s.axle - 0.04, s.frameLow, -0.55], [s.axle + 0.04, s.frameHigh, 0.55]),

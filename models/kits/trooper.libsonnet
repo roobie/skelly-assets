@@ -1,9 +1,8 @@
 // The trooper armour set: fitted worn shells (template and measures in tools/packages) with a ground model each, in an
-// olive field livery. Each item keeps its figure models beside its rows, as models/catalogue/worn.libsonnet's do, so a
-// consumer can read where the game wears it.
-local armour = import 'armour.libsonnet';
-local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
+// olive field livery.
+local armour = import 'models/armour.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 // Olive paint over parkerized fittings, brass rivets and a yellow chevron and edging.
 local livery = { plate: 'paint-olive', trim: 'steel-parkerized', strap: 'webbing-olive-dark', rivet: 'brass', insignia: 'paint-crane-yellow' };
 // The gauntlet's palm and fingers are a black leather glove under its cuff, as a soldier's are.
@@ -37,7 +36,7 @@ local helmet = [
 ];
 local set = {
   armor_trooper: suit('armor_trooper', 'Trooper body armour', 16.0, fit.trooper('armor_trooper', livery, title='Trooper body armour')),
-  helmet_trooper: fit.head('helmet_trooper', helmetBase) + {
+  helmet_trooper: {
     rows: [h.compound('helmet_trooper', 2.8, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
       title: 'Trooper helmet',
       voxelGrain: 0.004,
@@ -52,4 +51,4 @@ local set = {
                                                     { l: 0.32, w: 0.125, s: 0.035, toe: 0.105, instep: 0.13, top: 0.305, shaft: 0.135, laces: 0 }, { covers: ['sole'] }, title='Trooper boots')),
   legguard_trooper: suit('legguard_trooper', 'Trooper leg guards', 6.5, fit.trooperLegs('legguard_trooper', livery, title='Trooper leg guards')),
 };
-{ [k]: set[k] + { rows: armour.of(null, set[k].rows) } for k in std.objectFields(set) }
+std.flattenArrays([armour.of(null, set[k].rows) for k in std.objectFields(set)])

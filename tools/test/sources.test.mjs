@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile, execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   chmodSync,
   existsSync,
@@ -13,7 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
@@ -60,23 +61,23 @@ const { sources, ...options } = JSON.parse(process.argv[1]);
 await refreshJsonnetTwins(sources, options);
 `;
 
-// A refresh whose `compiler`, of the compiler driver's functions, finds `file` saved as `text` just before it reads the
-// files, as an edit landing after the refresh keyed them would. The edit is saved once, before the first compile: the
-// compiles run concurrently, and saving again under a running one would hand it a truncated file.
+// A refresh whose compiler finds `file` saved as `text` just before it evaluates the first expression that starts with
+// `prefix`, as an edit landing after the refresh keyed the files would. The edit is saved once: the compiles run
+// concurrently, and saving again under a running one would hand it a truncated file.
 const REFRESH_EDITED_MIDWAY = `
 import { writeFileSync } from 'node:fs';
 import { mock } from 'node:test';
-const { compiler, file, text, sources, ...options } = JSON.parse(process.argv[1]);
+const { prefix, file, text, sources, ...options } = JSON.parse(process.argv[1]);
 const real = await import(${moduleUrl('../jsonnet/index.mjs')});
 let saved = false;
-const editFirst = (...args) => {
-  if (!saved) {
+const editFirst = (expression, ...args) => {
+  if (!saved && expression.startsWith(prefix)) {
     writeFileSync(file, text);
     saved = true;
   }
-  return real[compiler](...args);
+  return real.evaluateJsonnetAsync(expression, ...args);
 };
-mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, [compiler]: editFirst } });
+mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, evaluateJsonnetAsync: editFirst } });
 const { refreshJsonnetTwins } = await import(${moduleUrl('../sources.mjs')});
 await refreshJsonnetTwins(sources, options);
 `;
@@ -100,11 +101,30 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
     write('other.jsonnet', "import 'lib/other.libsonnet'");
     write('pkg/nested.jsonnet', "import 'lib/value.libsonnet'");
     write('catalogue.jsonnet', "std.flattenArrays(std.objectValues(import 'rows/index.libsonnet'))");
-    const sources = ['source', 'other', 'pkg/nested', 'catalogue'].map((name) => join(root, `${name}.jsonnet`));
+    // The heads list each row file's rows by their id, as models/catalogue/heads.libsonnet lists the six fields; a
+    // reader of them needs no row.
+    write(
+      'rows/heads.libsonnet',
+      "local heads(rows) = [{ id: row.id } for row in rows]; { 'rows/a.libsonnet': heads(import 'rows/a.libsonnet'), 'rows/b.libsonnet': heads(import 'rows/b.libsonnet') }",
+    );
+    write('pkg/reader.jsonnet', "std.flattenArrays(std.objectValues(import 'rows/heads.libsonnet'))");
+    const sources = ['source', 'other', 'pkg/nested', 'catalogue', 'pkg/reader'].map((name) =>
+      join(root, `${name}.jsonnet`),
+    );
     const store = sharedStore ?? join(root, '.build', 'store');
     const stamp = join(root, '.build', 'stamp');
-    const options = (code) => ({ root, stamp, store, code, rowIndexes: [join(root, 'rows/index.libsonnet')] });
+    const options = (code) => ({
+      root,
+      stamp,
+      store,
+      code,
+      rowIndexes: [join(root, 'rows/index.libsonnet')],
+      heads: join(root, 'rows/heads.libsonnet'),
+    });
     const refresh = (code = []) => refreshJsonnetTwins(sources, options(code));
+    const catalogue = { folder: join(root, 'catalogue'), manifest: join(root, 'catalogue.ids.json') };
+    const refreshRows = () => refreshJsonnetTwins(sources, { ...options([]), catalogue });
+    const rowFile = (id) => join(catalogue.folder, `${id}.json`);
     const refreshElsewhere = () =>
       execFileAsync(process.execPath, [
         '--input-type=module',
@@ -112,20 +132,21 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
         REFRESH_ELSEWHERE,
         JSON.stringify({ sources, ...options([]) }),
       ]);
-    const refreshEditedMidway = (compiler, path, text) =>
+    const refreshEditedMidway = (prefix, path, text) =>
       execFileAsync(process.execPath, [
         '--experimental-test-module-mocks',
         '--input-type=module',
         '-e',
         REFRESH_EDITED_MIDWAY,
-        JSON.stringify({ compiler, file: join(root, path), text, sources, ...options([]) }),
+        JSON.stringify({ prefix, file: join(root, path), text, sources, ...options([]) }),
       ]);
     const twin = (name) => readFileSync(join(root, `${name}.json`), 'utf8');
     const value = (name) => JSON.parse(twin(name));
     const keep = (name) => writeFileSync(join(root, `${name}.json`), 'kept');
-    // The stored entry, of `kind` rows or twins, whose value `matches`.
+    // The stored entry, of `kind` rows or twins, whose JSON value `matches`.
     const entry = (kind, matches) =>
       readdirSync(join(store, kind))
+        .filter((name) => name.endsWith('.json'))
         .map((name) => join(store, kind, name))
         .find((path) => matches(JSON.parse(readFileSync(path, 'utf8'))));
     await check({
@@ -135,6 +156,9 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
       store,
       stamp,
       refresh,
+      catalogue,
+      refreshRows,
+      rowFile,
       refreshElsewhere,
       refreshEditedMidway,
       twin,
@@ -189,6 +213,39 @@ fixtureTest(
   },
 );
 
+fixtureTest(
+  "a row file over another row file compiles over that file's fragment, which an edit of either recompiles",
+  async ({ write, refresh, value, entry }) => {
+    write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].value }]");
+    write(
+      'rows/index.libsonnet',
+      "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+    );
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 1 });
+    writeFileSync(
+      entry('rows', ([row]) => row.id === 'a'),
+      JSON.stringify([{ id: 'a', value: 5 }]),
+    );
+    write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].value, edited: true }]");
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 5, edited: true });
+    write('rows/a.libsonnet', "[{ id: 'a', value: 7 }]");
+    await refresh();
+    assert.deepEqual(value('catalogue').at(-1), { id: 'c', from: 7, edited: true });
+  },
+);
+
+fixtureTest('row files that import each other fail naming their order', async ({ write, refresh }) => {
+  write('rows/a.libsonnet', "[{ id: 'a', from: (import 'rows/c.libsonnet')[0].id }]");
+  write('rows/c.libsonnet', "[{ id: 'c', from: (import 'rows/a.libsonnet')[0].id }]");
+  write(
+    'rows/index.libsonnet',
+    "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+  );
+  await assert.rejects(refresh(), /row files that import each other have no order to compile in/);
+});
+
 // A fragment is its row file's manifested JSON, so a row file that is not plain data would build differently from its
 // source; the compile refuses it, naming the file and the field.
 for (const [problem, row, message] of [
@@ -213,18 +270,20 @@ fixtureTest('a new file that shadows an import recompiles its importer', async (
 });
 
 // The refresh keyed the file before the edit, so the edited output must not land under that key, nor the twin be
-// stamped with it, or undoing the edit would leave the edited twin in place.
+// stamped with it, or undoing the edit would leave the edited twin in place. A twin over an edited fragment is keyed by
+// that fragment's digest, which it was built from, so it may be stored; the fragment may not.
 const edited = (json) => JSON.stringify(json).includes('"value":2');
-for (const [compiler, path, text, name] of [
-  ['compileJsonnetFiles', 'lib/value.libsonnet', '{ value: 2 }', 'source'],
-  ['evaluateJsonnetAsync', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue'],
+// A twin compiles by importing its source, and a row file by the expression that reads its rows.
+for (const [compiled, prefix, path, text, name, kinds] of [
+  ['a twin', 'import ', 'lib/value.libsonnet', '{ value: 2 }', 'source', ['rows', 'twins']],
+  ['a row file', 'local ', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue', ['rows']],
 ]) {
-  test(`a file edited before ${compiler} reads it serves the checkout but lands nowhere under its old key`, () =>
+  test(`a file edited before ${compiled} reads it serves the checkout but lands nowhere under its old key`, () =>
     withTwinFixture(async ({ root, write, refresh, refreshEditedMidway, value, entry }) => {
       const original = readFileSync(join(root, path), 'utf8');
-      await refreshEditedMidway(compiler, path, text);
+      await refreshEditedMidway(prefix, path, text);
       assert.ok(edited(value(name)), 'the checkout gets the output of the files the compile read');
-      for (const kind of ['rows', 'twins']) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
+      for (const kind of kinds) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
       write(path, original);
       await refresh();
       assert.ok(!edited(value(name)), 'undoing the edit recompiles the twin');
@@ -344,11 +403,11 @@ test('checkouts refreshing into one shared store at once each get whole twins fr
             assert.deepEqual(readdirSync(store).sort(), ['rows', 'twins']);
             const partial = ['rows', 'twins']
               .flatMap((kind) => readdirSync(join(store, kind)))
-              .filter((name) => !/^[0-9a-f]{64}\.json$/.test(name));
+              .filter((name) => !/^[0-9a-f]{64}\.(json|heads)$/.test(name));
             assert.deepEqual(partial, []);
             // One entry per unit, whichever checkout compiled it: a key that named the checkout would give two.
-            assert.equal(readdirSync(join(store, 'rows')).length, 2, 'a fragment per row file');
-            assert.equal(readdirSync(join(store, 'twins')).length, 4, 'a twin per source');
+            assert.equal(readdirSync(join(store, 'rows')).length, 4, 'a fragment and its heads per row file');
+            assert.equal(readdirSync(join(store, 'twins')).length, 5, 'a twin per source');
           },
           { store },
         ),
@@ -380,4 +439,250 @@ test('the twin digest covers this module, the compiler driver, the plain-data ch
     'tools/jsonnet/runtime.json',
   ])
     assert.ok(code.includes(driver), driver);
+});
+
+fixtureTest(
+  'a twin whose bytes come out as they were keeps its mtime',
+  async ({ root, write, refresh, value, twin, keep }) => {
+    const mtime = (name) => statSync(join(root, `${name}.json`)).mtimeMs;
+    const past = new Date(mtime('source') - 60_000);
+    for (const name of ['source', 'other']) utimesSync(join(root, `${name}.json`), past, past);
+    // Both twins go stale: one comes out different, the other the same, as a comment edit does.
+    write('lib/value.libsonnet', '{ value: 2 }');
+    write('lib/other.libsonnet', '{ other: 1 } // reworded');
+    await refresh();
+    assert.deepEqual(value('source'), { value: 2 });
+    assert.ok(mtime('source') > past.getTime(), 'a changed twin is written');
+    assert.equal(mtime('other'), past.getTime(), 'an identical twin is not');
+    // The identical twin counts as fresh, so the next refresh leaves it alone.
+    keep('other');
+    await refresh();
+    assert.equal(twin('other'), 'kept');
+  },
+);
+
+// A twin keys by the digest of what stands in for a row file, not by the file: an edit that leaves the fragment as it
+// was reaches no twin, and one that leaves the heads as they were reaches no twin that reads only them.
+fixtureTest(
+  'an edit that changes a row but no head recompiles the twins over the row and not those over the heads',
+  async ({ write, refresh, value, twin, keep }) => {
+    keep('pkg/reader');
+    write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+    await refresh();
+    assert.deepEqual(value('catalogue'), [{ id: 'a', value: 2 }, { id: 'b' }]);
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest(
+  'an edit that changes a head recompiles the twins over the heads',
+  async ({ write, refresh, value, twin, keep }) => {
+    keep('catalogue');
+    write('rows/a.libsonnet', "[{ id: 'a2', value: 1 }]");
+    await refresh();
+    assert.deepEqual(value('pkg/reader'), [{ id: 'a2' }, { id: 'b' }]);
+    assert.equal(value('catalogue')[0].id, 'a2');
+    keep('pkg/reader');
+    await refresh();
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest(
+  'an edit that leaves every fragment as it was recompiles the row file and no twin',
+  async ({ write, refresh, keep, twin }) => {
+    keep('catalogue');
+    keep('pkg/reader');
+    write('rows/a.libsonnet', "[{ id: 'a', value: 1 }] // reworded");
+    await refresh();
+    assert.equal(twin('catalogue'), 'kept');
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest('an unchanged tree reads no store entry', async ({ store, refresh, keep, twin }) => {
+  keep('catalogue');
+  for (const kind of ['rows', 'twins']) rmSync(join(store, kind), { recursive: true });
+  await refresh();
+  assert.equal(twin('catalogue'), 'kept');
+});
+
+fixtureTest(
+  'the stamp names each row file by its key and the digests of its fragment and its heads',
+  async ({ stamp, entry }) => {
+    const { rows } = JSON.parse(readFileSync(stamp, 'utf8'));
+    const [key, fragmentDigest, headsDigest] = rows['rows/a.libsonnet'];
+    const fragment = entry('rows', ([row]) => row.id === 'a');
+    const digest = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
+    assert.equal(basename(fragment), `${key}.json`);
+    assert.equal(digest(fragment), fragmentDigest);
+    assert.equal(digest(fragment.replace(/\.json$/, '.heads')), headsDigest);
+  },
+);
+
+// The stamp spares the refresh from reading the heads, so a row file added or deleted must still reach the twins over
+// them, though no file of theirs changed.
+fixtureTest('a row file deleted reaches the twins over the heads', async ({ root, write, refresh, value }) => {
+  write('rows/index.libsonnet', "{ a: import 'rows/a.libsonnet' }");
+  rmSync(join(root, 'rows/b.libsonnet'));
+  await refresh();
+  assert.deepEqual(value('pkg/reader'), [{ id: 'a' }]);
+});
+
+fixtureTest('a row file added reaches the twins over the heads', async ({ write, refresh, value }) => {
+  write('rows/c.libsonnet', "[{ id: 'c' }]");
+  write(
+    'rows/index.libsonnet',
+    "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+  );
+  await refresh();
+  assert.deepEqual(value('pkg/reader'), [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+});
+
+// A compile stands in for a row file through the overlay, which mirrors only the plain paths below the root and is only
+// a library path: any other way to the file would read it under a key that holds the stand-in's digest.
+for (const [name, files] of [
+  ['from the root beside it', { 'source.jsonnet': "import 'rows/a.libsonnet'" }],
+  [
+    'from the folder beside it',
+    {
+      'rows/c.libsonnet': "[{ id: 'c', from: (import 'a.libsonnet')[0].id }]",
+      'rows/index.libsonnet':
+        "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+    },
+  ],
+  ['by its absolute path', { 'source.jsonnet': (root) => `import '${join(root, 'rows/a.libsonnet')}'` }],
+  ['by a path up from beside the heads', { 'pkg/reader.jsonnet': "import '../rows/heads.libsonnet'" }],
+  [
+    'through a library path and a path up',
+    {
+      'pkg/nested.jsonnet': "import 'pkg/deep/x.libsonnet'",
+      'pkg/deep/x.libsonnet': "import '../rows/a.libsonnet'",
+    },
+  ],
+]) {
+  fixtureTest(`a file that imports a stand-in ${name} is refused`, async ({ root, write, refresh }) => {
+    for (const [path, text] of Object.entries(files)) write(path, typeof text === 'function' ? text(root) : text);
+    await assert.rejects(refresh(), /a file a compile stands in for/);
+  });
+}
+
+fixtureTest('a file that imports a stand-in by its root-relative path is served', async ({ write, refresh, value }) => {
+  write('pkg/nested.jsonnet', "(import 'rows/a.libsonnet')[0]");
+  await refresh();
+  assert.deepEqual(value('pkg/nested'), { id: 'a', value: 1 });
+});
+
+// The catalogue's rows come out one to a file, listed by a manifest, and only a row that changed is written again.
+const mtimeOf = (path) => statSync(path).mtimeMs;
+const readManifest = ({ catalogue }) => JSON.parse(readFileSync(catalogue.manifest, 'utf8'));
+const manifestOf = (fixture) => readManifest(fixture).ids;
+
+fixtureTest('the catalogue is a file for each row and a manifest of their ids in order', async (fixture) => {
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder).sort(), ['a.json', 'b.json']);
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+});
+
+fixtureTest('an edit that changes one row writes that row and the manifest, and no other file', async (fixture) => {
+  await fixture.refreshRows();
+  const past = new Date(mtimeOf(fixture.rowFile('a')) - 60_000);
+  const files = [fixture.rowFile('a'), fixture.rowFile('b'), fixture.catalogue.manifest];
+  for (const file of files) utimesSync(file, past, past);
+  fixture.write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+  await fixture.refreshRows();
+  assert.deepEqual(
+    files.filter((file) => mtimeOf(file) > past.getTime()),
+    [fixture.rowFile('a'), fixture.catalogue.manifest],
+  );
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 2 });
+});
+
+fixtureTest('a row that leaves its row file is swept, and one that joins is listed', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/b.libsonnet', "[{ id: 'c' }]");
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'c']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder).sort(), ['a.json', 'c.json']);
+});
+
+fixtureTest('a row file deleted takes its rows from the catalogue', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/index.libsonnet', "{ a: import 'rows/a.libsonnet' }");
+  rmSync(join(fixture.root, 'rows/b.libsonnet'));
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a']);
+  assert.deepEqual(readdirSync(fixture.catalogue.folder), ['a.json']);
+});
+
+fixtureTest('a catalogue missing from disk is written again in full', async (fixture) => {
+  await fixture.refreshRows();
+  rmSync(fixture.catalogue.folder, { recursive: true });
+  rmSync(fixture.catalogue.manifest);
+  await fixture.refreshRows();
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+  assert.ok(existsSync(fixture.rowFile('b')));
+});
+
+fixtureTest('a row file deleted from the catalogue is written again', async (fixture) => {
+  await fixture.refreshRows();
+  rmSync(fixture.rowFile('b'));
+  await fixture.refreshRows();
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('b'), 'utf8')), { id: 'b' });
+});
+
+fixtureTest('rows written from another fragment than the current one are written again', async (fixture) => {
+  await fixture.refreshRows();
+  // What a checkout of another branch leaves: the twins' stamp is current, the rows are another fragment's.
+  const manifest = readManifest(fixture);
+  manifest.shards['rows/a.libsonnet'] = 'another fragment';
+  writeFileSync(fixture.catalogue.manifest, JSON.stringify(manifest));
+  writeFileSync(fixture.rowFile('a'), '{"id":"a","value":9}');
+  await fixture.refreshRows();
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+  assert.notEqual(readManifest(fixture).shards['rows/a.libsonnet'], 'another fragment');
+});
+
+fixtureTest('a partial file of a refresh that died is swept, and that of one that lives is not', async (fixture) => {
+  await fixture.refreshRows();
+  const dead = join(fixture.catalogue.folder, 'a.json.99999999.partial');
+  // Named for rows this refresh does not write, since it would take the name of its own partial file.
+  const live = join(fixture.catalogue.folder, `c.json.${process.pid}.partial`);
+  const stale = join(fixture.catalogue.folder, `d.json.${process.pid}.partial`);
+  for (const file of [dead, live, stale]) writeFileSync(file, '{');
+  const longAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  utimesSync(stale, longAgo, longAgo);
+  // A refresh that died left the catalogue short of its fragments, so the next one writes it.
+  fixture.write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+  await fixture.refreshRows();
+  assert.deepEqual(
+    [dead, live, stale].map((file) => existsSync(file)),
+    [false, true, false],
+  );
+});
+
+fixtureTest(
+  'an id that is no plain id fails naming its row file and leaves the catalogue as it was',
+  async (fixture) => {
+    await fixture.refreshRows();
+    fixture.write('rows/b.libsonnet', "[{ id: '../outside' }]");
+    await assert.rejects(fixture.refreshRows(), /rows\/b\.libsonnet: row \.\.\/outside has no id/);
+    assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+    assert.ok(!existsSync(join(fixture.root, 'outside.json')));
+  },
+);
+
+fixtureTest('an id in two row files fails naming both and leaves the catalogue as it was', async (fixture) => {
+  await fixture.refreshRows();
+  fixture.write('rows/b.libsonnet', "[{ id: 'a', other: true }]");
+  await assert.rejects(fixture.refreshRows(), /rows\/b\.libsonnet: row a is also a row of rows\/a\.libsonnet/);
+  assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
+  assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+});
+
+fixtureTest('a row keeps the sign of its zeros', async (fixture) => {
+  fixture.write('rows/b.libsonnet', "[{ id: 'b', at: [-0, 0] }]");
+  await fixture.refreshRows();
+  assert.equal(readFileSync(fixture.rowFile('b'), 'utf8'), '{"at":[-0,0],"id":"b"}');
 });

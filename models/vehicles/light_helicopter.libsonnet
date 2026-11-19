@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local s = import 'light_helicopter.spec.libsonnet';
@@ -11,7 +11,7 @@ local doorPins = door.pins('frame');
 local trim = 'paint-charcoal';
 // Stands proud of the fairing, so it never shares a surface with the wall beneath it.
 local ventBody = [station + { half: station.half + 0.035, top: station.top + 0.035, bottom: station.bottom - 0.035 } for station in s.body];
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('light_helicopter_belly', s.shellMass,
              h.loft('belly', 'paint', s.body, x=[s.bulkhead, s.nose], arc=[90, 270]),
              { paint: s.paint }) + { title: 'Light helicopter belly' },

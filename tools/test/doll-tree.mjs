@@ -14,8 +14,8 @@ import { heldItems, readWields, WIELD_SETS } from '../wields.mjs';
 
 export const repo = resolve(import.meta.dirname, '../..');
 export const WEAR = 'leather_jacket';
-// The everyday clothes the worn-fit templates shape (models/worn-clothing.libsonnet), and the sleeveless top whose
-// armholes stand beside the arm (models/catalogue/worn.libsonnet).
+// The everyday clothes the worn-fit templates shape (models/kits/worn-clothing.libsonnet), and the sleeveless top whose
+// armholes stand beside the arm (models/kits/worn.libsonnet).
 export const CLOTHES = ['jacket', 'hoodie', 'jeans', 'rubber_boots', 'sneakers', 'tank_top'];
 // The other fitted garments, each on a fit the everyday clothes don't exercise: the robe template and the narrow boot.
 const OTHER_WORN = ['wizard_robe', 'combat_boots'];

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local s = import 'suv.spec.libsonnet';
@@ -9,7 +9,7 @@ local flareZ = [s.side - 0.01, s.side + 0.03];
 local frontFlare = shape.flare('front_flare', 'trim', s.frontAxle, s.sill, flareZ, 0.06, 0.02);
 local rearFlare = shape.flareHalves('rear_flare', 'trim', s.rearAxle, s.sill, flareZ, 0.06, 0.02, shut=s.rearDoor);
 local body = (import 'car-body.libsonnet').rows;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, body('suv', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, body('suv', vehicle.title, s) + [
   // The hybrid's nose: this file is what the thing tool indexes for a vehicle derived from this one.
   row
   for row in body('hybrid_suv', hybrid.title, s + { grilleShut: 0.45, noseAccent: 'plastic-green' })

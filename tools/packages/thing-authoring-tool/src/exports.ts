@@ -173,11 +173,15 @@ export const loadThingRecipeFiles = (files: readonly unknown[], catalogue: Catal
     catalogue,
   );
 /**
- * Each row with the one-item catalogue its export reads, once every row has loaded against the whole catalogue: a
- * build worker exports a row from its slice, since loading the whole catalogue costs each worker more than most
- * exports do. The slice gives the row the same inputs, so its cache key is the same.
+ * Each row with the one-item catalogue its export reads, once every row has loaded against the rows they name: a
+ * build worker exports a row from its slice, since loading the catalogue costs each worker more than most exports do,
+ * and the parent need load only the rows the recipes select. The slice gives the row the same inputs, so its cache key
+ * is the same. A row whose source is no row fails in `catalogueOf`, naming it.
  */
-export const thingTasks = (rows: readonly RecipeRow[], catalogue: Catalogue) => {
+export const thingTasks = (rows: readonly RecipeRow[], catalogueOf: (ids: readonly string[]) => Catalogue) => {
+  const catalogue = catalogueOf([
+    ...new Set(rows.flatMap(({ source }) => (typeof source === 'string' ? [source] : []))),
+  ]);
   loadThingRecipe(rows, catalogue);
   const { items, ...settings } = catalogue;
   const byId = new Map(items.map((item) => [item.id, item]));

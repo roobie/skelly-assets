@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'technical.spec.libsonnet';
@@ -9,7 +9,7 @@ local grain = k.grain;
 // The pins stand that gap clear of the valance below them as they turn.
 local tailgatePins = k.hingePins('hinge', 'z', [s.rear - grain - k.swingGap, s.deckBottom, s.panelIn - grain], [s.rear - grain - k.swingGap, s.deckBottom, -s.panelIn + grain]);
 local finish = { paint: 'paint-olive', cream: 'paint-cream', rust: 'scrap-rusted', rustred: 'rust-red', frame: 'steel-grey', dark: 'steel-spall-black', trim: 'paint-charcoal', glass: 'glass-clear', floor: 'wood-pine', steel: 'steel-parkerized' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('technical_frame', s.frameMass, [
     box('cross_front', 'frame', [s.nose - 0.14, 0.44, -0.34], [s.nose, 0.58, 0.34]),
     box('cross_mid', 'frame', [-0.1, 0.44, -0.34], [0.0, 0.58, 0.34]),

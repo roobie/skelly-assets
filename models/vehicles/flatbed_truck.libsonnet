@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local s = import 'flatbed_truck.spec.libsonnet';
 local vehicle = import 'flatbed_truck.placements.libsonnet';
 local plankEdges = [-s.deckSide + 0.05, -1, -0.5, 0, 0.5, 1, s.deckSide - 0.05];
 local stakes = [s.deckRear + 0.5 + i * (s.deckFront - s.deckRear - 0.9) / 5 for i in std.range(0, 5)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('flatbed_truck', vehicle.title, s) + [
   k.compound('flatbed_truck_deck', 720, [
     box('bed', 'steel', [s.deckRear, s.deckBottom + 0.02, -s.deckSide + 0.05], [s.deckFront, s.deckTop - 0.05, s.deckSide - 0.05]),
     box('tail', 'steel', [s.deckRear - 0.03, s.deckBottom, -s.deckSide], [s.deckRear + 0.05, s.deckTop, s.deckSide]),

@@ -2,12 +2,12 @@
 // over a plackart with a keel, three fauld lames and tassets, a lamed gorget, rounded pauldrons with stepped lames,
 // rerebraces, couters with a wing, vambraces, steel gauntlets, cuisses, poleyns, greaves, pointed sabatons and an armet
 // with a pointed visor. Worn shells only.
-local armour = import 'armour.libsonnet';
-local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'measures/bust.libsonnet';
-local arm = import 'measures/arm.libsonnet';
-local leg = import 'measures/leg.libsonnet';
+local armour = import 'models/armour.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.over;
 
@@ -158,9 +158,9 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
 local boots = fit.feet('sabaton_plate', sabaton,
                        { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
 
-// Each item whole, its rows with any figure models a fitted template gives, as models/trooper.libsonnet's are. The
-// breastplate encloses the trunk and the greave the shin, so each hides that skin; the shoulders stay drawn under the
-// pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates leave a joint's cap bare.
+// Each item's rows, in item order. The breastplate encloses the trunk and the greave the shin, so each hides that skin;
+// the shoulders stay drawn under the pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates
+// leave a joint's cap bare.
 local fitted(r) = local seg = std.split(r.id, '_worn_')[1]; if seg == 'palm' then extend(r, palmAdd) else if seg == 'shaft' then extend(r, shaftAdd(r)) else r;
 local set = {
   armor_plate: { rows: [
@@ -174,7 +174,7 @@ local set = {
   ] },
   gauntlet_plate: gloves + { rows: [fitted(r) for r in gloves.rows] },
   sabaton_plate: boots + { rows: [fitted(r) for r in boots.rows] },
-  helmet_plate_armet: fit.head('helmet_plate_armet', helmetBase) + {
+  helmet_plate_armet: {
     rows: [h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + {
       title: 'Plate armet',
       voxelGrain: 0.006,
@@ -183,4 +183,4 @@ local set = {
     }],
   },
 };
-{ [k]: set[k] + { rows: armour.of('medieval', set[k].rows) } for k in std.objectFields(set) }
+std.flattenArrays([armour.of('medieval', set[k].rows) for k in std.objectFields(set)])

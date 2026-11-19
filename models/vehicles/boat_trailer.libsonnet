@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'boat_trailer.spec.libsonnet';
@@ -21,7 +21,7 @@ local wallLayer(id, slot, y, b, bow, t=0.05) =
     ]
     for i in std.range(0, 2)
   ]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('boat_trailer_chassis', 130, [
     box('rear_rail', 'frame', [s.rear - 0.04, s.frameLow, -0.55], [s.rear, s.frameHigh, 0.55]),
     box('axle_rail', 'frame', [s.axle - 0.04, s.frameLow, -0.5], [s.axle + 0.04, s.frameHigh, 0.5]),

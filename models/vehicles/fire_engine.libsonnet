@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local stow = import 'stowage-kit.libsonnet';
@@ -92,7 +92,7 @@ local stowage = {
 };
 local rungs = std.range(0, 12);
 local gantry = [s.bodyRear + 0.6, -1.2, 0.5];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('fire_engine', vehicle.title, s) + [
   k.compound('fire_engine_body', 4880 - s.rearWallMass, [
     box('floor', 'frame', [s.bodyRear, s.bodyFloor - 0.05, -s.bodySide], [s.bodyFront, s.bodyFloor, s.bodySide]),
     box('roof', 'paint', [s.bodyRear, s.bodyTop - 0.05, -s.bodySide], [s.bodyFront, s.bodyTop, s.bodySide]),

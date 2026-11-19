@@ -514,18 +514,11 @@ function placedOn(model, dressing, { anchors, sided }) {
  * @returns {Promise<DollParts>}
  */
 export async function readDollParts(dressing) {
-  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
-  /** @param {string} id */
-  const row = (id) => {
-    const found = catalogue.items.find((item) => item.id === id);
-    if (!found) throw new Error(`doll: the catalogue has no ${id}`);
-    return found;
-  };
+  const { readItems } = await import('./packages/thing-authoring-tool/src/cli/content.ts');
+  const [bust, ...limbs] = readItems([dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)]);
   return {
-    anchors: Object.fromEntries(
-      Object.entries(row(dressing.doll.bust).anchors ?? {}).map(([name, { part }]) => [name, part]),
-    ),
-    sided: dressing.doll.limbs.flatMap(({ model }) => row(model).parts.map(({ id }) => id)),
+    anchors: Object.fromEntries(Object.entries(bust?.anchors ?? {}).map(([name, { part }]) => [name, part])),
+    sided: limbs.flatMap(({ parts }) => parts.map(({ id }) => id)),
   };
 }
 

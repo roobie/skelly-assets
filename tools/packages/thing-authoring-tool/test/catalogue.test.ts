@@ -5,10 +5,11 @@ import { parse } from 'valibot';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
 import { buildItem, loadCatalogue } from '../src/catalogue.ts';
-import { catalogue } from '../src/content.ts';
+import { readCatalogue } from '../src/cli/content.ts';
 import { exportItem, loadThingRecipe, THING_KINDS } from '../src/exports.ts';
 import lyingOnBack from './fixtures/lying-on-back.json' with { type: 'json' };
 
+const catalogue = readCatalogue();
 const material = Object.keys(MATERIALS)[0]!;
 // Fine enough that a voxelized box stays within `toBeCloseTo` of the smooth datum it follows.
 const VOXEL = { voxelGrain: 0.002 };

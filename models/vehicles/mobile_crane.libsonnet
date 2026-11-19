@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local vehicle = import 'mobile_crane.placements.libsonnet';
@@ -14,7 +14,7 @@ local cabIn = 0.55;
 local cabOut = 1.15;
 local cabRoof = 2.98;
 local winchX = -4.0;
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('mobile_crane', vehicle.title, s) + [
   k.compound('mobile_crane_deck', 3000, [
     box('plate', 'paint', [s.deckRear, s.deckLow, -s.side], [s.deckFront, s.deckTop, s.side]),
     box('tread', 'steel', [0.4, s.deckTop, -s.side], [3.7, s.deckTop + 0.03, -0.9]),

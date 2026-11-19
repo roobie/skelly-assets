@@ -27,7 +27,7 @@ local drawn = {
     for car in ['city_car', 'electric_city_car']
   },
   spec: s,
-  rows: (import 'models/vehicles/frame.libsonnet').rows(import 'models/vehicles/city_car.libsonnet'),
+  rows: import 'models/vehicles/city_car.libsonnet',
   settings: import 'models/item-settings.libsonnet',
   legacy: shape(s + { continuousCabin: false }).across('glass', 'glass',
     [[s.cowl, s.waist], [s.cowl + 0.08, s.waist],

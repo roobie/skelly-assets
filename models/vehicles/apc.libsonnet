@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'apc.spec.libsonnet';
 local turret = import 'turret-kit.libsonnet';
@@ -23,7 +23,7 @@ local hatch = k.hatch(s.hatch.radius, s.hatch.thickness, s.hatch.open);
 local cupolaHole = k.hatchHole(s.cupola.x, s.cupola.z, s.hatch.radius);
 local roofHoles = [k.hatchHole(s.driverX, s.driverZ, s.hatch.radius), k.ringHole(s.turretX, s.ring.inner), cupolaHole]
                   + [k.hatchHole(s.squadHatch.x, z, s.hatch.radius) for z in [s.squadHatch.z, -s.squadHatch.z]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'] } }, [
   k.compound('apc_hull_belly', 1660, [
     k.xPrism('v_hull', 'paint', [[s.belly, -0.55], [0.8, -s.wall], [s.floor, -s.wall], [s.floor, s.wall], [0.8, s.wall], [s.belly, 0.55]], [s.rear, 2.81]),
     box('deck', 'floor', [s.rear, s.floor, -0.88], [2.81, s.floor + 0.02, 0.88]),

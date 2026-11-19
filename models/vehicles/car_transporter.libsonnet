@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -15,7 +15,7 @@ local slope(id, a, b, z) = prism(id, 'deck', [[a[0], a[1] - thick], [b[0], b[1] 
 local slopeTail(id, a, b, z) = prism(id, 'deck', [[b[0], b[1] - thick], [a[0], a[1] - thick], [a[0], a[1]], [b[0], b[1]]], z);
 local headAt(f) = [s.upperFront + f * (s.headTip[0] - s.upperFront), s.upperTop + f * (s.headTip[1] - s.upperTop)];
 local tailAt(f) = [s.upperRear + f * (s.tailTip[0] - s.upperRear), s.upperTop + f * (s.tailTip[1] - s.upperTop)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('car_transporter', vehicle.title, s) + [
   k.compound('car_transporter_lower_deck', 2000, [
     box('plate', 'deck', [s.rear, s.lowerBottom, -s.deckSide], [s.lowerFront, s.lowerTop, s.deckSide]),
     box('cross_rear', 'frame', [-5.4, s.railTop, -0.46], [-5.2, s.lowerBottom, 0.46]),

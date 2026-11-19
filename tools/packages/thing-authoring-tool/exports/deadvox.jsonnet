@@ -1,4 +1,5 @@
-// The retained roster is separate from per-pack recipe production.
+// The retained roster is separate from per-pack recipe production. The export reads each row's head, not the row; see
+// models/catalogue/heads.libsonnet.
 local voxel = import '../../../jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import '../../../jsonnet/lib/taxonomy.libsonnet';
 local title = import '../../../jsonnet/lib/title.libsonnet';
@@ -13,6 +14,6 @@ local roster = { [id]: true for id in std.set(std.flattenArrays(std.objectValues
     voxel: voxel.of(voxel.item, row),
     options: { mass: row.exportMass },
   } + title.of(row) + taxonomy.of(row)
-  for row in (import '../items.jsonnet').items
+  for row in (import 'tools/jsonnet/heads.libsonnet').under(import 'models/catalogue/heads.libsonnet', '')
   if std.objectHas(roster, row.id)
 ]

@@ -1,10 +1,10 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'small_tractor.spec.libsonnet';
 local box = k.box;
 local prism = k.prism;
 local bothSides = k.bothSides;
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('small_tractor_chassis', s.shellMass, [
     box('transmission', 'cast', [s.rear, 0.42, -0.24], [0.6, s.deck, 0.24]),
     box('engine_cradle', 'cast', [0.6, 0.46, -0.22], [1.0, 0.66, 0.22]),

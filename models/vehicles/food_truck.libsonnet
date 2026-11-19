@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'food_truck.spec.libsonnet';
 local vehicle = import 'food_truck.placements.libsonnet';
@@ -8,7 +8,7 @@ local x0 = w[0] - 0.15;
 local x1 = w[1] + 0.15;
 local n = 6;
 local awningTop = s.windowTop + 0.1;
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('food_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, (import 'van-body.libsonnet').rows('food_truck', vehicle.title, s) + [
   k.compound('food_truck_counter', 20, [
     box('counter', 'steel', [x0, s.waist - 0.05, s.side], [x1, s.waist, s.side + 0.26]),
     box('fascia', 'steel', [x0, s.waist - 0.13, s.side], [x1, s.waist - 0.05, s.side + 0.03]),

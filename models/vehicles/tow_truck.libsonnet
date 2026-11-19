@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local s = import 'tow_truck.spec.libsonnet';
 local finish = { yellow: 'paint-crane-yellow', frame: 'paint-charcoal', steel: 'steel-grey', alu: 'alu-bare', dark: 'plastic-black', rubber: 'rubber-black', reflect: 'reflective-yellow', chain: 'steel-hardened', white: 'paint-white', red: 'plastic-red' };
 local slats = std.range(0, 3);
 local lockerDoors = [-2.3, -1.1, 0.1, 1.2];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('tow_truck_deck', 380, [
     box('plate', 'alu', [s.deckRear, s.deckBottom, -s.side], [s.deckFront, s.deckTop, s.side]),
   ] + [

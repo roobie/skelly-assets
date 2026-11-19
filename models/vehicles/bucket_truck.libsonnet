@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
@@ -8,7 +8,7 @@ local vehicle = import 'bucket_truck.placements.libsonnet';
 local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', alu: 'alu-bare', dark: 'plastic-black', reflect: 'reflective-yellow', orange: 'plastic-orange', insulated: 'plastic-yellow', red: 'plastic-red', cone: 'plastic-hivis' };
 local doors = [[-3.55, -2.55], [-2.45, -1.0], [-0.9, 0.3], [0.4, 1.74]];
 local basketZ = 0.4;
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('bucket_truck', vehicle.title, s) + [
   k.compound('bucket_truck_subframe', 400, [
     box('deck', 'alu', [s.bodyRear, s.deckTop - 0.06, -0.72], [s.bodyFront, s.deckTop, 0.72]),
     box('tail', 'frame', [s.bodyRear, s.lockerBottom, -0.72], [s.bodyRear + 0.06, s.deckTop - 0.06, 0.72]),

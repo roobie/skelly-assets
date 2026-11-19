@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'utility_4x4.spec.libsonnet';
@@ -43,7 +43,7 @@ local doorJambs(name, rear) = [
   k.doorJamb(name + '_head', rear, [s.waist, s.roof - 0.06], s.skinIn - lean),
 ];
 local tyre = [[-0.15, 0.22], [-0.15, 0.42], [-0.126, s.hub], [0.126, s.hub], [0.15, 0.42], [0.15, 0.22], [-0.15, 0.22]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   k.compound('utility_4x4_wheel', 45, [
     k.turned('tyre', 'tyre', 'z', tyre) + { sides: 24 },
     k.turned('rim', 'rim', 'z', k.disc(0.22, -0.105, 0.105)) + { sides: 24 },

@@ -75,12 +75,11 @@ const loadRecipeTools = async () => {
     },
     thing: {
       kinds: thing.THING_KINDS,
-      // Only the parent loads the whole catalogue; a worker gets its row's slice. thingTasks parses the rows before it
-      // reads them.
+      // Only the parent reads the rows the recipes select; a worker gets its row's slice.
       tasks: async (rows) =>
         thing.thingTasks(
           /** @type {readonly RecipeRow[]} */ (rows),
-          (await import('./packages/thing-authoring-tool/src/content.ts')).catalogue,
+          (await import('./packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue,
         ),
       exportOf: (task) => {
         const { row, catalogue } = /** @type {ReturnType<typeof thingTasks>[number]} */ (task);

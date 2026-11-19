@@ -417,8 +417,8 @@ export function withWornOn(models, dressing, dollParts) {
 // only after installJsonnetSources: the library reads the compiled finishes, which a module graph imported earlier would
 // have read before they were regenerated.
 const finishLibrary = async () => {
-  const { catalogue } = await import('./packages/thing-authoring-tool/src/content.ts');
-  return (await import('./packages/thing-authoring-tool/src/exports.ts')).finishLibrary(catalogue);
+  const { settings } = await import('./packages/thing-authoring-tool/src/settings.ts');
+  return (await import('./packages/thing-authoring-tool/src/exports.ts')).finishLibrary(settings);
 };
 
 /**

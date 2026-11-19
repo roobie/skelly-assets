@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'burnt_out_van.spec.libsonnet';
 local w = import 'wreck-kit.libsonnet';
@@ -31,7 +31,7 @@ local noseHole(z, y) =
   local a = std.abs(z);
   (a < 0.5 && y > 0.46 && y < 0.66) || (a > 0.55 && a < 0.86 && y > 0.5 && y < 0.72);
 local doorRow(t, y) = burn(0.72 + 0.55 * (w.panelNoise(31, t * 1.2, y) - 0.5));
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'], state: ['burnt'] } }, [
   k.compound('burnt_out_van_chassis', 170, [
     box('axle_front', 'rust', [s.frontAxle - 0.05, 0.16, -0.8], [s.frontAxle + 0.05, 0.24, 0.8]),
     box('axle_rear', 'rust', [s.rearAxle - 0.05, 0.16, -0.8], [s.rearAxle + 0.05, 0.24, 0.8]),

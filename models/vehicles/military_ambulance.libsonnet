@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local s = import 'military_ambulance.spec.libsonnet';
@@ -9,7 +9,7 @@ local back = s.bedRear;
 // The rear door turns on pins at its leaves' outer ends, on its outer edge, so none of it swings into the rear post.
 local rearDoorHinge = s.boxSide - 0.2;
 local rearDoorPins = k.hingePins('hinge', 'y', [back - 0.04, 2.65, rearDoorHinge], [back - 0.04, 1.71, rearDoorHinge], 'dark');
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, [
   // Stops inside the walls, which run down past it.
   k.compound('military_ambulance_box_floor', s.boxFloorMass, [
     box('floor', 'floor', [back + 0.05, s.deckBottom, -s.boxSide + 0.04], [s.bedFront, s.deckTop, s.boxSide - 0.04]),

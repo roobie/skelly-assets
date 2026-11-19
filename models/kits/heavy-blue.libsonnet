@@ -1,12 +1,12 @@
 // The heavy blue armour set: the trooper's fitted worn shells in a cobalt livery, with over-the-top pieces added per
 // slot: huge round pauldrons, a broad chest plate over a dark belt, bulky cuisses, greaves and vambraces, oversized
 // gauntlets and a chunky helm. Worn shells only (no ground models).
-local armour = import 'armour.libsonnet';
-local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'measures/bust.libsonnet';
-local arm = import 'measures/arm.libsonnet';
-local leg = import 'measures/leg.libsonnet';
+local armour = import 'models/armour.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.cloak;
 
@@ -155,15 +155,14 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+// Each item's rows, in item order.
 local worn = { armor_heavy: body, legguard_heavy: legs, gloves_heavy: gloves, boots_heavy: boots };
 local heavy(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
-{ [k]: worn[k] + { rows: armour.of(null, [heavy(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
-  helmet_heavy: fit.head('helmet_heavy', helmetBase) + {
-    rows: armour.of(null, [h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
-      title: 'Heavy helmet',
-      voxelGrain: 0.006,
-      anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
-    }]),
-  },
-}
+local items = { [k]: armour.of(null, [heavy(r) for r in worn[k].rows]) for k in std.objectFields(worn) } + {
+  helmet_heavy: armour.of(null, [h.compound('helmet_heavy', 3.2, helmet, livery + { lens: 'glass-lens-amber', grille: 'rubber-black' }) + {
+    title: 'Heavy helmet',
+    voxelGrain: 0.006,
+    anchors: { brow: fit.browAnchor('helmet_heavy', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+  }]),
+};
+std.flattenArrays(std.objectValues(items))

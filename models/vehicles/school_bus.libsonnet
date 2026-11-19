@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'school_bus.spec.libsonnet';
 local vehicle = import 'school_bus.placements.libsonnet';
@@ -14,7 +14,7 @@ local rearDoorPins = k.hingePins('hinge', 'y', [hingeX, 1.1, -half], [hingeX, 2.
 // Its latch edge stands where its inner corner's swing circle passes the clearance inside the near post's nearest corner.
 local latchRadius = std.sqrt(std.pow(s.rear - hingeX, 2) + std.pow(2 * half, 2));
 local latch = -half + std.sqrt(std.pow(latchRadius - clearance, 2) - std.pow(inner - hingeX, 2));
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('school_bus', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, (import 'bus-body.libsonnet').rows('school_bus', vehicle.title, s) + [
   // The rear exit swings on its far edge, in the centre of the rear wall.
   k.compound('school_bus_rear_door', 42, [
     k.box('skin', 'paint', [outer, doorway.y[0] + clearance, -half], [inner, 1.72, latch]),

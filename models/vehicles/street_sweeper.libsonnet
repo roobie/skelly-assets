@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -34,7 +34,7 @@ local stripe(id, slot, z0) = prism(id, slot, [], [0, 0]) + {
   axis: 'x', start: s.bodyRear - 0.1, end: s.bodyRear - 0.08,
   profile: [[doorY - 0.24, z0 + 0.1], [doorY - 0.24, z0], [doorY + 0.24, z0 + 0.19], [doorY + 0.24, z0 + 0.29]],
 };
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('street_sweeper', vehicle.title, s) + [
   k.compound('street_sweeper_subframe', 260, [
     box('guard_beam', 'frame', [-1.6, 0.94, -s.bodySide], [-0.9, s.bodyLow, s.bodySide]),
     box('front_beam', 'frame', [s.hopperFront, 0.94, -0.46], [s.hopperFront + 0.3, s.bodyLow, 0.46]),

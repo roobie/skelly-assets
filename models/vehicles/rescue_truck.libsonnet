@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local stow = import 'stowage-kit.libsonnet';
 local slots = import 'models/stowage.libsonnet';
@@ -115,7 +115,7 @@ local rearStowage = {
     for i in [0, 1, 2]
   ],
 };
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, [
   k.compound('rescue_truck_racking', 2200, [
     box('racking', 'frame', [s.rackingRear, s.bodyFloor, -0.82], [0.4, s.bodyTop - 0.1, 0.82]),
   ], finish) + { title: 'Rescue truck racking' },
