@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@skelly/construct": "*",
+    "@skelly/motion": "*",
     "@skelly/thing-core": "*",
     "@skelly/thing-export": "*",
     "@skelly/tool-ui": "*",

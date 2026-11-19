@@ -18,16 +18,13 @@ import {
   boolean as vBoolean,
 } from 'valibot';
 import { ModelPointSchema as Point } from './modelPoint.ts';
+import { MotionSchema } from './motionSchema.ts';
 import { OpticApertureSchema } from './opticAperture.ts';
 import { ReticleSchema } from './reticle.ts';
+import { Name } from './schemaPrimitives.ts';
 
 /** Callers own temporal brands; the firearm contract owns their structure and relations. */
-export interface FirearmPrimitives<
-  Seconds extends number = number,
-  PositiveSeconds extends number = number,
-  PerMinute extends number = number,
-> {
-  simSeconds: GenericSchema<number, Seconds>;
+export interface FirearmPrimitives<PositiveSeconds extends number = number, PerMinute extends number = number> {
   positiveSimSeconds: GenericSchema<number, PositiveSeconds>;
   simPerMinute: GenericSchema<number, PerMinute>;
   id: GenericSchema<string, string>;
@@ -39,11 +36,10 @@ export interface FirearmPrimitives<
   fraction: GenericSchema<number, number>;
 }
 
-export function firearmModelSchema<Seconds extends number, PositiveSeconds extends number, PerMinute extends number>(
-  primitives: FirearmPrimitives<Seconds, PositiveSeconds, PerMinute>,
+export function firearmModelSchema<PositiveSeconds extends number, PerMinute extends number>(
+  primitives: FirearmPrimitives<PositiveSeconds, PerMinute>,
 ) {
   const {
-    simSeconds: SimSeconds,
     positiveSimSeconds: PositiveSimSeconds,
     simPerMinute: SimPerMinute,
     id: Id,
@@ -60,38 +56,17 @@ export function firearmModelSchema<Seconds extends number, PositiveSeconds exten
   const ActionCycleSchema = pipe(
     strictObject({
       durationSimSeconds: PositiveSimSeconds,
-      rearwardSimSeconds: PositiveSimSeconds,
-      dwellSimSeconds: SimSeconds,
-      forwardSimSeconds: PositiveSimSeconds,
-      unlockSimSeconds: optional(PositiveSimSeconds),
-      lockSimSeconds: optional(PositiveSimSeconds),
+      legs: pipe(array(strictObject({ to: Name, seconds: PositiveSimSeconds })), nonEmpty('needs at least one leg')),
     }),
     check(
-      (cycle) =>
-        (cycle.unlockSimSeconds ?? 0) +
-          cycle.rearwardSimSeconds +
-          cycle.dwellSimSeconds +
-          cycle.forwardSimSeconds +
-          (cycle.lockSimSeconds ?? 0) <=
-        cycle.durationSimSeconds + 1e-9,
-      'cycle phases must fit within durationSimSeconds',
+      (cycle) => cycle.legs.reduce((sum, { seconds }) => sum + seconds, 0) <= cycle.durationSimSeconds + 1e-9,
+      'cycle legs must fit within durationSimSeconds',
     ),
   );
   const ActionPartSchema = strictObject({
-    node: pipe(string(), nonEmpty('must not be empty')),
-    axis: UnitVector,
-    strokeMetres: Positive,
+    node: Name,
     handGrip: optional(Point),
-    turn: optional(
-      strictObject({
-        pivot: Point,
-        axis: UnitVector,
-        angleRadians: pipe(
-          number(),
-          check((angle) => angle !== 0, 'turn angle must not be zero'),
-        ),
-      }),
-    ),
+    motion: MotionSchema,
     modes: pipe(
       array(picklist(['fire', 'hand'])),
       nonEmpty('needs at least one cycle mode'),
@@ -106,6 +81,7 @@ export function firearmModelSchema<Seconds extends number, PositiveSeconds exten
       ),
       fire: optional(ActionCycleSchema),
       hand: ActionCycleSchema,
+      // A fraction of the first leg of the hand timeline that goes to `open`: the case leaves that far into the stroke.
       ejectAt: Fraction,
       ejectDirection: UnitVector,
       holdOpen: vBoolean(),
@@ -118,14 +94,19 @@ export function firearmModelSchema<Seconds extends number, PositiveSeconds exten
     ),
     check(
       (action) =>
-        Object.values(action.parts).every(
-          (part) =>
-            !part.turn ||
-            part.modes.every(
-              (mode) => action[mode]?.unlockSimSeconds !== undefined && action[mode]?.lockSimSeconds !== undefined,
-            ),
+        Object.values(action.parts).every(({ motion, modes }) =>
+          modes.every((mode) =>
+            (action[mode]?.legs ?? []).every(({ to }) => motion.stops.some((stop) => stop.name === to)),
+          ),
         ),
-      'turning parts need unlock and lock phases in every referenced timeline',
+      'every timeline leg must go to a stop of each part that follows it',
+    ),
+    check(
+      (action) =>
+        Object.values(action.parts).every(({ motion, modes }) =>
+          modes.every((mode) => (action[mode]?.legs.at(-1)?.to ?? motion.stops[0]?.name) === motion.stops[0]?.name),
+        ),
+      'every timeline must end with its parts back at rest',
     ),
     check(
       (action) => (action.fire === undefined) === (action.roundsPerSimMinute === undefined),

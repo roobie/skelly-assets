@@ -188,6 +188,19 @@ jobs:
           history=()
           if [ -f "$RUNNER_TEMP/model-history.json" ]; then history=(--history "$RUNNER_TEMP/model-history.json"); fi
           node site/build.mjs --require-viewers --analytics "${history[@]}" _site
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('tools/package-lock.json') }}
+      - name: Install Playwright Chromium
+        timeout-minutes: 3
+        working-directory: tools
+        run: npx playwright install chromium
+      # The shader lab is the one viewer that draws the site's own tree, so the site it is published in is drawn.
+      - name: Smoke the shader lab on the site
+        timeout-minutes: 5
+        run: node tools/packages/shader-lab/test/browser/lab-smoke.mjs --site _site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

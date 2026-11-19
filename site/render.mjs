@@ -18,9 +18,12 @@ const VIEW_DIR = new THREE.Vector3(...FRONT_QUARTER);
 const loader = new GLTFLoader();
 const cache = new Map();
 const modelsById = new Map();
+let siteRoot = '';
 
-// The models.json models a vehicle's sites can name.
-export function registerModels(models) {
+// The models.json models a vehicle's sites can name, and the root of the site that serves their files, relative to
+// the page: a page in a folder of the site, as a viewer is, reaches it as `../`.
+export function registerModels(models, root = '') {
+  siteRoot = root;
   for (const m of models) modelsById.set(m.id, m);
 }
 
@@ -31,9 +34,9 @@ function load(model) {
       model.id,
       (async () => {
         const [gltf, clips, body] = await Promise.all([
-          loader.loadAsync(`built/${model.file}`),
-          model.clips ? fetch(`built/${model.clips}`).then((r) => r.json()) : null,
-          model.body ? fetch(`built/${model.body}`).then((r) => r.json()) : null,
+          loader.loadAsync(`${siteRoot}built/${model.file}`),
+          model.clips ? fetch(`${siteRoot}built/${model.clips}`).then((r) => r.json()) : null,
+          model.body ? fetch(`${siteRoot}built/${model.body}`).then((r) => r.json()) : null,
         ]);
         let triangles = 0;
         const materials = new Map();

@@ -6,6 +6,7 @@
   "workspaces": [
     "packages/construct",
     "packages/motion",
+    "packages/surfaces",
     "packages/thing-core",
     "packages/thing-export",
     "packages/mobgen",
@@ -13,7 +14,8 @@
     "packages/thing-authoring-tool",
     "packages/tool-ui",
     "packages/gun-authoring-tool",
-    "packages/vehicle-authoring-tool"
+    "packages/vehicle-authoring-tool",
+    "packages/shader-lab"
   ],
   "scripts": {
     "build": "node build.mjs",

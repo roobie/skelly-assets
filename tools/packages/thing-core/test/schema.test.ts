@@ -126,4 +126,21 @@ describe('material table', () => {
         .success,
     ).toBe(false);
   });
+
+  it('takes a shader surface, checked by its kind, and never beside a fabric', () => {
+    const bark = Object.values(MATERIALS).find(({ finish }) => finish.surface?.kind === 'bark');
+    expect(bark).toBeDefined();
+    if (bark === undefined) return;
+    const surface = bark.finish.surface;
+    expect(safeParse(MaterialSchema, bark).success).toBe(true);
+    expect(
+      safeParse(MaterialSchema, { ...bark, finish: { ...bark.finish, surface: { ...surface, relief: 9 } } }).success,
+    ).toBe(false);
+    expect(safeParse(MaterialSchema, { ...bark, finish: { ...bark.finish, surface: { kind: 'moss' } } }).success).toBe(
+      false,
+    );
+    const fabric = { kind: 'felt', grain: 0.003, relief: 0.5, noise: 0.1, crease: 0.2, fold: 0.08 };
+    const sheen = { colour: [0.6, 0.6, 0.6], roughness: 0.5 };
+    expect(safeParse(MaterialSchema, { ...bark, finish: { ...bark.finish, sheen, fabric } }).success).toBe(false);
+  });
 });

@@ -6,6 +6,7 @@ models/architecture/*.example.json
 models/nature/*.example.json
 models/building-kits.json
 models/finishes.json
+models/shader-lab.json
 models/guns/cartridges/120x570.json
 models/guns/cartridges/12-gauge-00-buck.json
 models/guns/cartridges/308-winchester.json

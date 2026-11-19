@@ -1,18 +1,19 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { IDENTITY, sub } from '@skelly/construct/foundation/math.ts';
+import { IDENTITY } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { expect, it } from 'vitest';
 import { parseCartridgeJson } from '../src/ammo/parseCartridge.ts';
 import { exportFileText } from '../src/cli/exportFile.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
+import { slideOf } from '../src/gun/actionMotion.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { PUMP_ACTION_TRAVEL_U, PUMP_LOADING_PORT_X, PUMP_SHELL_LOADED_LENGTH_U } from '../src/gun/pumpShell.ts';
 import { tubeMagazineCapacity } from '../src/gun/tubeCapacity.ts';
 import { uToMm } from '../src/gun/units.ts';
-import { cartridgeText, designText, loadDesigns } from './helpers.ts';
+import { cartridgeText, designText, loadDesigns, strokeOf } from './helpers.ts';
 
 const { assembly } = loadDesigns().find((entry) => entry.assembly.name === 'archetype-pump-shotgun')!;
 const parsed = parseCartridgeJson(cartridgeText('12-gauge-00-buck'));
@@ -41,7 +42,7 @@ it('exports a hand-only coupled 12-gauge action and an integral tube without box
   expect(action.roundsPerSimMinute).toBeUndefined();
   for (const part of Object.values(action.parts)) {
     expect(part.modes).toEqual(['hand']);
-    expect(part.strokeMetres).toBeCloseTo(PUMP_ACTION_TRAVEL_U * gunDomain.units.metresPerUnit, 6);
+    expect(slideOf(part.motion).travel).toBeCloseTo(PUMP_ACTION_TRAVEL_U * gunDomain.units.metresPerUnit, 6);
   }
   expect(action.ejectAt).toBeGreaterThan(0);
   expect(action.ejectAt).toBeLessThan(1);
@@ -126,7 +127,7 @@ it('clears every fixed solid over the exact whole coupled stroke, without keep-o
     );
   for (const part of Object.values(action.parts)) {
     expect(part.travel).toEqual([-PUMP_ACTION_TRAVEL_U, 0, 0].map((value) => expect.closeTo(value, 9)));
-    const [delta] = sub(part.def.motion!.end, part.def.motion!.start);
+    const [delta] = strokeOf(resolved, part.id);
     for (const solid of part.def.solids) {
       let swept: Solid;
       if (solid.kind === 'box') {

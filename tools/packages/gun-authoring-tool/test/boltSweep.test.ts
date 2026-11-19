@@ -16,11 +16,15 @@ it.each(['turn', 'draw'] as const)('detects a %s obstruction between clear endpo
   const action = resolveGunAction(baseline)!;
   const knob = action.parts.knob!;
   const solid = knob.def.solids[0]!;
-  const motion = knob.def.motion!;
+  const [turnStage, drawStage] = knob.motion.stages;
   const [min, max] = localSolidBounds(solid);
   const centre = min.map((value, axis) => (value + max[axis]!) / 2) as unknown as Vec3;
   const pose = (progress: number) =>
-    motionTransform(knob.placed, motion, phase === 'draw' ? progress : 0, phase === 'turn' ? progress : 1);
+    motionTransform(
+      knob.placed,
+      knob.motion,
+      phase === 'turn' ? progress * turnStage!.share : turnStage!.share + progress * drawStage!.share,
+    );
   const contactPhase = phase === 'turn' ? 0.2 : 0.25;
   const blocker: BoxSolid = {
     id: 'blocker',

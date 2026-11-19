@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shader lab</title>
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; color: #e4e9ee; background: #20252b; font: 13px system-ui, sans-serif; display: flex; height: 100vh; }
+      #view { flex: 1; min-width: 0; height: 100vh; display: block; touch-action: none; }
+      aside { width: 22rem; max-width: 45vw; overflow-y: auto; padding: 0.6rem 0.8rem; box-sizing: border-box; background: #191d22; }
+      h1 { font-size: 1rem; margin: 0 0 0.4rem; }
+      h2 { font-size: 0.85rem; margin: 0.9rem 0 0.3rem; color: #9fb1c2; }
+      label { display: grid; grid-template-columns: 1fr; gap: 0.15rem; margin: 0.3rem 0; }
+      #look label, #see label { grid-template-columns: 9rem 1fr 3.5rem; align-items: center; }
+      select, input[type='search'] { width: 100%; box-sizing: border-box; }
+      output { text-align: right; font-variant-numeric: tabular-nums; }
+      pre { white-space: pre-wrap; word-break: break-word; background: #0f1215; padding: 0.4rem; margin: 0.3rem 0; }
+      .note { color: #c9b98a; }
+      #errors { color: #ffb3a8; }
+      #errors:empty, #status:empty { display: none; }
+      .keys { color: #9fb1c2; }
+      @media (max-width: 700px) {
+        body { flex-direction: column; }
+        #view { height: 60vh; flex: none; }
+        aside { width: auto; max-width: none; height: 40vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="view" aria-label="Lab view"></canvas>
+    <aside>
+      <h1>Shader lab</h1>
+      <p class="note">
+        Surfaces only: skelly's fog, mood, auto-tone and sky are not drawn here, so judge a look against the game's own
+        frame before calling it done.
+      </p>
+      <pre id="errors" role="alert"></pre>
+      <p id="status"></p>
+      <label>Model <input id="search" type="search" placeholder="Filter models" /></label>
+      <select id="model" aria-label="Model"></select>
+      <label>Stage <select id="stage"></select></label>
+      <label>Camera <select id="camera"></select></label>
+      <p class="keys">Walking: drag to look, WASD or arrows to walk, R and F to climb.</p>
+      <h2>Surface</h2>
+      <select id="surface" aria-label="Surface"></select>
+      <div id="look"></div>
+      <h2>Paste into models/finishes.jsonnet</h2>
+      <pre id="snippet"></pre>
+      <h2>See-through (the game's inputs)</h2>
+      <div id="see"></div>
+      <pre id="see-snippet"></pre>
+    </aside>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

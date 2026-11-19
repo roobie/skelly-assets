@@ -19,9 +19,18 @@
 //   lug        barrel ↔ tube magazine front (closes a loop, like clamp)
 //   forend     tube magazine ↔ sliding forend
 
-import type { KeepOut, ParamSpec, PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
+import type {
+  KeepOut,
+  ParamSpec,
+  PartDef,
+  PartFamily,
+  PartMotion,
+  PartStage,
+  PortDef,
+} from '@skelly/construct/assembly/schema.ts';
 import { GRID, SIZE_CLASSES, type SizeClass } from '@skelly/construct/foundation/conventions.ts';
 import {
+  add,
   applyDir,
   applyPoint,
   compose,
@@ -36,6 +45,7 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
+import { UNLOCKED_STOP } from './actionMotion.ts';
 import { ACTION_CARRIER_ROLES, ACTION_PART_ROLES, type GunPartFamily } from './actionRoles.ts';
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
@@ -525,8 +535,8 @@ const BOLT_HANDLE_ARM_RADIUS_U = 0.375;
 const BOLT_RAIL_HALF_WIDTH_U = 1;
 /** Handle proportions and lift angles are visual estimates, not measured firearm specifications. */
 const BOLT_HANDLE_PROFILES = {
-  standard: { armLength: 5.25, knobFlatRadius: 0.875, liftRadians: Math.PI / 3 },
-  awm: { armLength: 6, knobFlatRadius: 1, liftRadians: Math.PI / 3 },
+  standard: { armLength: 5.25, knobFlatRadius: 0.875, liftDegrees: 60 },
+  awm: { armLength: 6, knobFlatRadius: 1, liftDegrees: 60 },
   sporter: SPORTER_PROPORTIONS.handle,
 } as const;
 type BoltHandleProfile = keyof typeof BOLT_HANDLE_PROFILES;
@@ -1471,7 +1481,8 @@ const boltRailLift = (params: Readonly<Record<string, string>>, carrierY: number
   const envelope = BOLT_CARRIER_ENVELOPES.bolt;
   const pivotY = (envelope.y[0] + envelope.y[1]) / 2;
   const [, rootY] = boltHandleRoot(envelope, params.section);
-  const angle = BOLT_HANDLE_PROFILES[(params.boltHandleProfile ?? 'standard') as BoltHandleProfile].liftRadians;
+  const { liftDegrees } = BOLT_HANDLE_PROFILES[(params.boltHandleProfile ?? 'standard') as BoltHandleProfile];
+  const angle = (liftDegrees * Math.PI) / 180;
   const seatAtRailEdge =
     carrierY + pivotY + (rootY - pivotY + BOLT_RAIL_HALF_WIDTH_U * Math.sin(angle)) / Math.cos(angle);
   return Math.max(
@@ -2246,15 +2257,20 @@ const boltHandleSweep = (prism: Solid, axis: Vec3, travel: number): KeepOut => {
   };
 };
 
-const boltTurn = (profile: BoltHandleProfile, frame?: Transform) => {
+/** The turn that lifts the bolt handle, about the bolt's own axis, in the frame of the part it moves. */
+const boltTurn = (profile: BoltHandleProfile, frame?: Transform): PartStage => {
   const envelope = BOLT_CARRIER_ENVELOPES.bolt;
   const pivot: Vec3 = [0, (envelope.y[0] + envelope.y[1]) / 2, (envelope.z[0] + envelope.z[1]) / 2];
-  return {
-    pivot: frame ? applyPoint(invert(frame), pivot) : pivot,
-    axis: frame ? applyDir(invert(frame), X) : X,
-    angleRadians: BOLT_HANDLE_PROFILES[profile].liftRadians,
-  };
+  const from = frame ? applyPoint(invert(frame), pivot) : pivot;
+  const axis = frame ? applyDir(invert(frame), X) : X;
+  return { kind: 'hinge', axis: { from, to: add(from, axis) }, angle: BOLT_HANDLE_PROFILES[profile].liftDegrees };
 };
+
+/** A turn-bolt part's motion: it turns free of its lugs, then is drawn back along its own stroke. */
+const boltMotion = (turn: PartStage, slide: PartStage): PartMotion => ({
+  stages: [turn, slide],
+  stops: [{ name: UNLOCKED_STOP, after: 0 }],
+});
 const boltArmFrame = (section?: string): Transform => {
   const basis = boltHandleBasis(section);
   return { r: fromColumns(basis.axis, basis.up, basis.side), t: boltHandleRoot(BOLT_CARRIER_ENVELOPES.bolt, section) };
@@ -2310,14 +2326,10 @@ const boltHandleArm: PartFamily = {
       keepOuts: [boltHandleSweep(solids[0]!, basis.motionAxis, travel)],
       axes: [],
       tags: [ACTION_PART_ROLES.arm],
-      motion: {
-        kind: 'linear',
-        axis: basis.motionAxis,
-        turn: boltTurn((params.handleProfile ?? 'standard') as BoltHandleProfile, boltArmFrame(params.section)),
-        start: [0, 0, 0],
-        end: [0, 0, 0],
-        sourceKeepOut: { port: 'base', id: 'bolt-handle-travel' },
-      },
+      motion: boltMotion(
+        boltTurn((params.handleProfile ?? 'standard') as BoltHandleProfile, boltArmFrame(params.section)),
+        { kind: 'slide', direction: basis.motionAxis, travel: { port: 'base', keepOut: 'bolt-handle-travel' } },
+      ),
     };
   },
 };
@@ -2349,16 +2361,13 @@ const boltHandleKnob: PartFamily = {
       keepOuts: [boltHandleSweep(solids[0]!, basis.knobMotionAxis, travel)],
       axes: [],
       tags: [ACTION_PART_ROLES.knob],
-      motion: {
-        kind: 'linear',
-        axis: basis.knobMotionAxis,
-        turn: boltTurn(
+      motion: boltMotion(
+        boltTurn(
           (params.handleProfile ?? 'standard') as BoltHandleProfile,
           boltKnobFrame(profile.armLength, params.section),
         ),
-        start: [0, 0, 0],
-        end: basis.knobMotionAxis.map((value) => value * travel) as unknown as Vec3,
-      },
+        { kind: 'slide', direction: basis.knobMotionAxis, travel },
+      ),
     };
   },
 };
@@ -2478,7 +2487,7 @@ const smgTubeFor = (
 };
 
 /** Travel and notch turn; the stem's share takes its part of the slot's length. */
-const smgHandleTravel = (section: string | undefined): { readonly travelU: number; readonly turnRadians: number } => {
+const smgHandleTravel = (section: string | undefined): { readonly travelU: number; readonly turnDegrees: number } => {
   const { slotLengthU } = smgTubeFor(section);
   const { notchTurnDegrees } = COMPACT_SMG_PROPORTIONS.chargingHandle;
   // The notch opens only the tube's upper-left quarter, so a turn past a right angle would leave it.
@@ -2487,7 +2496,7 @@ const smgHandleTravel = (section: string | undefined): { readonly travelU: numbe
   }
   return {
     travelU: slotLengthU - 2 * SMG_HANDLE_STEM_SLOT_HALF_U,
-    turnRadians: (notchTurnDegrees * Math.PI) / 180,
+    turnDegrees: notchTurnDegrees,
   };
 };
 
@@ -2573,7 +2582,7 @@ const smgSlidingHandle: PartFamily = {
     const solids = smgHandleShape();
     const [minimum, maximum] = solidsBounds(solids);
     const clearance = CARRIER_HANDLE_STYLES.smg.handClearanceU;
-    const { travelU: travel, turnRadians } = smgHandleTravel(params.section);
+    const { travelU: travel, turnDegrees } = smgHandleTravel(params.section);
     return {
       family: 'smg-handle',
       solids,
@@ -2595,19 +2604,25 @@ const smgSlidingHandle: PartFamily = {
       axes: [],
       tags: [ACTION_PART_ROLES.handle],
       motion: {
-        kind: 'linear',
-        axis: [1, 0, 0],
-        start: [0, 0, 0],
-        end: [0, 0, 0],
-        // At the slot's rear end the stem turns up about the bore into the notch: the held-back state.
-        turn: { pivot: [0, 0, 0], axis: [-1, 0, 0], angleRadians: turnRadians },
-        sourceKeepOut: { port: 'mount', id: 'smg-handle-travel' },
+        stages: [
+          { kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'smg-handle-travel' } },
+          // At the slot's rear end the stem turns up about the bore into the notch: the held-back state.
+          { kind: 'hinge', axis: { from: [0, 0, 0], to: [-1, 0, 0] }, angle: turnDegrees },
+        ],
       },
     };
   },
 };
 
 // ---- procedural bolt-carrier group ----
+
+/** A carrier strokes through the receiver's bolt travel; a turn-bolt carrier first turns free of its lugs. */
+const boltCarrierMotion = (pattern: BoltCarrierPattern, params: Readonly<Record<string, string>>): PartMotion => {
+  const stroke: PartStage = { kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'bolt-travel' } };
+  return pattern === 'bolt'
+    ? boltMotion(boltTurn((params.handleProfile ?? 'standard') as BoltHandleProfile), stroke)
+    : { stages: [stroke] };
+};
 
 const boltCarrier: GunPartFamily = {
   name: 'bolt-carrier',
@@ -2748,14 +2763,7 @@ const boltCarrier: GunPartFamily = {
           : []),
       ],
       axes: [],
-      motion: {
-        kind: 'linear',
-        axis: [1, 0, 0],
-        start: [0, 0, 0],
-        end: [0, 0, 0],
-        sourceKeepOut: { port: 'mount', id: 'bolt-travel' },
-        ...(pattern === 'bolt' ? { turn: boltTurn((params.handleProfile ?? 'standard') as BoltHandleProfile) } : {}),
-      },
+      motion: boltCarrierMotion(pattern, params),
       // The barrett pattern has no action description.
       tags: pattern === 'barrett' ? [] : [ACTION_CARRIER_ROLES[pattern]],
     };
@@ -4666,13 +4674,7 @@ const forend: PartFamily = {
       ],
       axes: [],
       tags: [ACTION_PART_ROLES.forend],
-      motion: {
-        kind: 'linear',
-        axis: NEG_X,
-        start: [0, 0, 0],
-        end: [0, 0, 0],
-        sourceKeepOut: { port: 'rear', id: 'forend-travel' },
-      },
+      motion: { stages: [{ kind: 'slide', direction: NEG_X, travel: { port: 'rear', keepOut: 'forend-travel' } }] },
     };
   },
 };
@@ -5080,10 +5082,7 @@ const pistolSlide: PartFamily = {
         },
       ],
       motion: {
-        kind: 'linear',
-        axis: NEG_X,
-        start: [0, 0, 0],
-        end: [-Math.ceil(mmToU(pistolAction.strokeMm) / GRID) * GRID, 0, 0],
+        stages: [{ kind: 'slide', direction: NEG_X, travel: Math.ceil(mmToU(pistolAction.strokeMm) / GRID) * GRID }],
       },
       tags: [ACTION_CARRIER_ROLES.slide],
     };

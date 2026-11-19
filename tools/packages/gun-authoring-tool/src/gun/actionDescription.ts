@@ -6,11 +6,13 @@ import {
   applyPoint,
   invert,
   length,
-  sub,
+  scale,
   type Transform,
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
+import type { Motion } from '@skelly/motion/motion';
 import { partNodeName } from '@skelly/thing-export/glb.ts';
+import { hingeOf, slideOf } from './actionMotion.ts';
 import {
   type ActionKind,
   type ActionRoleKey,
@@ -25,7 +27,8 @@ import { localEjectionPoint } from './ejection.ts';
 interface ActionPart {
   readonly id: string;
   readonly node: string;
-  readonly def: PartDef;
+  readonly def: Omit<PartDef, 'motion'>;
+  readonly motion: Motion;
   readonly placed: Transform;
   readonly axis: Vec3;
   readonly travel: Vec3;
@@ -45,18 +48,21 @@ export interface ResolvedGunAction {
 
 const actionPart = (resolved: Resolved, id: string, modes: readonly CycleMode[]): ActionPart | undefined => {
   const def = resolved.defs.get(id);
+  const motion = resolved.motions.get(id);
   const placed = resolved.placed.get(id);
   const family = resolved.assembly.parts[id]?.family;
-  if (!(def?.motion && placed && family)) {
+  if (!(def && motion && placed && family)) {
     return undefined;
   }
+  const { direction, travel } = slideOf(motion);
   return {
     id,
     node: partNodeName(id, family),
     def,
+    motion,
     placed,
-    axis: applyDir(placed, def.motion.axis),
-    travel: applyDir(placed, sub(def.motion.end, def.motion.start)),
+    axis: applyDir(placed, direction),
+    travel: applyDir(placed, scale(direction, travel)),
     modes,
   };
 };
@@ -113,15 +119,15 @@ export const resolveGunAction = (resolved: Resolved): ResolvedGunAction | undefi
   const boltEjectAt = port ? (carrierHome[0] - (port.box.center[0] - port.box.half[0])) / length(carrier.travel) : 0;
   const parts = coupledParts(resolved, carrier);
   // A turning hand-only handle on an automatic action is a notch hold, such as the SMG's.
-  const handNotch = Object.values(parts).some(({ def, modes }) => def.motion?.turn && !modes.includes('fire'));
+  const handNotch = Object.values(parts).some(({ motion, modes }) => hingeOf(motion) && !modes.includes('fire'));
   const notchTurnSeconds = handNotch ? COMPACT_SMG_PROPORTIONS.chargingHandle.notchTurnSeconds : undefined;
   let cycle: CycleMotion;
   if (kind === 'bolt') {
-    cycle = boltCycleMotion(carrier.def.motion!, resolved.domain.units.metresPerUnit, boltEjectAt);
+    cycle = boltCycleMotion(carrier.motion, resolved.domain.units.metresPerUnit, boltEjectAt);
   } else if (kind === 'pump') {
-    cycle = pumpCycleMotion(carrier.def.motion!, resolved.domain.units.metresPerUnit);
+    cycle = pumpCycleMotion(carrier.motion, resolved.domain.units.metresPerUnit);
   } else {
-    cycle = cycleMotion(kind, carrier.def.motion!, resolved.domain.units.metresPerUnit, {
+    cycle = cycleMotion(kind, carrier.motion, resolved.domain.units.metresPerUnit, {
       rpm: carrierCyclicRpm(resolved, id),
       notchTurnSeconds,
     });

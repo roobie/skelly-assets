@@ -131,6 +131,23 @@ export const terraceLattice = (
   base: latticeOrigin(placed, grain, metresPerUnit)[1] / metresPerUnit,
 });
 
+/**
+ * What a part's voxels sample for a display item: a terracing solid's steps on the part's lattice, else the solid as
+ * authored, never the bevelled display mesh. A bevel is cosmetic, and at a voxel's size its chamfers would notch every
+ * edge two solids share and shave box corners, leaving see-through lines. This is the one place that decides it.
+ */
+export const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undefined, revolveFacets?: number) => {
+  if (item.merged) {
+    // A group is welded into one mesh before it is sampled, so its members have no outlines of their own to step.
+    const terracing = item.solids.find((solid) => solid.display?.terrace !== undefined);
+    if (terracing) {
+      throw new Error(`Solid "${terracing.id}" terraces inside merge group "${item.id}"; a merged solid cannot.`);
+    }
+    return meshForSolidGroup(item.solids);
+  }
+  return (lattice && terracedMesh(item.solids[0]!, lattice)) ?? meshForSolid(item.solids[0]!, 0, revolveFacets);
+};
+
 /** Part-definition tag that asks a voxelized export for the finer `voxelDetailGrain`. */
 export const VOXEL_DETAIL = 'voxel-detail';
 
@@ -331,8 +348,8 @@ const SHEEN = 'KHR_materials_sheen';
 
 /**
  * The glTF material the writer gives a surface of this appearance. A sheen is glTF's own extension, so any loader draws
- * it; a fabric's grain has no glTF form and rides in the extras for a renderer that draws it; see
- * `docs/decisions/0013-fabric-finishes.md`, "Decision".
+ * it; a fabric's grain and a shader surface's look have no glTF form and ride in the extras for a renderer that draws
+ * them; see `docs/decisions/0013-fabric-finishes.md` and `docs/decisions/0022-surface-shaders.md`, "Decision".
  */
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
@@ -341,6 +358,7 @@ export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }
       ? {}
       : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
     ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
+    ...(finish.surface === undefined ? {} : { surface: finish.surface }),
   };
   return {
     name: hex(srgb),
@@ -390,7 +408,7 @@ interface PartExport {
   readonly id: string;
   readonly family: string;
   readonly appearance?: PartInstance['appearance'];
-  readonly def: PartDef;
+  readonly def: Omit<PartDef, 'motion'>;
   readonly placed: Transform;
 }
 
@@ -418,18 +436,6 @@ const splitMixed = (
       : item.solids.map((solid) => ({ id: solid.id, solids: [solid], merged: false }));
   });
 const fail = (error: GlbExportError): GlbExportResult => ({ ok: false, error });
-
-/** Keep the established GLB extras keys while the in-memory motion contract uses neutral endpoints. */
-const motionMetadata = (motion: NonNullable<PartDef['motion']>) => ({
-  kind: motion.kind,
-  axis: motion.axis,
-  ...(motion.turn ? { turn: motion.turn } : {}),
-  // biome-ignore lint/complexity/useLiteralKeys: preserve legacy GLB keys without core domain identifiers.
-  ['rest']: motion.start,
-  // biome-ignore lint/complexity/useLiteralKeys: preserve legacy GLB keys without core domain identifiers.
-  ['rearmost']: motion.end,
-  ...(motion.sourceKeepOut === undefined ? {} : { sourceKeepOut: motion.sourceKeepOut }),
-});
 
 /** Checks the input in the order the frozen error variants are listed; the first problem wins. */
 const refusal = (input: Parameters<ExportGlb>[0]): GlbExportError | undefined => {
@@ -647,18 +653,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
     const solids = copy === 'smooth' ? drawn.filter((solid) => !solid.display?.voxelOnly) : drawn;
     return splitMixed(displayItems(solids), (solid) => appearanceFor(part, solid));
   };
-  /** What a part's voxels sample for an item: a terracing solid's steps on the part's lattice, else the item's mesh. */
-  const voxelSourceOf = (item: DisplayItem, lattice: TerraceLattice | undefined) => {
-    if (item.merged) {
-      // A group is welded into one mesh before it is sampled, so its members have no outlines of their own to step.
-      const terracing = item.solids.find((solid) => solid.display?.terrace !== undefined);
-      if (terracing) {
-        throw new Error(`Solid "${terracing.id}" terraces inside merge group "${item.id}"; a merged solid cannot.`);
-      }
-      return meshOf(item);
-    }
-    return (lattice && terracedMesh(item.solids[0]!, lattice)) ?? meshOf(item);
-  };
   /** The part's voxel sources in part-local metres, one per display item, or none for an empty one. */
   const drawnMeshes = new Map<string, ({ positions: Float32Array; indices: Uint32Array } | undefined)[]>();
   const drawnOf = (part: PartExport) => {
@@ -670,7 +664,7 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
           : partVoxelGrain(part.def, { ...input, voxelGrain: input.voxelGrain }, metresPerUnit);
       const lattice = grain === undefined ? undefined : terraceLattice(part.placed, grain, metresPerUnit);
       drawn = itemsOf(part).map((item) => {
-        const mesh = voxelSourceOf(item, lattice);
+        const mesh = voxelSourceOf(item, lattice, input.revolveFacets);
         return mesh.triangleCount === 0 || mesh.indices.length === 0
           ? undefined
           : { positions: mesh.positions.map((x) => x * metresPerUnit), indices: mesh.indices };
@@ -874,7 +868,6 @@ const writeGlb = (input: GlbExportInput, smoothPrimitives: SmoothPrimitives = 'p
       ...(appearance.material === undefined ? {} : { material: appearance.material }),
       ...(appearance.slot === undefined ? {} : { slot: appearance.slot }),
       solids: drawn.map((s) => s.id),
-      ...(part.def.motion ? { motion: motionMetadata(part.def.motion) } : {}),
       ...(joints?.mount ? { mount: joints.mount } : {}),
       ...(joints && joints.meets.length > 0 ? { meets: joints.meets } : {}),
     };

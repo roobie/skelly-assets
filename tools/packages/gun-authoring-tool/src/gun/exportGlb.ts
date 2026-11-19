@@ -10,6 +10,7 @@ import {
   type Vec3,
 } from '@skelly/construct/foundation/math.ts';
 import { localSolidBounds } from '@skelly/construct/shapes/geometry.ts';
+import type { Motion } from '@skelly/motion/motion';
 import type { ModelParts, NeutralModel } from '@skelly/thing-core/schema';
 import { type DrawnGeometry, drawnGeometry } from '@skelly/thing-export/drawn.ts';
 import type {
@@ -24,6 +25,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
+import { cycleLegs, playedMotion, type TimelineLeg } from './actionTimeline.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
 import {
@@ -42,7 +44,7 @@ import {
 import { boltCalibreIssue, isBoltAssembly, withBoltCalibre } from './boltCartridge.ts';
 import type { CycleMode, CycleTimeline } from './cycle.ts';
 import { gunDomain } from './domain.ts';
-import { FILE_AXES, fileVector, gripTurn, inFileFrame, toFileAxes, toFileRotation } from './exportFrame.ts';
+import { FILE_AXES, fileMotion, fileVector, gripTurn, inFileFrame, toFileAxes, toFileRotation } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb, exportGunModels } from './glbWriter.ts';
 import { internalMagazineCapacity } from './internalMagazine.ts';
 import { getOptic } from './optics.ts';
@@ -59,23 +61,17 @@ export type DeadvoxModelFile = `assets/models/${string}.glb`;
 interface ActionPartMetadata {
   /** Exact glTF node name; the existing part node carries its geometry as a separate mesh. */
   readonly node: string;
-  /** Unit travel direction in model coordinates. */
-  readonly axis: Vec3;
-  /** Carrier stroke length in metres. */
-  readonly strokeMetres: number;
   readonly handGrip?: Vec3;
   /** Shared timelines this node follows; other modes leave it at home. */
   readonly modes: readonly CycleMode[];
-  readonly turn?: { readonly pivot: Vec3; readonly axis: Vec3; readonly angleRadians: number };
+  /** What the timelines play of the part, in the model file's frame and metres. */
+  readonly motion: Motion;
 }
 
 interface CycleMetadata {
   readonly durationSimSeconds: number;
-  readonly rearwardSimSeconds: number;
-  readonly dwellSimSeconds: number;
-  readonly forwardSimSeconds: number;
-  readonly unlockSimSeconds?: number;
-  readonly lockSimSeconds?: number;
+  /** The stops each following part's clock runs through in turn, from rest, over the seconds given. */
+  readonly legs: readonly TimelineLeg[];
 }
 
 interface GunActionMetadata {
@@ -202,13 +198,14 @@ interface GunActionExport {
   readonly action: GunActionMetadata;
 }
 
-const cycleMetadata = (cycle: CycleTimeline): CycleMetadata => ({
+const cycleMetadata = (cycle: CycleTimeline, parts: Readonly<Record<string, ActionPartMetadata>>): CycleMetadata => ({
   durationSimSeconds: cycle.durationSeconds,
-  rearwardSimSeconds: cycle.rearwardSeconds,
-  dwellSimSeconds: cycle.dwellSeconds,
-  forwardSimSeconds: cycle.forwardSeconds,
-  ...(cycle.unlockSeconds === undefined ? {} : { unlockSimSeconds: cycle.unlockSeconds }),
-  ...(cycle.lockSeconds === undefined ? {} : { lockSimSeconds: cycle.lockSeconds }),
+  legs: cycleLegs(
+    cycle,
+    Object.values(parts)
+      .filter(({ modes }) => modes.includes(cycle.mode))
+      .map(({ motion }) => motion),
+  ),
 });
 
 const handGripMetadata = (part: ResolvedGunAction['carrier'], metresPerUnit: number): { handGrip?: Vec3 } => {
@@ -222,29 +219,15 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
   if (!(description?.ejection && cycle)) {
     return undefined;
   }
-  const parts = Object.fromEntries(
+  const { metresPerUnit } = resolved.domain.units;
+  const parts: Record<string, ActionPartMetadata> = Object.fromEntries(
     Object.entries(description.parts).map(([role, part]) => [
       role,
       {
         node: part.node,
-        axis: toFileAxes(part.axis),
-        strokeMetres: round6(length(part.travel) * resolved.domain.units.metresPerUnit),
         modes: part.modes,
-        ...handGripMetadata(part, resolved.domain.units.metresPerUnit),
-        // A turn without unlock and lock phases, such as the SMG handle's notch, is a held state, not a cycle step.
-        ...(part.def.motion?.turn &&
-        part.modes.every((mode) => cycle[mode]?.unlockSeconds !== undefined && cycle[mode]?.lockSeconds !== undefined)
-          ? {
-              turn: {
-                pivot: modelPoint(
-                  applyPoint(part.placed, part.def.motion.turn.pivot),
-                  resolved.domain.units.metresPerUnit,
-                ),
-                axis: toFileAxes(applyDir(part.placed, part.def.motion.turn.axis)),
-                angleRadians: part.def.motion.turn.angleRadians,
-              },
-            }
-          : {}),
+        ...handGripMetadata(part, metresPerUnit),
+        motion: fileMotion(playedMotion(part.motion, part.modes, cycle), part.placed, metresPerUnit),
       },
     ]),
   );
@@ -253,8 +236,8 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
     action: {
       parts,
       ...(description.kind === 'slide' ? { triggerMode: pistolAction.triggerMode as 'semi' } : {}),
-      ...(cycle.fire ? { fire: cycleMetadata(cycle.fire) } : {}),
-      hand: cycleMetadata(cycle.hand),
+      ...(cycle.fire ? { fire: cycleMetadata(cycle.fire, parts) } : {}),
+      hand: cycleMetadata(cycle.hand, parts),
       ejectAt: cycle.ejectAt,
       ejectDirection: toFileAxes(cycle.ejectDirection),
       holdOpen: cycle.holdOpenOnEmpty,

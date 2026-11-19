@@ -6,6 +6,7 @@
     { "label": "Mob viewer", "viewer": "mobgen" },
     { "label": "Gun viewer", "viewer": "gun-authoring-tool" },
     { "label": "Thing authoring", "viewer": "thing-authoring-tool" },
-    { "label": "Vehicle authoring", "viewer": "vehicle-authoring-tool" }
+    { "label": "Vehicle authoring", "viewer": "vehicle-authoring-tool" },
+    { "label": "Shader lab", "viewer": "shader-lab" }
   ]
 }
