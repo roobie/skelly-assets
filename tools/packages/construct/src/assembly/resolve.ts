@@ -380,24 +380,27 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
       structure(`Connection #${index} connects "${from.part}" to itself.`, [from.part]);
       return;
     }
-    if (conn.slot !== undefined) {
+    let slot = conn.slot;
+    if (slot !== undefined) {
       const { slots } = from.port;
       if (!slots) {
         structure(`Connection #${index}: ${conn.from} has no slots.`, [from.part]);
         return;
       }
-      if (!Number.isInteger(conn.slot) || conn.slot < 0 || conn.slot >= slots.count) {
-        structure(`Connection #${index}: slot ${conn.slot} is outside ${conn.from} (0–${slots.count - 1}).`, [
-          from.part,
-        ]);
+      if (!Number.isInteger(slot) || slot < -slots.count || slot >= slots.count) {
+        structure(
+          `Connection #${index}: slot ${slot} is outside ${conn.from} (0–${slots.count - 1}, or -${slots.count}–-1 from its end).`,
+          [from.part],
+        );
         return;
       }
+      slot = slot < 0 ? slots.count + slot : slot;
     }
     if (conn.roll !== undefined && conn.roll % 90 !== 0) {
       structure(`Connection #${index}: roll ${conn.roll} is not a multiple of 90.`, [from.part]);
       return;
     }
-    pending.push({ index, conn, from, to });
+    pending.push({ index, conn: slot === undefined ? conn : { ...conn, slot }, from, to });
   });
 
   const { defs: resolvedDefs, motions } = resolveMotions(defs, pending, structure);

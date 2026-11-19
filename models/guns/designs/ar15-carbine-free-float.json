@@ -42,7 +42,7 @@
       { "from": "barrel.gas-block", "to": "gas-block.barrel" },
       { "from": "barrel.muzzle", "to": "flash-hider.base" },
       { "from": "upper.rail", "slot": 1, "to": "rear-sight.base" },
-      { "from": "handguard.rail", "slot": 36, "to": "front-sight.base" }
+      { "from": "handguard.rail", "slot": -1, "to": "front-sight.base" }
     ]
   },
   "locks": {

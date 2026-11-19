@@ -1,7 +1,6 @@
 import type { ConnectionTemplate, SlotTemplate, Template } from '@skelly/construct/assembly/template.ts';
 import { barrelGas } from './barrel.ts';
-import { type ArFrame, familyName, u } from './frame.ts';
-import { railSlotCount } from './rail.ts';
+import { type ArFrame, familyName } from './frame.ts';
 
 /** What one of a frame's templates says of the gun it builds. */
 interface ArModularGun {
@@ -17,6 +16,9 @@ export interface ArModularGuns {
 
 /** The rail slot a rear sight stands on, at the rear of the upper's rail where the eye is. */
 const REAR_SIGHT_RAIL_SLOT = 1;
+
+/** The rail slot a front sight stands on: the last of the handguard's own rail, whatever its length. */
+const FRONT_SIGHT_RAIL_SLOT = -1;
 
 /**
  * A frame's two modular ARs on its lower, every length a named choice of the frame table. They share the receiver, the
@@ -49,10 +51,6 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     slot: REAR_SIGHT_RAIL_SLOT,
     to: 'rear-sight.base',
   };
-  // The front sight stands at the front of the handguard's rail, on its last slot; the shortest handguard's, so it
-  // stands on every length.
-  const shortestHandguard = Math.min(...Object.values(frame.table.handguard.lengths).map(u));
-  const frontSightRailSlot = railSlotCount(frame.table.rail, shortestHandguard) - 1;
   const freeFloat: Template = {
     name: `${frame.name}-modular`,
     ...guns.freeFloat,
@@ -77,7 +75,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
       { from: 'barrel.gas-block', to: 'gas-block.barrel' },
       { from: 'barrel.muzzle', to: 'flash-hider.base' },
       rearSightConnection,
-      { from: 'handguard.rail', slot: frontSightRailSlot, to: 'front-sight.base' },
+      { from: 'handguard.rail', slot: FRONT_SIGHT_RAIL_SLOT, to: 'front-sight.base' },
     ],
   };
   // The A2 rifle's choices follow from its carry-handle upper and rifle extension; the gas system follows the barrel.

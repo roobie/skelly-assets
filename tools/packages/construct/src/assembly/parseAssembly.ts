@@ -170,7 +170,8 @@ const parseConnection = (value: unknown, path: string): Parsed<Connection> => {
   if (!to.ok) {
     return to;
   }
-  const slot = parseOptional(value, 'slot', path, (v, p) => parseInteger(v, p, 0));
+  // A negative slot counts from the port's far end; resolving holds it to the port's slot count.
+  const slot = parseOptional(value, 'slot', path, (v, p) => parseInteger(v, p, Number.MIN_SAFE_INTEGER));
   if (!slot.ok) {
     return slot;
   }

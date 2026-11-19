@@ -233,7 +233,10 @@ export interface Connection {
   readonly from: string;
   /** "partId.portId" */
   readonly to: string;
-  /** Slot on the `from` port, for slotted ports. */
+  /**
+   * Slot on the `from` port, for slotted ports. A negative slot counts from the port's far end, -1 its last, so a seat
+   * at a rail's end holds whatever the rail's length.
+   */
   readonly slot?: number;
   /** Roll about the `from` port's normal, in degrees; a multiple of 90. */
   readonly roll?: number;

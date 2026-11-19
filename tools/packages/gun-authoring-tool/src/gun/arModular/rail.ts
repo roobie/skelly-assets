@@ -10,7 +10,7 @@ import { type ArFrameTable, railTeethY, u } from './frame.ts';
 type RailFoot = { readonly spineBaseY: number } | 'teeth-only';
 
 /** How many cross slots a rail of the frame's `rail` cuts in a run `length` long, a whole tooth left at either end. */
-export const railSlotCount = (rail: ArFrameTable['rail'], length: number): number => {
+const railSlotCount = (rail: ArFrameTable['rail'], length: number): number => {
   const pitch = u(rail.pitch);
   return Math.floor((length - (pitch - u(rail.slotWidth))) / pitch);
 };
