@@ -123,7 +123,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
     return {
       family: 'front-sight-base',
       solids: [
-        ...journalClamp((side) => `ring-${side}`, rearX, ringFrontX, radius, wall, half),
+        ...journalClamp('ring', rearX, ringFrontX, radius, wall, half),
         ...solids,
         box('sling-loop', [loopRearX, u(F.bottomY), -lugHalf], [loopRearX + u(F.slingLoopLength), underY, lugHalf]),
       ],

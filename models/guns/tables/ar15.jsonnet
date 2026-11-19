@@ -448,6 +448,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       journalRadius + gasBlockWall + handguardClearance.side + detailFeature,
       'derived: the inner side %g mm out from the gas block' % handguardClearance.side,
     ),
+    chamfer: dim(self.halfWidth.mm - $.rail.topWidth.mm / 2, 'derived: the top flat as wide as the rail it carries'),
     skirt: outline(
       [[xOf(538), yOf(124)], [xOf(545), yOf(127)], [xOf(580), yOf(127)], [xOf(580), yOf(120)], [xOf(538), yOf(120)]],
       traced('handguard'),
@@ -504,6 +505,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     halfWidth: dim(20, 'derived: a body a little wider than the tube it wraps'),
     toe: collapsibleToe,
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
+    chamfer: dim(self.halfWidth.mm - self.toeHalfWidth.mm, 'derived: the bottom flat as wide as the toe under it'),
   },
 
   // The A2 fixed stock, measured from the end of the rifle extension it slides over: the butt plate covers the

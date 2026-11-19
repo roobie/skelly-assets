@@ -79,7 +79,7 @@ const gasBlockDef = (frame: ArFrame, journal: string): PartDef => {
   const half = u(gasBlock.length) / 2;
   return {
     family: 'gas-block',
-    solids: journalClamp((side) => side, -half, half, radius, wall, radius + wall),
+    solids: journalClamp('clamp', -half, half, radius, wall, radius + wall),
     ports: [
       {
         id: 'barrel',

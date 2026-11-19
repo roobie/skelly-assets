@@ -1,17 +1,9 @@
 import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
-import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
+import { choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
+import { CHAMFER_WALL_INSET, octagonalProfile, octagonalSectionChamfered, octagonalTubeWalls } from '../octagon.ts';
 import { type ArFrame, chosen, familyName, outlineU, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
-import { boxSleeve } from './shapes.ts';
-
-/** A handguard's four walls round the barrel from `fromX` to `toX`, `wall` thick inside its outer section. */
-const handguardWalls = (fromX: number, toX: number, topY: number, bottomY: number, half: number, wall: number) => [
-  box('top', [fromX, topY - wall, -half], [toX, topY, half]),
-  box('bottom', [fromX, bottomY, -half], [toX, bottomY + wall, half]),
-  box('right', [fromX, bottomY + wall, half - wall], [toX, topY - wall, half]),
-  box('left', [fromX, bottomY + wall, -half], [toX, topY - wall, -half + wall]),
-];
 
 /** Every handguard hangs from the barrel nut at the upper's front face. */
 const barrelNutPort: PortDef = {
@@ -35,12 +27,19 @@ export const arHandguard = (frame: ArFrame): PartFamily => ({
     const H = frame.table.handguard;
     const length = u(chosen(H.lengths, params.length));
     const [wall, half, topY, bottomY] = [u(H.wall), u(H.halfWidth), u(H.outerTopY), u(H.bottomY)];
+    const chamfer = u(H.chamfer);
     const rail = picatinnyRail(frame.table.rail, 0, length, u(H.railTopY), { spineBaseY: topY });
     const skirtHalf = u(H.skirtHalfWidth);
+    const outer = octagonalSectionChamfered([bottomY, topY], [-half, half], chamfer);
+    const inner = octagonalSectionChamfered(
+      [bottomY + wall, topY - wall],
+      [-half + wall, half - wall],
+      chamfer - wall * CHAMFER_WALL_INSET,
+    );
     return {
       family: 'handguard',
       solids: [
-        ...handguardWalls(0, length, topY, bottomY, half, wall),
+        ...octagonalTubeWalls('tube', outer, inner, [0, length]),
         { id: 'barrel-nut-skirt', kind: 'extruded-polygon', profile: outlineU(H.skirt), z: [-skirtHalf, skirtHalf] },
         ...rail.solids,
       ],
@@ -70,9 +69,9 @@ export const arDropInHandguard = (frame: ArFrame): PartFamily => ({
     return {
       family: 'handguard',
       solids: [
-        ...boxSleeve('delta-ring', 0, ringLength, bore, [-ringHalf, ringHalf], ringHalf),
-        ...handguardWalls(ringLength, span, half, -half, half, wall),
-        ...boxSleeve('cap', capRearX, span, bore, [-half + wall, half - wall], half - wall),
+        ...octagonalTubeWalls('delta-ring', octagonalProfile(ringHalf), octagonalProfile(bore), [0, ringLength]),
+        ...octagonalTubeWalls('shell', octagonalProfile(half), octagonalProfile(half - wall), [ringLength, span]),
+        ...octagonalTubeWalls('cap', octagonalProfile(half - wall), octagonalProfile(bore), [capRearX, span]),
       ],
       ports: [
         barrelNutPort,

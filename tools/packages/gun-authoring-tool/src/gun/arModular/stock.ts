@@ -2,8 +2,9 @@ import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/sc
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
+import { octagonalProfile, octagonalSection, octagonalSectionChamfered, octagonalTubeWalls } from '../octagon.ts';
 import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, pick, u } from './frame.ts';
-import { boxSleeve, roundBar } from './shapes.ts';
+import { roundBar } from './shapes.ts';
 
 /** The stock standard of an extension that takes the named buffer. */
 const tubeStandard = (buffer: string): string => `ar-tube-${buffer}`;
@@ -71,35 +72,33 @@ const stockPort = (buffer: ArFrameTable['stock']['buffer']): PortDef => ({
 });
 
 /**
- * The sleeve that wraps the extension from the stock's frame forward, with the detail grain its walls need: they are
- * thinner than the coarse voxel, and every stock is exported at the detail grain.
+ * The sleeve of `outer` section that wraps the extension from the stock's frame forward, with the detail grain its
+ * walls need: they are thinner than the coarse voxel, and every stock is exported at the detail grain.
  */
 const stockSleeve = (
   frontX: number,
   bore: number,
-  section: readonly [number, number],
-  half: number,
+  outer: readonly Vec2[],
 ): Required<Pick<PartDef, 'solids' | 'tags' | 'features'>> => {
-  const [bottom, top] = section;
+  const [ys, zs] = [outer.map(([y]) => y), outer.map(([, z]) => z)];
+  const flats = [Math.max(...ys), -Math.min(...ys), Math.max(...zs), -Math.min(...zs)];
   return {
-    solids: boxSleeve('sleeve', 0, frontX, bore, section, half),
+    solids: octagonalTubeWalls('sleeve', outer, octagonalProfile(bore), [0, frontX]),
     tags: [VOXEL_DETAIL],
-    features: [
-      { name: 'sleeve-wall', size: Math.min(top - bore, half - bore, -bore - bottom), disposition: { kind: 'detail' } },
-    ],
+    features: [{ name: 'sleeve-wall', size: Math.min(...flats) - bore, disposition: { kind: 'detail' } }],
   };
 };
 
 /**
  * The collapsible carbine stock at its traced position on the carbine extension. Its frame is the tube's end: the body's
- * rear block closes behind it, four walls wrap the tube ahead of it with a sliding fit, and the toe hangs under both.
+ * rear block closes behind it, the sleeve wraps the tube ahead of it with a sliding fit, and the toe hangs under both.
  */
 const collapsibleStock = (frame: ArFrame): PartDef => {
   const s = frame.table.stock;
   const [frontX, rearX, topY, bottomY, half] = [u(s.frontX), u(s.rearX), u(s.topY), u(s.bottomY), u(s.halfWidth)];
   const bore = tubeRadius(frame, s.buffer) + u(s.tubeClearance);
   const toeHalf = u(s.toeHalfWidth);
-  const sleeve = stockSleeve(frontX, bore, [bottomY, topY], half);
+  const sleeve = stockSleeve(frontX, bore, octagonalSectionChamfered([bottomY, topY], [-half, half], u(s.chamfer)));
   return {
     family: 'stock',
     solids: [
@@ -153,7 +152,7 @@ const a2Stock = (frame: ArFrame): PartDef => {
       ...(Math.max(...xs) > 0 && Math.min(...xs) < frontX ? [piece('-under-sleeve', ahead)] : []),
     ];
   });
-  const sleeve = stockSleeve(frontX, bore, [-combY, combY], half);
+  const sleeve = stockSleeve(frontX, bore, octagonalSection([-combY, combY], [-half, half]));
   return {
     family: 'stock',
     solids: [...outlineSolids, ...sleeve.solids],

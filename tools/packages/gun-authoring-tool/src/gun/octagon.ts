@@ -6,6 +6,12 @@ type Span = readonly [number, number];
 export const OCTAGON_CORNER = Math.SQRT2 - 1;
 
 /**
+ * How much shorter a 45-degree chamfer's legs are on a section `wall` inside another, per unit of wall, so the wall is as
+ * thick across the chamfer as across the flats.
+ */
+export const CHAMFER_WALL_INSET = 2 - Math.SQRT2;
+
+/**
  * The eight-sided section in the box `y` by `z` whose flats face both transverse axes, from the spans along Y of its Z
  * flats and along Z of its Y flats. Points are (Y, Z), for an extrusion along X, and every section starts at the same
  * corner and turns the same way, so any two of them pair vertex for vertex.
@@ -25,7 +31,7 @@ const octagonInBox = ([y0, y1]: Span, [z0, z1]: Span, [ya, yb]: Span, [za, zb]: 
  * The octagon in the box `y` by `z` that is regular when the box is square. Its corners scale with the box, so a box
  * that is not square gives chamfers that are not at 45 degrees.
  */
-const octagonalSection = (y: Span, z: Span): readonly Vec2[] => {
+export const octagonalSection = (y: Span, z: Span): readonly Vec2[] => {
   const [centreY, centreZ] = [(y[0] + y[1]) / 2, (z[0] + z[1]) / 2];
   const [cornerY, cornerZ] = [((y[1] - y[0]) / 2) * OCTAGON_CORNER, ((z[1] - z[0]) / 2) * OCTAGON_CORNER];
   return octagonInBox(y, z, [centreY - cornerY, centreY + cornerY], [centreZ - cornerZ, centreZ + cornerZ]);
