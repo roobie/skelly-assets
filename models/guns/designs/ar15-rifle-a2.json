@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "template": "ar15-modular-front-sight",
+  "platform": { "id": "ar", "sizeClass": "ar-15" },
+  "calibre": "5.56x45",
+  "assembly": {
+    "name": "ar15-rifle-a2",
+    "description": "AR rifle: carry-handle upper, 20 inch rifle barrel under a rifle-length drop-in handguard held by the A2 front sight base, A2 flash hider, rifle receiver extension with the A2 fixed stock, 20-round magazine.",
+    "root": "lower",
+    "parts": {
+      "lower": { "item": "ar15_lower" },
+      "upper": { "item": "ar15_upper_carry_handle" },
+      "barrel": { "item": "ar15_barrel_20_rifle" },
+      "front-sight-base": { "item": "ar15_front_sight_base_carry_handle" },
+      "handguard": { "item": "ar15_handguard_drop_in_rifle" },
+      "flash-hider": { "item": "ar15_flash_hider" },
+      "receiver-extension": { "item": "ar15_tube_rifle" },
+      "stock": { "item": "ar15_stock_a2" },
+      "grip": { "item": "ar15_grip" },
+      "magazine": {
+        "family": "magazine",
+        "params": { "length": "M", "profile": "stanag-straight" },
+        "prefab": { "id": "stanag-20", "version": 1 }
+      }
+    },
+    "connections": [
+      { "from": "lower.ar-upper", "to": "upper.ar-upper" },
+      { "from": "lower.receiver-extension", "to": "receiver-extension.lower" },
+      { "from": "receiver-extension.stock", "to": "stock.front" },
+      { "from": "lower.grip", "to": "grip.top" },
+      { "from": "lower.magazine", "to": "magazine.top" },
+      { "from": "upper.barrel", "to": "barrel.rear" },
+      { "from": "upper.barrel-nut", "to": "handguard.barrel-nut" },
+      { "from": "barrel.gas-block", "to": "front-sight-base.barrel" },
+      { "from": "front-sight-base.handguard-cap", "to": "handguard.handguard-cap" },
+      { "from": "barrel.muzzle", "to": "flash-hider.base" }
+    ]
+  },
+  "locks": {
+    "params": {},
+    "optionalParts": []
+  },
+  "status": "published"
+}

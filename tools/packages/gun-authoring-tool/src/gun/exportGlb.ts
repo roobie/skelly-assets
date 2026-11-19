@@ -53,6 +53,7 @@ import { BUILT_IN_FRONT_POST } from './parts.ts';
 import { gunModelParts, type PartItems, PartMassError } from './physical.ts';
 import { type PlatformChoice, withPlatformPorts } from './platforms.ts';
 import { type RevolverMetadata, revolverMetadata } from './revolverExport.ts';
+import { type SightRole, sightAxisOf, sightRoleOf } from './sightAxis.ts';
 import { ironGunEyeRange } from './sightView.ts';
 import { tubeMagazineCapacity } from './tubeCapacity.ts';
 
@@ -280,15 +281,20 @@ interface SightCandidate {
   eyeReliefMetres: number;
   ocularDiameterMetres?: number;
 }
+
+/** Which sight an export aims from: the eye looks through an optic or a rear sight, and only a front sight left alone. */
+const SIGHT_PRIORITY: Readonly<Record<SightRole, number>> = { optic: 0, rear: 1, front: 2 };
+
 const sightCandidate = (resolved: Resolved, id: string, part: PartDef): SightCandidate | undefined => {
-  const axis = part.axes.find(({ kind }) => kind === 'sight');
+  const axis = sightAxisOf(part);
+  const role = sightRoleOf(part);
   const transform = resolved.placed.get(id);
-  if (!(axis && transform)) {
+  if (!(axis && role && transform)) {
     return undefined;
   }
   const { family } = resolved.assembly.parts[id]!;
   const params = resolved.params.get(id);
-  const optic = family === 'sight' ? getOptic(params?.type?.value, params?.mountSection?.value) : undefined;
+  const optic = role === 'optic' ? getOptic(params?.type?.value, params?.mountSection?.value) : undefined;
   const eyeLocal = optic ? ([optic.ocularX, optic.opticalAxisY, 0] as Vec3) : axis.origin;
   const eye = applyPoint(transform, eyeLocal);
   let direction = normalize(applyDir(transform, axis.dir));
@@ -299,17 +305,9 @@ const sightCandidate = (resolved: Resolved, id: string, part: PartDef): SightCan
   if (eyeReliefU === undefined) {
     throw new Error(`Sight part ${id} needs exported eye relief`);
   }
-  let priority = 3;
-  if (optic) {
-    priority = 0;
-  } else if (family.includes('rear-sight')) {
-    priority = 1;
-  } else if (family.includes('front-sight')) {
-    priority = 2;
-  }
   return {
     id,
-    priority,
+    priority: SIGHT_PRIORITY[role],
     kind: optic ? 'optic' : 'iron',
     eye,
     direction,
@@ -507,19 +505,18 @@ const drawnTopOrThrow = (file: VoxelFile, partId: string, column: Column = {}): 
   return top;
 };
 
-const frontSightPost = (resolved: Resolved) => {
-  const id = Object.entries(resolved.assembly.parts).find(
-    ([partId, part]) =>
-      part.family.includes('front-sight') && resolved.defs.get(partId)?.solids.some((solid) => solid.id === 'post'),
-  )?.[0];
-  const transform = id && resolved.placed.get(id);
-  const def = id ? resolved.defs.get(id) : undefined;
-  const axis = def?.axes.find(({ kind }) => kind === 'sight');
-  const post = def?.solids.find((candidate) => candidate.id === 'post');
-  if (!(id && transform && axis && post)) {
-    throw new Error('A rear sight needs a front-sight post to define its aim line');
+/** The point a rear sight aims at: the origin of the one front-sight axis on the gun, placed. */
+const frontSightTip = (resolved: Resolved): Vec3 => {
+  const fronts = Object.keys(resolved.assembly.parts).flatMap((id) => {
+    const def = resolved.defs.get(id);
+    const transform = resolved.placed.get(id);
+    const axis = def && sightRoleOf(def) === 'front' ? sightAxisOf(def) : undefined;
+    return axis && transform ? [applyPoint(transform, axis.origin)] : [];
+  });
+  if (fronts.length !== 1) {
+    throw new Error(`A rear sight needs exactly one front sight to aim at, but the gun has ${fronts.length}`);
   }
-  return { tip: applyPoint(transform, axis.origin) };
+  return fronts[0]!;
 };
 
 /**
@@ -550,7 +547,7 @@ const leafSpan = (resolved: Resolved, sight: { readonly id: string }): readonly 
   const def = resolved.defs.get(sight.id)!;
   const transform = resolved.placed.get(sight.id)!;
   const { metresPerUnit } = resolved.domain.units;
-  const [, top] = def.axes.find(({ kind }) => kind === 'sight')!.origin;
+  const [, top] = sightAxisOf(def)!.origin;
   const bounds = def.solids.map((solid) => localSolidBounds(solid));
   const toppedOut = bounds.filter(([, high]) => Math.abs(high[1] - top) < 1e-6);
   const leaves = toppedOut.length > 0 ? toppedOut : bounds.filter(([low, high]) => low[1] < top && high[1] > top);
@@ -646,27 +643,27 @@ const openSightGapOrThrow = (file: VoxelFile, partId: string, grain: number, top
 
 /**
  * An iron sight's line as the voxelized file draws it, in model metres, because voxels move the tops the player lines
- * up. A separate sight part is too small to voxelize and is drawn as authored, so its authored datum stands: a rear
- * sight aims at the front post's authored tip and a bead keeps its level line. A sight built into a voxelized part,
- * such as a revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs
- * between, then drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in
- * front post, which a voxelized part draws too: then it aims at the post's drawn top, read no higher than one voxel
- * over its authored top so a hood ring above it stays out.
+ * up. A smooth rear sight, a separate part too small to voxelize, is drawn as authored, so its authored datum stands:
+ * it aims at frontSightTip, the origin of the gun's one front-sight axis, and a bead keeps its level line. A voxelized
+ * rear sight, built into a part such as a revolver's frame or a receiver's drum aperture, takes the top of its leaves,
+ * which the line also runs between, then drops into the aperture where that top is closed. It keeps its direction
+ * unless the gun has a builtInFrontPost, which a voxelized part draws too: then it aims at the post's drawn top, read
+ * no higher than one voxel over its authored top so a hood ring above it stays out.
  */
 const drawnIronSightLine = (
   file: VoxelFile,
   resolved: Resolved,
   sight: { readonly id: string; readonly eye: Vec3; readonly direction: Vec3 },
 ): { readonly eye: Vec3; readonly direction: Vec3 } => {
-  const { family } = resolved.assembly.parts[sight.id]!;
   const { metresPerUnit } = resolved.domain.units;
   const { bore, up, side } = FILE_AXES;
   const grainOf = (partId: string) => partVoxelGrain(resolved.defs.get(partId)!, file.grains, metresPerUnit);
   const sightGrain = grainOf(sight.id);
   if (sightGrain === undefined) {
-    const direction = family.includes('rear-sight')
-      ? normalize(sub(modelPoint(frontSightPost(resolved).tip, metresPerUnit), sight.eye))
-      : sight.direction;
+    const direction =
+      sightRoleOf(resolved.defs.get(sight.id)!) === 'rear'
+        ? normalize(sub(modelPoint(frontSightTip(resolved), metresPerUnit), sight.eye))
+        : sight.direction;
     return { eye: sight.eye, direction };
   }
   const top = drawnTopOrThrow(file, sight.id, {
@@ -803,8 +800,8 @@ const sightMetadata = (resolved: Resolved, voxel?: VoxelFile): GunModelFields['s
   const toModelDirection = (vector: Vec3): Vec3 => normalize(toFileAxes(vector));
   let direction = chosenDirection;
   if (sightKind === 'iron' && resolved.assembly.parts[sightId]!.family === 'ak-rear-sight') {
-    const front = frontSightPost(resolved);
-    direction = normalize([front.tip[0] - eye[0], front.tip[1] - eye[1], front.tip[2] - eye[2]]);
+    const tip = frontSightTip(resolved);
+    direction = normalize([tip[0] - eye[0], tip[1] - eye[1], tip[2] - eye[2]]);
   }
   // An optic's line is its optical axis, which the drawn tube does not define, so only iron sights read the file.
   const drawn =

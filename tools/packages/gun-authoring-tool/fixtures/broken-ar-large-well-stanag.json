@@ -1,0 +1,39 @@
+{
+  "name": "broken-ar-large-well-stanag",
+  "description": "Large-frame AR whose lower, cut for the SR-25 magazine, is offered a STANAG magazine, which is refused by standard and also stands off the well's seat.",
+  "expect": ["connection-contact", "port-compat"],
+  "root": "receiver",
+  "parts": {
+    "receiver": {
+      "family": "receiver",
+      "params": {
+        "action": "auto",
+        "feed": "box",
+        "bore": "M",
+        "chargingHandle": "rear-top",
+        "rail": "full",
+        "section": "ar",
+        "actionFrame": "large"
+      }
+    },
+    "charging-handle": { "family": "ar-charging-handle" },
+    "bolt-carrier": { "family": "bolt-carrier", "params": { "pattern": "ar", "actionFrame": "large" } },
+    "lower": { "family": "lower", "params": { "layout": "ar" } },
+    "barrel": { "family": "barrel", "params": { "length": "M" } },
+    "handguard": { "family": "handguard", "params": { "layout": "ar" } },
+    "grip": { "family": "grip", "params": { "length": "M" } },
+    "magazine": { "family": "magazine", "params": { "length": "M", "profile": "stanag-straight" } },
+    "stock": { "family": "stock", "params": { "length": "M", "style": "m4" } }
+  },
+  "connections": [
+    { "from": "receiver.charging-handle", "to": "charging-handle.mount" },
+    { "from": "receiver.lower", "to": "lower.top" },
+    { "from": "receiver.barrel", "to": "barrel.rear" },
+    { "from": "receiver.bolt-carrier", "to": "bolt-carrier.mount" },
+    { "from": "receiver.handguard", "to": "handguard.rear" },
+    { "from": "handguard.front", "to": "barrel.clamp" },
+    { "from": "lower.grip", "to": "grip.top" },
+    { "from": "lower.magazine", "to": "magazine.top" },
+    { "from": "receiver.stock", "to": "stock.front" }
+  ]
+}

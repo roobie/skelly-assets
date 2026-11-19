@@ -59,6 +59,7 @@ import {
   AR_EJECTION_PORT_CENTERS,
   AR_FREE_FLOAT_HANDGUARDS,
   AR_LOWER_PROPORTIONS,
+  arWellMagazineProfile,
 } from './arFrames.ts';
 import { AR_ACTION_LAYOUT, AR_ACTION_LAYOUTS, type ARActionLayout, arLayoutFor } from './arLayout.ts';
 import { AR_MODULAR_FAMILIES } from './arModular/index.ts';
@@ -76,8 +77,22 @@ import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
-import { MAGAZINE_PROFILES, MAGAZINE_WELL, magazineProfileContent, STANAG30_BODY } from './magazineProfiles.ts';
+import {
+  type DrawnMagazineProfile,
+  MAGAZINE_PROFILE_NAMES,
+  MAGAZINE_WELL,
+  magazineProfileContent,
+  magazineStandardOf,
+  STANAG30_BODY,
+} from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
+import {
+  OCTAGON_CORNER,
+  octagonalPrism,
+  octagonalProfile,
+  octagonalSectionChamfered,
+  octagonalTubeWalls,
+} from './octagon.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
 import { gunPort } from './portData.ts';
@@ -107,6 +122,7 @@ import {
 } from './roundedTriggerGuard.ts';
 import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIONS } from './shotgunProportions.ts';
 import { shroudFrontSightSolids } from './shroudFrontSight.ts';
+import { sightAxis } from './sightAxis.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
 import {
   cutSporterAction,
@@ -365,7 +381,7 @@ const magazineSectionFor = (
     : { depth: measured.depthU, width: measured.widthU };
 };
 type MagazineLength = '5-round' | '10-round' | SizeClass;
-type MagazineProfile = 'standard' | 'smg' | 'pistol' | 'ak-curved' | 'stanag-curved' | 'stanag-straight';
+type MagazineProfile = DrawnMagazineProfile;
 type MagazineBands = Readonly<Record<SizeClass, number>>;
 const STRAIGHT_STANAG_LENGTH_REFUSAL =
   'The straight STANAG magazine is available only at M length; other capacities are deferred to issue #414.';
@@ -938,24 +954,11 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
 
 export const RECEIVER_SECTION = {
   sporter: {
-    outline: (() => {
-      const radius = SPORTER_PROPORTIONS.receiver.flatRadiusU;
-      const corner = radius * (Math.SQRT2 - 1);
-      return [
-        [-radius, -corner],
-        [-corner, -radius],
-        [corner, -radius],
-        [radius, -corner],
-        [radius, corner],
-        [corner, radius],
-        [-corner, radius],
-        [-radius, corner],
-      ] as readonly Vec2[];
-    })(),
+    outline: octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
     faces: {
       top: {
         y: SPORTER_PROPORTIONS.receiver.flatRadiusU,
-        halfWidth: SPORTER_PROPORTIONS.receiver.flatRadiusU * (Math.SQRT2 - 1),
+        halfWidth: SPORTER_PROPORTIONS.receiver.flatRadiusU * OCTAGON_CORNER,
       },
       portSide: SPORTER_PROPORTIONS.receiver.flatRadiusU,
       handleSides: [-SPORTER_PROPORTIONS.receiver.flatRadiusU, SPORTER_PROPORTIONS.receiver.flatRadiusU],
@@ -1105,8 +1108,8 @@ const receiverShellSolids = ({
     return cutSporterAction({
       solids: octagonalTubeWalls(
         'receiver-sporter',
-        SPORTER_PROPORTIONS.receiver.flatRadiusU,
-        Math.max(...cavity.y.map(Math.abs)),
+        octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
+        octagonalProfile(Math.max(...cavity.y.map(Math.abs))),
         [xMin, xMax],
       ),
       port: portWindow,
@@ -1756,12 +1759,7 @@ const compactSmgReceiverDetails = (): Solid[] => {
 /** The drum's eye looks through its aperture along the bore, level with the front post's tip. */
 const compactSmgSightAxis = () => {
   const { aperture, eyeReliefU } = COMPACT_SMG_PROPORTIONS.rearSight;
-  return {
-    kind: 'sight' as const,
-    origin: [aperture.eyeX, aperture.centreY, 0] as Vec3,
-    dir: X,
-    referenceDistanceU: eyeReliefU,
-  };
+  return sightAxis('rear', { origin: [aperture.eyeX, aperture.centreY, 0], dir: X, referenceDistanceU: eyeReliefU });
 };
 
 const receiverSolids = (context: ReceiverContext): Solid[] => {
@@ -1857,8 +1855,8 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
           ...cutSporterAction({
             solids: octagonalTubeWalls(
               'receiver-action-ring',
-              SPORTER_PROPORTIONS.receiver.ringRadiusU,
-              SPORTER_PROPORTIONS.receiver.flatRadiusU,
+              octagonalProfile(SPORTER_PROPORTIONS.receiver.ringRadiusU),
+              octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
               [SPORTER_PROPORTIONS.receiver.ringRearX, frontFaceX],
             ),
             port: portWindow,
@@ -2896,15 +2894,7 @@ const lower: PartFamily = {
       from: [{ port: 'magazine', param: 'orientation' }],
     },
     magazineProfile: {
-      values: [
-        'standard',
-        'smg',
-        'pistol',
-        'ak-curved',
-        'stanag-curved',
-        'stanag-straight',
-        ...Object.keys(MAGAZINE_PROFILES),
-      ],
+      values: MAGAZINE_PROFILE_NAMES,
       default: 'standard',
       from: [{ port: 'magazine', param: 'profile' }],
     },
@@ -2967,9 +2957,23 @@ const lower: PartFamily = {
       } else if (params.magazineWell === 'recessed') {
         portY = RECESSED_MAGAZINE_PORT_Y;
       }
+      // A well is cut for the standard of the magazine it is shaped round: an AR well for the one its frame takes,
+      // whatever magazine is offered to it, and a recessed well for the one it is built for. An integral well is shaped
+      // round its cartridges, and a fixed well of any other lower is sized by no magazine, so neither is cut for a
+      // standard.
+      const shapedFor =
+        params.integral === 'yes'
+          ? undefined
+          : section !== undefined
+            ? magazineProfile
+            : layout === 'ar'
+              ? arWellMagazineProfile(params.actionFrame)
+              : undefined;
+      const standard = shapedFor === undefined ? undefined : magazineStandardOf(shapedFor);
       const port: PortDef = {
         id: 'magazine',
         mount: 'magazine',
+        ...(standard === undefined ? {} : { standard }),
         gender: 'female',
         pos: [x, portY, 0],
         normal: [Math.sin(tilt), -Math.cos(tilt), 0],
@@ -3480,76 +3484,19 @@ const barrelLength = (params: Readonly<Record<string, string>>): number => {
   return params.section === 'ak' ? akBarrelLength(sizeClass) : { S: 26, M: 36, L: 46 }[sizeClass];
 };
 
-/** Regular octagon with horizontal and vertical flats at the requested half-width. */
-const octagonalProfile = (flatRadius: number): readonly Vec2[] => {
-  const corner = flatRadius * (Math.SQRT2 - 1);
-  return [
-    [flatRadius, corner],
-    [corner, flatRadius],
-    [-corner, flatRadius],
-    [-flatRadius, corner],
-    [-flatRadius, -corner],
-    [-corner, -flatRadius],
-    [corner, -flatRadius],
-    [flatRadius, -corner],
-  ];
-};
-
-const octagonalPrism = (id: string, flatRadius: number, along: readonly [number, number]): Solid => ({
-  id,
-  kind: 'extruded-polygon',
-  profile: octagonalProfile(flatRadius),
-  axis: 'x',
-  z: along,
-});
-
-const octagonalTubeWalls = (
-  id: string,
-  outerFlatRadius: number,
-  innerFlatRadius: number,
-  along: readonly [number, number],
-): Solid[] => {
-  const outer = octagonalProfile(outerFlatRadius);
-  const inner = octagonalProfile(innerFlatRadius);
-  return outer.map((point, index) => {
-    const next = (index + 1) % outer.length;
-    return {
-      id: `${id}-wall-${index}`,
-      kind: 'extruded-polygon',
-      profile: [point, outer[next]!, inner[next]!, inner[index]!] as const,
-      axis: 'x',
-      z: along,
-    };
-  });
-};
-
 /** Eight-sided extrusion inscribed in its rectangular bounds, with 45-degree corner chamfers. */
 const octagonalRectanglePrism = (
   id: string,
   along: readonly [number, number],
   vertical: readonly [number, number],
   lateral: readonly [number, number],
-): Solid => {
-  const [y0, y1] = vertical;
-  const [z0, z1] = lateral;
-  const chamfer = OCTAGONAL_RECTANGLE_CHAMFER;
-  return {
-    id,
-    kind: 'extruded-polygon',
-    profile: [
-      [y0 + chamfer, z0],
-      [y1 - chamfer, z0],
-      [y1, z0 + chamfer],
-      [y1, z1 - chamfer],
-      [y1 - chamfer, z1],
-      [y0 + chamfer, z1],
-      [y0, z1 - chamfer],
-      [y0, z0 + chamfer],
-    ],
-    axis: 'x',
-    z: along,
-  };
-};
+): Solid => ({
+  id,
+  kind: 'extruded-polygon',
+  profile: octagonalSectionChamfered(vertical, lateral, OCTAGONAL_RECTANGLE_CHAMFER),
+  axis: 'x',
+  z: along,
+});
 
 /** The gas station of a non-AK barrel: the AR's fixed front sight and gas port. */
 const gasStationX = (length: SizeClass): number => {
@@ -3963,7 +3910,7 @@ const frontSight: PartFamily = {
       solids,
       ports: [{ id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: X, up: Y, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, postTop, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -3989,7 +3936,7 @@ const muzzleBead: PartFamily = {
         },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, 1.25, 0], dir: X }],
+      axes: [sightAxis('front', { origin: [0, 1.25, 0], dir: X })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4038,7 +3985,7 @@ const sportingRearSight: PartFamily = {
       ports: [
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
-      axes: [{ kind: 'sight', origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 }],
+      axes: [sightAxis('rear', { origin: [0, height, 0], dir: X, referenceDistanceU: sporter ? eyeReliefU : 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
       keepOuts: [],
     };
@@ -4067,7 +4014,7 @@ const railFrontSight: PartFamily = {
       ],
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, sightAxisY, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4084,7 +4031,9 @@ const railRearSight: PartFamily = {
       solids: railRearSightSolids(apertureU),
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }],
+      axes: [
+        sightAxis('rear', { origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_REAR_SIGHT_EYE_RELIEF_U }),
+      ],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4102,7 +4051,7 @@ const railPeepRearSight: PartFamily = {
       ports: [{ id: 'base', mount: 'rail-top', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true }],
       keepOuts: [],
       axes: [
-        { kind: 'sight', origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U },
+        sightAxis('rear', { origin: [0, apertureU, 0], dir: X, referenceDistanceU: RAIL_PEEP_REAR_SIGHT_EYE_RELIEF_U }),
       ],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
@@ -4122,7 +4071,7 @@ const shroudFrontSight: PartFamily = {
         { id: 'base', mount: 'shroud-sight', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 }],
+      axes: [sightAxis('front', { origin: [0, postTopU, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -4230,7 +4179,7 @@ const akRearSight: PartFamily = {
         { id: 'base', mount: 'sight-block', gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: [],
-      axes: [{ kind: 'sight', origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 }],
+      axes: [sightAxis('rear', { origin: [0, AK_REAR_SIGHT_NOTCH_TOP_U, 0], dir: X, referenceDistanceU: 22 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
@@ -5093,12 +5042,11 @@ const pistolSlide: PartFamily = {
           origin: [PISTOL_SLIDE_REAR + pistolAction.rackGripFromRearU, pistolAction.rackGripHeightU, -slideHalfWidth],
           dir: X,
         },
-        {
-          kind: 'sight',
+        sightAxis('rear', {
           origin: [PISTOL_SLIDE_REAR + PISTOL_IRON_SIGHT_LENGTH_U / 2, 3 + PISTOL_IRON_SIGHT_HEIGHT_U, 0],
           dir: X,
           referenceDistanceU: 4,
-        },
+        }),
       ],
       motion: {
         stages: [{ kind: 'slide', direction: NEG_X, travel: Math.ceil(mmToU(pistolAction.strokeMm) / GRID) * GRID }],
@@ -5364,15 +5312,7 @@ export const magazine: PartFamily = {
   params: {
     boltCalibre: { ...boltCalibreParam, from: [{ port: 'top', param: 'boltCalibre' }] },
     length: { values: ['5-round', '10-round', ...SIZE_CLASSES], default: 'M' },
-    profile: choice(
-      'standard',
-      'smg',
-      'pistol',
-      'ak-curved',
-      'stanag-curved',
-      'stanag-straight',
-      ...Object.keys(MAGAZINE_PROFILES),
-    ),
+    profile: choice(...MAGAZINE_PROFILE_NAMES),
     integral: choice('no', 'yes'),
     wellBody: { values: Object.keys(BOLT_WELL_PROFILES), default: 'standard' },
     orientation: choice(...MAGAZINE_ORIENTATIONS),
@@ -5419,6 +5359,8 @@ export const magazine: PartFamily = {
     } else if (params.profile === 'stanag-curved') {
       curveProfile = CURVED_MAGAZINE_PROFILES.stanag30;
     }
+    // An integral magazine is the cartridge box of its well, which is cut for no magazine standard.
+    const standard = params.integral === 'yes' ? undefined : magazineStandardOf(profile);
     const insertion = params.profile === 'pistol' ? PISTOL_MAGAZINE_INSERTION : MAGAZINE_INSERTION;
     const resolvedInsertion = curveProfile?.seat === 'face' ? 0 : insertion;
     const shape: MagazineShape = {
@@ -5458,6 +5400,7 @@ export const magazine: PartFamily = {
         gunPort({
           id: 'top',
           mount: 'magazine',
+          ...(standard === undefined ? {} : { standard }),
           gender: 'male',
           pos: [0, 0, 0],
           normal: Y,
@@ -5582,8 +5525,8 @@ const m4StockSolids = (len: number): Solid[] => {
   return [
     ...octagonalTubeWalls(
       'buffer-tube',
-      M4_STOCK_GEOMETRY.bufferTubeAcrossFlats / 2,
-      M4_STOCK_GEOMETRY.bufferTubeBoreAcrossFlats / 2,
+      octagonalProfile(M4_STOCK_GEOMETRY.bufferTubeAcrossFlats / 2),
+      octagonalProfile(M4_STOCK_GEOMETRY.bufferTubeBoreAcrossFlats / 2),
       [-len, 0],
     ),
     ...bodySolids,
@@ -5779,7 +5722,7 @@ const sight: PartFamily = {
         { id: 'base', mount: optic.mount.kind, gender: 'male', pos: [0, 0, 0], normal: NEG_Y, up: X, required: true },
       ],
       keepOuts: optic.keepOuts,
-      axes: [{ kind: 'sight', origin: [0, optic.opticalAxisY, 0], dir: X }],
+      axes: [sightAxis('optic', { origin: [0, optic.opticalAxisY, 0], dir: X })],
       tags: [VOXEL_DETAIL],
     };
   },

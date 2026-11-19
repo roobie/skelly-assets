@@ -41,8 +41,7 @@
     "magazine": {
       "family": "magazine",
       "params": {
-        "length": "M",
-        "profile": "stanag-curved"
+        "length": "M"
       }
     },
     "stock": {

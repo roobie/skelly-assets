@@ -13,6 +13,9 @@ import { designText } from './helpers.ts';
 
 const SAMPLES = 20;
 const TOLERANCE = 1e-6;
+// Each case exports a whole design, and the large AR takes over half the default 5 s alone, so beside the rest of the
+// suite it can run past it. The cost is that design's own export, which no shared warm-up removes.
+const EXPORTING = { timeout: 30_000 };
 
 interface OldTimeline {
   readonly durationSimSeconds: number;
@@ -103,7 +106,7 @@ const clockAt = (
   return 0;
 };
 
-describe('an exported action poses its parts as the old axis, stroke and turn did', () => {
+describe('an exported action poses its parts as the old axis, stroke and turn did', EXPORTING, () => {
   it.each(Object.entries(golden as unknown as Record<string, OldAction>))('%s', (design, old) => {
     const exported = exportFileText(designText(design), {
       id: design.replaceAll('-', '_'),

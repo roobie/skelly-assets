@@ -327,12 +327,13 @@ export const AR_FRAME_BY_CALIBRE: Readonly<Record<string, string>> = Object.from
   AR_FRAMES_BY_CALIBRE.map(({ cartridge, frame }) => [cartridge.id, frame.id]),
 );
 
-const magazineProfileOf = (frameId: string): string =>
+/** The magazine profile a frame's well is cut for; a part that names no frame builds to the reference frame. */
+export const arWellMagazineProfile = (frameId: string | undefined): string =>
   authored.find(({ frame }) => frame.id === frameId)?.magazineProfile ?? reference.magazineProfile;
 
 /** The magazine profile each calibre seats: the one its selected frame's well takes. */
 export const AR_MAGAZINE_PROFILE_BY_CALIBRE: Readonly<Record<string, string>> = Object.fromEntries(
-  AR_FRAMES_BY_CALIBRE.map(({ cartridge, frame }) => [cartridge.id, magazineProfileOf(frame.id)]),
+  AR_FRAMES_BY_CALIBRE.map(({ cartridge, frame }) => [cartridge.id, arWellMagazineProfile(frame.id)]),
 );
 
 /** Each frame's traced lower, where its content has one. */

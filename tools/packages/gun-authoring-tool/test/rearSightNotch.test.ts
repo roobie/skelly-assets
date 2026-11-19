@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
+import { sightRoleOf } from '../src/gun/sightAxis.ts';
 import { readGlb } from './glbReader.ts';
 import { itemsKept, loadDesigns, type MutableAssembly, partTriangles, type Triangle } from './helpers.ts';
 
@@ -25,13 +26,10 @@ const ironOnly = (assembly: Assembly): Assembly => {
   return copy;
 };
 
-/** The parts that carry a rear sight, a sight axis that is neither an optic nor a front sight, and whether each is smooth. */
+/** The parts that carry a rear sight, and whether each is smooth. */
 const rearSightParts = (assembly: Assembly): { partId: string; smooth: boolean }[] =>
   [...resolve(assembly, gunDomain).defs.entries()]
-    .filter(([id, def]) => {
-      const { family } = assembly.parts[id]!;
-      return def.axes.some(({ kind }) => kind === 'sight') && family !== 'sight' && !family.includes('front-sight');
-    })
+    .filter(([, def]) => sightRoleOf(def) === 'rear')
     .map(([partId, def]) => ({ partId, smooth: def.tags?.includes(SMOOTH) ?? false }));
 
 /**

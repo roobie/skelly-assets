@@ -14,7 +14,6 @@ local picatinny = { 'rail-top': 'picatinny', 'rail-side': 'picatinny', 'rail-bot
 local bufferFit = 'sourced: https://blog.primaryarms.com/guide/ar15-stock-does-not-fit-buffer-tube-troubleshooting/';
 // The bores a muzzle is cut for, so a rifle suppressor never certifies on a shotgun.
 local bores = { rifled: standard(), smoothbore: standard() };
-local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-mil-spec-buffer-tube.html');
 
 {
   // The job kinds a heavy part waits for, rather than going on in the slot UI.
@@ -24,17 +23,23 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
   // muzzle devices and add-ons) swap by hand; parts held by pins or screws need a tool; parts fitted, pressed or
   // timed into the gun need a bench. A mount type's `standards` are the only ones its ports may declare.
   mounts: {
-    magazine: { swap: slot },
-    // A stock slides on the receiver extension, so the extension's outside diameter defines its standard.
+    // A well is cut for one family of magazines, so a magazine that fits it by size alone is still refused. The large
+    // AR frame's well takes SR-25 magazines, not STANAGs, so it is cut for a standard of its own.
+    magazine: { swap: slot, standards: { 'ar15-magazine': standard(), 'ar10-magazine': standard() } },
+    // A stock slides on the receiver extension, so the extension's outside diameter defines its standard; the carbine
+    // and rifle extensions are made to different diameters, so a stock fits only its own.
     stock: {
       swap: slot,
       standards: {
         'ar-tube-carbine': standard({
-          outerDiameter: tubeDiameter,
+          outerDiameter: dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-mil-spec-buffer-tube.html'),
           bufferLength: dim(82.55, bufferFit + ' (3.25 in)'),
         }),
         'ar-tube-rifle': standard({
-          outerDiameter: tubeDiameter,
+          outerDiameter: dim(
+            28.32,
+            'sourced: https://www.opticsplanet.com/questions/questions-guntec-usa-ar-15-a2-buffer-tube.html (1.115 in)'
+          ),
           bufferLength: dim(150.368, bufferFit + ' (5.92 in)'),
         }),
       },
@@ -67,16 +72,6 @@ local tubeDiameter = dim(29.16, 'sourced: https://mountsplus.com/commercial-vs-m
     'barrel-nut': { swap: job('tool') },
     'handguard-cap': { swap: job('tool') },
     'port-cover': { swap: job('tool') },
-    'sight-height': {
-      swap: job('tool'),
-      standards: {
-        'ar-carry-handle': standard(),
-        // The flat-top front sight base stands 0.040 inch taller than the carry-handle one.
-        'ar-flat-top': standard({
-          baseExtraHeight: dim(1.02, 'sourced: https://www.firearmsnews.com/editorial/the-f-marked-front-sight/78343'),
-        }),
-      },
-    },
 
     barrel: { swap: job('bench') },
     'barrel-seat': { swap: job('bench') },

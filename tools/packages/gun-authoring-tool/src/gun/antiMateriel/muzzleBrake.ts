@@ -1,7 +1,8 @@
 import type { PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { GRID, type SizeClass } from '@skelly/construct/foundation/conventions.ts';
 import type { Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { choice, cls, NEG_X, octagonPrism, sizeParam, X, Y } from './common.ts';
+import { octagonalPrism } from '../octagon.ts';
+import { choice, cls, NEG_X, sizeParam, X, Y } from './common.ts';
 
 /**
  * A large two-chamber arrowhead brake. It threads onto the barrel's muzzle port and widens to two swept
@@ -70,8 +71,8 @@ export const muzzleBrake: PartFamily = {
     return {
       family: 'muzzle-brake',
       solids: [
-        octagonPrism('collar', coreHalf, [0, COLLAR_LENGTH]),
-        octagonPrism('core', coreHalf, [COLLAR_LENGTH, nose]),
+        octagonalPrism('collar', coreHalf, [0, COLLAR_LENGTH]),
+        octagonalPrism('core', coreHalf, [COLLAR_LENGTH, nose]),
         chamber(wing, 'rear-chamber-right', 1, rear),
         chamber(wing, 'front-chamber-right', 1, front),
         chamber(wing, 'rear-chamber-left', -1, rear),

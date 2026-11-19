@@ -20,6 +20,8 @@ import {
 import { boxFromMinMax, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 
+import { octagonalProfile } from './octagon.ts';
+import { sightAxis } from './sightAxis.ts';
 import { mmToU } from './units.ts';
 
 const SCALE = 1.15;
@@ -189,27 +191,11 @@ const keepOut = (id: string, min: Vec3, max: Vec3, allowPort?: string): KeepOut 
   };
 };
 
-const octagonAcrossFlats = (acrossFlats: number, center: readonly [number, number] = [0, 0]): Profile => {
-  const halfFlat = acrossFlats / 2;
-  const inset = halfFlat * (Math.SQRT2 - 1);
-  const outline: readonly Vec2[] = [
-    [halfFlat, inset],
-    [inset, halfFlat],
-    [-inset, halfFlat],
-    [-halfFlat, inset],
-    [-halfFlat, -inset],
-    [-inset, -halfFlat],
-    [inset, -halfFlat],
-    [halfFlat, -inset],
-  ];
-  return outline.map(([x, y]) => [x + center[0], y + center[1]] as const);
-};
+const octagonAcrossFlats = (acrossFlats: number): Profile => octagonalProfile(acrossFlats / 2);
 
-const octagonRadius = (radius: number, centre: readonly [number, number] = [0, 0]): Profile =>
-  Array.from({ length: 8 }, (_, index) => {
-    const angle = Math.PI / 8 + (Math.PI / 4) * index;
-    return [centre[0] + radius * Math.cos(angle), centre[1] + radius * Math.sin(angle)] as const;
-  });
+/** A regular octagon whose corners stand `radius` from `centre`. */
+const octagonRadius = (radius: number, centre?: Vec2): Profile =>
+  octagonalProfile(radius * Math.cos(Math.PI / 8), centre);
 
 const frameSide = (frameSize: string) => frameVariants[frameSize as keyof typeof frameVariants] ?? frameVariants.M;
 const gripLengthFor = (lengthName: string): number =>
@@ -343,32 +329,19 @@ const octagonalBossRing = (): Solid[] => {
       ),
     );
   }
-  const bottomOuter = C.threadBossOuterAcrossFlats.pickedU / 2;
-  const bottomInner = C.threadBossInnerAcrossFlats.pickedU / 2;
-  const outerInset = bottomOuter * (Math.SQRT2 - 1);
-  const innerInset = bottomInner * (Math.SQRT2 - 1);
+  const [bottomOuter, bottomInner] = [outer[3]![0], inner[3]![0]];
   const channelHalf = C.ejectorChannelHalfWidth.pickedU;
   solids.push(
     polySolid(
       'thread-boss-bottom-far',
-      [
-        [-bottomOuter, -outerInset],
-        [-bottomOuter, -channelHalf],
-        [-bottomInner, -channelHalf],
-        [-bottomInner, -innerInset],
-      ],
+      [outer[4]!, [bottomOuter, -channelHalf], [bottomInner, -channelHalf], inner[4]!],
       [0, C.frontBossLength.pickedU],
       'x',
       'revolver-frame',
     ),
     polySolid(
       'thread-boss-bottom-near',
-      [
-        [-bottomOuter, channelHalf],
-        [-bottomOuter, outerInset],
-        [-bottomInner, innerInset],
-        [-bottomInner, channelHalf],
-      ],
+      [[bottomOuter, channelHalf], outer[3]!, inner[3]!, [bottomInner, channelHalf]],
       [0, C.frontBossLength.pickedU],
       'x',
       'revolver-frame',
@@ -680,7 +653,7 @@ const revolverFrame: PartFamily = {
         keepOut('cylinder-gap', [cylinderFrontX, -1, -1], [boreX, 1, 1]),
         keepOut('hammer-travel', [-8.75, -1.5, -1], [-6.25, 1.25, 1], 'hammer'),
       ],
-      axes: [{ kind: 'sight', origin: [-6, 1.75, 0], dir: [1, 0, 0], referenceDistanceU: 4 }],
+      axes: [sightAxis('rear', { origin: [-6, 1.75, 0], dir: [1, 0, 0], referenceDistanceU: 4 })],
     };
   },
 };

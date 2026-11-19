@@ -78,7 +78,8 @@ it('gives every choice of every body family param a mass row that admits it', ()
       unmassed.push(family);
     }
     for (const [name, param] of Object.entries(def.params)) {
-      for (const value of param.values) {
+      // A fault value builds only a broken fixture, which never exports, so it has no mass.
+      for (const value of param.values.filter((value) => !param.fault?.includes(value))) {
         if (!familyRows.some((row) => row.match[name] === undefined || row.match[name] === value)) {
           unmassed.push(`${family}.${name}=${value}`);
         }

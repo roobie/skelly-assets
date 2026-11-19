@@ -1,7 +1,8 @@
 import type { KeepOut, ParamSpec, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { ExtrudedPolygonSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { choice, NEG_X, NEG_Y, octagonPrism, X, Y, Z } from './common.ts';
+import { octagonalPrism } from '../octagon.ts';
+import { choice, NEG_X, NEG_Y, X, Y, Z } from './common.ts';
 
 /**
  * A carry handle in three parts, to the left of the rifle (-Z; the side is fixed, not a param): a trunnion block
@@ -102,7 +103,7 @@ export const handleStrut: PartFamily = {
   build(params): PartDef {
     return {
       family: 'carry-handle',
-      solids: [octagonPrism('strut', STRUT_FLAT_RADIUS, [-STRUT_SINK_BASE, STRUT_LENGTH + STRUT_SINK_TOP])],
+      solids: [octagonalPrism('strut', STRUT_FLAT_RADIUS, [-STRUT_SINK_BASE, STRUT_LENGTH + STRUT_SINK_TOP])],
       ports: [
         { id: 'base', mount: 'handle-strut', gender: 'male', pos: [0, 0, 0], normal: NEG_X, up: Y, required: true },
         // Tilted back by the strut's angle: the bar mounted here comes out level. Stowed, the strut points down and
@@ -137,7 +138,7 @@ export const handleBar: PartFamily = {
     };
     return {
       family: 'carry-handle',
-      solids: [octagonPrism('grip-bar', BAR_FLAT_RADIUS, [-BAR_HALF_LENGTH, BAR_HALF_LENGTH])],
+      solids: [octagonalPrism('grip-bar', BAR_FLAT_RADIUS, [-BAR_HALF_LENGTH, BAR_HALF_LENGTH])],
       ports: [
         {
           id: 'base',
