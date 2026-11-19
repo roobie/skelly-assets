@@ -9,40 +9,59 @@ local box = h.box;
 
 local w = 0.055;  // half the receiver's width
 local underside = 0.15;  // the receiver's underside, where the magazine seats
+local top = 0.33;  // the receiver's top
 local barrelY = 0.245;
+local ridgeTop = 0.35;  // the receiver ridge's crest, which the rear sight stands on
+local sightTop = 0.375;  // the height both sights' tops share
+// The rear sight block, set in from the ridge's back so it stands whole on the ridge, and the notch cut `inset` inside
+// its ends.
+local rearSight = { back: bolt.ridgeBack + 0.04, front: self.back + 0.05, inset: 0.01 };
+// The ejection port on the right side; the charging lever stands out of the bolt at its back end, centred on it.
+local port = { back: 0.03, front: 0.12, bottom: 0.25, top: 0.29, mid: (self.bottom + self.top) / 2 };
 
-// The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
-// back keeps a hand's gap ahead of the trigger guard.
+// The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls.
 local roundLength = 0.11;
 local wall = 0.011;
-local magBack = bolt.guardFront + 0.02;
+local collar = 0.006;  // the magwell's lip behind and ahead of the magazine
+local magBack = bolt.feedBack + collar;
 local magFront = magBack + roundLength + 2 * wall;
 local magTop = underside;
-
-// A bolt seen side on in a window at `z`: a brass body and a pointed accent nose, its base at `x` and its foot at `y`.
-local roundSide(id, x, y, z) = [
-  box(id, 'round', [x, y, z], [x + roundLength - 0.016, y + 0.014, z + 0.0015]),
-  h.prism(id + '-nose', 'accent', 'z', [[x + roundLength - 0.016, y], [x + roundLength - 0.004, y + 0.005], [x + roundLength - 0.004, y + 0.009], [x + roundLength - 0.016, y + 0.014]], z, z + 0.0015),
-];
+local magHalf = 0.045;  // half the magazine's width
+local rimHalf = magHalf + 0.004;  // half the width of the magwell and base plate standing round it
 
 // The metal magwell collar either magazine seats in.
 local magwell = h.prism('magwell', 'metal', 'z', [
-  [magBack - 0.006, magTop], [magBack - 0.006, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + 0.006, 0.136], [magFront + 0.006, magTop],
-], -0.049, 0.049);
+  [magBack - collar, magTop], [magBack - collar, 0.136], [magBack, 0.128], [magFront, 0.128], [magFront + collar, 0.136], [magFront + collar, magTop],
+], -rimHalf, rimHalf);
 
-// A straight box magazine square to the bore, with a bevelled brass base plate and a window in its right side showing
-// the stacked bolts.
+// A straight box magazine square to the bore, with a bevelled brass base plate and a narrow slot cut into its right
+// side, through which the brass of the stacked bolts shows. The slot is built round rather than cut, since pieces only
+// add: the body stops short of the right face, and a skin around the slot makes up the face. The slot's floor is dark
+// and the bolts stand just off it, below the face, so they read as inside the magazine rather than laid on it.
+local magFoot = 0.012;
+// The slot, centred fore and aft on the magazine, and the bolts seen through it, each centred in an equal share of the
+// slot's height.
+local slotSize = { width: 0.028, bottom: 0.032, top: 0.12, depth: 0.008 };
+local slot = slotSize + { back: (magBack + magFront - slotSize.width) / 2, front: self.back + slotSize.width };
+local rounds = { count: 5, thick: 0.012, pitch: (slot.top - slot.bottom) / self.count };
+local slotFloor = magHalf - slot.depth;
+local skinBack = slotFloor - 0.004;
 local boxMagazine = [
-  h.prism('magazine', 'body', 'z', [[magBack, 0.012], [magFront, 0.012], [magFront, magTop], [magBack, magTop]], -0.045, 0.045),
+  h.prism('magazine', 'body', 'z', [[magBack, magFoot], [magFront, magFoot], [magFront, magTop], [magBack, magTop]], -magHalf, skinBack),
+  box('mag-skin-back', 'body', [magBack, magFoot, skinBack], [slot.back, magTop, magHalf]),
+  box('mag-skin-front', 'body', [slot.front, magFoot, skinBack], [magFront, magTop, magHalf]),
+  box('mag-skin-below', 'body', [slot.back, magFoot, skinBack], [slot.front, slot.bottom, magHalf]),
+  box('mag-skin-above', 'body', [slot.back, slot.top, skinBack], [slot.front, magTop, magHalf]),
+  box('mag-slot', 'vent', [slot.back, slot.bottom, skinBack], [slot.front, slot.top, slotFloor]),
   magwell,
   h.prism('mag-base', 'trim', 'z', [
     [magBack - 0.004, 0.004], [magBack, 0], [magFront, 0], [magFront + 0.004, 0.004], [magFront + 0.004, 0.014], [magBack - 0.004, 0.014],
-  ], -0.049, 0.049),
-  box('mag-window', 'vent', [magBack + wall, 0.032, 0.045], [magFront - wall, 0.118, 0.0465]),
-] + std.flattenArrays([
-  roundSide('round-%d' % i, magBack + wall + 0.002, 0.038 + i * 0.02, 0.0455)
-  for i in [0, 1, 2, 3]
-]);
+  ], -rimHalf, rimHalf),
+] + [
+  local y = slot.bottom + i * rounds.pitch + (rounds.pitch - rounds.thick) / 2;
+  box('round-%d' % i, 'round', [slot.back, y, slotFloor], [slot.front, y + rounds.thick, slotFloor + 0.004])
+  for i in std.range(0, rounds.count - 1)
+];
 
 // A rotary drum, a revolver cylinder hung on a neck below the magwell: its chambers lie along the bore around its
 // axle, so it is as long as a box magazine is deep and holds more bolts. It runs a little past the magwell's front so
@@ -69,7 +88,7 @@ local drumMagazine = [
 ];
 
 local carbine(id, massKg, magazine) =
-  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, 0.33, w, { front: 0.15, top: 0.35, halfWidth: 0.038 }) + [
+  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, top, w, { front: 0.15, top: ridgeTop, halfWidth: 0.038 }) + [
     // Barrel shroud, an octagonal slab with vents along both sides and a brass band at its mouth.
     h.prism('shroud', 'body', 'x', [[0.17, -0.045], [0.17, 0.045], [0.19, 0.062], [0.30, 0.062], [0.32, 0.045], [0.32, -0.045], [0.30, -0.062], [0.19, -0.062]], 0.17, 0.38),
     h.prism('shroud-band', 'trim', 'x', [[0.165, -0.049], [0.165, 0.049], [0.187, 0.067], [0.303, 0.067], [0.325, 0.049], [0.325, -0.049], [0.303, -0.067], [0.187, -0.067]], 0.36, 0.38),
@@ -87,15 +106,16 @@ local carbine(id, massKg, magazine) =
     for i in [0, 1, 2]
   ] + [
     box('bore', 'vent', [0.522, barrelY - 0.017, -0.017], [0.524, barrelY + 0.017, 0.017]),
-  ] + magazine + bolt.grip(0.155) + bolt.stock(0.33, 0.045) + [
-    // Sights: a rear block on the ridge and a front post over the shroud.
-    box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, 0.375, 0.02]),
-    box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, 0.3755, 0.004]),
-    box('front-post', 'metal', [0.33, 0.32, -0.007], [0.35, 0.36, 0.007]),
-    // Ejection port and a chunky charging lever on the right side.
-    box('ejection', 'vent', [0.03, 0.25, w], [0.12, 0.29, w + 0.002]),
-    box('lever', 'metal', [-0.15, 0.27, w], [-0.11, 0.29, w + 0.03]),
-    box('lever-knob', 'metal', [-0.16, 0.263, w + 0.022], [-0.10, 0.297, w + 0.036]),
+  ] + magazine + bolt.grip(0.155) + bolt.stock(top, 0.045) + [
+    // Sights: a rear block on the ridge and a front post over the shroud, a fin tapering from a broad foot to a narrow
+    // tip level with the rear block's top, so the two line up.
+    box('rear-sight', 'metal', [rearSight.back, ridgeTop, -0.02], [rearSight.front, sightTop, 0.02]),
+    box('rear-notch', 'vent', [rearSight.back + rearSight.inset, sightTop - 0.01, -0.004], [rearSight.front - rearSight.inset, sightTop + 0.0005, 0.004]),
+    h.prism('front-post', 'metal', 'z', [[0.32, 0.316], [0.36, 0.316], [0.349, sightTop], [0.341, sightTop]], -0.01, 0.01),
+    // Ejection port on the right side, with a chunky charging lever standing out of the bolt at its back end.
+    box('ejection', 'vent', [port.back, port.bottom, w], [port.front, port.top, w + 0.002]),
+    box('lever', 'metal', [port.back, port.mid - 0.01, w], [port.back + 0.04, port.mid + 0.01, w + 0.03]),
+    box('lever-knob', 'metal', [port.back - 0.01, port.mid - 0.017, w + 0.022], [port.back + 0.05, port.mid + 0.017, w + 0.036]),
   ] + [
     box('rivet-%d-%s' % [p[0], s], 'trim', [p[1] - 0.007, p[2] - 0.007, if s == 'r' then w else -w - 0.003], [p[1] + 0.007, p[2] + 0.007, if s == 'r' then w + 0.003 else -w])
     for p in [[0, -0.15, 0.18], [1, -0.15, 0.30], [2, 0.14, 0.18], [3, 0.14, 0.30]]

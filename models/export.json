@@ -3,7 +3,8 @@
     "bolt_carbine",
     "bolt_carbine_drum",
     "bolt_scattergun",
-    "bolt_plasma_caster"
+    "bolt_plasma_caster",
+    "bolt_laser_gun"
   ],
   "skelly.armour": [
     "helmet_trooper",

@@ -2,13 +2,35 @@ local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
 local box = h.box;
 
 // The body the bolt guns share: a bevelled slab receiver, the pistol grip and trigger group, the skeleton stock, the
-// paints and the row around them. One source keeps the three guns one family, so a change to the shared body reaches
-// all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x, the axis `gripOn` names.
+// energy guns' power cell, the paints and the row around them. One source keeps the guns one family, so a change to
+// the shared body reaches all of them; each gun's file keeps only what sets it apart. Laid out with the muzzle at +x,
+// the axis `gripOn` names.
 {
   // Where the receiver's back meets the stock.
   joint: -0.18,
-  // The x at which the trigger guard's front ends, which anything hung ahead of the grip must clear.
-  guardFront: 0.005,
+  // Where the receiver's top ridge starts, named so what stands on the ridge is placed from it.
+  ridgeBack: -0.16,
+  // The trigger group is sized for a trooper in thick armoured gauntlets, whose finger is about twice a bare one's
+  // thickness. `front` is the x at which the guard ends, which anything hung ahead of the grip must clear; `opening`
+  // is the height of the gap under the trigger's root, `bar` the guard's thickness. The trigger blade stands `gap`
+  // ahead of the grip, leaning its `sweep` forward down its `length`, so the finger has the guard's length ahead of it.
+  guard: { front: 0.02, opening: 0.06, bar: 0.012, halfWidth: 0.011 },
+  trigger: { gap: 0.012, width: 0.02, length: 0.045, sweep: 0.006, halfWidth: 0.007 },
+  // The x at which a feed hung under the receiver, a magazine's well or a cell's cap, starts: a small clearance ahead
+  // of the guard, so the two read as separate parts while the feed stays close ahead of the grip.
+  feedBack: $.guard.front + 0.006,
+  // How far a feed hung under the receiver rises up into it, so no seam shows between them.
+  feedSeat: 0.01,
+  // The guns' voxel size, the smallest step that still reads.
+  grain: 0.004,
+  // How far a band stands proud of the section it wraps: one voxel, so it always reads.
+  bandProud: $.grain,
+
+  // The x of the `count` parts `length` long spread from `from` to `to`, each centred in an equal share, so a row of
+  // them reads as evenly spaced whatever its length.
+  spread(count, from, to, length):
+    local pitch = (to - from) / count;
+    [from + i * pitch + (pitch - length) / 2 for i in std.range(0, count - 1)],
 
   // A section from `y0` to `y1`, `w` its half width, its top edges cut back by `top` and its bottom edges by
   // `bottom`, as the [y, z] outline of a prism along x. Cut edges keep the chunky slabs from reading as raw boxes.
@@ -17,51 +39,103 @@ local box = h.box;
     [y1, w - top], [y1, -w + top], [y1 - top, -w], [y0 + bottom, -w],
   ],
 
+  // A band from `x0` to `x1` round the section `y0` to `y1`, `w` its half width: the section grown by `bandProud` all
+  // round, its edges cut back by `top` and `bottom`.
+  band(id, slot, x0, x1, y0, y1, w, top, bottom=top):
+    h.prism(id, slot, 'x', $.bevel(y0 - $.bandProud, y1 + $.bandProud, w + $.bandProud, top, bottom), x0, x1),
+
   // The receiver from the stock joint to `front`, `y0` to `y1`, `w` its half width, with a top ridge running to
   // `ridge.front`, rising to `ridge.top`, `ridge.halfWidth` its half width, and a painted band round it.
   receiver(front, y0, y1, w, ridge): [
     h.prism('receiver', 'body', 'x', $.bevel(y0, y1, w, 0.016, 0.01), $.joint, front),
-    h.prism('ridge', 'body', 'x', [[y1, -ridge.halfWidth], [y1, ridge.halfWidth], [ridge.top, ridge.halfWidth - 0.008], [ridge.top, -ridge.halfWidth + 0.008]], -0.16, ridge.front),
-    h.prism('receiver-band', 'accent', 'x', $.bevel(y0 - 0.003, y1 + 0.003, w + 0.003, 0.018, 0.012), -0.04, 0.0),
+    h.prism('ridge', 'body', 'x', [[y1, -ridge.halfWidth], [y1, ridge.halfWidth], [ridge.top, ridge.halfWidth - 0.008], [ridge.top, -ridge.halfWidth + 0.008]], $.ridgeBack, ridge.front),
+    $.band('receiver-band', 'accent', -0.04, 0.0, y0, y1, w, 0.018, 0.012),
   ],
 
   // The pistol grip with a flared cap, trigger guard and trigger, hung from height `top`, at or just inside the
   // receiver's underside.
-  grip(top): [
-    h.prism('grip', 'grip', 'z', [[-0.13, top], [-0.07, top], [-0.10, 0.03], [-0.155, 0.03]], -0.026, 0.026),
-    h.prism('grip-cap', 'body', 'z', [[-0.16, 0.034], [-0.096, 0.034], [-0.093, 0.024], [-0.1, 0.016], [-0.158, 0.016], [-0.164, 0.024]], -0.03, 0.03),
-    box('guard', 'metal', [-0.075, top - 0.045, -0.008], [0.005, top - 0.033, 0.008]),
-    box('guard-front', 'metal', [-0.005, top - 0.045, -0.008], [$.guardFront, top, 0.008]),
-    box('trigger', 'metal', [-0.045, top - 0.033, -0.005], [-0.033, top - 0.002, 0.005]),
-  ],
+  grip(top):
+    local front = -0.07, g = $.guard, t = $.trigger;
+    // The grip's foot, from its `back` corner to its `front` one, which the grip's front rakes back to.
+    local foot = { back: -0.155, front: -0.10, y: 0.03 };
+    // The x of the grip's front at height `y`.
+    local frontAt(y) = foot.front + (front - foot.front) * (y - foot.y) / (top - foot.y);
+    // The cap's outline from its top down, each row's height against the foot's and how far it stands out past the
+    // foot's back and front corners: it flares widest across its middle.
+    local capRows = [
+      { y: 0.004, back: 0.005, front: 0.004 },
+      { y: -0.006, back: 0.009, front: 0.007 },
+      { y: -0.014, back: 0.003, front: 0 },
+    ];
+    local capPoint(row, end) = if end == 'back' then [foot.back - row.back, foot.y + row.y] else [foot.front + row.front, foot.y + row.y];
+    local floor = top - g.opening, bottom = floor - g.bar, blade = front + t.gap;
+    [
+      h.prism('grip', 'grip', 'z', [[-0.13, top], [front, top], [foot.front, foot.y], [foot.back, foot.y]], -0.026, 0.026),
+      h.prism('grip-cap', 'body', 'z', [capPoint(r, 'front') for r in capRows] + [capPoint(r, 'back') for r in std.reverse(capRows)], -0.03, 0.03),
+      // The guard's bottom bar runs back into the grip, so it reads as one with it.
+      box('guard', 'metal', [frontAt(bottom) - g.bar, bottom, -g.halfWidth], [g.front, floor, g.halfWidth]),
+      box('guard-front', 'metal', [g.front - g.bar, floor, -g.halfWidth], [g.front, top, g.halfWidth]),
+      h.prism('trigger', 'metal', 'z', [
+        [blade, top], [blade + t.width, top], [blade + t.width + t.sweep, top - t.length], [blade + t.sweep, top - t.length],
+      ], -t.halfWidth, t.halfWidth),
+    ],
+
+  // The energy guns' power cell, hung under a receiver whose underside is at `underside`, with its brass foot from
+  // `capBack` and its body to `front`: an octagonal block with a glowing window down each side. Slot `glow` must be in
+  // the gun's finish.
+  cell(front, underside, capBack=$.feedBack):
+    local half = 0.055, foot = 0.02, top = underside + $.feedSeat, lip = 0.005, back = capBack + lip;
+    // The windows keep an even margin of the cell's body above and below them.
+    local margin = 0.03, windows = [foot + margin, top - margin];
+    // The cell's plan, `half` its half width from `x0` to `x1`, its corners cut by `cut`. On y, a prism's outline
+    // is [z, x].
+    local plan(half, x0, x1, cut) = [
+      [-half, x0 + cut], [-half + cut, x0], [half - cut, x0], [half, x0 + cut],
+      [half, x1 - cut], [half - cut, x1], [-half + cut, x1], [-half, x1 - cut],
+    ];
+    [
+      h.prism('cell', 'body', 'y', plan(half, back, front, 0.012), foot, top),
+      h.prism('cell-cap', 'trim', 'y', plan(half + 0.003, capBack, front + lip, 0.014), foot - 0.01, foot + 0.01),
+      box('cell-window-l', 'glow', [back + 0.02, windows[0], -half - 0.0025], [front - 0.02, windows[1], -half]),
+      box('cell-window-r', 'glow', [back + 0.02, windows[0], half], [front - 0.02, windows[1], half + 0.0025]),
+    ],
+
+  // The stock's size against its outline, so the stock is resized in one place without redrawing it.
+  stockScale: 0.9,
+  // How far the comb's top sits below the receiver's top, so the receiver stands proud over the stock on every gun.
+  stockDrop: 0.015,
 
   // A skeleton stock from the stock joint to a butt plate and rubber pad: a wrist, a raised comb with rubber cheek
   // pads, a toe strut along the stock's underside, and the open window between them, its sides raked as the grip is.
-  // `top` is the height of the wrist's top where it meets the receiver, which the comb rises just above for the cheek;
-  // `w` is the stock's half width.
-  stock(top, w):
+  // `receiverTop` is the height of the receiver's top, which sets the comb's; `w` is the outline's half width.
+  stock(receiverTop, w):
+    // The outline is drawn about the comb's top over the stock joint, x running back from the joint and y up from the
+    // comb, and placed by `at`.
+    local at(x, y) = [$.joint + x * $.stockScale, receiverTop - $.stockDrop + y * $.stockScale];
+    local outline(points) = [at(p[0], p[1]) for p in points];
+    local across(z) = z * $.stockScale;
     // The underside, one straight line from the wrist to the toe.
-    local under(x) = 0.16 + (x - $.joint) * 0.24;
-    // A window side through x at height 0.2, raked as the grip, from the underside up to height `y`.
-    local side(x, y) =
-      local foot = x - 0.05 * 0.2;
-      { foot: [foot, under(foot)], head: [x + (y - 0.2) * 0.2, y] };
+    local under(x) = -0.182 + x * 0.24;
+    // A window side from the underside at `foot` up to height `y`, raked as the grip.
+    local side(foot, y) = { foot: [foot, under(foot)], head: [foot + (y - under(foot)) * 0.2, y] };
     // The point of a side at height `y`.
-    local at(s, y) = [s.foot[0] + (s.head[0] - s.foot[0]) * (y - s.foot[1]) / (s.head[1] - s.foot[1]), y];
-    local comb = top + 0.012, heel = -0.385, strut = 0.04, combFoot = 0.255;
-    local front = side(-0.245, top - 0.005), back = side(-0.335, comb);
+    local on(s, y) = [s.foot[0] + (s.head[0] - s.foot[0]) * (y - s.foot[1]) / (s.head[1] - s.foot[1]), y];
+    local wrist = -0.017, heel = -0.205, strut = 0.04, combFoot = -0.087;
+    local front = side(-0.075, wrist), back = side(-0.165, 0);
+    local slab(id, slot, points, half) = h.prism(id, slot, 'z', outline(points), across(-half), across(half));
     [
-      h.prism('stock-wrist', 'body', 'z', [[$.joint, 0.16], [$.joint, top - 0.005], front.head, front.foot], -w, w),
-      h.prism('comb', 'body', 'z', [at(front, combFoot), front.head, [front.head[0] - 0.03, comb], back.head, at(back, combFoot)], -w, w),
-      h.prism('toe', 'body', 'z', [front.foot, at(front, front.foot[1] + strut), at(back, back.foot[1] + strut), back.foot], -w, w),
-      h.prism('butt', 'body', 'z', [back.foot, back.head, [heel, comb - 0.004], [heel, under(heel)]], -w, w),
-      h.prism('butt-plate', 'trim', 'z', [[heel, under(heel) - 0.006], [heel, comb + 0.002], [heel - 0.007, comb + 0.002], [heel - 0.007, under(heel) - 0.006]], -w - 0.003, w + 0.003),
-      h.prism('butt-pad', 'grip', 'z', [
-        [heel - 0.007, under(heel) - 0.004], [heel - 0.007, comb], [heel - 0.02, comb - 0.004],
-        [heel - 0.03, comb - 0.02], [heel - 0.03, under(heel) + 0.012], [heel - 0.02, under(heel) - 0.002],
-      ], -w - 0.001, w + 0.001),
+      slab('stock-wrist', 'body', [[0, under(0)], [0, wrist], front.head, front.foot], w),
+      slab('comb', 'body', [on(front, combFoot), front.head, [front.head[0] - 0.03, 0], back.head, on(back, combFoot)], w),
+      slab('toe', 'body', [front.foot, on(front, front.foot[1] + strut), on(back, back.foot[1] + strut), back.foot], w),
+      slab('butt', 'body', [back.foot, back.head, [heel, -0.004], [heel, under(heel)]], w),
+      slab('butt-plate', 'trim', [[heel, under(heel) - 0.006], [heel, 0.002], [heel - 0.007, 0.002], [heel - 0.007, under(heel) - 0.006]], w + 0.003),
+      slab('butt-pad', 'grip', [
+        [heel - 0.007, under(heel) - 0.004], [heel - 0.007, 0], [heel - 0.02, -0.004],
+        [heel - 0.03, -0.02], [heel - 0.03, under(heel) + 0.012], [heel - 0.02, under(heel) - 0.002],
+      ], w + 0.001),
     ] + [
-      box('cheek-pad-%s' % s, 'grip', [-0.33, 0.27, if s == 'r' then w else -w - 0.003], [-0.28, top + 0.004, if s == 'r' then w + 0.003 else -w])
+      local face = if s == 'r' then [w, w + 0.003] else [-w - 0.003, -w];
+      box('cheek-pad-%s' % s, 'grip', at(-0.15, -0.072) + [across(face[0])], at(-0.10, -0.008) + [across(face[1])])
       for s in ['l', 'r']
     ],
 
@@ -76,6 +150,6 @@ local box = h.box;
       grip: 'rubber-black',
     } + finish) + h.gripOn(id, 'grip') + {
       taxonomy: { category: 'weapons', tags: { weapon: [weapon], setting: ['sci-fi'] } },
-      voxelGrain: 0.004,
+      voxelGrain: $.grain,
     },
 }
