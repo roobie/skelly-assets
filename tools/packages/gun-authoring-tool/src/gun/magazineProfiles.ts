@@ -1,5 +1,4 @@
 import {
-  array,
   finite,
   getDotPath,
   type InferOutput,
@@ -28,7 +27,7 @@ const ProfileSchema = strictObject({
 const ContentSchema = strictObject({
   well: strictObject({ heightU: Units, clearanceU: Units }),
   stanag30: strictObject({ depthU: Units, widthU: Units }),
-  wellStandards: record(Text, pipe(array(Text), nonEmpty())),
+  standards: record(Text, Text),
   profiles: record(Text, ProfileSchema),
 });
 
@@ -55,7 +54,7 @@ export const STANAG30_BODY = MAGAZINE_CONTENT.stanag30;
 
 /** The magazine standard a profile is cut for, if it is cut for one. */
 export const magazineStandardOf = (profile: string): string | undefined =>
-  Object.entries(MAGAZINE_CONTENT.wellStandards).find(([, profiles]) => profiles.includes(profile))?.[0];
+  Object.hasOwn(MAGAZINE_CONTENT.standards, profile) ? MAGAZINE_CONTENT.standards[profile] : undefined;
 
 /** Photo-measured straight box magazines, by profile name. */
 export const MAGAZINE_PROFILES = MAGAZINE_CONTENT.profiles;

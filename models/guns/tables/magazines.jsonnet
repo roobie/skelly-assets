@@ -10,9 +10,11 @@
   // The body of the 30-round STANAG magazine (the stanag-curved profile at L length), rounded to the grid: 65 mm deep,
   // and as wide as the 20-round's sourced 24.8 mm.
   stanag30: { depthU: 5.5, widthU: 2.25 },
-  // The magazine profiles cut for each magazine standard, by the standard's name.
-  wellStandards: {
-    'ar15-magazine': ['stanag-curved', 'stanag-straight'],
+  // The magazine standard each profile is cut for, by profile, so no profile can be cut for two; a profile left out is
+  // cut for none.
+  standards: {
+    'stanag-curved': 'ar15-magazine',
+    'stanag-straight': 'ar15-magazine',
   },
   profiles: {
     // The 20-round 7.62×51 SR-25 magazine for the large AR frame, traced from the same photo as that frame's
