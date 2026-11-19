@@ -32,9 +32,9 @@ export interface Stop {
 }
 
 /**
- * A part's motion from rest to its design stop, in one frame and unit: rigid stages run one after another, each through
- * its `share` of the clock, from 0 at rest to 1 at the stop. Every stage is given in the part's rest frame, and the
- * first carries the rest. `stops` name places on that clock, in order, the first at 0 and the last at 1.
+ * A part's motion from rest to the end of its travel, in one frame and unit: rigid stages run one after another, each
+ * through its `share` of the clock, from 0 at rest to 1 at the end of travel. Every stage is given in the part's rest
+ * frame, and the first carries the rest. `stops` name places on that clock, in order, the first at 0 and the last at 1.
  */
 export interface Motion {
   readonly stages: readonly MotionStage[];
@@ -45,100 +45,6 @@ export interface Motion {
 export type StageMove = {
   [Kind in MotionStage['kind']]: Omit<Extract<MotionStage, { kind: Kind }>, 'share'>;
 }[MotionStage['kind']];
-
-const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const cross = (a: Vec3, b: Vec3): Vec3 => [
-  a[1] * b[2] - a[2] * b[1],
-  a[2] * b[0] - a[0] * b[2],
-  a[0] * b[1] - a[1] * b[0],
-];
-const length = (a: Vec3) => Math.hypot(a[0], a[1], a[2]);
-const unit = (a: Vec3): Vec3 => {
-  const size = length(a);
-  return [a[0] / size, a[1] / size, a[2] / size];
-};
-
-/** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
-const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
-  if (stage.kind === 'slide') {
-    return stage.travel;
-  }
-  const u = unit(sub(stage.axis.to, stage.axis.from));
-  const radius = Math.max(...hull.map((point) => length(cross(u, sub(point, stage.axis.from)))));
-  return (Math.abs(stage.angle) * Math.PI * radius) / 180;
-};
-
-/**
- * The stages that run `moves` in order, each through the share of the clock its distance is of theirs together, so the
- * part keeps one pace from rest to stop. `hull` is the corners of the part's rest bounds.
- */
-export const shareStages = (moves: readonly StageMove[], hull: readonly Vec3[]): MotionStage[] => {
-  const distances = moves.map((move) => stageDistance(move, hull));
-  const total = distances.reduce((sum, distance) => sum + distance, 0);
-  if (!(total > 0)) {
-    throw new Error('the motion moves no point of the part, so it has no clock to share');
-  }
-  return moves.map((move, i) => ({ ...move, share: distances[i]! / total }));
-};
-
-/** How far each stage has moved from rest to its stop at `clock`, from 0 to 1: a stage waits for the ones before it. */
-const stageFractions = ({ stages }: Motion, clock: number): number[] => {
-  let start = 0;
-  return stages.map(({ share }) => {
-    const fraction = Math.min(1, Math.max(0, (clock - start) / share));
-    start += share;
-    return fraction;
-  });
-};
-
-/** Where one stage carries a point once it has moved `fraction` of the way from rest to its stop. */
-const poseStage = (stage: MotionStage, point: Vec3, fraction: number): Vec3 => {
-  if (stage.kind === 'slide') {
-    const step = stage.travel * fraction;
-    return [
-      point[0] + stage.direction[0] * step,
-      point[1] + stage.direction[1] * step,
-      point[2] + stage.direction[2] * step,
-    ];
-  }
-  const u = unit(sub(stage.axis.to, stage.axis.from));
-  const r = sub(point, stage.axis.from);
-  const turn = (stage.angle * fraction * Math.PI) / 180;
-  const [c, s] = [Math.cos(turn), Math.sin(turn)];
-  // Rodrigues' rotation of the offset from the axis.
-  const across = cross(u, r);
-  const kept = dot(u, r) * (1 - c);
-  return [0, 1, 2].map((i) => stage.axis.from[i]! + r[i]! * c + across[i]! * s + u[i]! * kept) as unknown as Vec3;
-};
-
-/**
- * Whether a stowing slide hides a point of the part at `clock`: the point, carried by the stages inside the slide and
- * then by the slide itself, lies past the slide's `stow` plane, which stays where it is as the slide moves.
- */
-export const isStowed = (motion: Motion, point: Vec3, clock = 1): boolean => {
-  const fractions = stageFractions(motion, clock);
-  let at = point;
-  for (let i = motion.stages.length - 1; i >= 0; i--) {
-    const stage = motion.stages[i]!;
-    at = poseStage(stage, at, fractions[i]!);
-    if (stage.kind === 'slide' && stage.stow !== undefined && dot(at, stage.direction) > stage.stow) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * Where a point of the part lies at `clock`, from 0 at rest to 1 at the stop. In time, the first stage runs first:
- * each runs linearly through its share of the clock once the stages before it have finished. In space, the first
- * stage is the outermost transform: every stage is given in the part's rest frame and carries the stages after it,
- * so a point is put through the last stage's transform first and the first stage's last.
- */
-export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => {
-  const fractions = stageFractions(motion, clock);
-  return motion.stages.reduceRight((at, stage, i) => poseStage(stage, at, fractions[i]!), point);
-};
 
 /** A rigid change of frame, or a reflection: a point goes to `rotation` times the point, then `shift`. */
 export interface Rigid {
@@ -155,6 +61,119 @@ export const IDENTITY_RIGID: Rigid = {
   shift: [0, 0, 0],
 };
 
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const cross = (a: Vec3, b: Vec3): Vec3 => [
+  a[1] * b[2] - a[2] * b[1],
+  a[2] * b[0] - a[0] * b[2],
+  a[0] * b[1] - a[1] * b[0],
+];
+const length = (a: Vec3) => Math.hypot(a[0], a[1], a[2]);
+const unit = (a: Vec3): Vec3 => {
+  const size = length(a);
+  return [a[0] / size, a[1] / size, a[2] / size];
+};
+
+const turned = ({ rotation }: Rigid, v: Vec3): Vec3 => [dot(rotation[0], v), dot(rotation[1], v), dot(rotation[2], v)];
+
+/** Where `rigid` carries a point. */
+export const applyRigid = (rigid: Rigid, point: Vec3): Vec3 => add(turned(rigid, point), rigid.shift);
+
+/** `a` after `b`: the change of frame that puts a point through `b` first. */
+export const composeRigid = (a: Rigid, b: Rigid): Rigid => {
+  const columns = [0, 1, 2].map((j): Vec3 => [b.rotation[0][j]!, b.rotation[1][j]!, b.rotation[2][j]!]);
+  const row = (r: Vec3): Vec3 => [dot(r, columns[0]!), dot(r, columns[1]!), dot(r, columns[2]!)];
+  return { rotation: [row(a.rotation[0]), row(a.rotation[1]), row(a.rotation[2])], shift: applyRigid(a, b.shift) };
+};
+
+/** How far a stage carries the part's furthest point: a slide its travel, a hinge the arc that `hull`'s point furthest from its axis sweeps. */
+const stageDistance = (stage: StageMove, hull: readonly Vec3[]): number => {
+  if (stage.kind === 'slide') {
+    return stage.travel;
+  }
+  const u = unit(sub(stage.axis.to, stage.axis.from));
+  const radius = Math.max(...hull.map((point) => length(cross(u, sub(point, stage.axis.from)))));
+  return (Math.abs(stage.angle) * Math.PI * radius) / 180;
+};
+
+/**
+ * The stages that run `moves` in order, each through the share of the clock its distance is of theirs together, so the
+ * part keeps one pace from rest to the end of travel. `hull` is the corners of the part's rest bounds.
+ */
+export const shareStages = (moves: readonly StageMove[], hull: readonly Vec3[]): MotionStage[] => {
+  const distances = moves.map((move) => stageDistance(move, hull));
+  const total = distances.reduce((sum, distance) => sum + distance, 0);
+  if (!(total > 0)) {
+    throw new Error('the motion moves no point of the part, so it has no clock to share');
+  }
+  return moves.map((move, i) => ({ ...move, share: distances[i]! / total }));
+};
+
+/** How far each stage has moved from rest to its end at `clock`, from 0 to 1: a stage waits for the ones before it. */
+const stageFractions = ({ stages }: Motion, clock: number): number[] => {
+  let start = 0;
+  return stages.map(({ share }) => {
+    const fraction = Math.min(1, Math.max(0, (clock - start) / share));
+    start += share;
+    return fraction;
+  });
+};
+
+/** What one stage does to the part once it has moved `fraction` of the way from rest to its end. */
+export const stagePose = (stage: MotionStage, fraction: number): Rigid => {
+  if (stage.kind === 'slide') {
+    const step = stage.travel * fraction;
+    return {
+      rotation: IDENTITY_RIGID.rotation,
+      shift: [stage.direction[0] * step, stage.direction[1] * step, stage.direction[2] * step],
+    };
+  }
+  const [ux, uy, uz] = unit(sub(stage.axis.to, stage.axis.from));
+  const turn = (stage.angle * fraction * Math.PI) / 180;
+  const [c, s, t] = [Math.cos(turn), Math.sin(turn), 1 - Math.cos(turn)];
+  const rotation: Rigid['rotation'] = [
+    [c + ux * ux * t, ux * uy * t - uz * s, ux * uz * t + uy * s],
+    [uy * ux * t + uz * s, c + uy * uy * t, uy * uz * t - ux * s],
+    [uz * ux * t - uy * s, uz * uy * t + ux * s, c + uz * uz * t],
+  ];
+  // The turn is about the axis, so the origin it carries is the axis point's own displacement.
+  return { rotation, shift: sub(stage.axis.from, turned({ rotation, shift: IDENTITY_RIGID.shift }, stage.axis.from)) };
+};
+
+/**
+ * What a motion does to the part at `clock`, from 0 at rest to 1 at the end of travel, as one change of frame. In time,
+ * the first stage runs first: each runs linearly through its share of the clock once the stages before it have
+ * finished. In space, the first stage is the outermost: every stage is given in the part's rest frame and carries the
+ * stages after it. From stage `first` on, the stages outside it are left out.
+ */
+export const poseAt = (motion: Motion, clock: number, first = 0): Rigid => {
+  const fractions = stageFractions(motion, clock);
+  return motion.stages
+    .slice(first)
+    .reduceRight((pose, stage, i) => composeRigid(stagePose(stage, fractions[first + i]!), pose), IDENTITY_RIGID);
+};
+
+/** Where a point of the part lies at `clock`, from 0 at rest to 1 at the end of travel. */
+export const posePoint = (motion: Motion, point: Vec3, clock = 1): Vec3 => applyRigid(poseAt(motion, clock), point);
+
+/**
+ * Whether a stowing slide hides a point of the part at `clock`: the point, carried by the stages inside the slide and
+ * then by the slide itself, lies past the slide's `stow` plane, which stays where it is as the slide moves.
+ */
+export const isStowed = (motion: Motion, point: Vec3, clock = 1): boolean => {
+  const fractions = stageFractions(motion, clock);
+  let at = point;
+  for (let i = motion.stages.length - 1; i >= 0; i--) {
+    const stage = motion.stages[i]!;
+    at = applyRigid(stagePose(stage, fractions[i]!), at);
+    if (stage.kind === 'slide' && stage.stow !== undefined && dot(at, stage.direction) > stage.stow) {
+      return true;
+    }
+  }
+  return false;
+};
+
 /** The reflection across the plane through the origin that is across `axis`: 0 is x, 1 is y, 2 is z. */
 export const reflection = (axis: 0 | 1 | 2): Rigid => ({
   rotation: IDENTITY_RIGID.rotation.map((row, i) =>
@@ -162,8 +181,6 @@ export const reflection = (axis: 0 | 1 | 2): Rigid => ({
   ) as unknown as Rigid['rotation'],
   shift: IDENTITY_RIGID.shift,
 });
-
-const turned = ({ rotation }: Rigid, v: Vec3): Vec3 => [dot(rotation[0], v), dot(rotation[1], v), dot(rotation[2], v)];
 
 /** A reflection reverses which way a turn goes; a rotation keeps it. */
 const handedness = ({ rotation: [a, b, c] }: Rigid) => (dot(cross(a, b), c) < 0 ? -1 : 1);
@@ -175,10 +192,7 @@ const handedness = ({ rotation: [a, b, c] }: Rigid) => (dot(cross(a, b), c) < 0 
  * slide's new direction.
  */
 export const transformMotion = (motion: Motion, rigid: Rigid, scale = 1): Motion => {
-  const place = (point: Vec3): Vec3 => {
-    const [x, y, z] = turned(rigid, [point[0] * scale, point[1] * scale, point[2] * scale]);
-    return [x + rigid.shift[0], y + rigid.shift[1], z + rigid.shift[2]];
-  };
+  const place = (point: Vec3): Vec3 => applyRigid(rigid, [point[0] * scale, point[1] * scale, point[2] * scale]);
   const sense = handedness(rigid);
   return {
     ...motion,

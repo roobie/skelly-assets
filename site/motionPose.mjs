@@ -4,9 +4,14 @@
 // three.js. A motion is `@skelly/motion`'s `Motion`; a pose is one rigid motion as twelve numbers: a row-major 3x3 turn, then
 // the shift. The reason for the model is in docs/decisions/0015-motion-as-content.md.
 /** @import { Vec3 } from '../tools/packages/construct/src/foundation/math.ts' */
-/** @import { Motion, MotionStage } from '../tools/packages/motion/src/motion.ts' */
+/** @import { Motion, Rigid } from '../tools/packages/motion/src/motion.ts' */
 
-import { IDENTITY_RIGID, reflection, transformMotion } from '../tools/packages/motion/src/motion.ts';
+import {
+  IDENTITY_RIGID,
+  poseAt as motionPoseAt,
+  reflection,
+  transformMotion,
+} from '../tools/packages/motion/src/motion.ts';
 import { MIRRORED_AXIS } from './modelFrame.mjs';
 
 /** @typedef {readonly [number, number, number, number, number, number, number, number, number, number, number, number]} Pose */
@@ -78,50 +83,11 @@ export const invert = (m) => [
 ];
 
 /**
- * One stage of a motion once it has run `fraction` of its way.
- * @param {MotionStage} stage
- * @param {number} fraction
+ * A change of frame as a pose, the one place the showcase and the swing check leave `@skelly/motion`'s `Rigid`.
+ * @param {Rigid} rigid
  * @returns {Pose}
  */
-function stageMotion(stage, fraction) {
-  if (stage.kind === 'slide') {
-    const step = stage.travel * fraction;
-    const [dx, dy, dz] = stage.direction;
-    return [1, 0, 0, 0, 1, 0, 0, 0, 1, dx * step, dy * step, dz * step];
-  }
-  const { from, to } = stage.axis;
-  const length = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
-  const [ux, uy, uz] = [(to[0] - from[0]) / length, (to[1] - from[1]) / length, (to[2] - from[2]) / length];
-  const turn = (stage.angle * fraction * Math.PI) / 180;
-  const [c, s, t] = [Math.cos(turn), Math.sin(turn), 1 - Math.cos(turn)];
-  /** @type {readonly [Vec3, Vec3, Vec3]} */
-  const rows = [
-    [c + ux * ux * t, ux * uy * t - uz * s, ux * uz * t + uy * s],
-    [uy * ux * t + uz * s, c + uy * uy * t, uy * uz * t - ux * s],
-    [uz * ux * t - uy * s, uz * uy * t + ux * s, c + uz * uz * t],
-  ];
-  /** @type {(row: Vec3, at: number) => number} */
-  const shifted = ([r0, r1, r2], at) => at - (r0 * from[0] + r1 * from[1] + r2 * from[2]);
-  const [x, y, z] = rows;
-  return [...x, ...y, ...z, shifted(x, from[0]), shifted(y, from[1]), shifted(z, from[2])];
-}
-
-/**
- * Where one motion has put its part at `clock`, from 0 at rest to 1 at the stop, as one rigid
- * motion. Stages run in turn through their shares of the clock, and the first is the outermost, as `posePoint`. From
- * stage `first` on, the stages outside it are left out.
- * @param {Motion} motion
- * @param {number} clock
- */
-function stagesAt({ stages }, clock, first = 0) {
-  const fractions = stages.map((stage, i) => {
-    const start = stages.slice(0, i).reduce((sum, { share }) => sum + share, 0);
-    return { stage, fraction: Math.min(1, Math.max(0, (clock - start) / stage.share)) };
-  });
-  return fractions
-    .slice(first)
-    .reduceRight((pose, { stage, fraction }) => compose(stageMotion(stage, fraction), pose), IDENTITY);
-}
+const poseOf = ({ rotation: [x, y, z], shift }) => [...x, ...y, ...z, ...shift];
 
 /**
  * Where a body's `layers` have put it at `clock`: its own motion first, then each carrier's, so a rider's motion is
@@ -132,7 +98,10 @@ function stagesAt({ stages }, clock, first = 0) {
  * @returns {Pose}
  */
 export const poseAt = (layers, clock, first = 0) =>
-  layers.reduceRight((inner, motion, i) => compose(stagesAt(motion, clock, i === 0 ? first : 0), inner), IDENTITY);
+  layers.reduceRight(
+    (inner, motion, i) => compose(poseOf(motionPoseAt(motion, clock, i === 0 ? first : 0)), inner),
+    IDENTITY,
+  );
 
 /**
  * The stow planes of what a body's `layers` move, one for each stowing slide: what the slide and the stages inside it

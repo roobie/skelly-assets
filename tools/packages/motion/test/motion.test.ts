@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyRigid,
+  composeRigid,
   IDENTITY_RIGID,
   isStowed,
   type Motion,
+  type MotionStage,
+  poseAt,
   posePoint,
   type Rigid,
   reflection,
   shareStages,
+  stagePose,
   transformMotion,
   type Vec3,
 } from '../src/motion.ts';
@@ -61,6 +66,38 @@ describe('shareStages', () => {
     expect(() =>
       shareStages([{ kind: 'hinge', axis: { from: [0, 0, 0], to: [0, 1, 0] }, angle: 30 }], [[0, 0.5, 0]]),
     ).toThrow(/no clock/);
+  });
+});
+
+describe('a staged motion', () => {
+  const [hinge, slide] = door().stages as [MotionStage, MotionStage];
+  const alone = (stage: MotionStage): Motion => ({ stops: STOPS, stages: [{ ...stage, share: 1 }] });
+  const [outer, inner] = [alone(hinge), alone(slide)];
+
+  it('keeps a stage at rest until the stages before it have finished', () => {
+    expectClose(posePoint(door(), leaf, hinge.share / 2), posePoint(outer, leaf, 0.5));
+    expectClose(posePoint(door(), leaf, hinge.share), posePoint(outer, leaf));
+    expectClose(posePoint(door(), leaf, hinge.share + slide.share / 2), posePoint(outer, posePoint(inner, leaf, 0.5)));
+  });
+
+  it('poses a stage as the turn or step it has made so far', () => {
+    expectClose(applyRigid(stagePose(hinge, 0.5), leaf), posePoint(outer, leaf, 0.5));
+    expectClose(applyRigid(stagePose(slide, 0.5), leaf), posePoint(inner, leaf, 0.5));
+    expect(stagePose(slide, 0)).toEqual(IDENTITY_RIGID);
+  });
+
+  it('composes the poses so the later one is applied to the point first', () => {
+    const [a, b] = [stagePose(hinge, 1), stagePose(slide, 1)];
+    expectClose(applyRigid(composeRigid(a, b), leaf), applyRigid(a, applyRigid(b, leaf)));
+  });
+
+  it('poses the whole part at a clock, leaving out the stages before `first`', () => {
+    for (const clock of [0, 0.3, 0.6, 0.8, 1]) {
+      expectClose(applyRigid(poseAt(door(), clock), leaf), posePoint(door(), leaf, clock));
+    }
+    const innerOnly: Motion = { ...door(), stages: [slide] };
+    expectClose(applyRigid(poseAt(door(), 0.8, 1), leaf), posePoint(innerOnly, leaf, 0.8 - hinge.share));
+    expect(poseAt(door(), 0.4, 1).shift).toEqual(IDENTITY_RIGID.shift);
   });
 });
 

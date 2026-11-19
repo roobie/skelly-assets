@@ -132,7 +132,7 @@ const ShareSchema = pipe(
 );
 
 /**
- * The named places on a motion's clock, in order from rest at 0 to the stop at 1, so a reader finds a place by what it
+ * The named places on a motion's clock, in order from rest at 0 to the end of travel at 1, so a reader finds a place by what it
  * is called rather than by a number it would have to guess.
  */
 export const StopsSchema = pipe(
@@ -144,7 +144,7 @@ export const StopsSchema = pipe(
 );
 
 /**
- * A part's motion from rest to its design stop, in the model frame and metres; the type, and what the stages and the
+ * A part's motion from rest to the end of its travel, in the model frame and metres; the type, and what the stages and the
  * stops mean, is `@skelly/motion`, `Motion`. Each stage's share is above 0 and they sum to 1.
  */
 export const MotionSchema = strictObject({
