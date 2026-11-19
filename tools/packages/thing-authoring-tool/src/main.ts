@@ -4,9 +4,10 @@ import { buildLayers, disposeGroup } from '@skelly/tool-ui/scene';
 import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Group } from 'three';
 import { buildItem, itemPalette, loadItem } from './catalogue.ts';
-import { exportItem, loadThingRecipeFiles } from './exports.ts';
-import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowResult, type RowView } from './live.ts';
-import { catalogue, type Entry, entries } from './viewerContent.ts';
+import { catalogue } from './content.ts';
+import { exportItem, loadThingRecipe } from './exports.ts';
+import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowResult, type RowView, viewKey } from './live.ts';
+import { type Entry, entries } from './viewerContent.ts';
 
 // The selected row is the page's address, so a reload or a shared link lands on the same row.
 const ITEM_PARAM = 'item';
@@ -20,6 +21,20 @@ let drawn: Group | undefined;
 let framed: string | undefined;
 
 const message = (failure: unknown) => (failure instanceof Error ? failure.message : String(failure));
+
+// Another row's model and error must not stand under this one's name while it waits to be evaluated.
+const undraw = () => {
+  if (drawn) {
+    preview.scene.remove(drawn);
+    disposeGroup(drawn);
+    drawn = undefined;
+  }
+};
+const clear = () => {
+  undraw();
+  compileError.hidden = true;
+  drawError.hidden = true;
+};
 
 const draw = ({ id, item, row }: Entry) => {
   try {
@@ -36,10 +51,7 @@ const draw = ({ id, item, row }: Entry) => {
       {},
       catalogue.facets,
     );
-    if (drawn) {
-      preview.scene.remove(drawn);
-      disposeGroup(drawn);
-    }
+    undraw();
     drawn = layers.solids;
     for (const unused of [layers.axes, layers.ports, layers.keepOuts]) {
       disposeGroup(unused);
@@ -60,12 +72,13 @@ const viewOf = ({ item, row }: Entry): RowView => ({ item: item.id, row: row?.id
 // The entry as the server evaluated it, loaded the way the catalogue and the recipes load theirs.
 const evaluated = (entry: Entry, result: Exclude<RowResult, { error: string }>): Entry => {
   const item = loadItem(result.item, catalogue);
-  const [row] = result.row === undefined ? [] : loadThingRecipeFiles([[result.row]], { ...catalogue, items: [item] });
+  const [row] = result.row === undefined ? [] : loadThingRecipe([result.row], { ...catalogue, items: [item] });
   return { id: entry.id, label: entry.label, item, ...(row ? { row } : {}) };
 };
 
 const open = () => {
   const entry = selected();
+  clear();
   history.replaceState(undefined, '', `?${new URLSearchParams({ [ITEM_PARAM]: entry.id })}`);
   // Under the dev server the Jsonnet may have changed since the content was built, so the row is drawn only once the
   // server has evaluated it; a built page has nothing newer.
@@ -81,7 +94,7 @@ open();
 
 import.meta.hot?.on(LIVE_ROW, ({ view, result }: RowMessage) => {
   const entry = selected();
-  if (JSON.stringify(view) !== JSON.stringify(viewOf(entry))) return;
+  if (viewKey(view) !== viewKey(viewOf(entry))) return;
   try {
     if ('error' in result) throw new Error(result.error);
     const fresh = evaluated(entry, result);

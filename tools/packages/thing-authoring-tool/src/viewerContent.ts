@@ -3,8 +3,6 @@
 import { catalogue } from './content.ts';
 import { loadThingRecipeFiles } from './exports.ts';
 
-export { catalogue };
-
 const rows = loadThingRecipeFiles(
   Object.values(import.meta.glob('../../../../models/recipes/*.json', { eager: true, import: 'default' })),
   catalogue,
