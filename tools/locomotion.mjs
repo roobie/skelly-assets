@@ -7,12 +7,11 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { clampJointAngles, sub } from '../site/kinematics.mjs';
 import { compilePose } from '../site/poseFile.mjs';
-import { dollRig, readRigContent } from './dollRig.mjs';
+import { DOLL_MOTIONS, dollRig, readRigContent } from './dollRig.mjs';
 import { readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { r4, standing } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
-import { DOLL_MOTIONS } from './wields.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const DEG = Math.PI / 180;
@@ -22,6 +21,7 @@ export const readLocomotion = (root = repo) =>
 
 const boneOf = (rig, id) => rig.bones.find((bone) => bone.id === id);
 const length = (v) => Math.hypot(...v);
+const rounded = (angles) => Object.fromEntries(Object.entries(angles).map(([id, turn]) => [id, r4(turn)]));
 
 /**
  * The leg `thigh` hangs with its knee bent `bendDeg`: `upright`, the thigh's flex that stands the ankle under the hip,
@@ -55,6 +55,15 @@ function leanAngles(rig, bones, leanDeg) {
   return angles;
 }
 
+// Where side `side` (the index of `gait.bones`' left-then-right lists) is in its own loop at `phase`: a leg plants at 0.
+const sidePhase = (phase, side) => (phase + Math.PI * side) % (2 * Math.PI);
+
+/**
+ * How far the arm of side `side` swings forward of hanging at `phase` of `walk`, in degrees: against its leg, by the
+ * walk's share of the thigh's swing.
+ */
+export const armSwing = (walk, phase, side) => Math.cos(sidePhase(phase, side)) * walk.swingDeg * walk.armShare;
+
 /**
  * The rig's angles for `walk` at `phase` (radians through one loop): each leg planted through half the loop, its
  * hip-to-ankle line turning so the ankle runs back at a steady pace, then swinging forward with the knee lifting it
@@ -66,13 +75,13 @@ export function gaitAngles(rig, gait, walk, phase) {
   const angles = leanAngles(rig, lean, walk.leanDeg);
   const sway = Math.sin(walk.swingDeg * DEG);
   legs.forEach((thigh, side) => {
-    const at = (phase + Math.PI * side) % (2 * Math.PI);
+    const at = sidePhase(phase, side);
     const planted = at < Math.PI;
     // Where the ankle stands from forward (-1) to back (+1) of the hip: at a steady pace while planted.
     const back = planted ? (at * 2) / Math.PI - 1 : Math.cos(at - Math.PI);
     const tilt = angles[boneOf(rig, thigh).parent]?.[0] ?? 0;
     const { upright } = legAt(rig, thigh, walk.bendDeg);
-    const forward = Math.cos(at) * walk.swingDeg * walk.armShare;
+    const forward = armSwing(walk, phase, side);
     angles[thigh] = [upright - Math.asin(back * sway) / DEG + tilt, 0, 0];
     angles[knees[side]] = [walk.bendDeg + (planted ? 0 : Math.sin(at - Math.PI) * walk.kneeDeg), 0, 0];
     angles[arms[side]] = [-forward, 0, 0];
@@ -81,17 +90,38 @@ export function gaitAngles(rig, gait, walk, phase) {
   return angles;
 }
 
+/** Where frame `k` of `walk`'s loop falls, in radians: the frames stand evenly through one loop. */
+export const framePhase = (walk, k) => (2 * Math.PI * k) / walk.frames;
+
+/** Frame `k` of `walk`'s loop as a pose file gives its angles, rounded as pose files are written. */
+export const walkAngles = (rig, gait, walk, k) => rounded(gaitAngles(rig, gait, walk, framePhase(walk, k)));
+
 /**
- * A pose compiled for a clip: its frame, and the joints it asked past the rig's limits. A foot held level (`standing`)
- * stops where its ankle does, as the gait means it to, so only what the pose asked counts.
+ * What a clip of `walk` says beside its frames: a loop in place, both feet once over the frames, the ground it covers
+ * and the pace it was drawn for. Every clip of a walk, empty-handed or holding something, says the same, since its legs
+ * are the walk's.
  */
+export const walkLoop = (rig, gait, walk) => ({
+  kind: 'pose',
+  loop: true,
+  strideMetres: r4([strideMetres(rig, gait, walk)])[0],
+  cycles: 1,
+  speedMetresPerSecond: walk.speedMetresPerSecond,
+});
+
+/**
+ * Of the joints compiling pose file `file` held at the rig's limits (`compilePose`'s `report.clamped`), those the file
+ * asked past them. A foot held level (`standing`) stops where its ankle does, as the gait means it to: the crouch walk's
+ * planted foot lifts at its ankle's limit.
+ */
+export const askedClamps = (file, clamped) =>
+  clamped.filter(({ bone }) => !(file.level?.includes(bone) && !file.angles?.[bone]));
+
+/** A pose compiled for a clip: its frame, and the joints it asked past the rig's limits (`askedClamps`). */
 function compiled(rig, file) {
   const { frame, report } = compilePose(rig, file);
-  const levelled = (bone) => file.level?.includes(bone) && !file.angles[bone];
-  return { frame, clamped: report.clamped.filter(({ bone }) => !levelled(bone)) };
+  return { frame, clamped: askedClamps(file, report.clamped) };
 }
-
-const rounded = (angles) => Object.fromEntries(Object.entries(angles).map(([id, turn]) => [id, r4(turn)]));
 
 /**
  * The clips of `gait` (readLocomotion) on `rig`, by name: `stand`, `idle` (the stand with the gait's sway, as an
@@ -114,19 +144,9 @@ export function locomotionClips(rig, gait) {
   clips.idle = { base: stand.frame, motion: gait.stand.motion };
   for (const [name, walk] of Object.entries(gait.walks)) {
     const poses = Array.from({ length: walk.frames }, (_, k) =>
-      compiled(rig, {
-        ...standing(rig),
-        angles: rounded(gaitAngles(rig, gait, walk, (2 * Math.PI * k) / walk.frames)),
-      }),
+      compiled(rig, { ...standing(rig), angles: walkAngles(rig, gait, walk, k) }),
     );
-    const loop = {
-      kind: 'pose',
-      loop: true,
-      strideMetres: r4([strideMetres(rig, gait, walk)])[0],
-      cycles: 1,
-      speedMetresPerSecond: walk.speedMetresPerSecond,
-    };
-    add(name, loop, poses);
+    add(name, walkLoop(rig, gait, walk), poses);
   }
   for (const [name, angles] of Object.entries(gait.poses))
     add(name, { kind: 'pose', loop: false }, [compiled(rig, { rig: standing(rig).rig, ground: true, angles })]);
