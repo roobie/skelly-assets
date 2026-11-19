@@ -56,9 +56,10 @@ local battery = {
   rake: 0.035,  // how far its front's foot stands back of its top
   pad: 0.01,  // the rubber pad's depth
   contact: 0.012,  // the contact plate's depth, below the receiver's underside
-  // The charge strip: `count` segments in a dark window from `y0` to `y1`, the window inset `margin` inside the faces.
+  // The charge strip: `count` segments in a dark window from `y0` to `y1`, the window inset `margin` inside the faces
+  // and the segments `inset` inside the window's top and bottom, so the dark frames them all round.
   // Its segments are two voxels wide with two between them, so each reads apart at the guns' grain.
-  charge: { count: 6, y0: 0.06, y1: 0.095, margin: 0.012, segment: 0.008 },
+  charge: { count: 6, y0: 0.06, y1: 0.095, margin: 0.012, inset: 0.005, segment: 0.008 },
   latch: { y0: 0.105, y1: 0.125, half: 0.03, proud: 0.012 },
   // Rubber ridges across the raked front, below the latch, where the off hand pulls the battery free.
   ridges: { count: 3, y0: 0.03, y1: 0.095, thick: 0.012, proud: 0.004 },
@@ -76,9 +77,21 @@ local lens = triangle(underside + 0.045, 0.33, 0.035, 0.3, 0.006) + { depth: 0.0
 local muzzleX = shroud.front + emitter.length;
 // The shroud's length that carries the fittings: from the collar to its front band.
 local section = { back: shroud.back, front: shroud.front - bandLength };
+// The fins over the shroud's ridge, spread along the whole section: each a rib of the shroud's outline above `y`, grown
+// out by `height` all round, so it stands from `bottom` up to `height` over the ridge.
+local fins = {
+  count: 7,
+  thick: 0.014,
+  height: 0.02,
+  y: 0.315,
+  bottom: self.y - self.height,
+  x: bolt.spread(self.count, section.back, section.front, self.thick),
+  outline: grown([[self.y, -shroud.zAt(self.y)], [self.y, shroud.zAt(self.y)], [top, shroud.zAt(top)], [top, -shroud.zAt(top)]], self.height),
+};
 // A coolant canister low along each of the shroud's sides, half sunk into it, its brass end caps `cap` long, the back
 // one against the collar; `z` is how far its axis stands out. Its coolant line, `pipe` wide, rises up the side a gap
-// behind the section's front to below the fins, and both the line's foot and its riser stand `reach` out from the side.
+// behind the section's front to `clear` below the fins, so it reads as feeding in under them rather than into them;
+// both the line's foot and its riser stand `reach` out from the side.
 local canister = {
   cap: 0.01,
   y: 0.185,
@@ -87,7 +100,8 @@ local canister = {
   z: shroud.zAt(self.y) + self.r - self.sink,
   pipe: 0.022,
   reach: self.sink + self.pipe / 2,
-  inlet: 0.285,
+  clear: 0.01,
+  inlet: fins.bottom - self.clear,
   riser: section.front - gap - self.pipe,
   x0: section.back + self.cap,
   x1: self.riser - self.cap,
@@ -104,9 +118,6 @@ local strap = {
 // The light slits down each side between the canister and the fins, spread from the collar to a gap behind the risers.
 // They start a voxel above the straps, so the glow never runs into them.
 local slits = { count: 6, width: 0.01, y0: strap.top + bolt.grain, y1: 0.28, x: bolt.spread(self.count, section.back, canister.riser - gap, self.width) };
-// The fins over the shroud's ridge, spread along the whole section: each a rib `height` proud of the shroud from `y`
-// up over the ridge.
-local fins = { count: 7, thick: 0.014, height: 0.02, y: 0.315, x: bolt.spread(self.count, section.back, section.front, self.thick) };
 // The dark grooves round the emitter's head, the first `inset` ahead of the shroud.
 local grooves = { count: 2, inset: 0.03, pitch: 0.035, width: 0.01 };
 // Which way each side faces.
@@ -141,22 +152,21 @@ local batteryPieces =
     onFront('battery-latch', 'accent', b.latch.y0, b.latch.y1, b.latch.proud, b.latch.half),
   ] + std.flattenArrays([
     [onSide(b.half, 'battery-charge-%s' % s, 'vent', s, [window.x0, c.y0], [window.x1, c.y1], -weld, 0.002)] + [
-      onSide(b.half, 'battery-charge-%d-%s' % [i, s], 'glow', s, [segments[i], c.y0 + 0.005], [segments[i] + c.segment, c.y1 - 0.005], 0, 0.003)
+      onSide(b.half, 'battery-charge-%d-%s' % [i, s], 'glow', s, [segments[i], c.y0 + c.inset], [segments[i] + c.segment, c.y1 - c.inset], 0, 0.003)
       for i in std.range(0, c.count - 1)
     ]
     for s in std.objectFields(sides)
   ]);
 local canisterPart(id, slot, x, length, r, z) =
   h.turned(id, slot, 'x', [[0, 0], [0, r], [length, r], [length, 0]], [x, canister.y, z]) + { sides: 8 };
-// The fins' rib: the shroud's outline above `fins.y`, grown out by their height.
-local finOutline = grown([[fins.y, -shroud.zAt(fins.y)], [fins.y, shroud.zAt(fins.y)], [top, shroud.zAt(top)], [top, -shroud.zAt(top)]], fins.height);
 [
-  bolt.gun('bolt_laser_gun', 12.5, 'energy', bolt.receiver(receiverFront, underside, top, w, { front: receiverFront - bandLength, top: 0.37, halfWidth: 0.045 }) + [
-    // The collar closing the receiver, its front face the step down to the shroud.
+  // The receiver's ridge rises to the fins' crest, so the fins carry it on over the shroud.
+  bolt.gun('bolt_laser_gun', 12.5, 'energy', bolt.receiver(receiverFront, underside, top, w, { front: receiverFront - bandLength, top: top + fins.height, halfWidth: 0.045 }) + [
+    // The collar hides the step down from the square receiver to the narrower shroud.
     bolt.band('collar', 'trim', receiverFront - bandLength, receiverFront, underside, top, w, 0.018, 0.012),
     h.prism('shroud', 'body', 'x', shroud.outline, shroud.back, shroud.front),
     h.prism('front-band', 'trim', 'x', grown(shroud.outline, bolt.bandProud), shroud.front - bandLength, shroud.front),
-    // The emitter: a steel head with two dark cooling grooves, and the lens.
+    // The emitter's head steps in again from the shroud, so the front narrows on to the lens the beam leaves from.
     h.prism('emitter', 'metal', 'x', emitter.outline, shroud.front, muzzleX - lens.proud),
     h.prism('lens', 'glow', 'x', lens.outline, muzzleX - lens.depth, muzzleX),
   ] + [
@@ -168,7 +178,7 @@ local finOutline = grown([[fins.y, -shroud.zAt(fins.y)], [fins.y, shroud.zAt(fin
     for i in std.range(0, slits.count - 1)
     for s in std.objectFields(sides)
   ] + [
-    h.prism('fin-%d' % i, 'metal', 'x', finOutline, fins.x[i], fins.x[i] + fins.thick)
+    h.prism('fin-%d' % i, 'metal', 'x', fins.outline,fins.x[i], fins.x[i] + fins.thick)
     for i in std.range(0, fins.count - 1)
   ] + std.flattenArrays([
     local z = sides[s] * canister.z, low = canister.y - canister.pipe / 2;
