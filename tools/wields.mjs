@@ -112,17 +112,16 @@ export function heldWeapon(entry, mesh) {
 
 /**
  * The socket a hand closes on, in the weapon's file: `seat` metres along the handle from the grip point toward the
- * working end, the palm on the handle's surface on the side `into` (held axes) points away from, the thumb toward the
- * working end. The handle runs along the held +z, so the surface is found by depth from the axis.
+ * working end, on the handle's axis, the palm facing it from the side `into` (held axes) points away from, the thumb
+ * toward the working end. A game's figure holds an item with its grip point on the palm's face, so the doll's palm
+ * meets the axis rather than the handle's surface, and a clip baked on the doll seats the weapon in the figure's fist.
  */
 export function gripSocket(weapon, { seat, into }) {
   const toFile = transpose(weapon.held);
   const axis = mulMV(toFile, [0, 0, 1]);
   const centre = add(weapon.at, scale(axis, seat));
-  const across = mulMV(toFile, normalize([into[0], into[1], 0]));
-  const radius = -signedDepth(weapon.solid, centre);
-  if (!(radius > 0)) throw new Error(`grip seat ${seat} lies off the handle`);
-  return { at: r4(sub(centre, scale(across, radius))), into: r4(across), axis: r4(axis) };
+  if (!(signedDepth(weapon.solid, centre) < 0)) throw new Error(`grip seat ${seat} lies off the handle`);
+  return { at: r4(centre), into: r4(mulMV(toFile, normalize([into[0], into[1], 0]))), axis: r4(axis) };
 }
 
 /** The anchor `from` of the weapon (`heldWeapon`'s `anchors`) moved by `offset` (held axes, metres), in its file. */
@@ -249,7 +248,7 @@ export function wieldWeapons(wields, entryOf, meshOf) {
   });
 }
 
-/** Every wield's pose files by name: each stance, and each strike's key frames (`ENDS`). */
+/** Every wield's pose files by name: each stance, and each strike's key frames (`strikeMoves`). */
 export function wieldPoses(rig, wields, weapons) {
   const poses = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
@@ -257,7 +256,7 @@ export function wieldPoses(rig, wields, weapons) {
     for (const [stance, key] of Object.entries(cls.stances))
       poses[clipName(name, 'stance', stance)] = poseOf(rig, cls, key, weapon, sockets);
     for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
-      for (const key of Object.values(ENDS))
+      for (const { key } of strikeMoves(wields, spec).filter(({ key }) => key))
         poses[keyName(clipName(name, 'strike', strike), key)] = poseOf(rig, cls, spec[key], weapon, sockets);
     }
   }
@@ -267,23 +266,40 @@ export function wieldPoses(rig, wields, weapons) {
 // Each phase's easing, the wields' own unless the strike names one.
 const easings = (wields, strike) => PHASES.map((phase) => strike.easing?.[phase] ?? wields.easing[phase]);
 
-/** Each strike as a sequence of its pose files for the pose page: guard, the three keys and back, at their seconds. */
+/**
+ * The key frames a strike moves through from its guard, in turn, each `{ key, at, easing }`: the key's name in the
+ * strike, none for the guard; where it falls, as a share of the strike's span; and how the move into it eases. Each
+ * phase but the last ends in its key (`ENDS`) and the recovery in the guard. A strike that names a `drawn` key recovers
+ * through it, halfway through the recovery: from the follow's rest it gathers speed into the drawn key and slows from
+ * there into the guard, so a guard held high takes the weapon back by where the strike draws it rather than swinging
+ * its end out past the hit.
+ */
+export function strikeMoves(wields, spec) {
+  const eases = easings(wields, spec);
+  return [
+    { at: 0 },
+    ...strikePhases(spec).flatMap(({ phase, from, to }, i) =>
+      phase === 'recovery' && spec.drawn
+        ? [
+            { key: 'drawn', at: (from + to) / 2, easing: 'ease-in' },
+            { at: to, easing: 'ease-out' },
+          ]
+        : [{ key: ENDS[phase], at: to, easing: eases[i] }],
+    ),
+  ];
+}
+
+/** Each strike as a sequence of its pose files for the pose page: guard, its keys (`strikeMoves`) and back. */
 export function wieldSequences(wields) {
   const sequences = {};
   for (const [name, cls] of Object.entries(wields.classes)) {
     for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
       const clip = clipName(name, 'strike', strike);
       const guard = clipName(name, 'stance', 'guard');
-      const phases = strikePhases(spec);
+      const moves = strikeMoves(wields, spec);
       sequences[clip] = {
-        keys: [
-          { fixture: guard, at: 0 },
-          ...phases.map(({ phase, to }) => ({
-            fixture: ENDS[phase] ? keyName(clip, ENDS[phase]) : guard,
-            at: to * spec.seconds,
-          })),
-        ],
-        easing: easings(wields, spec),
+        keys: moves.map(({ key, at }) => ({ fixture: key ? keyName(clip, key) : guard, at: at * spec.seconds })),
+        easing: moves.slice(1).map(({ easing }) => easing),
       };
     }
   }
@@ -365,15 +381,21 @@ function seatOn(rig, frame, item, lead) {
   return { r: mulMM(back, item.r), t: mulMV(back, sub(item.t, hand.t)) };
 }
 
+// A rounded quaternion scaled back to unit length.
+const unitQuat = (q) => {
+  const n = Math.hypot(...q);
+  return q.map((c) => c / n);
+};
+
 /**
  * The seat as a game reads it: the leading hand's bone, and the weapon's grip point and held axes (working end +z, up
  * +y) in that bone's rest frame, so the bone's transform carries them and a game seats any weapon of the class by its
- * own grip.
+ * own grip. The turn is unit length as written, so a game checks it as strictly as any other rotation.
  */
 const heldSeat = (seat, weapon, lead) => ({
   bone: lead,
   at: r4(add(mulMV(seat.r, weapon.at), seat.t)),
-  turn: r4(mat3ToQuat(mulMM(seat.r, transpose(weapon.held)))),
+  turn: unitQuat(r4(mat3ToQuat(mulMM(seat.r, transpose(weapon.held))))),
 });
 
 /**
@@ -462,15 +484,14 @@ function classClips(rig, wields, gait, name, cls, carried, meshOf) {
   }
   for (const [strike, spec] of Object.entries(cls.strikes ?? {})) {
     const clip = clipName(name, 'strike', strike);
-    const keys = [guard, ...Object.values(ENDS).map((key) => compileKey(spec[key])), guard];
-    const phases = strikePhases(spec);
-    const eases = easings(wields, spec);
+    const moves = strikeMoves(wields, spec);
+    const keys = moves.map(({ key }) => (key ? compileKey(spec[key]) : guard));
     const count = Math.max(2, Math.round(spec.seconds * wields.framesPerSecond) + 1);
     const baked = Array.from({ length: count }, (_, k) => {
       const at = k / (count - 1);
-      const i = phases.findLastIndex(({ from }) => from <= at);
-      const { from, to } = phases[i];
-      return between(keys[i], keys[i + 1], easingOf(eases, i)((at - from) / (to - from)));
+      const i = moves.slice(0, -1).findLastIndex(({ at: from }) => from <= at);
+      const [from, to] = [moves[i].at, moves[i + 1].at];
+      return between(keys[i], keys[i + 1], easingOf(moves[i + 1].easing)((at - from) / (to - from)));
     });
     clips[clip] = {
       kind: 'pose',
@@ -751,7 +772,7 @@ export function wieldProblems(reports) {
 // presets a pose file names.
 const AUTHORING = new Set(['clips', 'eye', 'presets']);
 const MELEE_DOC =
-  "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; a class wielding with one hand swings its arms as there, the weapon riding the leading hand, while a two-hand class keeps both hands on its weapon as its idle holds it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip.";
+  "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; a class wielding with one hand swings its arms as there, the weapon riding the leading hand, while a two-hand class keeps both hands on its weapon as its idle holds it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's frame, so a game seats any weapon of the class by its own grip; each hand on the weapon holds its handle's axis on the palm's face beside the arm's grip anchor, where a figure's fist holds an item.";
 const GUNS_DOC =
   "The doll's held gun clips by name, <gun>_stance_<idle|guard> and <gun>_<walk>_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. <gun>_<walk>_<stance>, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk in that stance, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's and both hands on the gun as in the stance, the gun tipped down by its stance's share of the walk's forward lean; at idle the gun sways a little with the stride, at guard the bore stays ahead and does not sway. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's frame, so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
 /**

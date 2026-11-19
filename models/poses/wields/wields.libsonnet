@@ -13,7 +13,8 @@
 //
 // A strike runs guard, `windup`, `hit`, `follow` and back to guard. Its phases (tools/wields.mjs, `PHASES`) take
 // `shares` of its `seconds`: wind-up to the windup key, strike to the hit, follow-through to the follow key and recovery
-// back to guard. The hit falls where the strike phase ends, so a game scales the clip to its own cooldown and keeps the
+// back to guard, through a `drawn` key halfway if the strike names one, where blending the follow straight into the
+// guard would swing the weapon's end out past the hit. The hit falls where the strike phase ends, so a game scales the clip to its own cooldown and keeps the
 // hit where it lands. A blow speeds up from the wind-up into the hit and slows after it, so the strike eases in and the
 // follow-through eases out, meeting at speed; the wind-up and recovery move from rest to rest.
 //
