@@ -2,8 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { applyPoint } from '@skelly/construct/foundation/math.ts';
-import { distanceWorld, localSolidBounds, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
@@ -15,7 +15,15 @@ import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
 import { isTriggerBlade } from '../src/gun/roundedTriggerGuard.ts';
 import { readGlb } from './glbReader.ts';
-import { itemsKept, loadDesignAssembly, loadDesigns, loadFixtures, variant } from './helpers.ts';
+import {
+  itemsKept,
+  LINE_HALF_THICKNESS,
+  loadDesignAssembly,
+  loadDesigns,
+  loadFixtures,
+  segmentBox,
+  variant,
+} from './helpers.ts';
 
 const FOLDER = join(import.meta.dirname, '../src/gun/arModular');
 const AR15 = AR15_FRAME.table;
@@ -218,6 +226,49 @@ describe('modular AR', () => {
     expect(rules).not.toContain('ar15-rear-sight');
     expect(rules).not.toContain('ar15-sight-height');
   });
+
+  // The profile is only what the post stands on, so every profile must keep every height's post on its rear sight.
+  const sightBaseFamily = gunDomain.families['ar15-front-sight-base']!;
+  const sightMatrix = sightBaseFamily.params.profile!.values.flatMap((profile) =>
+    sightBaseFamily.params.height!.values.flatMap((height) =>
+      [
+        { design: 'ar15-rifle-a2', rearHeight: 'carry-handle' },
+        { design: 'ar15-carbine-front-sight', rearHeight: 'flat-top' },
+      ].map((rear) => ({ profile, height, ...rear })),
+    ),
+  );
+  it.each(sightMatrix)(
+    'stands a $profile $height base on $design only at its own height, its line clear to the post',
+    ({ profile, height, design, rearHeight }) => {
+      const assembly = loadDesignAssembly(design);
+      assembly.parts['front-sight-base']!.params = { height, profile };
+      const { resolved, issues } = validate(assembly, gunDomain);
+      expect(issues.filter(({ rule }) => rule === 'ar15-sight-height')).toHaveLength(height === rearHeight ? 0 : 1);
+      if (height !== rearHeight) {
+        return;
+      }
+      const sightOf = (part: string) => {
+        const axis = resolved.defs.get(part)!.axes.find(({ kind }) => kind === 'sight')!;
+        return applyPoint(resolved.placed.get(part)!, axis.origin);
+      };
+      const rearPart = design === 'ar15-rifle-a2' ? 'upper' : 'rear-sight';
+      const eye = sightOf(rearPart);
+      const post = sightOf('front-sight-base');
+      const along = (x: number): Vec3 => [x, eye[1] + ((post[1] - eye[1]) * (x - eye[0])) / (post[0] - eye[0]), 0];
+      // The line stops short of the post's rear face by its own half-thickness, so its end stays off the target.
+      const line = segmentBox(
+        eye,
+        along(post[0] - u(AR15.frontSightBase.postWidth) / 2 - LINE_HALF_THICKNESS),
+        LINE_HALF_THICKNESS,
+      );
+      for (const [id, part] of resolved.defs) {
+        const placed = resolved.placed.get(id)!;
+        for (const solid of part.solids.filter(({ kind }) => kind !== 'revolved')) {
+          expect(penetrationWorld(line, worldSolid(placed, solid)), `${id}.${solid.id}`).toBeLessThanOrEqual(0);
+        }
+      }
+    },
+  );
 
   it('takes a rail front sight for no rear sight', () => {
     const front = variant('broken-ar15-rear-sight', (assembly) => {

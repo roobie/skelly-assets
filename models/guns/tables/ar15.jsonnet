@@ -108,10 +108,46 @@ local upperRearX = dim(xOf(profile.values.upperRearXPx.value), 'derived: ' + pro
 local stockMount = [tubeEndX, 0];
 local collapsibleToe = tracedOutline([[270, 122], [128, 122], [138, 196], [150, 200], [165, 193]], stockMount, 'stock');
 local railTopY = tracedY(75, 'topRailLine');
+local upperTopY = tracedY(88, 'upperReceiver');
 // The flat-top's front post stands at this height over the bore; the carry-handle base is the ar-flat-top extra lower.
 local sightPlane = dim(66.04, 'sourced: 2.6 in, the M4 front sight base, https://www.recoilweb.com/back-up-iron-sights-78135.html?nonamp=1');
-local wingCarryHandle = 'https://www.wingtactical.com/accessories/optics-sights/sights/aero-precision-a2-detachable-carry-handle-with-rear-sight';
 local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cmmg-a2-front-sight-base-assembly';
+
+// The A2 parts are traced off the M16A4 side photos, each scaled by the rifle's published overall length. The side
+// photo's heights are over its bore, which the sight line is measured from.
+local m16a4Side = import '../references/m16a4-side.trace.jsonnet';
+local m16a4Bare = import '../references/m16a4-bare.trace.jsonnet';
+local mmPerPxOf(record) =
+  local c = record.reference.calibration;
+  c.lengthMm.value / (c.pixels.value[1][0] - c.pixels.value[0][0]);
+local sideMmPerPx = mmPerPxOf(m16a4Side);
+local sideOverBore(py) = (m16a4Side.values.boreYPx.value - py) * sideMmPerPx;
+
+// The carry handle, registered at its rear face on the upper's rear face; a null height stands on the upper's top,
+// where the fixed handle is forged to the receiver.
+local handleX(px) = upperRearX.mm + (px - m16a4Side.values.handleRearXPx.value) * sideMmPerPx;
+local handlePoint(p) = [handleX(p[0]), if p[1] == null then upperTopY.mm else sideOverBore(p[1])];
+local handleOutline(pixels) = outline([handlePoint(p) for p in pixels], 'traced: m16a4-side/carryHandle');
+// The bar's top falls 1 px in 10 to the front, so the trace's bar is thinnest where it meets the front leg.
+local handleBarTop(px) = 1093.5 + (px - 1410) / 10;
+local windowFrontPx = 1809.5;
+local handleWindowTopY = sideOverBore(handleBarTop(windowFrontPx)) - detailFeature;
+
+// The A2 front sight base's triangle, from its rear face and the top of the journal.
+local sightBasePoint(p) = [(p[0] - m16a4Side.values.fsbRearXPx.value) * sideMmPerPx, sideOverBore(p[1]) - journalRadius];
+local sightBaseOutline(pixels) = outline([sightBasePoint(p) for p in pixels], 'traced: m16a4-side/frontSightBase');
+local sightBaseX(px) = dim(sightBasePoint([px, 0])[0], 'traced: m16a4-side/frontSightBase');
+
+// The A2 stock's outline off the bare photo, registered at its butt plate on the sourced stock length and at its comb on
+// the side photo's comb height over the bore, which the side photo resolves five times finer.
+local a2StockRearX = tubeLengths.rifle.mm - 266.7;
+local combY = sideOverBore(m16a4Side.values.combYPx.value);
+local bareMmPerPx = mmPerPxOf(m16a4Bare);
+local stockPoint(p) = [
+  a2StockRearX + (p[0] - m16a4Bare.values.buttRearXPx.value) * bareMmPerPx,
+  combY - (p[1] - m16a4Bare.values.combYPx.value) * bareMmPerPx,
+];
+local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m16a4-bare/a2Stock');
 
 {
   rail: {
@@ -187,20 +223,41 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
 
   upper: {
     rearX: upperRearX,
-    topY: tracedY(88, 'upperReceiver'),
+    topY: upperTopY,
     halfWidth: dim(14.5, 'derived: wider than the rail it carries'),
     rail: {
       rearX: tracedX(386, 'upperRail'),
       topY: railTopY,
     },
-    // The fixed A2 carry handle, from the receiver's rear face forward: the rear sight housing, the bar a hand closes
-    // round, and the front leg. No print of the fixed handle was found, so it takes the detachable handle's size.
+    // The fixed A2 carry handle as convex side outlines: the rear sight housing with its sloped back, the aperture ears
+    // over it and the block ahead of them, the bar falling to the front over the hand hole, and the front leg with its
+    // rounded corner. The ears stand either side of the aperture's slot, the rest across the handle's width.
     carryHandle: {
-      length: dim(176.276, "sourced: the detachable A2 handle's 6.94 in, " + wingCarryHandle),
-      topY: dim(
-        railTopY.mm + 41.402,
-        "derived: the detachable A2 handle's 1.63 in (" + wingCarryHandle + ') over the flat-top rail, the fixed one standing as tall',
+      housing: handleOutline([[1212, null], [1405, null], [1405, 1151], [1240, 1151], [1212, 1222]]),
+      ears: handleOutline([[1260, 1151], [1358, 1151], [1358, 1079], [1272, 1079], [1260, 1092]]),
+      housingFront: handleOutline([[1358, 1151], [1405, 1151], [1405, 1088.4], [1358, 1082.8]]),
+      bar: outline(
+        [
+          [handleX(1405), handleWindowTopY],
+          [handleX(windowFrontPx), handleWindowTopY],
+          handlePoint([windowFrontPx, handleBarTop(windowFrontPx)]),
+          handlePoint([1405, handleBarTop(1405)]),
+        ],
+        "derived: the m16a4-side/carryHandle bar top over a window top lowered from the trace's 1137.5 px so the bar's "
+        + 'thinnest is one bar depth; the trace thins it to %g px' % m16a4Side.values.barDepthPx.value,
       ),
+      frontLeg: handleOutline([
+        [windowFrontPx, null],
+        [1838.5, null],
+        [1838.5, 1165],
+        [1832, 1148],
+        [1820, 1138],
+        [windowFrontPx, handleBarTop(windowFrontPx)],
+      ]),
+      // The ears' foot, where the aperture plate stands on the housing between them.
+      earBottomY: dim(sideOverBore(1151), 'traced: m16a4-side/carryHandle'),
+      barDepth: detailWall('the bar over the window front, a'),
+      apertureX: dim(handleX(m16a4Side.values.apertureXPx.value), 'traced: m16a4-side/apertureXPx'),
       apertureY: dim(sightPlane.mm - flatTopExtra.mm, 'derived: the sight plane less the flat-top extra height, level with the carry-handle front post'),
       apertureHalfHeight: dim(5, 'derived: a flip aperture plate between the ears, a rim round its hole'),
       apertureRadius: dim(
@@ -210,9 +267,6 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
       apertureThickness: dim(1.5, 'derived: a stamped aperture plate, drawn smooth'),
       slotHalfWidth: dim(3.5, 'derived: the slot between the ears the aperture flips in'),
       halfWidth: dim(9, 'derived: a forged handle narrower than the receiver'),
-      rearSightLength: dim(30, 'derived: the rear sight housing with its windage drum'),
-      barDepth: dim(12, 'derived: a bar a hand closes round'),
-      frontLegLength: dim(20, 'derived: a forged leg standing on the receiver'),
     },
     forwardAssist: {
       // The profile's trace runs on to its plunger and that plunger's shadow; the close-up shows the housing's rear on
@@ -260,9 +314,9 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     wall: dim(gasBlockWall, 'derived: a steel wall around the journal, room for the set screws'),
   },
 
-  // The A2 front sight base, measured from the top of the journal at its gas port: a ring round the journal with the
-  // bayonet lug ahead of it, the tower, the post between its ears, and the sling loop under the ring. Its heights are
-  // the carry-handle base's; each base stands its raise taller.
+  // The front sight base, measured from the top of the journal at its gas port: a ring round the journal with the
+  // bayonet lug ahead of it, the post standing over the ring on one of the profiles below, and the sling loop under the
+  // ring. Its heights are the carry-handle base's; each base stands its raise taller.
   frontSightBase: {
     // Each base by the upper top whose rear sight it is made to meet, with how much taller than the carry-handle base
     // it stands.
@@ -281,17 +335,49 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
       "derived: the mid gas port less the Magpul mid-length handguard's 8.6 in mounting length (" + magpulMid
       + ') ahead of the upper; the 12 in rifle handguard puts it within 0.6 mm',
     ),
-    deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
     postTipY: dim(
       sightPlane.mm - flatTopExtra.mm - journalRadius,
       'derived: the sight plane less the flat-top extra height, over the top of the journal',
     ),
     ringLength: dim(25.4, 'derived: the ring round the journal, the bayonet lug filling the rest of the length'),
     wall: dim(gasBlockWall, 'derived: a forged wall round the journal, as on the gas block'),
-    towerLength: dim(12, 'derived: a tower thinner than the ring, as forged'),
+    slingLoopLength: dim(12, 'derived: a loop a sling clip closes through, centred under the ring'),
     earThickness: dim(3, 'derived: ears guarding the post'),
     postWidth: dim(1.8, 'derived: a post about 0.07 in square'),
-    lugHalfWidth: dim(5, 'derived: the bayonet lug and sling loop narrower than the ring'),
+    lugHalfWidth: dim(5, "derived: the bayonet lug, sling loop and the post's frame narrower than the ring"),
+    // The forged A2 triangle, from the base's rear face: a deck over the ring, the rear strut raked back to the rear
+    // face, the near-upright front strut, and the crown over the window between them, which is the two ears with the
+    // post between them. A taller base lifts everything over the deck by its raise.
+    'a-frame': {
+      deckY: dim(sightBasePoint([0, 1282])[1], 'traced: m16a4-side/frontSightBase'),
+      frontFootX: sightBaseX(3177),
+      postX: dim(sightBasePoint([m16a4Side.values.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
+      crown: sightBaseOutline([
+        [3075.3, 1162],
+        [3167.7, 1162],
+        [3166, 1140],
+        [3164, 1130],
+        [3161, 1124],
+        [3157, 1118],
+        [3151, 1112],
+        [3146, 1109],
+        [3130, 1109],
+        [3123, 1112],
+        [3102, 1124],
+        [3096, 1130],
+        [3089, 1140],
+      ]),
+      rearStrut: sightBaseOutline([[3013, 1262], [3013, 1274.4], [3090.25, 1162], [3075.3, 1162]]),
+      // The fillet where the rear strut meets the deck, drawn as a chamfer.
+      rearFoot: sightBaseOutline([[3013, 1282], [3044, 1282], [3027, 1254], [3013, 1274.4]]),
+      frontStrut: sightBaseOutline([[3163, 1282], [3176.65, 1282], [3167.65, 1162], [3159, 1162]]),
+    },
+    // A straight tower over the middle of the ring, as on a clamp-on front sight gas block, the ears standing on its
+    // deck.
+    tower: {
+      deckAboveJournal: dim(49.276, 'sourced: 1.94 in, https://charliescustomclones.com/front-sight-base-fsb-f-height-750-stripped'),
+      length: dim(12, 'derived: a tower thinner than the ring'),
+    },
   },
 
   // The fixed rear sight a flat-top carries on its rail, its aperture on the flat-top sight plane the flat-top front
@@ -378,20 +464,40 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     toeHalfWidth: dim(15, 'derived: the toe narrower than the body'),
   },
 
-  // The A2 fixed stock, measured from the end of the rifle extension it slides over: its front closes against the
-  // lower's buffer tower, and the butt plate covers the extension's end. No A2 side reference is traced, so its depth
-  // is the traced collapsible stock's.
+  // The A2 fixed stock, measured from the end of the rifle extension it slides over: the butt plate covers the
+  // extension's end, the sleeve wraps the extension to the lower's buffer tower, and the body under it deepens from the
+  // tower back to the toe. Its side outline is the butt and the bands between the belly's traced points, each from the
+  // comb down; the sleeve holds the extension's room through every band ahead of the butt plate.
   stockA2: {
     buffer: choiceOf('receiverExtension.buffers', 'rifle'),
     frontX: dim(tubeLengths.rifle.mm, "derived: closed against the lower's buffer tower"),
     rearX: dim(
-      tubeLengths.rifle.mm - 266.7,
+      a2StockRearX,
       'derived: 10-1/2 in long (https://www.gunmann.com/learning/a1-vs-a2-stock/); the 13.5 in length of pull the same '
       + 'page gives comes out 0.3 in longer from the trigger',
     ),
-    topY: dim(tubeRadius + 6, 'derived: the comb a 6 mm wall over the extension'),
-    frontBottomY: dim(-tubeRadius - 6, 'derived: a 6 mm wall under the extension where the stock meets the tower'),
-    toeY: dim(std.foldl(std.min, [p[1] for p in collapsibleToe.mm], 0), 'derived: the butt as deep as the traced collapsible toe'),
+    combY: dim(combY, 'traced: m16a4-side/combYPx'),
+    tubeClearance: dim(0.25, 'derived: a fixed stock is a close fit on its extension'),
+    butt: stockOutline([
+      [134, 157],
+      [120, 157],
+      [118, 157.9],
+      [116, 160.1],
+      [115.4, 162],
+      [114.6, 170],
+      [115.4, 186],
+      [116.3, 198],
+      [117.5, 210],
+      [118.8, 222],
+      [120.6, 234],
+      [122.7, 246],
+      [124.7, 254],
+      [127.3, 258],
+      [128, 258.5],
+      [134, 258.5],
+    ]),
+    // From the toe forward, past the stock front, which closes on the tower first.
+    belly: stockOutline([[134, 258.5], [160, 249.4], [208, 233.2], [256, 217.2], [304, 203.5], [332, 198.4]]),
     halfWidth: dim(20, 'derived: as wide as the collapsible stock'),
   },
 
@@ -423,6 +529,9 @@ local cmmgSightBase = 'https://www.wingtactical.com/firearm-parts-accessories/cm
     ar15_barrel_20_rifle: mass(0.992, 'sourced: 35 oz, https://www.midwestgunworks.com/page/mgwi/prod/babl556026m'),
     ar15_front_sight_base_flat_top: mass(0.147, 'sourced: 5.19 oz with its post and sling loop, ' + cmmgSightBase),
     ar15_front_sight_base_carry_handle: mass(0.147, 'derived: as the flat-top base (' + cmmgSightBase + '), which is 0.040 in taller'),
+    // No tower base is sold to weigh; its frame is no heavier than the triangle's struts and crown it replaces.
+    ar15_front_sight_base_tower_flat_top: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
+    ar15_front_sight_base_tower_carry_handle: mass(0.147, 'derived: as the forged flat-top base (' + cmmgSightBase + ')'),
     ar15_handguard_drop_in_mid: mass(0.247, 'sourced: 8.7 oz, ' + magpulMid),
     ar15_handguard_drop_in_rifle: mass(0.204, 'sourced: 7.2 oz, https://www.opticsplanet.com/luth-ar-a2-rifle-handguard.html'),
     ar15_tube_rifle: mass(

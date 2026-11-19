@@ -1,11 +1,11 @@
 import type { KeepOut, PartDef, PartFamily, PartFeature, PortDef } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
-import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_Y, X, Y } from '../antiMateriel/common.ts';
 import { RAIL_REAR_SIGHT_EYE_RELIEF_U } from '../railRearSight.ts';
 import { sightAxis } from '../sightAxis.ts';
-import { type ArFrame, type ArFrameTable, chosen, familyName, u } from './frame.ts';
+import { type ArFrame, type ArFrameTable, chosen, familyName, outlineU, u } from './frame.ts';
 import { picatinnyRail } from './rail.ts';
 
 /** A housing's traced side outline and how far it stands out of the receiver's side. */
@@ -34,22 +34,50 @@ const flatTop = (frame: ArFrame): UpperTop => {
   return { solids: rail.solids, ports: [rail.port], axes: [], features: rail.features };
 };
 
+/** A side outline of the handle extruded between two depths across the receiver. */
+const handlePiece = (id: string, profile: readonly Vec2[], z: readonly [number, number], clip?: ClipPlane): Solid => ({
+  id,
+  kind: 'extruded-polygon',
+  profile,
+  z,
+  ...(clip ? { clip: [clip], display: { bevel: false } } : {}),
+});
+
+/**
+ * A handle piece that stands over the sight line, with the channel cut along its top that the eye looks down: whole
+ * below the channel's floor, and above it a cheek either side of the channel.
+ */
+const channelled = (
+  id: string,
+  profile: readonly Vec2[],
+  floorY: number,
+  channelHalf: number,
+  half: number,
+): Solid[] => [
+  handlePiece(id, profile, [-half, half], { normal: Y, offset: floorY }),
+  handlePiece(`${id}-right`, profile, [channelHalf, half], { normal: NEG_Y, offset: -floorY }),
+  handlePiece(`${id}-left`, profile, [-half, -channelHalf], { normal: NEG_Y, offset: -floorY }),
+];
+
 /**
  * The A2 carry handle forged on the receiver: the rear sight housing at its rear, with the aperture plate flipping
- * between two ears, the bar over the hand hole, and the front leg. Its aperture is the gun's rear sight.
+ * between two ears, the bar over the hand hole, and the front leg. Its aperture is the gun's rear sight, and the eye
+ * looks from it down a channel in the handle's top, the channel as wide as the slot the aperture flips in.
  */
 const carryHandle = (frame: ArFrame): UpperTop => {
-  const { upper } = frame.table;
-  const h = upper.carryHandle;
-  const [rearX, baseY, topY, half] = [u(upper.rearX), u(upper.topY), u(h.topY), u(h.halfWidth)];
-  const frontX = rearX + u(h.length);
-  const sightFrontX = rearX + u(h.rearSightLength);
-  const [apertureY, apertureHalf, slotHalf] = [u(h.apertureY), u(h.apertureHalfHeight), u(h.slotHalfWidth)];
-  const apertureX = (rearX + sightFrontX) / 2;
+  const h = frame.table.upper.carryHandle;
+  const half = u(h.halfWidth);
+  const [apertureX, apertureY, apertureHalf, slotHalf] = [
+    u(h.apertureX),
+    u(h.apertureY),
+    u(h.apertureHalfHeight),
+    u(h.slotHalfWidth),
+  ];
   const apertureHalfThickness = u(h.apertureThickness) / 2;
-  const earBottomY = apertureY - apertureHalf;
+  const earBottomY = u(h.earBottomY);
   // The plate round the hole the eye looks through: above, below, and either side of it.
   const hole = u(h.apertureRadius);
+  const channelFloorY = apertureY - hole;
   const apertureFrame: [string, [number, number], [number, number]][] = [
     ['top', [apertureY + hole, apertureY + apertureHalf], [-slotHalf, slotHalf]],
     ['bottom', [earBottomY, apertureY - hole], [-slotHalf, slotHalf]],
@@ -58,9 +86,12 @@ const carryHandle = (frame: ArFrame): UpperTop => {
   ];
   return {
     solids: [
-      box('rear-sight-housing', [rearX, baseY, -half], [sightFrontX, earBottomY, half]),
-      box('rear-sight-ear-right', [rearX, earBottomY, slotHalf], [sightFrontX, topY, half]),
-      box('rear-sight-ear-left', [rearX, earBottomY, -half], [sightFrontX, topY, -slotHalf]),
+      handlePiece('rear-sight-housing', outlineU(h.housing), [-half, half]),
+      handlePiece('rear-sight-ear-right', outlineU(h.ears), [slotHalf, half]),
+      handlePiece('rear-sight-ear-left', outlineU(h.ears), [-half, -slotHalf]),
+      ...channelled('rear-sight-housing-front', outlineU(h.housingFront), channelFloorY, slotHalf, half),
+      ...channelled('handle-bar', outlineU(h.bar), channelFloorY, slotHalf, half),
+      handlePiece('handle-front-leg', outlineU(h.frontLeg), [-half, half]),
       ...apertureFrame.map(([id, [bottom, top], [right, left]]) =>
         box(
           `rear-sight-aperture-${id}`,
@@ -69,8 +100,6 @@ const carryHandle = (frame: ArFrame): UpperTop => {
           { display: { smooth: { seat: Y } } },
         ),
       ),
-      box('handle-bar', [sightFrontX, topY - u(h.barDepth), -half], [frontX - u(h.frontLegLength), topY, half]),
-      box('handle-front-leg', [frontX - u(h.frontLegLength), baseY, -half], [frontX, topY, half]),
     ],
     ports: [],
     axes: [
@@ -82,6 +111,8 @@ const carryHandle = (frame: ArFrame): UpperTop => {
     ],
     features: [
       { name: 'rear-sight-ear', size: half - slotHalf, disposition: { kind: 'detail' } },
+      { name: 'sight-channel-wall', size: half - slotHalf, disposition: { kind: 'detail' } },
+      { name: 'handle-bar', size: u(h.barDepth), disposition: { kind: 'detail' } },
       { name: 'rear-sight-aperture', size: 2 * apertureHalfThickness, disposition: { kind: 'smooth' } },
     ],
   };

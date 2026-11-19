@@ -1,5 +1,5 @@
 import type { PartDef, PartFamily, PortDef } from '@skelly/construct/assembly/schema.ts';
-import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { ClipPlane, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { box, choice, NEG_X, X, Y } from '../antiMateriel/common.ts';
 import { type ArFrame, chosen, familyName, outlineU, u } from './frame.ts';
@@ -118,33 +118,46 @@ const collapsibleStock = (frame: ArFrame): PartDef => {
 
 /**
  * The A2 fixed stock over the whole rifle extension. Its frame is the tube's end: the butt plate closes behind it, the
- * sleeve wraps the tube from there to the lower's tower, and the body under the sleeve deepens from the tower to the
- * butt's toe.
+ * sleeve wraps the tube from there to the lower's tower, as thick under the tube as the comb stands over it, and the
+ * body under the sleeve deepens from the tower to the butt's toe. Every piece of the side outline is whole behind the
+ * tube's end and only below the sleeve ahead of it, and the tower closes the front.
  */
 const a2Stock = (frame: ArFrame): PartDef => {
   const s = frame.table.stockA2;
-  const [frontX, rearX, topY, frontBottomY, toeY, half] = [
-    u(s.frontX),
-    u(s.rearX),
-    u(s.topY),
-    u(s.frontBottomY),
-    u(s.toeY),
-    u(s.halfWidth),
+  const [frontX, combY, half] = [u(s.frontX), u(s.combY), u(s.halfWidth)];
+  const bore = tubeRadius(frame, s.buffer.choice) + u(s.tubeClearance);
+  const belly = outlineU(s.belly);
+  const pieces: [string, Vec2[]][] = [
+    ['butt', outlineU(s.butt)],
+    ...belly.slice(1).map((front, i): [string, Vec2[]] => {
+      const rear = belly[i]!;
+      return [`body-${i + 1}`, [rear, front, [front[0], combY], [rear[0], combY]]];
+    }),
   ];
-  const bore = tubeRadius(frame, s.buffer.choice) + u(frame.table.stock.tubeClearance);
-  const belly: Vec2[] = [
-    [frontX, frontBottomY],
-    [0, frontBottomY],
-    [0, toeY],
+  const ahead: ClipPlane[] = [
+    { normal: NEG_X, offset: 0 },
+    { normal: Y, offset: -combY },
+    { normal: X, offset: frontX },
   ];
-  const sleeve = stockSleeve(frontX, bore, [frontBottomY, topY], half);
+  const outlineSolids = pieces.flatMap(([id, profile]): Solid[] => {
+    const xs = profile.map(([x]) => x);
+    const piece = (suffix: string, clip: ClipPlane[]): Solid => ({
+      id: `${id}${suffix}`,
+      kind: 'extruded-polygon',
+      profile,
+      z: [-half, half],
+      clip,
+      display: { bevel: false },
+    });
+    return [
+      ...(Math.min(...xs) < 0 ? [piece('', [{ normal: X, offset: 0 }])] : []),
+      ...(Math.max(...xs) > 0 && Math.min(...xs) < frontX ? [piece('-under-sleeve', ahead)] : []),
+    ];
+  });
+  const sleeve = stockSleeve(frontX, bore, [-combY, combY], half);
   return {
     family: 'stock',
-    solids: [
-      box('butt', [rearX, toeY, -half], [0, topY, half]),
-      ...sleeve.solids,
-      { id: 'belly', kind: 'extruded-polygon', profile: belly, z: [-half, half] },
-    ],
+    solids: [...outlineSolids, ...sleeve.solids],
     ports: [stockPort(s.buffer.choice)],
     keepOuts: [],
     axes: [],
