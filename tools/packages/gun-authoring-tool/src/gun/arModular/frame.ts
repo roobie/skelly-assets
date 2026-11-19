@@ -86,18 +86,24 @@ const checkLeaves = (node: unknown, keys: readonly string[], check: TableCheck):
   }
 };
 
+/** A place a pick pattern names: its keys from the table's root, and what the table holds there, if anything. */
+interface Place {
+  readonly keys: readonly string[];
+  readonly node: unknown;
+}
+
 /**
- * The places a pick pattern names in the table, each `*` standing for every key of the group there. A place whose
+ * The places a pick pattern names under `node`, each `*` standing for every key of the group there. A place whose
  * group is missing is still named, so the pick it should hold is reported missing.
  */
-const placesOf = (table: unknown, segments: readonly string[], keys: readonly string[] = []): string[][] => {
+const placesOf = (node: unknown, segments: readonly string[], keys: readonly string[] = []): Place[] => {
   const [segment, ...rest] = segments;
   if (segment === undefined) {
-    return [[...keys]];
+    return [{ keys, node }];
   }
-  const group = keys.length === 0 ? table : groupAt(table, keys.join('.'));
-  const children = segment === '*' ? Object.keys(isGroup(group) ? group : {}) : [segment];
-  return children.flatMap((key) => placesOf(table, rest, [...keys, key]));
+  const group = isGroup(node) ? node : {};
+  const children = segment === '*' ? Object.keys(group) : [segment];
+  return children.flatMap((key) => placesOf(group[key], rest, [...keys, key]));
 };
 
 /**
@@ -110,9 +116,8 @@ const requirePicks = (name: string, table: unknown, picks: PickGroups): void => 
     if (places.length === 0) {
       throw new Error(`${name}.${pattern}: no place holds the pick from ${group} that belongs here`);
     }
-    for (const keys of places) {
-      const node = groupAt(table, keys.join('.'));
-      if (node === undefined || !Object.hasOwn(node, 'choice')) {
+    for (const { keys, node } of places) {
+      if (!isGroup(node) || !Object.hasOwn(node, 'choice')) {
         throw new Error(`${[name, ...keys].join('.')}: expected a pick from ${group}`);
       }
     }
