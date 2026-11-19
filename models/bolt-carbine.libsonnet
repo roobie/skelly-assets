@@ -9,6 +9,7 @@ local box = h.box;
 
 local w = 0.055;  // half the receiver's width
 local underside = 0.15;  // the receiver's underside, where the magazine seats
+local top = 0.33;  // the receiver's top
 local barrelY = 0.245;
 
 // The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
@@ -69,7 +70,7 @@ local drumMagazine = [
 ];
 
 local carbine(id, massKg, magazine) =
-  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, 0.33, w, { front: 0.15, top: 0.35, halfWidth: 0.038 }) + [
+  bolt.gun(id, massKg, 'rifle', bolt.receiver(0.17, underside, top, w, { front: 0.15, top: 0.35, halfWidth: 0.038 }) + [
     // Barrel shroud, an octagonal slab with vents along both sides and a brass band at its mouth.
     h.prism('shroud', 'body', 'x', [[0.17, -0.045], [0.17, 0.045], [0.19, 0.062], [0.30, 0.062], [0.32, 0.045], [0.32, -0.045], [0.30, -0.062], [0.19, -0.062]], 0.17, 0.38),
     h.prism('shroud-band', 'trim', 'x', [[0.165, -0.049], [0.165, 0.049], [0.187, 0.067], [0.303, 0.067], [0.325, 0.049], [0.325, -0.049], [0.303, -0.067], [0.187, -0.067]], 0.36, 0.38),
@@ -87,7 +88,7 @@ local carbine(id, massKg, magazine) =
     for i in [0, 1, 2]
   ] + [
     box('bore', 'vent', [0.522, barrelY - 0.017, -0.017], [0.524, barrelY + 0.017, 0.017]),
-  ] + magazine + bolt.grip(0.155) + bolt.stock(0.33, 0.045) + [
+  ] + magazine + bolt.grip(0.155) + bolt.stock(top, 0.045) + [
     // Sights: a rear block on the ridge and a front post over the shroud.
     box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, 0.375, 0.02]),
     box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, 0.3755, 0.004]),

@@ -9,11 +9,12 @@ local box = h.box;
 // Laid out with the muzzle at +x, the axis `gripOn` names, so the built model's muzzle faces +z.
 
 local w = 0.07;  // half the receiver's width
+local top = 0.35;  // the receiver's top
 local coreY = 0.25;
 local muzzleX = 0.49;
 [
   // A deeper receiver than the carbine's.
-  bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(0.15, 0.14, 0.35, w, { front: 0.14, top: 0.37, halfWidth: 0.045 }) + [
+  bolt.gun('bolt_plasma_caster', 12, 'energy', bolt.receiver(0.15, 0.14, top, w, { front: 0.14, top: 0.37, halfWidth: 0.045 }) + [
     // The coil: a glowing core with three collars round it, then the emitter cup and its lens.
     h.rod('core', 'glow', 0.045, 0.15, 0.47, coreY) + { sides: 16 },
     h.turned('collar-a', 'metal', 'x', [[0, 0], [0, 0.08], [0.03, 0.08], [0.03, 0]], [0.17, coreY, 0]) + { sides: 8 },
@@ -32,5 +33,5 @@ local muzzleX = 0.49;
     h.prism('cell-cap', 'trim', 'y', [[-0.058, 0.009], [-0.044, -0.005], [0.044, -0.005], [0.058, 0.009], [0.058, 0.141], [0.044, 0.155], [-0.044, 0.155], [-0.058, 0.141]], 0.01, 0.03),
     box('cell-window-l', 'glow', [0.03, 0.05, -0.0575], [0.12, 0.12, -0.055]),
     box('cell-window-r', 'glow', [0.03, 0.05, 0.055], [0.12, 0.12, 0.0575]),
-  ] + bolt.grip(0.155) + bolt.stock(0.34, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
+  ] + bolt.grip(0.155) + bolt.stock(top, 0.05), { glow: 'crystal-glow-blue' }) + { title: 'Basic plasma caster' },
 ]

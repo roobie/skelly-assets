@@ -9,6 +9,7 @@ local box = h.box;
 // Hand-guard point (the off hand's hold on the pump handle), in this layout's metres: [0.4725, 0.215, 0].
 
 local w = 0.06;  // half the receiver's width
+local top = 0.34;  // the receiver's top
 local barrelY = 0.29;  // the barrel's axis
 local tubeY = 0.215;  // the magazine tube's axis
 local muzzleX = 0.98;
@@ -16,7 +17,7 @@ local pumpX0 = 0.40;
 local pumpX1 = 0.545;
 [
   // A shorter, taller receiver than the carbine's.
-  bolt.gun('bolt_scattergun', 12.5, 'shotgun', bolt.receiver(0.11, 0.14, 0.34, w, { front: 0.11, top: 0.36, halfWidth: 0.04 }) + [
+  bolt.gun('bolt_scattergun', 12.5, 'shotgun', bolt.receiver(0.11, 0.14, top, w, { front: 0.11, top: 0.36, halfWidth: 0.04 }) + [
     // The breech block the barrel and tube are bolted into.
     h.prism('breech', 'trim', 'x', bolt.bevel(0.17, 0.335, 0.06, 0.012), 0.11, 0.15),
     // One long slim barrel with a dark mouth and a rib, and a magazine tube beneath it ending in a brass cap.
@@ -39,7 +40,7 @@ local pumpX1 = 0.545;
     h.prism('rib-%d' % i, 'vent', 'x', bolt.bevel(tubeY - 0.038, tubeY + 0.038, 0.038, 0.011), pumpX0 + 0.015 + i * 0.032, pumpX0 + 0.027 + i * 0.032)
     for i in [0, 1, 2, 3]
   ] + [
-  ] + bolt.grip(0.15) + bolt.stock(0.34, 0.05) + [
+  ] + bolt.grip(0.15) + bolt.stock(top, 0.05) + [
     // Three brass shells held on the right side of the receiver.
     h.turned('shell-%d' % i, 'round', 'z', [[0, 0], [0, 0.014], [0.012, 0.014], [0.014, 0.011], [0.014, 0]], [-0.135 + i * 0.045, 0.205, w])
     for i in [0, 1, 2]
