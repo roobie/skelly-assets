@@ -644,7 +644,7 @@ const openSightGapOrThrow = (file: VoxelFile, partId: string, grain: number, top
 /**
  * An iron sight's line as the voxelized file draws it, in model metres, because voxels move the tops the player lines
  * up. A separate sight part is too small to voxelize and is drawn as authored, so its authored datum stands: a rear
- * sight aims at the front post's authored tip and a bead keeps its level line. A sight built into a voxelized part,
+ * sight aims at the origin of the front sight's axis and a bead keeps its level line. A sight built into a voxelized part,
  * such as a revolver's frame or a receiver's drum aperture, takes the top of its leaves, which the line also runs
  * between, then drops into the aperture where that top is closed. It keeps its direction unless the gun has a built-in
  * front post, which a voxelized part draws too: then it aims at the post's drawn top, read no higher than one voxel

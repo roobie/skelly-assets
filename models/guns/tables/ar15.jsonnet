@@ -383,15 +383,15 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       "derived: the mid gas port less the Magpul mid-length handguard's 8.6 in mounting length (" + magpulMid
       + ') ahead of the upper; the 12 in rifle handguard puts it within 0.6 mm',
     ),
-    postTipY: dim(
+    sightTipY: dim(
       sightPlane.mm - flatTopExtra.mm - journalRadius,
       'derived: the sight plane less the flat-top extra height, over the top of the journal',
     ),
     wall: dim(gasBlockWall, 'derived: a forged wall round the journal, as on the gas block'),
     slingLoopLength: dim(12, 'derived: a loop a sling clip closes through, centred under the ring'),
-    earThickness: dim(3, 'derived: ears guarding the post'),
+    earThickness: dim(3, 'derived: ears guarding the sight'),
     postWidth: dim(1.8, 'derived: a post about 0.07 in square'),
-    lugHalfWidth: dim(5, "derived: the bayonet lug, sling loop and the post's frame narrower than the ring"),
+    lugHalfWidth: dim(5, "derived: the bayonet lug, sling loop and the sight's frame narrower than the ring"),
     // The forged A2 triangle, from the base's rear face: a deck over the ring, the rear strut raked back to the rear
     // face, the near-upright front strut, and the crown over the window between them, which is the two ears with the
     // sight's notch between them. The ring runs forward to the front strut's foot, so the front is one face from the
@@ -404,7 +404,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
         "traced: m16a4-side/fsbFrontXPx; 1.3 mm short of the base's sourced 1.8 in (" + cmmgSightBase
         + "), kept so the front strut's foot is the front face",
       ),
-      postX: dim(sightBasePoint([side.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
+      sightX: dim(sightBasePoint([side.postXPx.value, 0])[0], 'traced: m16a4-side/postXPx'),
       crown: outline(
         [sightBasePoint(p) for p in [[3075.3, crownFoot], [3167.7, crownFoot], [3161, 1124], [3146, 1109], [3130, 1109], [3096, 1130]]],
         'derived: the m16a4-side/frontSightBase crown through its corners, ' + simplified,

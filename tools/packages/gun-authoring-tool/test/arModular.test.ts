@@ -243,7 +243,7 @@ describe('modular AR', () => {
       ],
       'broken-ar15-sight-height': [
         'ar15-sight-height',
-        'flat-top front sight base does not match the rear sight on upper: its post stands 1.02 mm above the sight line',
+        'flat-top front sight base does not match the rear sight on upper: its sight stands 1.02 mm above the sight line',
       ],
       'broken-ar15-tube-stock': [
         'port-compat',

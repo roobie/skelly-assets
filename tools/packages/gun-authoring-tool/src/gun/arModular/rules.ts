@@ -147,7 +147,7 @@ const sightLineY = (r: Resolved, part: string): number =>
   applyPoint(r.placed.get(part)!, sightAxisOf(r.defs.get(part)!)!.origin)[1];
 
 /**
- * The front post must stand on the rear sight's line: a carry handle's aperture is lower than a flat-top's rail rear
+ * The front sight must stand on the rear sight's line: a carry handle's aperture is lower than a flat-top's rail rear
  * sight's, and each front sight base is made for one of them. An optic aims on its own line, so only iron rear sights
  * are judged.
  */
@@ -166,7 +166,7 @@ const sightHeight = (frame: ArFrame): Rule => {
             : [
                 issue(
                   id,
-                  `${paramOf(r, base, 'height')} front sight base does not match the rear sight on ${rear}: its post stands ${uToMm(Math.abs(off)).toFixed(2)} mm ${off > 0 ? 'above' : 'below'} the sight line`,
+                  `${paramOf(r, base, 'height')} front sight base does not match the rear sight on ${rear}: its sight stands ${uToMm(Math.abs(off)).toFixed(2)} mm ${off > 0 ? 'above' : 'below'} the sight line`,
                   [base, rear],
                 ),
               ];
@@ -175,7 +175,7 @@ const sightHeight = (frame: ArFrame): Rule => {
   };
 };
 
-/** A front post alone cannot be aimed with: the eye needs a rear sight or an optic to line it up through. */
+/** A front sight alone cannot be aimed with: the eye needs a rear sight or an optic to line it up through. */
 const rearSightPresent = (frame: ArFrame): Rule => {
   const id = `${frame.name}-rear-sight`;
   return {

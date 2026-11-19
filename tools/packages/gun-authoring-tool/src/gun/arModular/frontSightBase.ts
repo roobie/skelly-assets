@@ -10,9 +10,9 @@ import { journalClamp } from './shapes.ts';
 type SightBaseTable = ArFrameTable['frontSightBase'];
 
 /** What a profile builds over the journal: its own solids, the station its sight is aimed at, and the ring's front. */
-interface PostFrame {
+interface SightFrame {
   readonly solids: readonly Solid[];
-  readonly postX: number;
+  readonly sightX: number;
   readonly ringFrontX: number;
 }
 
@@ -25,7 +25,7 @@ interface Placement {
   readonly raise: number;
   readonly lugHalf: number;
   readonly earInner: number;
-  readonly postTipY: number;
+  readonly sightTipY: number;
   readonly postHalf: number;
 }
 
@@ -35,7 +35,7 @@ interface Placement {
  * forward to the front strut's foot, so the front is one face from the strut down past the barrel, its underside
  * standing for the bayonet lug. Nothing stands in the window; the eye aims through the notch.
  */
-const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
+const aFrame = (F: SightBaseTable, at: Placement): SightFrame => {
   const a = F['a-frame'];
   const lift = (outline: Parameters<typeof outlineU>[0]): Vec2[] =>
     outlineU(outline).map(([x, y]): Vec2 => [at.rearX + x, at.raise + y]);
@@ -56,7 +56,7 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
       piece('ear-right', lift(a.crown), [at.earInner, at.lugHalf]),
       piece('ear-left', lift(a.crown), [-at.lugHalf, -at.earInner]),
     ],
-    postX: at.rearX + u(a.postX),
+    sightX: at.rearX + u(a.sightX),
     ringFrontX: frontX,
   };
 };
@@ -65,7 +65,7 @@ const aFrame = (F: SightBaseTable, at: Placement): PostFrame => {
  * A straight sight block over the middle of the ring, the post standing on its deck between its ears, and the bayonet
  * lug under the barrel ahead of the ring.
  */
-const sightBlock = (F: SightBaseTable, at: Placement): PostFrame => {
+const sightBlock = (F: SightBaseTable, at: Placement): SightFrame => {
   const blockRearX = at.rearX + (u(F.sightBlock.ringLength) - u(F.sightBlock.blockLength)) / 2;
   const blockFrontX = blockRearX + u(F.sightBlock.blockLength);
   const deckY = u(F.sightBlock.deckAboveJournal) + at.raise;
@@ -75,12 +75,12 @@ const sightBlock = (F: SightBaseTable, at: Placement): PostFrame => {
   return {
     solids: [
       box('block', [blockRearX, at.ringTopY, -at.lugHalf], [blockFrontX, deckY, at.lugHalf]),
-      box('ear-right', [blockRearX, deckY, at.earInner], [blockFrontX, at.postTipY, at.lugHalf]),
-      box('ear-left', [blockRearX, deckY, -at.lugHalf], [blockFrontX, at.postTipY, -at.earInner]),
-      box('post', [postX - at.postHalf, deckY, -at.postHalf], [postX + at.postHalf, at.postTipY, at.postHalf]),
+      box('ear-right', [blockRearX, deckY, at.earInner], [blockFrontX, at.sightTipY, at.lugHalf]),
+      box('ear-left', [blockRearX, deckY, -at.lugHalf], [blockFrontX, at.sightTipY, -at.earInner]),
+      box('post', [postX - at.postHalf, deckY, -at.postHalf], [postX + at.postHalf, at.sightTipY, at.postHalf]),
       box('bayonet-lug', [ringFrontX, at.underY, -at.lugHalf], [frontX, -2 * at.radius, at.lugHalf]),
     ],
-    postX,
+    sightX: postX,
     ringFrontX,
   };
 };
@@ -91,7 +91,7 @@ const PROFILES = { 'a-frame': aFrame, 'sight-block': sightBlock } as const;
  * The front sight base, by the upper top whose rear sight it is made to meet and by the profile its sight stands on. It
  * clamps the barrel's journal over the gas port in place of a gas block, carries the front sight between its ears, and
  * holds the front of a drop-in handguard at its rear face. Its frame sits on top of the journal at the gas port. It is
- * drawn smooth, since its ears and post are thinner than a voxel.
+ * drawn smooth, since its ears and any post are thinner than a voxel.
  */
 export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'front-sight-base'),
@@ -105,7 +105,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
     const raise = u(chosen(F.raise, params.height));
     const [wall, half, lugHalf] = [u(F.wall), u(F.halfWidth), u(F.lugHalfWidth)];
     const rearX = -u(F.rearOfPort);
-    const postTipY = u(F.postTipY) + raise;
+    const sightTipY = u(F.sightTipY) + raise;
     const underY = -2 * radius - wall;
     const placement: Placement = {
       rearX,
@@ -115,10 +115,10 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
       raise,
       lugHalf,
       earInner: lugHalf - u(F.earThickness),
-      postTipY,
+      sightTipY,
       postHalf: u(F.postWidth) / 2,
     };
-    const { solids, postX, ringFrontX } = chosen(PROFILES, params.profile)(F, placement);
+    const { solids, sightX, ringFrontX } = chosen(PROFILES, params.profile)(F, placement);
     const loopRearX = (rearX + ringFrontX - u(F.slingLoopLength)) / 2;
     return {
       family: 'front-sight-base',
@@ -148,7 +148,7 @@ export const arFrontSightBase = (frame: ArFrame): PartFamily => ({
         },
       ],
       keepOuts: [],
-      axes: [sightAxis('front', { origin: [postX, postTipY, 0], dir: X, referenceDistanceU: 4 })],
+      axes: [sightAxis('front', { origin: [sightX, sightTipY, 0], dir: X, referenceDistanceU: 4 })],
       tags: TOO_SMALL_TO_VOXELIZE,
     };
   },
