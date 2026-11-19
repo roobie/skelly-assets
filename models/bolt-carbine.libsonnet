@@ -11,6 +11,7 @@ local w = 0.055;  // half the receiver's width
 local underside = 0.15;  // the receiver's underside, where the magazine seats
 local top = 0.33;  // the receiver's top
 local barrelY = 0.245;
+local sightTop = 0.375;  // the height both sights' tops share
 
 // The rocket bolts lie along the bore, so a magazine is as deep fore and aft as a bolt is long plus its walls. Its
 // back keeps a hand's gap ahead of the trigger guard.
@@ -89,10 +90,11 @@ local carbine(id, massKg, magazine) =
   ] + [
     box('bore', 'vent', [0.522, barrelY - 0.017, -0.017], [0.524, barrelY + 0.017, 0.017]),
   ] + magazine + bolt.grip(0.155) + bolt.stock(top, 0.045) + [
-    // Sights: a rear block on the ridge and a front post over the shroud.
-    box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, 0.375, 0.02]),
-    box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, 0.3755, 0.004]),
-    box('front-post', 'metal', [0.33, 0.32, -0.007], [0.35, 0.36, 0.007]),
+    // Sights: a rear block on the ridge and a front post over the shroud, a fin tapering from a broad foot to a narrow
+    // tip level with the rear block's top, so the two line up.
+    box('rear-sight', 'metal', [-0.12, 0.35, -0.02], [-0.07, sightTop, 0.02]),
+    box('rear-notch', 'vent', [-0.11, 0.365, -0.004], [-0.08, sightTop + 0.0005, 0.004]),
+    h.prism('front-post', 'metal', 'z', [[0.32, 0.316], [0.36, 0.316], [0.349, sightTop], [0.341, sightTop]], -0.01, 0.01),
     // Ejection port on the right side, with a chunky charging lever standing out of the bolt at its back end.
     box('ejection', 'vent', [0.03, 0.25, w], [0.12, 0.29, w + 0.002]),
     box('lever', 'metal', [0.03, 0.26, w], [0.07, 0.28, w + 0.03]),
