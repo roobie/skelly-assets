@@ -326,6 +326,9 @@ export function firearmModelSchema<PositiveSeconds extends number, PerMinute ext
       ),
       muzzleDirection: optional(UnitVector),
       action: optional(ActionSchema),
+      moving: optional(
+        pipe(array(strictObject({ node: Name, motion: MotionSchema })), nonEmpty('needs at least one moving part')),
+      ),
       revolver: optional(RevolverSchema),
       chargingHandleDegrees: optional(pipe(number(), minValue(-180), maxValue(180))),
     }),

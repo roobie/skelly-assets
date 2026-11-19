@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { decodeFrame, sampleClip } from './clipFrames.mjs';
 import { explode } from './explode.mjs';
 import { wearFabrics } from './fabric.mjs';
-import { heldItem } from './heldMotion.mjs';
+import { gunMovers, heldItem } from './heldMotion.mjs';
 import { hideCovered } from './hiding.mjs';
 import { boneTransforms } from './kinematics.mjs';
 import { FRONT_QUARTER, MIRRORED_AXIS } from './modelFrame.mjs';
@@ -159,12 +159,13 @@ export function swing(moving, clock) {
 const stopOf = (motion, name) => motion.stops.find((stop) => stop.name === name)?.clock;
 
 // `obj`, an instance of `entry` (`loaded` is what it was loaded as), with every part that has a stop called `name` stood
-// at it and the rest at rest: a vehicle's moving parts by their own motion, a gun's action parts by the motions its
-// sidecar gives them. A gun is drawn as the pose page draws a held one (heldMotion.mjs), so it comes back as a copy.
+// at it and the rest at rest: a vehicle's moving parts by their own motion, a gun's parts by the motions its sidecar
+// gives them. A gun is drawn as the pose page draws a held one (heldMotion.mjs), so it comes back as a copy.
 export function atStop(obj, loaded, entry, name) {
-  if (entry.action) {
-    const held = heldItem({ scene: obj, action: entry.action }, entry.id);
-    const clocks = Object.values(entry.action.parts).flatMap(({ node, motion }) => {
+  const gunParts = gunMovers(entry);
+  if (gunParts.length > 0) {
+    const held = heldItem({ scene: obj, movers: gunParts }, entry.id);
+    const clocks = gunParts.flatMap(({ node, motion }) => {
       const clock = stopOf(motion, name);
       return clock === undefined ? [] : [[node.split(':')[0], clock]];
     });

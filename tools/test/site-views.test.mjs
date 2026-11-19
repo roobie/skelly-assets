@@ -83,6 +83,34 @@ test('a model, a vehicle or a worn view is drawn smooth only when everything it 
   assert.ok(hasSmooth(wornEntry(vest)));
 });
 
+test("a gun's stop stands its action and the parts that move outside it there, each by its own motion", () => {
+  const slide = (travel) => ({
+    stages: [{ kind: 'slide', direction: [1, 0, 0], travel, share: 1 }],
+    stops: [
+      { name: 'rest', clock: 0 },
+      { name: 'open', clock: 1 },
+    ],
+  });
+  const scene = new THREE.Group();
+  const part = (id, family) => {
+    const node = placed(id, [0, 0, 0]);
+    node.userData = { part: id, family };
+    scene.add(node);
+  };
+  part('carrier', 'bolt-carrier');
+  part('cover', 'port-cover');
+  const entry = {
+    id: 'gun',
+    action: { parts: { carrier: { node: 'carrier:bolt-carrier', motion: slide(-1) } } },
+    moving: [{ node: 'cover:port-cover', motion: slide(2) }],
+  };
+  const posed = atStop(scene, {}, entry, 'open');
+  posed.updateMatrixWorld(true);
+  const xOf = (id) => posed.getObjectByName(id).getWorldPosition(new THREE.Vector3()).x;
+  assert.ok(Math.abs(xOf('carrier') + 1) < 1e-9, 'the carrier strokes');
+  assert.ok(Math.abs(xOf('cover') - 2) < 1e-9, 'the cover opens');
+});
+
 test('a stop only the carrier names stands the carrier there and leaves the rider at rest', () => {
   const carrier = {
     stages: [{ kind: 'slide', direction: [1, 0, 0], travel: 2, share: 1 }],

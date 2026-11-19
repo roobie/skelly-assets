@@ -5,6 +5,7 @@ import { validate } from '@skelly/construct/assembly/validate.ts';
 import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { distanceWorld, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
+import type { Motion } from '@skelly/motion/motion';
 import { recipeVoxel } from '@skelly/thing-export/recipe.ts';
 import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
@@ -320,6 +321,31 @@ describe('modular AR', () => {
       }
     },
   );
+
+  it('exports the carbine action through the sourced stroke, and its cover and stock moving through their own stops', () => {
+    const result = exportGunGlb(
+      loadDesignAssembly('ar15-carbine-free-float'),
+      { id: 'ar15_motion_test', file: 'assets/models/ar15_motion_test.glb' },
+      { appearanceProfile: 'ar' },
+    );
+    if (!result.ok) {
+      throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+    }
+    const { action, moving } = result.modelEntry.gun;
+    const travelOf = (motion: Motion) => motion.stages.find((stage) => stage.kind === 'slide')?.travel;
+    const stroke = AR15.boltCarrier.stroke.mm / 1000;
+    expect(travelOf(action!.parts.carrier!.motion)).toBeCloseTo(stroke, 6);
+    expect(travelOf(action!.parts.handle!.motion)).toBeCloseTo(stroke, 6);
+    const motionOf = (part: string) => moving!.find(({ node }) => node.startsWith(`${part}:`))!.motion;
+    expect(moving!.map(({ node }) => node.split(':')[0]).sort()).toEqual(['port-cover', 'stock']);
+    const cover = motionOf('port-cover');
+    expect(cover.stages.map(({ kind }) => kind)).toEqual(['hinge']);
+    expect(cover.stages[0]!.kind === 'hinge' && cover.stages[0]!.angle).toBeCloseTo(AR15.portCover.openAngle.deg, 6);
+    const stock = motionOf('stock');
+    expect(stock.stops).toHaveLength(AR15.stock.positions.count);
+    const pitch = AR15.stock.pitch.mm / 1000;
+    expect(travelOf(stock)).toBeCloseTo((AR15.stock.positions.count - 1) * pitch, 6);
+  });
 
   it('takes a rail front sight for no rear sight', () => {
     const front = variant('broken-ar15-rear-sight', (assembly) => {

@@ -25,6 +25,7 @@ import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { type ResolvedGunAction, resolveGunAction } from './actionDescription.ts';
+import { isActionStroke } from './actionMotion.ts';
 import { cycleLegs, type TimelineLeg } from './actionTimeline.ts';
 import { GUN_ANCHORS } from './anchorData.ts';
 import { type AnchorSelectionError, GUN_ANCHOR_POLICY, type SelectedAnchors, selectGunAnchors } from './anchors.ts';
@@ -66,6 +67,13 @@ interface ActionPartMetadata {
   /** Shared timelines this node follows; other modes leave it at home. */
   readonly modes: readonly CycleMode[];
   /** What the timelines play of the part, in the model file's frame and metres. */
+  readonly motion: Motion;
+}
+
+interface MovingPartMetadata {
+  /** Exact glTF node name of the part. */
+  readonly node: string;
+  /** How the part moves through its named stops, in the model file's frame and metres. */
   readonly motion: Motion;
 }
 
@@ -113,6 +121,8 @@ export interface GunModelFields {
   readonly internalMagazine?: { readonly capacity: number };
   readonly rounds?: readonly { readonly at: Vec3; readonly tilt: number }[];
   readonly action?: GunActionMetadata;
+  /** Parts that move outside the action, such as a port cover or a collapsible stock; each node names its part. */
+  readonly moving?: readonly MovingPartMetadata[];
   readonly revolver?: RevolverMetadata;
   /** Metadata for an attachment exported as its own item model. */
   readonly attachment?: AttachmentMetadata;
@@ -214,8 +224,10 @@ const handGripMetadata = (part: ResolvedGunAction['carrier'], metresPerUnit: num
   return grip ? { handGrip: modelPoint(applyPoint(part.placed, grip.origin), metresPerUnit) } : {};
 };
 
-const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
-  const description = resolveGunAction(resolved);
+const buildActionExport = (
+  resolved: Resolved,
+  description: ResolvedGunAction | undefined,
+): GunActionExport | undefined => {
   const cycle = description?.cycle;
   if (!(description?.ejection && cycle)) {
     return undefined;
@@ -245,6 +257,28 @@ const buildActionExport = (resolved: Resolved): GunActionExport | undefined => {
       ...(cycle.rpm === undefined ? {} : { roundsPerSimMinute: cycle.rpm }),
     },
   };
+};
+
+/**
+ * Every part that moves for its own sake rather than with the action, a port cover or a stock: its node and its motion
+ * in the file's frame and metres. An action's stroke outside the action description has no timeline to follow, so it
+ * is left out with the action's own parts.
+ */
+const movingPartsData = (
+  resolved: Resolved,
+  description: ResolvedGunAction | undefined,
+): GunModelFields['moving'] | undefined => {
+  const acting = new Set(Object.values(description?.parts ?? {}).map(({ id }) => id));
+  const { metresPerUnit } = resolved.domain.units;
+  const moving = [...resolved.motions]
+    .filter(([id, motion]) => !(acting.has(id) || isActionStroke(motion)))
+    .map(
+      ([id, motion]): MovingPartMetadata => ({
+        node: partNodeName(id, resolved.assembly.parts[id]!.family),
+        motion: fileMotion(motion, resolved.placed.get(id)!, metresPerUnit),
+      }),
+    );
+  return moving.length > 0 ? moving : undefined;
 };
 
 const frontBeadSightLine = (
@@ -986,7 +1020,9 @@ export const exportGunGlb = (
     return result;
   }
   const voxelFile = voxelFileOf(result.glb, grains);
-  const handling = buildActionExport(resolved);
+  const action = resolveGunAction(resolved);
+  const handling = buildActionExport(resolved, action);
+  const moving = movingPartsData(resolved, action);
   const internalCapacity = integralCapacity(resolved, metadata.cartridge);
   const {
     units: { metresPerUnit },
@@ -1035,6 +1071,7 @@ export const exportGunGlb = (
       gun: {
         ...modelEntry.gun,
         ...(revolver ? { revolver } : {}),
+        ...(moving ? { moving } : {}),
         attachments: fittedAttachments,
         attachmentSlots: attachmentSlotsData,
         ...certificates,
