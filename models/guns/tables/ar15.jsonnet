@@ -39,10 +39,12 @@ local towerWall = 3;
 local partingY = (yOf(121) + yOf(124)) / 2;
 // The body of the shared stanag-30 magazine as the magazine family builds it: its depth and width, and how far its top
 // stands above the seat it hangs from. test/arModular.test.ts holds the well to the built magazine.
+local magazines = import 'magazines.jsonnet';
+local mmPerU = (import 'unitScale.jsonnet').metresPerUnit * 1000;
 local magazine = {
-  depth: 63.25,
-  width: 25.875,
-  topAboveSeat: 8.625,
+  depth: magazines.stanag30.depthU * mmPerU,
+  width: magazines.stanag30.widthU * mmPerU,
+  topAboveSeat: (magazines.well.heightU - magazines.well.clearanceU) * mmPerU,
 };
 local wellClearance = 0.5;
 local wellFrontX = xOf(526);

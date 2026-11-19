@@ -64,7 +64,7 @@ import {
 import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
-import { MAGAZINE_PROFILES, magazineProfileContent } from './magazineProfiles.ts';
+import { MAGAZINE_PROFILES, MAGAZINE_WELL, magazineProfileContent, STANAG30_BODY } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
@@ -303,9 +303,9 @@ const STANAG20_BODY_BOX_U = {
   width: snapMagazineDimension(STANAG20_SOURCED_WIDTH_MM),
 } as const;
 const STANAG30_CENTERLINE_LENGTH_U = snapMagazineDimension(190);
-const STANAG30_BODY_DEPTH_U = snapMagazineDimension(65);
-const STANAG30_BODY_WIDTH_U = STANAG20_BODY_BOX_U.width;
-const MAGAZINE_WELL_CLEARANCE = 0.25;
+const STANAG30_BODY_DEPTH_U = STANAG30_BODY.depthU;
+const STANAG30_BODY_WIDTH_U = STANAG30_BODY.widthU;
+const MAGAZINE_WELL_CLEARANCE = MAGAZINE_WELL.clearanceU;
 const wellSpan = (extent: number) => 2 * Math.ceil((extent / 2 + MAGAZINE_WELL_CLEARANCE) / GRID) * GRID;
 const boltWellOpening = (calibre: string | undefined) => {
   const section = boltMagazineSection(boltCartridge(calibre));
@@ -313,7 +313,7 @@ const boltWellOpening = (calibre: string | undefined) => {
 };
 const MAGAZINE_WELL_DEPTH = MAGAZINE_DEPTH + 2 * MAGAZINE_WELL_CLEARANCE;
 const MAGAZINE_WELL_WIDTH = MAGAZINE_WIDTH + 2 * MAGAZINE_WELL_CLEARANCE;
-const MAGAZINE_WELL_HEIGHT = 1;
+const MAGAZINE_WELL_HEIGHT = MAGAZINE_WELL.heightU;
 const MAGAZINE_WELL_CENTER_X = -7 + MAGAZINE_DEPTH / 2;
 const RECESSED_MAGAZINE_PORT_Y = 2;
 /** A magazine's section (front to back, side to side) by profile. */
