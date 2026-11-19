@@ -57,6 +57,9 @@ before the root was shared needs the same, or the group could not write there; `
 refresh stores a unit only if its files still hold the content it was keyed by once the compile has read them: the
 compiler reads them again after the refresh took their keys, and an edit in between would otherwise put one content's
 twin under another's key.
+The catalogue's settings (units, facets, turned sides, default material) have a twin of their own, since a consumer of
+them alone, such as the build's finish library, must not load and check every row; see
+`thing-authoring-tool/item-settings.jsonnet` and `src/settings.ts`.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
 late-bound `self` that an importer extends would differ from the source, so anything else belongs in a library,
 and a kit builds its rows from one and exports them finished. Each fragment compile holds its row file to that, failing

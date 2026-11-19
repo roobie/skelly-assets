@@ -238,11 +238,15 @@ const ItemSchema = pipe(
     ({ input }) => `${input.id} carries a hinge_a or hinge_b anchor; a moving part turns on its motion's pins instead`,
   ),
 );
-const CatalogueSchema = strictObject({
+const settingsEntries = {
   units: strictObject({ metresPerUnit: positive, grid: positive, bevel: pipe(number(), finite(), minValue(0)) }),
   facets: pipe(positive, integer(), minValue(3)),
   turnedSides: optional(pipe(positive, integer(), minValue(3))),
   defaultMaterial: material,
+};
+const SettingsSchema = strictObject(settingsEntries);
+const CatalogueSchema = strictObject({
+  ...settingsEntries,
   items: pipe(
     array(ItemSchema),
     nonEmpty(),
@@ -381,6 +385,8 @@ export const loadCatalogue = (value: unknown): Catalogue => {
   }
   return data;
 };
+/** The settings alone, for a consumer that needs no row. */
+export const loadSettings = (value: unknown): CatalogueSettings => parse(SettingsSchema, value);
 /** One item as the catalogue would load it, for a driver that evaluates a row apart from its catalogue. */
 export const loadItem = (value: unknown, { turnedSides }: CatalogueSettings): ToolItem => {
   const item = parse(ItemSchema, value);
