@@ -25,7 +25,7 @@ it('pins the gun-facing anchor selection and keeps gun registries out of the exp
 
   expectTypeOf<keyof PrefabCatalogueEntry>().toEqualTypeOf<'id' | 'version' | 'family' | 'fixedParams'>();
   expectTypeOf<GunAnchorName>().toEqualTypeOf<
-    'hold' | 'support' | 'butt' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port'
+    'hold' | 'support' | 'butt' | 'muzzle' | 'ejection' | 'magwell' | 'loading_port' | 'charging_handle'
   >();
   expectTypeOf<Parameters<SelectGunAnchors>>().toEqualTypeOf<
     [resolved: Resolved, declarations: GunAnchorDeclarations, policy: GunAnchorSelectionPolicy]
