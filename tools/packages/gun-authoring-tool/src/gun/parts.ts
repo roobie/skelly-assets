@@ -19,6 +19,7 @@
 //   lug        barrel ↔ tube magazine front (closes a loop, like clamp)
 //   forend     tube magazine ↔ sliding forend
 
+import { OPEN_STOP, REST_STOP } from '@skelly/construct/assembly/motion.ts';
 import type {
   KeepOut,
   ParamSpec,
@@ -45,7 +46,7 @@ import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import pistolDimensions from '../../../../../models/guns/tables/pistolDimensions.json' with { type: 'json' };
-import { UNLOCKED_STOP } from './actionMotion.ts';
+import { NOTCHED_STOP, UNLOCKED_STOP } from './actionMotion.ts';
 import { ACTION_CARRIER_ROLES, ACTION_PART_ROLES, type GunPartFamily } from './actionRoles.ts';
 import { akButtstockSolids, akStockTop } from './akButtstock.ts';
 import { AK_PROPORTIONS, akGasPortX } from './akProportions.ts';
@@ -2269,7 +2270,11 @@ const boltTurn = (profile: BoltHandleProfile, frame?: Transform): PartStage => {
 /** A turn-bolt part's motion: it turns free of its lugs, then is drawn back along its own stroke. */
 const boltMotion = (turn: PartStage, slide: PartStage): PartMotion => ({
   stages: [turn, slide],
-  stops: [{ name: UNLOCKED_STOP, after: 0 }],
+  stops: [
+    { name: REST_STOP, stage: 0, at: 0 },
+    { name: UNLOCKED_STOP, stage: 0 },
+    { name: OPEN_STOP, stage: 1 },
+  ],
 });
 const boltArmFrame = (section?: string): Transform => {
   const basis = boltHandleBasis(section);
@@ -2608,6 +2613,11 @@ const smgSlidingHandle: PartFamily = {
           { kind: 'slide', direction: X, travel: { port: 'mount', keepOut: 'smg-handle-travel' } },
           // At the slot's rear end the stem turns up about the bore into the notch: the held-back state.
           { kind: 'hinge', axis: { from: [0, 0, 0], to: [-1, 0, 0] }, angle: turnDegrees },
+        ],
+        stops: [
+          { name: REST_STOP, stage: 0, at: 0 },
+          { name: OPEN_STOP, stage: 0 },
+          { name: NOTCHED_STOP, stage: 1 },
         ],
       },
     };

@@ -3,12 +3,13 @@ import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import { length } from '@skelly/construct/foundation/math.ts';
 import { penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
+import { exportFileText } from '../src/cli/exportFile.ts';
 import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { clockOf } from '../src/gun/actionMotion.ts';
 import { sweepTurningAction } from '../src/gun/boltSweep.ts';
 import { advanceCycleClock, cycleMotion, sweepMovingPart } from '../src/gun/cycle.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { loadCorpus } from './helpers.ts';
+import { designText, loadCorpus } from './helpers.ts';
 
 const smgCases = loadCorpus().filter(({ label }) => label.includes('smg'));
 
@@ -42,6 +43,25 @@ describe('SMG charging handle', () => {
       expect(sweep.clashes, part.id).toEqual([]);
       expect(sweep.clear, part.id).toBeGreaterThanOrEqual(sweep.declared - 1e-9);
     }
+  });
+
+  it('exports the handle as a stroke then a turn, with the notch as a stop no timeline goes to', () => {
+    const exported = exportFileText(designText('compact-smg'), {
+      id: 'compact_smg',
+      file: 'assets/models/compact-smg.glb',
+    });
+    if (!exported.ok) {
+      throw new Error(exported.message);
+    }
+    const { action } = exported.modelEntry.gun;
+    const { motion } = action!.parts.handle!;
+    expect(motion.stages.map(({ kind }) => kind)).toEqual(['slide', 'hinge']);
+    expect(motion.stops).toEqual([
+      { name: 'rest', clock: 0 },
+      { name: 'open', clock: motion.stages[0]!.share },
+      { name: 'notched', clock: 1 },
+    ]);
+    expect(action!.hand.legs.every(({ to }) => to !== 'notched')).toBe(true);
   });
 
   it('rejects a notch turn that is not finite, not positive or does not fit inside the dwell', () => {

@@ -3,6 +3,9 @@ import type { HingeStage, Motion, SlideStage } from '@skelly/motion/motion';
 /** The stop of a turn-bolt part where the bolt has turned free of its lugs, before it is drawn back. */
 export const UNLOCKED_STOP = 'unlocked';
 
+/** The stop of an SMG's charging handle where it has drawn to the slot's rear end and turned up into the notch. */
+export const NOTCHED_STOP = 'notched';
+
 const FINISHED_TOLERANCE = 1e-9;
 
 /** The one slide of a hand-driven part: its stroke. */
