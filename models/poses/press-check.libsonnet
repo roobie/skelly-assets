@@ -18,9 +18,9 @@
 // the next move begins. The times are those of a practised hand: a reach of a forearm's length to a small target and a
 // grasp take under half a second, a pull of a few centimetres a fifth, a look that sees and confirms the chamber about
 // two eye fixations, and a spring-driven release a blink. So the check settles at unsighted fire, rolls deliberately
-// to the port, draws the handle briskly, pauses to look, and lets go, shuts the cover and comes back quickly, three
-// and a half seconds in all. Each move eases out of rest and into rest, as a hand moving from one place to the next
-// does.
+// to the port, draws the handle briskly, pauses to look, and lets go, reaches the open cover, flicks it shut and comes
+// back quickly, under four seconds in all. Each move eases out of rest and into rest, as a hand moving from one place
+// to the next does.
 // The hands meet the rifle as every held rifle_assault does (models/poses/guns/sockets.libsonnet): a frame's left hand
 // holding `socket: 'support'` takes that row's support socket.
 local sockets = (import 'guns/sockets.libsonnet').rifle_assault;
@@ -55,6 +55,13 @@ local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.
 // and it stays open until the hand shuts it.
 local pull = 0.3;
 local coverOpen = { 'port-cover': 1 };
+// A point of the cover, given where it stands shut.
+local cover(offset) = port(offset) { on: 'port-cover' };
+// The hand that shuts the cover: the index reaching, the other fingers curled out of its way.
+local coverHand = {
+  hold: crease { pole: [0.5, -0.87, 0] },
+  hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
+};
 local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
   rifle: 'rifle_assault',
@@ -84,16 +91,19 @@ local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': 
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },
-    // The left hand over the receiver's right side, its index pad on the cover's outer face below the port's middle,
-    // pushing the cover up shut.
-    'press-7-cover': turned {
+    // The left hand over the receiver's right side, its index pad under the open cover's free edge, on the face that
+    // closes the port, before it lifts the cover.
+    'press-7-cover-open': turned {
       into: 0.35,
-      hold: 0.1,
-      left: {
-        hold: crease { socket: { at: port([-0.002, 0.045, -0.004]), into: [0.5, -0.866, 0], axis: [-0.224, -0.129, -0.966] }, pole: [0.5, -0.87, 0], pinch: { index: port([-0.006, -0.006, -0.03]) } },
-        hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
-      },
+      moved: coverOpen,
+      left: coverHand { hold+: { socket: { at: port([-0.004, 0.019, -0.004]), into: [0.5, -0.866, 0], axis: [-0.224, -0.129, -0.966] }, pinch: { index: cover([0.011, 0.0085, -0.03]) } } },
     },
-    'press-8-fire': ready { into: 0.5, hold: 0.4 },
+    // The index pad on the shut cover's outer face below the port's middle, having swung it up shut.
+    'press-8-cover-shut': turned {
+      into: 0.15,
+      hold: 0.1,
+      left: coverHand { hold+: { socket: { at: port([-0.002, 0.045, -0.004]), into: [0.5, -0.866, 0], axis: [-0.224, -0.129, -0.966] }, pinch: { index: port([-0.006, -0.006, -0.03]) } } },
+    },
+    'press-9-fire': ready { into: 0.5, hold: 0.4 },
   },
 }
