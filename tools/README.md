@@ -40,9 +40,9 @@ catalogue sets, the vehicles, and the code-built kits in `../models/kits/`, each
 catalogue is their rows in path order and `models/` itself holds no row sources; see `row-index.mjs`,
 `catalogueIndex`. A row file that imports another, as a worn kit imports the one set file whose ground row it reuses
 instead of scanning every set, compiles over that file's fragment, so a set's edit recompiles the set and the kits that
-name it and no other kit; see `sources.mjs`, `compileFragments`. The stale twins compile in one run
-over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
-twins over it, not every row again, and one run evaluates the catalogue the recipes share once. A twin is written only
+name it and no other kit; see `sources.mjs`, `compileFragments`. The stale twins compile in parallel
+processes over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and
+the twins over it, not every row again, and a twin over the heads evaluates no row. A twin is written only
 when its bytes differ from the file on disk, so an edit that leaves a recipe's output as it was leaves the file and its
 mtime alone, so a dev server watching the twins reloads only what changed and 40 MB is not rewritten for nothing. CI
 jobs start from fresh checkouts, so they share compiled units through a content-addressed twin store restored from the
@@ -61,8 +61,8 @@ late-bound `self` that an importer extends would differ from the source, so anyt
 and a kit builds its rows from one and exports them finished. Each fragment compile holds its row file to that, failing
 with the file and field, because the difference would
 otherwise build silently and a mod's row file should fail where it is written; see `jsonnet/plain-data.libsonnet`,
-`rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
-exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
+`rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile in parallel and none
+exists in a fresh checkout until they end. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin

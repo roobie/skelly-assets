@@ -61,23 +61,23 @@ const { sources, ...options } = JSON.parse(process.argv[1]);
 await refreshJsonnetTwins(sources, options);
 `;
 
-// A refresh whose `compiler`, of the compiler driver's functions, finds `file` saved as `text` just before it reads the
-// files, as an edit landing after the refresh keyed them would. The edit is saved once, before the first compile: the
-// compiles run concurrently, and saving again under a running one would hand it a truncated file.
+// A refresh whose compiler finds `file` saved as `text` just before it evaluates the first expression that starts with
+// `prefix`, as an edit landing after the refresh keyed the files would. The edit is saved once: the compiles run
+// concurrently, and saving again under a running one would hand it a truncated file.
 const REFRESH_EDITED_MIDWAY = `
 import { writeFileSync } from 'node:fs';
 import { mock } from 'node:test';
-const { compiler, file, text, sources, ...options } = JSON.parse(process.argv[1]);
+const { prefix, file, text, sources, ...options } = JSON.parse(process.argv[1]);
 const real = await import(${moduleUrl('../jsonnet/index.mjs')});
 let saved = false;
-const editFirst = (...args) => {
-  if (!saved) {
+const editFirst = (expression, ...args) => {
+  if (!saved && expression.startsWith(prefix)) {
     writeFileSync(file, text);
     saved = true;
   }
-  return real[compiler](...args);
+  return real.evaluateJsonnetAsync(expression, ...args);
 };
-mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, [compiler]: editFirst } });
+mock.module(${moduleUrl('../jsonnet/index.mjs')}, { exports: { ...real, evaluateJsonnetAsync: editFirst } });
 const { refreshJsonnetTwins } = await import(${moduleUrl('../sources.mjs')});
 await refreshJsonnetTwins(sources, options);
 `;
@@ -129,13 +129,13 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
         REFRESH_ELSEWHERE,
         JSON.stringify({ sources, ...options([]) }),
       ]);
-    const refreshEditedMidway = (compiler, path, text) =>
+    const refreshEditedMidway = (prefix, path, text) =>
       execFileAsync(process.execPath, [
         '--experimental-test-module-mocks',
         '--input-type=module',
         '-e',
         REFRESH_EDITED_MIDWAY,
-        JSON.stringify({ compiler, file: join(root, path), text, sources, ...options([]) }),
+        JSON.stringify({ prefix, file: join(root, path), text, sources, ...options([]) }),
       ]);
     const twin = (name) => readFileSync(join(root, `${name}.json`), 'utf8');
     const value = (name) => JSON.parse(twin(name));
@@ -267,14 +267,15 @@ fixtureTest('a new file that shadows an import recompiles its importer', async (
 // stamped with it, or undoing the edit would leave the edited twin in place. A twin over an edited fragment is keyed by
 // that fragment's digest, which it was built from, so it may be stored; the fragment may not.
 const edited = (json) => JSON.stringify(json).includes('"value":2');
-for (const [compiler, path, text, name, kinds] of [
-  ['compileJsonnetFiles', 'lib/value.libsonnet', '{ value: 2 }', 'source', ['rows', 'twins']],
-  ['evaluateJsonnetAsync', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue', ['rows']],
+// A twin compiles by importing its source, and a row file by the expression that reads its rows.
+for (const [compiled, prefix, path, text, name, kinds] of [
+  ['a twin', 'import ', 'lib/value.libsonnet', '{ value: 2 }', 'source', ['rows', 'twins']],
+  ['a row file', 'local ', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue', ['rows']],
 ]) {
-  test(`a file edited before ${compiler} reads it serves the checkout but lands nowhere under its old key`, () =>
+  test(`a file edited before ${compiled} reads it serves the checkout but lands nowhere under its old key`, () =>
     withTwinFixture(async ({ root, write, refresh, refreshEditedMidway, value, entry }) => {
       const original = readFileSync(join(root, path), 'utf8');
-      await refreshEditedMidway(compiler, path, text);
+      await refreshEditedMidway(prefix, path, text);
       assert.ok(edited(value(name)), 'the checkout gets the output of the files the compile read');
       for (const kind of kinds) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
       write(path, original);

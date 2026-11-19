@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { BUILD_ROOT, makeBuildDir } from './buildDir.mjs';
 import { entryFolder } from './entryFolder.mjs';
-import { compileJsonnetFiles, evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
+import { evaluateJsonnetAsync, libraryPaths } from './jsonnet/index.mjs';
 import { HEADS, INDEX, ROW_DIRS } from './row-index.mjs';
 
 /** @import { EntryFolder } from './entryFolder.mjs' */
@@ -519,7 +519,7 @@ const assembledHeads = (root, headsOfRows) =>
 
 // The stamp maps each row file to the key it compiled under and the digest of its fragment, the heads to their digest and each twin to the key
 // it was written under, so a refresh with nothing changed reads no store. A row file edited without changing its
-// fragment recompiles one fragment and no twin. Twins whose keys the store lacks compile together in one run. A twin
+// fragment recompiles one fragment and no twin. Twins whose keys the store lacks compile in parallel processes. A twin
 // whose files changed during its compile is left unstamped, so the next refresh compiles it from what they are then,
 // and so is a row file that changed during its. A twin left unwritten because its bytes are unchanged is stamped like
 // any other: its key is current.
@@ -668,24 +668,23 @@ const compileTwins = async (twins, rows, outputs, headsText, options, digest) =>
     headsFile !== undefined && reached.has(headsFile) && headsText !== undefined
       ? { [relative(options.root, headsFile)]: headsText }
       : {};
-  const results = await withOverlay(
+  /** @type {Map<Twin, string>} */
+  const compiled = new Map();
+  await withOverlay(
     standingIn,
     fragmentsOf(outputs),
     options,
     (overlay) =>
-      compileJsonnetFiles(
-        twins.map(({ path }) => path),
-        compileRoot(options.root),
-        { overlay },
-      ),
+      forEachConcurrently(twins, async (twin) => {
+        const label = relative(options.root, twin.path);
+        const json = await evaluateJsonnetAsync(`import ${JSON.stringify(twin.path)}`, compileRoot(options.root), {
+          label,
+          overlay,
+        });
+        compiled.set(twin, json);
+      }),
     files,
   );
-  /** @type {Map<Twin, string>} */
-  const compiled = new Map();
-  for (const [at, json] of results.entries()) {
-    const twin = twins[at];
-    if (twin !== undefined) compiled.set(twin, json);
-  }
   const fresh = planNow(options);
   const changed = storeUnchanged(
     options.folders.twins,
