@@ -37,10 +37,18 @@ export const actionRoleKeyOf = (def: PartDef): ActionRoleKey | undefined => look
 export const actionKindOf = (def: PartDef): ActionKind | undefined => lookup(ACTION_CARRIER_ROLES, def.tags);
 
 /**
- * A part family that declares an action carrier reports how fast it cycles. The rate is the family's own content,
- * so a family in any module supplies it without the action description or the cycle knowing the family.
+ * What a gun part family declares of itself beyond its parts. Each is the family's own content, so a family in any
+ * module supplies it without the code that reads it knowing the family.
  */
 export interface GunPartFamily extends PartFamily {
-  /** Rounds per minute for the resolved params, or undefined to keep the action's default. */
+  /**
+   * Rounds per minute for the resolved params, or undefined to keep the action's default. A family that declares an
+   * action carrier reports how fast it cycles.
+   */
   readonly cyclicRpm?: (params: Readonly<Record<string, string>>) => number | undefined;
+  /**
+   * The family builds from millimetre tables kept exact rather than rounded to the grid, so its positions and sizes
+   * fall off the grid by design; the min-feature rule, not the grid, bounds how fine it goes.
+   */
+  readonly millimetreAuthored?: true;
 }

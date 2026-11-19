@@ -5,6 +5,7 @@
 
 import type { PartFamily, Rule } from '@skelly/construct/assembly/schema.ts';
 import type { Template } from '@skelly/construct/assembly/template.ts';
+import type { GunPartFamily } from '../actionRoles.ts';
 import type { GunAnchorDeclarations } from '../anchors.ts';
 import { arModularAnchors } from './anchors.ts';
 import { arBarrel, arFlashHider, arGasBlock } from './barrel.ts';
@@ -40,8 +41,12 @@ const PART_FAMILIES: readonly ((frame: ArFrame) => PartFamily)[] = [
   arGrip,
 ];
 
-export const AR_MODULAR_FAMILIES: Readonly<Record<string, PartFamily>> = Object.fromEntries(
-  FRAMES.flatMap(({ frame }) => PART_FAMILIES.map((family) => family(frame))).map((family) => [family.name, family]),
+// Every frame table is authored in exact millimetres.
+export const AR_MODULAR_FAMILIES: Readonly<Record<string, GunPartFamily>> = Object.fromEntries(
+  FRAMES.flatMap(({ frame }) => PART_FAMILIES.map((family) => family(frame))).map((family) => [
+    family.name,
+    { ...family, millimetreAuthored: true },
+  ]),
 );
 
 export const AR_MODULAR_ANCHORS: GunAnchorDeclarations = Object.assign(
