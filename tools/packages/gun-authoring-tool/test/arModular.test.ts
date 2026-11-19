@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import catalogue from '../../../../models/guns/tables/catalogue.json' with { type: 'json' };
 import { AR15_FRAME, checkFrameTable, u } from '../src/gun/arModular/frame.ts';
 import { AR_MODULAR_FAMILIES } from '../src/gun/arModular/index.ts';
+import { arUpper } from '../src/gun/arModular/upper.ts';
 import { gunDomain } from '../src/gun/domain.ts';
 import { exportGunGlb } from '../src/gun/exportGlb.ts';
 import gunVoxel from '../src/gun/gunVoxel.json' with { type: 'json' };
@@ -97,6 +98,12 @@ describe('modular AR', () => {
     const towerFront = boundsOf('lower', 'tower')[1]!;
     const upperRear = boundsOf('upper', 'receiver-body')[0]!;
     expect(towerFront[0]).toBeCloseTo(upperRear[0], 9);
+  });
+
+  it("keeps every solid of the upper receiver ahead of its rear face, clear of the lower's buffer tower", () => {
+    const upper = arUpper(AR15_FRAME).build({});
+    const behind = upper.solids.filter((solid) => localSolidBounds(solid)[0][0] < u(AR15.upper.rearX) - 1e-9);
+    expect(behind.map(({ id }) => id)).toEqual([]);
   });
 
   it('draws the trigger blade smooth inside the voxelized lower, not as its voxels', () => {

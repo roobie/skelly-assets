@@ -160,7 +160,9 @@ local stockMount = [tubeEndX, 0];
       topY: tracedY(75, 'topRailLine'),
     },
     forwardAssist: {
-      rearX: tracedX(372, 'forwardAssist'),
+      // The profile's trace runs on to its plunger and that plunger's shadow; the close-up shows the housing's rear on
+      // the upper's rear face, with only the plunger standing behind it.
+      rearX: dim(upperRearX.mm, "derived: the ar15-receiver/forward-assist-housing trace's rear on the upper's rear face"),
       frontX: tracedX(435, 'forwardAssist'),
       topY: tracedY(92, 'forwardAssist'),
       bottomY: tracedY(107, 'forwardAssist'),
