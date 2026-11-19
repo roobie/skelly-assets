@@ -5,7 +5,6 @@
 local fields = ['id', 'title', 'taxonomy', 'exportMass', 'voxelClass', 'voxelGrain'];
 {
   fields:: fields,
-  // The heads of `rows`, each with the fields it has.
   // The heads of the row files under `folder` (a root-relative path, with its slash; empty for them all) from
   // models/catalogue/heads.libsonnet, in the order of the rows: the files by name without its extension, which is the
   // order of their row indexes.
@@ -15,5 +14,6 @@ local fields = ['id', 'title', 'taxonomy', 'exportMass', 'voxelClass', 'voxelGra
       function(path) std.strReplace(path, '.libsonnet', ''),
     );
     std.flattenArrays([byFile[path] for path in files]),
+  // The heads of `rows`, each with the fields it has.
   of(rows):: [{ [field]: row[field] for field in fields if std.objectHas(row, field) } for row in rows],
 }

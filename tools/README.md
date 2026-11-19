@@ -25,9 +25,17 @@ file beside a module drifts from it; see that file's header for how a module opt
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
 of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the item
 catalogue is costly to compile, so a refresh recompiles only what an edit reaches; see `sources.mjs`,
-`refreshJsonnetTwins`. Each twin is keyed by its import closure, found by scanning the import literals rather than
-evaluating, so an edit invalidates exactly the twins that can see it. The catalogue and the recipes evaluate every
-row file, so each row file compiles on its own into a fragment, in parallel. Every row source is a row file: the
+`refreshJsonnetTwins`. A row file is keyed by its import closure, found by scanning the import literals rather than
+evaluating, so an edit invalidates exactly the files that can see it. The catalogue and the recipes evaluate every
+row file, so each row file compiles on its own into a fragment and the heads of its rows, in parallel. A twin is not
+keyed by the row files it reads but by the digest of what stands in for them, so an edit that leaves a fragment as it
+was recompiles no twin: the scan of its closure stops at a row file and at `models/catalogue/heads.libsonnet`, which a
+compile replaces by the heads of every row file. The heads are the six fields of a row that packs, recipes and the
+Deadvox export read, so a geometry edit reaches the items and no recipe; see `jsonnet/heads.libsonnet`. Only the
+library paths see what a compile stands in for, so a file imports a stood-in file by its root-relative path and the scan
+refuses it from beside the importer, where the compile would read the file itself under a key that holds the stand-in's
+digest. CI keys its store by the digest of every input's whole closure, because it names the store before any fragment
+exists. Every row source is a row file: the
 catalogue sets, the vehicles, and the code-built kits in `../models/kits/`, each a list of finished rows, so that the
 catalogue is their rows in path order and `models/` itself holds no row sources; see `row-index.mjs`,
 `catalogueIndex`. A row file that imports another, as a worn kit imports the one set file whose ground row it reuses

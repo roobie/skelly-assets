@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile, execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   chmodSync,
   existsSync,
@@ -13,7 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
@@ -100,10 +101,26 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
     write('other.jsonnet', "import 'lib/other.libsonnet'");
     write('pkg/nested.jsonnet', "import 'lib/value.libsonnet'");
     write('catalogue.jsonnet', "std.flattenArrays(std.objectValues(import 'rows/index.libsonnet'))");
-    const sources = ['source', 'other', 'pkg/nested', 'catalogue'].map((name) => join(root, `${name}.jsonnet`));
+    // The heads list each row file's rows by their id, as models/catalogue/heads.libsonnet lists the six fields; a
+    // reader of them needs no row.
+    write(
+      'rows/heads.libsonnet',
+      "local heads(rows) = [{ id: row.id } for row in rows]; { 'rows/a.libsonnet': heads(import 'rows/a.libsonnet'), 'rows/b.libsonnet': heads(import 'rows/b.libsonnet') }",
+    );
+    write('pkg/reader.jsonnet', "std.flattenArrays(std.objectValues(import 'rows/heads.libsonnet'))");
+    const sources = ['source', 'other', 'pkg/nested', 'catalogue', 'pkg/reader'].map((name) =>
+      join(root, `${name}.jsonnet`),
+    );
     const store = sharedStore ?? join(root, '.build', 'store');
     const stamp = join(root, '.build', 'stamp');
-    const options = (code) => ({ root, stamp, store, code, rowIndexes: [join(root, 'rows/index.libsonnet')] });
+    const options = (code) => ({
+      root,
+      stamp,
+      store,
+      code,
+      rowIndexes: [join(root, 'rows/index.libsonnet')],
+      heads: join(root, 'rows/heads.libsonnet'),
+    });
     const refresh = (code = []) => refreshJsonnetTwins(sources, options(code));
     const refreshElsewhere = () =>
       execFileAsync(process.execPath, [
@@ -123,9 +140,10 @@ const withTwinFixture = async (check, { store: sharedStore } = {}) => {
     const twin = (name) => readFileSync(join(root, `${name}.json`), 'utf8');
     const value = (name) => JSON.parse(twin(name));
     const keep = (name) => writeFileSync(join(root, `${name}.json`), 'kept');
-    // The stored entry, of `kind` rows or twins, whose value `matches`.
+    // The stored entry, of `kind` rows or twins, whose JSON value `matches`.
     const entry = (kind, matches) =>
       readdirSync(join(store, kind))
+        .filter((name) => name.endsWith('.json'))
         .map((name) => join(store, kind, name))
         .find((path) => matches(JSON.parse(readFileSync(path, 'utf8'))));
     await check({
@@ -246,18 +264,19 @@ fixtureTest('a new file that shadows an import recompiles its importer', async (
 });
 
 // The refresh keyed the file before the edit, so the edited output must not land under that key, nor the twin be
-// stamped with it, or undoing the edit would leave the edited twin in place.
+// stamped with it, or undoing the edit would leave the edited twin in place. A twin over an edited fragment is keyed by
+// that fragment's digest, which it was built from, so it may be stored; the fragment may not.
 const edited = (json) => JSON.stringify(json).includes('"value":2');
-for (const [compiler, path, text, name] of [
-  ['compileJsonnetFiles', 'lib/value.libsonnet', '{ value: 2 }', 'source'],
-  ['evaluateJsonnetAsync', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue'],
+for (const [compiler, path, text, name, kinds] of [
+  ['compileJsonnetFiles', 'lib/value.libsonnet', '{ value: 2 }', 'source', ['rows', 'twins']],
+  ['evaluateJsonnetAsync', 'rows/a.libsonnet', "[{ id: 'a', value: 2 }]", 'catalogue', ['rows']],
 ]) {
   test(`a file edited before ${compiler} reads it serves the checkout but lands nowhere under its old key`, () =>
     withTwinFixture(async ({ root, write, refresh, refreshEditedMidway, value, entry }) => {
       const original = readFileSync(join(root, path), 'utf8');
       await refreshEditedMidway(compiler, path, text);
       assert.ok(edited(value(name)), 'the checkout gets the output of the files the compile read');
-      for (const kind of ['rows', 'twins']) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
+      for (const kind of kinds) assert.equal(entry(kind, edited), undefined, `an edited ${kind} entry`);
       write(path, original);
       await refresh();
       assert.ok(!edited(value(name)), 'undoing the edit recompiles the twin');
@@ -377,11 +396,11 @@ test('checkouts refreshing into one shared store at once each get whole twins fr
             assert.deepEqual(readdirSync(store).sort(), ['rows', 'twins']);
             const partial = ['rows', 'twins']
               .flatMap((kind) => readdirSync(join(store, kind)))
-              .filter((name) => !/^[0-9a-f]{64}\.json$/.test(name));
+              .filter((name) => !/^[0-9a-f]{64}\.(json|heads)$/.test(name));
             assert.deepEqual(partial, []);
             // One entry per unit, whichever checkout compiled it: a key that named the checkout would give two.
-            assert.equal(readdirSync(join(store, 'rows')).length, 2, 'a fragment per row file');
-            assert.equal(readdirSync(join(store, 'twins')).length, 4, 'a twin per source');
+            assert.equal(readdirSync(join(store, 'rows')).length, 4, 'a fragment and its heads per row file');
+            assert.equal(readdirSync(join(store, 'twins')).length, 5, 'a twin per source');
           },
           { store },
         ),
@@ -434,3 +453,86 @@ fixtureTest(
     assert.equal(twin('other'), 'kept');
   },
 );
+
+// A twin keys by the digest of what stands in for a row file, not by the file: an edit that leaves the fragment as it
+// was reaches no twin, and one that leaves the heads as they were reaches no twin that reads only them.
+fixtureTest(
+  'an edit that changes a row but no head recompiles the twins over the row and not those over the heads',
+  async ({ write, refresh, value, twin, keep }) => {
+    keep('pkg/reader');
+    write('rows/a.libsonnet', "[{ id: 'a', value: 2 }]");
+    await refresh();
+    assert.deepEqual(value('catalogue'), [{ id: 'a', value: 2 }, { id: 'b' }]);
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest(
+  'an edit that changes a head recompiles the twins over the heads',
+  async ({ write, refresh, value, twin, keep }) => {
+    keep('catalogue');
+    write('rows/a.libsonnet', "[{ id: 'a2', value: 1 }]");
+    await refresh();
+    assert.deepEqual(value('pkg/reader'), [{ id: 'a2' }, { id: 'b' }]);
+    assert.equal(value('catalogue')[0].id, 'a2');
+    keep('pkg/reader');
+    await refresh();
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest(
+  'an edit that leaves every fragment as it was recompiles the row file and no twin',
+  async ({ write, refresh, keep, twin }) => {
+    keep('catalogue');
+    keep('pkg/reader');
+    write('rows/a.libsonnet', "[{ id: 'a', value: 1 }] // reworded");
+    await refresh();
+    assert.equal(twin('catalogue'), 'kept');
+    assert.equal(twin('pkg/reader'), 'kept');
+  },
+);
+
+fixtureTest('an unchanged tree reads no store entry', async ({ store, refresh, keep, twin }) => {
+  keep('catalogue');
+  for (const kind of ['rows', 'twins']) rmSync(join(store, kind), { recursive: true });
+  await refresh();
+  assert.equal(twin('catalogue'), 'kept');
+});
+
+fixtureTest(
+  'the stamp names each row file by its key and fragment digest, and the heads by theirs',
+  async ({ stamp, entry }) => {
+    const { rows, heads } = JSON.parse(readFileSync(stamp, 'utf8'));
+    const [key, digest] = rows['rows/a.libsonnet'];
+    const fragment = entry('rows', ([row]) => row.id === 'a');
+    assert.equal(basename(fragment), `${key}.json`);
+    assert.equal(createHash('sha256').update(readFileSync(fragment)).digest('hex'), digest);
+    assert.match(heads, /^[0-9a-f]{64}$/);
+  },
+);
+
+// A compile stands in for a row file through the overlay, which only the library paths see: an import beside the
+// importer, or the file's own path, would read the file under a key that holds the stand-in's digest.
+for (const [name, path, text] of [
+  ['from the root beside it', 'source.jsonnet', "import 'rows/a.libsonnet'"],
+  ['from the folder beside it', 'rows/c.libsonnet', "[{ id: 'c', from: (import 'a.libsonnet')[0].id }]"],
+  ['by its absolute path', 'source.jsonnet', (root) => `import '${join(root, 'rows/a.libsonnet')}'`],
+  ['the heads by a relative path', 'pkg/reader.jsonnet', "import '../rows/heads.libsonnet'"],
+]) {
+  fixtureTest(`a file that imports a stand-in ${name} is refused`, async ({ root, write, refresh }) => {
+    write(path, typeof text === 'function' ? text(root) : text);
+    if (path === 'rows/c.libsonnet')
+      write(
+        'rows/index.libsonnet',
+        "{ a: import 'rows/a.libsonnet', b: import 'rows/b.libsonnet', c: import 'rows/c.libsonnet' }",
+      );
+    await assert.rejects(refresh(), /a file a compile stands in for/);
+  });
+}
+
+fixtureTest('a file that imports a stand-in by its root-relative path is served', async ({ write, refresh, value }) => {
+  write('pkg/nested.jsonnet', "(import 'rows/a.libsonnet')[0]");
+  await refresh();
+  assert.deepEqual(value('pkg/nested'), { id: 'a', value: 1 });
+});

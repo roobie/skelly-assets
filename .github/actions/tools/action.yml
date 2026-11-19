@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v6
       with:
         path: ${{ runner.temp }}/jsonnet-twins
-        key: jsonnet-store-${{ steps.twins.outputs.digest }}
-        restore-keys: jsonnet-store-
+        key: jsonnet-store-v2-${{ steps.twins.outputs.digest }}
+        restore-keys: jsonnet-store-v2-
     - shell: bash
       run: node tools/sources.mjs
