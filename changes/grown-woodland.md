@@ -1,4 +1,0 @@
----
-type: changed
----
-Grow the woodland's trees and shrubs from species instead of drawing them piece by piece. `woodland_oak_spreading`, `woodland_oak_upright`, `woodland_birch`, `woodland_hazel` and `woodland_shrub_low` keep their ids with grown shapes and new sizes; `woodland_scots_pine` and `woodland_spruce` are added beside the drawn `woodland_pine`, which stays. The woodland grows them sparse (density 0.2, a content knob) and voxelizes them at the standard 0.5 m grain, so a tree's voxel file stays within about 1.1k triangles; the spreading oak is now an open crown 5.5 m across. Grown wood carries the `bark` (or `bark-birch`) material id and every leaf its foliage id, so a shader can tell them apart: until skelly draws bark and see-through foliage ([roobie/skelly#1903](https://github.com/roobie/skelly/issues/1903), and the shader pipeline coming to skelly-assets), the wood is plain and the leaves solid.

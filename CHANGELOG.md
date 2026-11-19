@@ -7,6 +7,98 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.13.0 - 2026-11-19
+
+### Breaking
+
+- Solid medicines and loose goods are no longer drawn each in its own container. Six generic holders, `pill_bottle`,
+  `glass_vial`, `blister_card`, `small_tin`, `paper_sack` and `zip_bag`, mark their label paintable so one model serves
+  every content of a form, and loose contents draw as a small heap of their form, such as `tablet_heap` or
+  `powder_heap`. Tablets, capsules and gum are drawn smooth in the voxel file too, by a new part flag `smooth` in
+  catalogue rows. The retired container models map to the holder their contents come in.
+- The red 10 L plastic fuel can `jerrycan` is now `plastic_fuel_can`, titled "Plastic fuel can", so it is no longer
+  mistaken for the pressed-steel `jerry_can`.
+
+### Upgrading from 0.12.0
+
+- Draw a packed content as its holder with the label repainted in the content's label finish, and a loose one as
+  its form's heap.
+- Map stored ids through the release's `renames.json`, which carries `jerrycan` to `plastic_fuel_can`.
+
+### Added
+
+- A one-handed knightly sword, `arming_sword`, joins the melee weapons. Its grip point seats the one-hand wield, and its anchors are `strike`, the point a thrust lands with, and `edge`, a point on the cutting edge a swing lands with.
+- Add optional versioned building metadata for all 22 medieval timber and stone modules: qualified shared-node joins, floor levels, nominal rectangular/arched openings, roof/vault supports and repeats, exact stair risers, parapet runs and fitted static attachments. The manifest discovers canonical sidecars and kit definitions shared by voxel and smooth copies. Strict producer schemas and forward-tolerant readers keep unsupported assembly semantics separate from ordinary rendering; production/cache and rotated-composition tests protect propagation and placement. Geometry is unchanged; no navigation, collision policy or interaction is implied.
+- The doll holds long guns: a new motions entry, `doll_guns` (`skelly.body/motions/doll.guns.json`, on the same rig as
+  `doll_melee`), with `<gun>_stance_idle` (low ready) and `<gun>_stance_guard` (shouldered) for `rifle_assault`,
+  `rifle_pipe` and `shotgun_pump`. Each clip's `held` seats that gun in the right hand by its `grip.at`, as the melee
+  clips do, and the left hand lies on that gun's fore-end, so play each gun's own clips rather than another's.
+- The doll walks: `skelly.body/motions/doll.locomotion.json` (the manifest's `doll_locomotion` motions, on the doll's
+  rig) holds a stand, an idle, sneak, walk, run and crouch-walk loops with their `strideMetres`, and crouch, prone,
+  downed and dead poses. The rig's root (`pelvis`) now pitches ±90° so a figure can lie down.
+- `skelly.audio.impact` has a glass vial landing on concrete, `glass_vial_on_concrete`, with four takes, for a game that drops glass.
+- A stocked gun's sidecar gains `anchors.butt`: the middle of the stock's rear face, where it meets the shoulder.
+- A gun model's root `extras.gungen` now names its `platform` (`id` and frame `sizeClass`), and every port node names a `sizeClass` and a `swap` path (`slot`, or a `job` of kind `tool` or `bench`) in its `extras.port`. A part fits another gun's site when both guns are of one platform and the mount type, gender, size class and standard agree; geometry and sidecars are unchanged.
+- A `katana` in the melee pack: a curved two-handed Japanese longsword, gripped by the rear hand near the kashira so a
+  two-handed wield seats both hands on the tsuka.
+- Added twelve modular medieval ashlar pieces to `skelly.structures`, with smooth counterparts: pier, wall, slit window, arched doorway, flagstone floor, stair flight, landing plinth, battlement, four-metre arch, barrel vault, vault end panel and buttress. They share the timber kit's bay/storey grid, with documented thicker stone joins, source examples of a vaulted passage and stair-accessed wall-walk, and exported-geometry regression checks.
+- `skelly.structures` gains ten medieval timber-and-plaster building modules, including open door/window walls, a separate plank door, floor bays, gables and tiled roofs, with smooth copies. A shared 2 m grid and source cottage example document how the pieces fit together.
+- Add a seventeen-piece temperate woodland starter kit to `skelly.nature` and its smooth counterpart: spreading and upright oaks, birch, pine, two saplings, a broken snag, cut and hollow stumps, fallen log, two shrubs, fern, grass and three large boulders. Include source-only grove and same-scale lineup compositions, authored ground-origin documentation and voxel/smooth export regression checks. Existing small nature props keep their ids and geometry.
+- Builders on one host can share one export cache, so a fresh worktree reuses the models others built instead of
+  generating the whole catalogue: `SKELLY_EXPORT_CACHE` names the folder, and a setgid, group-writable folder keeps
+  every entry some build used in the last week.
+- Worktrees and users on one host can share one Jsonnet twin store, so a fresh worktree takes the twins another already
+  compiled rather than compiling the catalogue again. `JSONNET_TWIN_STORE` names the folder, and a setgid,
+  group-writable folder keeps every entry some checkout still uses, as a shared export cache does.
+- The showcase's model page has a Smooth switch that draws a model as its smooth copy instead of its voxels, keeping the
+  camera where it is, and says when a model has no copy, as a mob or a severed part has none. The switch is kept in the
+  page's link as `smooth=1`. `models.json` names each model's copy as `smooth: { file, bytes }`.
+- A thing's `model.json` now carries its stowage ports as `stowage`: a locker part's `slots`, each with its `id` (the port id a load-out names), `accepts`, `envelope` and `frame`, and a stowable item's `seats`, each with its `standard` and `frame`, in the model frame and metres, as the GLB's stowage port nodes give them. The field is left out of a model without stowage ports, and the GLBs and every other field are unchanged.
+- A sloped compound prism can set `terrace: n` to draw its voxel copy as level steps n voxel layers tall instead of a
+  slope that shifts a fraction of a voxel on every layer. The smooth copy is unchanged, and no shipped model uses it yet.
+- The boss walker `mech_walker_mob_1` limps and flinches. Each foot is now a cut point (its body's `severableParts`
+  lists `foot.L` and `foot.R` under the leg regions), so a game hides a lost foot as it hides any cut part, and plays
+  `limping.walk.left` or `limping.walk.right`, by the side that lost it: a walk loop with its `strideMetres` in which the
+  stump bears on the ground where the heel stood. `standing.flinch` is a quick tilt back with its `peakAtSimSeconds`;
+  play it only on a hit by one of the rounds its `heavyRounds` names (today `round_50_h_bmg`, `round_40x365r` and
+  `round_120x570`, the heavy machine gun and anti-materiel round and heavier).
+
+### Changed
+
+- A warm build, the showcase build and `tools/check-sources.mjs` reuse what an earlier run measured of the vehicles'
+  overlaps, the doll's grips and the garments' cover, so a run after a small edit no longer redoes them. What the checks
+  find and what the build writes are unchanged.
+- The vehicle swing check takes a fraction of the time it did, most of all for vehicles with many moving parts, and
+  `tools/check-sources.mjs` reuses the sweeps the build keeps in the export cache (`--cache`, `--no-cache`) instead of
+  sweeping every vehicle on each run. What the check finds is unchanged.
+- The vocabulary, `models/taxonomy.json`, now holds the meanings of the showcase's Keyword and Form filters under
+  `dimensions`, and `models.json` carries them in its `taxonomy`.
+- Grow the woodland's trees and shrubs from species instead of drawing them piece by piece. `woodland_oak_spreading`, `woodland_oak_upright`, `woodland_birch`, `woodland_hazel` and `woodland_shrub_low` keep their ids with grown shapes and new sizes; `woodland_scots_pine` and `woodland_spruce` are added beside the drawn `woodland_pine`, which stays. The woodland grows them sparse (density 0.2, a content knob) and voxelizes them at the standard 0.5 m grain, so a tree's voxel file stays within about 1.1k triangles; the spreading oak is now an open crown 5.5 m across. Grown wood carries the `bark` (or `bark-birch`) material id and every leaf its foliage id, so a shader can tell them apart: until skelly draws bark and see-through foliage ([roobie/skelly#1903](https://github.com/roobie/skelly/issues/1903), and the shader pipeline coming to skelly-assets), the wood is plain and the leaves solid.
+- The build refuses a part with a `hinge_a` or `hinge_b` anchor, so no model carries one: a part that opens moves only
+  by its `motion`, and a part without one does not open.
+- The press-check pose frames start and end at unsighted fire, with the bore level, instead of at low ready, and the
+  charging handle and bolt carrier draw back a short pull, just far enough to show brass, instead of the full stroke.
+- Clip sampling slerps rotations with its own quaternion code, so the pose page, the showcase viewer and the Node reader
+  share one interpolation and the clip decode path no longer reaches three.js.
+- The 40 mm and 120 mm rounds (`round_40x365r`, `round_120x570` and their cases) look like shells: a nose ogive with a
+  fuze flat, a copper driving band on a new `band` material slot, and a primer sized to the case head, its cup inside
+  an anvil ring. Small-arms primers take their trade size, and the 12-gauge shell gains a primer, for 80 triangles.
+- The tools that read a model's sidecar from a built tree find it through one shared path helper instead of each spelling the path out.
+- A definition that names its own `voxelGrain` now keeps the rest of its recipe class, so a class that gives thin parts
+  the detail grain still does. No model changes: no row that names its own grain is in such a class. The rows that name
+  their own grain on the vehicle class (the bus doors, the sleek security walker, the wheeled APC and the 120 mm tank
+  gun) no longer carry a detail grain in their recipe, as the class has none; none has a part tagged for it.
+
+### Fixed
+
+- The APC turret now has continuously sloping armour plates in its smooth copy instead of seven broad staircase bands. Its roof sits between the walls without overlapping them, and the gun mask has a closed cheek where it meets the shell. The voxel copy steps the slopes in even terraces two voxel layers tall instead of a ragged layer-by-layer stair; fittings, gun ports, hatch motion, mass and placements are preserved.
+  Its collision boxes change on purpose: each sloped plate is stacked in short courses so the boxes follow the slope, and the core's 109 boxes become 122, covering 15.1% of the open interior rather than 15.8% (the fused turret: 142 become 155, 21.5% becomes 20.8%).
+- Corrected construction-mismatched titles, dominant-material filters and optional tags on 15 catalogue models, including the steel jerry can, plastic fuel can, cigarette pack, leather pouches and lid-on ember carrier. Model IDs, geometry and finishes are unchanged, except that `jerrycan` is renamed to `plastic_fuel_can`.
+- The city car and electric city car now have continuously sloping glass and pillars in their smooth copies, rather than broad staircase bands, with glazing trimmed clear of the pillars and panel edges to avoid z-fighting. Their voxel copies are sampled from the same continuous solids. The cabin glass and pillars now sit one voxel further out at the waist: the old bands started already pulled in by a step there, and the continuous lean starts from the waist line itself. At the waist row the door glass moves from z 0.656–0.719 to 0.687–0.750.
+- The showcase can open direct links to kit assemblies, such as `apc_turret_assembly`, so a turret can be reviewed with its separately exported fine-grain gun instead of the coarse fused model. These layouts do not duplicate entries in the catalogue grid or offer a nonexistent single-file download.
+- The heavy and power leg guards no longer sink into the doll's hanging hand: their cuisses are trimmed on the outer
+  side, and the power cuisse's outer piston runs only below the fingertips.
+
 ## 0.12.0 - 2026-11-16
 
 ### Added
