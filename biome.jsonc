@@ -74,6 +74,8 @@
         "**/test/**",
         "**/src/cli/**",
         "**/vite.config.ts",
+        "tools/packages/shader-lab/serve.ts",
+        "tools/packages/shader-lab/server/**",
         "tools/packages/thing-export/src/cache.ts",
         "tools/packages/thing-export/src/files.ts",
         "site/analytics.mjs",

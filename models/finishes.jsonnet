@@ -1,5 +1,6 @@
 local material(colour) = { colour: colour, finish: { metallic: 0, roughness: 0.85 } };
 local fabric = (import 'fabrics.libsonnet').material;
+local wear = (import 'surfaces.libsonnet').wear;
 local hex(n) = [std.floor(n / 65536) / 255, (std.floor(n / 256) % 256) / 255, (n % 256) / 255];
 local glossCoat(metallic=0) = { clearcoat: { amount: 1, roughness: 0.06, metallic: metallic } };
 local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
@@ -127,7 +128,7 @@ local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
   'fibreboard-black': material([0.1, 0.1, 0.1]) + { finish: { metallic: 0, roughness: 0.9 } },
   'cloth-upholstery': fabric([0.45, 0.38, 0.32], 'woven'),
   'nylon-red': fabric([0.62, 0.1, 0.1], 'woven', { roughness: 0.45 }),
-  'bark': material([0.3, 0.24, 0.18]) + { finish: { metallic: 0, roughness: 1 } },
+  'bark': material([0.3, 0.24, 0.18]) + { finish: { metallic: 0, roughness: 1 } } + wear('bark-log'),
   'cloth-denim': fabric([0.2, 0.3, 0.48], 'twill'),
   'cloth-black': fabric([0.08, 0.08, 0.09], 'woven'),
   'cloth-red': fabric([0.6, 0.1, 0.1], 'woven'),
@@ -169,7 +170,7 @@ local flatCoat = { clearcoat: { amount: 0.15, roughness: 0.8, metallic: 0 } };
   'nylon-coyote': fabric([0.6, 0.5, 0.36], 'woven'),
   'webbing-olive-dark': fabric([0.2, 0.22, 0.13], 'twill'),
   'plastic-matte-black': material([0.06, 0.06, 0.06]) + { finish: { metallic: 0, roughness: 0.9 } },
-  'bark-birch': material([0.9, 0.87, 0.8]) + { finish: { metallic: 0, roughness: 1 } },
+  'bark-birch': material([0.9, 0.87, 0.8]) + { finish: { metallic: 0, roughness: 1 } } + wear('bark-birch'),
   'webbing-black': fabric([0.1, 0.1, 0.1], 'twill'),
   'aramid-gold': fabric([0.85, 0.68, 0.25], 'woven'),
   'bronze': material([0.62, 0.42, 0.22]) + { finish: { metallic: 1, roughness: 0.35 } },

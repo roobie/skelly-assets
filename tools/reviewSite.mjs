@@ -25,9 +25,10 @@ export function buildSite(built, site) {
   });
 }
 
-// Serves `site` on a free local port; a path under built/ the site does not hold is read from the tree at `built`.
-// Both roots are made absolute first, since a requested path resolves to an absolute one that must lie under its root.
-export async function serveSite(siteRoot, builtRoot) {
+// The file a request for `pathname` reads from `site` (built by buildSite) over the tree at `built`, or undefined when
+// it names none: a path under built/ the site does not hold is read from the tree. Both roots are made absolute first,
+// since a requested path resolves to an absolute one that must lie under its root.
+export function siteFiles(siteRoot, builtRoot) {
   const site = resolve(siteRoot);
   const built = resolve(builtRoot);
   const sitePath = (pathname) => {
@@ -37,14 +38,27 @@ export async function serveSite(siteRoot, builtRoot) {
     const fromTree = resolve(built, `.${pathname.slice('/built'.length)}`);
     return fromTree.startsWith(built + sep) ? fromTree : undefined;
   };
+  return (pathname) => {
+    const path = sitePath(pathname);
+    return path && isFile(path) ? path : undefined;
+  };
+}
+
+// Answers a request with the file at `path`, or a 404 when there is none.
+export function sendFile(response, path) {
+  if (!path) {
+    response.writeHead(404).end();
+    return;
+  }
+  response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' });
+  createReadStream(path).pipe(response);
+}
+
+// Serves `site` on a free local port, as siteFiles reads it.
+export async function serveSite(siteRoot, builtRoot) {
+  const fileOf = siteFiles(siteRoot, builtRoot);
   const server = createServer((request, response) => {
-    const path = sitePath(decodeURIComponent(new URL(request.url, 'http://site').pathname));
-    if (!path || !isFile(path)) {
-      response.writeHead(404).end();
-      return;
-    }
-    response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' });
-    createReadStream(path).pipe(response);
+    sendFile(response, fileOf(decodeURIComponent(new URL(request.url, 'http://site').pathname)));
   });
   await new Promise((done) => server.listen(0, '127.0.0.1', done));
   return { origin: `http://127.0.0.1:${server.address().port}`, close: () => server.close() };

@@ -107,6 +107,7 @@ const importTarget = (file: string, specifier: string, roots: Roots): string | u
 const packageEdges = (roots: Roots): readonly PackageEdge[] => {
   const construct = join(roots.packages, 'construct');
   const motion = join(roots.packages, 'motion');
+  const surfaces = join(roots.packages, 'surfaces');
   const thingCore = join(roots.packages, 'thing-core');
   const thingExport = join(roots.packages, 'thing-export');
   const thingTool = join(roots.packages, 'thing-authoring-tool');
@@ -139,6 +140,11 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
       problem: 'motion imports another package',
     },
     {
+      from: surfaces,
+      forbids: (target) => isWithin(roots.packages, target) && !isWithin(surfaces, target),
+      problem: 'surfaces imports another package',
+    },
+    {
       from: join(roots.packages, 'deadvox'),
       forbids: (target) => isWithin(thingTool, target),
       problem: 'deadvox imports the thing tool',
@@ -147,8 +153,9 @@ const packageEdges = (roots: Roots): readonly PackageEdge[] => {
     {
       from: thingCore,
       forbids: (target) =>
-        isWithin(roots.packages, target) && ![construct, motion, thingCore].some((root) => isWithin(root, target)),
-      problem: 'thing-core imports a package other than the construct or motion package',
+        isWithin(roots.packages, target) &&
+        ![construct, motion, surfaces, thingCore].some((root) => isWithin(root, target)),
+      problem: 'thing-core imports a package other than the construct, motion or surfaces package',
     },
     {
       from: join(roots.packages, 'deadvox'),
@@ -495,7 +502,7 @@ describe('construct import boundary', () => {
     }
   });
 
-  it('keeps thing-core to the construct package among packages, and allows it', () => {
+  it('keeps thing-core to its lower packages, and allows them', () => {
     const fixtureRoot = mkdtempSync(join(tmpdir(), 'thing-core-boundary-'));
     const fixtureRoots = rootsUnder(fixtureRoot);
     const coreSrc = join(fixtureRoots.packages, 'thing-core', 'src');
@@ -504,13 +511,17 @@ describe('construct import boundary', () => {
     try {
       const toolImport = join(coreSrc, 'tool.ts');
       const constructImport = join(coreSrc, 'construct.ts');
+      const surfacesImport = join(coreSrc, 'surfaces.ts');
       writeFileSync(toolImport, "import '@skelly/tool-ui/scene';\n");
       writeFileSync(constructImport, "import '@skelly/construct/foundation/math.ts';\n");
+      writeFileSync(surfacesImport, "import '@skelly/surfaces/schema';\n");
 
-      expect(findBoundaryViolations([constructImport], fixtureRoots)).toEqual([]);
+      expect(findBoundaryViolations([constructImport, surfacesImport], fixtureRoots)).toEqual([]);
       const violations = findBoundaryViolations([toolImport], fixtureRoots);
       expect(violations).toHaveLength(1);
-      expect(violations[0]).toContain('thing-core imports a package other than the construct or motion package');
+      expect(violations[0]).toContain(
+        'thing-core imports a package other than the construct, motion or surfaces package',
+      );
     } finally {
       rmSync(fixtureRoot, { recursive: true, force: true });
     }

@@ -331,8 +331,8 @@ const SHEEN = 'KHR_materials_sheen';
 
 /**
  * The glTF material the writer gives a surface of this appearance. A sheen is glTF's own extension, so any loader draws
- * it; a fabric's grain has no glTF form and rides in the extras for a renderer that draws it; see
- * `docs/decisions/0013-fabric-finishes.md`, "Decision".
+ * it; a fabric's grain and a shader surface's look have no glTF form and ride in the extras for a renderer that draws
+ * them; see `docs/decisions/0013-fabric-finishes.md` and `docs/decisions/0022-surface-shaders.md`, "Decision".
  */
 export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }: ResolvedAppearance): Json => {
   const opacity = finish.opacity ?? 1;
@@ -341,6 +341,7 @@ export const gltfMaterial = ({ color: srgb, material, shade, finish, paintable }
       ? {}
       : { materialId: material, colourMultiplier: shade, ...(paintable ? { paintable } : {}) }),
     ...(finish.fabric === undefined ? {} : { fabric: finish.fabric }),
+    ...(finish.surface === undefined ? {} : { surface: finish.surface }),
   };
   return {
     name: hex(srgb),

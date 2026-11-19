@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { outputPath } from '../layout.mjs';
 import { buildManifest, manifestFiles, mobManifest, readCredits, treeDifferences } from '../manifest.mjs';
+import { SURFACE_CONTRACT } from '../packages/surfaces/src/contract.ts';
 
 const withReuse = (text, work) => {
   const root = mkdtempSync(join(tmpdir(), 'manifest-'));
@@ -101,6 +102,10 @@ test('the manifest names every produced file under its pack and every model with
     for (const file of packFiles) assert.ok(files.has(`built/${outputPath(pack, file)}`));
   }
   assert.ok(files.has('built/manifest.json'));
+});
+
+test('the manifest names the surface contract its materials are written for', () => {
+  assert.equal(fixtureManifest().surfaceContract, SURFACE_CONTRACT);
 });
 
 test('a model whose path is not among the produced files is refused', () => {
