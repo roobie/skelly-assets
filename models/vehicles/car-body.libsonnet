@@ -143,13 +143,18 @@ local pressings(id, title, s) = {
   local hasDoorCorner = !twoDoor && s.rearDoor < s.rearDoorArch,
   local doorPins(front) = k.hingePins('hinge', 'y', [front, s.floor + 0.2 * (s.waist - s.floor), s.side], [front, s.floor + 0.8 * (s.waist - s.floor), s.side]),
   local bHeadOut = s.glassOut + 0.02,
-  // The front door's glass leans in with the tumble, inboard of its hinge pins, so opening first carries its trailing
-  // edge back until it clears the B-pillar head's outer face. The glass ends short by that travel, worst at the top.
-  local frontGlassBack =
-    local reach = s.cowl - s.bFront;
-    local glassDepth = s.side - (paneZ[1] - shape.tumble);
-    local headDepth = s.side - (bHeadOut - shape.tumble);
-    s.bFront + std.max(0, std.sqrt(std.max(0, reach * reach + glassDepth * glassDepth - headDepth * headDepth)) - reach),
+  // A door's glass leans in with the tumble, inboard of its hinge pins, so opening first carries its trailing edge back
+  // until it clears the outer face of the pillar behind it. The glass ends short of that pillar, `reach` behind the pins
+  // with its outer face at `face`, by that travel. The pane's inner corner lies deepest, so it swings furthest back, and
+  // the tumble sets both deepest at the top.
+  local paneClear(reach, face) =
+    local paneDepth = s.side - (paneZ[0] - lean);
+    local faceDepth = s.side - (face - lean);
+    std.max(0, reach - std.sqrt(std.max(0, reach * reach + faceDepth * faceDepth - paneDepth * paneDepth))),
+  local frontGlassBack = s.bFront + paneClear(s.cowl - s.bFront, bHeadOut),
+  // The C-pillar's leading edge at the top of the glass, where the rear door's glass is nearest its pins.
+  local cPillarTop = s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist),
+  local rearGlassClear = if slidingRearDoor then 0 else paneClear(rearDoorFront - cPillarTop, s.glassOut),
   local rows = [
     part('_shell', 'shell', s.shellMass, tunnel + (if cab then [] else rearFloor(bootFloor - 0.1, bootFloor)) + [
       box('slam_panel', 'paint', [nose - 0.05, 0.35 + lift, -slam], [nose, slamTop, slam]),
@@ -285,7 +290,7 @@ local pressings(id, title, s) = {
       shape.foreCorner('skin_corner', 'paint', s.rearAxle, [s.skin, s.side]),
     ] else []) + [
       box('trim', 'trim', [if std.get(s, 'archLiner', false) then s.rearDoorArch + 0.02 else s.cWaist + 0.02, s.floor + 0.02, s.skin - 0.03], [rearDoorFront - 0.02, s.waist - 0.02, s.skin]),
-    ] + shape.side('glass', 'glass', [[s.cWaist, s.waist], [rearDoorFront, s.waist], [rearDoorFront, windowTop], [s.cWaist + (windowTop - s.waist) * s.cLean / (s.roof - s.waist), windowTop]], paneZ) + [
+    ] + shape.side('glass', 'glass', [[s.cWaist + rearGlassClear, s.waist], [rearDoorFront, s.waist], [rearDoorFront, windowTop], [cPillarTop + rearGlassClear, windowTop]], paneZ) + [
       box('handle', 'trim', [s.cWaist + 0.08, s.waist - 0.11, s.side - 0.01], [s.cWaist + 0.2, s.waist - 0.08, s.side + 0.002]),
     ] + (if slidingRearDoor then [] else doorPins(rearDoorFront)), doorFinish,
     motion=if slidingRearDoor then null else k.motion.hinge(doorPins(rearDoorFront), 'near', opens.door)),
