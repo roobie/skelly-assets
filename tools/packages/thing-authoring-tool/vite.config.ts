@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -16,16 +15,20 @@ const serverModule = <Module>(name: string): Promise<Module> =>
 
 // Every Jsonnet file a row can import: the models, TAT's and the other packages' own, and the shared library.
 const sourceFolders = [resolve(tools, '..', 'models'), resolve(tools, 'packages'), resolve(tools, 'jsonnet')];
-const catalogueFile = normalizePath(resolve(import.meta.dirname, 'items.json'));
-const recipeTwin = normalizePath(resolve(tools, '..', 'models', 'recipes')) + '/';
+// What a refresh writes: the catalogue's rows and manifest, and the recipes' twins.
+const generated = [
+  resolve(import.meta.dirname, 'items/**'),
+  resolve(import.meta.dirname, 'item-ids.json'),
+  resolve(tools, '..', 'models', 'recipes', '*.json'),
+].map(normalizePath);
 
 // The page draws the row it views from that row's own evaluated Jsonnet, so a saved source costs one row's evaluation
-// rather than the twins' whole compile; see server/liveRows.ts and src/main.ts. The twins, which a test run or a build
-// rewrites, are the list the page started from, so their changes must not reload it.
+// rather than the twins' whole compile; see server/liveRows.ts and src/main.ts. What a test run or a build rewrites is
+// the list the page started from, so the server does not watch it: a file added or deleted there reloads the page
+// through the glob over the rows, however a hot-update hook answers.
 const liveRows = (): Plugin => ({
   name: 'thing-live-rows',
   apply: 'serve',
-  handleHotUpdate: ({ file }) => (file === catalogueFile || file.startsWith(recipeTwin) ? [] : undefined),
   async configureServer({ config, watcher, ws }) {
     const [{ evaluateRow }, { liveRows: create }] = await Promise.all([
       serverModule<typeof import('./server/evaluateRow.ts')>('evaluateRow.ts'),
@@ -61,23 +64,10 @@ const liveRows = (): Plugin => ({
   },
 });
 
-// The catalogue is tens of megabytes. Vite's JSON transform serves it with a source map holding all of it again, which
-// Firefox refuses to load; as one JSON.parse call it carries none.
-const catalogueModule = (): Plugin => ({
-  name: 'thing-catalogue-module',
-  apply: 'serve',
-  enforce: 'pre',
-  load(id) {
-    if (id !== catalogueFile) return null;
-    const json = JSON.stringify(JSON.stringify(JSON.parse(readFileSync(catalogueFile, 'utf8'))));
-    return { code: `export default JSON.parse(${json});`, map: { mappings: '' }, moduleType: 'js' };
-  },
-});
-
 export default defineConfig(({ mode }) => ({
   base: './',
-  // Tests run a vite server of their own, which must not watch the models or swap the catalogue's module.
-  plugins: mode === 'test' ? [] : [catalogueModule(), liveRows()],
-  server: { fs: { allow: [tools] } },
+  // Tests run a vite server of their own, which must not watch the models.
+  plugins: mode === 'test' ? [] : [liveRows()],
+  server: { fs: { allow: [tools] }, watch: { ignored: generated } },
   test: sweepTimeout,
 }));
