@@ -304,19 +304,21 @@ describe('anchor data', () => {
   const STOCKS = new Set(['stock', 'recoil-stock']);
 
   it('puts the butt on every stocked gun at the middle of its stock’s rear face', () => {
-    const stocked = loadCorpus().filter(({ assembly }) =>
-      Object.values(assembly.parts).some(({ family }) => STOCKS.has(family)),
-    );
+    // A stock is known by its built part's role, whichever recipe builds it.
+    const stocked = loadCorpus().flatMap(({ label, assembly }) => {
+      const resolved = resolve(assembly, gunDomain);
+      const stock = [...resolved.defs].find(([, def]) => STOCKS.has(def.family));
+      return stock ? [{ label, assembly, resolved, stockId: stock[0] }] : [];
+    });
     expect(stocked.map(({ label }) => label)).toEqual(
       expect.arrayContaining([
         'design archetype-ar.json',
         'design pipe-rifle.json',
         'design archetype-pump-shotgun.json',
+        'design sks-carbine.json',
       ]),
     );
-    for (const { label, assembly } of stocked) {
-      const resolved = resolve(assembly, gunDomain);
-      const [stockId] = Object.entries(assembly.parts).find(([, { family }]) => STOCKS.has(family))!;
+    for (const { label, assembly, resolved, stockId } of stocked) {
       const placed = resolved.placed.get(stockId)!;
       const corners = resolved.defs
         .get(stockId)!
