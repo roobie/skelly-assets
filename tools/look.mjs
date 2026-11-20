@@ -30,16 +30,21 @@ export function lookIds(manifest, { ids = [], vehicles = false, assemblies = fal
 const fileOf = ({ pack, path }) => `${pack}/${path}`;
 
 // The built files a picture of `id` is drawn from, under the built tree: a model's GLB, a vehicle's placements and the
-// GLB of every part they place, or the GLB of every part of an assembly; a wearable's adds every model it is worn with.
+// GLB of every part they place, or the GLB of every part of an assembly; a wearable's adds every model it is worn with,
+// in both forms, since its picture shows the dressed doll smooth too whatever the look.
 export function lookSources(built, manifest, id) {
   const models = glbById(manifest);
   const partFiles = (parts) => [...new Set(parts.map((part) => fileOf(models.get(part))))];
+  const bothForms = (model) => [fileOf(model), ...(model.smooth ? [fileOf(model.smooth)] : [])];
   const assembly = assemblyById(manifest).get(id);
   if (assembly) return partFiles(assembly.sites.map(({ model }) => model));
   const vehicle = vehicleById(manifest).get(id);
   if (!vehicle)
     return [
-      ...new Set([fileOf(models.get(id)), ...partFiles((wornById(manifest).get(id) ?? []).map(({ model }) => model))]),
+      ...new Set([
+        fileOf(models.get(id)),
+        ...(wornById(manifest).get(id) ?? []).flatMap(({ model }) => bothForms(models.get(model))),
+      ]),
     ];
   const placements = fileOf(vehicle);
   const { sites } = JSON.parse(readFileSync(join(built, placements), 'utf8'));

@@ -126,6 +126,30 @@ test('a wearable picture changes digest when the doll it is worn on is rebuilt o
   }
 });
 
+test('a wearable picture changes digest when only a smooth copy of what it is worn with is rebuilt', () => {
+  const built = builtTree();
+  try {
+    mkdirSync(join(built, 'fixture.vans.smooth/models'), { recursive: true });
+    writeFileSync(join(built, 'fixture.vans.smooth/models/fixture_body.glb'), 'smooth body');
+    const smooth = { pack: 'fixture.vans.smooth', path: 'models/fixture_body.glb' };
+    const worn = {
+      ...manifest,
+      models: manifest.models.map((model) => (model.id === 'fixture_body' ? { ...model, smooth } : model)),
+      worn: {
+        fixture_door: [
+          { model: 'fixture_body', at: [0, 0, 0] },
+          { model: 'fixture_door', at: [0, 1, 0] },
+        ],
+      },
+    };
+    const before = lookDigest(built, worn, 'fixture_door');
+    writeFileSync(join(built, 'fixture.vans.smooth/models/fixture_body.glb'), 'smooth body, rebuilt');
+    assert.notEqual(lookDigest(built, worn, 'fixture_door'), before);
+  } finally {
+    rmSync(built, { recursive: true, force: true });
+  }
+});
+
 test('a printed label steers the picture, so relabelling a model changes its digest', () => {
   const built = builtTree();
   try {

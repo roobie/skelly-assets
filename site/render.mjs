@@ -381,14 +381,19 @@ export function pose(scene, body, clip, time) {
 
 // ---- staging ----
 
-export function makeStage(renderer) {
+// The showcase's light: a sun shining from `sunFrom`, a direction toward it, over a room's reflections and a sky's
+// fill, each at its intensity.
+const SHOWCASE_LIGHT = { sunFrom: [2, 4, 3], sun: 1.6, room: 0.8, sky: 0.6 };
+
+// A scene lit by a light shaped as SHOWCASE_LIGHT, the showcase's own unless another is given.
+export function makeStage(renderer, { sunFrom, sun, room, sky } = SHOWCASE_LIGHT) {
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.8;
-  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-  sun.position.set(2, 4, 3);
-  scene.add(sun, new THREE.HemisphereLight(0xffffff, 0x8a8070, 0.6));
+  scene.environmentIntensity = room;
+  const sunLight = new THREE.DirectionalLight(0xffffff, sun);
+  sunLight.position.set(...sunFrom);
+  scene.add(sunLight, new THREE.HemisphereLight(0xffffff, 0x8a8070, sky));
   return scene;
 }
 
