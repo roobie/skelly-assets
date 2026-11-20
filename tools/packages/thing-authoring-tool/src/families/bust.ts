@@ -1,4 +1,4 @@
-import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
+import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid } from '@skelly/construct/shapes/solid.ts';
 import { array, integer, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
 import { block, dome, oval, ovalCut, region } from './body.ts';
 import { positive, spheroid } from './shapes.ts';
@@ -7,7 +7,7 @@ import { positive, spheroid } from './shapes.ts';
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
-// slabs taper hips to shoulders, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
+// slabs taper hips to shoulders, the girdle's top slopes off the neck, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
 // neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit. Head
 // gear straps are fitted to the ring of hair drawn just above the hairline, which models/head-band.libsonnet lays out
 // on the head's voxel lattice and passes here as `hairRing`.
@@ -43,6 +43,8 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       /** How far each deltoid sets into the chest's side, and how far its top sits below the chest's. */
       deltoidInset: positive,
       deltoidDrop: positive,
+      /** How far the girdle's top falls from the neck's foot to the chest's side: the trapezius' slope. */
+      trapeziusDrop: positive,
       neckWidth: positive,
       neckHeight: positive,
       headWidth: positive,
@@ -138,26 +140,20 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   if (d.segment === 'torso') {
     const chestHalfX = d.chestWidth / 2;
     const chestHalfZ = d.chestDepth / 2;
-    const trapRise = 0.008;
-    // The trapezius: a low wedge from the neck's foot out to each shoulder, within the yoke a shell draws there.
-    const trapezius = (id: string, side: 1 | -1): ExtrudedPolygonSolid => {
-      const inner = side * 0.055;
-      const outer = side * (chestHalfX - 0.02);
-      const corners: Vec2[] = [
-        [inner, shoulders - 0.03 - origin],
-        [outer, shoulders - 0.03 - origin],
-        [outer, shoulders - origin],
-        [inner, shoulders + trapRise - origin],
-      ];
-      return {
-        id,
-        kind: 'extruded-polygon',
-        axis: 'z',
-        profile: side > 0 ? corners : corners.reverse(),
-        z: [-d.neckWidth / 2, d.neckWidth / 2],
-        slot: 'skin',
-      };
-    };
+    // The trapezius: the girdle's top falls from the neck's foot to the chest's side, each half cut by a plane through
+    // both. worn-fit.libsonnet, `trapezius`, fits shells to the same slope.
+    const neckFoot = d.neckWidth / 2;
+    const run = chestHalfX - neckFoot;
+    const slopeLength = Math.hypot(run, d.trapeziusDrop);
+    const trapezius = ([1, -1] as const).map((side) => ({
+      normal: [(side * d.trapeziusDrop) / slopeLength, run / slopeLength, 0] as const,
+      offset: (d.trapeziusDrop * neckFoot + run * (shoulders - origin)) / slopeLength,
+    }));
+    const sloped = (solid: ExtrudedPolygonSolid): ExtrudedPolygonSolid => ({
+      ...solid,
+      clip: trapezius,
+      display: { ...solid.display, bevel: false },
+    });
     // A pectoral: a lens on the chest's front plane, its lower edge the visible fold.
     const pec = (id: string, side: 1 | -1) =>
       oval(id, 'skin', ys(chest + d.chestHeight * 0.3, chest + d.chestHeight * 0.72), {
@@ -187,15 +183,15 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
         }),
       ]),
       ...region('shoulders', [
-        oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), {
-          halfX: chestHalfX,
-          halfZ: chestHalfZ - 0.006,
-          power: 3.6,
-        }),
-        pec('pec-left', 1),
-        pec('pec-right', -1),
-        trapezius('trap-left', 1),
-        trapezius('trap-right', -1),
+        sloped(
+          oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), {
+            halfX: chestHalfX,
+            halfZ: chestHalfZ - 0.006,
+            power: 3.6,
+          }),
+        ),
+        sloped(pec('pec-left', 1)),
+        sloped(pec('pec-right', -1)),
         deltoid('shoulder-left', 1),
         deltoid('shoulder-right', -1),
       ]),

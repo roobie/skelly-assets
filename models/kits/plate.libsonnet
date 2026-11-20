@@ -30,16 +30,19 @@ local cut = bust.torsoChamfer / 2;
 local chestW = bust.chestWidth + 2 * g + 0.03, chestD = bust.chestDepth + 2 * g + 0.045;
 local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local skirtTop = waistTop - 0.04;
-local shoulderX = bust.chestWidth / 2 + bust.shoulderWidth / 2 + 0.03 + g;
+// The breast stands this far off the shoulders, cut to their slope.
+local shoulderRise = 0.015;
 local body = [
   oct('plackart', 'plate', skirtTop, ribTop + 0.01, bust.waistWidth + 2 * g + 0.02, bust.ribDepth + 2 * g + 0.03, cut),
   oct('plackart-rim', 'trim', skirtTop, skirtTop + 0.012, bust.waistWidth + 2 * g + 0.03, bust.ribDepth + 2 * g + 0.04, cut),
-  oct('breast', 'plate', ribTop - 0.04, chestTop, chestW, chestD, 0.07),
+  oct('breast', 'plate', ribTop - 0.04, chestTop + shoulderRise, chestW, chestD, 0.07) + { clip: fit.trapezius(shoulderRise) },
   oct('breast-rim', 'trim', ribTop - 0.04, ribTop - 0.026, chestW + 0.01, chestD + 0.01, 0.07),
   // The keel: a ridge down the breast's front, turning the lance aside.
   h.prism('keel', 'trim', 'y', [[chestD / 2 - 0.004, -0.035], [chestD / 2 + 0.03, 0], [chestD / 2 - 0.004, 0.035]], ribTop - 0.03, chestTop - 0.02),
-  oct('yoke', 'plate', chestTop - 0.1, chestTop + 0.015, 2 * shoulderX - 0.02, bust.shoulderDepth + 2 * g + 0.02, 0.045),
-  // Arm-hole edges: a rim round each shoulder so the pauldron meets plate.
+  // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands two of the row's voxels off the
+  // deltoid, so rounding to them cannot sink it into the deltoid.
+  fit.deltoidCap('shoulder-left', 'plate', 1, 0.008),
+  fit.deltoidCap('shoulder-right', 'plate', -1, 0.008),
   oct('gorget-1', 'plate', chestTop - 0.01, chestTop + 0.04, bust.neckWidth + 0.09, bust.neckWidth + 0.09, 0.03, cz=-0.01),
   oct('gorget-2', 'plate', chestTop + 0.025, chestTop + 0.075, bust.neckWidth + 0.075, bust.neckWidth + 0.075, 0.028, cz=-0.01),
   oct('gorget-lip', 'trim', chestTop + 0.07, chestTop + 0.085, bust.neckWidth + 0.085, bust.neckWidth + 0.085, 0.028, cz=-0.01),
@@ -56,8 +59,9 @@ local body = [
   for k in [0, 1]
   for i in [0, 1]
 ] + [
-  // Straps and rivets: shoulder straps over the yoke, buckles on the breast's edge.
-  h.box('strap-%d' % k, 'strap', [[-0.13, 0.11][k], chestTop + 0.012, -bust.shoulderDepth / 2 - g], [[-0.11, 0.13][k], chestTop + 0.02, bust.shoulderDepth / 2 + g])
+  // Straps and rivets: shoulder straps over the breast's top, buckles on the breast's edge.
+  fit.slopeBand('strap-%d' % k, 'strap', [[-0.13, 0.11][k], [-0.11, 0.13][k]], [-bust.shoulderDepth / 2 - g, bust.shoulderDepth / 2 + g],
+                [shoulderRise - 0.003, shoulderRise + 0.005])
   for k in [0, 1]
 ] + [
   h.box('rivet-%d' % k, 'rivet', [[-0.19, 0.178][k], ribTop + 0.06, chestD / 2 - 0.03], [[-0.178, 0.19][k], ribTop + 0.075, chestD / 2 - 0.018])

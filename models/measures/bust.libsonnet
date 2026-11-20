@@ -12,6 +12,9 @@
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
   shoulderWidth: 0.09, shoulderHeight: 0.12, shoulderDepth: 0.12, deltoidInset: 0.012, deltoidDrop: 0.01,
+  // How far the girdle's top falls from the neck's foot to the chest's side, so the shoulders slope as the trapezius
+  // does rather than stand square; worn shells over the shoulders follow it.
+  trapeziusDrop: 0.04,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
   headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.

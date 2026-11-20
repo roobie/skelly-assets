@@ -16,8 +16,6 @@ local cuff = 'the bare forearm swells past the cuff\'s mouth where it enters it 
 
 {
   pokes: std.flattenArrays([
-    bothSides(poke, player, 'armor_heavy', 'upperArm', 'armor_heavy_worn_body', 0.002,
-              'the arm meets the body plate\'s shoulder opening a hair proud of it, under the pauldron\'s overhang'),
     bothSides(poke, player, 'gauntlet_plate', 'forearm', 'gauntlet_plate_worn_palm', 0.002, cuff),
     bothSides(poke, player, 'gloves_heavy', 'forearm', 'gloves_heavy_worn_palm', 0.002, cuff),
     bothSides(poke, player, 'gloves_power', 'forearm', 'gloves_power_worn_palm', 0.002, cuff),

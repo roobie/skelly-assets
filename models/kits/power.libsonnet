@@ -38,10 +38,13 @@ local beltY = waistTop - 0.1;
 local lowD = bust.pelvisDepth + 2 * g;
 local chestD = bust.chestDepth + 2 * g + 0.03;
 local front = chestD / 2 + 0.012, back = -chestD / 2;
+// The chest stands this far off the shoulders, and the breast plate is cut to the same slope.
+local shoulderRise = 0.005;
 local bodyAdd = [
-  oct('chest', 'plate', ribTop - 0.03, chestTop, 0.43, chestD, 0.07),
+  oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, 0.43, chestD, 0.07) + { clip: fit.trapezius(shoulderRise) },
   // Angular breast plate: a wedge that juts forward at the bottom of the chest.
-  h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -0.19, 0.19),
+  h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -0.19, 0.19)
+  + { clip: fit.trapezius(shoulderRise) },
   h.prism('breast-lower', 'trim', 'x', [[ribTop - 0.07, front - 0.01], [ribTop - 0.07, front + 0.03], [ribTop - 0.025, front + 0.045], [ribTop - 0.03, front - 0.01]], -0.12, 0.12),
   // The core: a dark frame round a glowing diamond.
   h.prism('core-frame', 'trim', 'z', [[0, ribTop + 0.0], [0.07, ribTop + 0.065], [0, ribTop + 0.13], [-0.07, ribTop + 0.065]], front + 0.03, front + 0.05),
