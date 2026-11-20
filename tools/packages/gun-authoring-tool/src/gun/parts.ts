@@ -73,6 +73,7 @@ import {
   boltStrokeUnits,
   boltWellProfile,
 } from './boltCartridge.ts';
+import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
@@ -94,6 +95,7 @@ import {
 } from './octagon.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
+import { POLYMER_SMG_PROPORTIONS } from './polymerSmgProportions.ts';
 import { gunPort } from './portData.ts';
 import {
   PUMP_ACTION_TRAVEL_U,
@@ -2032,6 +2034,9 @@ const receiver: PartFamily = {
     const rearFaceX = sectionData?.faces.rear ?? -16;
     const receiverBottom = (sectionData?.faces.bottom ?? -RECEIVER_FRONT_HALF_HEIGHT) - receiverDrop;
     const receiverTop = (sectionData?.faces.top.y ?? RECEIVER_FRONT_HALF_HEIGHT) - receiverDrop;
+    if (isTracedSmgSection(params.section) && params.rail !== 'none') {
+      throw new Error(`receiver ${params.section}: a traced section carries its own rails, so it takes no optic rail.`);
+    }
     if (
       sectionData &&
       params.section !== 'sporter' &&
@@ -5322,7 +5327,7 @@ const magazineGeometryFor = (
  * struts forward by the difference of the two lengths, while the latch housing and lever stay on the end cap.
  */
 const compactSmgTelescopingStock = (collapsed: boolean): Solid[] => {
-  const { stock, receiver } = TRACED_SMG_SECTIONS['compact-smg'];
+  const { stock, receiver } = COMPACT_SMG_PROPORTIONS;
   const { rearX } = receiver;
   const origin: Vec2 = [rearX, 0];
   const traced = stock.pad.flat();
@@ -5682,8 +5687,11 @@ const stock: PartFamily = {
       };
     }
     if (params.style === 'skeleton-folding') {
-      // Only the polymer SMG's stock is traced; it is built extended, since its fold has no motion yet.
-      const { stock: skeleton, receiver: body } = TRACED_SMG_SECTIONS['polymer-smg'];
+      // The polymer SMG's stock is traced extended at its own length, so `length` has no say; its fold has no pose yet.
+      if (params.pose === 'collapsed') {
+        throw new Error('stock skeleton-folding: the fold has no collapsed pose yet.');
+      }
+      const { stock: skeleton, receiver: body } = POLYMER_SMG_PROPORTIONS;
       return {
         family: 'stock',
         solids: skeletonStockSolids(skeleton, body.rearX),

@@ -15,7 +15,7 @@ base + {
     } + {
       receiver: parts.receiver + { params: parts.receiver.params + { section: 'polymer-smg', rail: 'none' } },
       barrel: parts.barrel + { params: parts.barrel.params + { muzzle: 'threaded' } },
-      stock: parts.stock + { params: parts.stock.params + { style: 'skeleton-folding', pose: 'extended' } },
+      stock: parts.stock + { params: parts.stock.params + { style: 'skeleton-folding' } },
     },
     connections: [
       c

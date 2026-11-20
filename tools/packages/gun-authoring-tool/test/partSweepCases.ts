@@ -1,4 +1,5 @@
 import type { PartFamily } from '@skelly/construct/assembly/schema.ts';
+import { isTracedSmgSection } from '../src/gun/tracedSmgSections.ts';
 import { fullProduct } from './coveringArray.ts';
 import { runSweeps } from './sweeps.ts';
 
@@ -51,14 +52,20 @@ export const withoutHandleStyle = (family: PartFamily) =>
     ),
   );
 
-// Straight STANAG only accepts M, and only the sporter lower (its section is not swept) is built without a well;
-// the rejected rows have dedicated contract tests.
-export const acceptedCases = (key: string, cases: Record<string, string>[]): Record<string, string>[] =>
-  key === 'magazine'
-    ? cases.filter(({ profile, length: lengthClass }) => profile !== 'stanag-straight' || lengthClass === 'M')
-    : key === 'lower'
-      ? cases.filter(({ magazineWell }) => magazineWell !== 'none')
-      : cases;
+// Straight STANAG only accepts M, only the sporter lower (its section is not swept) is built without a well, a traced
+// SMG receiver carries its own rails, and the skeleton stock has no fold pose; the rejected rows have dedicated
+// contract tests.
+const ACCEPTS: Readonly<Record<string, (row: Record<string, string>) => boolean>> = {
+  magazine: ({ profile, length: lengthClass }) => profile !== 'stanag-straight' || lengthClass === 'M',
+  lower: ({ magazineWell }) => magazineWell !== 'none',
+  receiver: ({ section, rail }) => !isTracedSmgSection(section) || rail === 'none',
+  stock: ({ style, pose }) => style !== 'skeleton-folding' || pose !== 'collapsed',
+};
 
-export const sweepCases = (_key: string, family: PartFamily): Record<string, string>[] =>
-  runSweeps ? fullProduct(withoutHandleStyle(family)) : [];
+export const acceptedCases = (key: string, cases: Record<string, string>[]): Record<string, string>[] => {
+  const accepts = ACCEPTS[key];
+  return accepts ? cases.filter(accepts) : cases;
+};
+
+export const sweepCases = (key: string, family: PartFamily): Record<string, string>[] =>
+  runSweeps ? acceptedCases(key, fullProduct(withoutHandleStyle(family))) : [];
