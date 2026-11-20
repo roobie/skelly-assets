@@ -262,7 +262,8 @@ press check, the head-band fit and the showcase's whole worn view, because their
 body, and a garment's `wornOn`, since fitting one garment to several dolls is not built. A limb a doll rests turned,
 such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models stay authored
 hanging as `docs/decisions/0008-dressing.md` has them; the code that reads a hand or a loose wearable off a hanging part
-refuses a turned one until it is taught to follow the turn.
+refuses a turned one until it is taught to follow the turn. A doll whose bones are not the player's gives its joints'
+places and its extra cuts to the body families as content (`packages/thing-authoring-tool/README.md`, Body families).
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a

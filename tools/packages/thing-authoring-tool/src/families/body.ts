@@ -1,3 +1,4 @@
+import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 
 interface Footprint {
@@ -167,6 +168,84 @@ export const block = (
   },
   slot,
 });
+
+type BodySolid = ExtrudedPolygonSolid | BoxSolid | RevolvedSolid;
+type Axis = 'x' | 'y' | 'z';
+const AXES: readonly Axis[] = ['x', 'y', 'z'];
+/** The frame axes a profile's two coordinates lie along, for a solid extruded along the key (see ExtrudedPolygonSolid). */
+const PROFILE_AXES: Record<Axis, readonly [Axis, Axis]> = { x: ['y', 'z'], y: ['z', 'x'], z: ['x', 'y'] };
+const profileCoordinate = (extrusion: Axis, axis: Axis) => PROFILE_AXES[extrusion].indexOf(axis) as 0 | 1;
+
+/**
+ * Solids moved by `by`, so a part drawn in its body's frame can be handed over in its own joint's frame. A clip plane
+ * moves with its solid, so the half-space it keeps stays on the same flesh.
+ */
+export const translate = <T extends BodySolid>(solids: readonly T[], by: Vec3): T[] => {
+  if (by.every((c) => c === 0)) return [...solids];
+  const along = (axis: Axis) => by[AXES.indexOf(axis)]!;
+  return solids.map((solid): T => {
+    if (solid.kind === 'box') {
+      return { ...solid, box: { ...solid.box, center: add(solid.box.center, by) } };
+    }
+    if (solid.kind === 'revolved') {
+      return { ...solid, origin: add(solid.origin ?? [0, 0, 0], by) };
+    }
+    const axis = solid.axis ?? 'z';
+    const [u, v] = PROFILE_AXES[axis];
+    return {
+      ...solid,
+      profile: solid.profile.map(([p, q]): Vec2 => [p + along(u), q + along(v)]),
+      z: [solid.z[0] + along(axis), solid.z[1] + along(axis)],
+      ...(solid.clip
+        ? { clip: solid.clip.map(({ normal, offset }) => ({ normal, offset: offset + dot(normal, by) })) }
+        : {}),
+    };
+  });
+};
+const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+/**
+ * Solids cut to the side of the plane `axis = at` that `keep` names (1 keeps above, -1 below), dropping any left
+ * empty, so one mass can be shared out among the parts of a body that bends where the mass does not. A turned solid
+ * is never sliced, since its profile is not a section; one that straddles the plane is an authoring error.
+ */
+export const cut = <T extends BodySolid>(solids: readonly T[], axis: Axis, at: number, keep: 1 | -1): T[] =>
+  solids.flatMap((solid): T[] => {
+    const i = AXES.indexOf(axis);
+    const clamp = ([lo, hi]: readonly [number, number]): [number, number] =>
+      keep > 0 ? [Math.max(lo, at), hi] : [lo, Math.min(hi, at)];
+    if (solid.kind === 'box') {
+      const { center, half } = solid.box;
+      const [lo, hi] = clamp([center[i]! - half[i]!, center[i]! + half[i]!]);
+      if (!(hi > lo)) return [];
+      // A box the plane misses is kept as drawn, so recentring it never moves its faces by a rounding.
+      if (lo === center[i]! - half[i]! && hi === center[i]! + half[i]!) return [solid];
+      const along = (values: Vec3, value: number) => values.map((v, j) => (j === i ? value : v)) as unknown as Vec3;
+      return [{ ...solid, box: { center: along(center, (lo + hi) / 2), half: along(half, (hi - lo) / 2) } }];
+    }
+    if (solid.kind === 'revolved') {
+      const [lo, hi] = revolvedExtent(solid, axis);
+      if (keep * (lo - at) >= 0 && keep * (hi - at) >= 0) return [solid];
+      if (keep * (lo - at) <= 0 && keep * (hi - at) <= 0) return [];
+      throw new Error(`${solid.id} straddles the cut at ${axis} = ${at}`);
+    }
+    if ((solid.axis ?? 'z') === axis) {
+      const z = clamp(solid.z);
+      return z[1] > z[0] ? [{ ...solid, z }] : [];
+    }
+    const profile = cutProfile(solid.profile, profileCoordinate(solid.axis ?? 'z', axis), at, keep);
+    return profile.length >= 3 ? [{ ...solid, profile }] : [];
+  });
+const revolvedExtent = (solid: RevolvedSolid, axis: Axis): [number, number] => {
+  const centre = (solid.origin ?? [0, 0, 0])[AXES.indexOf(axis)]!;
+  if ((solid.axis ?? 'z') === axis) {
+    const along = solid.profile.map(([a]) => a);
+    return [centre + Math.min(...along), centre + Math.max(...along)];
+  }
+  const radius = Math.max(...solid.profile.map(([, r]) => r));
+  return [centre - radius, centre + radius];
+};
 
 /**
  * Solids marked as one region of a doll part, a piece the export keeps as its own primitives, so a worn shell's `covers`

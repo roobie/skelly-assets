@@ -1,9 +1,35 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { finite, minValue, pipe, string, transform } from 'valibot';
+import {
+  finite,
+  type GenericSchema,
+  minValue,
+  number,
+  picklist,
+  pipe,
+  record,
+  string,
+  transform,
+  tuple,
+} from 'valibot';
 
 export const scalar = pipe(string(), transform(Number), finite());
 export const positive = pipe(scalar, minValue(Number.MIN_VALUE));
+/** A parameter carrying structured content, as the catalogue passes arrays and objects: JSON text. */
+export const json = <T>(schema: GenericSchema<unknown, T>) =>
+  pipe(
+    string(),
+    transform((text): unknown => JSON.parse(text)),
+    schema,
+  );
+const coordinate = pipe(number(), finite());
+export const point3 = tuple([coordinate, coordinate, coordinate]);
+/**
+ * Where each segment's joint lies in the frame its limb or body is drawn in, for a body whose joints are not on the
+ * centre line it is drawn about. A part is handed over about its own joint, the pivot its bone turns it about.
+ */
+export const jointOrigins = <const S extends string>(segments: readonly S[]) =>
+  json(record(picklist(segments), point3));
 /** Extruded solids must be convex, with the profile wound counterclockwise. */
 export const requireConvex = (profile: readonly Vec2[], what: string): void => {
   for (let i = 0; i < profile.length; i++) {
