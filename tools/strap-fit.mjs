@@ -16,6 +16,7 @@ import { thingEntryFile } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
+// The head-band fit is worked out on the player's bust, whose head the straps were authored for.
 const BUST = 'player_bust';
 const STRAP = 'strap';
 

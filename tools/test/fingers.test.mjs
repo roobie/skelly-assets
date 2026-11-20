@@ -21,7 +21,7 @@ import { compilePose } from '../../site/poseFile.mjs';
 // A hand in tools/dollRig.mjs, `dollRig`'s shape, part boxes in the doll frame: the palm faces -x as the doll's
 // reference side does, one finger of three phalanges hangs from it, flexing about the knuckle row so positive flex
 // curls toward the palm, and a thumb of three bones hangs beside its front edge (+z) in the same frame, its root free
-// to swing, roll and lift (models/poses/rig.libsonnet). The arm above is there for the hold's two-bone reach, its
+// to swing, roll and lift (models/dolls/player/rig.libsonnet). The arm above is there for the hold's two-bone reach, its
 // forearm pronating as the doll's does. A held handle crosses the palm near the knuckles, at the hand's grip share.
 const wide = { flex: [-90, 90], twist: [-90, 90], abduct: [-90, 90] };
 const sense = [1, 1, 1];

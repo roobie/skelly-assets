@@ -27,7 +27,7 @@ it. The trunk stays inside the hanging arm, so a sleeveless shell can enclose it
 garment that covers only part of a region needs a finer cut, made when such a garment is added, not in advance. Boots
 were such a garment: the leg's foot is cut into the ankle's cap and the sole below it, because a boot's vamp stops
 below the cap while the shaft that rises past it rides the shin, a different part copy. The regions are named once, as
-content (`models/dressing.libsonnet`, `regions`), so a declaration and a consumer read one list.
+content (a doll's record in `models/dolls/<id>/doll.libsonnet`, `regions`), so a declaration and a consumer read one list.
 
 **Each region is a closed surface.** The export keeps the faces where two regions meet
 (`tools/packages/thing-export/src/glb.ts`, `voxelPrimitivesFor`), so hiding one region shows the other's closed face,

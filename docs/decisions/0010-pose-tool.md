@@ -22,7 +22,7 @@ format to read and a second set of maths to keep in step.
 
 ## Decision
 
-**One rig model.** The doll's rig is content, `models/poses/rig.libsonnet`, in mobgen's bone shape, one bone per doll
+**One rig model.** The doll's rig is content, `models/dolls/player/rig.libsonnet`, in mobgen's bone shape, one bone per doll
 part, named as mobgen names the player's bones. `tools/dollRig.mjs`, `dollRig`, reads each pivot from the built doll,
 so the rig follows the avatar's models and anchors without copying their numbers. Limits are written once, for the
 reference side, and mirrored, so a mirrored pose is the same pose with twist and abduction negated. A pose file names
@@ -47,7 +47,7 @@ assert the kind of finding instead of a count that moves with every garment; how
 
 ## Fingers and grips
 
-Fingers are more bones under the hand in the same content (`models/poses/rig.libsonnet`, `fingerBones`), one per
+Fingers are more bones under the hand in the same content (`models/dolls/player/rig.libsonnet`, `fingerBones`), one per
 phalanx. The thumb is three bones in the fingers' frame (`thumbBones`) rather than a digit of its own kind: a
 metacarpal that swings, rolls and lifts, then two phalanges that only bend. Opposition is the roll of that root,
 read in the joint's own order with its swing and lift, because one three-freedom joint at the root is what lets the

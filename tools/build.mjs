@@ -6,8 +6,8 @@
 // With no row ids it first holds every model's title and taxonomy to their rules and every vehicle's parts at different
 // sites clear of each other (tools/check-sources.mjs), then builds every
 // id of the roster, models/export.json, every row of every recipe file in models/recipes/, every vehicle's placements
-// (tools/placements.mjs), the doll's baked wields and locomotion (tools/wields.mjs and tools/locomotion.mjs) and
-// built/manifest.json over them,
+// (tools/placements.mjs), each doll's rig (tools/dollRig.mjs, exportDollRigs), the player's baked wields and locomotion
+// (tools/wields.mjs and tools/locomotion.mjs) and built/manifest.json over them,
 // the mob rows and the sound rows (tools/mobs.mjs and tools/sounds.mjs write their files), with each pack's
 // dependencies (tools/packs.mjs) and the finish library (tools/manifest.mjs); with ids it builds only those
 // rows, from the roster source or a recipe file, with no pack index, placements or manifest; referenced building-kit
@@ -29,7 +29,8 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { exportBuildingKits } from './buildingKits.mjs';
 import { modelSources, sourceReport, vehicleReport } from './check-sources.mjs';
-import { readDollParts, readDressing, wornOnParts } from './dress.mjs';
+import { exportDollRigs } from './dollRig.mjs';
+import { dollDressing, PLAYER, readDollParts, readDressing, wornOnParts } from './dress.mjs';
 import { entryFolder } from './entryFolder.mjs';
 import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
 import { declaredPacks, outputPath, readMobRows, readRoster, readSoundRows, smoothPack } from './layout.mjs';
@@ -597,7 +598,8 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
-      const dressing = readDressing(repo);
+      // A wearable's wornOn names one doll's part copies; fitting one garment to many dolls is not built yet.
+      const dressing = dollDressing(readDressing(repo), PLAYER);
       const models = withWornOn(
         withSources([...built.models, ...recipes.models, ...mobs.models], sources),
         dressing,
@@ -621,6 +623,8 @@ async function main() {
         out,
       });
       for (const file of placed.files) console.log(`built ${file}`);
+      const dollRigs = exportDollRigs(out, { models });
+      for (const file of dollRigs.files) console.log(`built ${file}`);
       const wields = exportWields(out, { models }, { cache, prune: true });
       for (const file of wields.files) console.log(`built ${file}`);
       const locomotion = exportLocomotion(out, { models });
@@ -632,6 +636,7 @@ async function main() {
         ...mobs.files,
         ...sounds.files,
         ...placed.files,
+        ...dollRigs.files,
         ...wields.files,
         ...locomotion.files,
       ];
@@ -641,6 +646,7 @@ async function main() {
         models,
         buildingKits: kits.buildingKits,
         vehicles: placed.vehicles,
+        dolls: dollRigs.dolls,
         motions: [...wields.motions, ...locomotion.motions],
         sounds: sounds.sounds,
         dependsOn,

@@ -29,8 +29,8 @@ import {
   transpose,
 } from '../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../site/poseFile.mjs';
-import { DOLL_MOTIONS, dollRig, readRigContent } from './dollRig.mjs';
-import { dollFrom, dollModels, modelMeshes, readDressing } from './dress.mjs';
+import { dollRig } from './dollRig.mjs';
+import { dollDressing, dollFrom, dollModels, modelMeshes, PLAYER, readDressing } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing, unitQuat } from './keyFrames.mjs';
@@ -669,7 +669,7 @@ export async function wieldShard(modelOf, { root = repo, sets = WIELD_SETS, cach
   const weapons = Object.values(sets).flatMap(({ file }) =>
     Object.values(readWields(root, file).classes).flatMap(({ weapon }) => (weapon ? [weapon.model] : [])),
   );
-  const ids = new Set([...dollModels(readDressing(root)), ...weapons]);
+  const ids = new Set([...dollModels(dollDressing(readDressing(root), PLAYER)), ...weapons]);
   const files = new Map(await Promise.all([...ids].map(async (id) => [id, await modelOf(id)])));
   const { rig, meshOf, sets: read } = wieldModels((id) => files.get(id), { root, sets });
   wieldResults(rig, read, meshOf, { cache, shard });
@@ -682,20 +682,21 @@ export function readWieldTree(built, root = repo) {
 }
 
 /**
- * The doll's rig and each of `sets` as `{ wields, weapons, gait }`, from `filesOf(id)`, a model's `{ glb, entry }`: its
- * GLB and its sidecar, as a built tree holds them (`treeFiles`) or a build generates them. `gait` is the doll's
- * (readLocomotion), whose walks each set's classes walk holding what they hold.
+ * The player's rig and each of `sets` as `{ rig, dressing, meshOf, sets: { wields, weapons, gait } }`, from
+ * `filesOf(id)`, a model's `{ glb, entry }`: its GLB and its sidecar, as a built tree holds them (`treeFiles`) or a
+ * build generates them. Wields are authored for the player alone. `gait` is the player's (readLocomotion), whose walks
+ * each set's classes walk holding what they hold.
  */
 export function wieldModels(filesOf, { root = repo, sets = WIELD_SETS } = {}) {
-  const dressing = readDressing(root);
+  const dressing = dollDressing(readDressing(root), PLAYER);
   const doll = dollFrom(dressing, filesOf);
-  const rig = dollRig(readRigContent(root), doll, dressing);
+  const rig = dollRig(doll, dressing);
   const { meshOf, entryOf } = heldModels(filesOf);
   const read = mapValues(sets, ({ file }) => {
     const wields = readWields(root, file);
     return { wields, weapons: wieldWeapons(wields, entryOf, meshOf), gait: readLocomotion(root) };
   });
-  return { rig, doll, meshOf, sets: read };
+  return { rig, dressing, meshOf, sets: read };
 }
 
 /**
@@ -762,51 +763,45 @@ export function wieldProblems(reports) {
   );
 }
 
-// What the rig holds for authoring poses, not for playing clips: the pose page's clips, the eye a look aims, the hand
-// presets a pose file names.
-const AUTHORING = new Set(['clips', 'eye', 'presets']);
 const MELEE_DOC =
   "The doll's melee clips by name, <class>_<stance|strike|walk>_<kind>, posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height; a strike's frames stand evenly through durationSimSeconds, the first and last in its class's guard. phases: where each of windup, strike, follow and recovery ends; hitAtSimSeconds: where the strike phase ends and the blow lands, which a game scales with the clip to its own timing while its simulation decides the hit. <class>_<walk>_idle, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk holding what the class holds, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's; a class wielding with one hand swings its arms as there, the weapon riding the leading hand, while a two-hand class keeps both hands on its weapon as its idle holds it. held, on a weapon class's clips: the bone of the hand that leads the weapon, and the weapon's grip point (at) and its held axes (turn: working end +z, up +y) in that bone's rest model frame (the model's axes and origin before the bone's clip rotation, which is not the node frame of the rig's bind.rest), so a game seats any weapon of the class by its own grip; each hand on the weapon holds its handle's axis on the palm's face beside the arm's grip anchor, where a figure's fist holds an item.";
 const GUNS_DOC =
   "The doll's held gun clips by name, <gun>_stance_<idle|guard> and <gun>_<walk>_<idle|guard>, one set per gun family (the gun's model id), posing the rig the manifest's motions entry names. A frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the root at a point, which stands the doll barefoot on the ground: a game adds the largest soleLift among the models a figure wears (the manifest's models) to the root's height. idle: low ready, the gun carried muzzle down across the body; guard: shouldered, the bore level ahead and the eye on the sight line, the stance a game plays for ready whatever is in hand, as the melee clips' guard. <gun>_<walk>_<stance>, for each walk of doll.locomotion.json (sneak, walk, run, crouch_walk): that walk in that stance, shaped and played as the empty walk is (a loop in place, advanced by the ground travelled over strideMetres, with its speedMetresPerSecond), its legs the empty walk's and both hands on the gun as in the stance, the gun tipped down by its stance's share of the walk's forward lean; at idle the gun sways a little with the stride, at guard the bore stays ahead and does not sway. held: the bone of the hand on the pistol grip or stock wrist, and the gun's grip point (at) and its held axes (turn: bore +z, up +y) in that bone's rest model frame (the model's axes and origin before the bone's clip rotation, which is not the node frame of the rig's bind.rest), so a game seats the gun by its own grip.at; the clip was baked on that gun, so the support hand lies on its fore-end.";
 /**
- * The doll's sets of wields: each one's content file under models/poses, and the motions entry a release carries its
- * baked clips in, in the pack of the doll's parts, so a game that plays only one set loads only its file.
+ * The player's sets of wields: each one's content file under models/poses, and the motions entry a release carries its
+ * baked clips in, in the pack of the player's parts, so a game that plays only one set loads only its file.
  */
 export const WIELD_SETS = {
   melee: {
     file: 'wields/wields.libsonnet',
-    motions: { id: 'doll_melee', ...DOLL_MOTIONS, path: 'motions/doll.melee.json' },
+    motions: { id: 'doll_melee', path: 'motions/doll.melee.json' },
     doc: MELEE_DOC,
   },
   guns: {
     file: 'guns/guns.libsonnet',
-    motions: { id: 'doll_guns', ...DOLL_MOTIONS, path: 'motions/doll.guns.json' },
+    motions: { id: 'doll_guns', path: 'motions/doll.guns.json' },
     doc: GUNS_DOC,
   },
 };
 /** @typedef {Readonly<Record<string, (typeof WIELD_SETS)[keyof typeof WIELD_SETS]>>} WieldSets */
 
 /**
- * Writes the doll's rig and each of `sets` of its baked wields (all of `WIELD_SETS` unless given) into the built tree `out`, whose models
- * `manifest` lists, for a game to play: the rig a clip's frames turn, with each part's site on it, and each set's clips
- * by name. Refuses a set whose frames show any `wieldProblems`. Returns the files written, under their packs, and the
- * manifest's motions entries for them. `cache`, `prune` and `bake` are `wieldResults`'.
+ * Writes each of `sets` of the player's baked wields (all of `WIELD_SETS` unless given) into the built tree `out`,
+ * whose models `manifest` lists, for a game to play on the rig exportDollRigs writes: each set's clips by name. Refuses
+ * a set whose frames show any `wieldProblems`. Returns the files written, under their packs, and the manifest's motions
+ * entries for them. `cache`, `prune` and `bake` are `wieldResults`'.
  * @param {string} out
  * @param {Parameters<typeof treeFiles>[1]} manifest
  * @param {{ root?: string; sets?: WieldSets; cache?: string | undefined; prune?: boolean; bake?: string }} [options]
  */
 export function exportWields(out, manifest, { root = repo, sets = WIELD_SETS, ...options } = {}) {
-  const { rig, doll, meshOf, sets: read } = wieldModels(treeFiles(out, manifest), { root, sets });
+  const { rig, dressing, meshOf, sets: read } = wieldModels(treeFiles(out, manifest), { root, sets });
   const { results: baked } = wieldResults(rig, read, meshOf, options);
   const problems = Object.values(baked).flatMap(({ problems }) => problems);
   if (problems.length > 0) throw new Error(`baked wields: ${problems.join('; ')}`);
-  const posing = Object.fromEntries(Object.entries(rig).filter(([key]) => !AUTHORING.has(key)));
-  const rigFile = { ...posing, doll: doll.sites };
   const files = new Map();
   for (const [name, { motions, doc }] of Object.entries(sets)) {
-    files.set(outputPath(motions.pack, motions.rig), rigFile);
-    files.set(outputPath(motions.pack, motions.path), {
+    files.set(outputPath(dressing.pack, motions.path), {
       _doc: doc,
       rig: { id: rig.id, revision: rig.revision },
       clips: baked[name].clips,
@@ -816,7 +811,10 @@ export function exportWields(out, manifest, { root = repo, sets = WIELD_SETS, ..
     mkdirSync(dirname(join(out, file)), { recursive: true });
     writeFileSync(join(out, file), `${JSON.stringify(value)}\n`);
   }
-  return { files: [...files.keys()], motions: Object.values(sets).map((set) => set.motions) };
+  return {
+    files: [...files.keys()],
+    motions: Object.values(sets).map(({ motions }) => ({ ...motions, pack: dressing.pack, rig: dressing.rigPath })),
+  };
 }
 
 if (import.meta.main) {

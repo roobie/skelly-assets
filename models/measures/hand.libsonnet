@@ -1,6 +1,6 @@
 // The hand's layout from the arm's measures: where each finger sits across the knuckles, how long each phalanx and
 // thumb bone is and what its part and bone are called, so the doll (models/catalogue/sets/avatar.libsonnet), its rig
-// (models/poses/rig.libsonnet) and its gloves (packages/thing-authoring-tool/worn-fit.libsonnet) agree on one hand.
+// (models/dolls/player/rig.libsonnet) and its gloves (packages/thing-authoring-tool/worn-fit.libsonnet) agree on one hand.
 local arm = import 'arm.libsonnet';
 local halfPalm = arm.palmWidth / 2;
 local span = halfPalm * (1 + arm.fingerFrontShare);
@@ -26,6 +26,6 @@ local phalanges = std.length(arm.phalanxShares);
   thumbLength(k):: arm.thumbLength * arm.thumbShares[k],
   // Where a game's fist closes on a held item's grip point, as a share of the palm's length from the wrist: the arm's
   // grip anchor, and the palm seat of the doll's melee hands, so a wield clip baked on the doll seats its weapon where
-  // the game's figure holds it. The doll's own power grip (models/poses/rig.libsonnet, the hand's `grip`) seats deeper.
+  // the game's figure holds it. The doll's own power grip (models/dolls/player/rig.libsonnet, the hand's `grip`) seats deeper.
   fistShare: 0.5,
 }

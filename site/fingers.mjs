@@ -38,7 +38,7 @@ const boneById = (rig) => new Map(rig.bones.map((bone) => [bone.id, bone]));
 
 /**
  * The digits hanging from the hand bone `handId`: by digit name, its bones knuckle first. A digit bone names its
- * `digit` (models/poses/rig.libsonnet); the chain is read off the parents.
+ * `digit` (models/dolls/player/rig.libsonnet); the chain is read off the parents.
  */
 export function digitsOf(rig, handId) {
   const bones = boneById(rig);
@@ -109,7 +109,7 @@ export function handIssues(rig, handId, hand) {
  * The joint angles a hand shorthand (or the preset it names, under its own keys) asks of the digits of `handId`: a
  * finger's `curl` flexes each of its joints by that share of its range, `spread` abducts the knuckles by their share
  * of the spread, and the thumb's root goes `across` the palm, rolls into opposition by `oppose` and `lift`s toward the
- * palm, while `curl` bends the joints beyond it (models/poses/rig.libsonnet, the thumb). Returns
+ * palm, while `curl` bends the joints beyond it (models/dolls/player/rig.libsonnet, the thumb). Returns
  * `{ <bone>: [flex, twist, abduct] }`.
  */
 export function handAngles(rig, handId, asked) {

@@ -7,8 +7,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { clampJointAngles, sub } from '../site/kinematics.mjs';
 import { compilePose } from '../site/poseFile.mjs';
-import { DOLL_MOTIONS, dollRig, readRigContent } from './dollRig.mjs';
-import { readDoll, readDressing } from './dress.mjs';
+import { dollRig } from './dollRig.mjs';
+import { dollDressing, PLAYER, readDoll, readDressing } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { r4, standing } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
@@ -159,25 +159,25 @@ export const locomotionProblems = (reports) =>
     frames.flatMap((clamped, k) => clamped.map(({ bone }) => `${clip} frame ${k}: ${bone} asks past a limit`)),
   );
 
-const MOTIONS = { id: 'doll_locomotion', ...DOLL_MOTIONS, path: 'motions/doll.locomotion.json' };
+const MOTIONS = { id: 'doll_locomotion', path: 'motions/doll.locomotion.json' };
 const CLIPS_DOC =
   "The doll's locomotion clips by name, posing the rig the manifest's motions entry names, as doll.melee.json's do: a frame turns each bone it names from its rest by a quaternion [x, y, z, w] and stands the doll barefoot on the ground, so a game adds the soleLift of what a figure wears to the root's height. stand: standing still; idle: the stand as base, with motion oscillators a game layers over it on Sim seconds (periodSimSeconds, amplitudeDeg about a bone's axis, a salt to offset each oscillator's phase by the figure's seed). sneak, walk, run, crouch_walk: loops in place, both feet once over the frames; a game advances a loop by the ground travelled over strideMetres, so the planted foot keeps pace with the ground, and speedMetresPerSecond is the pace each was drawn for. crouch, prone, downed, dead: poses held still.";
 
 /**
- * Writes the doll's locomotion into the built tree `out`, whose models `manifest` lists, beside the rig exportWields
+ * Writes the player's locomotion into the built tree `out`, whose models `manifest` lists, for the rig exportDollRigs
  * writes. Returns the file written, under its pack, and the manifest's motions entry for it.
  */
 export function exportLocomotion(out, manifest, root = repo) {
-  const dressing = readDressing(root);
-  const rig = dollRig(readRigContent(root), readDoll(out, manifest, dressing), dressing);
+  const dressing = dollDressing(readDressing(root), PLAYER);
+  const rig = dollRig(readDoll(out, manifest, dressing), dressing);
   const { clips, reports } = locomotionClips(rig, readLocomotion(root));
   const problems = locomotionProblems(reports);
   if (problems.length > 0) throw new Error(`baked locomotion: ${problems.join('; ')}`);
-  const file = outputPath(MOTIONS.pack, MOTIONS.path);
+  const file = outputPath(dressing.pack, MOTIONS.path);
   mkdirSync(dirname(join(out, file)), { recursive: true });
   writeFileSync(
     join(out, file),
     `${JSON.stringify({ _doc: CLIPS_DOC, rig: { id: rig.id, revision: rig.revision }, clips })}\n`,
   );
-  return { files: [file], motions: [MOTIONS] };
+  return { files: [file], motions: [{ ...MOTIONS, pack: dressing.pack, rig: dressing.rigPath }] };
 }

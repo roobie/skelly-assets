@@ -149,6 +149,23 @@ test('motions whose rig file the tree does not hold are refused, so a consumer n
   );
 });
 
+test("a doll whose rig file the tree does not hold is refused, and one that does is listed with its parts' models", () => {
+  const doll = {
+    id: 'fixture',
+    pack: 'fixture.a',
+    rig: 'motions/fixture.rig.json',
+    models: { bust: 'fixture_bust', arm: 'fixture_arm' },
+  };
+  assert.throws(() => buildManifest({ models: [], dolls: [doll], files: [], credit }), /doll fixture/);
+  const { dolls } = buildManifest({
+    models: [],
+    dolls: [doll],
+    files: ['fixture.a/motions/fixture.rig.json'],
+    credit,
+  });
+  assert.deepEqual(dolls, [doll]);
+});
+
 test('the manifest carries what a worn shell covers, so a consumer reads it without opening the model entry', () => {
   const { models } = buildManifest({
     models: [

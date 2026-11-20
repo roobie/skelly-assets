@@ -1,0 +1,49 @@
+// The player doll, one of the dolls of models/dressing.libsonnet: the doll a game's player is drawn as. What the
+// dressing rule needs of a doll is read from here (tools/dress.mjs, `dollDressing`).
+{
+  // Where the doll's rig is released: the pack of its parts, and the file that rig is written to.
+  pack: 'skelly.body',
+  rigPath: 'motions/doll.rig.json',
+  // The bust, with each limb hung on each side by its own anchor from the bust's anchor of the same name and side,
+  // `<anchor>_<side>`. The limb models are built as the figure's right limb, so the `mirrored` side is their mirror. A
+  // place on one side only takes the first side's copy. The limbs' order is the order of their sites in the doll, which
+  // a rig file's bone binds index, so a limb added later goes last.
+  bust: 'player_bust',
+  limbs: [
+    { name: 'arm', model: 'player_arm', anchor: 'shoulder' },
+    { name: 'leg', model: 'player_leg', anchor: 'hip' },
+  ],
+  sides: ['right', 'left'],
+  mirrored: 'left',
+  // What a sided bone's id takes after its name, by side.
+  boneSuffix: { right: '.R', left: '.L' },
+  rig: import 'models/dolls/player/rig.libsonnet',
+  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions that part is cut into,
+  // which the doll's export keeps as pieces (docs/decisions/0012-hidden-body.md). A part not listed is not cut.
+  regions: {
+    // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
+    torso: ['trunk', 'shoulders'],
+    // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it: heel, instep and toes.
+    foot: ['ankle', 'sole'],
+  },
+  // The doll part each segment a worn piece's id ends in is drawn in, and the body slot it covers.
+  slots: import 'models/worn-slots.libsonnet',
+  // Where a wearable with no worn pieces sits, by the first of its slots listed here: on the doll part `part` (every
+  // side's copy with `both`, the first side's otherwise), centred across `against`, the direction from the
+  // part it rests against, and sunk into the part by `sink`, a share of its own depth along that direction. No
+  // direction centres it on the part. A place with `anchor` instead puts the model's own anchor of that name at the
+  // bust's, or its origin if it has none: a hat stands on its brim at y = 0, and the brim sits at the brow whatever the
+  // hat's height.
+  places: [
+    { slot: 'torso', part: 'torso', against: [0, 0, 1], sink: 0.5 },
+    { slot: 'legs', part: 'thigh', both: true, against: [0, 0, 1], sink: 0.5 },
+    { slot: 'head', anchor: 'brow' },
+    { slot: 'face', part: 'head', against: [0, 0, 1], sink: 0.3 },
+    { slot: 'neck', part: 'neck', against: [0, 0, 1], sink: 0.5 },
+    { slot: 'back', part: 'torso', against: [0, 0, -1], sink: 0 },
+    { slot: 'waist', part: 'pelvis', against: [0, 0, 1], sink: 0.5 },
+    { slot: 'arms', part: 'upper', against: [-1, 0, 0], sink: 0.5 },
+    { slot: 'hands', part: 'palm', against: [0, 0, 0], sink: 0 },
+    { slot: 'feet', part: 'foot', both: true, against: [0, -1, 0], sink: 1 },
+  ],
+}

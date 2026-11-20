@@ -6,7 +6,7 @@ import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import { sampleClip } from '../../site/clipFrames.mjs';
-import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
+import { dollDressing, isWearable, PLAYER, placeOf, readDressing, wornPieces } from '../dress.mjs';
 import {
   declaredPacks,
   outputPath,
@@ -123,7 +123,7 @@ test('the roster builder writes each id at its pack path, with its sidecar and i
 });
 
 test('every roster wearable the doll seats by an anchor builds with that anchor, so it is not seated by its origin', () => {
-  const dressing = readDressing(repo);
+  const dressing = dollDressing(readDressing(repo), PLAYER);
   const roster = new Map(readRoster().map((row) => [row.id, row]));
   const rows = JSON.parse(readFileSync(join(repo, 'tools/packages/thing-authoring-tool/exports/deadvox.json'), 'utf8'));
   const models = rows.filter(({ id }) => roster.has(id)).map(({ id, taxonomy }) => ({ id, tags: taxonomy.tags }));

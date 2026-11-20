@@ -131,7 +131,7 @@ const jointFrame = ({ frame, id }) => {
 // abducts, twists, then flexes, so the twist chooses which way its hinge lies. A bone that `pronates` twists last, so
 // the twist rolls the posed bone about its own length, as a forearm turns the hand, instead of carrying the flexed bone
 // round a cone; its flex is the outer turn because the middle one reads back only within a quarter turn either way, and
-// an elbow closes further than that while such a bone barely abducts (models/poses/rig.libsonnet, `pronates`).
+// an elbow closes further than that while such a bone barely abducts (models/dolls/player/rig.libsonnet, `pronates`).
 const localRotation = ({ pronates }, [flex, twist, abduct]) =>
   pronates ? mulMM(rotX(flex), mulMM(rotZ(abduct), rotY(twist))) : mulMM(rotZ(abduct), mulMM(rotY(twist), rotX(flex)));
 

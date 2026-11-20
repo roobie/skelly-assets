@@ -1,3 +1,5 @@
+import { writeGlb } from '../glb.mjs';
+
 // Closed axis-aligned boxes of 12 outward-wound triangles each, as one mesh.
 export const boxes = (...spans) => {
   const positions = [],
@@ -13,4 +15,23 @@ export const boxes = (...spans) => {
     );
   }
   return { positions, indices };
+};
+
+// A GLB of one node, the part `part`, drawn as a box spanning `span`.
+export const partGlb = (part, span) => {
+  const { positions, indices } = boxes(span);
+  return writeGlb(
+    {
+      asset: { version: '2.0' },
+      scene: 0,
+      scenes: [{ nodes: [0] }],
+      nodes: [{ extras: { part }, mesh: 0 }],
+      meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1, mode: 4 }] }],
+      accessors: [
+        { bufferView: 0, componentType: 5126, count: positions.length / 3, type: 'VEC3', min: span[0], max: span[1] },
+        { bufferView: 1, componentType: 5125, count: indices.length, type: 'SCALAR' },
+      ],
+    },
+    [new Float32Array(positions), new Uint32Array(indices)],
+  );
 };

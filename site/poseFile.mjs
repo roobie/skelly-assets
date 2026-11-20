@@ -12,7 +12,7 @@
 // the middle bone a pure bend, so `twist` then turns it about itself by that many degrees: a forearm, which pronates,
 // rolls the hand without moving the wrist, as a fist turns palm down on a punch. Grounding before the reach lets a
 // target be read off the standing figure, as the page shows it, and lets a foot reach a point on the ground. Why a file
-// names its rig is in models/poses/rig.libsonnet.
+// names its rig is in models/dolls/player/rig.libsonnet.
 //
 // Hands come as shorthand, `hands: { <hand bone>: "fist" | { preset?, curl, spread, thumb } }`, a preset of the rig or
 // its own shares, which site/fingers.mjs turns into digit angles before `angles` of single digit bones are read, so a

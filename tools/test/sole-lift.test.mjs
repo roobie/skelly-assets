@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { isWearable, placeOf, readDressing, wornPieces } from '../dress.mjs';
+import { dollDressing, isWearable, PLAYER, placeOf, readDressing, wornPieces } from '../dress.mjs';
 import { solid } from '../pieceSolid.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 import { facetTerms } from '../taxonomy.mjs';
@@ -16,7 +16,7 @@ const unworn = {
 await installJsonnetSources();
 const { items } = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 const models = items.map((item) => ({ ...item, tags: item.taxonomy?.tags }));
-const dressing = readDressing(repo);
+const dressing = dollDressing(readDressing(repo), PLAYER);
 
 /** A model's pieces with their solids. @param {{ parts: { params?: { pieces?: string } }[] }} model */
 const solidsOf = ({ parts }) =>

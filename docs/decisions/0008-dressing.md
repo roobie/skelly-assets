@@ -19,7 +19,8 @@ wrong. Most wearables have no worn pieces yet: only a few garments and carried g
 ## Decision
 
 Both show a wearable worn on the doll, the default player avatar assembled from its bust and limb models, through
-one rule: `models/dressing.libsonnet` holds what is content, and `tools/dress.mjs`, `wornSites`, turns it into sites
+one rule: `models/dressing.libsonnet` and the doll records it names, `models/dolls/<id>/doll.libsonnet`, hold what is
+content, so a second doll is another record and not another rule, and `tools/dress.mjs`, `wornSites`, turns it into sites
 when the showcase is built (`site/build.mjs`). The review sheets build and draw the showcase, so they draw the same
 sites and cannot place a wearable differently.
 

@@ -9,8 +9,16 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { coverGaps, dollRig, readRigContent } from './dollRig.mjs';
-import { coveringItems, modelMeshes, readDoll, readDressing, wornSites } from './dress.mjs';
+import { coverGaps, dollRig } from './dollRig.mjs';
+import {
+  coveringItems,
+  dollDressings,
+  dollGarments,
+  modelMeshes,
+  readDoll,
+  readDressing,
+  wornSites,
+} from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { readSeats, seatFindings } from './head-fit.mjs';
 import { MANIFEST } from './manifest.mjs';
@@ -88,18 +96,19 @@ function seatSmoothFindings(built, manifest, root) {
 function coverSmoothFindings(built, manifest, root) {
   const models = manifest.models.filter(({ path }) => path.endsWith('.glb'));
   const byId = new Map(models.map((model) => [model.id, model]));
-  const dressing = readDressing(root);
-  const doll = readDoll(built, manifest, dressing);
-  const rig = dollRig(readRigContent(root), doll, dressing);
   const meshesOf = (id, keep) => modelMeshes(readFileSync(join(built, formFile(byId.get(id), 'smooth'))), keep);
   const unplaced = () => {
     throw new Error('a covering item is dressed by its worn pieces, never placed whole');
   };
-  const gaps = coveringItems(models).flatMap((id) =>
-    guarded(id, () =>
-      coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf),
-    ),
-  );
+  const gaps = dollDressings(readDressing(root)).flatMap((dressing) => {
+    const doll = readDoll(built, manifest, dressing);
+    const rig = dollRig(doll, dressing);
+    return dollGarments(dressing, coveringItems(models)).flatMap((id) =>
+      guarded(id, () =>
+        coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf),
+      ),
+    );
+  });
   const open = (gap) => (typeof gap === 'string' ? Infinity : gap.open === 'nothing' ? 0 : gap.open);
   return gaps
     .sort((a, b) => open(b) - open(a))
