@@ -84,6 +84,15 @@ function nodeRotationOf(name, { nodeRotation }, side) {
   return rotation;
 }
 
+// The bone a bone hangs from on a side: one named for every side, the sided one taking the side's suffix, or one per
+// side, as a limb hangs from a paired bust part that is a bone of its own on each side (models/dolls/ual/rig.libsonnet).
+function parentOf(name, { parent }, side, sided) {
+  if (parent === null) return null;
+  if (typeof parent === 'string') return sided(parent, side);
+  if (typeof parent?.[side] !== 'string') throw new Error(`rig: bone ${name} hangs from no bone on the ${side}`);
+  return parent[side];
+}
+
 /**
  * Where a part copy's own model frame sits in its bone's node frame at rest, so a consumer seats a piece drawn in the
  * part's frame on the bone's node with this one constant: a point `q` of the part's model lands at
@@ -179,7 +188,7 @@ export function dollRig(doll, dressing) {
       );
       bones.push({
         id: sided(name, side),
-        parent: spec.parent === null ? null : sided(spec.parent, side),
+        parent: parentOf(name, spec, side, sided),
         head,
         along,
         flexAxis,

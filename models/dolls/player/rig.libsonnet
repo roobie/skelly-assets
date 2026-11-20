@@ -7,6 +7,9 @@
 // compose in or the reference side changed. Widening or narrowing a limit keeps it, since a pose file states its
 // angles and a held angle shows in its report.
 //
+// A sided bone's `parent` takes the side's suffix when the parent is sided too; a limb hanging from a paired bust part,
+// a bone of its own on each side, names one per side instead, `{ right, left }`.
+//
 // `pivot` is `origin`, the part's own origin, which the avatar draws at the joint it hangs from, or `{ anchor }`, a
 // bust anchor. `along` is the bone's rest direction, used to find its tail when it has no single child bone. Both
 // `along` and `flexAxis` are written in the part's own frame, as its model hangs, so a limb that its doll record

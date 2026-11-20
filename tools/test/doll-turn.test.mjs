@@ -173,6 +173,32 @@ test("a doll measured off a skeleton seats each part on its bone's head and rest
   assert.throws(() => measured(missing), /upper\.R is no bone of the skeleton/);
 });
 
+test("a limb hangs on each side from that side's own bone of a paired bust part", () => {
+  // Both girdle bones move the toy's one bust part, which is all a parent needs to be.
+  const girdle = { ...rigContent.bones.spine, parent: 'spine' };
+  const paired = dollRig(doll, {
+    ...dressing,
+    rig: {
+      ...rigContent,
+      bones: {
+        ...rigContent.bones,
+        clavicle_r: girdle,
+        clavicle_l: girdle,
+        upper: { ...rigContent.bones.upper, parent: { right: 'clavicle_r', left: 'clavicle_l' } },
+      },
+    },
+  });
+  const parentOf = (id) => paired.bones.find((b) => b.id === id).parent;
+  assert.equal(parentOf('upper.R'), 'clavicle_r');
+  assert.equal(parentOf('upper.L'), 'clavicle_l');
+  assert.equal(parentOf('fore.L'), 'upper.L');
+  const oneSided = { ...rigContent.bones.upper, parent: { right: 'spine' } };
+  assert.throws(
+    () => dollRig(doll, { ...dressing, rig: { ...rigContent, bones: { ...rigContent.bones, upper: oneSided } } }),
+    /bone upper hangs from no bone on the left/,
+  );
+});
+
 test("the left's limits mirror the axes in the mirror plane as they were written, under the turn", () => {
   const [right, left] = [bone('upper.R'), bone('upper.L')];
   assert.deepEqual(right.limits, { flex: [-10, 20], twist: [-30, 40], abduct: [-5, 60] });
