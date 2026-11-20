@@ -1,0 +1,86 @@
+{
+   "assembly": {
+      "connections": [
+         {
+            "from": "receiver.barrel",
+            "to": "barrel.mount"
+         },
+         {
+            "from": "receiver.bolt-carrier",
+            "to": "bolt-carrier.mount"
+         },
+         {
+            "from": "receiver.stock",
+            "to": "stock.mount"
+         },
+         {
+            "from": "receiver.rear-sight",
+            "to": "rear-sight.mount"
+         },
+         {
+            "from": "receiver.trigger-group",
+            "to": "lower.mount"
+         },
+         {
+            "from": "receiver.gas-tube",
+            "to": "handguard.mount"
+         },
+         {
+            "from": "barrel.front-sight",
+            "to": "front-sight.mount"
+         },
+         {
+            "from": "barrel.bayonet",
+            "to": "bayonet.mount"
+         }
+      ],
+      "description": "Simonov SKS-45 carbine: one-piece walnut stock, fixed ten-round magazine, wooden handguard over the gas tube, tangent rear sight, hooded front sight and the bayonet folded under the barrel.",
+      "name": "sks-carbine",
+      "parts": {
+         "barrel": {
+            "family": "sks-barrel"
+         },
+         "bayonet": {
+            "family": "sks-bayonet"
+         },
+         "bolt-carrier": {
+            "family": "sks-bolt-carrier"
+         },
+         "front-sight": {
+            "family": "sks-front-sight"
+         },
+         "handguard": {
+            "family": "sks-handguard"
+         },
+         "lower": {
+            "family": "sks-lower"
+         },
+         "rear-sight": {
+            "family": "sks-rear-sight"
+         },
+         "receiver": {
+            "family": "sks-receiver"
+         },
+         "stock": {
+            "family": "sks-stock"
+         }
+      },
+      "root": "receiver"
+   },
+   "calibre": "7.62x39",
+   "finish": {
+      "furniture": "wood-walnut",
+      "metal": "steel-blued"
+   },
+   "format": 1,
+   "locks": {
+      "optionalParts": [ ],
+      "params": { }
+   },
+   "platform": {
+      "id": "sks",
+      "sizeClass": "sks"
+   },
+   "status": "published",
+   "template": "sks-carbine"
+}
