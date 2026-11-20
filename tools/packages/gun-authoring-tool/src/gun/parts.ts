@@ -1972,6 +1972,12 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
   });
 };
 
+/** A traced section's rails are its own solids, so the generic optic rail would stack a second rail on them. */
+const tracedReceiverRailRefusal = (params: Readonly<Record<string, string>>): string | undefined =>
+  isTracedSmgSection(params.section) && params.rail !== 'none'
+    ? `The ${params.section} receiver carries its own rails, so it takes no optic rail.`
+    : undefined;
+
 const receiver: PartFamily = {
   name: 'receiver',
   params: {
@@ -2023,6 +2029,7 @@ const receiver: PartFamily = {
       from: [{ port: 'lower', param: 'magazineWell' }],
     },
   },
+  validateParams: tracedReceiverRailRefusal,
   build(params): PartDef {
     const bore = cls(params, 'bore');
     const tubeFed = params.feed === 'tube';
@@ -2034,8 +2041,9 @@ const receiver: PartFamily = {
     const rearFaceX = sectionData?.faces.rear ?? -16;
     const receiverBottom = (sectionData?.faces.bottom ?? -RECEIVER_FRONT_HALF_HEIGHT) - receiverDrop;
     const receiverTop = (sectionData?.faces.top.y ?? RECEIVER_FRONT_HALF_HEIGHT) - receiverDrop;
-    if (isTracedSmgSection(params.section) && params.rail !== 'none') {
-      throw new Error(`receiver ${params.section}: a traced section carries its own rails, so it takes no optic rail.`);
+    const refusal = tracedReceiverRailRefusal(params);
+    if (refusal) {
+      throw new Error(refusal);
     }
     if (
       sectionData &&
@@ -5640,6 +5648,12 @@ const m4StockSolids = (len: number): Solid[] => {
   ];
 };
 
+/** The skeleton stock is traced extended, and its fold has no pose yet. */
+const skeletonFoldRefusal = (params: Readonly<Record<string, string>>): string | undefined =>
+  params.style === 'skeleton-folding' && params.pose === 'collapsed'
+    ? 'The skeleton-folding stock has no collapsed pose yet.'
+    : undefined;
+
 const stock: PartFamily = {
   name: 'stock',
   params: {
@@ -5664,6 +5678,7 @@ const stock: PartFamily = {
       from: [{ port: 'front', param: 'section' }],
     },
   },
+  validateParams: skeletonFoldRefusal,
   build(params): PartDef {
     const tapered = params.style === 'tapered' || params.style === 'tapered-sawed';
     const len = (tapered ? TAPERED_STOCK_PROPORTIONS.lengthU : { S: 10, M: 16, L: 22 })[cls(params, 'length')];
@@ -5687,9 +5702,10 @@ const stock: PartFamily = {
       };
     }
     if (params.style === 'skeleton-folding') {
-      // The polymer SMG's stock is traced extended at its own length, so `length` has no say; its fold has no pose yet.
-      if (params.pose === 'collapsed') {
-        throw new Error('stock skeleton-folding: the fold has no collapsed pose yet.');
+      // The polymer SMG's stock is traced extended at its own length, so `length` has no say.
+      const refusal = skeletonFoldRefusal(params);
+      if (refusal) {
+        throw new Error(refusal);
       }
       const { stock: skeleton, receiver: body } = POLYMER_SMG_PROPORTIONS;
       return {
