@@ -232,6 +232,7 @@ std.flattenArrays([
   import 'models/catalogue/sets/packages.libsonnet',
   import 'models/catalogue/sets/stash-chest.libsonnet',
   import 'models/catalogue/sets/supplies.libsonnet',
+  import 'models/catalogue/sets/ual.libsonnet',
   import 'models/catalogue/sets/warrior-statue.libsonnet',
   import 'models/catalogue/sets/woodland.libsonnet',
   import 'models/catalogue/sets/zweihander.libsonnet',
