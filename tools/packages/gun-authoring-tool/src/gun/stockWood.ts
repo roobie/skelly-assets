@@ -18,6 +18,19 @@ export const hermite = (
   );
 };
 
+/** A traced line through `points` in rising x, straight between them and level beyond its ends. */
+export const tracedLine =
+  (points: readonly Vec2[]) =>
+  (x: number): number => {
+    const next = points.findIndex(([px]) => px >= x);
+    if (next <= 0) {
+      return points[next === 0 ? 0 : points.length - 1]![1];
+    }
+    const [x0, y0] = points[next - 1]!;
+    const [x1, y1] = points[next]!;
+    return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+  };
+
 /** A wooden stock's side profile and plan width along x, and how its cells merge for display. */
 export interface StockContour {
   readonly top: (x: number) => number;
@@ -103,7 +116,12 @@ export const inletWood = (solids: readonly Solid[], { name, halfWidth, opening }
         start >= -halfWidth && end <= halfWidth ? subtractConvexSection(solid.profile, section) : [solid.profile];
       return profiles
         .map(
-          (profile, piece): Solid => ({ ...solid, id: `${solid.id}-${name}-${band}-${piece}`, profile, z: [start, end] }),
+          (profile, piece): Solid => ({
+            ...solid,
+            id: `${solid.id}-${name}-${band}-${piece}`,
+            profile,
+            z: [start, end],
+          }),
         )
         .filter((piece) => {
           if (piece.kind !== 'extruded-polygon') {
