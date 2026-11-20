@@ -221,6 +221,40 @@ test("the left's limits mirror the axes in the mirror plane as they were written
   close(mirroredPose, reflect(posed));
 });
 
+const withUpper = (upper, on = doll) =>
+  dollRig(on, { ...dressing, rig: { ...rigContent, bones: { ...rigContent.bones, upper } } });
+
+test('a bone running obliquely in its part mirrors as squarely as one running down a doll axis', () => {
+  const slanted = withUpper({ ...rigContent.bones.upper, along: [0.3, -1, 0.4] }).bones;
+  const [right, left] = ['upper.R', 'upper.L'].map((id) => slanted.find((b) => b.id === id));
+  close(left.frame.y, mirrorX(right.frame.y), 'the bone mirrored');
+  assert.deepEqual(left.sense, [1, -1, -1]);
+  const angles = [12, -20, 33];
+  const reflect = (m) => mulMM(mulMM([-1, 0, 0, 0, 1, 0, 0, 0, 1], m), [-1, 0, 0, 0, 1, 0, 0, 0, 1]);
+  close(
+    jointRotation(
+      left,
+      angles.map((a, i) => a * left.sense[i]),
+    ),
+    reflect(jointRotation(right, angles)),
+  );
+});
+
+test('a bone is refused a direction that leaves it no joint frame, or a mirrored copy turned apart from its own', () => {
+  const upper = rigContent.bones.upper;
+  assert.throws(() => withUpper({ ...upper, along: [0, 0, 0] }), /bone upper runs along no direction/);
+  assert.throws(() => withUpper({ ...upper, along: [2, 0, 0] }), /bone upper runs along its flex axis/);
+  assert.throws(() => withUpper({ ...upper, flexAxis: [1, 1, 0] }), /bone upper flexes about .* neither along x/);
+  const parts = new Map(doll.parts);
+  parts.set(
+    'upper',
+    doll.parts
+      .get('upper')
+      .map((copy) => (copy.side === 'left' ? { ...copy, turn: mat3ToQuat(rotAxis([0, 0, 1], 80)) } : copy)),
+  );
+  assert.throws(() => withUpper(upper, { ...doll, parts }), /bone upper's left copy is turned no mirror image/);
+});
+
 // The model meshes of the toy: one triangle per part, in the model frame.
 const triangle = (points, offset) => ({
   positions: points.flatMap((p) => add(p, offset)),

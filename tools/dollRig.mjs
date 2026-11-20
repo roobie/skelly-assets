@@ -16,6 +16,7 @@ import {
   mat3ToQuat,
   mulMM,
   mulMV,
+  normalize,
   quatToMat3,
   scale,
   sub,
@@ -63,17 +64,42 @@ function checkLimits(name, limits) {
   }
 }
 
-// Whether a joint axis lies in the doll's mirror plane (x = 0) or runs along x; a copy mirrored across x turns the
-// opposite way about an in-plane axis and the same way about x, so a limit range mirrors with the former and keeps
-// with the latter. Any other axis has no mirrored twin on the same frame and is refused.
-const inMirrorPlane = (axis, name) => {
-  const [x, y, z] = axis;
-  if (Math.abs(x) < 1e-9) return true;
-  if (Math.hypot(y, z) < 1e-9) return false;
+// The `sense` of a sided bone's angles off the reference side, per joint axis. That side's joint frame is the
+// reference's mirrored across x but for the flex axis, which is kept, and a turn mirrored runs the other way about
+// the mirrored axis. The bone is mirrored, so twist reverses whichever way the bone runs. A flex axis in the mirror
+// plane is its own mirror image, so flex reverses; one along x is its mirror image reversed, so flex keeps; the third
+// axis, square to both, does the opposite of flex. A flex axis neither in the plane nor along x has no mirror image
+// on the other side's frame, so the sides could not share limits, and is refused.
+const mirroredSense = (flexAxis, name) => {
+  const [x, y, z] = flexAxis;
+  if (Math.abs(x) < 1e-9) return [-1, -1, 1];
+  if (Math.hypot(y, z) < 1e-9) return [1, -1, -1];
   throw new Error(
-    `rig: bone ${name} has a joint axis ${axis.map((a) => a.toFixed(3)).join(',')} neither along x nor square to it, so its mirrored copy cannot share its limits`,
+    `rig: bone ${name} flexes about ${flexAxis.map((a) => a.toFixed(3)).join(',')}, neither along x nor square to it, so its mirrored copy cannot share its limits`,
   );
 };
+
+// A bone runs along a direction its flex axis leaves a joint frame about: not nothing, and not the flex axis itself.
+function checkAlong(name, along, flexAxis) {
+  const size = Math.hypot(...along);
+  if (!(size > 1e-9)) throw new Error(`rig: bone ${name} runs along no direction`);
+  const x = normalize(flexAxis);
+  if (Math.hypot(...sub(along, scale(x, dot(along, x)))) < 1e-6 * size)
+    throw new Error(`rig: bone ${name} runs along its flex axis, which leaves it no joint frame`);
+}
+
+// The sides of a sided bone are mirror images in the doll: its other copy's direction is the reference's mirrored
+// across x, and its flex axis the reference's mirrored, reversed where flex keeps its sense. A site turned otherwise
+// would pose the two sides apart under limits written for one.
+function checkMirrored(name, reference, other) {
+  const mirror = ([x, y, z]) => [-x, y, z];
+  const apart = (a, b) => Math.hypot(...sub(a, b)) > 1e-6;
+  if (
+    apart(other.along, mirror(reference.along)) ||
+    apart(other.flexAxis, scale(mirror(reference.flexAxis), -other.sense[0]))
+  )
+    throw new Error(`rig: bone ${name}'s ${other.side} copy is turned no mirror image of its ${reference.side} one`);
+}
 
 // The rest rotation of a bone's node on a side, a quaternion [x, y, z, w] of the node's axes in the model's, which the
 // bone's content states for every side or each (models/dolls/player/rig.libsonnet, `nodeRotation`).
@@ -159,13 +185,13 @@ function checkSkeleton(bones, skeleton) {
 
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
 // `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
-// limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, so a
-// mirrored copy's is mirrored; `flexAxis` is an axis of rotation, which a mirror does not flip across x, so it is
-// kept and turned alone, and the `sense` below tells the two sides' angles apart. A sided bone off the reference side
-// mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense` each angle takes
-// there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying. Whether an axis is in
-// the mirror plane is asked of the axis as written in the part, since the two sides' turns are mirror images: the same
-// axis, turned by each side's own turn, lands on mirror images of each other.
+// limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, any
+// way the part's flesh runs, so a mirrored copy's is mirrored as the copy's flesh is; `flexAxis` is an axis of
+// rotation, which a mirror does not flip across x, so it is kept and turned alone, and the `sense` tells the two sides'
+// angles apart. A sided bone off the reference side mirrors the limits of the axes its sense reverses and its reach
+// pole across x, and carries the `sense` each angle takes there, 1 or -1 per axis, so a pose written for the reference
+// side is mirrored by multiplying. The sense is asked of the flex axis as written in the part, since the two sides'
+// turns are mirror images, which each bone's two copies are checked to be.
 export function dollRig(doll, dressing) {
   const { sides, rig: content, boneSuffix } = dressing;
   if (!sides.includes(content.reference))
@@ -174,22 +200,24 @@ export function dollRig(doll, dressing) {
   const bones = [];
   for (const [name, spec] of Object.entries(content.bones)) {
     checkLimits(name, spec.limits);
+    const flexInPart = spec.flexAxis ?? [1, 0, 0];
+    checkAlong(name, spec.along, flexInPart);
+    const copies = [];
     for (const side of spec.sided ? sides : ['centre']) {
       const copy = doll.parts.get(spec.part)?.find((c) => c.side === side);
       if (!copy) throw new Error(`rig: the doll has no ${spec.part} on the ${side}`);
       const head = spec.pivot === 'origin' ? copy.at : doll.anchors[spec.pivot?.anchor];
       if (!head) throw new Error(`rig: no pivot for ${name}: ${JSON.stringify(spec.pivot)}`);
       const mirrored = spec.sided && side !== content.reference;
-      const flexInPart = spec.flexAxis ?? [1, 0, 0];
-      const axes = frameAbout([0, 0, 0], spec.along, flexInPart);
       const turning = copy.turn && quatToMat3(copy.turn);
       const intoDoll = (axis) => (turning ? mulMV(turning, axis) : axis);
-      const along = intoDoll(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along);
+      const along = normalize(intoDoll(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along));
       const flexAxis = intoDoll(flexInPart);
-      const sense = ['x', 'y', 'z'].map((axis) => (mirrored && inMirrorPlane(axes[axis], name) ? -1 : 1));
+      const sense = mirrored ? mirroredSense(flexInPart, name) : [1, 1, 1];
       const limits = Object.fromEntries(
         AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]),
       );
+      copies.push({ side, along, flexAxis, sense });
       bones.push({
         id: sided(name, side),
         parent: parentOf(name, spec, side, sided),
@@ -219,6 +247,10 @@ export function dollRig(doll, dressing) {
         ...(spec.grip !== undefined ? { grip: spec.grip } : {}),
         ...(spec.gripSlant !== undefined ? { gripSlant: spec.gripSlant } : {}),
       });
+    }
+    if (spec.sided) {
+      const reference = copies.find(({ side }) => side === content.reference);
+      for (const other of copies.filter((copy) => copy !== reference)) checkMirrored(name, reference, other);
     }
   }
   const ordered = parentsFirst(bones);

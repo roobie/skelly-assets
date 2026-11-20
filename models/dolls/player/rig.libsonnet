@@ -17,9 +17,10 @@
 // `flexAxis` is the joint frame's x: positive flex bends the way the joint works most (a limb swings forward, an elbow
 // and a knee close, toes point down, the trunk and head bend forward). Twist is about the bone, abduction about the
 // remaining axis. Limits are degrees [min, max], written for the `reference` side, the figure's left (+x), where
-// positive abduction carries a limb away from the body. The other side mirrors the ranges of the joint axes that lie
-// in the mirror plane (a limb's twist and abduction; a finger's flex, which is about the knuckle row) and keeps the
-// axis along x, so a pose is mirrored by the `sense` tools/dollRig.mjs gives each bone.
+// positive abduction carries a limb away from the body. The other side mirrors the ranges of the joint axes a mirror
+// reverses (a limb's twist and abduction; a finger's flex, which is about the knuckle row, and its twist) and keeps
+// the rest, so a pose is mirrored by the `sense` tools/dollRig.mjs gives each bone; a flex axis must lie in the mirror
+// plane or along x, while `along` may run any way.
 //
 // A joint's three turns compose in the joint's own order, each about the axis the earlier turns carried
 // (site/kinematics.mjs, `jointRotation`): abduction, then twist, then flex, so a ball joint's twist chooses which way
