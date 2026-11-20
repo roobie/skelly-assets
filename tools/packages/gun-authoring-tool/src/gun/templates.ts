@@ -472,6 +472,25 @@ const compactSmg: Template = {
   ),
 };
 
+const polymerSmg: Template = {
+  ...smg,
+  name: 'polymer-smg',
+  description: 'Polymer-framed submachine gun traced from a side reference, on the proportions table.',
+  // Its traced sights and rails are barrel, receiver and handguard solids, so the add-on sight parts stay off; see
+  // `packages/gun-authoring-tool/docs/polymer-smg-export.md`.
+  slots: smg.slots
+    .filter((slot) => slot.id !== 'front-sight' && slot.id !== 'sight')
+    .map((slot) => {
+      if (slot.id === 'receiver') {
+        return { ...slot, params: { ...slot.params, section: 'polymer-smg', rail: 'none' } };
+      }
+      return slot.id === 'stock' ? { ...slot, params: { ...slot.params, style: 'skeleton-folding' } } : slot;
+    }),
+  connections: smg.connections.filter(
+    (connection) => connection.to !== 'sight.base' && connection.to !== 'front-sight.base',
+  ),
+};
+
 export const boltRifleBox: Template = {
   name: 'bolt-rifle-box',
   description:
@@ -698,6 +717,7 @@ export const TEMPLATES: readonly Template[] = [
   huntingRifle,
   pipeRifle,
   compactSmg,
+  polymerSmg,
   boltRifleBox,
   boltRifleThumbhole,
   pumpShotgun,
