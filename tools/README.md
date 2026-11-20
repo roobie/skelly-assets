@@ -232,7 +232,10 @@ A model built of components, such as a gun, is drawn exploded by the same rule, 
 sites its file names; see `../docs/decisions/0009-component-mounts.md`.
 
 A wearable's picture adds it worn on the doll, because a loose or folded item does not show whether it fits the body.
-The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`.
+The showcase's viewer dresses it by the same sites; see `../docs/decisions/0008-dressing.md`. Below, the dressed doll
+is seen straight down at the sizes a top-down game draws a figure, voxel and smooth, because there a garment's front
+is out of sight and only its colour and its top surfaces carry it. Those views are drawn at their real pixel size and
+enlarged without smoothing, so a review judges the pixels a game shows; see `../site/tile.mjs`, `drawOverhead`.
 
 A pose sheet, `pose-sheet.mjs`, draws the doll bent by a pose fixture or a pose file, bare or dressed, because a
 wearable worn still does not show whether it fits when a limb bends, and a pose written by hand needs seeing before

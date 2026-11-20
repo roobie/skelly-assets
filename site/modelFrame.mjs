@@ -60,5 +60,11 @@ export const FIT_VIEWS = [
   ['top', UP],
 ];
 
+// Where the overhead view's sun shines from. That view looks straight down with the front at the bottom of the picture
+// and the model's right at its left, so this sun, tilted back and to the right, lights from the picture's upper left,
+// the usual convention for a lit picture; tilted only a little off vertical, it lights every top surface while a dome
+// or a pack's top still shades across its pixels from lit to dark.
+export const OVERHEAD_SUN = from(-0.45, 0.45, 1);
+
 // The view sets a look can draw a tile from, by the name a review asks for.
 export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, straight: STRAIGHT_VIEWS, fit: FIT_VIEWS };
