@@ -55,8 +55,8 @@ local slopeY(x, rise) =
   chestTop - bust.trapeziusDrop * (std.abs(x) - neckFoot) / slopeRun + rise * slopeLength / slopeRun;
 // The deltoid's top set out by `rise` at `x`, or null past its reach.
 local deltoidY(x, rise) =
-  local a = deltoid.halfAxial + rise, u = (std.abs(x) - deltoid.x) / a;
-  if std.abs(u) >= 1 then null else deltoid.y + (deltoid.radius + rise) * std.sqrt(1 - u * u);
+  local a = deltoid.radius + rise, u = (std.abs(x) - deltoid.x) / a;
+  if std.abs(u) >= 1 then null else deltoid.y + (deltoid.halfHeight + rise) * std.sqrt(1 - u * u);
 // The highest the shoulder, slope or deltoid, set out by `rise` reaches over [x0, x1] on one side: the slope falls
 // outward, so it is highest at the inner end, and the deltoid at its centre.
 local shoulderY(xs, rise) =
@@ -67,16 +67,18 @@ local shoulderY(xs, rise) =
 // over the slope is.
 local slopeQuad(id, slot, xs, zs, low, high) =
   h.prism(id, slot, 'z', [[xs[0], low(xs[0])], [xs[1], low(xs[1])], [xs[1], high(xs[1])], [xs[0], high(xs[0])]], zs[0], zs[1]);
-// A spheroid over the deltoid on `side` (1 the figure's left, +x), set out by `rise`. Its sides' flats lie on the
-// set-out spheroid, and its profile and its turn are cut in finer steps than the body's, so it clears the body's facets.
+// A cap over the deltoid on `side` (1 the figure's left, +x), set out by `rise`: its crown the set-out deltoid's, over
+// a round bowl as deep as the cap is wide, which hangs over the arm's top where the low crown would leave it bare.
+// Its sides' flats lie on the set-out shape, and its profile and its turn are cut in finer steps than the body's, so
+// it clears the body's facets.
 local deltoidCap(id, slot, side, rise) =
   local steps = 16;
-  local a = deltoid.halfAxial + rise, b = deltoid.radius + rise;
-  h.turned(id, slot, 'x', [[0, 0]] + [
+  local crown = deltoid.halfHeight + rise, r = deltoid.radius + rise;
+  h.turned(id, slot, 'y', [[0, 0]] + [
     local t = std.pi * i / steps;
-    [a * (1 - std.cos(t)), b * std.sin(t)]
+    [(if i <= steps / 2 then r else crown) * -std.cos(t) + r, r * std.sin(t)]
     for i in std.range(1, steps - 1)
-  ] + [[2 * a, 0]], [side * deltoid.x - a, deltoid.y, 0]) + { sides: steps };
+  ] + [[r + crown, 0]], [side * deltoid.x, deltoid.y - r, 0]) + { sides: steps };
 
 // A hood lying down on the upper back, sunk a centimetre into the body shell, its lining showing at the open top.
 // A shallow hood's corners and lining shrink with it, so its outlines stay convex. Both follow the trapezius's slope,
@@ -104,10 +106,11 @@ local shell(model, pieces, finish, covers, title=null) =
   row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }) + (if title == null then {} else { title: title });
 local fitted(shells) = { rows: shells };
 
-// The trooper's pauldron top stands this far above the shoulder joint it is worn about, and the cuirass's deltoid caps
-// stay `pauldronClear` under it, more than one of the rows' voxels, so at rest no cap shows through a pauldron.
-local trooperPauldronTop = 0.085, pauldronClear = 0.005;
-local trooperShoulderRise = trooperPauldronTop - deltoid.radius - pauldronClear;
+// How far the trooper's cuirass stands off the shoulders, and how far its pauldron's top stands above the shoulder
+// joint it is worn about. The cuirass's deltoid caps stay `pauldronClear` under that top, more than one of the rows'
+// voxels, so at rest no cap shows through a pauldron.
+local trooperShoulderRise = 0.02, trooperPauldronTop = 0.085, pauldronClear = 0.005;
+assert deltoid.halfHeight + trooperShoulderRise <= trooperPauldronTop - pauldronClear : 'the trooper caps show through its pauldrons';
 
 // Where a torso shell's hem falls on the bust, from the hips' bottom.
 local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
@@ -126,6 +129,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // A shell over the shoulders follows the bust's: `trapezius(rise)` cuts a piece to the slope set out by `rise`,
   // `deltoidCap` covers a deltoid, and `slopeY`, `shoulderY` and the straps below seat gear on them, so all of it
   // follows the body as its measures change.
+  deltoid: deltoid,
   trapezius: trapezius,
   slopeY: slopeY,
   shoulderY: shoulderY,

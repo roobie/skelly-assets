@@ -15,6 +15,11 @@
   // How far the girdle's top falls from the neck's foot to the chest's side, so the shoulders slope as the trapezius
   // does rather than stand square; worn shells over the shoulders follow it.
   trapeziusDrop: 0.04,
+  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands only `deltoidCrown`
+  // above the slope's end, so the slope runs on over a low rounded cap rather than into a ball. At this radius the
+  // cap's side meets the slope's end within a voxel at the chest's side, and its voxels lie evenly about the joint,
+  // whose pivot is their middle.
+  deltoidRadius: 0.051, deltoidCrown: 0.007,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
   headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.

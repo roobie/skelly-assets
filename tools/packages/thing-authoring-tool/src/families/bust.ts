@@ -39,13 +39,13 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       chestLowShare: positive,
       torsoChamfer: positive,
       chestChamfer: positive,
-      /** The trapezius' clip planes, one per side, and the left deltoid's centre, half extent along x and radius. */
+      /** The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. */
       girdle: pipe(
         string(),
         transform((text): unknown => JSON.parse(text)),
         strictObject({
           trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
-          deltoid: strictObject({ x: number(), y: number(), halfAxial: number(), radius: number() }),
+          deltoid: strictObject({ x: number(), y: number(), radius: number(), halfHeight: number() }),
         }),
       ),
       neckWidth: positive,
@@ -84,10 +84,10 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const ys = (bottom: number, topY: number): [number, number] => [bottom - origin, topY - origin];
   const eyeY = crown + d.headHeight * d.eyeShare;
   const brow = crown + d.jawHeight;
-  // The shoulder: a spheroid, so the arm hangs from a round cap rather than a cube.
+  // The shoulder: an upright spheroid, so the arm hangs from a cap round from above and from the front.
   const deltoid = (id: string, side: 1 | -1) => {
-    const { x, y, halfAxial, radius } = d.girdle.deltoid;
-    return spheroid(id, [side * x, y - origin, 0], [halfAxial, radius], ['x', 'skin']);
+    const { x, y, radius, halfHeight } = d.girdle.deltoid;
+    return spheroid(id, [side * x, y - origin, 0], [halfHeight, radius], ['y', 'skin']);
   };
   const facePower = d.facePower;
   /** Where the face's rounded front lies at `x`, so a feature can sit on the surface rather than stand off it. */

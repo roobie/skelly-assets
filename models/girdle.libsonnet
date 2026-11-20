@@ -6,13 +6,13 @@ function(m) {
   neckFoot: m.neckWidth / 2,
   slopeRun: m.chestWidth / 2 - self.neckFoot,
   slopeLength: std.sqrt(self.slopeRun * self.slopeRun + m.trapeziusDrop * m.trapeziusDrop),
-  // The deltoid on the figure's left (+x), its right the mirror: its centre, the shoulder joint, and its half extent
-  // along x and radius about it.
+  // The deltoid on the figure's left (+x), its right the mirror: a spheroid upright about its centre, the shoulder
+  // joint, `radius` round in plan and `halfHeight` from the centre to its crown.
   deltoid: {
     x: m.chestWidth / 2 + m.shoulderWidth / 2 - m.deltoidInset,
     y: $.chestTop - m.shoulderHeight / 2 - m.deltoidDrop,
-    halfAxial: m.shoulderWidth / 2,
-    radius: std.min(m.shoulderHeight, m.shoulderDepth) / 2,
+    radius: m.deltoidRadius,
+    halfHeight: $.chestTop - m.trapeziusDrop + m.deltoidCrown - self.y,
   },
   // The clip planes that cut a piece to the slope set out `rise` square to it, one per side.
   trapezius(rise):: [
@@ -22,6 +22,8 @@ function(m) {
   ],
   // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from.
   bustParams::
-    local drawnFrom = ['shoulderWidth', 'shoulderHeight', 'shoulderDepth', 'deltoidInset', 'deltoidDrop', 'trapeziusDrop'];
+    local drawnFrom = [
+      'shoulderWidth', 'shoulderHeight', 'shoulderDepth', 'deltoidInset', 'deltoidDrop', 'deltoidRadius', 'deltoidCrown', 'trapeziusDrop',
+    ];
     std.foldl(std.objectRemoveKey, drawnFrom, m) + { girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid } },
 }

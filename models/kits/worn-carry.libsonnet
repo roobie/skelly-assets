@@ -207,9 +207,8 @@ local wornAtom(id, title, massKg, pieces, finish, taxonomy=null) = {
 // to the slung gun's stock. Its foot meets the gun where
 // https://github.com/roobie/skelly, `packages/deadvox/src/content/base/models-firearms.libsonnet`, `slung`, hangs it.
 local sling =
-  local deltoidX = if overJacket then torso.chest.hx - fit.slingInset
-                  else bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
-  local half = if overJacket then torso.chest.hz + fit.slingClearance else bust.shoulderDepth / 2;
+  local deltoidX = if overJacket then torso.chest.hx - fit.slingInset else wornFit.deltoid.x;
+  local half = if overJacket then torso.chest.hz + fit.slingClearance else wornFit.deltoid.radius;
   local xs = [-deltoidX - 0.012, -deltoidX + 0.012];
   local deltoidTop = wornFit.shoulderY(xs, rise) + (if overJacket then fit.slingClearance else 0);
   local pad = [deltoidTop + 0.004, deltoidTop + 0.012];
