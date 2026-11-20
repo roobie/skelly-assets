@@ -524,11 +524,19 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     clamp: {
       length: dim(25.4, 'sourced: 1.00 in, ' + ddFixedFront),
       width: dim(31.5, 'sourced: 1.24 in, ' + ddFixedFront),
-      // The post's protective ears are left undrawn, so only the clamp stands under the post.
       height: dim(5.75, "styled: half a gun unit, a look estimate taken from the generic rail sight's clamp, as the maker states no clamp height"),
     },
     // Square in section, as an A2 post is.
     postWidth: dim(1.78, 'sourced: 0.070 in, ' + ddFixedFront),
+    // The maker's sight guards its post with ears on a tower over the clamp, as an A2 base does. Drawn, they give the
+    // sight its sturdy look: the sourced post alone reads as a bare stalk at the model's scale, and widening it would
+    // fill the rear aperture. The maker gives none of their sizes.
+    ears: {
+      length: dim(9.525, 'styled: 3/8 in along the bore, a tower shorter than the clamp'),
+      width: dim(12.7, 'styled: 1/2 in across both ears, leaving light either side of the post between them'),
+      thickness: dim($.frontSightBase.earThickness.mm, "styled: as thick as the A2 base's ears"),
+      postExposed: dim(9, "styled: the post's tip standing clear of the tower's deck between the ears, as an A2 post's does"),
+    },
   },
 
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.

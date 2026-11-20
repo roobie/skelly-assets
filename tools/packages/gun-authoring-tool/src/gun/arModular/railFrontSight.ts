@@ -14,11 +14,18 @@ export const arRailFrontSight = (frame: ArFrame): PartFamily => ({
   name: familyName(frame, 'rail-front-sight'),
   params: {},
   build(): PartDef {
-    const { postAboveRail, clamp, postWidth } = frame.table.railFrontSight;
+    const { postAboveRail, clamp, postWidth, ears } = frame.table.railFrontSight;
     const postU = u(postAboveRail);
+    const outerHalfWidthU = u(ears.width) / 2;
     const shape = {
       base: { halfLengthU: u(clamp.length) / 2, heightU: u(clamp.height), halfWidthU: u(clamp.width) / 2 },
       post: { halfLengthU: u(postWidth) / 2, halfWidthU: u(postWidth) / 2 },
+      ears: {
+        halfLengthU: u(ears.length) / 2,
+        outerHalfWidthU,
+        innerHalfWidthU: outerHalfWidthU - u(ears.thickness),
+        deckU: postU - u(ears.postExposed),
+      },
     };
     return {
       family: 'rail-front-sight',
