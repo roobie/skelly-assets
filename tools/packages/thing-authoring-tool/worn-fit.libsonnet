@@ -101,19 +101,19 @@ local shell(model, pieces, finish, covers, title=null) =
   row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }) + (if title == null then {} else { title: title });
 local fitted(shells) = { rows: shells };
 
-// A body shell's pieces shared out among the spine parts of a doll that bends its trunk, cut where `spine.cuts` cuts the
-// bust, so each shell bends with the flesh it lies on, and each moved into its part's frame from `spine.segments`. Each
-// encloses its part, but where a sleeveless body (`bare`) leaves the chest above the armpit showing.
+// A body shell's pieces shared out among the spine parts of a doll that bends its trunk, cut where the bust is, at the
+// belly's and the body's joints, so each shell bends with the flesh it lies on, and each moved into its part's frame.
+// Each hides what it encloses, but where a sleeveless body (`bare`) leaves the chest above the armpit showing.
 local spineShells(id, pieces, finish, spine, bare, title) =
-  local cuts = spine.cuts;
+  local ribs = spine.belly.origin[1], chest = spine.body.origin[1];
   local bands = [
-    { segment: 'waist', pieces: h.cut(pieces, 'y', cuts.ribs, -1), encloses: true },
-    { segment: 'belly', pieces: h.cut(h.cut(pieces, 'y', cuts.ribs, 1), 'y', cuts.chest, -1), encloses: true },
-    { segment: 'body', pieces: h.cut(pieces, 'y', cuts.chest, 1), encloses: !bare },
+    { segment: 'waist', pieces: h.cut(pieces, 'y', ribs, -1), encloses: true },
+    { segment: 'belly', pieces: h.cut(h.cut(pieces, 'y', ribs, 1), 'y', chest, -1), encloses: true },
+    { segment: 'body', pieces: h.cut(pieces, 'y', chest, 1), encloses: !bare },
   ];
   [
-    local part = spine.segments[band.segment];
-    shell(id + '_worn_' + band.segment, h.moved(band.pieces, [-c for c in part.origin]), finish, if band.encloses then [part.part] else [],
+    local part = spine[band.segment];
+    shell(id + '_worn_' + band.segment, h.moved(band.pieces, [-c for c in part.origin]), finish, if band.encloses then part.covers else [],
           title=named(title, band.segment))
     for band in bands
     if band.pieces != []
@@ -181,9 +181,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // each deltoid, under a collar; 'straps' cuts the body off at a neckline between the trunk's top and the shoulders,
   // held up by a strap over each trapezius, for a tank top, and draws no collar. `slots` names the ground row's finish
   // slots the shells reuse: `body`, `trim` and `fastener`, and with a hood `hood` and `lining`. `spine`, for a doll
-  // whose trunk bends at its spine, shares the body shell out among the spine's parts (`spineShells`): `cuts`, the
-  // bust's `ribs` and `chest` cut heights, and `segments`, for each of `waist`, `belly` and `body` the doll `part` it
-  // lies on and that part's `origin` in the bust's frame.
+  // whose trunk bends at its spine, shares the body shell out among the spine's parts (`spineShells`): for each of
+  // `waist`, `belly` and `body`, the `origin` in the bust's frame of the doll part it lies on, where the bust is cut
+  // below it, and what of the doll it `covers`.
   torso(id, finish, spec, title=null)::
     local s = { layer: 'normal', sleeveLayer: self.layer, hem: 'hip', top: 'yoke', round: 0, sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: 'welt', hood: null,
                 spine: null, slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;

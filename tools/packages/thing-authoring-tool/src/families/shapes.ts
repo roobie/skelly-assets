@@ -30,6 +30,26 @@ export const point3 = tuple([coordinate, coordinate, coordinate]);
  */
 export const jointOrigins = <const S extends string>(segments: readonly S[]) =>
   json(record(picklist(segments), point3));
+/** How far a place given as content may lie from where the measures derive it: a rounding of the measures and no more. */
+export const MEASURE_TOLERANCE = 1e-6;
+/**
+ * A joint is given whole, as its skeleton has it, while the measures lay out the flesh along the limb; a joint at
+ * another height than the measures' would turn its part about a point the flesh does not end at.
+ */
+export const requireJointHeights = (
+  joints: Readonly<Partial<Record<string, Vec3>>>,
+  heights: Readonly<Partial<Record<string, number>>>,
+  what: string,
+): void => {
+  for (const [segment, height] of Object.entries(heights)) {
+    const joint = joints[segment];
+    if (joint && height !== undefined && Math.abs(joint[1] - height) > MEASURE_TOLERANCE) {
+      throw new Error(
+        `The ${what}'s ${segment} joint stands at ${joint[1]}, not at ${height} where its measures put it`,
+      );
+    }
+  }
+};
 /** Extruded solids must be convex, with the profile wound counterclockwise. */
 export const requireConvex = (profile: readonly Vec2[], what: string): void => {
   for (let i = 0; i < profile.length; i++) {

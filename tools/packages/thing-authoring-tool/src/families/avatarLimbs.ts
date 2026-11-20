@@ -2,17 +2,21 @@ import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
 import { block, cut, oval, region, taper, translate } from './body.ts';
-import { json, point3, positive, requireConvex, scalar, spheroid } from './shapes.ts';
+import { json, point3, positive, requireConvex, requireJointHeights, scalar, spheroid } from './shapes.ts';
 
 // The player's limbs hang from their joint: origin on the joint at the limb's top, y up, the limb down -y, front
 // toward +z. Each limb is mirror-symmetric in x, so one model serves either side, and code poses it about its joint.
 // Every solid stays within the measures a worn shell is fitted to: a segment tapers toward its lower joint and ends
 // in a round cap of the lower segment's section, so a bent joint turns on a ball instead of opening a wedge.
 // A body's joints need not lie on the limb's centre line, so `origins` may set them in the limb's frame: a segment's
-// flesh stays where the measures lay it, its ball cap sits on the joint it turns about, and the part is handed over
-// about its own joint.
+// flesh is moved off the centre line to its bone, its ball cap sits on the joint it turns about, and the part is
+// handed over about its own joint. The flesh is drawn upright, so it follows a bone that leans from joint to joint by
+// standing on the bone's middle: leaning it would need slanted solids the voxel families do not draw.
 
 type LimbSolid = ExtrudedPolygonSolid | BoxSolid | RevolvedSolid;
+
+/** Where a segment's upright flesh stands across the limb: midway between its joints, or on its one joint. */
+const boneMiddle = (head: Vec3, tail: Vec3 = head): Vec3 => [(head[0] + tail[0]) / 2, 0, (head[2] + tail[2]) / 2];
 
 /**
  * The arm's segments, each its own part so the view can bend the arm at its joints
@@ -124,6 +128,10 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
   const thumbLength = (k: number) => d.thumbLength * (d.thumbShares[k] ?? 0);
   const thumbTop = thumbRoot - d.thumbShares.slice(0, phalanx).reduce((sum, _, k) => sum + thumbLength(k), 0);
+  const measured = { upper: 0, fore: elbow, palm: wrist };
+  if (d.origins) {
+    requireJointHeights(d.origins, measured, 'arm');
+  }
   const joints = d.origins ?? { upper: [0, 0, 0], fore: [0, elbow, 0], palm: [0, wrist, 0] };
   // Each segment's origin in the arm frame; the segment is drawn about it. A digit is drawn about its own joint
   // already, where its socket on the palm places it, so it has no joint off the arm's centre line to be moved by.
@@ -133,6 +141,15 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
     thumb: [0, thumbTop, 0],
   };
   const [originX, originY, originZ] = origins[d.segment];
+  // The palm stands on the wrist alone: its far end is the knuckle row, which is given in its frame.
+  const bones: Record<(typeof ARM_SEGMENTS)[number], Vec3> = {
+    upper: boneMiddle(joints.upper, joints.fore),
+    fore: boneMiddle(joints.fore, joints.palm),
+    palm: boneMiddle(joints.palm),
+    finger: [0, 0, 0],
+    thumb: [0, 0, 0],
+  };
+  const flesh = <T extends LimbSolid>(solids: T[]) => translate(solids, bones[d.segment]);
   const ys = (bottom: number, top: number): [number, number] => [bottom - originY, top - originY];
   const upperHalfX = d.upperWidth / 2;
   const upperHalfZ = d.upperDepth / 2;
@@ -148,24 +165,27 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
     if (d.knuckles.length !== d.fingers.length) {
       throw new Error(`The palm has ${d.knuckles.length} knuckles for ${d.fingers.length} fingers`);
     }
-    return d.knuckles.map(([, y, z]): Vec2 => [joints.palm[1] + y, joints.palm[2] + z]);
+    // The palm's flesh is moved onto its wrist afterwards, which carries the row's z with it.
+    return d.knuckles.map(([, y, z]): Vec2 => [joints.palm[1] + y, z]);
   };
   const drawn = (): LimbSolid[] => {
     switch (d.segment) {
       case 'upper':
         return [
-          // The named solid spans the whole segment at its narrow end, so the anchors on it keep their places.
-          oval('upper-arm', 'skin', ys(elbow, 0), { halfX: upperHalfX * 0.82, halfZ: upperHalfZ * 0.82, power: 2.4 }),
-          ...taper(
-            'upper-arm-flesh',
-            'skin',
-            ys(elbow + d.upperLength * 0.15, 0),
-            [
-              { halfX: upperHalfX * 0.84, halfZ: upperHalfZ * 0.84 },
-              { halfX: upperHalfX, halfZ: upperHalfZ },
-            ],
-            { slices: 4, power: 2.4 },
-          ),
+          ...flesh([
+            // The named solid spans the whole segment at its narrow end, so the anchors on it keep their places.
+            oval('upper-arm', 'skin', ys(elbow, 0), { halfX: upperHalfX * 0.82, halfZ: upperHalfZ * 0.82, power: 2.4 }),
+            ...taper(
+              'upper-arm-flesh',
+              'skin',
+              ys(elbow + d.upperLength * 0.15, 0),
+              [
+                { halfX: upperHalfX * 0.84, halfZ: upperHalfZ * 0.84 },
+                { halfX: upperHalfX, halfZ: upperHalfZ },
+              ],
+              { slices: 4, power: 2.4 },
+            ),
+          ]),
           spheroid(
             'elbow',
             [joints.fore[0], joints.fore[1] - originY, joints.fore[2]],
@@ -174,7 +194,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
           ),
         ];
       case 'fore':
-        return [
+        return flesh([
           oval('forearm', 'skin', ys(wristTop + d.foreLength * 0.12, elbow + d.seamOverlap), {
             halfX: foreHalfX,
             halfZ: foreHalfZ,
@@ -190,7 +210,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
             halfZ: wristHalfZ,
             power: 2.6,
           }),
-        ];
+        ]);
       case 'palm': {
         // The palm ends along the knuckle row, which slants back toward the little finger; past the outer knuckles the
         // row's line carries on to either edge, so the outline stays convex. Each knuckle ridges the back of the hand, -x.
@@ -214,7 +234,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
           [top, halfPalm - corner],
         ].map(([y, z]): Vec2 => [y - originY, z]);
         requireConvex(outline, 'palm');
-        return [
+        return flesh([
           {
             id: 'palm',
             kind: 'extruded-polygon',
@@ -232,7 +252,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
               [knuckleZ(i) - fingerWidth / 2, knuckleZ(i) + fingerWidth / 2],
             ),
           ),
-        ];
+        ]);
       }
       case 'finger': {
         // One phalanx, reaching into the one above it so the joint stays closed when it curls; the tip a shade slimmer.
@@ -323,12 +343,24 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
   const sole = -d.length;
   const ankle = sole + d.shoeHeight;
   const halfShoe = d.shoeWidth / 2 - d.upperSideInset;
+  if (d.origins) {
+    requireJointHeights(d.origins, { thigh: 0, shin: knee, foot: ankle }, 'leg');
+  }
   const joints = d.origins ?? { thigh: [0, 0, 0], shin: [0, knee, 0], foot: [0, ankle, 0] };
   const joint = d.segment === 'ball' ? d.ballJoint : joints[d.segment];
   if (!joint) {
     throw new Error('The ball segment is the front of a foot cut at its ballJoint, which the leg does not give');
   }
   const [originX, origin, originZ] = joint;
+  // The foot stands on the ankle alone: the ball's joint lies along the foot, not across it, and the ball is cut
+  // from the foot's own flesh.
+  const bones: Record<(typeof LEG_SEGMENTS)[number], Vec3> = {
+    thigh: boneMiddle(joints.thigh, joints.shin),
+    shin: boneMiddle(joints.shin, joints.foot),
+    foot: boneMiddle(joints.foot),
+    ball: boneMiddle(joints.foot),
+  };
+  const flesh = <T extends LimbSolid>(solids: T[]) => translate(solids, bones[d.segment]);
   const ys = (bottom: number, top: number): [number, number] => [bottom - origin, top - origin];
   const thighHalfX = d.thighWidth / 2;
   const thighHalfZ = d.thighDepth / 2;
@@ -338,18 +370,20 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
     switch (d.segment) {
       case 'thigh':
         return [
-          // The named solid spans the whole segment at the knee's section, so the anchors on it keep their places.
-          oval('thigh', 'skin', ys(knee, 0), { halfX: shinHalfX * 1.05, halfZ: shinHalfZ * 1.05, power: 2.6 }),
-          ...taper(
-            'thigh-flesh',
-            'skin',
-            ys(knee + d.thighLength * 0.12, 0),
-            [
-              { halfX: shinHalfX * 1.1, halfZ: shinHalfZ * 1.1 },
-              { halfX: thighHalfX, halfZ: thighHalfZ },
-            ],
-            { slices: 5, power: 2.6 },
-          ),
+          ...flesh([
+            // The named solid spans the whole segment at the knee's section, so the anchors on it keep their places.
+            oval('thigh', 'skin', ys(knee, 0), { halfX: shinHalfX * 1.05, halfZ: shinHalfZ * 1.05, power: 2.6 }),
+            ...taper(
+              'thigh-flesh',
+              'skin',
+              ys(knee + d.thighLength * 0.12, 0),
+              [
+                { halfX: shinHalfX * 1.1, halfZ: shinHalfZ * 1.1 },
+                { halfX: thighHalfX, halfZ: thighHalfZ },
+              ],
+              { slices: 5, power: 2.6 },
+            ),
+          ]),
           spheroid(
             'knee',
             [joints.shin[0], joints.shin[1] - origin, joints.shin[2]],
@@ -359,7 +393,7 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
         ];
       case 'shin': {
         const shinLength = knee - ankle;
-        return [
+        return flesh([
           oval('shin', 'skin', ys(ankle - d.ankleOverlap, knee + d.kneeOverlap), {
             halfX: shinHalfX * 0.74,
             halfZ: shinHalfZ * 0.76,
@@ -377,7 +411,7 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
             power: 2.6,
             cz: -0.002,
           }),
-        ];
+        ]);
       }
       case 'foot':
       case 'ball': {
@@ -408,13 +442,15 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
           edge -= width + toeGap;
           return toe;
         });
-        const heel = oval('heel', 'skin', ys(sole, ankle - 0.015), {
-          halfX: halfShoe * 0.95,
-          halfZ: 0.05,
-          power: 2.6,
-          cz: heelBack + 0.05,
-        });
-        const front = [
+        const heel = flesh([
+          oval('heel', 'skin', ys(sole, ankle - 0.015), {
+            halfX: halfShoe * 0.95,
+            halfZ: 0.05,
+            power: 2.6,
+            cz: heelBack + 0.05,
+          }),
+        ]);
+        const front = flesh([
           {
             id: 'instep',
             kind: 'extruded-polygon',
@@ -425,17 +461,17 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
           } satisfies ExtrudedPolygonSolid,
           // The model is the right foot, so the big toe is on its inner side, +x; the left foot is its mirror.
           ...toes,
-        ];
+        ]);
         if (d.segment === 'ball') {
           // A whole part of the sole, so it needs no region of its own.
-          return cut([heel, ...front], 'z', originZ, 1);
+          return cut([...heel, ...front], 'z', originZ, 1);
         }
         const behindBall = <T extends LimbSolid>(solids: T[]) =>
           d.ballJoint ? cut(solids, 'z', d.ballJoint[2], -1) : solids;
         // Regions a worn shell's `covers` names, so footwear hides the skin it encloses: the ankle's cap, which rises
         // above a shoe's vamp into the shaft that rides the shin, and the sole below it, heel, instep and toes.
         return [
-          ...region('sole', behindBall([heel])),
+          ...region('sole', behindBall(heel)),
           ...region('ankle', [
             spheroid(
               'ankle',

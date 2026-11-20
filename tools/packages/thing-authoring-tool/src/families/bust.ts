@@ -14,28 +14,26 @@ import {
   tuple,
 } from 'valibot';
 import { block, cut, dome, oval, ovalCut, region, translate } from './body.ts';
-import { jointOrigins, json, positive, spheroid } from './shapes.ts';
+import { jointOrigins, MEASURE_TOLERANCE, positive, requireJointHeights, spheroid } from './shapes.ts';
 
 /**
- * The segments a trunk bending along its spine is cut into at `spineCuts`: the waist, the ribs, the chest, and each
- * shoulder girdle, which a clavicle lifts on its own.
+ * The segments a trunk bending along its spine is cut into: the waist, the ribs and the chest, each cut where its
+ * joint stands, and each shoulder girdle, which a clavicle lifts on its own from `clavicleCut`.
  */
-const SPINE_SEGMENTS = ['waist', 'ribs', 'chest', 'clavicle-left', 'clavicle-right'] as const;
+const SPINE_SEGMENTS = ['waist', 'ribs', 'chest', 'clavicle_l', 'clavicle_r'] as const;
 /** The bust's segments: the head is its own part so a stance can lift it about the neck while the torso leans. */
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head', ...SPINE_SEGMENTS] as const;
-/** How far the armpit may lie from the chest's cut, a rounding of the measures it is derived from and no more. */
-const ARMPIT_TOLERANCE = 1e-6;
 
 const BustParams = strictObject({
   segment: picklist(BUST_SEGMENTS),
-  /** Each segment's joint in the bust's frame; without it every joint lies on the centre line. */
-  origins: optional(jointOrigins(BUST_SEGMENTS)),
   /**
-   * Where the trunk is cut for a spine that bends in three: the heights the ribs and the chest stand on and the one
-   * the clavicles lift from. The chest's cut is the armpit, so the trunk and the shoulders a garment covers are each
-   * whole parts.
+   * Each segment's joint in the bust's frame; without it every joint lies on the centre line. The ribs' and the
+   * chest's joints are where the trunk is cut for a spine that bends in three, and the chest's is the armpit, so the
+   * trunk and the shoulders a garment covers are each whole parts.
    */
-  spineCuts: optional(json(strictObject({ ribs: number(), chest: number(), clavicle: number() }))),
+  origins: optional(jointOrigins(BUST_SEGMENTS)),
+  /** The height the clavicles lift the shoulder girdles from, for a spine that bends in three. */
+  clavicleCut: optional(positive),
   /** How far the neck reaches up into the head; its top is the head's joint. */
   neckOverlap: positive,
   pelvisWidth: positive,
@@ -100,8 +98,14 @@ type Bust = InferOutput<typeof BustParams>;
 export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
   const d = parse(BustParams, params);
   const heights = levels(d);
-  if (d.spineCuts) {
-    requireSpineCuts(d, d.spineCuts);
+  if (d.origins) {
+    // The pelvis is the root, and a clavicle turns where its bone does, below the girdle it lifts; the ribs and the
+    // chest are cut where their joints stand, so none of those has a height of the measures' to meet.
+    requireJointHeights(
+      d.origins,
+      { torso: heights.waist, waist: heights.waist, neck: heights.shoulders, head: heights.crown + d.neckOverlap },
+      'bust',
+    );
   }
   const joint = d.origins
     ? d.origins[d.segment]
@@ -120,15 +124,25 @@ const levels = (d: Bust) => {
   const crown = shoulders + d.neckHeight;
   return { waist, ribs, chest, shoulders, crown, armpit: chest + d.chestHeight * d.armpit };
 };
-const requireSpineCuts = (d: Bust, cuts: NonNullable<Bust['spineCuts']>) => {
+/** Where a trunk bending in three is cut: at its ribs' and its chest's joints, and where its clavicles lift. */
+const spineCuts = (d: Bust) => {
+  const ribs = d.origins?.ribs?.[1];
+  const chest = d.origins?.chest?.[1];
+  const clavicle = d.clavicleCut;
+  if (ribs === undefined || chest === undefined || clavicle === undefined) {
+    throw new Error(
+      `The bust's ${d.segment} is a cut of the trunk, which needs its ribs' and chest's joints and clavicleCut`,
+    );
+  }
   const at = levels(d);
   // The trunk and the shoulders are regions a garment hides, and a region is whole parts only when it ends at a cut.
-  if (Math.abs(at.armpit - cuts.chest) > ARMPIT_TOLERANCE) {
-    throw new Error(`The bust's armpit, ${at.armpit}, is not at its chest's cut, ${cuts.chest}`);
+  if (Math.abs(at.armpit - chest) > MEASURE_TOLERANCE) {
+    throw new Error(`The bust's armpit, ${at.armpit}, is not at its chest's joint, ${chest}`);
   }
-  if (!(at.waist < cuts.ribs && cuts.ribs < cuts.chest && cuts.chest < cuts.clavicle && cuts.clavicle < at.shoulders)) {
+  if (!(at.waist < ribs && ribs < chest && chest < clavicle && clavicle < at.shoulders)) {
     throw new Error("The bust's spine cuts must rise from its waist to its shoulders in turn");
   }
+  return { ribs, clavicle };
 };
 const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
   const { waist, ribs, chest, shoulders, crown } = levels(d);
@@ -242,11 +256,8 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
       return [...region('trunk', trunk), ...region('shoulders', [...slope, deltoids.left, deltoids.right])];
     }
     // A spine segment is a whole part of one region, so it needs no region of its own.
-    if (!d.spineCuts) {
-      throw new Error(`The bust's ${d.segment} is a cut of the trunk, which needs spineCuts`);
-    }
     const at = (height: number) => height - origin;
-    const { ribs: ribsCut, clavicle } = d.spineCuts;
+    const { ribs: ribsCut, clavicle } = spineCuts(d);
     switch (d.segment) {
       case 'waist':
         return cut(trunk, 'y', at(ribsCut), -1);
@@ -255,9 +266,9 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
       case 'chest':
         return cut(slope, 'y', at(clavicle), -1);
       // The deltoid caps the arm the clavicle carries, so it rides the clavicle whole, however low it reaches.
-      case 'clavicle-left':
+      case 'clavicle_l':
         return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, 1), deltoids.left];
-      case 'clavicle-right':
+      case 'clavicle_r':
         return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, -1), deltoids.right];
     }
   }
