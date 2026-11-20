@@ -22,12 +22,16 @@ const SwapSchema = variant('path', [
   strictObject({ path: literal('slot') }),
   strictObject({ path: literal('job'), job: Id }),
 ]);
-/** Where an authored measurement comes from, so every number in a table can be checked against its origin. */
+/**
+ * Where an authored measurement comes from, so every number in a table can be checked against its origin. A styled
+ * value is picked for how the model reads, where no source gives one or the sourced one reads wrong at the model's
+ * scale, and says so rather than pass for a measurement.
+ */
 export const SourceSchema = pipe(
   string(),
   regex(
-    /^(traced|sourced|derived): \S/,
-    "a source reads 'traced: <trace key>', 'sourced: <URL>' or 'derived: <reason>'",
+    /^(traced|sourced|derived|styled): \S/,
+    "a source reads 'traced: <trace key>', 'sourced: <URL>', 'derived: <reason>' or 'styled: <reason>'",
   ),
 );
 const DimensionSchema = strictObject({ mm: pipe(number(), gtValue(0)), source: SourceSchema });

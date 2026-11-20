@@ -23,7 +23,7 @@ import { compilePose } from '../../site/poseFile.mjs';
 import { poseJson } from '../keyFrames.mjs';
 import { outputPath } from '../layout.mjs';
 import { locomotionClips, readLocomotion, walkLoop } from '../locomotion.mjs';
-import { partStrokes, pressCheckPoses, pressCheckSockets } from '../press-check.mjs';
+import { partMotions, pressCheckPoses } from '../press-check.mjs';
 import {
   exportWields,
   graspOf,
@@ -74,8 +74,8 @@ const assertBorne = (name, depths) => {
 const pressPoses = pressCheckPoses(
   rig,
   pressCheck,
-  partStrokes(thingOf(pressCheck.rifle)),
-  pressCheckSockets(pressCheck, heldWeapon(thingOf(pressCheck.rifle), itemMesh(pressCheck.rifle))),
+  heldWeapon(thingOf(pressCheck.rifle), itemMesh(pressCheck.rifle)),
+  partMotions(thingOf(pressCheck.rifle)),
 );
 
 test("the press check's pose files are what its tool writes from its key frames", () => {

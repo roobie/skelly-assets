@@ -1,5 +1,6 @@
 import { resolve } from '@skelly/construct/assembly/resolve.ts';
 import type { Assembly, Connection, Domain, PartInstance, ResolvedParam } from '@skelly/construct/assembly/schema.ts';
+import { slotIndex } from '@skelly/construct/assembly/slots.ts';
 import type { Choice, ParamReference, Template } from '@skelly/construct/assembly/template.ts';
 
 const partOf = (ref: string): string => ref.slice(0, ref.indexOf('.'));
@@ -178,7 +179,7 @@ export interface ParamRef {
 
 /**
  * Drops every connection touching `part` that names a port it doesn't
- * declare (or a `from` slot beyond that port's slot count), after rebuilding
+ * declare (or a `from` slot past either end of that port's slots), after rebuilding
  * `part` from its current params. Generic over the domain: a family's ports
  * can depend on its own params (e.g. a handguard's `front` port only exists
  * when `mount: 'clamped'`), and this never looks at family or port names.
@@ -191,7 +192,7 @@ const pruneDangling = (candidate: Assembly, domain: Domain, part: string): EditR
   const dangling = (c: Connection): boolean => {
     if (partOf(c.from) === part) {
       const port = def.ports.find((p) => p.id === portIdOf(c.from));
-      if (!port || (c.slot !== undefined && (!port.slots || c.slot >= port.slots.count))) {
+      if (!port || (c.slot !== undefined && (!port.slots || slotIndex(port.slots, c.slot) === undefined))) {
         return true;
       }
     }

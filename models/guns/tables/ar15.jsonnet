@@ -32,6 +32,8 @@ local aboutMount(pixels, mount) = [[xOf(p[0]) - mount[0], yOf(p[1]) - mount[1]] 
 local tracedOutline(pixels, mount, key) = outline(aboutMount(pixels, mount), traced(key));
 
 local picatinny = 'sourced: https://en.wikipedia.org/wiki/Picatinny_rail';
+// The Daniel Defense rail-mounted fixed front sight, the fixed post a free-float handguard commonly carries.
+local ddFixedFront = 'https://ar15.build/products/front-sight/306521/daniel-defense-rail-mounted-fixed-front-sight-comma-black-hardcoat-dd-rail-mounted-fixed-front-sight';
 // The parts with thin features export at the detail grain; the thinnest feature it carries evenly is this many mm. An
 // authored wall is drawn at least this thick, so the export never drops a voxel from one side of it.
 local grains = import 'models/voxel-grains.libsonnet';
@@ -516,6 +518,27 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     apertureAboveRail: dim(sightPlane.mm - $.upper.rail.topY.mm, 'derived: the flat-top sight plane over the top rail'),
   },
 
+  // The fixed post a free-float handguard carries at the front of its rail, its tip on the same sight plane.
+  railFrontSight: {
+    postAboveRail: dim(sightPlane.mm - $.handguard.railTopY.mm, "derived: the flat-top sight plane over the handguard's top rail"),
+    clamp: {
+      length: dim(25.4, 'sourced: 1.00 in, ' + ddFixedFront),
+      width: dim(31.5, 'sourced: 1.24 in, ' + ddFixedFront),
+      height: dim(5.75, "styled: half a gun unit, a look estimate taken from the generic rail sight's clamp, as the maker states no clamp height"),
+    },
+    // Square in section, as an A2 post is.
+    postWidth: dim(1.78, 'sourced: 0.070 in, ' + ddFixedFront),
+    // The maker's sight guards its post with ears on a tower over the clamp, as an A2 base does. Drawn, they give the
+    // sight its sturdy look: the sourced post alone reads as a bare stalk at the model's scale, and widening it would
+    // fill the rear aperture. The maker gives none of their sizes.
+    ears: {
+      length: dim(9.525, 'styled: 3/8 in along the bore, a tower shorter than the clamp'),
+      width: dim(12.7, 'styled: 1/2 in across both ears, leaving light either side of the post between them'),
+      thickness: dim($.frontSightBase.earThickness.mm, "styled: as thick as the A2 base's ears"),
+      postExposed: dim(9, "styled: the post's tip standing clear of the tower's deck between the ears, as an A2 post's does"),
+    },
+  },
+
   // How far a front post may stand off the rear sight's line, so a post is taken for the base it is nearer.
   sightLine: {
     tolerance: dim(flatTopExtra.mm / 2, 'derived: half the step between the two front sight base heights'),
@@ -542,6 +565,12 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       traced('handguard'),
     ),
     skirtHalfWidth: dim(17, 'derived: the barrel nut under the tube'),
+    // Either handguard's, from its tube's rear end.
+    supportHold: dim(
+      54,
+      "derived: the support palm's middle cupping the tube's rear, a half hand's width ahead of the receiver, " +
+      'where the press check proved its thumb reaches the port cover and the charging handle',
+    ),
   },
 
   // The drop-in handguard runs from the delta ring on the barrel nut to the front sight base's rear face, so its length
@@ -676,6 +705,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
     ),
     ar15_stock_a2: mass(0.315, 'sourced: 11.1 oz, https://www.hogueinc.com/overmolded-fixed-buttstock-fits-a2-buffer-tube-black-ar-15-m16'),
     ar15_rear_sight: mass(0.048, 'sourced: 1.7 oz, a fixed A1.5 rear sight, https://www.primaryarms.com/daniel-defense-a1-5-fixed-rear-sight-19-064-11002'),
+    ar15_rail_front_sight: mass(0.0312, 'sourced: 1.10 oz, ' + ddFixedFront),
     ar15_bolt_carrier: mass(0.3266, 'sourced: 11.52 oz, https://www.wingtactical.com/firearm-parts/ar-15/upper-receiver-parts/bolts-carriers/aero-precision-complete-5-56-bolt-carrier-group'),
     ar15_charging_handle: mass(0.0312, 'sourced: 1.1 oz, https://www.opticsplanet.com/aero-precision-ar15-standard-charging-handle.html'),
     ar15_port_cover: mass(0.0221, 'sourced: 0.78 oz, https://www.wingtactical.com/firearm-parts-accessories/aero-precision-ar15-dust-cover-assembly'),

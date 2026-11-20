@@ -41,7 +41,7 @@ export interface ConnectionTemplate {
   readonly from: Choice<string>;
   /** "part.port" */
   readonly to: string;
-  /** Slot on the `from` port: a number, a list to pick from, or any slot the port has. */
+  /** Slot on the `from` port: a number (negative from its far end), a list to pick from, or any slot the port has. */
   readonly slot?: Choice<number> | 'any';
   /** Probability the connection is made, when both parts are present (default 1). */
   readonly chance?: number;

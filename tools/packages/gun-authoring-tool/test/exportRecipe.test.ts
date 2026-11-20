@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
-import { SMOOTH } from '@skelly/thing-export/glb.ts';
+import { isSmoothPiece, SMOOTH } from '@skelly/thing-export/glb.ts';
 import type { ModelExport } from '@skelly/thing-export/recipe.ts';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
 import { REPO_ROOT } from '../src/cli/content.ts';
 import { loadExportRecipe } from '../src/cli/exportRecipe.ts';
+import { ATTACHMENT_FAMILIES } from '../src/gun/attachmentParts.ts';
+import { attachmentInstanceForId } from '../src/gun/attachments.ts';
 import { PART_CATALOGUE } from '../src/gun/catalogue.ts';
 import type { DeadvoxModelEntry } from '../src/gun/exportGlb.ts';
 import { FAMILIES } from '../src/gun/parts.ts';
@@ -70,7 +72,14 @@ const placedCoordinates = (positions: ArrayLike<number>, transform: Matrix4): nu
     new Vector3(positions[3 * i]!, positions[3 * i + 1]!, positions[3 * i + 2]!).applyMatrix4(transform).toArray(),
   ).flat();
 
-/** A gun family's part built with its default params, or none for a family outside the gun catalogue. */
+/**
+ * A gun family's part built with its default params, or none for a family outside the gun catalogue. A row's export
+ * builds its parts with the row's own params, which reach the test only by replaying each kind's export; the default
+ * build stands in, since the export drew each mesh by its own build, so a family whose smoothness changed with its
+ * params would fail the grain check rather than pass it. The iron sight lattice skips a row whose eye is on a smooth
+ * sight by it too, and leans on the same: the grain check holds the sight's mesh to this default build, so a row whose
+ * own sight disagreed fails there rather than skipping unseen.
+ */
 const defaultPart = (name: string): PartDef | undefined => {
   const family = FAMILIES[name];
   return family?.build(Object.fromEntries(Object.entries(family.params).map(([param, spec]) => [param, spec.default])));
@@ -78,6 +87,24 @@ const defaultPart = (name: string): PartDef | undefined => {
 
 /** Whether a family's part keeps its authored mesh in a voxelized export. */
 const buildsSmooth = (name: string): boolean => defaultPart(name)?.tags?.includes(SMOOTH) ?? false;
+
+/** Whether a loose attachment keeps its authored mesh, built as its export builds it: its own family and params. */
+const attachmentBuildsSmooth = (id: string): boolean => {
+  const { family: name, params } = attachmentInstanceForId(id);
+  const family = FAMILIES[name] ?? ATTACHMENT_FAMILIES[name]!;
+  const defaults = Object.fromEntries(Object.entries(family.params).map(([param, spec]) => [param, spec.default]));
+  return family.build({ ...defaults, ...params }).tags?.includes(SMOOTH) ?? false;
+};
+
+/** Whether a family's part draws these of its solids as smooth pieces, as a smooth feature of a voxelized part. */
+const smoothPieces = (name: string, solids: readonly string[]): boolean => {
+  const part = defaultPart(name);
+  return (
+    part !== undefined &&
+    solids.length > 0 &&
+    solids.every((id) => part.solids.some((solid) => solid.id === id && isSmoothPiece(solid)))
+  );
+};
 
 /** The family of each exported part node, with its mesh. */
 const partNodes = (glb: Uint8Array) =>
@@ -191,16 +218,16 @@ describe('recipe output grain', () => {
     expect(meshes.length, `${row.id}: no meshes`).toBeGreaterThan(0);
     // A loose part's node is named by the family its part builds, which need not be its catalogue family.
     const familyOf = (node: string) => (row.kind === 'part' ? PART_CATALOGUE.items.get(row.source)!.family : node);
-    const smoothMeshes = new Set(
-      partNodes(glb).flatMap(({ family, mesh }) =>
-        mesh !== undefined && buildsSmooth(familyOf(family)) ? [mesh] : [],
-      ),
+    const meshFamilies = new Map(
+      partNodes(glb).flatMap(({ family, mesh }) => (mesh === undefined ? [] : [[mesh, familyOf(family)] as const])),
     );
     meshes.forEach(({ primitives }, mesh) => {
-      const allowed = smoothMeshes.has(mesh) ? [undefined] : grains;
+      const family = meshFamilies.get(mesh);
       for (const { extras } of primitives) {
-        expect(allowed, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
-          (extras as { voxelGrain?: number } | undefined)?.voxelGrain,
+        const { voxelGrain, solids = [] } = (extras ?? {}) as { voxelGrain?: number; solids?: string[] };
+        const smooth = family !== undefined && (buildsSmooth(family) || smoothPieces(family, solids));
+        expect(smooth ? [undefined] : grains, `${row.id}: a mesh is not drawn on its part's grains`).toContain(
+          voxelGrain,
         );
       }
     });
@@ -217,7 +244,7 @@ describe('recipe output grain', () => {
 });
 
 describe('loose smooth attachment seat', () => {
-  const rows = loadExportRecipe().filter(({ kind, source }) => kind === 'attachment' && buildsSmooth(source));
+  const rows = loadExportRecipe().filter(({ kind, source }) => kind === 'attachment' && attachmentBuildsSmooth(source));
   it('has smooth attachment rows to check', () => {
     expect(rows.length).toBeGreaterThan(0);
   });

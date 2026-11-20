@@ -9,6 +9,7 @@ import {
   hashModels,
   mergeHistory,
   previousTag,
+  silentRetirements,
   standings,
   vehicleStanding,
 } from '../model-history.mjs';
@@ -142,4 +143,16 @@ test('a model is hashed with its smooth copy, and one without a copy keeps the h
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('a model a release held must stay, be renamed, or be named dropped in an upgrade step', () => {
+  const hashes = { kept: 'a', edited: 'b', new_name: 'c' };
+  const renames = { old_name: 'new_name' };
+  assert.deepEqual(silentRetirements(before, hashes, renames, ['Re-place `kept`.']), ['gone']);
+  assert.deepEqual(silentRetirements(before, hashes, renames, ['Drop `gone`, which has no successor.']), []);
+  // A mention inside a longer id tells nothing of this one.
+  assert.deepEqual(silentRetirements(before, hashes, renames, ['Drop `gone_too`.']), ['gone']);
+  // Only a drop step tells a model's going: one re-placing it says it stays.
+  assert.deepEqual(silentRetirements(before, hashes, renames, ['Re-place anything attached to `gone`.']), ['gone']);
+  assert.deepEqual(silentRetirements(before, { kept: 'a' }, renames, []), ['edited', 'gone', 'old_name']);
 });

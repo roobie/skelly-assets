@@ -35,6 +35,7 @@ import type {
   ResolvedConnection,
   ResolvedParam,
 } from './schema.ts';
+import { slotIndex, slotRange } from './slots.ts';
 
 /** 180° about the port's up axis: turns a port frame to face its mate. */
 const FLIP = rotation(rotY(180));
@@ -380,14 +381,16 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
       structure(`Connection #${index} connects "${from.part}" to itself.`, [from.part]);
       return;
     }
+    let slot: number | undefined;
     if (conn.slot !== undefined) {
       const { slots } = from.port;
       if (!slots) {
         structure(`Connection #${index}: ${conn.from} has no slots.`, [from.part]);
         return;
       }
-      if (!Number.isInteger(conn.slot) || conn.slot < 0 || conn.slot >= slots.count) {
-        structure(`Connection #${index}: slot ${conn.slot} is outside ${conn.from} (0–${slots.count - 1}).`, [
+      slot = slotIndex(slots, conn.slot);
+      if (slot === undefined) {
+        structure(`Connection #${index}: slot ${conn.slot} is outside ${conn.from} (${slotRange(slots)}).`, [
           from.part,
         ]);
         return;
@@ -397,7 +400,7 @@ export const resolve = (assembly: Assembly, domain: Domain): Resolved => {
       structure(`Connection #${index}: roll ${conn.roll} is not a multiple of 90.`, [from.part]);
       return;
     }
-    pending.push({ index, conn, from, to });
+    pending.push({ index, conn: slot === undefined ? conn : { ...conn, slot }, from, to });
   });
 
   const { defs: resolvedDefs, motions } = resolveMotions(defs, pending, structure);

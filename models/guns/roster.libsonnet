@@ -5,7 +5,7 @@
 {
   // A curated design in models/guns/designs/, by file name.
   designs: [
-    { id: 'rifle_assault', title: 'Assault rifle', design: 'archetype-ar', weapon: 'rifle' },
+    { id: 'rifle_assault', title: 'Assault rifle', design: 'ar15-carbine-free-float', weapon: 'rifle' },
     { id: 'rifle_ak', title: 'AK rifle', design: 'archetype-ak-akm', weapon: 'rifle' },
     { id: 'shotgun_pump', title: 'Pump-action shotgun', design: 'archetype-pump-shotgun', weapon: 'shotgun' },
     { id: 'rifle_anti_materiel', title: 'Anti-materiel rifle', design: 'archetype-anti-materiel', weapon: 'rifle' },
@@ -58,7 +58,7 @@
   ],
   // Every catalogue part exports as its loose part. A part whose id names one of these actions or frames belongs to
   // its weapon class.
-  partWeapons: { ak: 'rifle', ar: 'rifle', sporter: 'rifle', pipe: 'rifle', pump: 'shotgun', pistol: 'handgun', revolver: 'handgun' },
+  partWeapons: { ak: 'rifle', ar: 'rifle', ar15: 'rifle', sporter: 'rifle', pipe: 'rifle', pump: 'shotgun', pistol: 'handgun', revolver: 'handgun' },
   // The keywords a part takes from the action or frame its id names, as its gun design does.
   partKeywords: { pipe: ['improvised'] },
 }

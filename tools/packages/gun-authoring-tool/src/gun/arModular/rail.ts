@@ -9,6 +9,12 @@ import { type ArFrameTable, railTeethY, u } from './frame.ts';
  */
 type RailFoot = { readonly spineBaseY: number } | 'teeth-only';
 
+/** How many cross slots a rail of the frame's `rail` cuts in a run `length` long, a whole tooth left at either end. */
+const railSlotCount = (rail: ArFrameTable['rail'], length: number): number => {
+  const pitch = u(rail.pitch);
+  return Math.floor((length - (pitch - u(rail.slotWidth))) / pitch);
+};
+
 /**
  * A Picatinny top rail of the frame's `rail` along x from `fromX` to `toX` with its top at `topY`: teeth between the
  * cross slots, standing on `foot`. The slots are centred on the run, so its two end teeth share what is left over. Its
@@ -25,7 +31,7 @@ export const picatinnyRail = (
   const pitch = u(rail.pitch);
   const slotWidth = u(rail.slotWidth);
   const halfWidth = u(rail.topWidth) / 2;
-  const slotCount = Math.floor((toX - fromX - (pitch - slotWidth)) / pitch);
+  const slotCount = railSlotCount(rail, toX - fromX);
   const firstSlotX = (fromX + toX - (slotCount - 1) * pitch) / 2;
   const slotEdges = Array.from({ length: slotCount }, (_, index) => {
     const centre = firstSlotX + index * pitch;

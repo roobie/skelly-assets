@@ -340,6 +340,16 @@ describe('modular AR', () => {
     },
   );
 
+  it("stands the free-float carbine's rail front post on its rear sight's line", () => {
+    const { resolved, issues } = validate(loadDesignAssembly('ar15-carbine-free-float'), gunDomain);
+    expect(issues).toEqual([]);
+    const sightY = (part: string) => {
+      const axis = resolved.defs.get(part)!.axes.find(({ kind }) => kind === 'sight')!;
+      return applyPoint(resolved.placed.get(part)!, axis.origin)[1];
+    };
+    expect(sightY('front-sight')).toBeCloseTo(sightY('rear-sight'), 6);
+  });
+
   it('exports the carbine action through the sourced stroke, and its cover and stock moving through their own stops', () => {
     const result = exportGunGlb(
       loadDesignAssembly('ar15-carbine-free-float'),
@@ -364,6 +374,29 @@ describe('modular AR', () => {
     const pitch = AR15.stock.pitch.mm / 1000;
     expect(travelOf(stock)).toBeCloseTo((AR15.stock.positions.count - 1) * pitch, 6);
   });
+
+  // The doll's support hand and the press check's fingers seat by these anchors, so every v2 design must export them.
+  it.each(['ar15-carbine-free-float', 'ar15-carbine-front-sight', 'ar15-rifle-a2'])(
+    'exports %s with the anchors the hands seat by',
+    (design) => {
+      const result = exportGunGlb(
+        loadDesignAssembly(design),
+        { id: 'ar15_anchor_test', file: 'assets/models/ar15_anchor_test.glb' },
+        { appearanceProfile: 'ar' },
+      );
+      if (!result.ok) {
+        throw new Error(`export failed: ${JSON.stringify(result.error)}`);
+      }
+      const { anchors, grip } = result.modelEntry;
+      expect(Object.keys(anchors!).sort()).toEqual(['butt', 'charging_handle', 'ejection', 'muzzle', 'support']);
+      // The support hand cups the handguard below the bore and ahead of the grip; the T stands above the bore behind
+      // the port.
+      expect(anchors!.support![1]).toBeLessThan(0);
+      expect(anchors!.support![2]).toBeGreaterThan(grip!.at[2]);
+      expect(anchors!.charging_handle![1]).toBeGreaterThan(0);
+      expect(anchors!.charging_handle![2]).toBeLessThan(anchors!.ejection![2]);
+    },
+  );
 
   it('takes a rail front sight for no rear sight', () => {
     const front = variant('broken-ar15-rear-sight', (assembly) => {

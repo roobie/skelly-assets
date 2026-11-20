@@ -19,7 +19,7 @@ local ar15Item(id, role, params) =
       section: 'ar', action: 'auto', actionFrame: 'small', feed: 'box', bore: 'M', chargingHandle: 'rear-top',
       boltHandle: 'rest', rail: 'full', magazineWell: 'standard', integral: 'no', boltHandleProfile: 'standard',
       handleStyle: 'auto', carrierPattern: 'ar', stockStyle: 'm4', boltCalibre: '308-winchester',
-    }, 0.9, 'ar') + { title: 'AR receiver' },
+    }, 0.9, 'ar'),
     item('receiver_ar_large', 'receiver', ['section', 'actionFrame'], {
       section: 'ar', action: 'auto', actionFrame: 'large', feed: 'box', bore: 'M', chargingHandle: 'rear-top',
       boltHandle: 'rest', rail: 'full', magazineWell: 'standard', integral: 'no', boltHandleProfile: 'standard',
@@ -39,7 +39,7 @@ local ar15Item(id, role, params) =
     row('receiver-bolt', 'receiver', { section: 'standard', action: 'bolt' }, 0.85),
     row('receiver-battle', 'receiver', { section: 'standard', action: 'auto', carrierPattern: 'barrett' }, 1.1),
     row('receiver-smg', 'receiver', { section: 'standard', action: 'auto', carrierPattern: 'smg' }, 0.7),
-    item('charging_handle_ar', 'ar-charging-handle', ['actionFrame'], { actionFrame: 'small' }, 0.06, 'ar') + { title: 'AR charging handle' },
+    item('charging_handle_ar', 'ar-charging-handle', ['actionFrame'], { actionFrame: 'small' }, 0.06, 'ar'),
     item('charging_handle_ar_large', 'ar-charging-handle', ['actionFrame'], { actionFrame: 'large' }, 0.07, 'ar') + { title: 'Heavy AR charging handle' },
     item('bolt_carrier_ak', 'bolt-carrier', ['pattern'], {
       pattern: 'ak', handleStyle: 'auto', handleProfile: 'standard', feed: 'box', section: 'ak', bore: 'S',
@@ -48,7 +48,7 @@ local ar15Item(id, role, params) =
     item('bolt_carrier_ar', 'bolt-carrier', ['pattern', 'actionFrame'], {
       pattern: 'ar', actionFrame: 'small', handleStyle: 'auto', handleProfile: 'standard', feed: 'box', section: 'ar',
       bore: 'M', action: 'auto', boltCalibre: '308-winchester',
-    }, 0.33, 'ar') + { title: 'AR bolt carrier' },
+    }, 0.33, 'ar'),
     item('bolt_carrier_ar_large', 'bolt-carrier', ['pattern', 'actionFrame'], {
       pattern: 'ar', actionFrame: 'large', handleStyle: 'auto', handleProfile: 'standard', feed: 'box', section: 'ar',
       bore: 'M', action: 'auto', boltCalibre: '308-winchester',
@@ -83,7 +83,7 @@ local ar15Item(id, role, params) =
       layout: 'ar', actionFrame: 'small', triggerGuard: 'present', magazineWell: 'standard',
       magazineProfile: 'stanag-straight', magazineOrientation: 'straight', integral: 'no', section: 'ar',
       boltCalibre: '308-winchester',
-    }, 0.35, 'ar') + { title: 'AR lower receiver' },
+    }, 0.35, 'ar'),
     item('lower_ar_large', 'lower', ['layout', 'actionFrame'], {
       layout: 'ar', actionFrame: 'large', triggerGuard: 'present', magazineWell: 'standard',
       magazineProfile: 'sr25-straight', magazineOrientation: 'straight', integral: 'no', section: 'ar',
@@ -111,7 +111,7 @@ local ar15Item(id, role, params) =
     item('barrel_ar_medium', 'barrel', ['section', 'length', 'actionFrame'], {
       section: 'ar', length: 'M', profile: 'standard', muzzle: 'threaded', frontSightStyle: 'ar', handguardLength: 'M',
       handguardLayout: 'ar', bore: 'M', actionFrame: 'small', tubeLengthPercent: '75',
-    }, 0.95, 'ar') + { title: 'Medium AR barrel' },
+    }, 0.95, 'ar'),
     item('barrel_ar_large_medium', 'barrel', ['section', 'length', 'actionFrame'], {
       section: 'ar', length: 'M', profile: 'standard', muzzle: 'threaded', frontSightStyle: 'ar', handguardLength: 'M',
       handguardLayout: 'ar', bore: 'M', actionFrame: 'large', tubeLengthPercent: '75',
@@ -157,7 +157,7 @@ local ar15Item(id, role, params) =
       layout: 'ar', mount: 'clamped', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'M',
       actionFrame: 'small', boltCalibre: '308-winchester', section: 'ar', length: 'M', bore: 'M',
       boltHandleProfile: 'standard', style: 'fitted',
-    }, 0.35, 'ar') + { title: 'Clamped AR handguard' },
+    }, 0.35, 'ar'),
     // The large frame's wider barrel extension opens the handguard's bore, so its clamped handguard is its own shape.
     item('handguard_ar_large_clamped', 'handguard', ['layout', 'mount', 'actionFrame'], {
       layout: 'ar', mount: 'clamped', clearance: 'M', handleStyle: 'none', fit: 'receiver', barrelBore: 'M',
@@ -185,7 +185,7 @@ local ar15Item(id, role, params) =
     // A grip is built to its lower's section and finished to its gun, so the AR and AK grips are separate items.
     item('grip_standard', 'grip', ['section', 'length'], {
       length: 'M', well: 'none', section: 'ar', actionFrame: 'small',
-    }, 0.1, 'ar') + { title: 'Pistol grip' },
+    }, 0.1, 'ar'),
     item('grip_ar_long', 'grip', ['section', 'length', 'actionFrame'], {
       length: 'L', well: 'none', section: 'ar', actionFrame: 'large',
     }, 0.12, 'ar') + { title: 'Long AR pistol grip' },
@@ -201,7 +201,7 @@ local ar15Item(id, role, params) =
       style: 'ak-buttstock', length: 'L', combDegrees: '2', section: 'ak',
     }, 0.4, 'ak') + { title: 'Long AK stock' },
     row('stock-m4-short', 'stock', { style: 'm4', length: 'S' }, 0.3),
-    item('stock_m4_medium', 'stock', ['style', 'length'], { style: 'm4', length: 'M', combDegrees: '2', section: 'ar' }, 0.35, 'ar') + { title: 'Medium AR stock' },
+    item('stock_m4_medium', 'stock', ['style', 'length'], { style: 'm4', length: 'M', combDegrees: '2', section: 'ar' }, 0.35, 'ar'),
     item('stock_m4_long', 'stock', ['style', 'length'], { style: 'm4', length: 'L', combDegrees: '2', section: 'ar' }, 0.4, 'ar') + { title: 'Long AR stock' },
     row('stock-sporting-short', 'stock', { style: 'sporting', length: 'S' }, 0.35),
     item('stock_sporting_medium', 'stock', ['style', 'length'], {
@@ -228,7 +228,7 @@ local ar15Item(id, role, params) =
     item('rear_sight_ak', 'ak-rear-sight', [], {}, 0.05, 'ak') + { title: 'AK tangent rear sight' },
     item('front_sight_ak', 'front-sight', ['style'], { style: 'ak', section: 'ak', bore: 'S' }, 0.05, 'ak') + { title: 'AK front sight' },
     // The AR sight block is built to its barrel's section and bore, so the narrow-section build is its own shape.
-    item('front_sight_ar', 'front-sight', ['style', 'section'], { style: 'ar', section: 'ar', bore: 'M' }, 0.11, 'ar') + { title: 'AR front sight' },
+    item('front_sight_ar', 'front-sight', ['style', 'section'], { style: 'ar', section: 'ar', bore: 'M' }, 0.11, 'ar'),
     row('front-sight-ar-standard', 'front-sight', { style: 'ar', section: 'standard' }, 0.11),
     item('front_sight_sporter', 'front-sight', ['style'], {
       style: 'sporting', section: 'sporter', bore: 'M',
@@ -299,32 +299,33 @@ local ar15Item(id, role, params) =
     row('bipod', 'bipod', {}, 0.8),
     row('monopod', 'monopod', {}, 0.25),
   ] + [
-    // The modular AR-15: each item's mass is sourced in the frame table. They carry no title until a roster gun ships
-    // them, so the exporter leaves them out.
-    ar15Item('ar15_lower', 'lower', {}),
-    ar15Item('ar15_upper_flattop', 'upper', { top: 'flat-top' }),
+    // The modular AR-15: each item's mass is sourced in the frame table. The items the assault rifle ships carry their
+    // titles; the rest carry none until a roster gun ships them, so the exporter leaves them out.
+    ar15Item('ar15_lower', 'lower', {}) + { title: 'AR lower receiver' },
+    ar15Item('ar15_upper_flattop', 'upper', { top: 'flat-top' }) + { title: 'AR flat-top upper receiver' },
     ar15Item('ar15_upper_carry_handle', 'upper', { top: 'carry-handle' }),
-    ar15Item('ar15_barrel_16_mid', 'barrel', { length: '16-mid' }),
+    ar15Item('ar15_barrel_16_mid', 'barrel', { length: '16-mid' }) + { title: 'AR 16-inch mid-length barrel' },
     ar15Item('ar15_barrel_20_rifle', 'barrel', { length: '20-rifle' }),
-    ar15Item('ar15_gas_block_low', 'gas-block', { journal: '750' }),
+    ar15Item('ar15_gas_block_low', 'gas-block', { journal: '750' }) + { title: 'AR low-profile gas block' },
     ar15Item('ar15_front_sight_base_flat_top', 'front-sight-base', { height: 'flat-top', profile: 'a-frame' }),
     ar15Item('ar15_front_sight_base_carry_handle', 'front-sight-base', { height: 'carry-handle', profile: 'a-frame' }),
     ar15Item('ar15_front_sight_base_sight_block_flat_top', 'front-sight-base', { height: 'flat-top', profile: 'sight-block' }),
     ar15Item('ar15_front_sight_base_sight_block_carry_handle', 'front-sight-base', {
       height: 'carry-handle', profile: 'sight-block',
     }),
-    ar15Item('ar15_rear_sight', 'rear-sight', {}),
-    ar15Item('ar15_handguard_free_float', 'handguard', { length: '15' }),
+    ar15Item('ar15_rear_sight', 'rear-sight', {}) + { title: 'AR rail rear sight' },
+    ar15Item('ar15_rail_front_sight', 'rail-front-sight', {}) + { title: 'AR rail front sight' },
+    ar15Item('ar15_handguard_free_float', 'handguard', { length: '15' }) + { title: 'AR free-floating railed handguard' },
     ar15Item('ar15_handguard_drop_in_mid', 'handguard-drop-in', { gas: 'mid' }),
     ar15Item('ar15_handguard_drop_in_rifle', 'handguard-drop-in', { gas: 'rifle' }),
-    ar15Item('ar15_flash_hider', 'flash-hider', {}),
-    ar15Item('ar15_tube_carbine', 'receiver-extension', { buffer: 'carbine' }),
+    ar15Item('ar15_flash_hider', 'flash-hider', {}) + { title: 'AR flash hider' },
+    ar15Item('ar15_tube_carbine', 'receiver-extension', { buffer: 'carbine' }) + { title: 'AR carbine buffer tube' },
     ar15Item('ar15_tube_rifle', 'receiver-extension', { buffer: 'rifle' }),
-    ar15Item('ar15_stock_collapsible', 'stock', { style: 'collapsible' }),
+    ar15Item('ar15_stock_collapsible', 'stock', { style: 'collapsible' }) + { title: 'AR collapsible stock' },
     ar15Item('ar15_stock_a2', 'stock', { style: 'a2' }),
-    ar15Item('ar15_grip', 'grip', {}),
-    ar15Item('ar15_bolt_carrier', 'bolt-carrier', {}),
-    ar15Item('ar15_charging_handle', 'charging-handle', {}),
-    ar15Item('ar15_port_cover', 'port-cover', {}),
+    ar15Item('ar15_grip', 'grip', {}) + { title: 'AR pistol grip' },
+    ar15Item('ar15_bolt_carrier', 'bolt-carrier', {}) + { title: 'AR bolt carrier' },
+    ar15Item('ar15_charging_handle', 'charging-handle', {}) + { title: 'AR charging handle' },
+    ar15Item('ar15_port_cover', 'port-cover', {}) + { title: 'AR ejection port cover' },
   ],
 }

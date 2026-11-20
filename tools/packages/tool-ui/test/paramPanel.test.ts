@@ -126,6 +126,37 @@ describe('parameter panel', () => {
     ).toBe(true);
   });
 
+  it('prunes a connection whose slot the shortened port no longer has, counted from either end', () => {
+    const rail: Domain = {
+      ...domain,
+      families: {
+        ...domain.families,
+        post: {
+          ...domain.families.post!,
+          build: (params): PartDef => ({
+            ...domain.families.post!.build(params),
+            ports: [
+              {
+                id: 'rail',
+                mount: 'cap',
+                gender: 'male',
+                pos: [0, 0, 0],
+                normal: [1, 0, 0],
+                up: [0, 1, 0],
+                slots: { count: params.label === 'a' ? 4 : 2, pitch: 1 },
+              },
+            ],
+          }),
+        },
+      },
+    };
+    for (const slot of [3, -3]) {
+      const railed = { ...baseline, connections: [{ from: 'post.rail', slot, to: 'cap.attach' }] };
+      expect(setParam(railed, rail, { part: 'post', name: 'capped' }, 'no').dropped).toEqual([]);
+      expect(setParam(railed, rail, { part: 'post', name: 'label' }, 'b').dropped).toEqual(railed.connections);
+    }
+  });
+
   it('prunes connections to removed ports and restores them on clear', () => {
     const pruned = setParam(baseline, domain, { part: 'post', name: 'capped' }, 'no');
     expect(pruned.dropped).toEqual(baseline.connections);

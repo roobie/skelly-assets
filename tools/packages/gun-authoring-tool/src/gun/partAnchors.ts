@@ -82,6 +82,19 @@ export const undersideSupport = (part: PartDef, along: number): GunPartAnchors =
 };
 
 /**
+ * Middle of a tube's underside, `fromRear` part units ahead of its rear end: where the support hand cups a fore-end
+ * drawn as the walls of one tube (`octagonalTubeWalls`), whose underside no single solid holds.
+ */
+export const tubeUndersideSupport = (part: PartDef, tube: string, fromRear: number): GunPartAnchors => {
+  const walls = part.solids.filter(({ id }) => id.startsWith(`${tube}-wall-`));
+  if (walls.length === 0) {
+    return {};
+  }
+  const [min, max] = boundsOfPoints(walls.flatMap(localSolidBounds));
+  return { support: frameAt([min[0] + fromRear, min[1], (min[2] + max[2]) / 2]) };
+};
+
+/**
  * Middle of a stock's rear face, where the shoulder takes it: the height and width centre of the solids reaching the
  * stock's rearmost point, at that point. A raked pad steps forward from its heel, so the export moves it onto the
  * drawn face.

@@ -17,6 +17,9 @@ export interface ArModularGuns {
 /** The rail slot a rear sight stands on, at the rear of the upper's rail where the eye is. */
 const REAR_SIGHT_RAIL_SLOT = 1;
 
+/** The rail slot a front sight stands on: the last of the handguard's own rail, whatever its length. */
+const FRONT_SIGHT_RAIL_SLOT = -1;
+
 /**
  * A frame's two modular ARs on its lower, every length a named choice of the frame table. They share the receiver, the
  * stock, the grip and the magazine, and differ ahead of the upper: the free-float carbine clamps a low-profile gas block
@@ -43,6 +46,11 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
     { from: 'upper.port-cover', to: 'port-cover.upper' },
   ];
   const actionSlots = [slot('bolt-carrier'), slot('charging-handle'), slot('port-cover')];
+  const rearSightConnection: ConnectionTemplate = {
+    from: 'upper.rail',
+    slot: REAR_SIGHT_RAIL_SLOT,
+    to: 'rear-sight.base',
+  };
   const freeFloat: Template = {
     name: `${frame.name}-modular`,
     ...guns.freeFloat,
@@ -59,11 +67,15 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
       slot('stock', { style: 'collapsible' }),
       slot('grip'),
       { id: 'magazine', family: 'magazine', params: { length: 'L', profile: 'stanag-curved' } },
+      slot('rear-sight'),
+      { id: 'front-sight', family: familyName(frame, 'rail-front-sight') },
     ],
     connections: [
       ...sharedConnections,
       { from: 'barrel.gas-block', to: 'gas-block.barrel' },
       { from: 'barrel.muzzle', to: 'flash-hider.base' },
+      rearSightConnection,
+      { from: 'handguard.rail', slot: FRONT_SIGHT_RAIL_SLOT, to: 'front-sight.base' },
     ],
   };
   // The A2 rifle's choices follow from its carry-handle upper and rifle extension; the gas system follows the barrel.
@@ -121,7 +133,7 @@ export const arModularTemplates = (frame: ArFrame, guns: ArModularGuns): Templat
       { from: 'barrel.gas-block', to: 'front-sight-base.barrel' },
       { from: 'front-sight-base.handguard-cap', to: 'handguard.handguard-cap' },
       { from: 'barrel.muzzle', to: 'flash-hider.base' },
-      { from: 'upper.rail', slot: REAR_SIGHT_RAIL_SLOT, to: 'rear-sight.base', when: isFlatTop },
+      { ...rearSightConnection, when: isFlatTop },
     ],
   };
   return [freeFloat, frontSight];
