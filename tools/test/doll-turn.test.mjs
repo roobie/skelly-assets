@@ -118,6 +118,22 @@ test('a turned limb hangs from its anchor with its parts, origins and boxes in t
   close(doll.sites[2].at, [0.1, 0.4, 0], 'left site');
 });
 
+test('a bust stood off the doll frame origin carries its parts, its anchors and the limbs hung on them', () => {
+  const by = [0.01, 0.9, -0.02];
+  const stood = dollOf({ ...dressing, bustAt: by }, figure);
+  close(stood.sites[0].at, by, 'bust site');
+  close(stood.parts.get('torso')[0].at, by, 'torso');
+  close(stood.parts.get('torso')[0].box.min, [-0.09, 0.9, -0.12], 'torso box');
+  close(stood.anchors.shoulder_right, [-0.09, 1.3, -0.02], 'anchor');
+  for (const [i, copy] of stood.parts.get('fore').entries()) {
+    close(
+      copy.at,
+      doll.parts.get('fore')[i].at.map((c, axis) => c + by[axis]),
+      `fore ${copy.side}`,
+    );
+  }
+});
+
 test("a bone's head, reach and joint frame follow the turn, the left a mirror image of the right", () => {
   const [right, left] = [bone('upper.R'), bone('upper.L')];
   close(right.head, [-0.1, 0.4, 0]);

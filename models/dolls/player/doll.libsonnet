@@ -11,7 +11,8 @@
   // hangs (down -y), as a T-pose arm, adds `turn: { axis, degrees }` for the side that is not `mirrored`; the mirrored
   // side turns as its mirror image, so one turn serves both. The axis is one of the doll's, [±1, 0, 0] or alike, and
   // the degrees a multiple of 90, so a turned part's box stays exact for what reads it. The player's limbs hang, so it
-  // has none.
+  // has none. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its origin in
+  // the doll frame; the player's doll frame is its bust's.
   bust: 'player_bust',
   limbs: [
     { name: 'arm', model: 'player_arm', anchor: 'shoulder' },
