@@ -19,6 +19,8 @@ local clavicle(suffix, out) = trunk('clavicle_' + suffix, 'clavicle_' + suffix, 
 }) { along: [out, 0, 0], flexAxis: [0, 0, out] };
 local arm(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: 'origin', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
 local leg(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: 'origin', along: [0, -1, 0] };
+// A digit bone runs as the skeleton's does, toward its next joint, which for the thumb is well off the hanging arm's
+// axes.
 local digit(name, parent, digitName) = arm(name, parent) { flexAxis: [0, 0, -1], digit: digitName };
 local fingerCount = std.length(hand.fingers);
 local fingerBones = {
@@ -27,6 +29,7 @@ local fingerBones = {
     if k == 0 then 'hand' else hand.part(hand.fingers[i], k - 1),
     hand.fingers[i],
   ) {
+    along: hand.tail(i, k),
     limits: joints.phalanges[k] { twist: [0, 0] },
     [if k == 0 then 'spread']: 1 - 2 * i / (fingerCount - 1),
   }
@@ -35,6 +38,7 @@ local fingerBones = {
 };
 local thumbBones = {
   [hand.thumbPart(k)]: digit(hand.thumbPart(k), if k == 0 then 'hand' else hand.thumbPart(k - 1), 'thumb') {
+    along: hand.thumbTail(k),
     limits: joints.thumb[k],
   }
   for k in std.range(0, hand.thumbBones - 1)

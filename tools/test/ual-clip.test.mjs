@@ -2,7 +2,18 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { add, applyPoint, IDENTITY_M, mulMM, mulMV, quatToMat3, sub, transpose } from '../../site/kinematics.mjs';
+import {
+  add,
+  applyPoint,
+  dot,
+  IDENTITY_M,
+  mulMM,
+  mulMV,
+  quatToMat3,
+  scale,
+  sub,
+  transpose,
+} from '../../site/kinematics.mjs';
 import { glbAccessor, glbJson } from '../glb.mjs';
 import { GLB } from '../ual-skeleton.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
@@ -89,3 +100,32 @@ for (const clip of ['Walk_Loop', 'Idle_Loop']) {
     }
   });
 }
+
+// A leaf part's origin is checked above, which a part turned about it keeps; its far end, the rig's tail through its
+// flesh's far face, lies on the line from its joint to the skeleton's leaf beyond it, the point the clip carries the
+// bone's end to, as exactly as the joints do. Along that line the far face stands off the leaf by the flesh of a
+// fingertip, the thumb's pad or a shoe's toe, under 3 mm. Head is no leaf here: the mannequin's skeleton ends at its
+// head's joint, with no leaf beyond to land on.
+const LEAF_FLESH = 0.003;
+const { bones: skeleton } = JSON.parse(readFileSync(join(repo, 'models/dolls/ual/skeleton.json'), 'utf8'));
+const leaves = Object.entries(skeleton)
+  .filter(([name]) => name.includes('_leaf'))
+  .map(([name, { parent }]) => ({ name, bone: rig.bones.find(({ id }) => id === parent) }));
+
+test('every leaf part reaches out to the skeleton leaf beyond it, at rest and as the clips play', () => {
+  assert.ok(leaves.length > 0 && leaves.every(({ bone }) => bone), 'every skeleton leaf hangs from a bone of the rig');
+  for (const [clip, key] of [[null, 0], ...['Walk_Loop', 'Idle_Loop'].flatMap((c) => [0, 7, 19].map((k) => [c, k]))]) {
+    const nodes = posedNodes(clip, key);
+    for (const { name, bone } of leaves) {
+      const joint = seated(nodes, bone, [0, 0, 0]);
+      const toLeaf = sub(nodes.get(name).t, joint);
+      const line = scale(toLeaf, 1 / Math.hypot(...toLeaf));
+      const far = sub(seated(nodes, bone, inPart(bone, bone.tail)), joint);
+      const beyond = dot(far, line) - Math.hypot(...toLeaf);
+      const off = Math.hypot(...sub(far, scale(line, dot(far, line))));
+      const at = `${clip ?? 'rest'} key ${key}: ${bone.id}`;
+      assert.ok(off < 1e-4, `${at} ends ${off} m off the line to ${name}`);
+      assert.ok(Math.abs(beyond) < LEAF_FLESH, `${at} ends ${beyond} m past ${name}`);
+    }
+  }
+});
