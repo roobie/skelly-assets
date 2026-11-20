@@ -525,7 +525,7 @@ local stockOutline(pixels) = outline([stockPoint(p) for p in pixels], 'traced: m
       length: dim(25.4, 'sourced: 1.00 in, ' + ddFixedFront),
       width: dim(31.5, 'sourced: 1.24 in, ' + ddFixedFront),
       // The post's protective ears are left undrawn, so only the clamp stands under the post.
-      height: dim(5.75, "derived: half a gun unit, the generic rail sight's clamp, as the maker states no clamp height"),
+      height: dim(5.75, "styled: half a gun unit, a look estimate taken from the generic rail sight's clamp, as the maker states no clamp height"),
     },
     // Square in section, as an A2 post is.
     postWidth: dim(1.78, 'sourced: 0.070 in, ' + ddFixedFront),
