@@ -7,6 +7,11 @@ import { compilePose } from '../site/poseFile.mjs';
 
 const DEG = Math.PI / 180;
 export const r4 = (v) => v.map((x) => Math.round(x * 1e4) / 1e4 || 0);
+// A rounded quaternion scaled back to unit length.
+export const unitQuat = (q) => {
+  const n = Math.hypot(...q);
+  return q.map((c) => c / n);
+};
 
 /** The head of a generated pose file for `rig`: the figure stood on the ground on level feet. */
 export const standing = (rig) => ({

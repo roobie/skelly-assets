@@ -1,14 +1,27 @@
 // The doll's rig from models/poses/rig.libsonnet and the built doll (tools/dress.mjs, `dollOf`): a bone per doll part
 // copy in mobgen's bone shape (id, parent, head, tail, frame, limits, parents first), with a `bind` naming the part copy
-// it moves, so site/kinematics.mjs poses the doll as it would pose a mob. Also the doll's rest meshes per bone, which
-// the clearance probe (site/clearance.mjs) compares in a pose, and the check that a worn piece encloses what it hides.
+// it moves and where it rests in the bone's node, so site/kinematics.mjs poses the doll as it would pose a mob. Also
+// the doll's rest meshes per bone, which the clearance probe (site/clearance.mjs) compares in a pose, and the check
+// that a worn piece encloses what it hides.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { COINCIDENT, coveredSurface, posedSolid, runAlong, signedDepth } from '../site/clearance.mjs';
 import { hides } from '../site/hiding.mjs';
-import { add, dot, frameAbout, IDENTITY_M, scale, sub } from '../site/kinematics.mjs';
+import {
+  add,
+  dot,
+  frameAbout,
+  IDENTITY_M,
+  mat3ToQuat,
+  mulMV,
+  quatToMat3,
+  scale,
+  sub,
+  transpose,
+} from '../site/kinematics.mjs';
 import { modelMeshes } from './dress.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { r4, unitQuat } from './keyFrames.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
@@ -66,6 +79,31 @@ const inMirrorPlane = (axis, name) => {
   );
 };
 
+// The rest rotation of every bone's node, a quaternion [x, y, z, w] of the node's axes in the model's: the doll's
+// joints are glTF nodes at their heads turned by nothing, and a clip's quaternion turns that node about its head.
+// A doll whose nodes are rest-turned states each bone's own, and its clips must then be baked as each node's local
+// rotation, since today's bakes turn every bone on the model's axes, which only an unturned node shares.
+const NODE_REST = [0, 0, 0, 1];
+
+/**
+ * Where a part copy's own model frame sits in its bone's node frame at rest, so a consumer seats a piece drawn in the
+ * part's frame on the bone's node with this one constant: a point `q` of the part's model lands at
+ * `rotation * (scale * q) + translation` in the node. The node frame is the one a game's joint node has and a clip
+ * turns: origin at the bone's head, axes `nodeRotation`. It is not the bone's `frame`, the joint-limit frame the angles
+ * of a pose are read in. `rotation` is the node's rest rotation inverted, a quaternion [x, y, z, w], so the offset is
+ * general for a node turned off the model's axes. A rotation alone cannot mirror, so a mirrored copy's reflection is the
+ * `scale` [-1, 1, 1], applied to the part's own coordinates before the rotation, as the copy is drawn mirrored in the
+ * part's frame; an unmirrored copy's is [1, 1, 1]. Values are rounded as a held seat's are.
+ */
+export function restOffset({ at, mirror }, head, nodeRotation) {
+  const back = transpose(quatToMat3(nodeRotation));
+  return {
+    translation: r4(mulMV(back, sub(at, head))),
+    rotation: unitQuat(r4(mat3ToQuat(back))),
+    scale: [mirror ? -1 : 1, 1, 1],
+  };
+}
+
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A sided bone off the
 // reference side mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense`
 // each angle takes there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying.
@@ -105,6 +143,7 @@ export function dollRig(content, doll, dressing) {
           box: copy.box,
           mirror: Boolean(copy.mirror),
         },
+        at: copy.at,
         ...(spec.reach
           ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole }
           : {}),
@@ -128,7 +167,7 @@ export function dollRig(content, doll, dressing) {
     clips: content.clips,
     eye: content.eye,
     presets: content.presets ?? {},
-    bones: ordered.map(({ along, flexAxis, pole, ...bone }) => {
+    bones: ordered.map(({ along, flexAxis, pole, at, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
       const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
@@ -136,7 +175,9 @@ export function dollRig(content, doll, dressing) {
       const reaching = pole && { reach: { chain: [byId.get(bone.parent)?.parent, bone.parent], pole } };
       if (reaching && !reaching.reach.chain.every(Boolean))
         throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
-      return { ...bone, tail, frame: frameAbout(bone.head, tail, flexAxis), ...reaching };
+      const frame = frameAbout(bone.head, tail, flexAxis);
+      const rest = restOffset({ at, mirror: bone.bind.mirror }, bone.head, NODE_REST);
+      return { ...bone, node: { rotation: NODE_REST }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
     }),
   };
 }
