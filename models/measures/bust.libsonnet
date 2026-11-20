@@ -6,9 +6,9 @@
   chestWidth: 0.4, chestDepth: 0.22, chestHeight: 0.15,
   // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers.
   armpit: 0.4,
-  // The lower chest's width as a share of the chest's, so it stays inside the hanging arm and a sleeveless shell can
-  // enclose it.
-  chestLowShare: 0.94,
+  // The lower chest's width as a share of the chest's: narrow enough that a sleeveless shell of the under layer fits
+  // between it and the hanging arm, which the worn fit asserts.
+  chestLowShare: 0.92,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
   // The shoulder joint, which the arm pivots on: how far out past the chest's side and how far below its top. The rig

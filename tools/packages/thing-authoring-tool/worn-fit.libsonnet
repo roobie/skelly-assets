@@ -174,10 +174,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local hem = hems[s.hem];
     local neckline = l.ribs.y[1] + 0.65 * bust.chestHeight;
     local bodyTop = if straps then neckline else l.chest.y[1];
-    // A sleeveless body's sides stand inside the hanging arm, so the arm's skin never lies over them, and stop just
-    // above the armpit; above it only a front and a back panel, clear of the arm, rise to the neckline.
+    // A sleeveless body's sides stand off the lower chest, inside the hanging arm, so the arm's skin never lies over
+    // them, and stop just above the armpit; above it only a front and a back panel, clear of the arm, rise to the
+    // neckline.
     local armpit = l.ribs.y[1] + bust.armpit * bust.chestHeight + g;
-    local chest = if straps then l.chest { width: 2 * (armInner - g) } else l.chest;
+    local sideX = bust.chestWidth / 2 * bust.chestLowShare + g;
+    assert !straps || sideX <= armInner : 'a sleeveless body\'s side at %g lies under the hanging arm, whose inner face is at %g' % [sideX, armInner];
+    local chest = if straps then l.chest { width: 2 * sideX } else l.chest;
     local panel(name, side) =
       local w = chest.width, d = chest.depth, c = chest.chamfer, inner = arm.upperDepth / 2 + g;
       local front = [[inner, -w / 2], [d / 2 - c, -w / 2], [d / 2, -w / 2 + c], [d / 2, w / 2 - c], [d / 2 - c, w / 2], [inner, w / 2]];
