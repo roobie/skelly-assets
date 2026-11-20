@@ -10,6 +10,14 @@ export const TRACED_SMG_SECTIONS = {
 
 export type TracedSmgSection = keyof typeof TRACED_SMG_SECTIONS;
 
+export const TRACED_SMG_SECTION_NAMES = Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[];
+
+/** One entry per traced section, built from its table, so a new table needs no entry of its own. */
+export const byTracedSmgSection = <T>(build: (table: TracedSmgProportions) => T): Record<TracedSmgSection, T> =>
+  Object.fromEntries(
+    TRACED_SMG_SECTION_NAMES.map((section) => [section, build(TRACED_SMG_SECTIONS[section])]),
+  ) as Record<TracedSmgSection, T>;
+
 export const isTracedSmgSection = (section: unknown): section is TracedSmgSection =>
   typeof section === 'string' && Object.hasOwn(TRACED_SMG_SECTIONS, section);
 

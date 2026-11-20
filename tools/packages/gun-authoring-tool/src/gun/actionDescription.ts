@@ -20,9 +20,9 @@ import {
   describedActionKindOf,
   type GunPartFamily,
 } from './actionRoles.ts';
-import { smgChargingHandleFor } from './tracedSmgSections.ts';
 import { boltCycleMotion, type CycleMode, type CycleMotion, cycleMotion, pumpCycleMotion } from './cycle.ts';
 import { localEjectionPoint } from './ejection.ts';
+import { smgChargingHandleFor } from './tracedSmgSections.ts';
 
 interface ActionPart {
   readonly id: string;

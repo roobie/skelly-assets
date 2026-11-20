@@ -16,6 +16,7 @@ import {
 } from './arFrames.ts';
 import { AR_MODULAR_TEMPLATES } from './arModular/index.ts';
 import type { OpticTypeId } from './optics.ts';
+import type { TracedSmgSection } from './tracedSmgSections.ts';
 
 const sightMix = (...weights: readonly (readonly [OpticTypeId, number])[]): readonly OpticTypeId[] =>
   weights.flatMap(([type, weight]) => Array.from({ length: weight }, () => type));
@@ -453,43 +454,38 @@ const pipeRifle: Template = {
   connections: huntingRifle.connections.filter(({ to }) => to !== 'magazine.top' && to !== 'sight.base'),
 };
 
-const compactSmg: Template = {
+/**
+ * A submachine gun traced on its section's proportions table. Its traced sights and rails are part solids, so the
+ * add-on sight parts stay off; see `packages/gun-authoring-tool/docs/<section>-export.md`, "Rulings".
+ */
+const tracedSmgTemplate = (section: TracedSmgSection, stockStyle: string, description: string): Template => ({
   ...smg,
-  name: 'compact-smg',
-  description: 'Compact submachine gun traced from a side photo, on the proportions table.',
-  // Its traced sights are barrel and receiver solids, so the add-on sight parts stay off; see
-  // `packages/gun-authoring-tool/docs/compact-smg-export.md`, "Rulings".
+  name: section,
+  description,
   slots: smg.slots
     .filter((slot) => slot.id !== 'front-sight' && slot.id !== 'sight')
     .map((slot) => {
       if (slot.id === 'receiver') {
-        return { ...slot, params: { ...slot.params, section: 'compact-smg', rail: 'none' } };
+        return { ...slot, params: { ...slot.params, section, rail: 'none' } };
       }
-      return slot.id === 'stock' ? { ...slot, params: { ...slot.params, style: 'telescoping' } } : slot;
+      return slot.id === 'stock' ? { ...slot, params: { ...slot.params, style: stockStyle } } : slot;
     }),
   connections: smg.connections.filter(
     (connection) => connection.to !== 'sight.base' && connection.to !== 'front-sight.base',
   ),
-};
+});
 
-const polymerSmg: Template = {
-  ...smg,
-  name: 'polymer-smg',
-  description: 'Polymer-framed submachine gun traced from a side reference, on the proportions table.',
-  // Its traced sights and rails are barrel, receiver and handguard solids, so the add-on sight parts stay off; see
-  // `packages/gun-authoring-tool/docs/polymer-smg-export.md`.
-  slots: smg.slots
-    .filter((slot) => slot.id !== 'front-sight' && slot.id !== 'sight')
-    .map((slot) => {
-      if (slot.id === 'receiver') {
-        return { ...slot, params: { ...slot.params, section: 'polymer-smg', rail: 'none' } };
-      }
-      return slot.id === 'stock' ? { ...slot, params: { ...slot.params, style: 'skeleton-folding' } } : slot;
-    }),
-  connections: smg.connections.filter(
-    (connection) => connection.to !== 'sight.base' && connection.to !== 'front-sight.base',
-  ),
-};
+const compactSmg = tracedSmgTemplate(
+  'compact-smg',
+  'telescoping',
+  'Compact submachine gun traced from a side photo, on the proportions table.',
+);
+
+const polymerSmg = tracedSmgTemplate(
+  'polymer-smg',
+  'skeleton-folding',
+  'Polymer-framed submachine gun traced from a side reference, on the proportions table.',
+);
 
 export const boltRifleBox: Template = {
   name: 'bolt-rifle-box',

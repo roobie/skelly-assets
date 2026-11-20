@@ -9,7 +9,7 @@ const MM_PER_INCH = 25.4;
 
 /** A traced estimate on the gun grid. */
 export const snap = (value: number): number => Math.round(value / GRID) * GRID;
-export const mmToU =(mm: number): number => mm / (GUN_UNITS.metresPerUnit * 1000);
+export const mmToU = (mm: number): number => mm / (GUN_UNITS.metresPerUnit * 1000);
 export const uToMm = (u: number): number => u * (GUN_UNITS.metresPerUnit * 1000);
 export const inchesToMm = (inches: number): number => inches * MM_PER_INCH;
 export const mmToInches = (mm: number): number => mm / MM_PER_INCH;

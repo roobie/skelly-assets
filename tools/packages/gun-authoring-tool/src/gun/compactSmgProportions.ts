@@ -22,7 +22,7 @@ export const SMG_CHARGING_HANDLE = {
   notchTurnSeconds: 0.1,
 } as const satisfies TracedSmgProportions['chargingHandle'];
 
-const stockLengthU =(overallLengthMm: number): number =>
+const stockLengthU = (overallLengthMm: number): number =>
   stockReachU(overallLengthMm, barrelTipThreadedU, receiverRearX);
 
 /**

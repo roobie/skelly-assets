@@ -83,7 +83,12 @@ export interface TracedSmgProportions {
   readonly frontSight: {
     readonly block: Box2 & { readonly halfWidthU: number };
     readonly tower: Box2 & { readonly halfWidthU: number };
-    readonly hood: { readonly x: Span; readonly centreY: number; readonly outerRadiusU: number; readonly wallU: number };
+    readonly hood: {
+      readonly x: Span;
+      readonly centreY: number;
+      readonly outerRadiusU: number;
+      readonly wallU: number;
+    };
     readonly wheel?: { readonly x: Span; readonly centreY: number; readonly radiusU: number };
     readonly post: { readonly x: Span; readonly baseY: number; readonly halfWidthU: number };
   };
