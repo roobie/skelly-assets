@@ -148,6 +148,24 @@ describe('a doll whose skeleton is not the player body', () => {
     expect(() => avatarArm({ ...given, segment: 'palm' })).toThrow(/no digit/);
   });
 
+  it("draws a digit at the length its hand gives, and refuses lengths that miss one of the hand's bones", () => {
+    const span = (given: Record<string, string>) => {
+      const [solid] = avatarArm(given);
+      if (solid?.kind !== 'box') throw new Error('the digit is drawn as no box');
+      return 2 * solid.box.half[1];
+    };
+    const finger = params(toy.parts.arm, 'toy_arm_index_01');
+    const thumb = params(toy.parts.arm, 'toy_arm_thumb_01');
+    const shares = (name: string) => JSON.parse(finger[name]!) as number[];
+    const fingerFirst = Number(finger.fingerLength) * shares('fingerShares')[0]! * shares('phalanxShares')[0]!;
+    const thumbFirst = Number(thumb.thumbLength) * shares('thumbShares')[0]!;
+    const lengths = JSON.stringify(shares('fingers').map(() => [0.05, 0.03, 0.02]));
+    expect(span({ ...finger, phalanxLengths: lengths }) - span(finger)).toBeCloseTo(0.05 - fingerFirst, 9);
+    expect(span({ ...thumb, thumbLengths: '[0.04,0.03,0.02]' }) - span(thumb)).toBeCloseTo(0.04 - thumbFirst, 9);
+    expect(() => avatarArm({ ...finger, phalanxLengths: '[[0.05,0.03,0.02]]' })).toThrow(/phalanxLengths/);
+    expect(() => avatarArm({ ...thumb, thumbLengths: '[0.04,0.03]' })).toThrow(/thumbLengths/);
+  });
+
   it('stands the deltoid off the centre line by the front-to-back offset its girdle gives', () => {
     const given = params(toy.parts.bust, 'toy_bust_clavicle_l');
     const girdle = JSON.parse(given.girdle!) as { deltoid: Record<string, number> };

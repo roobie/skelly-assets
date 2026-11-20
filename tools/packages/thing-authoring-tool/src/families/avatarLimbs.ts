@@ -1,6 +1,6 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
+import { array, minValue, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
 import { block, cut, oval, region, taper, translate } from './body.ts';
 import { json, point3, positive, requireConvex, requireJointHeights, scalar, spheroid } from './shapes.ts';
 
@@ -30,6 +30,7 @@ const numbers = pipe(
   transform((s) => JSON.parse(s) as number[]),
   array(number()),
 );
+const length = pipe(number(), minValue(Number.MIN_VALUE));
 const names = pipe(
   string(),
   transform((s) => JSON.parse(s) as string[]),
@@ -100,6 +101,12 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
        */
       knuckles: optional(json(array(point3))),
       /**
+       * Each finger's phalanges' lengths, the index first and each from the knuckle, and the thumb's bones', for a hand
+       * whose digits the measures' shares do not describe, as a skeleton's do not.
+       */
+      phalanxLengths: optional(json(array(array(length)))),
+      thumbLengths: optional(json(array(length))),
+      /**
        * A digit's far joint, or its tip, from its own joint in the arm's frame, for a digit that leans off hanging
        * straight down, as a thumb reaching forward from the palm's edge does.
        */
@@ -129,9 +136,20 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   if (d.segment === 'thumb' && !(phalanx >= 0 && phalanx < d.thumbShares.length)) {
     throw new Error(`thumb segment needs a phalanx below ${d.thumbShares.length}, not ${d.phalanx}`);
   }
-  const phalanxLength = (k: number) => d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
+  if (
+    d.phalanxLengths &&
+    (d.phalanxLengths.length !== d.fingers.length ||
+      d.phalanxLengths.some((lengths) => lengths.length !== d.phalanxShares.length))
+  ) {
+    throw new Error(`The hand's phalanxLengths need ${d.phalanxShares.length} for each of ${d.fingers.join(' ')}`);
+  }
+  if (d.thumbLengths && d.thumbLengths.length !== d.thumbShares.length) {
+    throw new Error(`The hand's thumbLengths need one for each of the thumb's ${d.thumbShares.length} bones`);
+  }
+  const phalanxLength = (k: number) =>
+    d.phalanxLengths?.[fingerAt]?.[k] ?? d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
   const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
-  const thumbLength = (k: number) => d.thumbLength * (d.thumbShares[k] ?? 0);
+  const thumbLength = (k: number) => d.thumbLengths?.[k] ?? d.thumbLength * (d.thumbShares[k] ?? 0);
   const thumbTop = thumbRoot - d.thumbShares.slice(0, phalanx).reduce((sum, _, k) => sum + thumbLength(k), 0);
   const measured = { upper: 0, fore: elbow, palm: wrist };
   if (d.origins) {
