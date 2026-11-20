@@ -7,6 +7,59 @@ read_if:
 
 What each release changes for those who consume the assets. Each version's section is assembled from the change notes in `changes/`; see `changes/README.md`.
 
+## 0.15.0 - 2026-11-20
+
+### Breaking
+
+- A gun part's motion can name any number of stops, not only `rest`, `unlocked` and `open`, and `open` is no longer always the last one. The compact SMG's charging handle now exports its turn into the notch as a last stop, `notched` at clock 1, with `open` at the end of its stroke; the gun generator also has a `fal-folding` stock that turns from `extended` to `folded`. A part may now hinge without being a bolt.
+- The coach's door swings out on a pivot arm, as a touring coach's does, instead of folding: `coach_door_arm` turns out
+  on a column at the doorway's rear end and carries `coach_door_leaf`, which stays parallel to the body and stops beside
+  the doorway, behind it.
+- Opening parts no longer sink into what stands beside them. A car door's glass ends short of the pillar behind it by
+  the distance its leaning top corner swings back, so front door glass is 8 to 23 mm shorter and rear door glass 17 to
+  29 mm shorter. The hearse's grille stands 9 mm proud of the bonnet's nose, which swings forward as it lifts, and its
+  front belt trim is `hearse_front_door_brightwork`, riding each front door. The prison bus's door bar rails stop 15 mm
+  short of the jamb panel's hinge.
+
+### Upgrading from 0.14.0
+
+- Read the SMG handle's `gun.action.parts[*].motion` as a slide then a hinge with the stops `rest`, `open` and `notched`. The timeline's legs are unchanged and never go to `notched`, so a handle posed from them plays as before; a reader that took clock 1 for `open` must look the stop up by name.
+- Tell a bolt by its `unlocked` stop, never by a hinge: the SMG handle hinges and is no bolt.
+- Place `coach_door_arm` where you placed `coach_door_jamb` and `coach_door_leaf` where you placed `coach_door_free`,
+  the leaf riding the arm, at the coach's `door_arm_0` and `door_leaf_0` sites, and open them by playing their
+  `motion`s on one clock.
+- Place `hearse_front_door_brightwork` on each hearse front door, as the hearse's `front_door_brightwork_near` and
+  `front_door_brightwork_far` sites do: `hearse_brightwork` keeps only the rear belts.
+
+### Added
+
+- The AR-15s now have moving parts. Each one has a bolt carrier and charging handle in `gun.action`, which draw back together through the 95.25 mm stroke at 700 rounds a minute. The charging handle rides back clear over the stock. A gun's `gun.moving` lists the parts that move outside its action, each with its node and motion. On the AR-15s these are the ejection port cover and, on the carbines, the collapsible stock. The upper is hollow, and its ejection port opens onto the carrier. The port cover turns out and down about 168° until it rests on the magazine well. The stock slides through stops `extended`, `position-5` to `position-2` and `collapsed`.
+- The gun authoring tool builds two more modular AR-15 designs, `ar15-rifle-a2` (20 inch A2 rifle with carry handle and fixed stock) and `ar15-carbine-front-sight` (16 inch carbine with front sight base and rail rear sight), from the same lower and parts as the free-float carbine. Their front sight base comes as the forged A2 triangle, whose front is one face from its front strut down past the barrel and whose sling loop sits centred under that longer ring, or as a straight sight block. The free-float carbine's rail now stands about 2.2 mm lower, 1.6 mm over a measured flat-top's height so the charging handle's channel under it keeps a roof, with its handguard rail flush with the receiver's, and the rail rear sight keeps its aperture on the flat-top sight plane. Every AR-15's handguard, stock sleeve, front sight base ring, gas clamp, barrel, flash hider, buffer tube and castle nut is eight-sided across, as the other guns' round parts are, in the same side outline: the free-float handguard's top flat is as wide as the rail it carries, and the collapsible stock's bottom flat as wide as its toe. The A2 stock's body fills out under its sleeve's lower corners, so the two meet without a groove. No pack exports these AR-15 designs or their parts yet, so no pack id changes; they reach the packs when `rifle_assault` is built from them. The smooth pack's `revolver`, `revolver_cylinder`, `shotgun_pump` and `tube_magazine` files change in the same shape, since every gun's octagons now come from one builder: the pump's chamfered bands list their corners from another start, and the revolver's octagons differ in the last bit.
+- A basic laser gun, `bolt_laser_gun`, joins the bolt guns: a triangular shroud with red-glowing slits, fed by a battery
+  pack. Its red glow is a new finish, `crystal-glow-red`.
+- The mobgen viewer offers the floater, the cinderling's body, so a flame elemental's glow can be judged where it
+  is authored, beside the acid zombie's glowing sac and eyes (Dark scene shows glow as a light source).
+- A voxel part's node may now also hold smooth pieces: primitives without `voxelGrain` in `extras`, drawn as authored meshes beside the part's voxels, because a piece read by its exact outline loses it to any grain. The AR-15 carbine is the first: its trigger blade is a smooth piece of the lower receiver. The piece moves, collides and is placed with its part as before.
+
+### Changed
+
+- STANAG magazines and the AR-15 magazine wells they seat in now declare the `ar15-magazine` port standard in their port `extras`, and the large AR frame's well and its SR-25 magazine declare `ar10-magazine`, so a magazine cut for one well no longer matches the other. This changes `magazine_stanag_20`, `magazine_stanag_30`, `lower_ar`, `lower_ar_large`, `rifle_assault` and the `archetype_ar`, `archetype_ar_free_float` and `archetype_ar_large` designs; their geometry is unchanged. Other exported magazines and wells declare no standard.
+- The bolt guns have a smaller, lower stock and a gauntlet-sized trigger and guard; the carbine's lever, sight and
+  magazine slot, the plasma caster's rails and the scattergun's shroud and pump are redrawn.
+- The models in the skelly.armour, skelly.bolt-guns, skelly.ground-vehicles and skelly.wearables pack indexes now come in
+  the catalogue's order, its row files by path. No model changed; look models up by id, not by index position.
+
+### Fixed
+
+- Every loose shoe, boot, sandal, skate and fin whose sole raises the foot declares its `soleLift`, so a figure wearing
+  one stands on the sole instead of sinking through it. The sabatons and toecaps stand the heel on a new heel
+  piece, and `sabaton` on the sole of the shoe it straps over, instead of leaving the heel or the whole foot on air.
+- A melee clip's `held.at` now lands on the player arm's `grip` anchor, where a figure's fist holds an item, rather than
+  two centimetres off it, and `held.turn` is written unit length. The `onehand` and `twohand` guards hold the weapon
+  cocked back, loaded to swing, with the holding hands and the handle in a first-person view; the idle stays neutral. A
+  strike may name a `drawn` key its recovery passes through halfway back to the guard, and the `onehand` overhead does,
+  so its end still reaches farthest at the hit. The strikes keep their phases and hit timing.
+
 ## 0.14.0 - 2026-11-19
 
 ### Breaking
