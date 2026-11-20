@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local vehicle = import 'semi_tractor.placements.libsonnet';
@@ -7,7 +7,7 @@ local prism = k.prism;
 local s = t.spec(import 'semi_tractor.spec.libsonnet');
 local finish = { paint: s.paint, frame: 'paint-charcoal', steel: 'steel-grey', chrome: 'steel-bright', trim: 'plastic-black', glass: 'glass-clear', tread: 'alu-bare', red: 'plastic-red', yellow: 'plastic-yellow', grease: 'rubber-black', bunk: 'cloth-seat' };
 local coilY = s.floor + 0.28;
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('semi_tractor', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('semi_tractor', vehicle.title, s) + [
   k.compound('semi_tractor_sleeper', 480, [
     box('floor', 'frame', [s.sleeperBack, s.floor - 0.05, -s.side], [s.cabBack, s.floor, s.side]),
     box('rear_wall', 'paint', [s.sleeperBack, s.floor - 0.05, -s.side], [s.sleeperBack + 0.05, s.roof + 0.11, s.side]),

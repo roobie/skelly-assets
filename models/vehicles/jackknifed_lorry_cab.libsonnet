@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'jackknifed_lorry_cab.spec.libsonnet';
@@ -120,7 +120,7 @@ local frontWheelDisc = [
   k.turned('rim', 'bare', 'z', k.disc(s.rimR, -0.1, 0.12)) + { sides: 24 },
   k.turned('hub', 'crease', 'z', k.disc(0.12, 0.12, 0.17)) + { sides: 12 },
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'], state: ['crashed'] } }, [
   k.compound('jackknifed_lorry_cab_chassis', 2350,
              rail(1) + rail(-1) + std.flattenArrays([
                s.box('cross_' + i, 'frame', [-3.3 + i * 1.1, s.rail[0] + 0.05, -s.railZ], [-3.2 + i * 1.1, s.rail[1] - 0.05, s.railZ])

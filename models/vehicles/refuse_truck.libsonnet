@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -10,7 +10,7 @@ local layer(name, z, drop) = prism(name, 'paint', [[s.bodyRear, s.bodyLow], [s.b
 local ribs = [s.bodyRear + 0.45 + i * (s.bodyFront - s.bodyRear - 0.9) / 5 for i in std.range(0, 5)];
 local posts = [2.7, 1.4, 0.1, -0.7];
 local hood = [[s.hopperRear, s.hopperLintel], [s.bodyRear - 0.2, s.hopperLintel], [s.bodyRear, s.bodyRiseRear - 0.1], [s.bodyRear - 0.6, s.bodyRiseRear - 0.15], [s.hopperRear, s.hopperLintel + 0.05]];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('refuse_truck', vehicle.title, s) + [
   k.compound('refuse_truck_subframe', 460, k.bothSides([
     box('runner', 'frame', [s.bodyRear - 1.4, s.railTop, 0.34], [s.bodyFront, s.bodyLow, 0.46]),
   ]), finish) + { title: 'Refuse truck subframe' },

@@ -2,21 +2,23 @@
 // figure's own worn colours rather than the ground rows'.
 local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local worn = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
-local jacket = import 'measures/jacket.libsonnet';
+// The ground rows these shells reuse the titles of.
+local ground = import 'models/catalogue/sets/clothing-bags.libsonnet';
+local jacket = import 'models/measures/jacket.libsonnet';
 local clothing(material) = { category: 'clothing', tags: { material: material, setting: ['modern'] } };
-local jacketShells = fit.torso('jacket', { cloth: 'cloth-shirt-player', trim: 'cloth-charcoal', fastener: 'steel-grey' }, jacket, worn.groundTitle('jacket'));
+local jacketShells = fit.torso('jacket', { cloth: 'cloth-shirt-player', trim: 'cloth-charcoal', fastener: 'steel-grey' }, jacket, worn.groundTitle(ground, 'jacket'));
 // Soft cloth under the jacket, its hood lying flat enough on the back that the over-jacket gear clears it.
 local hoodieShells = fit.torso('hoodie', { cloth: 'cloth-red', trim: 'cloth-charcoal' }, {
   round: 0.01, collar: 'none', zipX: null, pockets: 'kangaroo', hood: 0.03,
   slots: { body: 'cloth', trim: 'trim', hood: 'cloth', lining: 'cloth' },
-}, worn.groundTitle('hoodie'));
-local jeansShells = fit.trousers('jeans', { cloth: 'cloth-pants-player', trim: 'cloth-charcoal' }, title=worn.groundTitle('jeans'));
+}, worn.groundTitle(ground, 'hoodie'));
+local jeansShells = fit.trousers('jeans', { cloth: 'cloth-pants-player', trim: 'cloth-charcoal' }, title=worn.groundTitle(ground, 'jeans'));
 // Rubber boots stand loose over trousers.
 local rubberBoots = fit.feet('rubber_boots', { upper: 'rubber-black', toe: 'rubber-black', sole: 'rubber-offblack', collar: 'rubber-offblack' },
-                             { l: 0.3, w: 0.13, s: 0.025, toe: 0.085, instep: 0.11, top: 0.405, laces: 0 }, { ease: 0.016, covers: ['sole'] }, worn.groundTitle('rubber_boots'));
+                             { l: 0.3, w: 0.13, s: 0.025, toe: 0.085, instep: 0.11, top: 0.405, laces: 0 }, { ease: 0.016, covers: ['sole'] }, worn.groundTitle(ground, 'rubber_boots'));
 // High-tops: a shoe that stopped below the ankle bone would pass beneath it, so the probe would take it as covered.
 local sneakers = fit.feet('sneakers', { upper: 'cloth-pants-player', toe: 'rubber-black', sole: 'rubber-black', collar: 'rubber-black' },
-                          { l: 0.3, w: 0.13, s: 0.025, toe: 0.075, instep: 0.09, top: 0.18, laces: 0 }, title=worn.groundTitle('sneakers'));
+                          { l: 0.3, w: 0.13, s: 0.025, toe: 0.075, instep: 0.09, top: 0.18, laces: 0 }, title=worn.groundTitle(ground, 'sneakers'));
 worn.shells(clothing(['fabric']), jacketShells.rows + hoodieShells.rows + jeansShells.rows)
 + worn.shells(clothing(['rubber']), rubberBoots.rows)
 + worn.shells(clothing(['fabric', 'rubber']), sneakers.rows)

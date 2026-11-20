@@ -1,8 +1,8 @@
 local k = import 'kit.libsonnet';
 local s = import 'security_walker_sleek.spec.libsonnet';
-local original = import 'mech_walker_vehicle_1.libsonnet';
+local original = import 'models/vehicles/mech_walker_vehicle_1.libsonnet';
 local vehicle = import 'security_walker_sleek.placements.libsonnet';
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local box = k.box;
 local h = s.hull;
 local axisY = s.rotary.centre[1];
@@ -50,7 +50,7 @@ local feedPieces = std.flattenArrays([
      for j in std.range(0,count-1)]
   for i in std.range(0,std.length(feed.path)-2)
 ]);
-taxonomy.inherit({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}},[
+frame.vehicleRows({tags:{'vehicle-body':['armoured'],setting:['modern','sci-fi']}},[
   part('carrier', 'carrier', 1000, [
     box('belly', 'frame', [-1.30,belly-0.07,-0.76],[1.35,belly,0.76]),
     box('rear_bulkhead', 'frame', [-1.34,belly,-0.98],[-1.27,3.80,0.98]),

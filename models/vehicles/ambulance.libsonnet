@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'ambulance.spec.libsonnet';
 local van = import 'van-body.libsonnet';
@@ -25,7 +25,7 @@ local checks(tag, x0, x1, z0, z1) = [
   for row in [0, 1]
   if std.max(tail + i * block, x0) < std.min(tail + (i + 1) * block, x1)
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('ambulance', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('ambulance', vehicle.title, s) + [
   // A two-row chequer above the stripe and a green cross between the window and the side door on each wall and on the
   // roof, which tell this box from a parcel van's.
   k.compound('ambulance_markings', 3, checks('far', tail, s.box.slideFront, -s.box.side - grain, -s.box.side)

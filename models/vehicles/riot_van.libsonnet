@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'riot_van.spec.libsonnet';
 local van = import 'van-body.libsonnet';
@@ -53,7 +53,7 @@ local chequerEnd = tail + 19 * 0.28;
 local nearFace = [s.side, s.side + 1 / 32];
 local farFace = [-s.side - 1 / 32, -s.side];
 local chequerFinish = { yellow: 'reflective-yellow', blue: 'paint-police-blue' };
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('riot_van', vehicle.title, s) + [
   k.compound('riot_van_windscreen_grille', 22, [
     screenBar('bar' + i, s.waist + 0.06 + i * 0.16)
     for i in std.range(0, 5)

@@ -1,7 +1,7 @@
 // Road, farm and military vehicles that drive on the ground, with the parts they share. Helicopters and wrecks are
 // their own packs, so a product can carry a city's traffic without its aircraft or its ruins.
 local packs = import 'models/vehicles/packs.libsonnet';
-local vehicleParts = { [id]: true for id in std.set([part.id for part in import 'models/vehicle-parts.libsonnet'] + packs.parts('skelly.ground-vehicles')) };
+local vehicleParts = { [id]: true for id in std.set([part.id for part in (import 'models/catalogue/heads.libsonnet')['models/kits/vehicle-parts.libsonnet']] + packs.parts('skelly.ground-vehicles')) };
 // Loose spare parts from the catalogue: belts, filters and plugs a player carries, not fitted to a vehicle.
 local catalogue = import 'models/catalogue/packs.libsonnet';
 local spares = catalogue.ids('skelly.ground-vehicles');

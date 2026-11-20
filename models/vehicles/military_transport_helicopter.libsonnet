@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
@@ -7,7 +7,7 @@ local s = import 'military_transport_helicopter.spec.libsonnet';
 local box = k.box;
 local e = s.engine;
 local hull = (import 'military-helicopter-body.libsonnet').rows('military_transport_helicopter', vehicle.title, s);
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, hull + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'] } }, hull + [
   h.tailRotor('military_transport_helicopter_tail_rotor', 60, s.tailRotor.radius, blades=4, chord=0.22, shaft=s.tailRotor.z, phase=15) + { title: 'Military transport helicopter tail rotor' },
   h.mainRotor('military_transport_helicopter_main_rotor', 450, s.rotorRadius, blades=4, chord=0.52, droop=0.4, phase=20, hub=0.28, segments=14) + { title: 'Military transport helicopter main rotor' },
   h.mast('military_transport_helicopter_mast', 80, s.hub - s.mastFoot, radius=0.08) + { title: 'Military transport helicopter mast' },

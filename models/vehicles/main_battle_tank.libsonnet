@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local hull = import 'armoured-hull-kit.libsonnet';
 local s = import 'main_battle_tank.spec.libsonnet';
@@ -11,7 +11,7 @@ local bothSides = k.bothSides;
 local paint = { paint: s.paint };
 local steel = 'steel-parkerized';
 local top = hull.shelfTop(s);
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title) + [
   // The near side's skirt over the track's top run, hung on the sponson's edge: a thick armour panel over the front
   // road wheels, a thinner one behind it and a rubber strip along the bottom.
   k.compound('mbt_side_skirt', 900, [

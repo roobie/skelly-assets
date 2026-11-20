@@ -1,5 +1,6 @@
 // Parts real vehicles share. Each has its own frame, so any blueprint can place it: x forward, y up from the
 // part's base, centred on x and z unless a comment says otherwise.
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local wheelKit = import 'wheel-kit.libsonnet';
@@ -469,7 +470,7 @@ local towHitch = k.compound('tow_hitch', 18, [
   box('neck', 'steel', [-0.2, 0.02, -0.03], [0, 0.07, 0.03]),
   k.turned('ball', 'steel', 'y', [[0, 0], [0, 0.015], [0.03, 0.025], [0.06, 0.015], [0.07, 0], [0, 0]], [-0.2, 0.07, 0]),
 ], { steel: 'paint-charcoal' }) + { title: 'Tow hitch' };
-[
+frame.vehicleRows({}, [
   wheel('wheel_165_70r13', 12, 0.165, 0.165, 0.281) + { title: 'Wheel 165/70R13' },
   wheel('wheel_235_75r15', 26, 0.235, 0.19, 0.367) + { title: 'Wheel 235/75R15' },
   wheel('wheel_225_75r16c', 28, 0.225, 0.203, 0.372) + { title: 'Wheel 225/75R16C' },
@@ -579,4 +580,4 @@ local towHitch = k.compound('tow_hitch', 18, [
   { inline: inline, vee: vee }[e.layout](id, e.massKg, e.length, e.width, e.height) + { title: e.title }
   for id in std.objectFields(plainEngines)
 ] + (import 'engine-kit.libsonnet').rows + wheelKit.rows
-  + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows
+  + (import 'exhaust-kit.libsonnet').rows + (import 'fuel-tank-kit.libsonnet').rows + (import 'cooling-kit.libsonnet').rows)

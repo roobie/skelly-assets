@@ -1,10 +1,10 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local s = import 'police_car.spec.libsonnet';
 local vehicle = import 'police_car.placements.libsonnet';
 local barX = -0.4;
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('police_car', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('police_car', vehicle.title, s) + [
   k.compound('police_car_light_bar', 8, [
     box('bar', 'bar', [barX - 0.13, s.roof + 0.06, -0.62], [barX + 0.13, s.roof + 0.12, 0.62]),
   ] + k.bothSides([

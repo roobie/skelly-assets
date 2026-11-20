@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
@@ -52,7 +52,7 @@ local windows = [-4.4, -3.2, -2.0, -0.8, 0.4, 1.6, 2.8];
 local gearbox(id, massKg) = k.compound(id, massKg, [
   k.turned('case', 'steel', 'y', [[0, 0], [0, 0.56], [0.25, 0.42], [0.42, 0.24], [0.42, 0], [0, 0]]) + { sides: 16 },
 ], { steel: 'steel-grey' });
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('heavy_cargo_helicopter_belly', s.shellMass,
              h.loft('nose', 'paint', s.body, x=[5.5, s.nose], arc=[90, 270], sides=32, square=square)
              + h.loft('middle', 'paint', s.body, x=[s.floorRear, 5.5], arc=[90, 270], step=11.5, sides=32, square=square),

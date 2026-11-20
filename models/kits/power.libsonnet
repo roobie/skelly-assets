@@ -3,12 +3,12 @@
 // a power pack with glowing windows on the back. Hydraulic pistons run along the thighs, shins and forearms; the
 // shoulder plates are slanted slabs, not domes. Worn shells only. Slot `glow` is the set's own light: the game lights
 // the material (a game's glow colour, arpg1: data/art.gd POWER_GLOW).
-local armour = import 'armour.libsonnet';
-local fit = import '../tools/packages/thing-authoring-tool/worn-fit.libsonnet';
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
-local bust = import 'measures/bust.libsonnet';
-local arm = import 'measures/arm.libsonnet';
-local leg = import 'measures/leg.libsonnet';
+local armour = import 'models/armour.libsonnet';
+local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local arm = import 'models/measures/arm.libsonnet';
+local leg = import 'models/measures/leg.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.cloak;
 
@@ -172,15 +172,14 @@ local forArmour = {
   shin: function(r) remake(r, starts(['knee', 'greave']), shinAdd),
   shaft: function(r) remake(r, starts([]), [shaftGuard(r)]),
 };
-// Each item whole, its rows with its figure models, as models/trooper.libsonnet's are.
+// Each item's rows, in item order.
 local worn = { armor_power: body, legguard_power: legs, gloves_power: gloves, boots_power: boots };
 local powered(r) = local seg = std.split(r.id, '_worn_')[1]; if std.objectHas(forArmour, seg) then forArmour[seg](r) else r;
-{ [k]: worn[k] + { rows: armour.of('sci-fi', [powered(r) for r in worn[k].rows]) } for k in std.objectFields(worn) } + {
-  helmet_power: fit.head('helmet_power', helmetBase) + {
-    rows: armour.of('sci-fi', [h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
-      title: 'Power helmet',
-      voxelGrain: 0.004,
-      anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
-    }]),
-  },
-}
+local items = { [k]: armour.of('sci-fi', [powered(r) for r in worn[k].rows]) for k in std.objectFields(worn) } + {
+  helmet_power: armour.of('sci-fi', [h.compound('helmet_power', 3.0, helmet, livery + { lens: 'cell-glow-teal', grille: 'rubber-black' }) + {
+    title: 'Power helmet',
+    voxelGrain: 0.004,
+    anchors: { brow: fit.browAnchor('helmet_power', 'shell', shell.min, shell.max, fit.headroom(helmetBase).brow) },
+  }]),
+};
+std.flattenArrays(std.objectValues(items))

@@ -23,14 +23,31 @@ types as JSDoc in the source, checked by `tsconfig.json` here under the same bas
 file beside a module drifts from it; see that file's header for how a module opts in. Install the locked dependencies with `npm ci` in `tools/`;
 `node tools/jsonnet/setup.mjs` and `node tools/sources.mjs`, run from the repository root, prepare the pinned
 compiler and Jsonnet twins before parallel tests. Generated twins stay ignored so Jsonnet remains the source
-of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the item
+of truth; see `sources.mjs`, `installJsonnetSources`. Every package pre-script asks for the twins, and the
 catalogue is costly to compile, so a refresh recompiles only what an edit reaches; see `sources.mjs`,
-`refreshJsonnetTwins`. Each twin is keyed by its import closure, found by scanning the import literals rather than
-evaluating, so an edit invalidates exactly the twins that can see it. The catalogue and the recipes evaluate every
-row file, so each row file compiles on its own into a fragment, in parallel, and the stale twins compile in one run
-over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and the
-twins over it, not every row again, and one run evaluates the catalogue the recipes share once. CI jobs start from
-fresh checkouts, so they share compiled units through a content-addressed twin store restored from the latest run.
+`refreshJsonnetTwins`. A row file is keyed by its import closure, found by scanning the import literals rather than
+evaluating, so an edit invalidates exactly the files that can see it. Every row file compiles on its own into a
+fragment and the heads of its rows, in parallel. A twin is not
+keyed by the row files it reads but by the digest of what stands in for them, so an edit that leaves a fragment as it
+was recompiles no twin: the scan of its closure stops at a row file and at `models/catalogue/heads.libsonnet`, which a
+compile replaces by the heads of every row file. The heads are the six fields of a row that packs, recipes and the
+Deadvox export read, so a geometry edit reaches the items and no recipe; see `jsonnet/heads.libsonnet`. Only a library path
+mirrored by the overlay sees what a compile stands in for, so a file imports a stood-in file by its plain
+root-relative path and the scan refuses any other way to it (from beside the importer, by an absolute path, or through
+a `..`), because the compile would read the file itself under a key that holds the stand-in's digest. A row file added
+or deleted changes the heads' digest, so it reaches every twin over the heads. CI keys its store by the digest of every
+input's whole closure, because it names the store before any fragment exists. Every row source is a row file: the
+catalogue sets, the vehicles, and the code-built kits in `../models/kits/`, each a list of finished rows, so that the
+catalogue is their rows in path order and `models/` itself holds no row sources; see `row-index.mjs`,
+`catalogueIndex`. A row file that imports another, as a worn kit imports the one set file whose ground row it reuses
+instead of scanning every set, compiles over that file's fragment, so a set's edit recompiles the set and the kits that
+name it and no other kit; see `sources.mjs`, `compileFragments`. The stale twins compile in parallel
+processes over an overlay that puts the fragments in place of the row files: an edited row file costs its fragment and
+the twins over it, not every row again, and a twin over the heads evaluates no row. A twin is written only
+when its bytes differ from the file on disk, so an edit that leaves a recipe's output as it was leaves the file and its
+mtime alone, so a watcher of the twins sees only what changed. CI
+jobs start from fresh checkouts, so they share compiled units through a content-addressed twin store restored from the
+latest run.
 A fresh worktree is a fresh checkout too, so worktrees and users on one host can share a store the way they share the
 export cache: `JSONNET_TWIN_STORE` names its folder, and a setgid, group-writable folder keeps every entry some
 checkout's refresh used within an entry life rather than only the entries of the checkout that refreshed last. The
@@ -40,12 +57,28 @@ before the root was shared needs the same, or the group could not write there; `
 refresh stores a unit only if its files still hold the content it was keyed by once the compile has read them: the
 compiler reads them again after the refresh took their keys, and an edit in between would otherwise put one content's
 twin under another's key.
+The catalogue's settings (units, facets, turned sides, default material) have a twin of their own, since a consumer of
+them alone, such as the build's finish library, must not load and check every row; see
+`thing-authoring-tool/item-settings.jsonnet` and `src/settings.ts`.
+The catalogue's rows are not a twin at all but a file for each row, `thing-authoring-tool/items/<id>.json`, and a
+manifest of their ids in catalogue order, `item-ids.json`, both written from the stored fragments with no Jsonnet
+evaluated. One 40 MB file made every reader parse the whole catalogue and every edit rewrite it, while a reader wants one
+row or a few and an edit reaches one or two. A row's file is written only when its bytes change, so a geometry edit moves
+the files of the rows it reaches and nothing a dev server watches but those. The manifest, not the folder, says which
+rows exist, because a refresh races its readers: it is written after the rows and before the sweep of the files it does
+not list, so a reader sees the catalogue half way between two refreshes but never a file half written. The manifest
+also records the fragment each row file's rows were written from, because the twins' stamp follows twins and a checkout
+of another branch moves it without touching the folder; a missing row file is written again for the same reason. A row's
+id is a file name, so two row files holding one id, or an id of anything but the thing id's letters, digits and `_`,
+fail the refresh naming the row file; see `catalogue-rows.mjs`,
+`writeCatalogueRows`, and `thing-authoring-tool/src/cli/content.ts` for what Node code reads, which is the rows it names.
 A row file must be plain data, because its fragment is its manifested JSON: a hidden field, a function or a
-late-bound `self` that an importer extends would differ from the source, so anything else belongs in a kit or
-library. Each fragment compile holds its row file to that, failing with the file and field, because the difference would
+late-bound `self` that an importer extends would differ from the source, so anything else belongs in a library,
+and a kit builds its rows from one and exports them finished. Each fragment compile holds its row file to that, failing
+with the file and field, because the difference would
 otherwise build silently and a mod's row file should fail where it is written; see `jsonnet/plain-data.libsonnet`,
-`rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile together and none
-exists in a fresh checkout until that run ends. The compiler is checksum-verified; transient release
+`rows`. Jsonnet imports another source's `.jsonnet`, never its twin, because stale twins compile in parallel and none
+exists in a fresh checkout until they end. The compiler is checksum-verified; transient release
 hosting failures are retried rather than failing every Jsonnet build. See `jsonnet/setup.mjs`, `downloadWithRetry`.
 
 ## Origin

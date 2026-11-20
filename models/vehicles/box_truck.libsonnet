@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local s = import 'box_truck.spec.libsonnet';
 local vehicle = import 'box_truck.placements.libsonnet';
 local electric = import 'electric_box_truck.placements.libsonnet';
 // The electric truck keeps this cab but has no radiator for a grille to feed.
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('box_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('box_truck', vehicle.title, s) + [
   r for r in t.rows('electric_box_truck', electric.title, s { grille: false }) if r.id == 'electric_box_truck_front_panel'
 ] + [
   k.compound('box_truck_box_floor', 400, [

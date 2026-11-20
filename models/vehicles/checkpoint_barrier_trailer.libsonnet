@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'military-kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
@@ -18,7 +18,7 @@ local strap(x, n) = [
   box('drop_' + n, 'strap', [x - 0.03, s.wall - 0.02, s.side + 0.02], [x + 0.03, s.railTop + 0.02, s.side + 0.035]),
   box('hook_' + n, 'strap', [x - 0.03, s.wall - 0.02, s.side], [x + 0.03, s.wall, s.side + 0.02]),
 ]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('checkpoint_barrier_trailer_chassis', 180, [
     box('front_rail', 'frame', [s.front - 0.04, s.frameLow, -0.55], [s.front, s.frameHigh, 0.55]),
     box('mid_rail', 'frame', [s.axle - 0.04, s.frameLow, -0.55], [s.axle + 0.04, s.frameHigh, 0.55]),

@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'trencher.spec.libsonnet';
@@ -19,7 +19,7 @@ local tooth(i) =
     k.bar('tooth_under_' + i, 'tooth', under, [under[0] + dirY * 0.12, under[1] - dirX * 0.12], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
     k.bar('tooth_over_' + i, 'tooth', over, [over[0] - dirY * 0.1, over[1] + dirX * 0.1], 0.07, [-s.chainZ - 0.05, s.chainZ + 0.05], 0.04),
   ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('trencher_chassis', s.shellMass, [
     box('belly', 'dark', [-1.05, 0.32, -0.55], [1.25, s.deck, 0.55]),
     box('deck_plate', 'dark', [-1.3, s.deck - 0.05, -s.side], [1.55, s.deck, s.side]),

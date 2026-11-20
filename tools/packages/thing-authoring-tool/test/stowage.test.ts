@@ -6,7 +6,7 @@ import { parse } from 'valibot';
 import { expect, it } from 'vitest';
 import { readRecipes } from '../../../recipes.mjs';
 import { loadCatalogue } from '../src/catalogue.ts';
-import { catalogue } from '../src/content.ts';
+import { readCatalogue } from '../src/cli/content.ts';
 import { exportItem, loadThingRecipe, THING_KINDS } from '../src/exports.ts';
 
 const material = Object.keys(MATERIALS)[0]!;
@@ -139,6 +139,7 @@ it.each([
   ['a slot part', 'female'],
   ['a stowable item', 'male'],
 ] as const)("carries the stowage of %s's GLB into its shipped model entry", (_case, gender) => {
+  const catalogue = readCatalogue();
   const stows = (item: (typeof catalogue.items)[number]) =>
     item.parts.some(({ ports }) => ports.some((port) => port.mount === STOWAGE_MOUNT && port.gender === gender));
   const sources = new Set(catalogue.items.filter(stows).map(({ id }) => id));

@@ -48,7 +48,7 @@ a handle or moving its part also moves the hand. Pose corrections stay authored 
 the geometry because the consumer's held frame need not match the tool's upright frame.
 See `src/catalogue.ts`, `buildItem`, and `packages.libsonnet`. Attachment datums, exported
 as named anchors, use the same solid reference for the same reason: a vehicle part's mount
-follows its geometry. See `models/vehicle-parts.libsonnet`.
+follows its geometry. See `models/kits/vehicle-parts.libsonnet`.
 
 Equipment uses family-specific construction rather than a generic box so silhouettes and
 exposed working parts remain useful identification cues at play distance. Repair trays show
@@ -77,11 +77,14 @@ Authoring a row is a loop of edit and look, so the dev server (`npm run dev`, wh
 machine's browser can watch) evaluates the row a page views when a Jsonnet source is saved, and the page redraws it in
 place: the camera is what the author has just set, and a reload would throw it away. The row is in the address
 (`?item=`) for the cases a reload happens anyway. Only viewed rows are evaluated because compiling every twin costs
-seconds and rewrites the whole catalogue, while Jsonnet is lazy and one row costs about one evaluation. The page draws
+seconds, while Jsonnet is lazy and one row costs about one evaluation. The page draws
 a row only from its own evaluation, and a failed one is shown beside the old drawing, so a model is never silently
 stale. A row's data is self-contained, so nothing else is evaluated with it. The list of rows and the settings come
-from the twins made when the server started. A row no recipe exports yet is drawn too, since a row is
-authored before it is exported. See `vite.config.ts`, `server/evaluateRow.ts` and `src/main.ts`.
+from the manifest and the settings twin made when the server started. A row no recipe exports yet is drawn too, since a
+row is authored before it is exported. A built page, which has no server to evaluate, fetches the row file of the row it
+opens rather than carrying the catalogue, and the dev server does not watch those files, so a refresh that writes,
+adds or sweeps a row reloads nothing. See `vite.config.ts`, `server/evaluateRow.ts`, `src/main.ts` and
+`src/viewerContent.ts`.
 
 Pack-owned recipes make consumption explicit rather than inferring targets from item
 relationships. Shared validation and file writing prevent parallel formats. See

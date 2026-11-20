@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'skid_steer.spec.libsonnet';
@@ -47,7 +47,7 @@ local tank = { x: [-1.22, -0.97], z: [0.06, 0.34], top: 0.74 };
 // The cooler's return drops between the radiator's near tank and the tail door.
 local returnX = -1.21;
 local returnZ = 0.32;
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('skid_steer_frame', s.shellMass, [
     box('floor', 'steel', [s.cageRear, 0.4, -sponsonInner - 0.01], [s.cageFront, s.floor, sponsonInner + 0.01]),
     box('belly', 'steel', [-1.2, 0.3, -sponsonInner - 0.01], [s.cageFront, 0.5, sponsonInner + 0.01]),

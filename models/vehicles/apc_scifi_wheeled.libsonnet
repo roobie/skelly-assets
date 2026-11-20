@@ -1,7 +1,7 @@
 local k = import 'kit.libsonnet';
 local s = import 'apc_scifi_wheeled.spec.libsonnet';
 local vehicle = import 'apc_scifi_wheeled.placements.libsonnet';
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local apcHatch = (import 'apc.spec.libsonnet').hatch;
 local box = k.box;
 local b = s.body;
@@ -121,7 +121,7 @@ local d = s.driver;
 local seatTop = floorTop + d.seat;
 local locker = s.locker;
 local rack = s.rack;
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'], setting: ['sci-fi'] } }, [
   // The hull's shell: its floor and walls, the wheel wells boxed off from the crew space and the solid fenders round
   // them. The crew space runs the core's length and widens to the full width in the bay between the wells.
   part('hull', 'hull', 7000, [

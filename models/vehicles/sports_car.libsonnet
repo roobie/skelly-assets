@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 local s = import 'sports_car.spec.libsonnet';
 local vehicle = import 'sports_car.placements.libsonnet';
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('sports_car', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('sports_car', vehicle.title, s) + [
   m.wheel('sports_car_wheel', 24, 0.245, 0.23, s.hubHeight) + { title: 'Sports car wheel' },
   k.compound('sports_car_bucket_seat', 12, [
     box('base', 'frame', [-0.22, 0, -0.22], [0.22, 0.05, 0.22]),

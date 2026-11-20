@@ -20,7 +20,6 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(
   evaluateJsonnet(
     `
   local placements = import 'models/vehicles/placements.libsonnet';
-  local frame = import 'models/vehicles/frame.libsonnet';
   local rows = std.flattenArrays(std.objectValues(import 'models/vehicles/index.libsonnet'));
   local folding(site) = std.endsWith(site.part, '_jamb') || std.endsWith(site.part, '_free');
   local sites = { [v]: [site for site in std.get(placements[v], 'sites', []) if folding(site)] for v in std.objectFields(placements) };
@@ -33,7 +32,7 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(
     grain: (import 'models/voxel-grains.libsonnet').classes.vehicle.grain,
     vehicles: { [v]: sites[v] for v in std.objectFields(sites) if std.length(sites[v]) > 0 },
     doorPairs: { [v]: pairsOf(v) for v in std.objectFields(placements) if pairsOf(v) != null },
-    rows: frame.rows([row for row in rows if std.member(parts, row.id)]),
+    rows: [row for row in rows if std.member(parts, row.id)],
   }
 `,
     resolve(import.meta.dirname, '../../../..'),

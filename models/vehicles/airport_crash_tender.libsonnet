@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local driveline = import 'driveline.libsonnet';
@@ -172,7 +172,7 @@ local monitorHead(at, size, reach) = [
 ] + k.bothSides([
   box('cheek', 'paint', [at[0] - 0.12 * size, at[1] + 0.1 * size, 0.16 * size], [at[0] + 0.12 * size, at[1] + 0.38 * size, 0.22 * size]),
 ]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_tender', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('airport_crash_tender', vehicle.title, s) + [
   // In its frame the origin is on the hubs' line under the rear output, which stands `rise` above it.
   k.compound('airport_crash_tender_transfer_case', s.transferCaseMass, [
     box('case', 'steel', [-s.transferHalf, rise - 0.18, -0.18], [s.transferHalf, rise + 0.06, 0.18]),

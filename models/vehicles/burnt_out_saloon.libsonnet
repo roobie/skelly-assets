@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'burnt_out_saloon.spec.libsonnet';
 local w = import 'wreck-kit.libsonnet';
@@ -31,7 +31,7 @@ local pillars(x, y, z) =
   y < roofAt(x, z) && x > cRear && x < aFront && (
     x > aFront - 0.14 || (x > s.bRear - 0.02 && x < s.bFront + 0.02) || x < cFront || y > roofAt(x, z) - 0.09
   );
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'], state: ['burnt'] } }, [
   k.compound('burnt_out_saloon_shell', s.shellMass,
              // Near side: the front door has gone from its opening and hangs as its own part.
              w.plate('near', 'z', [s.rear, s.nose], [s.sill, 0.98],

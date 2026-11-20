@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'tractor.spec.libsonnet';
 local box = k.box;
@@ -23,7 +23,7 @@ local arcPoint(i) = [arcX(i), arcY(arcX(i))];
 assert arcY(doorRear) < shoulder : 'the door arc must leave the door skin below the shoulder';
 local doorPins = k.hingePins('hinge', 'y', [s.cabFront - 0.04, (doorSill + shoulder) / 2, s.cabSide + k.grain],
                              [s.cabFront - 0.04, s.roof - 0.115, s.cabSide + k.grain]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('tractor_chassis', s.shellMass, [
     box('front_bolster', 'cast', [1.55, 0.52, -0.34], [s.nose, 0.86, 0.34]),
     box('transmission', 'cast', [-1.72, 0.5, -0.36], [0.5, 1.1, 0.36]),

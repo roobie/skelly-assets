@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'trailer-frame.libsonnet';
 local s = import 'tank_trailer.spec.libsonnet';
@@ -8,7 +8,7 @@ local finish = { paint: s.paint, frame: s.frame };
 local barrelAt = [0, s.barrelY, 0];
 local section(id, slot, r, from, to) = k.turned(id, slot, 'x', k.disc(r, from, to), barrelAt) + { sides: 24 };
 local bandAt = [-1.3, -0.5, 0.3, 1.1];
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('tank_trailer_chassis', 320, [
     box('rear_rail', 'frame', [s.rear - 0.08, 0.5, -0.85], [s.rear, 0.6, 0.85]),
     box('rear_cross', 'frame', [s.rear, s.frameLow, -0.5], [s.rear + 0.06, s.frameHigh, 0.5]),

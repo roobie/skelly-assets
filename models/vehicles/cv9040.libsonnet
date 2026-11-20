@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local hull = import 'armoured-hull-kit.libsonnet';
 local s = import 'cv9040.spec.libsonnet';
@@ -18,7 +18,7 @@ local doorFar = door.half + k.swingStandOff(2 * door.half, door.face - door.pinX
 local trackOuter = s.trackZ + trackClasses[tracks[s.track].class].link.width / 2;
 local troop = s.troopHatch;
 local troopHatch = k.panelHatch(troop.length, troop.width, troop.thickness, troop.open);
-taxonomy.inherit({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title, [k.panelHatchHole(troop.x, 0, troop.length, troop.width)]) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['armoured'] } }, hull.rows(s, vehicle.title, [k.panelHatchHole(troop.x, 0, troop.length, troop.width)]) + [
   // The near side's skirt outside the track's top run, hung from the sponson's edge above the track.
   k.compound('cv9040_side_skirt', 250, [
     box('hanger', 'paint', [-2.95, s.shelf, s.side], [2.2, hull.shelfTop(s), trackOuter]),

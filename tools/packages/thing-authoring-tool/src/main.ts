@@ -3,11 +3,11 @@ import { createPreview } from '@skelly/tool-ui/preview';
 import { buildLayers, disposeGroup } from '@skelly/tool-ui/scene';
 import { threeRuntime } from '@skelly/tool-ui/three-runtime';
 import type { Group } from 'three';
-import { buildItem, itemPalette, loadItem } from './catalogue.ts';
-import { catalogue } from './content.ts';
-import { exportItem, loadThingRecipe } from './exports.ts';
-import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowResult, type RowView, viewKey } from './live.ts';
-import { type Entry, entries } from './viewerContent.ts';
+import { buildItem, itemPalette } from './catalogue.ts';
+import { exportItem } from './exports.ts';
+import { LIVE_ROW, LIVE_VIEW, type RowMessage, type RowView, viewKey } from './live.ts';
+import { settings } from './settings.ts';
+import { type Entry, entries, readEntry, type Shown, shown } from './viewerContent.ts';
 
 // The selected row is the page's address, so a reload or a shared link lands on the same row.
 const ITEM_PARAM = 'item';
@@ -36,20 +36,20 @@ const clear = () => {
   drawError.hidden = true;
 };
 
-const draw = ({ id, item, row }: Entry) => {
+const draw = (id: string, { item, row }: Shown) => {
   try {
-    const { report } = buildItem(item, catalogue);
+    const { report } = buildItem(item, settings);
     // Only a recipe says how the item is voxelled, so only a recipe row has an export to take the balance point from.
-    const centre = row && exportItem(item, catalogue, recipeAsset(row), row.voxel).physical.centreOfMass;
+    const centre = row && exportItem(item, settings, recipeAsset(row), row.voxel).physical.centreOfMass;
     const layers = buildLayers(
       report,
       [],
-      itemPalette(catalogue),
+      itemPalette(settings),
       threeRuntime,
       { origin: [0, 0, 0], dir: [0, 1, 0] },
       'finish',
       {},
-      catalogue.facets,
+      settings.facets,
     );
     undraw();
     drawn = layers.solids;
@@ -67,23 +67,24 @@ const draw = ({ id, item, row }: Entry) => {
 };
 
 const selected = () => entries.find(({ id }) => id === select.value)!;
-const viewOf = ({ item, row }: Entry): RowView => ({ item: item.id, row: row?.id });
-
-// The entry as the server evaluated it, loaded the way the catalogue and the recipes load theirs.
-const evaluated = (entry: Entry, result: Exclude<RowResult, { error: string }>): Entry => {
-  const item = loadItem(result.item, catalogue);
-  const [row] = result.row === undefined ? [] : loadThingRecipe([result.row], { ...catalogue, items: [item] });
-  return { id: entry.id, label: entry.label, item, ...(row ? { row } : {}) };
-};
+const viewOf = ({ source, recipe }: Entry): RowView => ({ item: source, row: recipe?.id });
 
 const open = () => {
   const entry = selected();
   clear();
   history.replaceState(undefined, '', `?${new URLSearchParams({ [ITEM_PARAM]: entry.id })}`);
-  // Under the dev server the Jsonnet may have changed since the content was built, so the row is drawn only once the
-  // server has evaluated it; a built page has nothing newer.
+  // Under the dev server the Jsonnet may have changed since the row's file was written, so the row is drawn only once
+  // the server has evaluated it; a built page has nothing newer.
   if (import.meta.hot) import.meta.hot.send(LIVE_VIEW, viewOf(entry));
-  else draw(entry);
+  else
+    readEntry(entry).then(
+      (row) => selected() === entry && draw(entry.id, row),
+      (failure) => {
+        if (selected() !== entry) return;
+        drawError.textContent = message(failure);
+        drawError.hidden = false;
+      },
+    );
 };
 
 select.replaceChildren(...entries.map(({ id, label }) => new Option(label, id)));
@@ -97,9 +98,9 @@ import.meta.hot?.on(LIVE_ROW, ({ view, result }: RowMessage) => {
   if (viewKey(view) !== viewKey(viewOf(entry))) return;
   try {
     if ('error' in result) throw new Error(result.error);
-    const fresh = evaluated(entry, result);
+    const fresh = shown(result.item, result.row);
     compileError.hidden = true;
-    draw(fresh);
+    draw(entry.id, fresh);
   } catch (failure) {
     compileError.textContent = message(failure);
     compileError.hidden = false;

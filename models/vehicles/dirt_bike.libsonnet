@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'dirt_bike.spec.libsonnet';
 local box = k.box;
@@ -18,7 +18,7 @@ local wheel(id, massKg, radius) = k.compound(id, massKg, knobbly(radius) + [
   k.bar('spoke_' + i, 'spoke', [0.06 * std.cos(a), 0.06 * std.sin(a)], [(radius - 0.12) * std.cos(a), (radius - 0.12) * std.sin(a)], 0.04, [-0.03, 0.03])
   for i in std.range(0, 5)
 ], { tyre: 'rubber-black', rim: 'steel-grey', spoke: 'steel-stainless', hub: 'alu-bare' }, { hub: ['hub', [0.5, 0.5, 0.5]] });
-taxonomy.inherit({ tags: { 'vehicle-body': ['motorcycle'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['motorcycle'] } }, [
   k.compound('dirt_bike_frame', 19, [
     k.bar('head', 'frame', [forkX(0.84), 0.84], [forkX(1.06), 1.06], 0.08, [-0.032, 0.032]),
     k.bar('spine', 'frame', [-0.24, 0.78], [forkX(0.98), 0.98], 0.07, [-0.032, 0.032]),

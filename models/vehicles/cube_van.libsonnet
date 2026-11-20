@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local stow = import 'stowage-kit.libsonnet';
 local s = import 'cube_van.spec.libsonnet';
@@ -21,7 +21,7 @@ local blankets = [
   for j in std.range(0, std.length(stacks) - 1)
   for i in std.range(0, 3)
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('cube_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('cube_van', vehicle.title, s) + [
   // The box's overhang above the cab roof.
   // Continues the box's own section, so its walls and roof line run on unbroken.
   k.compound('cube_van_peak', 70, [

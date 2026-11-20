@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'abandoned_pickup.spec.libsonnet';
@@ -20,7 +20,7 @@ local upper(x, y) =
   local front = s.aPost - s.aLean * t;
   local rear = s.cabBack + s.cabLean * t;
   x > rear && x < front && (x > front - 0.1 || x < s.doorRear + s.cabLean * t || y > s.roof - 0.06);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'], state: ['abandoned'] } }, [
   k.compound('abandoned_pickup_cab', 290,
              // The near door is gone from its opening; the far door is its own part.
              w.plate('near', 'z', [s.cabBack, s.nose], [s.sill, s.waist],

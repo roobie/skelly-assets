@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local bus = import 'bus-body.libsonnet';
 local s = import 'prison_bus.spec.libsonnet';
@@ -22,7 +22,7 @@ local doorSpan = std.sort([-jamb * pinsUnderSkin, -jamb * g.leafWidth / 2]);
 local doorW = doorSpan[1] - doorSpan[0];
 local doorMid = (doorSpan[0] + doorSpan[1]) / 2;
 local cage = s.bulkhead;
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'] } }, bus.rows('prison_bus', vehicle.title, s) + [
   // The rails overlap the pillars either side, so the grille is seated on the skin at its fitting's `at`.
   k.compound('prison_bus_window_bars', 11, [
     box('rail_low', 'bar', [-w / 2 - 0.05, -0.02, 0], [w / 2 + 0.05, b.rail, b.z]),

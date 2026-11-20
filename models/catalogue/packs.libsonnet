@@ -3,7 +3,12 @@
 local voxel = import 'tools/jsonnet/lib/voxel-grains.libsonnet';
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local title = import 'tools/jsonnet/lib/title.libsonnet';
-local rows = std.flattenArrays(std.objectValues(import 'sets/index.libsonnet'));
+// Every catalogue row's head, and those of the sets, which the packs divide between them. The import is
+// root-relative, so a compile's stand-in for it replaces it; see tools/sources.mjs.
+local headsOf = import 'tools/jsonnet/heads.libsonnet';
+local heads = import 'models/catalogue/heads.libsonnet';
+local catalogue = headsOf.under(heads, '');
+local rows = headsOf.under(heads, 'models/catalogue/sets/');
 local byCategory = {
   ammunition: 'skelly.firearms',
   arcana: 'skelly.arcana',
@@ -52,12 +57,12 @@ local packOf(row) =
   packs:: { [row.id]: packOf(row) for row in rows },
   // The ids of the catalogue rows that pack `packId` exports.
   ids(packId):: std.set([id for id in std.objectFields($.packs) if $.packs[id] == packId]),
-  // The item rows whose ids `ids` lists, in item order. Every recipe filters the whole item list, so membership is a
-  // field lookup: go-jsonnet's std.setMember walks the set, and a recipe then costs rows times ids. std.set drops a
-  // repeated id, which a field comprehension rejects.
+  // The heads of the item rows whose ids `ids` lists, in item order. Every recipe filters the whole item list, so
+  // membership is a field lookup: go-jsonnet's std.setMember walks the set, and a recipe then costs rows times ids.
+  // std.set drops a repeated id, which a field comprehension rejects.
   rows(ids)::
     local wanted = { [id]: true for id in std.set(ids) };
-    [row for row in (import 'packages/thing-authoring-tool/items.jsonnet').items if std.objectHas(wanted, row.id)],
+    [row for row in catalogue if std.objectHas(wanted, row.id)],
   // The item recipe rows that export `rows`, each under its own id.
   items(rows):: [
     {

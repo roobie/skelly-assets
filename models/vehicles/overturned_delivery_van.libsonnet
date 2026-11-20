@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local s = import 'overturned_delivery_van.spec.libsonnet';
@@ -54,7 +54,7 @@ local tub(tag, axle) = [
   box(tag + '_top_near', 'soot', [axle - s.arch, 0.84, 0.74], [axle + s.arch, 0.86, s.skin]),
   box(tag + '_top_far', 'soot', [axle - s.arch, 0.84, -s.skin], [axle + s.arch, 0.86, -0.74]),
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'], state: ['overturned'] } }, [
   k.compound('overturned_delivery_van_chassis', 300, lying([
     box('axle_front', 'rust', [s.frontAxle - 0.05, axleY[0], -0.84], [s.frontAxle + 0.05, axleY[1], 0.84]),
     box('axle_rear', 'rust', [s.rearAxle - 0.05, axleY[0], -0.84], [s.rearAxle + 0.05, axleY[1], 0.84]),

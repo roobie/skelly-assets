@@ -1,5 +1,5 @@
-local h = import '../tools/packages/thing-authoring-tool/compound.libsonnet';
-local bolt = import 'bolt-gun.libsonnet';
+local h = import 'packages/thing-authoring-tool/compound.libsonnet';
+local bolt = import 'models/bolt-gun.libsonnet';
 local box = h.box;
 
 // The bolt carbine's trench scattergun: the family's grip and stock kept, a shorter taller receiver, a long slim barrel

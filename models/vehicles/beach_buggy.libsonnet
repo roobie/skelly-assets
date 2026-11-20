@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local box = k.box;
@@ -6,7 +6,7 @@ local prism = k.prism;
 local bothSides = k.bothSides;
 local s = import 'beach_buggy.spec.libsonnet';
 local tubeZ = [0.42, 0.47];
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, [
   m.wheel('beach_buggy_front_wheel', 9, s.frontWidth, 0.15, s.frontHub) + { title: 'Beach buggy front wheel' },
   m.wheel('beach_buggy_rear_wheel', 24, s.rearWidth, 0.2, s.rearHub, 14, 0.025, 'paint-charcoal') + { title: 'Beach buggy rear wheel' },
   k.compound('beach_buggy_frame', s.shellMass * 0.6, [

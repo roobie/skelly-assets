@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local s = import 'crashed_light_helicopter.spec.libsonnet';
@@ -8,7 +8,7 @@ local trim = 'paint-charcoal';
 local proud = [station + { half: station.half + 0.04, top: station.top + 0.04, bottom: station.bottom } for station in s.body];
 local crease(id, x, arc) = h.shell(id, 'crease', proud, thick=0.05, x=x, arc=arc, step=0.05, sides=32);
 local ventBody = [station + { half: station.half + 0.035, top: station.top + 0.035, bottom: station.bottom } for station in s.body];
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } }, [
   k.compound('crashed_light_helicopter_belly', s.shellMass,
              h.loft('belly', 'paint', s.body, x=[s.bulkhead, s.nose], arc=[90, 270])
              // The crushed hood over the nose, burst open on the near side.

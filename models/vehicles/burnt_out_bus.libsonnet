@@ -1,12 +1,12 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local k = import 'kit.libsonnet';
+local frame = import 'frame.libsonnet';
 local s = import 'burnt_out_bus.spec.libsonnet';
 local w = import 'wreck-kit.libsonnet';
 local box = k.box;
 local abs = std.abs;
 local bars = [s.bayFront - i * s.pitch for i in std.range(0, s.bays)];
 local fin = s.finish;
-local frame = { steel: 'iron-cast', rust: 'scrap-rusted', char: 'steel-spall-black' };
+local scrap = { steel: 'iron-cast', rust: 'scrap-rusted', char: 'steel-spall-black' };
 local sag(x) = s.collapse.depth * w.smooth((s.collapse.from - x) / (s.collapse.from - s.collapse.to));
 local roofY(x, z) =
   local across = abs(z) / s.side;
@@ -85,12 +85,12 @@ local rim(id, massKg, twin) =
     box('slag_a', 'char', [-0.42, -s.hubY, -0.2], [0.34, -s.hubY + 0.03, 0.22]),
     box('slag_b', 'char', [-0.26, -s.hubY, 0.2], [0.46, -s.hubY + 0.02, 0.3]),
     box('bead_a', 'char', [0.2, -s.hubY + 0.03, -0.1], [0.34, -s.hubY + 0.07, 0.12]),
-  ], frame);
+  ], scrap);
 local wheelBox(id, x) = [
   box(id, 'soot', [x - s.arch - 0.05, s.floor, 0.76], [x + s.arch + 0.05, s.waist - 0.04, 0.82]),
   box(id + '_top', 'soot', [x - s.arch - 0.05, s.waist - 0.1, 0.76], [x + s.arch + 0.05, s.waist - 0.04, s.side - 0.06]),
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['bus'], state: ['burnt'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['bus'], state: ['burnt'] } }, [
   k.compound('burnt_out_bus_floor', 2300,
              w.field('deck', 'y', [s.rear, s.front - 0.06], [-s.side + 0.03, s.side - 0.03], 0.25, 0.25, floorAt)
              + [
@@ -157,7 +157,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'], state: ['burnt'] } }, [
     k.prism('column', 'steel', w.ccw(w.barProfile([5.2, 0.9], [4.98, 1.18], 0.06)), [0.69, 0.75]),
     k.turned('wheel', 'steel', 'y', k.annulus(0.19, 0.23, 1.17, 1.21), [4.96, 0, 0.72]) + { sides: 16 },
   ], { char: 'steel-spall-black', soot: 'iron-cast', steel: 'iron-dull' }) + { title: 'Burnt-out bus dash' },
-  k.compound('burnt_out_bus_seat_frame', 9, seat('pair'), frame) + { title: 'Burnt-out bus seat frame' },
+  k.compound('burnt_out_bus_seat_frame', 9, seat('pair'), scrap) + { title: 'Burnt-out bus seat frame' },
   k.compound('burnt_out_bus_driver_frame', 14, [
     box('pedestal', 'char', [-0.18, 0, -0.2], [0.18, 0.34, 0.2]),
     seatBar('rail_a', [-0.24, 0.42], [0.22, 0.4], [-0.25, -0.21]),
@@ -166,7 +166,7 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'], state: ['burnt'] } }, [
     seatBar('back_a', [-0.24, 0.42], [-0.36, 1.05], [-0.25, -0.21]),
     seatBar('back_b', [-0.24, 0.42], [-0.36, 1.05], [0.21, 0.25]),
     box('back_top', 'rust', [-0.39, 1.0, -0.25], [-0.34, 1.05, 0.25]),
-  ], frame) + { title: 'Burnt-out bus driver seat frame' },
+  ], scrap) + { title: 'Burnt-out bus driver seat frame' },
   rim('burnt_out_bus_rim', 70, false) + { title: 'Burnt-out bus rim' },
   rim('burnt_out_bus_dual_rim', 130, true) + { title: 'Burnt-out bus dual rim' },
   k.compound('burnt_out_bus_sprung_door', 32, [
@@ -176,12 +176,12 @@ taxonomy.inherit({ tags: { 'vehicle-body': ['bus'], state: ['burnt'] } }, [
     { id: 'head', kind: 'prism', slot: 'steel', axis: 'y', profile: w.ccw(w.barProfile([1.3, 5.5], [1.76, 5.1], 0.05)), start: 2.14, end: 2.26 },
     { id: 'mid', kind: 'prism', slot: 'char', axis: 'y', profile: w.ccw(w.barProfile([1.3, 5.5], [1.76, 5.1], 0.05)), start: 1.0, end: 1.08 },
     { id: 'foot', kind: 'prism', slot: 'rust', axis: 'y', profile: w.ccw(w.barProfile([1.3, 5.5], [1.76, 5.1], 0.05)), start: 0.1, end: 0.28 },
-  ], frame) + { title: 'Burnt-out bus door (sprung)' },
+  ], scrap) + { title: 'Burnt-out bus door (sprung)' },
   k.compound('burnt_out_bus_fallen_door', 30, [
     box('post_a', 'steel', [0.2, 0, 1.55], [0.28, 0.06, 2.15]),
     box('post_b', 'rust', [1.3, 0, 1.55], [1.38, 0.06, 2.15]),
     box('head', 'rust', [0.28, 0, 1.55], [1.3, 0.06, 1.63]),
     box('foot', 'char', [0.28, 0, 2.07], [1.3, 0.06, 2.15]),
     box('mid', 'steel', [0.28, 0, 1.82], [0.86, 0.04, 1.9]),
-  ], frame) + { title: 'Burnt-out bus door (fallen)' },
+  ], scrap) + { title: 'Burnt-out bus door (fallen)' },
 ])

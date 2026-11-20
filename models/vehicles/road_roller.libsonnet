@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
 local s = import 'road_roller.spec.libsonnet';
@@ -18,7 +18,7 @@ local yoke(id, x, back) = k.compound(id, 240, [
   prism('cheek', 'paint', [[x - 0.13, s.drumRadius - 0.12], [x + 0.13, s.drumRadius - 0.12], [x + 0.4, 1.2], [x - 0.4, 1.2]], [s.drumHalf + 0.02, s.drumHalf + 0.08]),
   m.axleDisc('bearing', 'dark', x, s.drumRadius, 0.14, [s.drumHalf + 0.02, s.drumHalf + 0.14], 12),
 ]), { paint: s.paint, dark: 'paint-charcoal' });
-taxonomy.inherit({ tags: { 'vehicle-body': ['plant'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['plant'] } }, [
   k.compound('road_roller_drum', 1500, [
     m.axleDisc('roll', 'steel', 0, 0, s.drumRadius, [-s.drumHalf, s.drumHalf], 32),
   ] + bothSides([

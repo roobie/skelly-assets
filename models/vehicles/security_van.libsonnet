@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'security_van.spec.libsonnet';
 local box = k.box;
@@ -7,7 +7,7 @@ local vehicle = import 'security_van.placements.libsonnet';
 local tail = van.tail(s);
 local plate = [s.glassOut - 0.01, s.side];
 local pillarY(x) = van.pillarY(s, x);
-taxonomy.inherit({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['van'] } }, van.rows('security_van', vehicle.title, s) + [
   // Plates the cab door's glass down to a small port; it rides the door.
   // It keeps to the door's own outline, so it swings clear of the pillars and rail around it as the glass does.
   local plateRear = van.frontDoorRear(s);

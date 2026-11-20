@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local s = import 'air_ambulance.spec.libsonnet';
@@ -45,7 +45,7 @@ local seat(id, massKg, half) = k.compound(id, massKg, [
   box('cushion', 'seat', [-0.24, 0.08, -half], [0.22, 0.18, half]),
   k.prism('back', 'seat', [[-0.3, 0.14], [-0.2, 0.14], [-0.24, 0.82], [-0.33, 0.82]], [-half, half]),
 ], { dark: trim, seat: 'cloth-seat' });
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'] } }, [
   k.compound('air_ambulance_belly', s.shellMass,
              h.loft('core', 'floor', core, x=[s.tail, s.noseCap], arc=[90, 270])
              + skin('keel', 'accent', [s.tail, s.nose - 0.02], [90, 270], 32),

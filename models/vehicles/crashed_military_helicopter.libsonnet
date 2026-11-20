@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local h = import 'helicopter-kit.libsonnet';
 local m = import 'machine-kit.libsonnet';
@@ -55,7 +55,7 @@ local across(t, by) =
   local length = std.sqrt(dx * dx + dz * dz);
   [p.x + dz / length * by, p.z - dx / length * by];
 local tailHub = { x: along(0.97).x - 0.25, y: 1.45, z: along(0.97).z + 0.2 };
-taxonomy.inherit({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['helicopter'], state: ['crashed'] } }, [
   k.compound('crashed_military_helicopter_fuselage', s.shellMass,
              wall('cabin_front', 'paint', [s.doorFront, s.cockpitRear], [-180, 180])
              + wall('cabin_rear', 'paint', [s.cabinRear, s.doorRear], [-180, 180])

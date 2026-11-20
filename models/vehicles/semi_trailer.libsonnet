@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local s = import 'semi_trailer.spec.libsonnet';
 local box = k.box;
@@ -13,7 +13,7 @@ local suspension(i) = local x = s.axles[i]; [
   box('hanger_' + i, 'frame', [x + 0.45, s.hub - 0.1, 0.4], [x + 0.57, s.frameLow, 0.52]),
   box('air_spring_' + i, 'rubber', [x - 0.2, s.hub + 0.04, 0.38], [x + 0.02, s.frameLow, 0.54]),
 ];
-taxonomy.inherit({ tags: { 'vehicle-body': ['trailer'] } }, [
+frame.vehicleRows({ tags: { 'vehicle-body': ['trailer'] } }, [
   k.compound('semi_trailer_chassis', 3790,
     [box('cross_' + i, 'frame', [-6.3 + 0.9 * i - 0.04, 1.2, -1.24], [-6.3 + 0.9 * i + 0.04, s.frameHigh, 1.24]) for i in crossIds]
     + [

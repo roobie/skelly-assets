@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 import { evaluateJsonnetAsync } from '../../../jsonnet/index.mjs';
 import type { RowResult, RowView } from '../src/live.ts';
 
-const itemsSource = resolve(import.meta.dirname, '../items.jsonnet');
+const catalogueSource = resolve(import.meta.dirname, '../../../../models/index.libsonnet');
 const recipes = resolve(import.meta.dirname, '../../../../models/recipes');
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -34,7 +34,7 @@ const only = (rows: string, id: string) => `only(${rows}, ${JSON.stringify(id)})
 export const evaluateRow = async ({ item, row }: RowView): Promise<RowResult> => {
   try {
     const fields = [
-      `item: ${only(`(import ${JSON.stringify(itemsSource)}).items`, item)}`,
+      `item: ${only(`import ${JSON.stringify(catalogueSource)}`, item)}`,
       ...(row === undefined ? [] : [`row: ${only(`import ${JSON.stringify(recipeSource(row))}`, row)}`]),
     ];
     const expression = `

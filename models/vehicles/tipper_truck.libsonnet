@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local t = import 'truck-cab.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
@@ -9,7 +9,7 @@ local tubPaint = { paint: s.paint, steel: 'steel-grey', frame: 'paint-charcoal',
 local wallFront = s.tubFront - 0.07;
 local topAt(x) = s.wallTopRear + (x - s.tubRear) * (s.wallTop - s.wallTopRear) / (wallFront - s.tubRear);
 local ribs = [s.tubRear + 0.5 + i * 0.95 for i in std.range(0, 5)];
-taxonomy.inherit({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tipper_truck', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['truck'] } }, t.rows('tipper_truck', vehicle.title, s) + [
   k.compound('tipper_truck_subframe', 520, k.bothSides([
     box('runner', 'frame', [s.tubRear + 0.2, s.railTop, 0.34], [wallFront, s.tubFloor, 0.46]),
     box('hinge', 'steel', [s.tubRear + 0.2, s.tubFloor - 0.14, 0.46], [s.tubRear + 0.5, s.tubFloor, 0.56]),

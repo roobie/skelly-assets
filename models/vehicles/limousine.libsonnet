@@ -1,4 +1,4 @@
-local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
+local frame = import 'frame.libsonnet';
 local k = import 'kit.libsonnet';
 local box = k.box;
 local prism = k.prism;
@@ -13,7 +13,7 @@ local pane(id, from, to) = shape.side(id, 'glass', rect(from, to, windowTop), [s
 local bright = 'steel-stainless';
 local belt(id, from, to) = box(id, 'bright', [from, s.waist - shape.grain, s.side - shape.grain], [to, s.waist + shape.grain, s.side + shape.grain]);
 local post(id, from) = shape.side(id, 'paint', rect(from, from + 0.1, s.roof - 0.02), [s.skin - 0.02, s.glassOut + 0.02]);
-taxonomy.inherit({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('limousine', vehicle.title, s) + [
+frame.vehicleRows({ tags: { 'vehicle-body': ['car'] } }, (import 'car-body.libsonnet').rows('limousine', vehicle.title, s) + [
   k.compound('limousine_stretch', 180, k.bothSides([
     box('skin', 'paint', [s.rearDoorFront, s.floor, s.skin], [s.bRear, s.waist, s.side]),
     box('liner', 'trim', [s.rearDoorFront, s.floor + 0.02, s.skin - 0.03], [s.bRear, s.waist - 0.02, s.skin]),

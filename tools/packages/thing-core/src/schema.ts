@@ -30,7 +30,7 @@ export { Name } from './schemaPrimitives.ts';
 export { ModelPointSchema };
 
 const dotOf = (a: readonly number[], b: readonly number[]) => a.reduce((sum, value, axis) => sum + value * b[axis]!, 0);
-const ID_PATTERN = /^[a-z0-9_]+$/;
+export const ID_PATTERN = /^[a-z0-9_]+$/;
 const CALIBRE_ID_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
 export const Id = pipe(string(), regex(ID_PATTERN, 'must be lowercase letters, digits and _'));
 export const CalibreId = pipe(string(), regex(CALIBRE_ID_PATTERN, 'must be a cartridge-data id'));
