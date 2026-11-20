@@ -4,6 +4,7 @@ import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { ACTION_CARRIER_ROLES, type GunPartFamily } from '../actionRoles.ts';
 import { box, choice, NEG_X } from '../antiMateriel/common.ts';
+import { HAND_CLEARANCE_U } from '../handClearance.ts';
 import { octagonalProfile, octagonalSectionChamfered } from '../octagon.ts';
 import { buildReceiverSection, subtractAxialPockets } from '../receiverSection.ts';
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
@@ -56,7 +57,7 @@ export const sksReceiver: GunPartFamily = {
 
 /**
  * The bolt carrier in battery, its knob standing off its right side. It runs back through its stroke under the top
- * cover, so the path behind the knob is kept clear under the knob's own name.
+ * cover, so the path behind the knob, with room for the fingers around it, is kept clear under the knob's own name.
  */
 export const sksBoltCarrier: GunPartFamily = {
   name: 'sks-bolt-carrier',
@@ -77,7 +78,10 @@ export const sksBoltCarrier: GunPartFamily = {
         {
           id: SKS_KNOB_ID,
           kind: 'clearance',
-          box: boxFromMinMax([min[0] - C.travelU, min[1], min[2]], [min[0], max[1], max[2]]),
+          box: boxFromMinMax(
+            [min[0] - C.travelU - HAND_CLEARANCE_U, min[1] - HAND_CLEARANCE_U, min[2]],
+            [min[0], max[1] + HAND_CLEARANCE_U, max[2] + HAND_CLEARANCE_U],
+          ),
         },
       ],
       axes: [],

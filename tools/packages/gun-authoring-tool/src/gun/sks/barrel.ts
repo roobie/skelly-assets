@@ -1,15 +1,12 @@
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
-import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
 import type { GunPartFamily } from '../actionRoles.ts';
 import { X, Y } from '../antiMateriel/common.ts';
+import { muzzleBlastKeepOut } from '../muzzleBlast.ts';
 import { octagonalPrism, octagonalProfile, octagonalSectionChamfered } from '../octagon.ts';
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
 import { mountPort, sitePorts } from './joints.ts';
 import { block, type Span } from './shapes.ts';
-
-/** How far ahead of the muzzle the muzzle's blast is kept clear, and how wide. */
-const BLAST = { lengthU: 30, halfU: 1.5 } as const;
 
 /** The exposed barrel from the breech to the muzzle, with the gas block, the bayonet's lug and the front sight's base. */
 export const sksBarrel: GunPartFamily = {
@@ -39,16 +36,7 @@ export const sksBarrel: GunPartFamily = {
           up: Y,
         },
       ],
-      keepOuts: [
-        {
-          id: 'muzzle',
-          kind: 'muzzle',
-          box: boxFromMinMax(
-            [muzzleX, -BLAST.halfU, -BLAST.halfU],
-            [muzzleX + BLAST.lengthU, BLAST.halfU, BLAST.halfU],
-          ),
-        },
-      ],
+      keepOuts: [muzzleBlastKeepOut(muzzleX)],
       axes: [{ kind: 'bore', origin: [0, 0, 0], dir: X }],
     };
   },

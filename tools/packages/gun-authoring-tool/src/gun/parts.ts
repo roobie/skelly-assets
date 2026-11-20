@@ -77,6 +77,7 @@ import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
+import { HAND_CLEARANCE_U } from './handClearance.ts';
 import {
   type DrawnMagazineProfile,
   MAGAZINE_PROFILE_NAMES,
@@ -86,6 +87,7 @@ import {
   STANAG30_BODY,
 } from './magazineProfiles.ts';
 import { railSlots } from './mounts.ts';
+import { muzzleBlastKeepOut } from './muzzleBlast.ts';
 import {
   OCTAGON_CORNER,
   octagonalPrism,
@@ -774,20 +776,38 @@ const carrierEnvelope = (pattern: BoltCarrierPattern, frameId: string | undefine
   pattern === 'ar' ? arCarrierEnvelope(arLayoutFor(frameId)) : BOLT_CARRIER_ENVELOPES[pattern];
 
 export const CARRIER_HANDLE_STYLES = {
-  ar: { shape: 'rear-t', owner: 'ar-charging-handle', motion: 'hand', handClearanceU: 0.25 },
-  ak: { shape: 'stick-paddle', owner: 'carrier', motion: 'linear', handClearanceU: 0.25, sweep: true },
-  autoShotgun: { shape: 'stick-paddle', owner: 'carrier', motion: 'linear', handClearanceU: 0.25, sweep: true },
-  bolt: { shape: 'down-back-ball', owner: 'carrier', motion: 'linear', handClearanceU: 0.25, sweep: true },
+  ar: { shape: 'rear-t', owner: 'ar-charging-handle', motion: 'hand', handClearanceU: HAND_CLEARANCE_U },
+  ak: { shape: 'stick-paddle', owner: 'carrier', motion: 'linear', handClearanceU: HAND_CLEARANCE_U, sweep: true },
+  autoShotgun: {
+    shape: 'stick-paddle',
+    owner: 'carrier',
+    motion: 'linear',
+    handClearanceU: HAND_CLEARANCE_U,
+    sweep: true,
+  },
+  bolt: { shape: 'down-back-ball', owner: 'carrier', motion: 'linear', handClearanceU: HAND_CLEARANCE_U, sweep: true },
   smg: {
     shape: 'mp5-cocking-tube',
     owner: 'handguard',
     motion: 'linear',
-    handClearanceU: 0.25,
+    handClearanceU: HAND_CLEARANCE_U,
     sweep: true,
     segment: 'receiver-connected',
   },
-  battle: { shape: 'fal-folded-out', owner: 'carrier', motion: 'linear', handClearanceU: 0.25, sweep: true },
-  barrett: { shape: 'right-side-crank', owner: 'carrier', motion: 'linear', handClearanceU: 0.25, sweep: true },
+  battle: {
+    shape: 'fal-folded-out',
+    owner: 'carrier',
+    motion: 'linear',
+    handClearanceU: HAND_CLEARANCE_U,
+    sweep: true,
+  },
+  barrett: {
+    shape: 'right-side-crank',
+    owner: 'carrier',
+    motion: 'linear',
+    handClearanceU: HAND_CLEARANCE_U,
+    sweep: true,
+  },
   pump: { shape: 'none', owner: 'none', motion: 'none' },
   pistol: { shape: 'none', owner: 'none', motion: 'none' },
   bullpup: { shape: 'none', owner: 'none', motion: 'none' },
@@ -3899,7 +3919,7 @@ const barrel: PartFamily = {
           up: Y,
         },
       ],
-      keepOuts: [keepOut('muzzle', [len, -1.5, -1.5], [len + 30, 1.5, 1.5], 'muzzle')],
+      keepOuts: [muzzleBlastKeepOut(len)],
       axes: [{ kind: 'bore', origin: [0, 0, 0], dir: X }],
     };
   },
