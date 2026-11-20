@@ -37,8 +37,8 @@ const channel = (name: string, inlet: Inlet): WoodInlet => ({
 
 /**
  * The one-piece wooden stock, from the steel butt plate to the nose under the handguard's band: a raised comb and a
- * straight wrist behind the receiver, and channels for the receiver, the trigger group, the barrel and the folded
- * bayonet's blade. The firing hand takes the wrist.
+ * straight wrist behind the receiver, and channels for the receiver, the trigger group, and the barrel. The firing
+ * hand takes the wrist.
  */
 export const sksStock: GunPartFamily = {
   name: 'sks-stock',

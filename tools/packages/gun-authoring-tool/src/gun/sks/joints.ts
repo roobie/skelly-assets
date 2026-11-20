@@ -27,11 +27,6 @@ export const SKS_JOINTS = {
     mount: 'sight-block',
     pos: [(P.frontSight.post.x[0] + P.frontSight.post.x[1]) / 2, P.barrel.sightBase.y[1], 0],
   },
-  bayonet: {
-    on: 'barrel',
-    mount: 'lug',
-    pos: [(P.barrel.lug.x[0] + P.barrel.lug.x[1]) / 2, P.barrel.lug.y[0], 0],
-  },
 } as const satisfies Readonly<Record<string, SksJoint>>;
 
 export type SksSlot = keyof typeof SKS_JOINTS;

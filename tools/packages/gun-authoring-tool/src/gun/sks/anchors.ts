@@ -18,12 +18,13 @@ const knobAnchor = (_params: Readonly<Record<string, string>>, part: PartDef): G
 
 /**
  * Any stock's butt and hold, and the support hand under the fore-end, since the SKS's stock is its fore-end too. The
- * hand cups the belly midway between the magazine and the folded blade's tip, so it closes on neither.
+ * hand cups the belly midway between the magazine and the fore-end's nose, so it closes on the magazine's front no
+ * more than it overhangs the nose.
  */
 const sksStockAnchors = (params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
   const magazineFront = Math.max(...P.lower.magazine.map(([x]) => x));
-  const bladeTip = Math.min(...P.bayonet.blade.map(([x]) => x));
-  const supportX = (magazineFront + bladeTip) / 2;
+  const noseX = P.stock.top[P.stock.top.length - 1]![0];
+  const supportX = (magazineFront + noseX) / 2;
   return { ...stockAnchors(params, part), support: frameAt([supportX, tracedLine(P.stock.bottom)(supportX), 0]) };
 };
 

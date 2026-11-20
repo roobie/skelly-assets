@@ -2,12 +2,12 @@
 read_if:
   - you build, tune or retrace the SKS carbine
   - you change the one-piece wooden stock machinery the SKS shares with the hunting rifle (`src/gun/stockWood.ts`)
-  - you add the SKS to the roster or unfold its bayonet
+  - you add the SKS to the roster or model its bayonet
 ---
 
 # SKS export
 
-The SKS carbine is traced from one side photo with simple shapes and built in the Gungen engine, as the hunting rifle and the compact SMG were. It must read as an SKS-45 from the side: the one-piece walnut stock with its straight wrist and raised comb, the fixed angular magazine ahead of a round trigger guard, the receiver with the carrier and its knob on the right, the wooden handguard over the gas tube, the tangent rear sight, the exposed barrel with its gas block and hooded front sight, and the bayonet folded under the barrel.
+The SKS carbine is traced from one side photo with simple shapes and built in the Gungen engine, as the hunting rifle and the compact SMG were. It must read as an SKS-45 from the side: the one-piece walnut stock with its straight wrist and raised comb, the fixed angular magazine ahead of a round trigger guard, the receiver with the carrier and its knob on the right, the wooden handguard over the gas tube, the tangent rear sight, the exposed barrel with its gas block and hooded front sight.
 
 ## Reference trace
 
@@ -31,5 +31,5 @@ Its cycle is its own content (`models/guns/tables/sksAction.jsonnet`), not the A
 
 ## Deferred
 
-- **Bayonet unfolding.** The bayonet is a fixed solid in its folded place; a hinged stop is later work.
+- **Bayonet.** The carbine ships without it: it is to come back as its own piece of work with an unfold pose, not as a fixed folded solid.
 - **Roster.** The design is published, but not added to `models/guns/roster.libsonnet`.

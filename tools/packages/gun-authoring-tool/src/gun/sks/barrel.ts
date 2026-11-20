@@ -6,20 +6,19 @@ import { muzzleBlastKeepOut } from '../muzzleBlast.ts';
 import { octagonalPrism, octagonalProfile, octagonalSectionChamfered } from '../octagon.ts';
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
 import { mountPort, sitePorts } from './joints.ts';
-import { block, type Span } from './shapes.ts';
+import { block } from './shapes.ts';
 
-/** The exposed barrel from the breech to the muzzle, with the gas block, the bayonet's lug and the front sight's base. */
+/** The exposed barrel from the breech to the muzzle, with the gas block and the front sight's base. */
 export const sksBarrel: GunPartFamily = {
   name: 'sks-barrel',
   params: {},
   build(): PartDef {
-    const { breechX, muzzleX, radiusU, gasBlock, lug, sightBase } = P.barrel;
+    const { breechX, muzzleX, radiusU, gasBlock, sightBase } = P.barrel;
     return {
       family: 'barrel',
       solids: [
         octagonalPrism('barrel', radiusU, [breechX, muzzleX]),
         block('gas-block', gasBlock),
-        block('bayonet-lug', lug),
         block('front-sight-base', sightBase),
       ],
       ports: [
@@ -71,28 +70,6 @@ export const sksHandguard: GunPartFamily = {
         },
       ],
       ports: [mountPort('handguard')],
-      keepOuts: [],
-      axes: [],
-    };
-  },
-};
-
-/** The bayonet folded back under the barrel from its hinge on the lug: hinge, handle, crossguard and blade. */
-export const sksBayonet: GunPartFamily = {
-  name: 'sks-bayonet',
-  params: {},
-  build(): PartDef {
-    const { hinge, handle, crossguard, blade, halfWidthU, hingeHalfWidthU } = P.bayonet;
-    const fitting = (id: string, { x, y }: { x: Span; y: Span }) => block(id, { x, y, halfWidthU: hingeHalfWidthU });
-    return {
-      family: 'bayonet',
-      solids: [
-        fitting('hinge', hinge),
-        fitting('handle', handle),
-        fitting('crossguard', crossguard),
-        { id: 'blade', kind: 'extruded-polygon', profile: blade, z: [-halfWidthU, halfWidthU] },
-      ],
-      ports: [mountPort('bayonet')],
       keepOuts: [],
       axes: [],
     };

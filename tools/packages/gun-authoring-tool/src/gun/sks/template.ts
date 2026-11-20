@@ -5,7 +5,7 @@ import { jointConnections, SKS_JOINTS } from './joints.ts';
 export const SKS_TEMPLATE: Template = {
   name: 'sks-carbine',
   description:
-    'Simonov SKS-45 carbine: one-piece wooden stock, fixed ten-round magazine, gas tube under a wooden handguard, tangent rear sight, hooded front sight and folded bayonet.',
+    'Simonov SKS-45 carbine: one-piece wooden stock, fixed ten-round magazine, gas tube under a wooden handguard, tangent rear sight, hooded front sight.',
   variant: '7.62x39',
   root: 'receiver',
   slots: [

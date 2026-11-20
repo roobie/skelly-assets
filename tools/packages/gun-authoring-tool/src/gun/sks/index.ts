@@ -5,7 +5,7 @@
 import type { Template } from '@skelly/construct/assembly/template.ts';
 import type { GunPartFamily } from '../actionRoles.ts';
 import { sksBoltCarrier, sksReceiver } from './action.ts';
-import { sksBarrel, sksBayonet, sksHandguard } from './barrel.ts';
+import { sksBarrel, sksHandguard } from './barrel.ts';
 import { sksLower } from './lower.ts';
 import { sksFrontSight, sksRearSight } from './sights.ts';
 import { sksStock } from './stock.ts';
@@ -19,7 +19,6 @@ export const SKS_FAMILIES: Readonly<Record<string, GunPartFamily>> = Object.from
     sksBoltCarrier,
     sksBarrel,
     sksHandguard,
-    sksBayonet,
     sksLower,
     sksFrontSight,
     sksRearSight,

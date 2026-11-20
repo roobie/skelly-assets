@@ -46,8 +46,6 @@ export const SKS_PROPORTIONS = {
     breechX,
     radiusU: 0.5,
     gasBlock: { x: [20.5, 21.75], y: [-1, 2], halfWidthU: 0.75 },
-    // The clamp the folded bayonet hinges on.
-    lug: { x: [30.25, 31.75], y: [-1.25, 0.75], halfWidthU: 0.5 },
     sightBase: { x: [33.5, 36], y: [-1, 0.75], halfWidthU: 0.75 },
   },
   handguard: {
@@ -136,21 +134,6 @@ export const SKS_PROPORTIONS = {
       receiver: { x: [-27.25, 0], above: -1.25, halfWidthU: 1 },
       triggerGroup: { x: [-26, -6.5], below: -1.25, halfWidthU: 0.75 },
       barrel: { x: [0, 12], above: -0.75, halfWidthU: 0.625 },
-      bayonet: { x: [6.25, 12], below: -1.25, halfWidthU: 0.375 },
     },
-  },
-  // The bayonet is drawn folded back under the barrel, its blade let into the fore-end.
-  bayonet: {
-    hinge: { x: [30.25, 31.75], y: [-2.5, -1.25] },
-    handle: { x: [26.5, 30.25], y: [-2.75, -1.5] },
-    crossguard: { x: [25.25, 26.5], y: [-5.25, -1.25] },
-    blade: [
-      [6.5, -3],
-      [25.25, -3.375],
-      [25.25, -1.5],
-      [8.75, -1.75],
-    ],
-    halfWidthU: 0.25,
-    hingeHalfWidthU: 0.5,
   },
 } as const;
