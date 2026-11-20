@@ -7,13 +7,14 @@ function(m) {
   slopeRun: m.chestWidth / 2 - self.neckFoot,
   slopeLength: std.sqrt(self.slopeRun * self.slopeRun + m.trapeziusDrop * m.trapeziusDrop),
   // The deltoid on the figure's left (+x), its right the mirror: a spheroid upright about its centre, the shoulder
-  // joint, `radius` round in plan and `halfHeight` from the centre to its crown.
+  // joint, `radius` round in plan and `halfHeight` from the centre to its crown. A body whose shoulder joints stand off
+  // the trunk's centre line, front to back, gives `shoulderJointForward`; without it they lie on it.
   deltoid: {
     x: m.chestWidth / 2 + m.shoulderJointOut,
     y: $.chestTop - m.shoulderJointBelow,
     radius: m.deltoidRadius,
     halfHeight: $.chestTop - m.trapeziusDrop + m.deltoidCrown - self.y,
-  },
+  } + (if std.objectHas(m, 'shoulderJointForward') then { z: m.shoulderJointForward } else {}),
   // The rig pivots the arm on the middle of the deltoid's voxels, which lies on the joint only when the joint lies on
   // a voxel's middle or edge; a set scaling the measures draws at its own grain and leaves the grain out.
   local onGrain(v) = local steps = v / (m.voxelGrain / 2); std.abs(steps - std.round(steps)) < 1e-9,
@@ -35,6 +36,6 @@ function(m) {
     if std.abs(u) >= 1 then null else $.deltoid.y + ($.deltoid.halfHeight + rise) * std.sqrt(1 - u * u),
   // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from.
   bustParams::
-    local drawnFrom = ['shoulderJointOut', 'shoulderJointBelow', 'deltoidRadius', 'deltoidCrown', 'trapeziusDrop'];
+    local drawnFrom = ['shoulderJointOut', 'shoulderJointBelow', 'shoulderJointForward', 'deltoidRadius', 'deltoidCrown', 'trapeziusDrop'];
     std.foldl(std.objectRemoveKey, drawnFrom, m) + { girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid } },
 }

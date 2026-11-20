@@ -148,6 +148,20 @@ describe('a doll whose skeleton is not the player body', () => {
     expect(() => avatarArm({ ...given, segment: 'palm' })).toThrow(/no digit/);
   });
 
+  it('stands the deltoid off the centre line by the front-to-back offset its girdle gives', () => {
+    const given = params(toy.parts.bust, 'toy_bust_clavicle_l');
+    const girdle = JSON.parse(given.girdle!) as { deltoid: Record<string, number> };
+    const centre = (deltoid: Record<string, number>) => {
+      const solid = bust({ ...given, girdle: JSON.stringify({ ...girdle, deltoid }) }).find(
+        ({ id }) => id === 'shoulder-left',
+      );
+      if (solid?.kind !== 'revolved' || !solid.origin) throw new Error('the clavicle draws no deltoid');
+      return solid.origin;
+    };
+    const [x, y, z] = centre(girdle.deltoid);
+    expect(centre({ ...girdle.deltoid, z: 0.02 })).toEqual([x, y, z + 0.02]);
+  });
+
   it("cuts the torso garment at the bust's spine joints, each shell in its part's frame", () => {
     const { jacket } = toy.garments;
     const level = (shell: string, id: string, part: string) => {

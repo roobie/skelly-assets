@@ -54,13 +54,22 @@ const BustParams = strictObject({
   chestLowShare: positive,
   torsoChamfer: positive,
   chestChamfer: positive,
-  /** The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. */
+  /**
+   * The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. The centre
+   * lies on the trunk's centre line, front to back, unless it gives its `z`.
+   */
   girdle: pipe(
     string(),
     transform((text): unknown => JSON.parse(text)),
     strictObject({
       trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
-      deltoid: strictObject({ x: number(), y: number(), radius: number(), halfHeight: number() }),
+      deltoid: strictObject({
+        x: number(),
+        y: number(),
+        z: optional(number(), 0),
+        radius: number(),
+        halfHeight: number(),
+      }),
     }),
   ),
   neckWidth: positive,
@@ -154,8 +163,8 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
   const brow = crown + d.jawHeight;
   // The shoulder: an upright spheroid, so the arm hangs from a cap round from above and from the front.
   const deltoid = (id: string, side: 1 | -1) => {
-    const { x, y, radius, halfHeight } = d.girdle.deltoid;
-    return spheroid(id, [side * x, y - origin, 0], [halfHeight, radius], ['y', 'skin']);
+    const { x, y, z, radius, halfHeight } = d.girdle.deltoid;
+    return spheroid(id, [side * x, y - origin, z], [halfHeight, radius], ['y', 'skin']);
   };
   const facePower = d.facePower;
   /** Where the face's rounded front lies at `x`, so a feature can sit on the surface rather than stand off it. */
