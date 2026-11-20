@@ -1,23 +1,37 @@
 // The camera skin check (site/skin.mjs) drawn in headless Chromium, so it runs only on demand: ASSETS_SWEEPS=1, as the
-// manual slow-tests workflow sets it. The page is the site's own modules served from source, with three.js from the
-// CDN the site's import maps name.
+// manual slow-tests workflow sets it. The page is the site's own modules served as built, since the build is what puts
+// the modules from tools/ beside them and makes the TypeScript they import loadable; the tree they are built over is
+// empty, as the page draws only boxes of its own. three.js comes from the CDN the site's import maps name.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import process from 'node:process';
 import { after, before, test } from 'node:test';
-import { launchBrowser, serveSite } from '../reviewSite.mjs';
+import { makeBuildDir } from '../buildDir.mjs';
+import { buildSite, launchBrowser, serveSite } from '../reviewSite.mjs';
 
 const skip = process.env.ASSETS_SWEEPS ? false : 'draws in a browser: set ASSETS_SWEEPS=1';
-const site = resolve(import.meta.dirname, '../../site');
-const importMap = readFileSync(join(site, 'pose.html'), 'utf8').match(/<script type="importmap">[\s\S]*?<\/script>/)[0];
 
+let dir;
 let server;
 let browser;
 let page;
 before(async () => {
   if (skip) return;
-  server = await serveSite(site, site);
+  dir = makeBuildDir('skin-check');
+  const built = join(dir, 'built');
+  const site = join(dir, 'site');
+  mkdirSync(built);
+  writeFileSync(
+    join(built, 'manifest.json'),
+    JSON.stringify({ packs: {}, models: [], finishes: {}, renames: {}, vehicles: [], motions: [], sounds: [] }),
+  );
+  buildSite(built, site);
+  // The built page's import map is the one that points the motion package's TypeScript at its stripped copy.
+  const importMap = readFileSync(join(site, 'pose.html'), 'utf8').match(
+    /<script type="importmap">[\s\S]*?<\/script>/,
+  )[0];
+  server = await serveSite(site, built);
   browser = await launchBrowser();
   page = await browser.newPage();
   await page.route(`${server.origin}/skin-check.html`, (route) =>
@@ -31,6 +45,7 @@ before(async () => {
 after(async () => {
   await browser?.close();
   server?.close();
+  if (dir) rmSync(dir, { recursive: true, force: true });
 });
 
 // The covered skin showing in each review view of an arm in a sleeve `width` wide; the arm is 0.1 m thick, as in
