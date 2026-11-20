@@ -14,6 +14,7 @@ import {
   frameAbout,
   IDENTITY_M,
   mat3ToQuat,
+  mulMM,
   mulMV,
   quatToMat3,
   scale,
@@ -91,20 +92,26 @@ function nodeRotationOf(name, { nodeRotation }, side) {
  * of a pose are read in. `rotation` is the node's rest rotation inverted, a quaternion [x, y, z, w], so the offset is
  * general for a node turned off the model's axes. A rotation alone cannot mirror, so a mirrored copy's reflection is the
  * `scale` [-1, 1, 1], applied to the part's own coordinates before the rotation, as the copy is drawn mirrored in the
- * part's frame; an unmirrored copy's is [1, 1, 1]. Values are rounded as a held seat's are.
+ * part's frame; an unmirrored copy's is [1, 1, 1]. A copy turned at its site (tools/dress.mjs, `turn`) is turned after
+ * that reflection, so the rotation is the node's inverse after the turn. Values are rounded as a held seat's are.
  */
-export function restOffset({ at, mirror }, head, nodeRotation) {
+export function restOffset({ at, mirror, turn }, head, nodeRotation) {
   const back = transpose(quatToMat3(nodeRotation));
+  const seat = turn ? mulMM(back, quatToMat3(turn)) : back;
   return {
     translation: r4(mulMV(back, sub(at, head))),
-    rotation: unitQuat(r4(mat3ToQuat(back))),
+    rotation: unitQuat(r4(mat3ToQuat(seat))),
     scale: [mirror ? -1 : 1, 1, 1],
   };
 }
 
-// Each bone of the content, once per side when sided, bound to its part copy in the doll. A sided bone off the
-// reference side mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense`
-// each angle takes there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying.
+// Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
+// `flexAxis` are written in its part's own frame, which the copy's site turn carries into the doll's, so a limb rested
+// off the way its model hangs has the same content on each side. A sided bone off the reference side mirrors the limits
+// of its in-plane joint axes and its reach pole across x, and carries the `sense` each angle takes there, 1 or -1 per
+// axis, so a pose written for the reference side is mirrored by multiplying. Whether an axis is in the mirror plane is
+// asked of the axis as written, since the left's turn is the reference's mirrored: it takes the same axis, turned by
+// its own turn, to the mirror image of the reference's.
 export function dollRig(doll, dressing) {
   const { sides, rig: content, boneSuffix } = dressing;
   if (!sides.includes(content.reference))
@@ -119,8 +126,10 @@ export function dollRig(doll, dressing) {
       const head = spec.pivot === 'origin' ? copy.at : doll.anchors[spec.pivot?.anchor];
       if (!head) throw new Error(`rig: no pivot for ${name}: ${JSON.stringify(spec.pivot)}`);
       const mirrored = spec.sided && side !== content.reference;
-      const flexAxis = spec.flexAxis ?? [1, 0, 0];
-      const axes = frameAbout([0, 0, 0], spec.along, flexAxis);
+      const own = { along: spec.along, flexAxis: spec.flexAxis ?? [1, 0, 0] };
+      const axes = frameAbout([0, 0, 0], own.along, own.flexAxis);
+      const turning = copy.turn && quatToMat3(copy.turn);
+      const [along, flexAxis] = [own.along, own.flexAxis].map((axis) => (turning ? mulMV(turning, axis) : axis));
       const sense = ['x', 'y', 'z'].map((axis) => (mirrored && inMirrorPlane(axes[axis], name) ? -1 : 1));
       const limits = Object.fromEntries(
         AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]),
@@ -129,7 +138,7 @@ export function dollRig(doll, dressing) {
         id: sided(name, side),
         parent: spec.parent === null ? null : sided(spec.parent, side),
         head,
-        along: spec.along,
+        along,
         flexAxis,
         limits,
         sense,
@@ -143,6 +152,7 @@ export function dollRig(doll, dressing) {
           mirror: Boolean(copy.mirror),
         },
         at: copy.at,
+        turn: copy.turn,
         ...(spec.reach
           ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole }
           : {}),
@@ -166,7 +176,7 @@ export function dollRig(doll, dressing) {
     clips: content.clips,
     eye: content.eye,
     presets: content.presets ?? {},
-    bones: ordered.map(({ along, flexAxis, pole, at, nodeRotation, ...bone }) => {
+    bones: ordered.map(({ along, flexAxis, pole, at, turn, nodeRotation, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
       const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
@@ -175,7 +185,7 @@ export function dollRig(doll, dressing) {
       if (reaching && !reaching.reach.chain.every(Boolean))
         throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
       const frame = frameAbout(bone.head, tail, flexAxis);
-      const rest = restOffset({ at, mirror: bone.bind.mirror }, bone.head, nodeRotation);
+      const rest = restOffset({ at, mirror: bone.bind.mirror, turn }, bone.head, nodeRotation);
       return { ...bone, node: { rotation: nodeRotation }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
     }),
   };
@@ -185,9 +195,17 @@ export function dollRig(doll, dressing) {
 
 const STILL = { r: IDENTITY_M, t: [0, 0, 0] };
 const mirrorX = (positions) => positions.map((x, i) => (i % 3 === 0 ? -x : x));
-const placed = (mesh, { at, mirror }) => {
+const turnedBy = (turn, positions) => {
+  const r = quatToMat3(turn);
+  const out = [];
+  for (let i = 0; i < positions.length; i += 3) out.push(...mulMV(r, positions.slice(i, i + 3)));
+  return out;
+};
+// A mesh in its model frame placed as a site places it: mirrored, then turned, then moved.
+const placed = (mesh, { at, mirror, turn }) => {
   const flipped = mirror ? mirrorX(mesh.positions) : mesh.positions;
-  return { positions: flipped.map((x, i) => x + at[i % 3]), indices: mesh.indices, pieces: mesh.pieces };
+  const turned = turn ? turnedBy(turn, flipped) : flipped;
+  return { positions: turned.map((x, i) => x + at[i % 3]), indices: mesh.indices, pieces: mesh.pieces };
 };
 const wholeModel = (meshes) => {
   const positions = [],

@@ -8,7 +8,9 @@
 // angles and a held angle shows in its report.
 //
 // `pivot` is `origin`, the part's own origin, which the avatar draws at the joint it hangs from, or `{ anchor }`, a
-// bust anchor. `along` is the bone's rest direction, used to find its tail when it has no single child bone.
+// bust anchor. `along` is the bone's rest direction, used to find its tail when it has no single child bone. Both
+// `along` and `flexAxis` are written in the part's own frame, as its model hangs, so a limb that its doll record
+// turns at rest (`turn`, models/dolls/player/doll.libsonnet) is written once for each side.
 // `flexAxis` is the joint frame's x: positive flex bends the way the joint works most (a limb swings forward, an elbow
 // and a knee close, toes point down, the trunk and head bend forward). Twist is about the bone, abduction about the
 // remaining axis. Limits are degrees [min, max], written for the `reference` side, the figure's left (+x), where

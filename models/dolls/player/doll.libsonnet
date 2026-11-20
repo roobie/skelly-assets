@@ -7,7 +7,9 @@
   // The bust, with each limb hung on each side by its own anchor from the bust's anchor of the same name and side,
   // `<anchor>_<side>`. The limb models are built as the figure's right limb, so the `mirrored` side is their mirror. A
   // place on one side only takes the first side's copy. The limbs' order is the order of their sites in the doll, which
-  // a rig file's bone binds index, so a limb added later goes last.
+  // a rig file's bone binds index, so a limb added later goes last. A limb a doll rests turned off the way its model
+  // hangs (down -y), as a T-pose arm, adds `turn: { axis, degrees }`, about an axis of the doll frame, for the side
+  // that is not `mirrored`; the mirrored side turns as its mirror image, so one turn serves both. The player's limbs hang, so it has none.
   bust: 'player_bust',
   limbs: [
     { name: 'arm', model: 'player_arm', anchor: 'shoulder' },
