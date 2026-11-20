@@ -2,21 +2,16 @@
 // Declarations are keyed by registry key; a grip's frame follows its own leaned axes after placement.
 
 import type { AnchorFrame } from '@skelly/construct/assembly/anchors.ts';
-import { extrusionPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
-import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { GunAnchorDeclarations } from './anchors.ts';
 import { AR_MODULAR_ANCHORS } from './arModular/index.ts';
-import { FIRING_GRIP } from './firingGrip.ts';
 import {
-  axisMidpoint,
   ejectionAnchor,
-  findSolid,
   frameAt,
   gripHold,
-  interiorPoint,
   magwellAnchor,
   muzzlePortAnchor,
   rearFaceButt,
+  stockAnchors,
   undersideSupport,
   X,
   Y,
@@ -31,33 +26,6 @@ const revolverGripAxes = (): Pick<AnchorFrame, 'forward' | 'up'> => {
     forward: [Math.cos(rake), -Math.sin(rake), 0],
     up: [Math.sin(rake), Math.cos(rake), 0],
   };
-};
-
-/** Existing ordinary grip placement; authored palm datums take precedence for curved stocks. */
-const gripHoldPoint = (s: Solid): Vec3 => {
-  if (s.kind === 'box') {
-    return s.box.center;
-  }
-  if (s.kind === 'revolved') {
-    return axisMidpoint(s);
-  }
-  const n = s.profile.length;
-  const centroid: readonly [number, number] = [
-    s.profile.reduce((sum, vertex) => sum + vertex[0], 0) / n,
-    s.profile.reduce((sum, vertex) => sum + vertex[1], 0) / n,
-  ];
-  if (s.axis === 'y') {
-    return extrusionPoint(s.axis, centroid, s.z[0]);
-  }
-  const lowestProfileAxis = s.axis === 'x' ? 0 : 1;
-  const lowest = s.profile.reduce((best, vertex) =>
-    vertex[lowestProfileAxis]! < best[lowestProfileAxis]! ? vertex : best,
-  );
-  const blendedProfile: readonly [number, number] = [
-    lowest[0] * 0.99 + centroid[0] * 0.01,
-    lowest[1] * 0.99 + centroid[1] * 0.01,
-  ];
-  return extrusionPoint(s.axis, blendedProfile, (s.z[0] + s.z[1]) / 2);
 };
 
 export const GUN_ANCHORS: GunAnchorDeclarations = {
@@ -86,21 +54,7 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
       return { ...hold, ...(magazine ? { magwell: frameAt(magazine.pos) } : {}) };
     },
   },
-  // Every stock has a butt; only a firing-grip stock has a hold. An authored palm datum is independent
-  // of the stock's lowest silhouette vertex; ordinary wrists use their interior.
-  stock: {
-    holdRank: 'firing-grip-stock',
-    anchors: (_params, part) => {
-      const gripSolid = part.solids.find((solid) => solid.id === 'grip');
-      const grip = gripSolid ?? findSolid(part, 'wrist');
-      const palm = part.axes.find((a) => a.kind === 'firing-grip');
-      const position = palm?.origin ?? (grip && (gripSolid ? gripHoldPoint(grip) : interiorPoint(grip)));
-      return {
-        ...rearFaceButt(part),
-        ...(position && part.tags?.includes(FIRING_GRIP) ? { hold: frameAt(position) } : {}),
-      };
-    },
-  },
+  stock: { holdRank: 'firing-grip-stock', anchors: stockAnchors },
   'recoil-stock': { anchors: (_params, part) => rearFaceButt(part) },
   handguard: {
     anchors: (params, part) =>

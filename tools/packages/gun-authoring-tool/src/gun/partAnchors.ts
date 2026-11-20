@@ -8,6 +8,7 @@ import { boundsOfPoints, localSolidBounds } from '@skelly/construct/shapes/geome
 import type { RevolvedSolid, Solid } from '@skelly/construct/shapes/solid.ts';
 import type { GunPartAnchors } from './anchors.ts';
 import { localEjectionPoint } from './ejection.ts';
+import { FIRING_GRIP } from './firingGrip.ts';
 
 export const X: Vec3 = [1, 0, 0];
 export const Y: Vec3 = [0, 1, 0];
@@ -16,13 +17,13 @@ export const findSolid = (part: PartDef, ...ids: string[]): Solid | undefined =>
   ids.map((id) => part.solids.find((s) => s.id === id)).find((s) => s !== undefined);
 
 /** A revolved solid's interior point: on its axis, midway along it. */
-export const axisMidpoint = (s: RevolvedSolid): Vec3 => {
+const axisMidpoint = (s: RevolvedSolid): Vec3 => {
   const axial = s.profile.map((p) => p[0]);
   return add(s.origin ?? [0, 0, 0], extrusionPoint(s.axis, [0, 0], (Math.min(...axial) + Math.max(...axial)) / 2));
 };
 
 /** A point inside a convex solid: box centre, the axis midpoint of a revolved one, or the vertex mean of a convex profile at mid-extrusion. */
-export const interiorPoint = (s: Solid): Vec3 => {
+const interiorPoint = (s: Solid): Vec3 => {
   if (s.kind === 'box') {
     return s.box.center;
   }
@@ -104,4 +105,46 @@ export const rearFaceButt = (part: PartDef): GunPartAnchors => {
   const rear = Math.min(...bounds.map(([min]) => min[0]));
   const [min, max] = boundsOfPoints(bounds.filter(([low]) => low[0] - rear < 1e-6).flat());
   return { butt: frameAt([rear, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2]) };
+};
+
+/** Existing ordinary grip placement; authored palm datums take precedence for curved stocks. */
+const gripHoldPoint = (s: Solid): Vec3 => {
+  if (s.kind === 'box') {
+    return s.box.center;
+  }
+  if (s.kind === 'revolved') {
+    return axisMidpoint(s);
+  }
+  const n = s.profile.length;
+  const centroid: readonly [number, number] = [
+    s.profile.reduce((sum, vertex) => sum + vertex[0], 0) / n,
+    s.profile.reduce((sum, vertex) => sum + vertex[1], 0) / n,
+  ];
+  if (s.axis === 'y') {
+    return extrusionPoint(s.axis, centroid, s.z[0]);
+  }
+  const lowestProfileAxis = s.axis === 'x' ? 0 : 1;
+  const lowest = s.profile.reduce((best, vertex) =>
+    vertex[lowestProfileAxis]! < best[lowestProfileAxis]! ? vertex : best,
+  );
+  const blendedProfile: readonly [number, number] = [
+    lowest[0] * 0.99 + centroid[0] * 0.01,
+    lowest[1] * 0.99 + centroid[1] * 0.01,
+  ];
+  return extrusionPoint(s.axis, blendedProfile, (s.z[0] + s.z[1]) / 2);
+};
+
+/**
+ * Every stock has a butt; only a firing-grip stock has a hold. An authored palm datum is independent of the stock's
+ * lowest silhouette vertex; ordinary wrists use their interior.
+ */
+export const stockAnchors = (_params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
+  const gripSolid = part.solids.find((solid) => solid.id === 'grip');
+  const grip = gripSolid ?? findSolid(part, 'wrist');
+  const palm = part.axes.find((a) => a.kind === 'firing-grip');
+  const position = palm?.origin ?? (grip && (gripSolid ? gripHoldPoint(grip) : interiorPoint(grip)));
+  return {
+    ...rearFaceButt(part),
+    ...(position && part.tags?.includes(FIRING_GRIP) ? { hold: frameAt(position) } : {}),
+  };
 };

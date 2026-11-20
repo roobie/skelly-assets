@@ -130,8 +130,6 @@ export const SKS_PROPORTIONS = {
     combX: -36,
     // The palm wraps the straight wrist behind the guard.
     palm: [-31, -4.5, 0],
-    // The support hand cups the fore-end's belly under the handguard, at this x.
-    supportX: 6,
     // Each metal part's channel: cut down from the stock's top to `above`, or up from its belly to `below`.
     inlets: {
       receiver: { x: [-27.25, 0], above: -1.25, halfWidthU: 1 },
