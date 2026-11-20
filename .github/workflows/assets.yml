@@ -151,6 +151,8 @@ jobs:
           node tools/model-history.mjs fetch --optional --out "$RUNNER_TEMP/model-history.json"
           if [ -f "$RUNNER_TEMP/model-history.json" ]; then
             node tools/model-history.mjs retired --history "$RUNNER_TEMP/model-history.json" --built "$RUNNER_TEMP/fresh/built-1"
+          else
+            echo "::notice::no model is held to a release: there is no released model history to read"
           fi
       # A report only; see docs/decisions/0020-smooth-copy.md.
       - run: node tools/smooth-fit.mjs --built "$RUNNER_TEMP/fresh/built-1"
@@ -197,7 +199,11 @@ jobs:
       - name: Build the site
         run: |
           history=()
-          if [ -f "$RUNNER_TEMP/model-history.json" ]; then history=(--history "$RUNNER_TEMP/model-history.json"); fi
+          if [ -f "$RUNNER_TEMP/model-history.json" ]; then
+            history=(--history "$RUNNER_TEMP/model-history.json")
+          else
+            echo "::warning::the showcase shows no model versions: there is no released model history to read"
+          fi
           node site/build.mjs --require-viewers --analytics "${history[@]}" _site
       - name: Cache Playwright Chromium
         uses: actions/cache@v6

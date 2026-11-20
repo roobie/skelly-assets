@@ -194,7 +194,8 @@ function fetchCommand({ out, optional }) {
   if (history !== undefined) return write(out, history);
   const why = latest === undefined ? 'no release yet' : `${latest} has no ${HISTORY_ASSET}`;
   if (!optional) throw new Error(why);
-  console.warn(`::warning::the showcase shows no model versions: ${why}`);
+  // What a missing history costs is the reader's to say, as the showcase and the retired gate lose different things.
+  console.log(`no model history: ${why}`);
 }
 
 // Walks the releases oldest first, merging each one's models, so the result is what the release job would have written
