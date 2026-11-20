@@ -4,10 +4,11 @@
 // empty, as the page draws only boxes of its own. three.js comes from the CDN the site's import maps name.
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after, before, test } from 'node:test';
 import { makeBuildDir } from '../buildDir.mjs';
+import { buildManifest, MANIFEST, manifestJson, readCredits } from '../manifest.mjs';
 import { buildSite, launchBrowser, serveSite } from '../reviewSite.mjs';
 
 const skip = process.env.ASSETS_SWEEPS ? false : 'draws in a browser: set ASSETS_SWEEPS=1';
@@ -22,9 +23,10 @@ before(async () => {
   const built = join(dir, 'built');
   const site = join(dir, 'site');
   mkdirSync(built);
+  const repo = resolve(import.meta.dirname, '../..');
   writeFileSync(
-    join(built, 'manifest.json'),
-    JSON.stringify({ packs: {}, models: [], finishes: {}, renames: {}, vehicles: [], motions: [], sounds: [] }),
+    join(built, MANIFEST),
+    manifestJson(buildManifest({ models: [], files: [], credit: readCredits(repo) })),
   );
   buildSite(built, site);
   // The built page's import map is the one that points the motion package's TypeScript at its stripped copy.
