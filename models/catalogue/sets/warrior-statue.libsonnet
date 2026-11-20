@@ -12,6 +12,7 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local band = import 'models/head-band.libsonnet';
+local girdle = import 'models/girdle.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
@@ -86,14 +87,15 @@ local scaledMeasures(m) = {
   for f in std.objectFields(m)
 };
 local ring = band.hairRing;
-local bustMeasures = scaledMeasures(bust) { hairRing: { bottom: ring.bottom * k, top: ring.top * k, rows: [times(row, k) for row in ring.rows] } };
+local bustMeasures = girdle(scaledMeasures(bust)).bustParams { hairRing: { bottom: ring.bottom * k, top: ring.top * k, rows: [times(row, k) for row in ring.rows] } };
 local armMeasures = scaledMeasures(arm);
 local legMeasures = scaledMeasures(leg);
 
 // The doll's joints in its own frames, life-size (models/catalogue/sets/avatar.libsonnet).
-local shoulderX = bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
-local shoulderY = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight - bust.shoulderHeight / 2 - bust.deltoidDrop;
-local chestTop = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight;
+local lifeGirdle = girdle(bust);
+local shoulderX = lifeGirdle.deltoid.x;
+local shoulderY = lifeGirdle.deltoid.y;
+local chestTop = lifeGirdle.chestTop;
 local hipX = bust.pelvisWidth / 4;
 local hipY = bust.pelvisHeight * 0.12;
 local ankleDrop = leg.length - leg.thighLength - leg.shoeHeight;

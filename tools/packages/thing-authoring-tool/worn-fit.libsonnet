@@ -39,26 +39,16 @@ local ring(id, slot, y0, y1, w, d, c, wall) =
     for i in std.range(0, 7)
   ];
 
-// The shoulders as the bust draws them (src/families/bust.ts), so a shell over them follows the body's own shape: the
-// girdle's top sloping off the neck's foot, and the deltoid spheroid on each side.
-local chestTop = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight;
-local neckFoot = bust.neckWidth / 2;
-local slopeRun = bust.chestWidth / 2 - neckFoot;
-local slopeLength = std.sqrt(slopeRun * slopeRun + bust.trapeziusDrop * bust.trapeziusDrop);
-local deltoid = {
-  x: bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset,
-  y: chestTop - bust.shoulderHeight / 2 - bust.deltoidDrop,
-  halfAxial: bust.shoulderWidth / 2,
-  radius: std.min(bust.shoulderHeight, bust.shoulderDepth) / 2,
-};
+// The shoulders as the bust draws them, so a shell over them follows the body's own shape.
+local girdle = (import 'models/girdle.libsonnet')(bust);
+local chestTop = girdle.chestTop;
+local neckFoot = girdle.neckFoot;
+local slopeRun = girdle.slopeRun;
+local slopeLength = girdle.slopeLength;
+local deltoid = girdle.deltoid;
+local trapezius = girdle.trapezius;
 // Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
 local armInner = deltoid.x - arm.upperWidth / 2;
-// The clip planes that cut a piece to the slope set out `rise` square to it, one per side.
-local trapezius(rise) = [
-  { normal: [side * bust.trapeziusDrop / slopeLength, slopeRun / slopeLength, 0],
-    offset: (bust.trapeziusDrop * neckFoot + slopeRun * chestTop) / slopeLength + rise }
-  for side in [1, -1]
-];
 // The slope's height set out by `rise` at `x`, which must lie past the neck's foot, where the slope is straight.
 local slopeY(x, rise) =
   assert std.abs(x) >= neckFoot - 1e-9 : 'x %g lies over the neck, off the slope' % x;
@@ -78,14 +68,15 @@ local shoulderY(xs, rise) =
 local slopeQuad(id, slot, xs, zs, low, high) =
   h.prism(id, slot, 'z', [[xs[0], low(xs[0])], [xs[1], low(xs[1])], [xs[1], high(xs[1])], [xs[0], high(xs[0])]], zs[0], zs[1]);
 // A spheroid over the deltoid on `side` (1 the figure's left, +x), set out by `rise`. Its sides' flats lie on the
-// set-out spheroid, and it is turned in finer steps than the body's, so it clears the body's facets.
-local deltoidCap(id, slot, side, rise, steps=16) =
+// set-out spheroid, and its profile and its turn are cut in finer steps than the body's, so it clears the body's facets.
+local deltoidCap(id, slot, side, rise) =
+  local steps = 16;
   local a = deltoid.halfAxial + rise, b = deltoid.radius + rise;
   h.turned(id, slot, 'x', [[0, 0]] + [
     local t = std.pi * i / steps;
     [a * (1 - std.cos(t)), b * std.sin(t)]
     for i in std.range(1, steps - 1)
-  ] + [[2 * a, 0]], [side * deltoid.x - a, deltoid.y, 0]) + { sides: 16 };
+  ] + [[2 * a, 0]], [side * deltoid.x - a, deltoid.y, 0]) + { sides: steps };
 
 // A hood lying down on the upper back, sunk a centimetre into the body shell, its lining showing at the open top.
 // A shallow hood's corners and lining shrink with it, so its outlines stay convex. Both follow the trapezius's slope,
@@ -113,6 +104,11 @@ local shell(model, pieces, finish, covers, title=null) =
   row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }) + (if title == null then {} else { title: title });
 local fitted(shells) = { rows: shells };
 
+// The trooper's pauldron top stands this far above the shoulder joint it is worn about, and the cuirass's deltoid caps
+// stay `pauldronClear` under it, more than one of the rows' voxels, so at rest no cap shows through a pauldron.
+local trooperPauldronTop = 0.085, pauldronClear = 0.005;
+local trooperShoulderRise = trooperPauldronTop - deltoid.radius - pauldronClear;
+
 // Where a torso shell's hem falls on the bust, from the hips' bottom.
 local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 
@@ -138,6 +134,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   slopeBand(id, slot, xs, zs, rises):: slopeQuad(id, slot, xs, zs, function(x) slopeY(x, rises[0]), function(x) slopeY(x, rises[1])),
   // A strap across [x0, x1] and `zs` hanging down a face from the slope set out by `rise` to the height `foot`.
   slopeHung(id, slot, xs, zs, foot, rise):: slopeQuad(id, slot, xs, zs, function(x) foot, function(x) slopeY(x, rise)),
+  // How far the trooper's deltoid caps stand off the shoulders, so a set keeping them can fit its own chest under them.
+  trooperShoulderRise: trooperShoulderRise,
 
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them. Gear worn over a torso shell
@@ -163,8 +161,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // `pockets` are 'welt' slits at the hips, a 'patch' pocket either side of the closure, a 'kangaroo' pocket across
   // the belly, or 'none'. `top` 'yoke' covers the shoulders, the chest cut to the trapezius's slope and a cap over
   // each deltoid, under a collar; 'straps' cuts the body off at a neckline between the trunk's top and the shoulders,
-  // held up by a strap over each trapezius, for a tank top, and draws no collar. `slots` names the ground row's finish slots the shells reuse: `body`, `trim` and `fastener`,
-  // and with a hood `hood` and `lining`.
+  // held up by a strap over each trapezius, for a tank top, and draws no collar. `slots` names the ground row's finish
+  // slots the shells reuse: `body`, `trim` and `fastener`, and with a hood `hood` and `lining`.
   torso(id, finish, spec, title=null)::
     local s = { layer: 'normal', sleeveLayer: self.layer, hem: 'hip', top: 'yoke', round: 0, sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: 'welt', hood: null,
                 slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;
@@ -371,8 +369,6 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local chestTop = ribTop + bust.chestHeight;
     local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
     local chestW = bust.chestWidth + 2 * g + 0.03, chestD = bust.chestDepth + 2 * g + 0.03;
-    // The cuirass stands this far off the shoulders, low enough that its caps stay under the pauldrons' tops.
-    local shoulderRise = 0.02;
     local bandBase = waistTop - 0.07;
     local front = chestD / 2, back = -chestD / 2;
     local slabFront = front + 0.012;
@@ -384,9 +380,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
           bust.waistWidth + 2 * g + 0.012 + 0.012 * i, bust.ribDepth + 2 * g + 0.006 + 0.008 * i, cut)
       for i in [0, 1, 2]
     ] + [
-      oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, chestW, chestD, 0.05) + { clip: trapezius(shoulderRise) },
-      deltoidCap('shoulder-left', 'plate', 1, shoulderRise),
-      deltoidCap('shoulder-right', 'plate', -1, shoulderRise),
+      oct('chest', 'plate', ribTop - 0.03, chestTop + trooperShoulderRise, chestW, chestD, 0.05) + { clip: trapezius(trooperShoulderRise) },
+      deltoidCap('shoulder-left', 'plate', 1, trooperShoulderRise),
+      deltoidCap('shoulder-right', 'plate', -1, trooperShoulderRise),
       h.prism('slab', 'plate', 'z', [[-0.16, ribTop - 0.02], [0.16, ribTop - 0.02], [0.19, chestTop - 0.03], [-0.19, chestTop - 0.03]],
               front - 0.004, slabFront),
     ] + [
@@ -437,9 +433,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local upper = [
       // The pauldron stands well proud of the shoulder: a flat top, a stepped plate, a comb and a broad rim.
       oct('pauldron', 'plate', -0.03, 0.07, uw + 0.15, ud + 0.13, 0.045),
-      oct('pauldron-top', 'plate', 0.07, 0.085, uw + 0.12, ud + 0.1, 0.04),
+      oct('pauldron-top', 'plate', 0.07, trooperPauldronTop, uw + 0.12, ud + 0.1, 0.04),
       oct('pauldron-rim', 'insignia', -0.045, -0.03, uw + 0.158, ud + 0.138, 0.047),
-      h.box('comb', 'trim', [-0.01, 0.085, -(ud + 0.09) / 2], [0.01, 0.11, (ud + 0.09) / 2]),
+      h.box('comb', 'trim', [-0.01, trooperPauldronTop, -(ud + 0.09) / 2], [0.01, 0.11, (ud + 0.09) / 2]),
     ] + [
       oct('pauldron-lame-%d' % k, 'plate', -0.045 - k * 0.04, -0.035 - (k - 1) * 0.04, uw + 0.11 - 0.02 * k, ud + 0.09 - 0.02 * k, 0.035)
       for k in [1, 2]

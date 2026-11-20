@@ -31,8 +31,9 @@ local chestTop = ribTop + bust.chestHeight;
 local beltY = waistTop - 0.1;
 local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local chestDepth = 0.31;
-// The chest plate stands this far off the shoulders, and its front slab is cut to the same slope.
-local shoulderRise = 0.005;
+// The chest plate and its front slab are cut to the shoulders' slope a quarter of the way out to the trooper's deltoid
+// caps, which this set keeps, so the caps stand proud of the plate.
+local shoulderRise = fit.trooperShoulderRise / 4;
 local bodyAdd = [
   oct('chest', 'plate', ribTop - 0.04, chestTop + shoulderRise, 0.5, chestDepth, 0.1) + { clip: fit.trapezius(shoulderRise) },
   h.prism('slab', 'plate', 'z', [[-0.21, ribTop - 0.03], [0.21, ribTop - 0.03], [0.24, chestTop - 0.02], [-0.24, chestTop - 0.02]],

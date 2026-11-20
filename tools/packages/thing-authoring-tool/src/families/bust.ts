@@ -7,8 +7,10 @@ import { positive, spheroid } from './shapes.ts';
 const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
-// slabs taper hips to shoulders, the girdle's top slopes off the neck, a deltoid spheroid is centred on each shoulder joint, and the head stands on the
-// neck. Every solid stays within the measures a worn shell is fitted to, so the shaping here never changes a fit. Head
+// slabs taper hips to shoulders, the girdle's top slopes off the neck, a deltoid spheroid is centred on each shoulder
+// joint, and the head stands on the neck. The girdle's slope and deltoids come drawn by models/girdle.libsonnet as
+// `girdle`, which worn shells fit to as well. Every solid stays within the measures a worn shell is fitted to, so the
+// shaping here never changes a fit. Head
 // gear straps are fitted to the ring of hair drawn just above the hairline, which models/head-band.libsonnet lays out
 // on the head's voxel lattice and passes here as `hairRing`.
 // The head segment is drawn about the neck's top, the joint it turns about. The model's anchors name solids here, so
@@ -37,14 +39,15 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       chestLowShare: positive,
       torsoChamfer: positive,
       chestChamfer: positive,
-      shoulderWidth: positive,
-      shoulderHeight: positive,
-      shoulderDepth: positive,
-      /** How far each deltoid sets into the chest's side, and how far its top sits below the chest's. */
-      deltoidInset: positive,
-      deltoidDrop: positive,
-      /** How far the girdle's top falls from the neck's foot to the chest's side: the trapezius' slope. */
-      trapeziusDrop: positive,
+      /** The trapezius' clip planes, one per side, and the left deltoid's centre, half extent along x and radius. */
+      girdle: pipe(
+        string(),
+        transform((text): unknown => JSON.parse(text)),
+        strictObject({
+          trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
+          deltoid: strictObject({ x: number(), y: number(), halfAxial: number(), radius: number() }),
+        }),
+      ),
       neckWidth: positive,
       neckHeight: positive,
       headWidth: positive,
@@ -81,16 +84,11 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   const ys = (bottom: number, topY: number): [number, number] => [bottom - origin, topY - origin];
   const eyeY = crown + d.headHeight * d.eyeShare;
   const brow = crown + d.jawHeight;
-  const deltoidX = d.chestWidth / 2 + d.shoulderWidth / 2 - d.deltoidInset;
-  const deltoidY = shoulders - d.shoulderHeight / 2 - d.deltoidDrop;
-  // The shoulder: a spheroid filling the deltoid's box, so the arm hangs from a round cap rather than a cube.
-  const deltoid = (id: string, side: 1 | -1) =>
-    spheroid(
-      id,
-      [side * deltoidX, deltoidY - origin, 0],
-      [d.shoulderWidth / 2, Math.min(d.shoulderHeight, d.shoulderDepth) / 2],
-      ['x', 'skin'],
-    );
+  // The shoulder: a spheroid, so the arm hangs from a round cap rather than a cube.
+  const deltoid = (id: string, side: 1 | -1) => {
+    const { x, y, halfAxial, radius } = d.girdle.deltoid;
+    return spheroid(id, [side * x, y - origin, 0], [halfAxial, radius], ['x', 'skin']);
+  };
   const facePower = d.facePower;
   /** Where the face's rounded front lies at `x`, so a feature can sit on the surface rather than stand off it. */
   const faceZ = (x: number) => halfZ * (1 - Math.abs(x / halfX) ** facePower) ** (1 / facePower);
@@ -140,18 +138,11 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
   if (d.segment === 'torso') {
     const chestHalfX = d.chestWidth / 2;
     const chestHalfZ = d.chestDepth / 2;
-    // The trapezius: the girdle's top falls from the neck's foot to the chest's side, each half cut by a plane through
-    // both. worn-fit.libsonnet, `trapezius`, fits shells to the same slope.
-    const neckFoot = d.neckWidth / 2;
-    const run = chestHalfX - neckFoot;
-    const slopeLength = Math.hypot(run, d.trapeziusDrop);
-    const trapezius = ([1, -1] as const).map((side) => ({
-      normal: [(side * d.trapeziusDrop) / slopeLength, run / slopeLength, 0] as const,
-      offset: (d.trapeziusDrop * neckFoot + run * (shoulders - origin)) / slopeLength,
-    }));
+    // The trapezius: the girdle's top falls from the neck's foot to the chest's side. The torso is drawn in the bust's
+    // frame, so the girdle's planes cut it as given.
     const sloped = (solid: ExtrudedPolygonSolid): ExtrudedPolygonSolid => ({
       ...solid,
-      clip: trapezius,
+      clip: d.girdle.trapezius,
       display: { ...solid.display, bevel: false },
     });
     // A pectoral: a lens on the chest's front plane, its lower edge the visible fold.
