@@ -63,8 +63,8 @@ local body = [
   for k in [0, 1]
   for i in [0, 1]
 ] + [
-  // Straps and rivets: shoulder straps over the breast's top, buckles on the breast's edge.
-  fit.slopeBand('strap-%d' % k, 'strap', [[-0.13, 0.11][k], [-0.11, 0.13][k]], [-bust.shoulderDepth / 2 - g, bust.shoulderDepth / 2 + g],
+  // Straps and rivets: shoulder straps over the breast's top from front to back, buckles on the breast's edge.
+  fit.slopeBand('strap-%d' % k, 'strap', [[-0.13, 0.11][k], [-0.11, 0.13][k]], [-chestD / 2, chestD / 2],
                 [shoulderRise - strapSink, shoulderRise + strapProud])
   for k in [0, 1]
 ] + [

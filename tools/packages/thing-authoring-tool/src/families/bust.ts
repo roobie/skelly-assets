@@ -10,9 +10,8 @@ const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
 // slabs taper hips to shoulders, the girdle's top slopes off the neck, a deltoid spheroid is centred on each shoulder
 // joint, and the head stands on the neck. The girdle's slope and deltoids come drawn by models/girdle.libsonnet as
 // `girdle`, which worn shells fit to as well. Every solid stays within the measures a worn shell is fitted to, so the
-// shaping here never changes a fit. Head
-// gear straps are fitted to the ring of hair drawn just above the hairline, which models/head-band.libsonnet lays out
-// on the head's voxel lattice and passes here as `hairRing`.
+// shaping here never changes a fit. Head gear straps are fitted to the ring of hair drawn just above the hairline,
+// which models/head-band.libsonnet lays out on the head's voxel lattice and passes here as `hairRing`.
 // The head segment is drawn about the neck's top, the joint it turns about. The model's anchors name solids here, so
 // a joint follows the solid that seats its limb.
 export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {

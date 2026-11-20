@@ -42,21 +42,16 @@ local ring(id, slot, y0, y1, w, d, c, wall) =
 // The shoulders as the bust draws them, so a shell over them follows the body's own shape.
 local girdle = (import 'models/girdle.libsonnet')(bust);
 local chestTop = girdle.chestTop;
-local neckFoot = girdle.neckFoot;
-local slopeRun = girdle.slopeRun;
-local slopeLength = girdle.slopeLength;
 local deltoid = girdle.deltoid;
 local trapezius = girdle.trapezius;
+local slopeY = girdle.slopeY;
+local deltoidY = girdle.deltoidY;
 // Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
 local armInner = deltoid.x - arm.upperWidth / 2;
-// The slope's height set out by `rise` at `x`, which must lie past the neck's foot, where the slope is straight.
-local slopeY(x, rise) =
-  assert std.abs(x) >= neckFoot - 1e-9 : 'x %g lies over the neck, off the slope' % x;
-  chestTop - bust.trapeziusDrop * (std.abs(x) - neckFoot) / slopeRun + rise * slopeLength / slopeRun;
-// The deltoid's top set out by `rise` at `x`, or null past its reach.
-local deltoidY(x, rise) =
-  local a = deltoid.radius + rise, u = (std.abs(x) - deltoid.x) / a;
-  if std.abs(u) >= 1 then null else deltoid.y + (deltoid.halfHeight + rise) * std.sqrt(1 - u * u);
+// A sleeve's head covers the deltoid, so its depth follows the deltoid's rather than the arm's, eased so the cloth
+// hangs loose over it.
+local sleeveEase = 0.018;
+local sleeveHeadDepth = 2 * deltoid.radius + sleeveEase;
 // The highest the shoulder, slope or deltoid, set out by `rise` reaches over [x0, x1] on one side: the slope falls
 // outward, so it is highest at the inner end, and the deltoid at its centre.
 local shoulderY(xs, rise) =
@@ -138,8 +133,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   slopeBand(id, slot, xs, zs, rises):: slopeQuad(id, slot, xs, zs, function(x) slopeY(x, rises[0]), function(x) slopeY(x, rises[1])),
   // A strap across [x0, x1] and `zs` hanging down a face from the slope set out by `rise` to the height `foot`.
   slopeHung(id, slot, xs, zs, foot, rise):: slopeQuad(id, slot, xs, zs, function(x) foot, function(x) slopeY(x, rise)),
-  // How far the trooper's deltoid caps stand off the shoulders, so a set keeping them can fit its own chest under them.
-  trooperShoulderRise: trooperShoulderRise,
+  // How far a set keeping the trooper's deltoid caps stands its own chest off the shoulders: a quarter of the way out
+  // to the caps, so they stand proud of it.
+  trooperChestRise: trooperShoulderRise / 4,
 
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them. Gear worn over a torso shell
@@ -240,9 +236,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('belt', sl.body, hem, hem + 0.035, l.waist.width + 0.008, l.waist.depth + 0.008, l.waist.chamfer),
       h.box('buckle', sl.fastener, [0.1, hem + 0.002, lowFront + 0.004], [0.135, hem + 0.033, lowFront + 0.008]),
     ] else []) + (if s.hood == null then [] else hood(sl.hood, sl.lining, l.chest.depth, s.hood));
-    // The sleeve's head covers the deltoid, so its depth follows the shoulder's rather than the arm's.
     local gs = layers[s.sleeveLayer];
-    local upper = [oct('sleeve', sl.body, -arm.upperLength - arm.seamOverlap, 0.03, arm.upperWidth + 2 * gs + 0.01, bust.shoulderDepth + 2 * gs, 0.02 + s.round)];
+    local upper = [oct('sleeve', sl.body, -arm.upperLength - arm.seamOverlap, 0.03, arm.upperWidth + 2 * gs + 0.01, sleeveHeadDepth + 2 * gs, 0.02 + s.round)];
     // The cuff reaches past the wrist, so its end does not lie on the forearm's.
     local fore = [
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
@@ -304,8 +299,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ] + hood(sl.hood, sl.lining, chestD, 0.07) + std.flattenArrays([star(i, s.stars[i]) for i in std.range(0, std.length(s.stars) - 1)])
       + (if s.moon == null then [] else moon(s.moon));
     // On the model arm, a right arm, the body side is +x, so a sleeve flares towards -x.
-    // The sleeve's head covers the deltoid, so its depth follows the shoulder's rather than the arm's.
-    local uw = arm.upperWidth + 2 * g + 0.01, ud = bust.shoulderDepth + 2 * g;
+    local uw = arm.upperWidth + 2 * g + 0.01, ud = sleeveHeadDepth + 2 * g;
     local upper = [
       oct('sleeve', sl.cloth, -arm.upperLength / 2, 0.03, uw, ud, 0.02),
       oct('sleeve-flare', sl.cloth, -arm.upperLength - arm.seamOverlap, -arm.upperLength / 2 + 0.01, uw + 0.02, ud + 0.03, 0.025, cx=-0.01),
