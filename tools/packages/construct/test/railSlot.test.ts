@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { parseAssemblyJson } from '../src/assembly/parseAssembly.ts';
 import { resolve } from '../src/assembly/resolve.ts';
 import type { Domain, PartDef } from '../src/assembly/schema.ts';
 
@@ -55,8 +56,24 @@ describe('rail slots', () => {
   it('refuses a slot past either end', () => {
     for (const slot of [4, -5]) {
       expect(sightOn(slot).issues.map(({ message }) => message)).toContainEqual(
-        expect.stringContaining(`slot ${slot} is outside rail.rail`),
+        `Connection #0: slot ${slot} is outside rail.rail (slots 0 to 3, or -1 to -4 from the far end).`,
       );
     }
+  });
+
+  it('reads a negative slot from an assembly file and refuses a fractional one', () => {
+    const file = (slot: number) =>
+      parseAssemblyJson(
+        JSON.stringify({
+          version: 1,
+          name: 'railed',
+          root: 'rail',
+          parts: { rail: { family: 'rail' }, sight: { family: 'sight' } },
+          connections: [{ from: 'rail.rail', slot, to: 'sight.base' }],
+        }),
+      );
+    const fromEnd = file(-1);
+    expect(fromEnd.ok && fromEnd.assembly.connections[0]!.slot).toBe(-1);
+    expect(file(1.5)).toMatchObject({ ok: false, error: { message: 'expected an integer, got 1.5' } });
   });
 });

@@ -87,10 +87,13 @@ const parseOptional = <T>(
   parse: (value: unknown, path: string) => Parsed<T>,
 ): Parsed<T | undefined> => (record[key] === undefined ? pass(undefined) : parse(record[key], joinPath(path, key)));
 
-const parseInteger = (value: unknown, path: string, min: number): Parsed<number> =>
-  typeof value === 'number' && Number.isInteger(value) && value >= min
+const parseInteger = (value: unknown, path: string, min?: number): Parsed<number> =>
+  typeof value === 'number' && Number.isInteger(value) && (min === undefined || value >= min)
     ? pass(value)
-    : fail(path, `expected an integer >= ${min}, got ${typeof value === 'number' ? value : describeValue(value)}`);
+    : fail(
+        path,
+        `expected an integer${min === undefined ? '' : ` >= ${min}`}, got ${typeof value === 'number' ? value : describeValue(value)}`,
+      );
 
 const parseFiniteNumber = (value: unknown, path: string): Parsed<number> =>
   typeof value === 'number' && Number.isFinite(value)
@@ -171,7 +174,7 @@ const parseConnection = (value: unknown, path: string): Parsed<Connection> => {
     return to;
   }
   // A negative slot counts from the port's far end; resolving holds it to the port's slot count.
-  const slot = parseOptional(value, 'slot', path, (v, p) => parseInteger(v, p, Number.MIN_SAFE_INTEGER));
+  const slot = parseOptional(value, 'slot', path, (v, p) => parseInteger(v, p));
   if (!slot.ok) {
     return slot;
   }
