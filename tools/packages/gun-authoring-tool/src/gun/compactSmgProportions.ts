@@ -1,11 +1,28 @@
-import { citedBarrel, stockReachU } from './tracedSmgProportions.ts';
+import { citedBarrel, stockReachU, type TracedSmgProportions } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 17.5;
 // The photo shows only threaded muzzles; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 16.5;
 const receiverRearX = -24.25;
 
-const stockLengthU = (overallLengthMm: number): number =>
+/**
+ * The notched cocking tube and knob traced from the compact SMG's photo. Every SMG handle starts from it: an untraced
+ * section's handle takes its knob and notch turn, and a traced gun overrides only what its reference shows differently.
+ */
+export const SMG_CHARGING_HANDLE = {
+  tube: { centreY: 2.5, halfU: 0.75 },
+  // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
+  // hand space clears the receiver's front face.
+  notchX: 1,
+  // The side photo hides the knob's reach from the tube; its stem holds it clear of the handguard's side.
+  // The close-up shows a short knob, about half as long as it is wide, with a rounded outer rim.
+  knob: { radiusU: 0.75, radial: [2, 2.75], rimRoundU: 0.25 },
+  notchTurnDegrees: 45,
+  // A visual estimate for the notch turn.
+  notchTurnSeconds: 0.1,
+} as const satisfies TracedSmgProportions['chargingHandle'];
+
+const stockLengthU =(overallLengthMm: number): number =>
   stockReachU(overallLengthMm, barrelTipThreadedU, receiverRearX);
 
 /**
@@ -61,17 +78,7 @@ export const COMPACT_SMG_PROPORTIONS = {
     post: { x: [13.25, 13.75], baseY: 3.25, halfWidthU: 0.125 },
   },
   handguard: { lengthU: 11, topU: 1.75, bottomU: -1.75, halfWidthU: 1.75 },
-  // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
-  // hand space clears the receiver's front face. notchTurnSeconds is a visual estimate for the notch turn.
-  chargingHandle: {
-    tube: { centreY: 2.5, halfU: 0.75 },
-    notchX: 1,
-    // The side photo hides the knob's reach from the tube; its stem holds it clear of the handguard's side.
-    // The close-up shows a short knob, about half as long as it is wide, with a rounded outer rim.
-    knob: { radiusU: 0.75, radial: [2, 2.75], rimRoundU: 0.25 },
-    notchTurnDegrees: 45,
-    notchTurnSeconds: 0.1,
-  },
+  chargingHandle: SMG_CHARGING_HANDLE,
   lower: {
     halfWidthU: 1.5,
     // The housing's flat bottom is the grip's mount face.

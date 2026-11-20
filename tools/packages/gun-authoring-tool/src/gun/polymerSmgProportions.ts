@@ -1,3 +1,4 @@
+import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
 import { citedBarrel, stockReachU } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 16;
@@ -82,13 +83,12 @@ export const POLYMER_SMG_PROPORTIONS = {
       toothLengthU: 0.5,
     })),
   },
-  // The handle reuses the compact SMG's notched tube; its knob reaches past the wider handguard's side.
+  // The same notched tube and knob as the compact SMG's, lower on the receiver, the knob reaching past the wider
+  // handguard's side.
   chargingHandle: {
-    tube: { centreY: 2, halfU: 0.75 },
-    notchX: 1,
-    knob: { radiusU: 0.75, radial: [2.5, 3.25], rimRoundU: 0.25 },
-    notchTurnDegrees: 45,
-    notchTurnSeconds: 0.1,
+    ...SMG_CHARGING_HANDLE,
+    tube: { ...SMG_CHARGING_HANDLE.tube, centreY: 2 },
+    knob: { ...SMG_CHARGING_HANDLE.knob, radial: [2.5, 3.25] },
   },
   // One polymer piece: the housing, the large guard and the well, with the grip's front as the guard's rear.
   lower: {

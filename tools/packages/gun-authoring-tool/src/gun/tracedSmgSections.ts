@@ -1,4 +1,4 @@
-import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
+import { COMPACT_SMG_PROPORTIONS, SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
 import { POLYMER_SMG_PROPORTIONS } from './polymerSmgProportions.ts';
 import type { TracedSmgProportions } from './tracedSmgProportions.ts';
 
@@ -17,6 +17,6 @@ export const isTracedSmgSection = (section: unknown): section is TracedSmgSectio
 export const tracedSmgFor = (section: unknown): TracedSmgProportions | undefined =>
   isTracedSmgSection(section) ? TRACED_SMG_SECTIONS[section] : undefined;
 
-/** The knob and notch turn of a section's SMG handle; an untraced section's tube borrows the compact SMG's. */
+/** The tube, knob and notch turn of a section's SMG handle; an untraced section takes the generic handle. */
 export const smgChargingHandleFor = (section: unknown): TracedSmgProportions['chargingHandle'] =>
-  (tracedSmgFor(section) ?? TRACED_SMG_SECTIONS['compact-smg']).chargingHandle;
+  tracedSmgFor(section)?.chargingHandle ?? SMG_CHARGING_HANDLE;
