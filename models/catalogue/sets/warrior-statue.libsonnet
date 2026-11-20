@@ -42,7 +42,7 @@ local pose = {
   head: { turn: 14, lift: 6 },
   // The sword arm hangs `forward` and `abduct` out; the hand lies flat on the pommel, fingers forward and turned
   // `inward`, the wrist bent back `wrist` so the forearm slopes down to it.
-  sword: { abduct: 16, forward: 20, inward: 10, wrist: 35 },
+  sword: { abduct: 17, forward: 20, inward: 10, wrist: 35 },
   // The shield arm hangs `abduct` out, the palm flat to the shield's back; the shield turns `turn` to face out and
   // forward and leans its top `lean` in.
   shield: { abduct: 20, turn: 50, lean: 4 },
