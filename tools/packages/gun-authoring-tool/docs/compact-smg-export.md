@@ -29,16 +29,16 @@ Some photo detail is beyond the build's primitives and stays a known difference.
 
 ## Parts and joins
 
-The design sits on the `compactSmg` template; see `src/gun/templates.ts`, `compactSmg`. Its traced parts come from the compact-SMG builders in `src/gun/parts.ts`:
+The design sits on the `compactSmg` template; see `src/gun/templates.ts`, `compactSmg`. Its traced parts come from the traced-SMG builders in `src/gun/parts.ts`, which read the section's table through `src/gun/tracedSmgSections.ts`, `TRACED_SMG_SECTIONS`:
 
-- **Receiver and end cap.** The receiver's section ties its outline and cavity to the table; see `RECEIVER_SECTION` and `compactSmgReceiverDetails`. The receiver carries the gun's sight axis, since the drum rear sight is part of it; see `compactSmgSightAxis`. The section forces the `smg` carrier pattern (`carrierPatternFor`), because the other patterns' carriers do not fit its cavity.
-- **Barrel and front sight.** The barrel carries the front sight and muzzle collar; see `compactSmgBarrelDetails`. The hood ring stands between the drum aperture and the post, so its bore must leave the aiming line from the aperture to the post tip clear.
+- **Receiver and end cap.** The receiver's section ties its outline and cavity to the table; see `RECEIVER_SECTION` and `tracedSmgReceiverDetails`. The receiver carries the gun's sight axis, since the drum rear sight is part of it; see `tracedSmgSightAxis`. The section forces the `smg` carrier pattern (`carrierPatternFor`), because the other patterns' carriers do not fit its cavity.
+- **Barrel and front sight.** The barrel carries the front sight and muzzle collar; see `tracedSmgBarrelDetails`. The hood ring stands between the drum aperture and the post, so its bore must leave the aiming line from the aperture to the post tip clear.
 - **Cocking tube.** Its walls are open, so the handle stem rides in a real slot; see `smgCockingTube`.
 - **Handguard.** It hangs below the cocking tube and leaves the magazine well clear.
 - **Muzzle.** A threaded, suppressor-ready muzzle on the existing thread mount (see `src/gun/mounts.ts`, `muzzle`), and a plain stub whose length is the model's own design. The barrel's `muzzle` param picks the variant, and the port id stays `muzzle` so the anchor sits at the tip of either.
-- **Lower.** The trigger housing, magazine well, trigger and guard; see `compactSmgLower`. The housing's flat bottom is the grip's mount face.
-- **Grip.** Traced pieces turned onto the grip's lean; see `compactSmgGrip`. Its front meets the guard's rear wall.
-- **Magazine.** Traced, curved and forward-raked; see `compactSmgMagazine`. Its top hides in the well.
+- **Lower.** The trigger housing, magazine well, trigger and guard; see `tracedSmgLower`. The housing's flat bottom is the grip's mount face.
+- **Grip.** Traced pieces turned onto the grip's lean; see `tracedGrip`. Its front meets the guard's rear wall.
+- **Magazine.** Traced, curved and forward-raked; see `tracedSmgMagazine`. Its top hides in the well.
 - **Stock.** The telescoping stock is traced from the photo: a butt pad on two struts, with the latch housing and lever on the end cap; see `compactSmgTelescopingStock`. Its `pose` param picks extended or collapsed. The photo has no fixed stock, so the fixed stock is the generic straight style at its published length.
 
 Joins keep the shared receiver frame, so struts, tube and lower cannot drift from the receiver when it is retuned. The struts and their butt pad are one group, so the pad cannot be left behind at either pose.
