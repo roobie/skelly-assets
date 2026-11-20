@@ -171,6 +171,12 @@ test("a doll measured off a skeleton seats each part on its bone's head and rest
   assert.throws(() => measured({ ...skeleton, spine: { ...skeleton.spine, rotation: turned } }), /spine's node rests/);
   const { 'upper.R': _, ...missing } = skeleton;
   assert.throws(() => measured(missing), /upper\.R is no bone of the skeleton/);
+  const rehung = { ...skeleton, 'fore.L': { ...skeleton['fore.L'], parent: 'upper.R' } };
+  assert.throws(() => measured(rehung), /fore\.L hangs from upper\.L, not upper\.R as in the skeleton/);
+  // The skeleton may hold a node above the rig's root, as UAL's `root` above its pelvis.
+  const [root] = rig.bones.filter(({ parent }) => parent === null);
+  const above = { root: { parent: null, head: [0, 0, 0], rotation: [0, 0, 0, 1] } };
+  assert.doesNotThrow(() => measured({ ...skeleton, ...above, [root.id]: { ...skeleton[root.id], parent: 'root' } }));
 });
 
 test("a limb hangs on each side from that side's own bone of a paired bust part", () => {

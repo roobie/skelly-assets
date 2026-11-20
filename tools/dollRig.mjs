@@ -138,11 +138,15 @@ function skeletonRotations(skeleton) {
 
 // A doll measured off a skeleton (its rig content's `skeleton`) seats each part copy's origin on its bone's head there,
 // and rests each node turned as the skeleton's is, so a game playing the skeleton's clips moves the doll's parts with
-// the joints they were measured from. Rotations are compared as matrices, which a quaternion's sign does not change.
-export function checkSkeleton(bones, skeleton) {
+// the joints they were measured from. Each bone hangs from the skeleton's parent too, since a clip turns a node about
+// its parent's, but the rig's root, which hangs from nothing whatever the skeleton holds above it. Rotations are
+// compared as matrices, which a quaternion's sign does not change.
+function checkSkeleton(bones, skeleton) {
   const rotationOf = skeletonRotations(skeleton);
-  for (const { id, at, nodeRotation } of bones) {
+  for (const { id, parent, at, nodeRotation } of bones) {
     if (!skeleton[id]) throw new Error(`rig: bone ${id} is no bone of the skeleton it is measured off`);
+    if (parent !== null && parent !== skeleton[id].parent)
+      throw new Error(`rig: ${id} hangs from ${parent}, not ${skeleton[id].parent} as in the skeleton`);
     const miss = Math.hypot(...sub(at, skeleton[id].head));
     if (miss > SKELETON_TOLERANCE)
       throw new Error(`rig: ${id}'s part lies ${miss.toFixed(5)} m from the skeleton's head, ${skeleton[id].head}`);
