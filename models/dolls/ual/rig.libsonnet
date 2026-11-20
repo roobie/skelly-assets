@@ -3,7 +3,8 @@
 // each node from its rest, plays on the doll as it does on the mannequin. The fields are the player's
 // (models/dolls/player/rig.libsonnet), which says what each means; `along` and `flexAxis` are the player's joint for
 // joint, and so are the limits (models/dolls/joints.libsonnet) but where UAL's joints are not the player's: the spine,
-// split in three, the clavicles, the shoulder, which rests raised to the T-pose, and the toes.
+// split in three, which shares the player's range out, the clavicles, the shoulder, which rests raised to the T-pose,
+// and the toes.
 local joints = import 'models/dolls/joints.libsonnet';
 local skeleton = import 'models/dolls/ual/skeleton.libsonnet';
 local hand = (import 'models/dolls/ual/measures.libsonnet').hand;
@@ -22,6 +23,8 @@ local leg(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: '
 // A digit bone runs as the skeleton's does, toward its next joint, which for the thumb is well off the hanging arm's
 // axes.
 local digit(name, parent, digitName) = arm(name, parent) { flexAxis: [0, 0, -1], digit: digitName };
+// The spine is three joints here, each taking a third of the whole spine's range.
+local spineThird = { [axis]: [end / 3 for end in joints.spine[axis]] for axis in std.objectFields(joints.spine) };
 local fingerCount = std.length(hand.fingers);
 local fingerBones = {
   [hand.part(hand.fingers[i], k)]: digit(
@@ -51,10 +54,9 @@ local thumbBones = {
   skeleton: skeleton.bones,
   bones: {
     pelvis: trunk('pelvis', 'pelvis', null, joints.pelvis),
-    // The player's one spine joint is three here, each taking a third of its range.
-    spine_01: trunk('spine_01', 'spine_01', 'pelvis', { flex: [-10, 20], twist: [-25, 25], abduct: [-12, 12] }),
-    spine_02: trunk('spine_02', 'spine_02', 'spine_01', { flex: [-10, 20], twist: [-25, 25], abduct: [-12, 12] }),
-    spine_03: trunk('spine_03', 'spine_03', 'spine_02', { flex: [-10, 20], twist: [-30, 30], abduct: [-11, 11] }),
+    spine_01: trunk('spine_01', 'spine_01', 'pelvis', spineThird),
+    spine_02: trunk('spine_02', 'spine_02', 'spine_01', spineThird),
+    spine_03: trunk('spine_03', 'spine_03', 'spine_02', spineThird),
     // A clavicle runs out to its shoulder and flexes about the axis that lifts it, positive raising the shoulder; it
     // draws the shoulder forward and back a little about the third axis.
     clavicle_l: clavicle('l', 1),

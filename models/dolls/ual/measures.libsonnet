@@ -52,7 +52,8 @@ local bust = {
   shoulderJointForward: head('upperarm_l')[2] - bustBase[2],
   trapeziusDrop: 0.02,
   deltoidRadius: 0.065, deltoidCrown: 0.03,
-  // The neck runs from its joint to the chin, and on into the head to the head's joint.
+  // The neck runs from its joint to the chin, and on into the head to the head's joint. The chin is flesh, set by hand
+  // against the mannequin, as no joint marks it.
   chin:: 1.555,
   neckWidth: 0.12,
   neckHeight: self.chin - head('neck_01')[1],

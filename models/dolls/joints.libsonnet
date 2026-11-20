@@ -4,6 +4,8 @@
 {
   // The root's flex is the body's pitch in the world, no joint's, so it reaches a figure lying on its front or back.
   pelvis: { flex: [-90, 90], twist: [-30, 30], abduct: [-15, 15] },
+  // The whole spine's, from the pelvis to the neck, however many joints a doll splits it into.
+  spine: { flex: [-30, 60], twist: [-80, 80], abduct: [-35, 35] },
   neck: { flex: [-30, 40], twist: [-60, 60], abduct: [-30, 30] },
   head: { flex: [-30, 30], twist: [-45, 45], abduct: [-20, 20] },
   // Negative twist supinates, turning the palm up from facing the body; a support hand under a rifle's handguard, its

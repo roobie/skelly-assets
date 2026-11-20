@@ -92,7 +92,7 @@ local thumbBones = {
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
                     limits: joints.pelvis },
     spine: trunk { part: 'torso', parent: 'pelvis', pivot: { anchor: 'spine' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
-                   absorbs: ['chest'], limits: { flex: [-30, 60], twist: [-80, 80], abduct: [-35, 35] } },
+                   absorbs: ['chest'], limits: joints.spine },
     neck: trunk { part: 'neck', parent: 'spine', pivot: { anchor: 'neck' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                   limits: joints.neck },
     head: trunk { part: 'head', parent: 'neck', pivot: { anchor: 'head' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
