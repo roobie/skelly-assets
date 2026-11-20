@@ -2,23 +2,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import {
-  add,
-  applyPoint,
-  dot,
-  IDENTITY_M,
-  mulMM,
-  mulMV,
-  quatToMat3,
-  scale,
-  sub,
-  transpose,
-} from '../../site/kinematics.mjs';
+import { add, applyPoint, IDENTITY_M, mulMM, mulMV, quatToMat3, sub, transpose } from '../../site/kinematics.mjs';
+import { restMeshes, treeMeshes } from '../dollRig.mjs';
 import { glbAccessor, glbJson } from '../glb.mjs';
+import { modelGrain } from '../shapeProbe.mjs';
 import { GLB } from '../ual-skeleton.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
-const { doll, rig } = dollTree({ doll: 'ual' });
+const { doll, rig, built, manifest } = dollTree({ doll: 'ual' });
 const glb = readFileSync(join(repo, GLB));
 const gltf = glbJson(glb);
 
@@ -101,31 +92,43 @@ for (const clip of ['Walk_Loop', 'Idle_Loop']) {
   });
 }
 
-// A leaf part's origin is checked above, which a part turned about it keeps; its far end, the rig's tail through its
-// flesh's far face, lies on the line from its joint to the skeleton's leaf beyond it, the point the clip carries the
-// bone's end to, as exactly as the joints do. Along that line the far face stands off the leaf by the flesh of a
-// fingertip, the thumb's pad or a shoe's toe, under 3 mm. Head is no leaf here: the mannequin's skeleton ends at its
-// head's joint, with no leaf beyond to land on.
-const LEAF_FLESH = 0.003;
+// A leaf part's origin is checked above, which a part turned about it keeps; a digit's tip, the middle of its flesh's
+// far face, lands on the skeleton's leaf beyond it, the point the clip carries the bone's end to. The flesh is drawn
+// hanging down its part's y, so the far face is the one of least y. It is voxelised at its model's grain, which moves
+// each coordinate of the face's middle up to half a grain off the tip as drawn, and a leaning digit's last upright step
+// (avatarLimbs.ts, `digit`) stops a little short of its tail: within a grain in all, where a digit turned off its bone
+// by a grain at its tip misses. Head is no leaf here: the mannequin's skeleton ends at its head's joint, with no leaf
+// beyond to land on. The ball's leaf ends the toes short of the shoe's toe, which is flesh set by hand (`toeReach`,
+// models/dolls/ual/measures.libsonnet), so the toes land on no leaf either.
 const { bones: skeleton } = JSON.parse(readFileSync(join(repo, 'models/dolls/ual/skeleton.json'), 'utf8'));
+const rest = restMeshes(rig, doll.sites, treeMeshes(built, manifest));
+const tip = (bone) => {
+  const { positions } = rest.body.find((body) => body.bone === bone.id).mesh;
+  const flesh = Array.from({ length: positions.length / 3 }, (_, i) => inPart(bone, positions.slice(3 * i, 3 * i + 3)));
+  const foot = Math.min(...flesh.map(([, y]) => y));
+  const face = flesh.filter(([, y]) => y - foot < 1e-6);
+  return [0, 1, 2].map((axis) => {
+    const along = face.map((p) => p[axis]);
+    return (Math.min(...along) + Math.max(...along)) / 2;
+  });
+};
+const grainOf = (bone) => {
+  const { pack, path } = manifest.models.find(({ id }) => id === doll.sites[bone.bind.site].model);
+  return modelGrain(glbJson(readFileSync(join(built, pack, path))));
+};
 const leaves = Object.entries(skeleton)
   .filter(([name]) => name.includes('_leaf'))
-  .map(([name, { parent }]) => ({ name, bone: rig.bones.find(({ id }) => id === parent) }));
+  .map(([name, { parent }]) => ({ name, bone: rig.bones.find(({ id }) => id === parent) }))
+  .filter(({ bone }) => bone?.digit)
+  .map((leaf) => ({ ...leaf, tip: tip(leaf.bone), grain: grainOf(leaf.bone) }));
 
-test('every leaf part reaches out to the skeleton leaf beyond it, at rest and as the clips play', () => {
-  assert.ok(leaves.length > 0 && leaves.every(({ bone }) => bone), 'every skeleton leaf hangs from a bone of the rig');
+test("every digit's tip lands on the skeleton leaf beyond it, at rest and as the clips play", () => {
+  assert.equal(leaves.length, 10, 'each hand ends four fingers and a thumb at a skeleton leaf');
   for (const [clip, key] of [[null, 0], ...['Walk_Loop', 'Idle_Loop'].flatMap((c) => [0, 7, 19].map((k) => [c, k]))]) {
     const nodes = posedNodes(clip, key);
-    for (const { name, bone } of leaves) {
-      const joint = seated(nodes, bone, [0, 0, 0]);
-      const toLeaf = sub(nodes.get(name).t, joint);
-      const line = scale(toLeaf, 1 / Math.hypot(...toLeaf));
-      const far = sub(seated(nodes, bone, inPart(bone, bone.tail)), joint);
-      const beyond = dot(far, line) - Math.hypot(...toLeaf);
-      const off = Math.hypot(...sub(far, scale(line, dot(far, line))));
-      const at = `${clip ?? 'rest'} key ${key}: ${bone.id}`;
-      assert.ok(off < 1e-4, `${at} ends ${off} m off the line to ${name}`);
-      assert.ok(Math.abs(beyond) < LEAF_FLESH, `${at} ends ${beyond} m past ${name}`);
+    for (const { name, bone, tip, grain } of leaves) {
+      const miss = Math.hypot(...sub(seated(nodes, bone, tip), nodes.get(name).t));
+      assert.ok(miss < grain, `${clip ?? 'rest'} key ${key}: ${bone.id} ends ${miss} m off ${name}`);
     }
   }
 });
