@@ -1,4 +1,4 @@
-import { GRID } from '@skelly/construct/foundation/conventions.ts';
+import { snap } from './units.ts';
 
 /**
  * AK v2 proportions, mapped from BR's golden reference, an Izhmash AKM photographed from the right:
@@ -10,7 +10,6 @@ import { GRID } from '@skelly/construct/foundation/conventions.ts';
  * front face, y up from the bore. Silhouette estimates, snapped to the grid; widths are not in a side
  * view and keep the earlier model's.
  */
-const snap = (value: number) => Math.round(value / GRID) * GRID;
 
 /** The receiver: the stamped shell with its dust cover, over a lower plate that reaches its bottom. */
 const receiver = {

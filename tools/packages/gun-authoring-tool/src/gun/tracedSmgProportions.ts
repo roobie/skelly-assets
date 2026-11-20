@@ -1,12 +1,15 @@
-import { GRID } from '@skelly/construct/foundation/conventions.ts';
-import { mmToU } from './units.ts';
+import { mmToU, snap } from './units.ts';
 
 type Span = readonly [number, number];
 type Point = readonly [number, number];
 type Polygon = readonly Point[];
 type Box2 = { readonly x: Span; readonly y: Span };
 
-const snap = (value: number): number => Math.round(value / GRID) * GRID;
+/** A barrel of a published length, measured back from its threaded muzzle tip to the breech. */
+export const citedBarrel = (citedLengthMm: number, threadedTipU: number) => {
+  const citedLengthU = snap(mmToU(citedLengthMm));
+  return { breechU: threadedTipU - citedLengthU, citedLengthU };
+};
 
 /**
  * The stock's reach behind the receiver's rear face, for a published overall length from the threaded muzzle tip

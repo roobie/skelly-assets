@@ -1,13 +1,8 @@
-import { GRID } from '@skelly/construct/foundation/conventions.ts';
-import { stockReachU } from './tracedSmgProportions.ts';
-import { mmToU } from './units.ts';
-
-const snap = (value: number): number => Math.round(value / GRID) * GRID;
+import { citedBarrel, stockReachU } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 16;
 // The reference shows only a threaded muzzle; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 15;
-const citedBarrelLengthU = snap(mmToU(200));
 const receiverRearX = -22.5;
 const receiverTopU = 3.5;
 
@@ -58,8 +53,7 @@ export const POLYMER_SMG_PROPORTIONS = {
   },
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
-    breechU: barrelTipThreadedU - citedBarrelLengthU,
-    citedLengthU: citedBarrelLengthU,
+    ...citedBarrel(200, barrelTipThreadedU),
     tipU: { threaded: barrelTipThreadedU, plain: barrelTipPlainU },
     radiusU: 0.625,
     collar: { x: [12, 14.75], radiusU: 1 },
