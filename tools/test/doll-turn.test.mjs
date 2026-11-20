@@ -270,6 +270,10 @@ const TURNS = {
   'about z, where the mirror image is the inverse': { axis: [0, 0, 1], degrees: -90 },
   'about y, where the mirror image is the inverse': { axis: [0, 1, 0], degrees: 90 },
   'about x, where the mirror image is the turn itself': { axis: [1, 0, 0], degrees: 90 },
+  'about x, the other way': { axis: [1, 0, 0], degrees: -90 },
+  'about y, the other way': { axis: [0, 1, 0], degrees: -90 },
+  // A half turn is its own inverse and mirror image, so it cannot tell the mirror rule from a plain inverse; it only
+  // checks the half turn itself.
   'about -x by a half turn': { axis: [-1, 0, 0], degrees: 180 },
 };
 // The reflection of a rotation across x = 0, and of a frame's polar axes; a rotation axis (flex) flips with it.
