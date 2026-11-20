@@ -6,32 +6,39 @@ import { installJsonnetSources } from '../sources.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 
-test('a covers name is the part its piece is drawn on or a region the dressing cuts that part into', () => {
-  const dressing = { piece: 'chest', slots: { cuff: { part: 'sleeve' } }, regions: { chest: ['belly'] } };
+test('a covers name is the part its piece is drawn on or a region with a surface on that part', () => {
+  const dressing = {
+    piece: 'chest',
+    slots: { cuff: { part: 'sleeve' }, collar: { part: 'neck' } },
+    regions: { belly: ['chest#belly'], throat: ['neck', 'chest#yoke'] },
+  };
   const problems = coversProblems(
     [
-      { id: 'coat_worn', covers: ['belly'] },
+      { id: 'coat_worn', covers: ['belly', 'throat'] },
       { id: 'coat_worn_cuff', covers: ['sleeve'] },
+      { id: 'scarf_worn_collar', covers: ['throat'] },
       { id: 'vest_worn', covers: ['chest', 'sleeve'] },
       { id: 'mitt_worn_cuff', covers: ['belly'] },
+      { id: 'hood_worn_collar', covers: ['belly'] },
       { id: 'coat_worn_tail', covers: ['tail'] },
       { id: 'coat', covers: ['chest'] },
       { id: 'scarf_worn' },
     ],
     dressing,
   );
-  assert.equal(problems.length, 4);
+  assert.equal(problems.length, 5);
   assert.match(problems[0], /vest_worn covers sleeve/);
   assert.match(problems[1], /mitt_worn_cuff covers belly/);
-  assert.match(problems[2], /segment tail/);
-  assert.match(problems[3], /coat declares .* no worn piece/);
+  assert.match(problems[2], /hood_worn_collar covers belly/);
+  assert.match(problems[3], /segment tail/);
+  assert.match(problems[4], /coat declares .* no worn piece/);
 });
 
 // The authored items, which carry what each worn shell covers into its export.
 await installJsonnetSources();
 const { items } = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 
-test('every worn shell names in covers only its doll part or the regions the dressing cuts it into', () => {
+test('every worn shell names in covers only its doll part or the regions with a surface on it', () => {
   assert.ok(
     items.some(({ covers }) => covers),
     'no item declares what it covers, so nothing was checked',

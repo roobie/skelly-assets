@@ -47,7 +47,8 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {string} mirrored
  * @property {Readonly<Record<string, string>>} boneSuffix
  * @property {any} rig the rig's content (tools/dollRig.mjs)
- * @property {Readonly<Record<string, readonly string[]>>} regions
+ * @property {Readonly<Record<string, readonly string[]>>} regions each region by the surfaces that make it: a whole
+ * part, or `<part>#<piece>`, a piece the export keeps of a part cut into regions
  * @property {Readonly<Record<string, { part: string; slot: string }>>} slots
  * @property {Place[]} places
  */
@@ -492,9 +493,12 @@ export function wornPieces(id, models, dressing) {
   });
 }
 
+/** The doll part a region's surface lies on. @param {string} surface */
+const surfacePart = (surface) => surface.split('#')[0];
+
 /**
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
- * regions the dressing cuts that part into, since a consumer hides by those names and no other.
+ * doll's regions with a surface on that part, since a consumer hides by those names and no other.
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
  */
@@ -505,7 +509,10 @@ export function coversProblems(models, dressing) {
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
     const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
     if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
-    const names = [part, ...(dressing.regions[part] ?? [])];
+    const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
+      surfaces.some((surface) => surfacePart(surface) === part),
+    );
+    const names = [part, ...regions.map(([region]) => region)];
     return covers
       .filter((name) => !names.includes(name))
       .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
