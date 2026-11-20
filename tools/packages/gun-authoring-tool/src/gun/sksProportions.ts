@@ -1,12 +1,15 @@
 import { GRID } from '@skelly/construct/foundation/conventions.ts';
+import trace from '../../../../../models/guns/references/sks-profile.trace.json' with { type: 'json' };
 import { mmToU } from './units.ts';
 
 const snap = (value: number): number => Math.round(value / GRID) * GRID;
 
-// The muzzle is traced; the cited barrel and overall lengths then place the breech and the butt's heel.
+// The muzzle is traced; the trace record's cited barrel and overall lengths then place the breech and the butt's heel.
 const muzzleX = 36.75;
-const citedBarrelLengthU = snap(mmToU(520));
-const citedOverallLengthU = snap(mmToU(1021));
+const breechX = muzzleX - snap(mmToU(trace.values.barrelLengthMm.value));
+const heelX = muzzleX - snap(mmToU(trace.values.overallLengthMm.value));
+// The steel butt plate is raked: its toe stands this far ahead of its heel.
+const toeX = heelX + 1;
 
 /**
  * Side-photo trace estimates in the gun frame: x from the receiver's front face, y from the bore.
@@ -40,8 +43,7 @@ export const SKS_PROPORTIONS = {
   },
   barrel: {
     muzzleX,
-    breechX: muzzleX - citedBarrelLengthU,
-    citedLengthU: citedBarrelLengthU,
+    breechX,
     radiusU: 0.5,
     gasBlock: { x: [20.5, 21.75], y: [-1, 2], halfWidthU: 0.75 },
     // The clamp the folded bayonet hinges on.
@@ -93,10 +95,9 @@ export const SKS_PROPORTIONS = {
     magazineHalfWidthU: 1,
   },
   stock: {
-    // The steel butt plate is raked: the heel stands behind the toe.
-    butt: { heelX: muzzleX - citedOverallLengthU, toeX: -51, plateU: 0.25 },
+    butt: { heelX, toeX, plateU: 0.25 },
     top: [
-      [-52, -3],
+      [heelX, -3],
       [-36, -2.25],
       [-32.5, -3],
       [-29.5, -2],
@@ -108,7 +109,7 @@ export const SKS_PROPORTIONS = {
       [12, 0.5],
     ],
     bottom: [
-      [-51, -12.25],
+      [toeX, -12.25],
       [-35.25, -8.25],
       [-33.5, -8],
       [-31.5, -7],
@@ -120,7 +121,7 @@ export const SKS_PROPORTIONS = {
       [12, -2],
     ],
     halfWidth: [
-      [-52, 1.5],
+      [heelX, 1.5],
       [-36, 1.5],
       [-32, 1.25],
       [-28, 1.375],

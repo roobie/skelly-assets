@@ -11,7 +11,9 @@ The SKS carbine is traced from one side photo with simple shapes and built in th
 
 ## Reference trace
 
-The reference is the [Simonov SKS-45 photo on Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simonow_SKS_45_noBG.jpg), kept outside the repository. It shows the gun twice; the trace uses the upper one, whose muzzle points right, so it is the gun's right side and the knob faces the camera. The [trace record](../../../../models/guns/references/sks-profile.trace.json) keeps the photo's registration and the published lengths with their sources. Each value in `src/gun/sksProportions.ts` is a photo estimate in the gun frame, so a retrace changes the table and nothing else.
+The reference is the [Simonov SKS-45 photo on Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simonow_SKS_45_noBG.jpg), kept outside the repository. It shows the gun twice; the trace uses the upper one, whose muzzle points right, so it is the gun's right side and the knob faces the camera. The [trace record](../../../../models/guns/references/sks-profile.trace.json) keeps the published lengths with their sources, and the table and its test read them from there, so a corrected citation cannot leave either behind. Each other value in `src/gun/sksProportions.ts` is a photo estimate in the gun frame, so a retrace changes the table and nothing else.
+
+The record has no visible-edge SVG. The contours are written once, in gun units, in the table; an SVG would be a second copy of them, the very disagreement it exists to prevent, and the overlay that reads it is not needed while the cited lengths, not the photo's scale, fix the gun's span.
 
 The photo is not dimensioned, so it is scaled from the published overall length, and the published barrel length places the breech, which the receiver hides. The muzzle is traced; the two lengths then fix the breech and the butt plate's heel, so the gun spans its published lengths whatever the photo's perspective does to them. The origin is the receiver's front face, where the handguard starts, as for the other traced guns (`docs/bolt-action-export.md`, "Reference registration").
 
