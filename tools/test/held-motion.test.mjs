@@ -2,16 +2,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { Vector3 } from 'three';
+import { Box3, Matrix4, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { gunMovers, heldItem } from '../../site/heldMotion.mjs';
-import { poseAt } from '../packages/motion/src/motion.ts';
 import { dollTree, heldThings, repo } from './doll-tree.mjs';
 
 // The pose page moves a held gun's parts by the motions its sidecar gives them, found through the nodes the glTF
 // loader hands back, whose names it has rewritten: a part must still find its motion there. An action part must slide
 // its whole stroke, its slide's direction times its travel, by the clock, as the press check's hand on the handle
-// follows it; a part moving outside the action, such as a hinged cover or the stock, stands where its motion says.
+// follows it; a part moving outside the action, such as the port cover, turns its hinge's angle by the clock.
 const partStrokes = (entry) =>
   Object.fromEntries(
     Object.values(entry.gun.action.parts).map(({ node, motion }) => {
@@ -31,20 +30,45 @@ test('a moved pose slides each action part along its stroke and stands each othe
   const movers = gunMovers(thingOf(model).gun);
   const { obj, move } = heldItem({ scene, movers }, model);
   const strokes = partStrokes(thingOf(model));
-  const positionOf = (part) => {
+  const nodeOf = (part) => {
     let found;
     obj.traverse((node) => {
-      if (node.userData.part === part) found = node.position.clone();
+      if (node.userData.part === part) found = node;
     });
     return found;
   };
-  const posed = (part, clock) => {
-    const { motion } = movers.find(({ node }) => node.split(':')[0] === part);
-    const { rotation, shift } = poseAt(motion, clock);
-    const at = rest[part];
-    return new Vector3(...rotation.map((row, i) => row[0] * at.x + row[1] * at.y + row[2] * at.z + shift[i]));
+  // A part's own point, its mesh's centre, where the part now holds it: a hinge may turn about the part's origin,
+  // which then stays put while the rest of the part swings.
+  const centres = Object.fromEntries(
+    Object.keys(moved).map((part) => {
+      const node = nodeOf(part);
+      node.updateMatrixWorld(true);
+      const box = new Box3().setFromObject(node);
+      return [part, box.getCenter(new Vector3()).applyMatrix4(node.matrixWorld.clone().invert())];
+    }),
+  );
+  const pointOf = (part) => {
+    const node = nodeOf(part);
+    return centres[part].clone().applyMatrix4(new Matrix4().compose(node.position, node.quaternion, node.scale));
   };
-  const rest = Object.fromEntries(Object.keys(moved).map((part) => [part, positionOf(part)]));
+  // Turned by hand about the sidecar's own hinge, so the check does not lean on the motion package it checks.
+  const hinged = (part, clock) => {
+    const { stages } = movers.find(({ node }) => node.split(':')[0] === part).motion;
+    assert.deepEqual(
+      stages.map(({ kind }) => kind),
+      ['hinge'],
+      `${part} turns on one hinge`,
+    );
+    const [{ axis, angle }] = stages;
+    const pivot = new Vector3(...axis.from);
+    const along = new Vector3(...axis.to).sub(pivot).normalize();
+    return rest[part]
+      .clone()
+      .sub(pivot)
+      .applyAxisAngle(along, (angle * clock * Math.PI) / 180)
+      .add(pivot);
+  };
+  const rest = Object.fromEntries(Object.keys(moved).map((part) => [part, pointOf(part)]));
   assert.ok(
     Object.keys(moved).some((part) => Object.hasOwn(strokes, part)),
     'the pose moves an action part',
@@ -53,13 +77,13 @@ test('a moved pose slides each action part along its stroke and stands each othe
   for (const [part, clock] of Object.entries(moved)) {
     const want = Object.hasOwn(strokes, part)
       ? rest[part].clone().add(new Vector3(...strokes[part]).multiplyScalar(clock))
-      : posed(part, clock);
-    assert.ok(want.distanceTo(rest[part]) > 0, `${part} moves`);
+      : hinged(part, clock);
+    assert.ok(want.distanceTo(rest[part]) > 1e-3, `${part} moves`);
     assert.ok(
-      positionOf(part).distanceTo(want) < 1e-6,
-      `${part} stands at ${positionOf(part).toArray()}, wanted ${want.toArray()}`,
+      pointOf(part).distanceTo(want) < 1e-6,
+      `${part} stands at ${pointOf(part).toArray()}, wanted ${want.toArray()}`,
     );
   }
   move();
-  for (const [part, at] of Object.entries(rest)) assert.ok(positionOf(part).distanceTo(at) < 1e-9, `${part} rests`);
+  for (const [part, at] of Object.entries(rest)) assert.ok(pointOf(part).distanceTo(at) < 1e-9, `${part} rests`);
 });
