@@ -26,6 +26,7 @@ models/guns/designs/hunting-rifle.json
 models/guns/designs/pipe-rifle.json
 models/guns/designs/polymer-smg.json
 models/guns/designs/service-nine.json
+models/guns/designs/sks-carbine.json
 models/guns/references/*.json
 models/guns/tables/*.json
 models/mobs/**/*.json
