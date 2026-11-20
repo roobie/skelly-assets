@@ -71,7 +71,8 @@ its existing scale; it adds no new building geometry or building compatibility r
 
 ## Validation and limits
 
-`tools/test/woodland.test.mjs` checks production recipe membership, titles/taxonomy, supported primitives,
+`tools/test/woodland.test.mjs` checks production recipe membership, titles/taxonomy, the showcase search finding each
+tree, shrub and piece of deadwood by that word, supported primitives,
 independent size budgets, exported ground contact, voxel/smooth footprint drift, retained foliage materials,
 fern leaflet/stalk contact and the hollow stump's exported cavity. Mesh ray probes sample the example's clear
 central corridor. Existing catalogue/index, building and metadata regressions remain applicable.

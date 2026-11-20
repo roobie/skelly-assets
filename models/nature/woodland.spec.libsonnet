@@ -12,6 +12,9 @@
   // A sparse crown a player can hide in, though not easily, and that a scene of many trees can afford; a row's own
   // `density` overrides it.
   grownDensity: 0.2,
+  // What a search finds the drawn trees and the deadwood by (models/TAXONOMY.md); a grown row's are its species'. A
+  // snag died standing, so it is both a tree and deadwood.
+  keywords: { tree: ['tree'], deadwood: ['deadwood'] },
   grown: [
     { id: 'woodland_oak_spreading', title: 'Spreading woodland oak', species: 'broadleaf', seed: 1, kg: 3600 },
     { id: 'woodland_oak_upright', title: 'Upright woodland oak', species: 'upright', seed: 1, kg: 3200 },

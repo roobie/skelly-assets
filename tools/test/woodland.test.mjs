@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DoubleSide, Group, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { emptyFilter, matches } from '../../site/filter.mjs';
 import { sourceReport } from '../check-sources.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { loadCatalogue } from '../packages/thing-authoring-tool/src/catalogue.ts';
 import { exportItem } from '../packages/thing-authoring-tool/src/exports.ts';
 import { grown } from '../packages/thing-authoring-tool/src/families/grown.ts';
-import { readVocabulary } from '../taxonomy.mjs';
+import { manifestTaxonomy, readVocabulary } from '../taxonomy.mjs';
 import { glbBounds } from './architecture-helpers.mjs';
 
 const { rows, recipe, edge, lineup, settings } = JSON.parse(
@@ -142,13 +143,45 @@ test('every woodland asset is registered once in the existing nature recipe, wit
       assert.equal(p.sides % 4, 0, 'supported revolve facet count');
   }
   for (const id of ['log', 'large_rock', 'field_stone']) assert.equal(recipe.filter((r) => r.id === id).length, 1);
-  assert.deepEqual(
-    sourceReport(
-      rows.map(({ id, title, taxonomy }) => ({ id, title, taxonomy, pack: 'skelly.nature' })),
-      readVocabulary(),
-    ).problems,
-    [],
+  const { problems, unlisted } = sourceReport(
+    rows.map(({ id, title, taxonomy }) => ({ id, title, taxonomy, pack: 'skelly.nature' })),
+    readVocabulary(),
   );
+  assert.deepEqual(problems, []);
+  assert.deepEqual(unlisted, [], 'every woodland keyword is curated');
+});
+
+// The words a player types for each kind of woodland model, and the models each must find: no title names a tree, so
+// only the keywords the manifest carries make a tree findable by the word.
+const searches = {
+  tree: [
+    'woodland_birch',
+    'woodland_oak_sapling',
+    'woodland_oak_spreading',
+    'woodland_oak_upright',
+    'woodland_pine',
+    'woodland_pine_sapling',
+    'woodland_scots_pine',
+    'woodland_snag',
+    'woodland_spruce',
+  ],
+  shrub: ['woodland_hazel', 'woodland_shrub_low'],
+  deadwood: ['woodland_fallen_log', 'woodland_snag', 'woodland_stump_cut', 'woodland_stump_hollow'],
+};
+
+test('a showcase search finds every woodland tree, sapling, shrub and piece of deadwood by its everyday word', () => {
+  // Each recipe row as the showcase's models.json carries it (site/build.mjs): its taxonomy as the manifest writes it.
+  const entries = recipe.map(({ id, title, taxonomy }) => ({
+    id,
+    title,
+    tags: {},
+    keywords: [],
+    ...manifestTaxonomy(taxonomy),
+  }));
+  for (const [q, expected] of Object.entries(searches)) {
+    const found = entries.filter((entry) => matches(entry, { ...emptyFilter(), q })).map(({ id }) => id);
+    assert.deepEqual(found.filter((id) => byId.has(id)).sort(), expected, q);
+  }
 });
 
 for (const { id, voxelGrain } of rows)

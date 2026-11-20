@@ -88,10 +88,10 @@ local pine = roots(0.27, 0.75) + [
   for i in std.range(0, 7)
 ]);
 local finish = { trunk: 'bark', bark: 'bark', leaf: 'foliage-oak', cut: 'wood-oak', cavity: 'wood-weathered', stone: 'stone-grey', moss: 'moss-woodland' };
-local row(id, title, kg, pieces, grain, materials, extra={}) =
+local row(id, title, kg, pieces, grain, materials, extra={}, keywords=[]) =
   h.compound(id, kg, pieces, finish + extra) + {
     title: title, voxelGrain: grain,
-    taxonomy: { category: 'nature', tags: { material: materials } },
+    taxonomy: { category: 'nature', tags: { material: materials }, keywords: keywords },
   };
 local stump(hollow) = roots(0.55, 1.1) + (if hollow then [
   h.turned('hollow-bole', 'trunk', 'y', [[-0.08, 0.57], [0.12, 0.5], [0.76, 0.42], [0.76, 0.27], [0.12, 0.34], [-0.08, 0.34], [-0.08, 0.57]], [0, 0, 0]) + { sides: 12 },
@@ -150,7 +150,7 @@ local grassBlade(i) =
     for t in s.grown
   ] + [
     row(t.id, t.title, t.kg, scalePieces(if t.form == 'oak' then oak(t.seed) else pine, t.scale), t.grain, ['wood', 'plant'],
-      if t.form == 'pine' then { leaf: 'foliage-pine' } else {})
+      if t.form == 'pine' then { leaf: 'foliage-pine' } else {}, keywords=s.keywords.tree)
     for t in s.trees
   ] + [
     row('woodland_snag', 'Broken woodland snag', 1100, roots() + [
@@ -160,16 +160,16 @@ local grassBlade(i) =
       branch('dead-limb-a', 'trunk', [0.08, 2.9, 0.04], [-1.1, 4.1, 0.35], 0.16, 0.07),
       branch('dead-limb-b', 'trunk', [-1.1, 4.1, 0.35], [-1.7, 4.4, 0.4], 0.07, 0.025),
       branch('dead-limb-c', 'trunk', [0.16, 3.9, 0.05], [0.9, 4.7, -0.7], 0.12, 0.035),
-    ], 0.06, ['wood'], { trunk: 'wood-weathered' }),
-    row('woodland_stump_cut', 'Cut woodland stump', 140, stump(false), 0.04, ['wood']),
-    row('woodland_stump_hollow', 'Hollow woodland stump', 100, stump(true), 0.04, ['wood']),
+    ], 0.06, ['wood'], { trunk: 'wood-weathered' }, keywords=s.keywords.tree + s.keywords.deadwood),
+    row('woodland_stump_cut', 'Cut woodland stump', 140, stump(false), 0.04, ['wood'], keywords=s.keywords.deadwood),
+    row('woodland_stump_hollow', 'Hollow woodland stump', 100, stump(true), 0.04, ['wood'], keywords=s.keywords.deadwood),
     row('woodland_fallen_log', 'Fallen woodland log', 280, [
       branch('bole-a', 'trunk', [-1.9, 0.3, 0], [0.1, 0.31, 0.06], 0.34, 0.31, 0),
       branch('bole-b', 'trunk', [0.1, 0.31, 0.06], [1.8, 0.28, 0.02], 0.31, 0.28, 0),
       h.turned('cut-end', 'cut', 'x', [[0, 0], [0, 0.3], [0.04, 0.3], [0.04, 0]], [-1.94, 0.3, 0]) + { sides: 12 },
       branch('branch-stub', 'trunk', [-0.25, 0.5, 0.1], [0.2, 1, 0.4], 0.12, 0.07, 0),
       branch('broken-stub', 'cut', [0.2, 1, 0.4], [0.22, 1.025, 0.415], 0.07, 0.06, 0),
-    ], 0.04, ['wood']),
+    ], 0.04, ['wood'], keywords=s.keywords.deadwood),
     row('woodland_fern', 'Woodland fern clump', 0.7, fern, 0.02, ['plant'], { leaf: 'foliage-understorey' }),
     row('woodland_grass', 'Woodland grass tuft', 0.3, [grassBlade(i) for i in std.range(0, 19)], 0.02, ['plant'], { leaf: 'grass-woodland' }),
   ] + [

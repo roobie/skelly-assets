@@ -5,7 +5,7 @@ local s = import 'timber.spec.libsonnet';
 local metadata = (import 'metadata.libsonnet').timber;
 local half = (s.bay - s.timber) / 2;
 local finish = { plaster: 'chalk-white', timber: 'wood-walnut', board: 'wood-oak', roof: 'clay-terracotta', iron: 'iron-dull' };
-local taxonomy = { category: 'structures', tags: { setting: ['medieval'] } };
+local taxonomy = { category: 'structures', tags: { setting: ['medieval'] }, keywords: ['building'] };
 local row(id, title, kg, pieces, materials=['wood']) =
   h.compound(id, kg, pieces, finish) + { title: title, voxelGrain: s.grain, taxonomy: taxonomy + { tags+: { material: materials } } }
   + { building: metadata[id] };
