@@ -101,6 +101,24 @@ local shell(model, pieces, finish, covers, title=null) =
   row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }) + (if title == null then {} else { title: title });
 local fitted(shells) = { rows: shells };
 
+// A body shell's pieces shared out among the spine parts of a doll that bends its trunk, cut where `spine.cuts` cuts the
+// bust, so each shell bends with the flesh it lies on, and each moved into its part's frame from `spine.segments`. Each
+// encloses its part, but where a sleeveless body (`bare`) leaves the chest above the armpit showing.
+local spineShells(id, pieces, finish, spine, bare, title) =
+  local cuts = spine.cuts;
+  local bands = [
+    { segment: 'waist', pieces: h.cut(pieces, 'y', cuts.ribs, -1), encloses: true },
+    { segment: 'belly', pieces: h.cut(h.cut(pieces, 'y', cuts.ribs, 1), 'y', cuts.chest, -1), encloses: true },
+    { segment: 'body', pieces: h.cut(pieces, 'y', cuts.chest, 1), encloses: !bare },
+  ];
+  [
+    local part = spine.segments[band.segment];
+    shell(id + '_worn_' + band.segment, h.moved(band.pieces, [-c for c in part.origin]), finish, if band.encloses then [part.part] else [],
+          title=named(title, band.segment))
+    for band in bands
+    if band.pieces != []
+  ];
+
 // How far the trooper's cuirass stands off the shoulders, and how far its pauldron's top stands above the shoulder
 // joint it is worn about. The cuirass's deltoid caps stay `pauldronClear` under that top, more than one of the rows'
 // voxels, so at rest no cap shows through a pauldron.
@@ -162,10 +180,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // the belly, or 'none'. `top` 'yoke' covers the shoulders, the chest cut to the trapezius's slope and a cap over
   // each deltoid, under a collar; 'straps' cuts the body off at a neckline between the trunk's top and the shoulders,
   // held up by a strap over each trapezius, for a tank top, and draws no collar. `slots` names the ground row's finish
-  // slots the shells reuse: `body`, `trim` and `fastener`, and with a hood `hood` and `lining`.
+  // slots the shells reuse: `body`, `trim` and `fastener`, and with a hood `hood` and `lining`. `spine`, for a doll
+  // whose trunk bends at its spine, shares the body shell out among the spine's parts (`spineShells`): `cuts`, the
+  // bust's `ribs` and `chest` cut heights, and `segments`, for each of `waist`, `belly` and `body` the doll `part` it
+  // lies on and that part's `origin` in the bust's frame.
   torso(id, finish, spec, title=null)::
     local s = { layer: 'normal', sleeveLayer: self.layer, hem: 'hip', top: 'yoke', round: 0, sleeves: 'long', collar: 'band', zipX: 0, belt: false, pockets: 'welt', hood: null,
-                slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;
+                spine: null, slots: { body: 'cloth', trim: 'cloth', fastener: 'zip' } } + spec;
     assert std.member(['yoke', 'straps'], s.top) : 'torso %s: top %s is neither yoke nor straps' % [id, s.top];
     local straps = s.top == 'straps';
     local g = layers[s.layer];
@@ -246,7 +267,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
       oct('cuff', sl.trim, -arm.foreLength - 0.004, -arm.foreLength + 0.03, arm.foreWidth + 2 * gs + 0.012, arm.upperDepth + 2 * gs + 0.008, 0.02 + s.round),
     ];
-    fitted([shell(id + '_worn_body', body, finish, if straps then ['trunk'] else ['torso'], title=named(title, 'body'))]
+    fitted((if s.spine == null then [shell(id + '_worn_body', body, finish, if straps then ['trunk'] else ['torso'], title=named(title, 'body'))]
+            else spineShells(id, body, finish, s.spine, straps, title))
            + (if s.sleeves == 'none' then [] else [
                 shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper sleeve')),
                 shell(id + '_worn_fore', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
@@ -627,9 +649,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
   // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
   // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
-  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee.
+  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee. `ball`,
+  // for a doll whose foot bends at the ball, cuts the toes off the foot piece as a `toe` piece that bends with them:
+  // `joint`, the ball's joint in the foot's frame, and `part`, the doll part beyond it, which the toe encloses when the
+  // vamp covers the sole it belongs to.
   feet(id, finish, b, spec={}, title=null)::
-    local s = { layer: 'normal', ease: 0, covers: [] } + spec;
+    local s = { layer: 'normal', ease: 0, covers: [], ball: null } + spec;
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
@@ -664,8 +689,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in std.range(0, b.laces - 1)
     ]);
     local shafted = top > ankle;
-    local shod = shell(id + '_worn_foot', foot, { lining: 'paint-charcoal' } + finish, s.covers, title=named(title, 'foot'));
-    fitted([shod { soleLift: b.s }]
+    local footFinish = { lining: 'paint-charcoal' } + finish;
+    local shod = shell(id + '_worn_foot', if s.ball == null then foot else h.cut(foot, 'z', s.ball.joint[2], -1), footFinish, s.covers, title=named(title, 'foot'));
+    local toe = if s.ball == null then [] else [
+      shell(id + '_worn_toe', h.moved(h.cut(foot, 'z', s.ball.joint[2], 1), [-c for c in s.ball.joint]), footFinish,
+            if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe')),
+    ];
+    fitted([shod { soleLift: b.s }] + toe
            + (if shafted then [shell(id + '_worn_shaft', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
       ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),

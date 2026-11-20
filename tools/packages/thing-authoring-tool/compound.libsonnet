@@ -6,6 +6,27 @@ local part(id, family, massKg, dimensions, finish, ports=[]) = { id: id, family:
 local item(id, family, massKg, dimensions, finish) = { id: id, exportMass: 'parts', parts: [part(id, family, massKg, dimensions, finish)], connections: [] };
 // A cylinder along x from `x0` to `x1`, its axis at height `y`.
 local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', axis: 'x', profile: [[0, 0], [0, radius], [x1 - x0, radius], [x1 - x0, 0]], origin: [x0, y, 0] };
+local axisIndex(axis) = std.find(axis, ['x', 'y', 'z'])[0];
+// The axes a prism's profile points lie along, by the prism's own axis (see `prism`).
+local profileAxes = { x: ['y', 'z'], y: ['z', 'x'], z: ['x', 'y'] };
+local with(values, i, value) = [if j == i then value else values[j] for j in std.range(0, std.length(values) - 1)];
+// A convex counterclockwise profile cut to the half-plane `point[c] >= limit` (`<=` with `keep` -1).
+local cutProfile(profile, c, limit, keep) =
+  local n = std.length(profile);
+  local inside(p) = keep * (p[c] - limit) >= 0;
+  local crossing(p, q) = local t = (limit - p[c]) / (q[c] - p[c]); [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+  local kept = std.flattenArrays([
+    local p = profile[i], q = profile[(i + 1) % n];
+    if inside(p) then (if inside(q) then [p] else [p, crossing(p, q)]) else (if inside(q) then [crossing(p, q)] else [])
+    for i in std.range(0, n - 1)
+  ]);
+  local m = std.length(kept);
+  // A point on the cut line is its own crossing, which would repeat it.
+  [kept[i] for i in std.range(0, m - 1) if std.abs(kept[i][0] - kept[(i + 1) % m][0]) + std.abs(kept[i][1] - kept[(i + 1) % m][1]) > 1e-9];
+// Where a turned piece's middle lies along axis `i`.
+local turnedMiddle(p, i) =
+  local o = std.get(p, 'origin', [0, 0, 0])[i];
+  if axisIndex(p.axis) == i then o + (std.minArray([q[0] for q in p.profile]) + std.maxArray([q[0] for q in p.profile])) / 2 else o;
 {
   item: item,
   part: part,
@@ -271,19 +292,43 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
       for i in std.range(0, steps)
     ];
     $.turned(id, slot, 'y', [[0, 0]] + pts[1:std.length(pts) - 1] + [[2 * r * squash, 0]], [x, y - r * squash, z]),
-  // The same pieces raised `dy` along y, so a shell authored on a body frame stands on the floor as its ground model.
-  lifted(pieces, dy): [
+  // The same pieces moved by `by`, so pieces authored in one frame can be handed over in another. A clip plane moves
+  // with its piece, so it keeps cutting the same corner.
+  moved(pieces, by): [
+    local along(axis) = by[axisIndex(axis)];
     p + (
-      if p.kind == 'box' then { min: [p.min[0], p.min[1] + dy, p.min[2]], max: [p.max[0], p.max[1] + dy, p.max[2]] }
+      if p.kind == 'box' then { min: [p.min[i] + by[i] for i in [0, 1, 2]], max: [p.max[i] + by[i] for i in [0, 1, 2]] }
       else if p.kind == 'prism' then (
-        if p.axis == 'y' then { start: p.start + dy, end: p.end + dy }
-        else if p.axis == 'z' then { profile: [[q[0], q[1] + dy] for q in p.profile] }
-        else { profile: [[q[0] + dy, q[1]] for q in p.profile] }
+        local uv = profileAxes[p.axis];
+        { profile: [[q[0] + along(uv[0]), q[1] + along(uv[1])] for q in p.profile], start: p.start + along(p.axis), end: p.end + along(p.axis) }
       )
-      else { origin: local o = std.get(p, 'origin', [0, 0, 0]); [o[0], o[1] + dy, o[2]] }
-    ) + (if std.objectHas(p, 'clip') then { clip: [c { offset: c.offset + c.normal[1] * dy } for c in p.clip] } else {})
+      else { origin: local o = std.get(p, 'origin', [0, 0, 0]); [o[i] + by[i] for i in [0, 1, 2]] }
+    ) + (if std.objectHas(p, 'clip') then { clip: [c { offset: c.offset + std.sum([c.normal[i] * by[i] for i in [0, 1, 2]]) } for c in p.clip] } else {})
     for p in pieces
   ],
+  // The same pieces raised `dy` along y, so a shell authored on a body frame stands on the floor as its ground model.
+  lifted(pieces, dy): self.moved(pieces, [0, dy, 0]),
+  // The pieces cut to the side of the plane `axis = at` that `keep` names (1 keeps above, -1 below), dropping any left
+  // empty, so one shell can be shared out among the parts of a body that bends where the shell does not. A turned piece
+  // is not sliced, since its profile is not a section: it goes whole to the side holding its middle.
+  cut(pieces, axis, at, keep): std.flattenArrays([
+    local i = axisIndex(axis);
+    local clamp(lo, hi) = if keep > 0 then [std.max(lo, at), hi] else [lo, std.min(hi, at)];
+    if p.kind == 'box' then (
+      local r = clamp(p.min[i], p.max[i]);
+      if r[1] > r[0] then [p { min: with(p.min, i, r[0]), max: with(p.max, i, r[1]) }] else []
+    ) else if p.kind == 'turned' then (
+      local middle = turnedMiddle(p, i);
+      if (if keep > 0 then middle >= at else middle < at) then [p] else []
+    ) else if p.axis == axis then (
+      local r = clamp(p.start, p.end);
+      if r[1] > r[0] then [p { start: r[0], end: r[1] }] else []
+    ) else (
+      local profile = cutProfile(p.profile, std.find(axis, profileAxes[p.axis])[0], at, keep);
+      if std.length(profile) >= 3 then [p { profile: profile }] else []
+    )
+    for p in pieces
+  ]),
   // The same pieces made k times larger about the origin, for oversized cuts of a model.
   scaled(pieces, k): [
     p + (

@@ -165,3 +165,8 @@ parts rather than drawing each anew, so the split body has the silhouette the wh
 is then a union of whole parts, which needs no piece of its own. The chest's cut must be the armpit, because a
 garment's trunk ends there and a region that ended elsewhere would hide skin it does not enclose. See
 `src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
+
+A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and
+bends with it; a shell that spanned a bend would leave the flesh under it uncovered or pierce it. A round piece goes
+whole to the side holding its middle, because halving a turned piece would leave it open. See `worn-fit.libsonnet`,
+the torso's `spine` and the feet's `ball`, and `compound.libsonnet`, `cut` and `moved`.
