@@ -1,5 +1,5 @@
 // Traced from one side photo; see `packages/gun-authoring-tool/docs/sks-export.md`.
-local onReceiver = ['barrel', 'bolt-carrier', 'stock', 'rear-sight'];
+local onReceiver = ['barrel', 'bolt-carrier', 'lower', 'stock', 'rear-sight', 'handguard'];
 local onBarrel = ['front-sight', 'bayonet'];
 {
   format: 1,
@@ -11,14 +11,9 @@ local onBarrel = ['front-sight', 'bayonet'];
     name: 'sks-carbine',
     description: 'Simonov SKS-45 carbine: one-piece walnut stock, fixed ten-round magazine, wooden handguard over the gas tube, tangent rear sight, hooded front sight and the bayonet folded under the barrel.',
     root: 'receiver',
-    parts: {
-      [slot]: { family: 'sks-' + slot }
-      for slot in ['receiver', 'lower', 'handguard'] + onReceiver + onBarrel
-    },
-    connections: [{ from: 'receiver.' + slot, to: slot + '.mount' } for slot in onReceiver] + [
-      { from: 'receiver.trigger-group', to: 'lower.mount' },
-      { from: 'receiver.gas-tube', to: 'handguard.mount' },
-    ] + [{ from: 'barrel.' + slot, to: slot + '.mount' } for slot in onBarrel],
+    parts: { [slot]: { family: 'sks-' + slot } for slot in ['receiver'] + onReceiver + onBarrel },
+    connections: [{ from: 'receiver.' + slot, to: slot + '.mount' } for slot in onReceiver] +
+                 [{ from: 'barrel.' + slot, to: slot + '.mount' } for slot in onBarrel],
   },
   locks: { params: {}, optionalParts: [] },
   status: 'published',

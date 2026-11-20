@@ -21,9 +21,9 @@ A traced shape yields to a gun rule where the two disagree. The trigger guard's 
 
 No existing archetype is a good base. The SKS's receiver, carrier, gas tube and sights are their own, so they are built in `src/gun/sks/` from the table and not by bending the sporter or AK receivers toward it, which would tie those guns' geometry to this one. Only the hunting rifle's one-piece stock machinery is shared: the convex wood cells and the inlet cut that lets metal parts into the wood (`src/gun/stockWood.ts`).
 
-Every part is drawn where it sits in the gun frame, and each joint's two ports stand at one point facing each other, so the template places every part where it was drawn (`src/gun/sks/joints.ts`). Two joints take site names other than their slot's: the trigger group carries the magazine itself, and the handguard rides on the gas tube, so neither is the lower or the handguard socket that rules written for other guns expect.
+Every part is drawn where it sits in the gun frame, so a retrace moves a part and its joint together and no offset can drift between them (`src/gun/sks/joints.ts`).
 
-The trigger group holds the fixed magazine, since the SKS loads from above through the open action and has no well. The knob stands off the carrier's right side and runs back through the receiver's open right wall, so its stroke is kept clear under its own name, as every charging handle's is.
+The trigger group is an integral-magazine lower, since the SKS loads from above through the open action and has no well; the feed rule then accepts it as it would a lower over a well. The knob's stroke is kept clear under its own name so the action rules guard it as they do every charging handle's.
 
 Its cycle is its own content (`models/guns/tables/sksAction.jsonnet`), not the AK's: the AK's gas system drives a carrier much like it, but the SKS fires once per pull and holds open on its last round.
 

@@ -1,6 +1,7 @@
 import type { PartDef } from '@skelly/construct/assembly/schema.ts';
 import { boxFromMinMax } from '@skelly/construct/shapes/geometry.ts';
 import type { GunPartFamily } from '../actionRoles.ts';
+import { choice } from '../antiMateriel/common.ts';
 import { roundedTriggerGuardSolids, TRIGGER_BLADE_ID } from '../roundedTriggerGuard.ts';
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
 import { mountPort } from './joints.ts';
@@ -12,7 +13,7 @@ import { block } from './shapes.ts';
  */
 export const sksLower: GunPartFamily = {
   name: 'sks-lower',
-  params: {},
+  params: { integral: choice('yes') },
   build(): PartDef {
     const { housing, finger, guard, trigger, triggerHalfWidthU, magazine, magazineHalfWidthU } = P.lower;
     const fingerBox = boxFromMinMax(

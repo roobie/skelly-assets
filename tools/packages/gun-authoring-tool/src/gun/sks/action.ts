@@ -3,7 +3,7 @@ import { boxFromMinMax, localSolidBounds } from '@skelly/construct/shapes/geomet
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { VOXEL_DETAIL } from '@skelly/thing-export/glb.ts';
 import { ACTION_CARRIER_ROLES, type GunPartFamily } from '../actionRoles.ts';
-import { box, NEG_X } from '../antiMateriel/common.ts';
+import { box, choice, NEG_X } from '../antiMateriel/common.ts';
 import { octagonalProfile, octagonalSectionChamfered } from '../octagon.ts';
 import { buildReceiverSection, subtractAxialPockets } from '../receiverSection.ts';
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
@@ -20,7 +20,8 @@ export const SKS_KNOB_ID = 'charging-handle';
  */
 export const sksReceiver: GunPartFamily = {
   name: 'sks-receiver',
-  params: {},
+  // Stripper clips load the magazine from above, through the open action.
+  params: { feed: choice('top') },
   build(): PartDef {
     const front = R.x[1];
     const bore = P.barrel.radiusU;
