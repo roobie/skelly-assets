@@ -20,7 +20,6 @@ import type {
   VoxelGrains,
 } from '@skelly/thing-export/exportTypes.ts';
 import { partNodeName, partVoxelGrain } from '@skelly/thing-export/glb.ts';
-import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
 import { compareCodeUnits } from '../../../../codeUnitOrder.mjs';
 import { calibreSlug } from '../ammo/calibreSlug.ts';
 import type { Cartridge } from '../ammo/cartridge.ts';
@@ -43,7 +42,7 @@ import {
   withAttachmentInstanceAppearances,
 } from './attachments.ts';
 import { boltCalibreIssue, isBoltAssembly, withBoltCalibre } from './boltCartridge.ts';
-import type { CycleMode, CycleTimeline } from './cycle.ts';
+import type { CycleMode, CycleTimeline, TriggerMode } from './cycle.ts';
 import { gunDomain } from './domain.ts';
 import { FILE_AXES, fileMotion, fileVector, gripTurn, inFileFrame, toFileAxes, toFileRotation } from './exportFrame.ts';
 import { exportGunGeometry as exportGlb, exportGunModels } from './glbWriter.ts';
@@ -90,7 +89,7 @@ interface GunActionMetadata {
   readonly ejectDirection: Vec3;
   readonly holdOpen: boolean;
   readonly roundsPerSimMinute?: number;
-  readonly triggerMode?: 'semi' | 'auto';
+  readonly triggerMode?: TriggerMode;
 }
 
 export interface DeadvoxModelEntry extends NeutralModel {
@@ -245,7 +244,7 @@ const buildActionExport = (
     ejection: description.ejection,
     action: {
       parts,
-      ...(description.kind === 'slide' ? { triggerMode: pistolAction.triggerMode as 'semi' } : {}),
+      ...(cycle.triggerMode ? { triggerMode: cycle.triggerMode } : {}),
       ...(cycle.fire ? { fire: cycleMetadata(cycle.fire, parts) } : {}),
       hand: cycleMetadata(cycle.hand, parts),
       ejectAt: cycle.ejectAt,

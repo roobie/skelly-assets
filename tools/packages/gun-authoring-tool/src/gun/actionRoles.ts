@@ -15,6 +15,7 @@ export const ACTION_PART_ROLES = {
 const DESCRIBED_CARRIER_ROLES = {
   ar: 'ar-carrier',
   ak: 'ak-carrier',
+  sks: 'sks-carrier',
   smg: 'smg-carrier',
   pump: 'pump-carrier',
   bolt: 'turn-bolt-carrier',

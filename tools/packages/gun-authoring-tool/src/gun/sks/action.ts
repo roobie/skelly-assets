@@ -80,7 +80,7 @@ export const sksBoltCarrier: GunPartFamily = {
         },
       ],
       axes: [],
-      tags: [ACTION_CARRIER_ROLES.ak, VOXEL_DETAIL],
+      tags: [ACTION_CARRIER_ROLES.sks, VOXEL_DETAIL],
       motion: { stages: [{ kind: 'slide', direction: NEG_X, travel: C.travelU }] },
     };
   },

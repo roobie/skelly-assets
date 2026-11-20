@@ -2,7 +2,7 @@
 read_if:
   - you build, tune or retrace the SKS carbine
   - you change the one-piece wooden stock machinery the SKS shares with the hunting rifle (`src/gun/stockWood.ts`)
-  - you add the SKS to the roster, unfold its bayonet or give it a fire mode
+  - you add the SKS to the roster or unfold its bayonet
 ---
 
 # SKS export
@@ -25,8 +25,9 @@ Every part is drawn where it sits in the gun frame, and each joint's two ports s
 
 The trigger group holds the fixed magazine, since the SKS loads from above through the open action and has no well. The knob stands off the carrier's right side and runs back through the receiver's open right wall, so its stroke is kept clear under its own name, as every charging handle's is.
 
+Its cycle is its own content (`models/guns/tables/sksAction.jsonnet`), not the AK's: the AK's gas system drives a carrier much like it, but the SKS fires once per pull and holds open on its last round.
+
 ## Deferred
 
 - **Bayonet unfolding.** The bayonet is a fixed solid in its folded place; a hinged stop is later work.
-- **Fire mode.** The trigger is drawn, but the export does not mark the SKS as semi-automatic only.
 - **Roster.** The design is published, but not added to `models/guns/roster.libsonnet`.
