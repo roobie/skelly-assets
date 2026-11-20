@@ -53,6 +53,7 @@
 // quaternion turns that node about its head. A doll whose nodes are rest-turned states each bone's own, and its clips
 // must then be baked as each node's local rotation, since today's bakes turn every bone on the model's axes, which only
 // an unturned node shares.
+local joints = import 'models/dolls/joints.libsonnet';
 local unturned = [0, 0, 0, 1];
 local trunk = { nodeRotation: unturned };
 local arm = { nodeRotation: unturned, sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
@@ -60,26 +61,21 @@ local leg = { nodeRotation: unturned, sided: true, parent: 'pelvis', along: [0, 
 local hand = import 'models/measures/hand.libsonnet';
 local digit(name) = arm { pivot: 'origin', flexAxis: [0, 0, -1], digit: name };
 local fingerCount = std.length(hand.fingers);
-// The knuckle hyperextends a little and spreads; the joints beyond it only curl, the middle one furthest.
-local phalanxLimits = [{ flex: [-20, 90], abduct: [-15, 15] }, { flex: [0, 110], abduct: [0, 0] }, { flex: [0, 80], abduct: [0, 0] }];
 local fingerBones = {
   [hand.part(hand.fingers[i], k)]: digit(hand.fingers[i]) {
     part: hand.part(hand.fingers[i], k),
     parent: if k == 0 then 'hand' else hand.part(hand.fingers[i], k - 1),
-    limits: phalanxLimits[if hand.phalanges == 1 then 0 else std.min(k, 2)] { twist: [0, 0] },
+    limits: joints.phalanges[if hand.phalanges == 1 then 0 else std.min(k, 2)] { twist: [0, 0] },
     [if k == 0 then 'spread']: 1 - 2 * i / (fingerCount - 1),
   }
   for i in std.range(0, fingerCount - 1)
   for k in std.range(0, hand.phalanges - 1)
 };
-// The root crosses the palm further than it spreads away, rolls into opposition and lifts toward the palm; the
-// knuckle beyond bends a little back and most of a right angle forward; the last joint bends further.
-local thumbLimits = [{ flex: [-10, 60], twist: [0, 70], abduct: [-60, 25] }, { flex: [-10, 60], twist: [0, 0], abduct: [0, 0] }, { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }];
 local thumbBones = {
   [hand.thumbPart(k)]: digit('thumb') {
     part: hand.thumbPart(k),
     parent: if k == 0 then 'hand' else hand.thumbPart(k - 1),
-    limits: thumbLimits[std.min(k, 2)],
+    limits: joints.thumb[std.min(k, 2)],
   }
   for k in std.range(0, hand.thumbBones - 1)
 };
@@ -92,29 +88,19 @@ local thumbBones = {
   // The eyes, from the head's joint in the head's frame, which a generated frame turns the head to look from.
   eye: [0, 0.11, 0.08],
   bones: {
-    // The root's flex is the body's pitch in the world, no joint's, so it reaches a figure lying on its front or back.
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
-                    limits: { flex: [-90, 90], twist: [-30, 30], abduct: [-15, 15] } },
+                    limits: joints.pelvis },
     spine: trunk { part: 'torso', parent: 'pelvis', pivot: { anchor: 'spine' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                    absorbs: ['chest'], limits: { flex: [-30, 60], twist: [-80, 80], abduct: [-35, 35] } },
     neck: trunk { part: 'neck', parent: 'spine', pivot: { anchor: 'neck' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
-                  limits: { flex: [-30, 40], twist: [-60, 60], abduct: [-30, 30] } },
+                  limits: joints.neck },
     head: trunk { part: 'head', parent: 'neck', pivot: { anchor: 'head' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
-                  limits: { flex: [-30, 30], twist: [-45, 45], abduct: [-20, 20] } },
+                  limits: joints.head },
     upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30, 170] } },
-    // Negative twist supinates, turning the palm up from facing the body; a support hand under a rifle's handguard,
-    // its elbow down and out, takes nearly all of it. The forearm turns about as far each way, so a hand on a pistol
-    // grip, its elbow out, pronates as far as the support hand supinates.
-    forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true,
-                   limits: { flex: [0, 150], twist: [-90, 90], abduct: [0, 0] } },
-    // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do,
-    // and its abduction is deviation, positive toward the thumb; about the arm's flex axis a turn would move the hand
-    // in the palm's plane. The wrist bends further toward the little finger than the thumb: a pistol grip, raked
-    // back, is held with the wrist deviated that way, furthest when the hand rolls the rifle onto its side. The limits
-    // are a supple wrist's, so a hand reaching across a rolled rifle to its charging handle bends back as far as it
-    // can rather than stopping short of the handle. The reach pole puts the elbow down and out, as an arm reaching
-    // in front of the body carries it.
+    forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true, limits: joints.forearm },
+    // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do;
+    // about the arm's flex axis a turn would move the hand in the palm's plane.
     // `grip`: where a handle held in a power grip crosses the palm's middle, as a share of its length from the wrist
     // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle deep in the
     // palm, in the wedge between the palm and the lifted thumb's root, so the palm's heel and the thumb's root both
@@ -124,14 +110,12 @@ local thumbBones = {
     // palm under the little finger. Each finger then reaches the same way round it; held square, as a bar is, the
     // little finger, whose knuckle sits furthest back, stands off a handle the others wrap. Much past a quarter turn
     // the index finger's root comes onto the handle and opens the fist from the other end.
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: [0.5, -1, -0.3] }, grip: 0.65, gripSlant: 20,
-                limits: { flex: [-80, 85], twist: [0, 0], abduct: [-45, 25] } },
-    thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0],
-                 limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },
-    shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0],
-                limits: { flex: [0, 140], twist: [0, 0], abduct: [0, 0] } },
-    foot: leg { part: 'foot', parent: 'shin', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: [0, 0, 1] },
-                limits: { flex: [-30, 45], twist: [-10, 10], abduct: [-20, 20] } },
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, grip: 0.65, gripSlant: 20,
+                limits: joints.wrist },
+    thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0], limits: joints.thigh },
+    shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0], limits: joints.knee },
+    foot: leg { part: 'foot', parent: 'shin', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: joints.poles.foot },
+                limits: joints.ankle },
   } + thumbBones + fingerBones,
   presets: import 'models/poses/hands.libsonnet',
 }

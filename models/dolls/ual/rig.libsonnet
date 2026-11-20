@@ -1,8 +1,10 @@
 // The UAL doll's rig: one bone per doll part (models/catalogue/sets/ual.libsonnet), each named, placed and rest-turned
 // as the mannequin's skeleton has it (`skeleton`, which the build checks every bone against), so a UAL clip, which turns
 // each node from its rest, plays on the doll as it does on the mannequin. The fields are the player's
-// (models/dolls/player/rig.libsonnet), which says what each means; `along`, `flexAxis` and the limits are the player's
-// joint for joint, but for the shoulder, which rests raised to the T-pose.
+// (models/dolls/player/rig.libsonnet), which says what each means; `along` and `flexAxis` are the player's joint for
+// joint, and so are the limits (models/dolls/joints.libsonnet) but where UAL's joints are not the player's: the spine,
+// split in three, the clavicles, the shoulder, which rests raised to the T-pose, and the toes.
+local joints = import 'models/dolls/joints.libsonnet';
 local skeleton = import 'models/dolls/ual/skeleton.libsonnet';
 local hand = (import 'models/dolls/ual/measures.libsonnet').hand;
 // A node's rest turn, the skeleton's, in the model's axes; a sided bone's per side, as UAL's right side is no mirror
@@ -19,23 +21,21 @@ local arm(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: '
 local leg(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: 'origin', along: [0, -1, 0] };
 local digit(name, parent, digitName) = arm(name, parent) { flexAxis: [0, 0, -1], digit: digitName };
 local fingerCount = std.length(hand.fingers);
-local phalanxLimits = [{ flex: [-20, 90], abduct: [-15, 15] }, { flex: [0, 110], abduct: [0, 0] }, { flex: [0, 80], abduct: [0, 0] }];
 local fingerBones = {
   [hand.part(hand.fingers[i], k)]: digit(
     hand.part(hand.fingers[i], k),
     if k == 0 then 'hand' else hand.part(hand.fingers[i], k - 1),
     hand.fingers[i],
   ) {
-    limits: phalanxLimits[k] { twist: [0, 0] },
+    limits: joints.phalanges[k] { twist: [0, 0] },
     [if k == 0 then 'spread']: 1 - 2 * i / (fingerCount - 1),
   }
   for i in std.range(0, fingerCount - 1)
   for k in std.range(0, hand.phalanges - 1)
 };
-local thumbLimits = [{ flex: [-10, 60], twist: [0, 70], abduct: [-60, 25] }, { flex: [-10, 60], twist: [0, 0], abduct: [0, 0] }, { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }];
 local thumbBones = {
   [hand.thumbPart(k)]: digit(hand.thumbPart(k), if k == 0 then 'hand' else hand.thumbPart(k - 1), 'thumb') {
-    limits: thumbLimits[k],
+    limits: joints.thumb[k],
   }
   for k in std.range(0, hand.thumbBones - 1)
 };
@@ -46,7 +46,7 @@ local thumbBones = {
   reference: 'left',
   skeleton: skeleton.bones,
   bones: {
-    pelvis: trunk('pelvis', 'pelvis', null, { flex: [-90, 90], twist: [-30, 30], abduct: [-15, 15] }),
+    pelvis: trunk('pelvis', 'pelvis', null, joints.pelvis),
     // The player's one spine joint is three here, each taking a third of its range.
     spine_01: trunk('spine_01', 'spine_01', 'pelvis', { flex: [-10, 20], twist: [-25, 25], abduct: [-12, 12] }),
     spine_02: trunk('spine_02', 'spine_02', 'spine_01', { flex: [-10, 20], twist: [-25, 25], abduct: [-12, 12] }),
@@ -55,29 +55,18 @@ local thumbBones = {
     // draws the shoulder forward and back a little about the third axis.
     clavicle_l: clavicle('l', 1),
     clavicle_r: clavicle('r', -1),
-    neck_01: trunk('neck_01', 'neck_01', 'spine_03', { flex: [-30, 40], twist: [-60, 60], abduct: [-30, 30] }),
-    Head: trunk('Head', 'head', 'neck_01', { flex: [-30, 30], twist: [-45, 45], abduct: [-20, 20] }),
+    neck_01: trunk('neck_01', 'neck_01', 'spine_03', joints.neck),
+    Head: trunk('Head', 'head', 'neck_01', joints.head),
     // The arm rests raised level, so it lowers to the side by a right angle and a little across, lifts overhead by
     // less, and swings forward level across the chest and back behind it.
     upperarm: arm('upperarm', { right: 'clavicle_r', left: 'clavicle_l' }) {
       limits: { flex: [-50, 130], twist: [-70, 90], abduct: [-110, 80] },
     },
-    lowerarm: arm('lowerarm', 'upperarm') { pronates: true, limits: { flex: [0, 150], twist: [-90, 90], abduct: [0, 0] } },
-    // The pole is in the doll's frame, which the arm's rest turn does not turn: the elbow down and out, as an arm
-    // reaching in front of the body carries it.
-    hand: arm('hand', 'lowerarm') {
-      flexAxis: [0, 0, -1],
-      reach: { pole: [0.5, -1, -0.3] },
-      limits: { flex: [-80, 85], twist: [0, 0], abduct: [-45, 25] },
-    },
-    thigh: leg('thigh', 'pelvis') { flexAxis: [-1, 0, 0], limits: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] } },
-    calf: leg('calf', 'thigh') { flexAxis: [1, 0, 0], limits: { flex: [0, 140], twist: [0, 0], abduct: [0, 0] } },
-    foot: leg('foot', 'calf') {
-      along: [0, 0, 1],
-      flexAxis: [1, 0, 0],
-      reach: { pole: [0, 0, 1] },
-      limits: { flex: [-30, 45], twist: [-10, 10], abduct: [-20, 20] },
-    },
+    lowerarm: arm('lowerarm', 'upperarm') { pronates: true, limits: joints.forearm },
+    hand: arm('hand', 'lowerarm') { flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, limits: joints.wrist },
+    thigh: leg('thigh', 'pelvis') { flexAxis: [-1, 0, 0], limits: joints.thigh },
+    calf: leg('calf', 'thigh') { flexAxis: [1, 0, 0], limits: joints.knee },
+    foot: leg('foot', 'calf') { along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: joints.poles.foot }, limits: joints.ankle },
     // The toes bend up off the ground further than down.
     ball: leg('ball', 'foot') { along: [0, 0, 1], flexAxis: [1, 0, 0], limits: { flex: [-60, 30], twist: [0, 0], abduct: [0, 0] } },
   } + thumbBones + fingerBones,
