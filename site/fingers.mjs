@@ -332,6 +332,13 @@ export function holdIssues(rig, handId, hold) {
   return issues;
 }
 
+// The hand's socket and the digits' pads are read off a part's box as a hand hanging down -y at rest, so a part the doll
+// rests turned would put them in the wrong place without a word.
+const hangsDown = (bone) => {
+  if (bone.bind.turn)
+    throw new Error(`${bone.id}: the doll rests this part turned, and the hand's socket and pads assume it hangs`);
+};
+
 // A right-handed frame from a direction into a surface and an axis along it, as columns.
 const triad = (into, axis) => {
   const x = normalize(into);
@@ -344,6 +351,7 @@ const triad = (into, axis) => {
 // crosses it, the palm's normal, and the thumb's direction across the palm turned `slant` degrees toward the fingers,
 // read off the palm part's box and which way the part faces.
 const palmSocket = (hand, grip, slant) => {
+  hangsDown(hand);
   const { min, max } = hand.bind.box;
   const sign = hand.bind.mirror ? -1 : 1;
   const a = (slant * Math.PI) / 180;
@@ -475,6 +483,7 @@ const PAD = 0.3;
 
 /** The pad of a digit's last bone `tip` in rest doll axes: on the face of its part the palm faces, near the tip. */
 export const padOf = (tip) => {
+  hangsDown(tip);
   const { min, max } = tip.bind.box;
   return [tip.bind.mirror ? min[0] : max[0], min[1] + PAD * (max[1] - min[1]), (min[2] + max[2]) / 2];
 };

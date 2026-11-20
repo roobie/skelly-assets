@@ -259,7 +259,10 @@ doll, and the manifest's `dolls` names each one's rig file. A garment's pieces a
 (`dress.mjs`, `dollGarments`), and the rest-poke allowances name the doll they were judged on. What is still the
 player's alone, named so in the code (`PLAYER`) and not left to a first doll, is the baked wields and locomotion, the
 press check, the head-band fit and the showcase's whole worn view, because their content was worked out on the player's
-body, and a garment's `wornOn`, since fitting one garment to several dolls is not built.
+body, and a garment's `wornOn`, since fitting one garment to several dolls is not built. A limb a doll rests turned,
+such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models stay authored
+hanging as `docs/decisions/0008-dressing.md` has them; the code that reads a hand or a loose wearable off a hanging part
+refuses a turned one until it is taught to follow the turn.
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a
