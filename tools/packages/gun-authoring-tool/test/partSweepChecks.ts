@@ -35,6 +35,8 @@ export const definePartChecks = (family: GunPartFamily, cases: Record<string, st
       'shroud-front-sight',
       'ak-rear-sight',
       'sporting-rear-sight',
+      'sks-front-sight',
+      'sks-rear-sight',
     ].includes(family.name)
   ) {
     gridStep = GRID / 4;

@@ -125,6 +125,7 @@ import {
 import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIONS } from './shotgunProportions.ts';
 import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import { sightAxis } from './sightAxis.ts';
+import { SKS_FAMILIES } from './sks/index.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
 import {
   cutSporterAction,
@@ -5898,4 +5899,5 @@ export const FAMILIES: Readonly<Record<string, PartFamily>> = {
   ...revolverFamilySet,
   ...ANTI_MATERIEL_FAMILIES,
   ...AR_MODULAR_FAMILIES,
+  ...SKS_FAMILIES,
 };

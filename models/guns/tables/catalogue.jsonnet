@@ -305,6 +305,16 @@ local ar15Item(id, role, params) =
     row('carry-bar', 'handle-bar', {}, 0.1),
     row('bipod', 'bipod', {}, 0.8),
     row('monopod', 'monopod', {}, 0.25),
+    // The SKS's parts share its cited 3.85 kg unloaded weight (https://en.wikipedia.org/wiki/SKS).
+    row('sks-receiver', 'sks-receiver', {}, 0.9),
+    row('sks-bolt-carrier', 'sks-bolt-carrier', {}, 0.35),
+    row('sks-barrel', 'sks-barrel', {}, 0.75),
+    row('sks-handguard', 'sks-handguard', {}, 0.15),
+    row('sks-bayonet', 'sks-bayonet', {}, 0.3),
+    row('sks-lower', 'sks-lower', {}, 0.55),
+    row('sks-front-sight', 'sks-front-sight', {}, 0.03),
+    row('sks-rear-sight', 'sks-rear-sight', {}, 0.07),
+    row('sks-stock', 'sks-stock', {}, 0.75),
   ] + [
     // The modular AR-15: each item's mass is sourced in the frame table. The items the assault rifle ships carry their
     // titles; the rest carry none until a roster gun ships them, so the exporter leaves them out.

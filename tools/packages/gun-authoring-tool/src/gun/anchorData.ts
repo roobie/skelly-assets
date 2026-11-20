@@ -22,6 +22,7 @@ import {
   Y,
 } from './partAnchors.ts';
 import { REVOLVER_GRIP_RAKE_DEGREES } from './revolver.ts';
+import { SKS_ANCHORS } from './sks/index.ts';
 import { sporterSupport } from './sporter.ts';
 
 const revolverGripAxes = (): Pick<AnchorFrame, 'forward' | 'up'> => {
@@ -112,6 +113,7 @@ export const GUN_ANCHORS: GunAnchorDeclarations = {
   barrel: { anchors: muzzlePortAnchor },
   'muzzle-brake': { anchors: muzzlePortAnchor },
   ...AR_MODULAR_ANCHORS,
+  ...SKS_ANCHORS,
   receiver: {
     anchors: (params, part) => {
       const mouth = part.keepOuts.find(
