@@ -137,6 +137,17 @@ describe('a doll whose skeleton is not the player body', () => {
     expect(await offBone(item, bone)).toBeLessThan(VOXEL.voxelGrain);
   });
 
+  it('stands the flesh of a leaning digit on its bone, in steps that keep it whole', async () => {
+    const item = toy.parts.arm.find(({ id }) => id === 'toy_arm_thumb_02')!;
+    const given = params(toy.parts.arm, item.id);
+    const tail = JSON.parse(given.tail!) as number[];
+    expect(await offBone(item, tail)).toBeLessThan(VOXEL.voxelGrain);
+    expect(avatarArm(given).length).toBeGreaterThan(1);
+    const [x, y, z] = tail;
+    expect(() => avatarArm({ ...given, tail: JSON.stringify([x, y! + 0.001, z]) })).toThrow(/tail joint/);
+    expect(() => avatarArm({ ...given, segment: 'palm' })).toThrow(/no digit/);
+  });
+
   it("cuts the torso garment at the bust's spine joints, each shell in its part's frame", () => {
     const { jacket } = toy.garments;
     const level = (shell: string, id: string, part: string) => {
