@@ -42,6 +42,7 @@ import { dollTree, heldThings, repo, WEAR } from './doll-tree.mjs';
 
 // One garment dresses the doll, for the body a held gun must stand clear of.
 const { built, manifest, doll, rig, restIn, itemMesh, thingOf } = dollTree({ wears: [WEAR], held: true });
+const PLAYER_PACK = 'skelly.body';
 const { pressCheck, wields, guns, gunIds } = heldThings();
 const rest = restIn(WEAR);
 
@@ -618,10 +619,10 @@ test('a walking gun, or a weapon walked in both hands, stands clear of the body,
 test("the export lists the gun clips' motions entry, a clip with its held seat for every gun and stance", () => {
   // The export reads the doll and the guns from the tree it writes into, so it writes into this test's own.
   const { files, motions } = exportWields(built, manifest, { sets: { guns: WIELD_SETS.guns } });
-  const { pack, path } = WIELD_SETS.guns.motions;
-  assert.deepEqual(motions, [WIELD_SETS.guns.motions]);
-  assert.ok(files.includes(outputPath(pack, path)));
-  const { clips } = JSON.parse(readFileSync(join(built, outputPath(pack, path)), 'utf8'));
+  const { path } = WIELD_SETS.guns.motions;
+  assert.deepEqual(motions, [{ ...WIELD_SETS.guns.motions, pack: PLAYER_PACK, rig: 'motions/doll.rig.json' }]);
+  assert.ok(files.includes(outputPath(PLAYER_PACK, path)));
+  const { clips } = JSON.parse(readFileSync(join(built, outputPath(PLAYER_PACK, path)), 'utf8'));
   for (const id of gunIds)
     for (const stance of ['idle', 'guard']) {
       assert.ok(clips[`${id}_stance_${stance}`]?.held, `${id}_stance_${stance}`);
@@ -633,9 +634,9 @@ test("the export lists the gun clips' motions entry, a clip with its held seat f
 // Every melee strike bakes in this export, so it runs only on demand.
 const sweep = process.env.ASSETS_SWEEPS ? false : 'bakes every strike: set ASSETS_SWEEPS=1';
 test('the export lists every melee class in every walk, held on a class with a weapon', { skip: sweep }, () => {
-  const { pack, path } = WIELD_SETS.melee.motions;
+  const { path } = WIELD_SETS.melee.motions;
   exportWields(built, manifest, { sets: { melee: WIELD_SETS.melee } });
-  const { clips } = JSON.parse(readFileSync(join(built, outputPath(pack, path)), 'utf8'));
+  const { clips } = JSON.parse(readFileSync(join(built, outputPath(PLAYER_PACK, path)), 'utf8'));
   for (const [kind, cls] of Object.entries(wields.classes))
     for (const walk of Object.keys(gait.walks))
       for (const stance of Object.keys(cls.walks)) {

@@ -41,9 +41,16 @@
 // hinge the roll has turned, so a lifted thumb leans the way its pad faces. Across, roll and lift together bring the
 // pad against a fingertip or over a gripped handle; the two joints beyond only bend toward the pad. `presets` names
 // hand shorthands (site/fingers.mjs, `handAngles`) a pose file can ask for by name.
-local trunk = { model: 'player_bust' };
-local arm = { model: 'player_arm', sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
-local leg = { model: 'player_leg', sided: true, parent: 'pelvis', along: [0, -1, 0] };
+//
+// `nodeRotation` is the rest rotation of a bone's glTF node, a quaternion [x, y, z, w] of the node's axes in the model's,
+// or one per side for a sided bone. The player's joints are nodes at their heads turned by nothing, and a clip's
+// quaternion turns that node about its head. A doll whose nodes are rest-turned states each bone's own, and its clips
+// must then be baked as each node's local rotation, since today's bakes turn every bone on the model's axes, which only
+// an unturned node shares.
+local unturned = [0, 0, 0, 1];
+local trunk = { nodeRotation: unturned };
+local arm = { nodeRotation: unturned, sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
+local leg = { nodeRotation: unturned, sided: true, parent: 'pelvis', along: [0, -1, 0] };
 local hand = import 'models/measures/hand.libsonnet';
 local digit(name) = arm { pivot: 'origin', flexAxis: [0, 0, -1], digit: name };
 local fingerCount = std.length(hand.fingers);
@@ -120,5 +127,5 @@ local thumbBones = {
     foot: leg { part: 'foot', parent: 'shin', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: [0, 0, 1] },
                 limits: { flex: [-30, 45], twist: [-10, 10], abduct: [-20, 20] } },
   } + thumbBones + fingerBones,
-  presets: import 'hands.libsonnet',
+  presets: import 'models/poses/hands.libsonnet',
 }

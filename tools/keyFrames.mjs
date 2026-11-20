@@ -13,7 +13,10 @@ export const unitQuat = (q) => {
   return q.map((c) => c / n);
 };
 
-/** The head of a generated pose file for `rig`: the figure stood on the ground on level feet. */
+/**
+ * The head of a generated pose file for `rig`: the figure stood on the ground on level feet. The feet are the player
+ * doll's bones, as the generators that use this (wields, press check) are the player's.
+ */
 export const standing = (rig) => ({
   rig: { id: rig.id, revision: rig.revision },
   ground: true,

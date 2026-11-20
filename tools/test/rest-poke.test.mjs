@@ -3,12 +3,12 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { writeGlb } from '../glb.mjs';
 import { restPokeReport, restPokeResults } from '../restPoke.mjs';
-import { boxes } from './boxes.mjs';
+import { partGlb } from './boxes.mjs';
 
 // A doll of one torso on a one-bone rig, wearing a vest narrower than the torso across x, so each side of the torso
-// stands out of the vest it passes beneath by the difference.
+// stands out of the vest it passes beneath by the difference. A second, toy doll of the same shape has no garment
+// fitted to it, so nothing is probed on it.
 const TORSO = [
   [-0.1, 0, -0.1],
   [0.1, 0.5, 0.1],
@@ -18,28 +18,6 @@ const VEST = [
   [-0.1 + SIDE, 0.1, -0.12],
   [0.1 - SIDE, 0.4, 0.12],
 ];
-const partGlb = (part, span) => {
-  const { positions, indices } = boxes(span);
-  return writeGlb(
-    {
-      asset: { version: '2.0' },
-      scene: 0,
-      scenes: [{ nodes: [0] }],
-      nodes: [{ extras: { part }, mesh: 0 }],
-      meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1, mode: 4 }] }],
-      accessors: [
-        { bufferView: 0, componentType: 5126, count: positions.length / 3, type: 'VEC3', min: span[0], max: span[1] },
-        { bufferView: 1, componentType: 5125, count: indices.length, type: 'SCALAR' },
-      ],
-    },
-    [new Float32Array(positions), new Uint32Array(indices)],
-  );
-};
-const dressing = {
-  doll: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left' },
-  piece: 'torso',
-  slots: {},
-};
 const rig = {
   id: 'fixture',
   revision: 1,
@@ -48,6 +26,7 @@ const rig = {
   bones: {
     spine: {
       model: 'bust',
+      nodeRotation: [0, 0, 0, 1],
       part: 'torso',
       parent: null,
       pivot: 'origin',
@@ -58,26 +37,38 @@ const rig = {
 };
 const root = mkdtempSync(join(tmpdir(), 'rest-poke-'));
 after(() => rmSync(root, { recursive: true, force: true }));
-mkdirSync(join(root, 'models/poses'), { recursive: true });
+mkdirSync(join(root, 'models'), { recursive: true });
+const dressing = {
+  dolls: {
+    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, rig },
+    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, rig },
+  },
+  piece: 'torso',
+};
 writeFileSync(join(root, 'models/dressing.libsonnet'), JSON.stringify(dressing));
-writeFileSync(join(root, 'models/poses/rig.libsonnet'), JSON.stringify(rig));
 const files = {
   bust: { glb: partGlb('torso', TORSO), entry: { anchors: {} } },
+  toybust: { glb: partGlb('torso', TORSO), entry: { anchors: {} } },
   vest_worn: { glb: partGlb('torso', VEST), entry: {} },
 };
 const generated = {
-  models: [{ id: 'bust' }, { id: 'vest_worn', tags: { fit: ['worn'] } }],
+  models: [{ id: 'bust' }, { id: 'toybust' }, { id: 'vest_worn', tags: { fit: ['worn'] } }],
   modelOf: async (id) => files[id],
 };
 const cache = join(root, 'cache');
 const probed = await restPokeResults(generated, { root, cache, workers: 1 });
 
 test('the check finds the body poking out of the piece meant to cover it, by its depth', () => {
-  assert.deepEqual(Object.keys(probed.results), ['vest']);
-  const [poke, ...others] = probed.results.vest.pokes;
+  const [poke, ...others] = probed.results.player.vest.pokes;
   assert.deepEqual(others, []);
   assert.equal(`${poke.bone} out of ${poke.piece}`, 'spine out of vest_worn');
   assert.ok(Math.abs(poke.depth - SIDE) < 1e-6, `pokes by ${poke.depth} m, not ${SIDE} m`);
+});
+
+test('a garment is probed on the doll it is fitted to alone', () => {
+  assert.deepEqual(Object.keys(probed.results), ['player', 'toy']);
+  assert.deepEqual(Object.keys(probed.results.player), ['vest']);
+  assert.deepEqual(probed.results.toy, {});
 });
 
 test('a garment whose inputs are unchanged is not probed again', async () => {
@@ -91,6 +82,7 @@ test('a garment whose inputs are unchanged is not probed again', async () => {
 
 // Content writes a cap as the depth rounded up to the millimetre.
 const entry = (depth, extra = { why: 'fixture' }) => ({
+  doll: 'player',
   garment: 'vest',
   bone: 'spine',
   piece: 'vest_worn',
@@ -102,7 +94,7 @@ const none = { pokes: [], unjudged: [] };
 test('a poke fails unless an entry allows it to its depth', () => {
   assert.match(
     restPokeReport(probed.results, none).problems.join('\n'),
-    /vest: the doll's spine pokes out of vest_worn at rest by 20\.0 mm$/,
+    /vest on player: the doll's spine pokes out of vest_worn at rest by 20\.0 mm$/,
   );
   assert.match(
     restPokeReport(probed.results, { ...none, pokes: [entry(0.015)] }).problems.join('\n'),
@@ -130,15 +122,21 @@ test('an entry that is stale, doubled or capped loose fails', () => {
   assert.match(problems({ pokes: [entry(0.025)] }), /capped at 25\.0 mm, far above the 20\.0 mm it measures/);
 });
 
+test('an entry is judged against the doll it names', () => {
+  const problems = restPokeReport(probed.results, { ...none, pokes: [entry(0.021), { ...entry(0.021), doll: 'toy' }] });
+  assert.match(problems.problems.join('\n'), /^vest on toy: allowed rest poke of spine out of vest_worn is stale/);
+  assert.equal(problems.problems.length, 1);
+});
+
 test('a piece that declares it covers body it does not enclose fails, whatever the entries allow', async () => {
   const declaring = {
     ...generated,
     modelOf: async (id) => (id === 'vest_worn' ? { ...files.vest_worn, entry: { covers: ['torso'] } } : files[id]),
   };
   const { results } = await restPokeResults(declaring, { root, workers: 1 });
-  assert.deepEqual(probed.results.vest.gaps, []);
+  assert.deepEqual(probed.results.player.vest.gaps, []);
   assert.match(
     restPokeReport(results, { ...none, pokes: [entry(0.021)] }).problems.join('\n'),
-    /^vest: vest_worn \(\w+\) covers torso but would hide body it does not enclose: \d+ samples show/,
+    /^vest on player: vest_worn \(\w+\) covers torso but would hide body it does not enclose: \d+ samples show/,
   );
 });

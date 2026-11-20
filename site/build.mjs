@@ -21,8 +21,8 @@ import { parseArgs } from 'node:util';
 import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } from '../tools/actorCompose.mjs';
 import { ASSEMBLY_SUFFIX, readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
-import { dollRig, readRigContent } from '../tools/dollRig.mjs';
-import { isWearable, modelBox, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
+import { dollRig } from '../tools/dollRig.mjs';
+import { dollDressing, isWearable, modelBox, PLAYER, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
 import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -167,9 +167,9 @@ const paintOf = (finish) => {
 const modelsById = new Map(models.map((model) => [model.id, model]));
 
 // Each wearable worn on the doll, as the sites the browser composes its worn view from (tools/dress.mjs). A tree with no
-// wearable, such as one of mobs alone, needs no doll.
+// wearable, such as one of mobs alone, needs no doll. The pages show the player alone until they take a doll to show.
 const wearables = new Set(models.filter((model) => isWearable(model, models)));
-const dressing = readDressing(root);
+const dressing = dollDressing(readDressing(root), PLAYER);
 const doll = wearables.size > 0 ? readDoll(built, manifest, dressing) : undefined;
 const boxOf = (id) => modelBox(readFileSync(join(built, modelsById.get(id).file)));
 const anchorsOf = (id) => {
@@ -376,7 +376,7 @@ if (doll) {
     .sort();
   // `doll` is the bare doll's sites, so the page can pose it undressed; a wearable's worn sites extend them. `clips`
   // names the clip actor's plain clips and its walk speed, which paces its walk; `motions`, the clips baked for the doll.
-  const rig = dollRig(readRigContent(root), doll, dressing);
+  const rig = dollRig(doll, dressing);
   const actor = modelsById.get(rig.clips);
   if (!actor?.clips) throw new Error(`rig ${rig.id}: the tree holds no clips of ${rig.clips}`);
   // The press check and each strike play on the page as clips through their key frames' pose files, each at its own

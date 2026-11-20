@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { applyPoint, boneTransforms } from '../../site/kinematics.mjs';
 import { clipIssues, posedCorners } from '../../site/poseFile.mjs';
+import { exportDollRigs } from '../dollRig.mjs';
 import { exportLocomotion, gaitAngles, locomotionClips, locomotionProblems, readLocomotion } from '../locomotion.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
@@ -73,6 +74,25 @@ test("a lean is taken at the hips first, so the run's back swing stays within th
   assert.equal(run.spine[0], 0);
   const [extension] = rig.bones.find((bone) => bone.id === 'thigh.L').limits.flex;
   assert.ok(run['thigh.L'][0] >= extension - 1e-9, `thigh.L flexes ${run['thigh.L'][0]}`);
+});
+
+test("each doll's rig is written at its record's path, the player's with the site of each of its models", () => {
+  const { files, dolls } = exportDollRigs(built, manifest, repo);
+  assert.deepEqual(files, ['skelly.body/motions/doll.rig.json']);
+  assert.deepEqual(dolls, [
+    {
+      id: 'player',
+      pack: 'skelly.body',
+      rig: 'motions/doll.rig.json',
+      models: { bust: 'player_bust', arm: 'player_arm', leg: 'player_leg' },
+    },
+  ]);
+  const written = JSON.parse(readFileSync(join(built, files[0]), 'utf8'));
+  assert.equal(written.id, rig.id);
+  assert.deepEqual(
+    written.doll.map(({ model }) => model),
+    ['player_bust', 'player_arm', 'player_arm', 'player_leg', 'player_leg'],
+  );
 });
 
 test('the export writes the clips beside the rig, naming its revision, and the motions entry for the manifest', () => {

@@ -1,6 +1,6 @@
 // The doll's locomotion, as tools/locomotion.mjs bakes it into the clips a game plays: how it stands and idles, its
 // walks and the poses it lies or crouches in. Seeded from ahg3's figure gait (a port of arpg1's avatar gait), whose look
-// the owner judged there. Angles are degrees in the rig's terms (models/poses/rig.libsonnet): [flex, twist, abduct],
+// the owner judged there. Angles are degrees in the rig's terms (models/dolls/player/rig.libsonnet): [flex, twist, abduct],
 // flex positive the way the joint works most, written for each bone as the rig names it.
 //
 // `bones` names the bones each part of the gait turns: the legs, knees, feet, arms and elbows, left then right, and

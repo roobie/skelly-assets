@@ -4,13 +4,14 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { withWornOn } from '../build.mjs';
 import { modelSources } from '../check-sources.mjs';
-import { readRigContent } from '../dollRig.mjs';
 import {
   coveringItems,
+  dollDressing,
   dollOf,
   isWearable,
   modelBox,
   modelParts,
+  PLAYER,
   readDollParts,
   readDressing,
   wornOnParts,
@@ -26,7 +27,11 @@ const close = (actual, expected) =>
 
 // A doll of a bust with one limb on each side, hung by its own anchor, which sits off the limb's origin.
 const dressing = {
-  doll: { bust: 'bust', limbs: [{ model: 'limb', anchor: 'shoulder' }], sides: ['right', 'left'], mirrored: 'left' },
+  id: 'test',
+  bust: 'bust',
+  limbs: [{ name: 'arm', model: 'limb', anchor: 'shoulder' }],
+  sides: ['right', 'left'],
+  mirrored: 'left',
   piece: 'chest',
   layers: ['over-jacket'],
   lying: ['folded'],
@@ -173,10 +178,10 @@ test("a worn piece sits on the part its frame is, one over other clothing on its
 });
 
 test("every worn piece, over other clothing too, and every wearable with no pieces sits on the part worn-slots or its place names, which the rig binds, on the side of the rig's copy", async () => {
-  const dressing = readDressing(repo);
+  const dressing = dollDressing(readDressing(repo), PLAYER);
   const wornSlots = JSON.parse(evaluateJsonnet("import 'models/worn-slots.libsonnet'", repo));
   const dollParts = await readDollParts(dressing);
-  const bones = Object.values(readRigContent(repo).bones);
+  const bones = Object.values(dressing.rig.bones);
   const bound = new Set(bones.map(({ part }) => part));
   assert.deepEqual(new Set(dollParts.sided), new Set(bones.filter(({ sided }) => sided).map(({ part }) => part)));
   const sources = await modelSources(repo);
@@ -200,7 +205,7 @@ test("every worn piece, over other clothing too, and every wearable with no piec
     ...placed.map((entry) => {
       const { part: placePart, both, anchor } = dressing.places.find(({ slot }) => tags(entry, 'slot').includes(slot));
       const part = anchor === undefined ? placePart : dollParts.anchors[anchor];
-      const copy = both ? { both } : dollParts.sided.includes(part) ? { side: dressing.doll.sides[0] } : {};
+      const copy = both ? { both } : dollParts.sided.includes(part) ? { side: dressing.sides[0] } : {};
       return [entry.id, { part, ...copy, ...(anchor === undefined ? {} : { anchor }) }];
     }),
   ]);
@@ -351,7 +356,7 @@ test("a doll part turned off its model's axes is refused, as a piece in its fram
 });
 
 test('every body slot the vocabulary names has a place on the doll, and every segment a part', () => {
-  const { places, slots } = readDressing(repo);
+  const { places, slots } = dollDressing(readDressing(repo), PLAYER);
   const terms = Object.keys(JSON.parse(readFileSync(resolve(repo, 'models/taxonomy.json'), 'utf8')).facets.slot.terms);
   assert.deepEqual(
     terms.filter((slot) => !places.some((place) => place.slot === slot)),

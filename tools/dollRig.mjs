@@ -1,10 +1,11 @@
-// The doll's rig from models/poses/rig.libsonnet and the built doll (tools/dress.mjs, `dollOf`): a bone per doll part
-// copy in mobgen's bone shape (id, parent, head, tail, frame, limits, parents first), with a `bind` naming the part copy
-// it moves and where it rests in the bone's node, so site/kinematics.mjs poses the doll as it would pose a mob. Also
-// the doll's rest meshes per bone, which the clearance probe (site/clearance.mjs) compares in a pose, and the check
-// that a worn piece encloses what it hides.
-import { readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+// A doll's rig from its record's rig content (models/dolls/<id>/rig.libsonnet) and the built doll (tools/dress.mjs,
+// `dollOf`): a bone per doll part copy in mobgen's bone shape (id, parent, head, tail, frame, limits, parents first),
+// with a `bind` naming the part copy it moves, the model that draws it and where it rests in the bone's node, so
+// site/kinematics.mjs poses the doll as it would pose a mob. Also the doll's rest meshes per bone, which the clearance
+// probe (site/clearance.mjs) compares in a pose, the check that a worn piece encloses what it hides, and the export of
+// each doll's rig for a game.
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { COINCIDENT, coveredSurface, posedSolid, runAlong, signedDepth } from '../site/clearance.mjs';
 import { hides } from '../site/hiding.mjs';
 import {
@@ -19,18 +20,12 @@ import {
   sub,
   transpose,
 } from '../site/kinematics.mjs';
-import { modelMeshes } from './dress.mjs';
-import { evaluateJsonnet } from './jsonnet/index.mjs';
+import { dollDressings, modelMeshes, readDoll, readDressing } from './dress.mjs';
 import { r4, unitQuat } from './keyFrames.mjs';
+import { outputPath } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 
-export const readRigContent = (root = repo) => JSON.parse(evaluateJsonnet("import 'models/poses/rig.libsonnet'", root));
-
-/** Where a release carries the doll's motions: the pack of its parts, and the rig every motions file of it poses. */
-export const DOLL_MOTIONS = { pack: 'skelly.body', rig: 'motions/doll.rig.json' };
-
-const SUFFIX = { right: 'R', left: 'L' };
 const AXES = ['flex', 'twist', 'abduct'];
 const corners = ({ min, max }) =>
   [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a])));
@@ -79,11 +74,14 @@ const inMirrorPlane = (axis, name) => {
   );
 };
 
-// The rest rotation of every bone's node, a quaternion [x, y, z, w] of the node's axes in the model's: the doll's
-// joints are glTF nodes at their heads turned by nothing, and a clip's quaternion turns that node about its head.
-// A doll whose nodes are rest-turned states each bone's own, and its clips must then be baked as each node's local
-// rotation, since today's bakes turn every bone on the model's axes, which only an unturned node shares.
-const NODE_REST = [0, 0, 0, 1];
+// The rest rotation of a bone's node on a side, a quaternion [x, y, z, w] of the node's axes in the model's, which the
+// bone's content states for every side or each (models/dolls/player/rig.libsonnet, `nodeRotation`).
+function nodeRotationOf(name, { nodeRotation }, side) {
+  const rotation = Array.isArray(nodeRotation) ? nodeRotation : nodeRotation?.[side];
+  if (rotation?.length !== 4 || !rotation.every(Number.isFinite))
+    throw new Error(`rig: bone ${name} needs a nodeRotation [x, y, z, w] for the ${side}`);
+  return rotation;
+}
 
 /**
  * Where a part copy's own model frame sits in its bone's node frame at rest, so a consumer seats a piece drawn in the
@@ -107,11 +105,11 @@ export function restOffset({ at, mirror }, head, nodeRotation) {
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A sided bone off the
 // reference side mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense`
 // each angle takes there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying.
-export function dollRig(content, doll, dressing) {
-  const { sides } = dressing.doll;
+export function dollRig(doll, dressing) {
+  const { sides, rig: content, boneSuffix } = dressing;
   if (!sides.includes(content.reference))
     throw new Error(`rig: limits are written for the ${content.reference}, which the doll has no side of`);
-  const sided = (id, side) => (content.bones[id]?.sided ? `${id}.${SUFFIX[side]}` : id);
+  const sided = (id, side) => (content.bones[id]?.sided ? `${id}${boneSuffix[side]}` : id);
   const bones = [];
   for (const [name, spec] of Object.entries(content.bones)) {
     checkLimits(name, spec.limits);
@@ -135,8 +133,9 @@ export function dollRig(content, doll, dressing) {
         flexAxis,
         limits,
         sense,
+        nodeRotation: nodeRotationOf(name, spec, side),
         bind: {
-          model: spec.model,
+          model: doll.sites[copy.site].model,
           part: spec.part,
           side,
           site: copy.site,
@@ -167,7 +166,7 @@ export function dollRig(content, doll, dressing) {
     clips: content.clips,
     eye: content.eye,
     presets: content.presets ?? {},
-    bones: ordered.map(({ along, flexAxis, pole, at, ...bone }) => {
+    bones: ordered.map(({ along, flexAxis, pole, at, nodeRotation, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
       const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
@@ -176,8 +175,8 @@ export function dollRig(content, doll, dressing) {
       if (reaching && !reaching.reach.chain.every(Boolean))
         throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
       const frame = frameAbout(bone.head, tail, flexAxis);
-      const rest = restOffset({ at, mirror: bone.bind.mirror }, bone.head, NODE_REST);
-      return { ...bone, node: { rotation: NODE_REST }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
+      const rest = restOffset({ at, mirror: bone.bind.mirror }, bone.head, nodeRotation);
+      return { ...bone, node: { rotation: nodeRotation }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
     }),
   };
 }
@@ -331,6 +330,38 @@ function declaredSurfaces(rig, sites, meshesOf) {
         return { declaration, samples, pieces, bone };
       });
     });
+}
+
+// What the rig holds for authoring poses, not for playing clips: the pose page's clips, the eye a look aims, the hand
+// presets a pose file names.
+const AUTHORING = new Set(['clips', 'eye', 'presets']);
+
+/**
+ * Writes each doll's rig into the built tree `out`, whose models `manifest` lists, for a game to pose it by: the rig a
+ * clip's frames turn, with each part's site on it, at its record's path under its pack. Returns the files written,
+ * under their packs, and the manifest's `dolls` entries (tools/manifest.mjs).
+ * @param {string} out
+ * @param {Parameters<typeof readDoll>[1]} manifest
+ */
+export function exportDollRigs(out, manifest, root = repo) {
+  const written = dollDressings(readDressing(root)).map((dressing) => {
+    const doll = readDoll(out, manifest, dressing);
+    const posing = Object.entries(dollRig(doll, dressing)).filter(([key]) => !AUTHORING.has(key));
+    const models = {
+      bust: dressing.bust,
+      ...Object.fromEntries(dressing.limbs.map(({ name, model }) => [name, model])),
+    };
+    return {
+      file: outputPath(dressing.pack, dressing.rigPath),
+      content: { ...Object.fromEntries(posing), doll: doll.sites },
+      entry: { id: dressing.id, pack: dressing.pack, rig: dressing.rigPath, models },
+    };
+  });
+  for (const { file, content } of written) {
+    mkdirSync(dirname(join(out, file)), { recursive: true });
+    writeFileSync(join(out, file), `${JSON.stringify(content)}\n`);
+  }
+  return { files: written.map(({ file }) => file), dolls: written.map(({ entry }) => entry) };
 }
 
 // A built tree's part meshes by model id, read once each.

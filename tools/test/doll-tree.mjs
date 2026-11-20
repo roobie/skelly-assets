@@ -5,8 +5,8 @@ import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { after } from 'node:test';
 import { modelSources } from '../check-sources.mjs';
-import { dollRig, readRigContent, restMeshes, treeMeshes } from '../dollRig.mjs';
-import { dollModels, modelBox, readDoll, readDressing, wornSites } from '../dress.mjs';
+import { dollRig, restMeshes, treeMeshes } from '../dollRig.mjs';
+import { dollDressing, dollModels, modelBox, PLAYER, readDoll, readDressing, wornSites } from '../dress.mjs';
 import { thingEntryFile } from '../layout.mjs';
 import { readPressCheck } from '../press-check.mjs';
 import { manifestTaxonomy } from '../taxonomy.mjs';
@@ -46,7 +46,7 @@ const taxonomies = new Map(sources.map(({ pack, id, taxonomy }) => [`${pack}/${i
 // repo's own content, so the doll tests check the rig, the fixtures, the probe and the fitted shells against the doll as
 // it is drawn, not against a stand-in. Each test file builds only what it checks, since the files build in parallel.
 export const dollTree = ({ wears = [], held = false }) => {
-  const dressing = readDressing(repo);
+  const dressing = dollDressing(readDressing(repo), PLAYER);
   const built = mkdtempSync(join(tmpdir(), 'doll-tree-'));
   after(() => rmSync(built, { recursive: true, force: true }));
   execFileSync(
@@ -83,7 +83,7 @@ export const dollTree = ({ wears = [], held = false }) => {
     ),
   };
   const doll = readDoll(built, manifest, dressing);
-  const rig = dollRig(readRigContent(repo), doll, dressing);
+  const rig = dollRig(doll, dressing);
   const models = manifest.models.filter((model) => model.path.endsWith('.glb'));
   const boxOf = (id) => {
     const entry = models.find((model) => model.id === id);

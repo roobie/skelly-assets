@@ -252,6 +252,15 @@ shows (`../site/skin.mjs`, `skinCheck`); see `../docs/decisions/0011-clearance-c
 to the doll or the rig moves every fit at once. The sheets and the sweep reach the showcase through one served site
 and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.
 
+The doll is a named target, since a second body should be a record and not a second copy of the code. Each doll is a
+record in `../models/dolls/<id>/doll.libsonnet`, listed in `../models/dressing.libsonnet`; the build, the checks and
+`dollRig.mjs`'s `exportDollRigs` take the dressing as one doll wears it (`dress.mjs`, `dollDressing`) and run for every
+doll, and the manifest's `dolls` names each one's rig file. A garment's pieces are fitted to one doll
+(`dress.mjs`, `dollGarments`), and the rest-poke allowances name the doll they were judged on. What is still the
+player's alone, named so in the code (`PLAYER`) and not left to a first doll, is the baked wields and locomotion, the
+press check, the head-band fit and the showcase's whole worn view, because their content was worked out on the player's
+body, and a garment's `wornOn`, since fitting one garment to several dolls is not built.
+
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a
 wheel with its brake, is therefore also drawn on its own and exploded about its own centre. The assemblies come from

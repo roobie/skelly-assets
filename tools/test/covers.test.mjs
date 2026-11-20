@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { coversProblems, readDressing } from '../dress.mjs';
+import { coversProblems, dollDressings, dollGarments, readDressing, wornGarment } from '../dress.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
@@ -36,7 +36,10 @@ test('every worn shell names in covers only its doll part or the regions the dre
     items.some(({ covers }) => covers),
     'no item declares what it covers, so nothing was checked',
   );
-  assert.deepEqual(coversProblems(items, readDressing(repo)), []);
+  for (const dressing of dollDressings(readDressing(repo))) {
+    const own = items.filter(({ id }) => dollGarments(dressing, [wornGarment(id) ?? id]).length > 0);
+    assert.deepEqual(coversProblems(own, dressing), []);
+  }
 });
 
 test("the combat boots' foot piece declares the sole below the ankle, which a consumer hides while they are worn", () => {

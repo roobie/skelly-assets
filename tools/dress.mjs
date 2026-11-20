@@ -1,10 +1,11 @@
 // @ts-check
-// Dressing a wearable on the doll, the default player avatar, by the rule in models/dressing.libsonnet: the sites the
-// showcase (site/build.mjs) composes into its worn view, which the review sheets draw too. A site is
-// { model, at, mirror?, turn? }: the model mirrored across its own x = 0 plane, then turned by the quaternion `turn`,
-// then moved by `at`, as site/render.mjs places it. A worn piece's site adds the doll part copy it rides
-// { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs). Footwear's site carries the
-// lift its sole stands the figure on { soleLift }.
+// Dressing a wearable on a doll by the rule in models/dressing.libsonnet: the sites the showcase (site/build.mjs)
+// composes into its worn view, which the review sheets draw too. A doll is a target of that rule, a record under the
+// dressing's `dolls` by id; `dollDressing` gives the rule as one doll wears it, which every function here that takes a
+// `dressing` takes. A site is { model, at, mirror?, turn? }: the model mirrored across its own x = 0 plane, then turned
+// by the quaternion `turn`, then moved by `at`, as site/render.mjs places it. A worn piece's site adds the doll part
+// copy it rides { part, side } and what of that copy it hides { covers, bodySite } (site/hiding.mjs). Footwear's site
+// carries the lift its sole stands the figure on { soleLift }.
 /** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
 /** @import { GltfMesh, GltfNode } from './glb.mjs' */
 import { readFileSync } from 'node:fs';
@@ -26,15 +27,33 @@ import { facetTerms } from './taxonomy.mjs';
  */
 
 /**
+ * A doll's record, models/dolls/<id>/doll.libsonnet.
+ * @typedef {object} DollRecord
+ * @property {string} pack the pack its rig is released in
+ * @property {string} rigPath where in that pack
+ * @property {string} bust
+ * @property {readonly { name: string; model: string; anchor: string }[]} limbs in the order their sites are numbered
+ * @property {readonly [string, string]} sides
+ * @property {string} mirrored
+ * @property {Readonly<Record<string, string>>} boneSuffix
+ * @property {any} rig the rig's content (tools/dollRig.mjs)
+ * @property {Readonly<Record<string, readonly string[]>>} regions
+ * @property {Readonly<Record<string, { part: string; slot: string }>>} slots
+ * @property {Place[]} places
+ */
+
+/**
  * models/dressing.libsonnet.
  * @typedef {object} Dressing
- * @property {{ bust: string; limbs: { model: string; anchor: string }[]; sides: [string, string]; mirrored: string }} doll
+ * @property {Readonly<Record<string, DollRecord>>} dolls
  * @property {string[]} layers
  * @property {string[]} lying
  * @property {string} piece
- * @property {Place[]} places
- * @property {Readonly<Record<string, readonly string[]>>} regions
- * @property {Readonly<Record<string, { part: string; slot: string }>>} slots
+ */
+
+/**
+ * The dressing as one doll wears it: its shared fields and the doll's record, with the doll's `id`.
+ * @typedef {Omit<Dressing, 'dolls'> & DollRecord & { id: string }} DollDressing
  */
 
 /**
@@ -58,6 +77,31 @@ const repo = resolve(import.meta.dirname, '..');
 
 /** @returns {Dressing} */
 export const readDressing = (root = repo) => JSON.parse(evaluateJsonnet("import 'models/dressing.libsonnet'", root));
+
+// The doll a game's player is drawn as. The showcase's worn view, the wields, the locomotion and the pose checks are
+// all authored against that doll's rig and its bones' names, so they name it here, where they would otherwise each
+// repeat it, rather than in content that has no second doll to tell apart.
+export const PLAYER = 'player';
+
+/**
+ * The dressing as the doll `id` wears it.
+ * @param {Dressing} dressing
+ * @param {string} id
+ * @returns {DollDressing}
+ */
+export function dollDressing({ dolls, ...shared }, id) {
+  const record = dolls[id];
+  if (!record) throw new Error(`the dressing has no doll ${id}; it has ${Object.keys(dolls).join(', ')}`);
+  const clash = Object.keys(record).filter((key) => key in shared || key === 'id');
+  if (clash.length > 0) throw new Error(`doll ${id}: ${clash.join(', ')} is also a shared field of the dressing`);
+  return { ...shared, ...record, id };
+}
+
+/**
+ * The dressing as each of its dolls wears it.
+ * @param {Dressing} dressing
+ */
+export const dollDressings = (dressing) => Object.keys(dressing.dolls).map((id) => dollDressing(dressing, id));
 
 // ---- boxes and transforms ----
 
@@ -283,11 +327,12 @@ export function modelMeshes(buffer, keep = () => true) {
  * { side, site, at, box, mirror }, in the order of the dressing's sides, where `site` indexes the doll site that draws
  * the copy, and the bust's anchors, which are in the doll frame too. `figure` holds each doll model's `parts`
  * (modelParts) and `anchors` (its things sidecar).
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  * @param {Readonly<Record<string, FigureModel>>} figure
  */
 export function dollOf(dressing, figure) {
-  const { bust, limbs, sides, mirrored: mirroredSide } = dressing.doll;
+  const { bust, sides, mirrored: mirroredSide } = dressing;
+  const { limbs } = dressing;
   /** @param {string} model */
   const figureOf = (model) => {
     const found = figure[model];
@@ -338,6 +383,8 @@ const tagsOf = (model, facet) => facetTerms(model.tags, facet);
 // model that is no worn piece. Pieces fitted over other clothing are not worn pieces here, so the doll wears each item
 // on its own.
 const PIECE_ID = /^(.+)_worn(?:_([^_]+))?$/;
+/** The garment a worn piece's id names, whether or not the model is tagged as one. @param {string} id */
+export const wornGarment = (id) => PIECE_ID.exec(id)?.[1];
 /**
  * @param {DressModel} model
  * @returns {{ garment: string; segment: string | undefined } | undefined}
@@ -352,7 +399,7 @@ function pieceOf(model) {
  * The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
  * @param {string} id
  * @param {{ segment: string | undefined }} piece
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 function piecePart(id, { segment }, dressing) {
   if (segment === undefined) return dressing.piece;
@@ -366,7 +413,7 @@ function piecePart(id, { segment }, dressing) {
  * part, as its model declares, with the sole lift a foot piece declares.
  * @param {string} id
  * @param {readonly DressModel[]} models
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 export function wornPieces(id, models, dressing) {
   return models.flatMap((model) => {
@@ -384,7 +431,7 @@ export function wornPieces(id, models, dressing) {
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
  * regions the dressing cuts that part into, since a consumer hides by those names and no other.
  * @param {readonly DressModel[]} models
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 export function coversProblems(models, dressing) {
   return models.flatMap(({ id, covers }) => {
@@ -433,9 +480,22 @@ export const isWearable = (model, models) =>
 export const fittedGarments = (models) => [...new Set(models.flatMap((model) => pieceOf(model)?.garment ?? []))];
 
 /**
+ * The garments among `garments` whose pieces were fitted to the doll of `dressing`. A garment's pieces are fitted to
+ * one doll, which the checks run on that doll alone for: a piece's shape is only meant for the doll it was drawn
+ * against. Every piece is the player's until they are told apart by the doll their id names (`_worn_<doll>`), and then
+ * only `fittedDoll` changes.
+ * @param {DollDressing} dressing
+ * @param {readonly string[]} garments
+ */
+export const dollGarments = (dressing, garments) => garments.filter((garment) => fittedDoll(garment) === dressing.id);
+
+/** The doll a garment's pieces were fitted to. @param {string} _garment */
+const fittedDoll = (_garment) => PLAYER;
+
+/**
  * The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
  * @param {DressModel} model
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 export function placeOf(model, dressing) {
   const slots = tagsOf(model, 'slot');
@@ -448,7 +508,7 @@ export function placeOf(model, dressing) {
  * The `<item>_worn` twin of a piece fitted over other clothing, a fit among the dressing's `layers`, read from its id
  * `<item>_worn_<layer>`; nothing for any other model.
  * @param {DressModel} model
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 function layerTwinOf(model, dressing) {
   if (!tagsOf(model, 'fit').some((fit) => dressing.layers.includes(fit))) return undefined;
@@ -464,7 +524,7 @@ function layerTwinOf(model, dressing) {
  * pieces has its place's part with the copy it sits on (placedOn), from `dollParts` (readDollParts). A wearable with
  * pieces has none: its pieces are what sit on the doll.
  * @param {readonly DressModel[]} models
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  * @param {DollParts} dollParts
  */
 export function wornOnParts(models, dressing, dollParts) {
@@ -494,7 +554,7 @@ export function wornOnParts(models, dressing, dollParts) {
  * A placed wearable sits on its place's part, or for an anchor place on the part the anchor lies on, and on the copy of
  * the doll's first side when the part is a limb's and the place does not span both copies, as `wornSites` places it.
  * @param {DressModel} model
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  * @param {DollParts} dollParts
  * @returns {WornOn}
  */
@@ -502,7 +562,7 @@ function placedOn(model, dressing, { anchors, sided }) {
   const place = placeOf(model, dressing);
   const part = place.anchor === undefined ? place.part : anchors[place.anchor];
   if (!part) throw new Error(`${model.id}: the doll's bust has no anchor ${place.anchor} on a part`);
-  const copy = place.both ? { both: true } : sided.includes(part) ? { side: dressing.doll.sides[0] } : {};
+  const copy = place.both ? { both: true } : sided.includes(part) ? { side: dressing.sides[0] } : {};
   return { part, ...copy, ...(place.anchor === undefined ? {} : { anchor: place.anchor }) };
 }
 
@@ -510,12 +570,12 @@ function placedOn(model, dressing, { anchors, sided }) {
  * What a manifest's `wornOn` needs of the doll's catalogue rows, since the built sidecars keep only points: the part
  * each bust anchor lies on, `anchors`, and the parts of the limbs, `sided`, which the doll has a copy of on each side.
  * Import only after installJsonnetSources, as the catalogue reads the compiled rows.
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  * @returns {Promise<DollParts>}
  */
 export async function readDollParts(dressing) {
   const { readItems } = await import('./packages/thing-authoring-tool/src/cli/content.ts');
-  const [bust, ...limbs] = readItems([dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)]);
+  const [bust, ...limbs] = readItems(dollModels(dressing));
   return {
     anchors: Object.fromEntries(Object.entries(bust?.anchors ?? {}).map(([name, { part }]) => [name, part])),
     sided: limbs.flatMap(({ parts }) => parts.map(({ id }) => id)),
@@ -549,7 +609,7 @@ function rest(box, region, { against, sink }) {
  * `boxOf` gives a loose model's box and `anchorsOf` its anchors, both in its own frame.
  * @param {DressModel} model
  * @param {object} options
- * @param {Dressing} options.dressing
+ * @param {DollDressing} options.dressing
  * @param {Doll} options.doll
  * @param {readonly DressModel[]} options.models
  * @param {(id: string) => Box} options.boxOf
@@ -607,14 +667,14 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
 
 /**
  * The models the doll is made of: its bust and each limb's.
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
-export const dollModels = (dressing) => [dressing.doll.bust, ...dressing.doll.limbs.map(({ model }) => model)];
+export const dollModels = (dressing) => [dressing.bust, ...dressing.limbs.map(({ model }) => model)];
 
 /**
  * The doll from `filesOf(id)`, each doll model's `{ glb, entry }`: its parts from its GLB and anchors from its things
  * sidecar, as a built tree holds them or a build generates them.
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  * @param {(id: string) => { glb: Buffer; entry: { anchors?: Readonly<Record<string, Vec3>> } }} filesOf
  */
 export const dollFrom = (dressing, filesOf) =>
@@ -632,7 +692,7 @@ export const dollFrom = (dressing, filesOf) =>
  * The doll as the built tree holds it.
  * @param {string} built
  * @param {{ models: readonly { id: string; pack: string; path: string }[] }} manifest
- * @param {Dressing} dressing
+ * @param {DollDressing} dressing
  */
 export function readDoll(built, manifest, dressing) {
   return dollFrom(dressing, (id) => {
