@@ -53,7 +53,8 @@ const loadPoseFile = (name) =>
 
 // ---- the figure: sites bound to joints ----
 
-const siteKey = ({ model, at, mirror }) => `${model}@${at.map((x) => x.toFixed(4)).join(',')}${mirror ? '~' : ''}`;
+const siteKey = ({ model, at, mirror, turn }) =>
+  `${model}@${at.map((x) => x.toFixed(4)).join(',')}${mirror ? '~' : ''}${turn ? `^${turn.map((q) => q.toFixed(4)).join(',')}` : ''}`;
 
 // The doll's own sites, first and in the rig's site order, and the worn pieces of each wearable. A wearable's `worn`
 // begins with the doll's sites (tools/dress.mjs, `wornSites`), which count once however many wearables are worn.

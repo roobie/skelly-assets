@@ -106,12 +106,14 @@ export function restOffset({ at, mirror, turn }, head, nodeRotation) {
 }
 
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
-// `flexAxis` are written in its part's own frame, which the copy's site turn carries into the doll's, so a limb rested
-// off the way its model hangs has the same content on each side. A sided bone off the reference side mirrors the limits
-// of its in-plane joint axes and its reach pole across x, and carries the `sense` each angle takes there, 1 or -1 per
-// axis, so a pose written for the reference side is mirrored by multiplying. Whether an axis is in the mirror plane is
-// asked of the axis as written, since the left's turn is the reference's mirrored: it takes the same axis, turned by
-// its own turn, to the mirror image of the reference's.
+// `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
+// limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, so a
+// mirrored copy's is mirrored; `flexAxis` is an axis of rotation, which a mirror does not flip across x, so it is
+// kept and turned alone, and the `sense` below tells the two sides' angles apart. A sided bone off the reference side
+// mirrors the limits of its in-plane joint axes and its reach pole across x, and carries the `sense` each angle takes
+// there, 1 or -1 per axis, so a pose written for the reference side is mirrored by multiplying. Whether an axis is in
+// the mirror plane is asked of the axis as written in the part, since the two sides' turns are mirror images: the same
+// axis, turned by each side's own turn, lands on mirror images of each other.
 export function dollRig(doll, dressing) {
   const { sides, rig: content, boneSuffix } = dressing;
   if (!sides.includes(content.reference))
@@ -126,10 +128,12 @@ export function dollRig(doll, dressing) {
       const head = spec.pivot === 'origin' ? copy.at : doll.anchors[spec.pivot?.anchor];
       if (!head) throw new Error(`rig: no pivot for ${name}: ${JSON.stringify(spec.pivot)}`);
       const mirrored = spec.sided && side !== content.reference;
-      const own = { along: spec.along, flexAxis: spec.flexAxis ?? [1, 0, 0] };
-      const axes = frameAbout([0, 0, 0], own.along, own.flexAxis);
+      const flexInPart = spec.flexAxis ?? [1, 0, 0];
+      const axes = frameAbout([0, 0, 0], spec.along, flexInPart);
       const turning = copy.turn && quatToMat3(copy.turn);
-      const [along, flexAxis] = [own.along, own.flexAxis].map((axis) => (turning ? mulMV(turning, axis) : axis));
+      const intoDoll = (axis) => (turning ? mulMV(turning, axis) : axis);
+      const along = intoDoll(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along);
+      const flexAxis = intoDoll(flexInPart);
       const sense = ['x', 'y', 'z'].map((axis) => (mirrored && inMirrorPlane(axes[axis], name) ? -1 : 1));
       const limits = Object.fromEntries(
         AXES.map((axis, i) => [axis, sense[i] < 0 ? mirrorRange(spec.limits[axis]) : spec.limits[axis]]),
@@ -150,9 +154,9 @@ export function dollRig(doll, dressing) {
           site: copy.site,
           box: copy.box,
           mirror: Boolean(copy.mirror),
+          ...(copy.turn ? { turn: copy.turn } : {}),
         },
         at: copy.at,
-        turn: copy.turn,
         ...(spec.reach
           ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole }
           : {}),
@@ -176,7 +180,7 @@ export function dollRig(doll, dressing) {
     clips: content.clips,
     eye: content.eye,
     presets: content.presets ?? {},
-    bones: ordered.map(({ along, flexAxis, pole, at, turn, nodeRotation, ...bone }) => {
+    bones: ordered.map(({ along, flexAxis, pole, at, nodeRotation, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
       const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
@@ -185,7 +189,7 @@ export function dollRig(doll, dressing) {
       if (reaching && !reaching.reach.chain.every(Boolean))
         throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
       const frame = frameAbout(bone.head, tail, flexAxis);
-      const rest = restOffset({ at, mirror: bone.bind.mirror, turn }, bone.head, nodeRotation);
+      const rest = restOffset({ at, mirror: bone.bind.mirror, turn: bone.bind.turn }, bone.head, nodeRotation);
       return { ...bone, node: { rotation: nodeRotation }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
     }),
   };

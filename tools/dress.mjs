@@ -28,8 +28,10 @@ import { facetTerms } from './taxonomy.mjs';
 
 /**
  * A limb hung on the doll: `turn`, if the doll rests it turned off the way its model hangs (down -y), is `degrees`
- * about `axis` of the doll frame, as the reference (unmirrored) side takes it; the mirrored side takes its mirror image
- * (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both.
+ * about `axis` of the doll frame, as the side that is not `mirrored` takes it; the other side's turn is this side's
+ * mirror image (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both. The turn is a
+ * multiple of 90 degrees about a doll axis, so the turned part boxes stay exact boxes and nothing that reads a box
+ * (a bone's reach, a hand's socket) is left with a looser one than the part fills.
  * @typedef {{ name: string; model: string; anchor: string; turn?: { axis: Vec3; degrees: number } }} DollLimb
  */
 
@@ -75,7 +77,16 @@ import { facetTerms } from './taxonomy.mjs';
 /** @typedef {{ part: string; at: Vec3; box: Box }} ModelPart */
 /** @typedef {{ parts: readonly ModelPart[]; anchors: Readonly<Record<string, Vec3>> }} FigureModel */
 /** @typedef {{ model: string; at: Vec3; mirror?: boolean; turn?: Quaternion }} DollSite */
-/** @typedef {{ part: string; side: string; site: number; at: Vec3; box: Box; mirror?: boolean; turn?: Quaternion }} PartCopy */
+/**
+ * @typedef {object} PartCopy
+ * @property {string} part
+ * @property {string} side
+ * @property {number} site
+ * @property {Vec3} at
+ * @property {Box} box
+ * @property {boolean} [mirror]
+ * @property {Quaternion} [turn]
+ */
 /** @typedef {ReturnType<typeof dollOf>} Doll */
 /** @typedef {{ anchors: Readonly<Record<string, string>>; sided: readonly string[] }} DollParts */
 /** @typedef {{ part: string; both?: boolean; side?: string; anchor?: string }} WornOn */
@@ -187,20 +198,25 @@ const rotate = ([x, y, z, w], v) => {
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
 
 /**
- * The quaternion of a turn of `degrees` about `axis`.
+ * The quaternion of a limb's turn: a multiple of 90 degrees about one of the doll's axes, either way along it.
+ * @param {string} model the limb's model, named in what is refused
  * @param {{ axis: Vec3; degrees: number }} turn
  * @returns {Quaternion}
  */
-const turnOf = ({ axis, degrees }) => {
+const turnOf = (model, { axis, degrees }) => {
+  const along = axis.filter((c) => c !== 0);
+  if (axis.length !== 3 || !axis.every(Number.isFinite) || along.length !== 1 || Math.abs(along[0] ?? 0) !== 1)
+    throw new Error(`doll: ${model}'s turn axis ${JSON.stringify(axis)} is not a doll axis, [±1, 0, 0] or alike`);
+  if (!Number.isFinite(degrees) || degrees % 90 !== 0)
+    throw new Error(`doll: ${model}'s turn of ${degrees} degrees is not a multiple of 90`);
   const half = (degrees * Math.PI) / 360;
-  const length = Math.hypot(...axis);
-  const [x, y, z] = perAxis((a) => (Math.sin(half) * axis[a]) / length);
+  const [x, y, z] = perAxis((a) => Math.sin(half) * axis[a]);
   return [x, y, z, Math.cos(half)];
 };
 /**
  * A turn as the mirror plane x = 0 sees it: the reflection M of a rotation R is M R M, which turns by the same angle
- * about the axis an axial vector takes across the plane, (x, -y, -z). A limb mirrored then turned by this lies where the
- * reference limb turned by R, mirrored, does.
+ * about the axis an axial vector takes across the plane, (x, -y, -z). A limb mirrored then turned by this lies where
+ * the unmirrored limb turned by R, mirrored, does.
  * @param {Quaternion} turn
  * @returns {Quaternion}
  */
@@ -353,10 +369,9 @@ export function modelMeshes(buffer, keep = () => true) {
  * The doll's sites, for each of its part names the copies of that part in the doll frame as
  * { side, site, at, box, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
  * draws the copy, and the bust's anchors, which are in the doll frame too. A limb's copies are placed as its site is:
- * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the reference side's),
+ * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the other's),
  * then moved so its own anchor lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the
- * doll-frame box enclosing the part (the turned corners', as large as the box was only for a turn off the axes).
- * `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
+ * doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
  * @param {DollDressing} dressing
  * @param {Readonly<Record<string, FigureModel>>} figure
  */
@@ -378,13 +393,13 @@ export function dollOf(dressing, figure) {
   for (const { part, at, box } of figureOf(bust).parts) add({ part, side: 'centre', site: 0, at, box });
   for (const { model, anchor, turn: limbTurn } of limbs) {
     const own = figureOf(model).anchors[anchor];
+    const unmirroredTurn = limbTurn && turnOf(model, limbTurn);
     for (const side of sides) {
       const hung = figureOf(bust).anchors[`${anchor}_${side}`];
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
-      const reference = limbTurn && turnOf(limbTurn);
-      const turn = mirror && reference ? mirroredTurn(reference) : reference;
-      /** @type {(p: Vec3) => Vec3} a point of the limb's model frame, as the site puts it relative to the site's `at` */
+      const turn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
+      /** @type {(p: Vec3) => Vec3} a point of the limb's model frame, relative to where the site puts its origin */
       const place = (p) => {
         const flipped = mirror ? mirrorX(p) : p;
         return turn ? rotate(turn, flipped) : flipped;
@@ -693,7 +708,12 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     return [...sites, { model: model.id, at: difference(at, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
   }
   const copies = copiesOf(place.part);
-  const region = union((place.both ? copies : copies.slice(0, 1)).map(({ box }) => box));
+  const resting = place.both ? copies : copies.slice(0, 1);
+  if (resting.some(({ turn }) => turn))
+    throw new Error(
+      `${model.id}: placed loose on the ${place.part}, which the doll rests turned; a loose wearable has no placing against a turned part yet`,
+    );
+  const region = union(resting.map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).

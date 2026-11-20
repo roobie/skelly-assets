@@ -10,7 +10,7 @@
 // `pivot` is `origin`, the part's own origin, which the avatar draws at the joint it hangs from, or `{ anchor }`, a
 // bust anchor. `along` is the bone's rest direction, used to find its tail when it has no single child bone. Both
 // `along` and `flexAxis` are written in the part's own frame, as its model hangs, so a limb that its doll record
-// turns at rest (`turn`, models/dolls/player/doll.libsonnet) is written once for each side.
+// turns at rest (`turn`, models/dolls/player/doll.libsonnet) is written once, for both sides.
 // `flexAxis` is the joint frame's x: positive flex bends the way the joint works most (a limb swings forward, an elbow
 // and a knee close, toes point down, the trunk and head bend forward). Twist is about the bone, abduction about the
 // remaining axis. Limits are degrees [min, max], written for the `reference` side, the figure's left (+x), where
@@ -25,7 +25,8 @@
 // arm's twist turns the hand where it is instead of swinging the wrist round a cone about the arm's rest line.
 //
 // `reach` marks a bone whose joint two-bone IK places by turning its parent and grandparent, the middle joint bending
-// toward `pole`, a direction in the reference side's axes, unless a pose file gives its own.
+// toward `pole`, a direction in the reference side's axes, unless a pose file gives its own. A pole is in the doll's
+// frame, which a limb's site turn does not turn, and the other side's is mirrored across x.
 //
 // `absorbs` names the bones of the player's mob rig (`clips`, an actor of models/mobs.json) that this bone stands for,
 // children folded into it, so the player's clips play on the doll: the doll's one torso part is mobgen's spine and chest.

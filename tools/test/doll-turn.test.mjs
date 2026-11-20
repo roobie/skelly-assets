@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { holdItem, padOf } from '../../site/fingers.mjs';
 import {
   add,
   applyPoint,
@@ -261,4 +262,94 @@ test('a worn piece is seated on the turned arm by the arm bone alone', () => {
   // The cuff keeps its mirror: a left point is the right's reflected across x.
   const [r, l] = rest.pieces.map(({ mesh }) => pointsOf(mesh)[0]);
   close(l, mirrorX(r));
+});
+
+// ---- the mirror image of a turn, for any turn and either side as the rig's reference ----
+
+const TURNS = {
+  'about z, where the mirror image is the inverse': { axis: [0, 0, 1], degrees: -90 },
+  'about y, where the mirror image is the inverse': { axis: [0, 1, 0], degrees: 90 },
+  'about x, where the mirror image is the turn itself': { axis: [1, 0, 0], degrees: 90 },
+  'about -x by a half turn': { axis: [-1, 0, 0], degrees: 180 },
+};
+// The reflection of a rotation across x = 0, and of a frame's polar axes; a rotation axis (flex) flips with it.
+const reflect = (m) => mulMM(mulMM([-1, 0, 0, 0, 1, 0, 0, 0, 1], m), [-1, 0, 0, 0, 1, 0, 0, 0, 1]);
+const slanted = [0.6, -0.8, 0];
+
+const scenario = (turn, reference) => {
+  const turned = { ...dressing, limbs: [{ ...dressing.limbs[0], turn }] };
+  const toy = dollOf(turned, figure);
+  const content = {
+    ...rigContent,
+    reference,
+    bones: { ...rigContent.bones, fore: { ...rigContent.bones.fore, along: slanted } },
+  };
+  const toyRig = dollRig(toy, { ...turned, rig: content });
+  const toySites = wornSites(wearable[0], { dressing: turned, doll: toy, models: wearable });
+  return { toy, toyRig, meshes: restMeshes(toyRig, toySites, meshesOf) };
+};
+
+for (const [name, turn] of Object.entries(TURNS)) {
+  for (const reference of ['right', 'left']) {
+    test(`a turn ${name}: the left arm is the right's image across x, ${reference} the rig's reference`, () => {
+      const { toy, toyRig, meshes } = scenario(turn, reference);
+      const [right, left] = toy.sites.slice(1).map((site) => site.turn);
+      close(left, [right[0], -right[1], -right[2], right[3]], 'mirrored quaternion');
+      const bones = (id) => [
+        toyRig.bones.find((b) => b.id === `${id}.R`),
+        toyRig.bones.find((b) => b.id === `${id}.L`),
+      ];
+      const meshOf = (list, id) => pointsOf(list.find(({ bone: b }) => b === id).mesh);
+      for (const id of ['upper', 'fore']) {
+        meshOf(meshes.body, `${id}.L`).forEach((p, i) => close(p, mirrorX(meshOf(meshes.body, `${id}.R`)[i]), id));
+        const [r, l] = bones(id);
+        close(l.head, mirrorX(r.head), `${id} head`);
+        close(l.tail, mirrorX(r.tail), `${id} tail`);
+        close(l.frame.y, mirrorX(r.frame.y), `${id} frame y`);
+        close(l.frame.z, mirrorX(r.frame.z), `${id} frame z`);
+        close(
+          l.frame.x,
+          mirrorX(r.frame.x).map((c) => -c),
+          `${id} frame x, an axis of rotation`,
+        );
+        const [from, to] = reference === 'right' ? [r, l] : [l, r];
+        const angles = [12, -20, 33];
+        const posed = jointRotation(from, angles);
+        const image = jointRotation(
+          to,
+          angles.map((a, i) => a * to.sense[i]),
+        );
+        close(image, reflect(posed), `${id} posed from the ${reference}`);
+      }
+      meshOf(meshes.pieces, 'upper.L').forEach((p, i) =>
+        close(p, mirrorX(meshOf(meshes.pieces, 'upper.R')[i]), 'cuff'),
+      );
+    });
+  }
+}
+
+test('a turn that is not a quarter turn about a doll axis is refused', () => {
+  const refused = (turn) => () => dollOf({ ...dressing, limbs: [{ ...dressing.limbs[0], turn }] }, figure);
+  assert.throws(refused({ axis: [0, 0, 1], degrees: -70 }), /not a multiple of 90/);
+  assert.throws(refused({ axis: [0, 0, 1], degrees: Number.NaN }), /not a multiple of 90/);
+  assert.throws(refused({ axis: [0.4, 0.2, 1], degrees: 90 }), /not a doll axis/);
+  assert.throws(refused({ axis: [0, 0, 0], degrees: 90 }), /not a doll axis/);
+  assert.throws(refused({ axis: [0, 0, 2], degrees: 90 }), /not a doll axis/);
+});
+
+test('what reads a turned part as a hanging one, or places a loose wearable on it, is refused', () => {
+  assert.throws(
+    () =>
+      wornSites(
+        { id: 'glove', tags: { slot: ['hands'] } },
+        {
+          dressing: { ...dressing, places: [{ slot: 'hands', part: 'upper', against: [0, 0, 0], sink: 0 }] },
+          doll,
+          models: [],
+        },
+      ),
+    /rests turned/,
+  );
+  assert.throws(() => padOf(bone('fore.R')), /rests this part turned/);
+  assert.throws(() => holdItem(rig, {}, 'fore.R', {}, {}), /rests this part turned/);
 });
