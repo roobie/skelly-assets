@@ -5,6 +5,12 @@ path = ["models/**", "built/**"]
 SPDX-FileCopyrightText = "Björn Roberg"
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
+# Later annotations override earlier ones, so this carve-out out of `models/**` must stay below it.
+[[annotations]]
+path = "models/references/**"
+SPDX-FileCopyrightText = "Quaternius"
+SPDX-License-Identifier = "CC0-1.0"
+
 [[annotations]]
 path = ["tools/**", "site/**", "docs/**", ".github/**", ".agents/**", ".claude/skills", "README.md", "LICENSE", "REUSE.toml", ".gitignore"]
 SPDX-FileCopyrightText = "Björn Roberg"
