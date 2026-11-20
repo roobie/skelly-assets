@@ -248,6 +248,31 @@ it('exports datums and baked collision that follow the resized solid', () => {
   expect(after.datum).toBeGreaterThan(before.datum!);
   expect(after.box).toBeCloseTo(after.datum!);
 });
+it('exports a point anchor where its part frame puts it, off the grid and the drawn voxels', () => {
+  const input = fixture();
+  const point: Vec3 = [0.01234, 0.04567, -0.00891];
+  const anchors = buildItem(
+    loadCatalogue({
+      ...input,
+      items: [
+        {
+          ...input.items[0],
+          anchors: { origin: { part: 'upper', at: [0, 0, 0] }, joint: { part: 'upper', at: point } },
+        },
+      ],
+    }).items[0]!,
+    loadCatalogue(input),
+  ).handling.anchors!;
+  sub(anchors.joint!, anchors.origin!).forEach((value, axis) => expect(value).toBeCloseTo(point[axis]!, 12));
+  // The upper part stands on the lower's top port.
+  expect(anchors.origin).toEqual([0, 0.02, 0]);
+  expect(() =>
+    loadCatalogue({
+      ...input,
+      items: [{ ...input.items[0], anchors: { joint: { part: 'upper', at: point, solid: 'body' } } }],
+    }),
+  ).toThrow();
+});
 it('refuses baked collision on an inventory atom, whose export carries no parts', () => {
   const input = fixture();
   input.items[0]!.exportMass = 'inventory-atom';

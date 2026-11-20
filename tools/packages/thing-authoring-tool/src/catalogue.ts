@@ -40,6 +40,7 @@ import {
   regex,
   strictObject,
   string,
+  union,
   unknown,
   variant,
 } from 'valibot';
@@ -171,8 +172,16 @@ const ItemSchema = pipe(
     covers: optional(NeutralModelSchema.entries.covers),
     soleLift: NeutralModelSchema.entries.soleLift,
     building: optional(BuildingSchema),
-    /** Named datums on solids, exported as the model's anchors. */
-    anchors: optional(record(pipe(string(), regex(/^[a-z0-9_]+$/)), strictObject(SolidPointSchema))),
+    /**
+     * Named datums, exported as the model's anchors: on a solid, so a mount follows its geometry, or at a point of a
+     * part's own frame, for a joint that must land where a skeleton has it rather than on a voxel of the flesh.
+     */
+    anchors: optional(
+      record(
+        pipe(string(), regex(/^[a-z0-9_]+$/)),
+        union([strictObject(SolidPointSchema), strictObject({ part: name, at: ModelPointSchema })]),
+      ),
+    ),
     /**
      * How a compound part of the item moves on whatever carries it, from rest to its authored stop, in stages run one
      * after another: a hinge turning on pins drawn on the part, toward a direction, or a slide along one. Exported in
@@ -564,6 +573,13 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
     const point = min.map((value, axis) => value + datum.fraction[axis]! * (max[axis]! - value)) as unknown as Vec3;
     return scale(applyPoint(report.resolved.placed.get(datum.part)!, point), settings.units.metresPerUnit);
   };
+  const pointAt = ({ part, at }: { part: string; at: Vec3 }): Vec3 => {
+    const placed = report.resolved.placed.get(part);
+    if (!placed) {
+      throw new Error(`${item.id}: an anchor names part ${part}, which the item has not`);
+    }
+    return scale(applyPoint(placed, at), settings.units.metresPerUnit);
+  };
   const directionIn = (part: string, direction: Vec3): Vec3 => {
     const turned = applyDir(report.resolved.placed.get(part)!, direction);
     return scale(turned, 1 / Math.hypot(...turned));
@@ -581,7 +597,9 @@ export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: V
   if (item.anchors) {
     handling = {
       ...handling,
-      anchors: Object.fromEntries(Object.entries(item.anchors).map(([id, datum]) => [id, datumAt(datum)])),
+      anchors: Object.fromEntries(
+        Object.entries(item.anchors).map(([id, datum]) => [id, 'at' in datum ? pointAt(datum) : datumAt(datum)]),
+      ),
     };
   }
   // A flat rectangle on a solid, facing a part-frame direction: the solid's extent across and along its top.
