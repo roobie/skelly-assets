@@ -73,7 +73,6 @@ import {
   boltStrokeUnits,
   boltWellProfile,
 } from './boltCartridge.ts';
-import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
 import { EJECTION_PORT_MARGIN_U as SHARED_EJECTION_PORT_MARGIN_U } from './ejectionPort.ts';
 import { falFoldingStockSolids, falFoldMotion } from './falFoldingStock.ts';
 import { FIRING_GRIP } from './firingGrip.ts';
@@ -125,6 +124,8 @@ import { COMPACT_TRIGGER_PLATE, PUMP_FOREND_PROPORTIONS, TAPERED_STOCK_PROPORTIO
 import { shroudFrontSightSolids } from './shroudFrontSight.ts';
 import { sightAxis } from './sightAxis.ts';
 import { SMG_HANDLE_PROPORTIONS } from './smgHandleProportions.ts';
+import type { SkeletonStockProportions, TracedRail, TracedSmgProportions } from './tracedSmgProportions.ts';
+import { isTracedSmgSection, smgChargingHandleFor, TRACED_SMG_SECTIONS, tracedSmgFor } from './tracedSmgSections.ts';
 import {
   cutSporterAction,
   sporterActionDetails,
@@ -840,7 +841,7 @@ const carrierPatternFor = (params: Readonly<Record<string, string>>): BoltCarrie
   if (params.section === 'pump' || params.action === 'pump') {
     return 'pump';
   }
-  if (params.section === 'compact-smg') {
+  if (isTracedSmgSection(params.section)) {
     return 'smg';
   }
   if (
@@ -953,6 +954,41 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
   };
 };
 
+/** A traced SMG's chamfered box, its end cap clipped along the traced slope. */
+const tracedSmgReceiverSection = ({ receiver }: TracedSmgProportions) => {
+  const { topU, bottomU, halfWidthU, chamferU, topFlatHalfWidthU, rearX, frontX, endCapSlope, magazineWellX } =
+    receiver;
+  const flatZ = halfWidthU - chamferU;
+  const [[slopeX0, slopeY0], [slopeX1, slopeY1]] = [endCapSlope.from, endCapSlope.to];
+  const slope = (slopeY1 - slopeY0) / (slopeX1 - slopeX0);
+  return {
+    clip: [{ normal: [-slope, 1, 0] as Vec3, offset: slopeY0 - slope * slopeX0 }],
+    outline: [
+      [topU, flatZ],
+      [topU - chamferU, halfWidthU],
+      [bottomU + chamferU, halfWidthU],
+      [bottomU, flatZ],
+      [bottomU, -flatZ],
+      [bottomU + chamferU, -halfWidthU],
+      [topU - chamferU, -halfWidthU],
+      [topU, -flatZ],
+    ] as readonly Vec2[],
+    magazineWellX,
+    faces: {
+      top: { y: topU, halfWidth: topFlatHalfWidthU },
+      portSide: halfWidthU,
+      handleSides: [-halfWidthU, halfWidthU],
+      front: frontX,
+      rear: rearX,
+      bottom: bottomU,
+    },
+  };
+};
+
+/** The traced end cap's run from the rear face to the roof; the receiver's cavity ends at the full-height section. */
+const tracedSmgRearSlopeRun = ({ receiver }: TracedSmgProportions): number =>
+  receiver.endCapSlope.to[0] - receiver.rearX;
+
 export const RECEIVER_SECTION = {
   sporter: {
     outline: octagonalProfile(SPORTER_PROPORTIONS.receiver.flatRadiusU),
@@ -996,34 +1032,8 @@ export const RECEIVER_SECTION = {
       bottom: AK_RECEIVER.shellBottomU,
     } as const,
   },
-  'compact-smg': (() => {
-    const { topU, bottomU, halfWidthU, chamferU, topFlatHalfWidthU, rearX, frontX, endCapSlope } =
-      COMPACT_SMG_PROPORTIONS.receiver;
-    const flatZ = halfWidthU - chamferU;
-    const [[slopeX0, slopeY0], [slopeX1, slopeY1]] = [endCapSlope.from, endCapSlope.to];
-    const slope = (slopeY1 - slopeY0) / (slopeX1 - slopeX0);
-    return {
-      clip: [{ normal: [-slope, 1, 0] as Vec3, offset: slopeY0 - slope * slopeX0 }],
-      outline: [
-        [topU, flatZ],
-        [topU - chamferU, halfWidthU],
-        [bottomU + chamferU, halfWidthU],
-        [bottomU, flatZ],
-        [bottomU, -flatZ],
-        [bottomU + chamferU, -halfWidthU],
-        [topU - chamferU, -halfWidthU],
-        [topU, -flatZ],
-      ] as readonly Vec2[],
-      faces: {
-        top: { y: topU, halfWidth: topFlatHalfWidthU },
-        portSide: halfWidthU,
-        handleSides: [-halfWidthU, halfWidthU],
-        front: frontX,
-        rear: rearX,
-        bottom: bottomU,
-      },
-    };
-  })(),
+  'compact-smg': tracedSmgReceiverSection(TRACED_SMG_SECTIONS['compact-smg']),
+  'polymer-smg': tracedSmgReceiverSection(TRACED_SMG_SECTIONS['polymer-smg']),
   pump: {
     clip: PUMP_REAR_SLOPE.clip,
     portCornerU: COMPACT_TRIGGER_PLATE.cornerU,
@@ -1132,7 +1142,8 @@ const receiverShellSolids = ({
       ak: AK_REAR_BEVEL.run,
       ar: undefined,
       sporter: undefined,
-      'compact-smg': COMPACT_SMG_PROPORTIONS.receiver.endCapSlope.to[0] - COMPACT_SMG_PROPORTIONS.receiver.rearX,
+      'compact-smg': tracedSmgRearSlopeRun(TRACED_SMG_SECTIONS['compact-smg']),
+      'polymer-smg': tracedSmgRearSlopeRun(TRACED_SMG_SECTIONS['polymer-smg']),
     }[section];
     const spec: ReceiverSectionSpec = {
       id: `receiver-${section}`,
@@ -1154,7 +1165,7 @@ const receiverShellSolids = ({
       ...(feed === 'box'
         ? {
             magazineWell: {
-              x: 'magazineWellX' in data ? data.magazineWellX : ([-7, -1.5] as const),
+              x: ('magazineWellX' in data ? data.magazineWellX : undefined) ?? ([-7, -1.5] as const),
               sectionAxis: 1 as const,
               section:
                 section === 'ar'
@@ -1514,8 +1525,8 @@ const receiverPorts = (context: ReceiverContext): PortDef[] => {
   let barrelPortX = frontFaceX;
   if (params.section === 'ar') {
     barrelPortX -= context.arLayout!.barrelExtensionLengthU;
-  } else if (params.section === 'compact-smg') {
-    barrelPortX = COMPACT_SMG_PROPORTIONS.barrel.breechU;
+  } else if (isTracedSmgSection(params.section)) {
+    barrelPortX = TRACED_SMG_SECTIONS[params.section].barrel.breechU;
   }
   const ports: PortDef[] = [
     ...(context.carrierPattern === 'bolt' && params.section !== 'sporter'
@@ -1727,39 +1738,73 @@ const receiverKeepOuts = (context: ReceiverContext): KeepOut[] => {
   return keepOuts;
 };
 
-/** The rear lug the trigger housing pins to, and the drum sight on its base, pierced along the bore by its aperture. */
-const compactSmgReceiverDetails = (): Solid[] => {
-  const { rearLug } = COMPACT_SMG_PROPORTIONS.receiver;
-  const lugHalfWidth = COMPACT_SMG_PROPORTIONS.lower.halfWidthU;
-  const { drum, base, halfWidthU, aperture } = COMPACT_SMG_PROPORTIONS.rearSight;
-  const profile = tracedProfile(drum);
+/** The faces of a part's body that a traced rail stands off. */
+interface RailFaces {
+  readonly topU: number;
+  readonly bottomU: number;
+  readonly halfWidthU: number;
+}
+
+/**
+ * A traced rail's base strip and its teeth, standing out of one face of a body. Each tooth starts on the pitch
+ * from the rail's rear end; one that would overhang the rail's front end is left off.
+ */
+const tracedRailSolids = (id: string, rail: TracedRail, faces: RailFaces): Solid[] => {
+  const outward = rail.face === 'bottom' || rail.face === 'left' ? -1 : 1;
+  const faceU = { top: faces.topU, bottom: faces.bottomU, left: -faces.halfWidthU, right: faces.halfWidthU }[
+    rail.face
+  ];
+  const across = [rail.centreU - rail.halfWidthU, rail.centreU + rail.halfWidthU] as const;
+  const strip = (stripId: string, x: readonly [number, number], from: number, to: number): Solid => {
+    const [low, high] = [faceU + outward * from, faceU + outward * to].toSorted((a, b) => a - b) as [number, number];
+    return rail.face === 'top' || rail.face === 'bottom'
+      ? solid(stripId, [x[0], low, across[0]], [x[1], high, across[1]])
+      : solid(stripId, [x[0], across[0], low], [x[1], across[1], high]);
+  };
+  const toothCount = Math.floor((rail.x[1] - rail.x[0] - rail.toothLengthU) / rail.pitchU + 1e-9) + 1;
+  return [
+    strip(`${id}-base`, rail.x, 0, rail.baseU),
+    ...Array.from({ length: toothCount }, (_, index) => {
+      const x0 = rail.x[0] + index * rail.pitchU;
+      return strip(`${id}-tooth-${index}`, [x0, x0 + rail.toothLengthU], rail.baseU, rail.baseU + rail.toothU);
+    }),
+  ];
+};
+
+/**
+ * The rear lug the trigger housing pins to, the traced top rail, and the rear sight on its optional base, pierced
+ * along the bore by its aperture.
+ */
+const tracedSmgReceiverDetails = ({ receiver, lower, rearSight }: TracedSmgProportions): Solid[] => {
+  const { rearLug } = receiver;
+  const lugHalfWidth = lower.halfWidthU;
+  const { name, base, halfWidthU, aperture } = rearSight;
+  const profile = tracedProfile(rearSight.profile);
   const cut = (plane: ClipPlane): Vec2[] =>
     clipPolygon(
       profile.map(([x, y]) => [x, y, 0]),
       plane,
     ).map(([x, y]): Vec2 => [x, y]);
-  const drumPiece = (id: string, points: Vec2[], z: readonly [number, number]): Solid => ({
-    ...extrudedPolygon(id, points, z),
+  const sightPiece = (side: string, points: Vec2[], z: readonly [number, number]): Solid => ({
+    ...extrudedPolygon(`rear-sight-${name}-${side}`, points, z),
     slot: 'metal',
   });
   const holeTop = aperture.centreY + aperture.halfU;
   const holeBottom = aperture.centreY - aperture.halfU;
   return [
     solid('rear-lug', [rearLug.x[0], rearLug.y[0], -lugHalfWidth], [rearLug.x[1], rearLug.y[1], lugHalfWidth]),
-    metalSolid('rear-sight-base', [base.x[0], base.y[0], -halfWidthU], [base.x[1], base.y[1], halfWidthU]),
-    drumPiece('rear-sight-drum-left', profile, [-halfWidthU, -aperture.halfU]),
-    drumPiece('rear-sight-drum-right', profile, [aperture.halfU, halfWidthU]),
-    drumPiece('rear-sight-drum-top', cut({ normal: [0, -1, 0], offset: -holeTop }), [-aperture.halfU, aperture.halfU]),
-    drumPiece('rear-sight-drum-bottom', cut({ normal: [0, 1, 0], offset: holeBottom }), [
-      -aperture.halfU,
-      aperture.halfU,
-    ]),
+    ...(receiver.rail ? tracedRailSolids('receiver-top-rail', receiver.rail, receiver) : []),
+    ...(base ? [metalSolid('rear-sight-base', [base.x[0], base.y[0], -halfWidthU], [base.x[1], base.y[1], halfWidthU])] : []),
+    sightPiece('left', profile, [-halfWidthU, -aperture.halfU]),
+    sightPiece('right', profile, [aperture.halfU, halfWidthU]),
+    sightPiece('top', cut({ normal: [0, -1, 0], offset: -holeTop }), [-aperture.halfU, aperture.halfU]),
+    sightPiece('bottom', cut({ normal: [0, 1, 0], offset: holeBottom }), [-aperture.halfU, aperture.halfU]),
   ];
 };
 
-/** The drum's eye looks through its aperture along the bore, level with the front post's tip. */
-const compactSmgSightAxis = () => {
-  const { aperture, eyeReliefU } = COMPACT_SMG_PROPORTIONS.rearSight;
+/** The rear sight's eye looks through its aperture along the bore, level with the front post's tip. */
+const tracedSmgSightAxis = ({ rearSight }: TracedSmgProportions) => {
+  const { aperture, eyeReliefU } = rearSight;
   return sightAxis('rear', { origin: [aperture.eyeX, aperture.centreY, 0], dir: X, referenceDistanceU: eyeReliefU });
 };
 
@@ -1869,8 +1914,9 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
           ...sporterActionDetails(),
         ]
       : [];
-  const compactSmgDetails = params.section === 'compact-smg' ? compactSmgReceiverDetails() : [];
-  const body = [...shell, ...receiverHandles, ...tubeSeat, ...opticRail, ...sporterDetails, ...compactSmgDetails];
+  const traced = tracedSmgFor(params.section);
+  const tracedSmgDetails = traced ? tracedSmgReceiverDetails(traced) : [];
+  const body = [...shell, ...receiverHandles, ...tubeSeat, ...opticRail, ...sporterDetails, ...tracedSmgDetails];
   if (carrierPattern !== 'bolt') {
     return body;
   }
@@ -1928,7 +1974,7 @@ const receiver: PartFamily = {
     actionFrame: choice(...Object.keys(AR_ACTION_LAYOUTS)),
     /** box: magazine through the lower. top: loaded from above. tube: tube magazine. */
     feed: choice('box', 'top', 'tube'),
-    section: choice('standard', 'ar', 'pump', 'sporter', 'compact-smg'),
+    section: choice('standard', 'ar', 'pump', 'sporter', 'compact-smg', 'polymer-smg'),
     stockStyle: {
       ...choice(
         'straight',
@@ -1941,6 +1987,7 @@ const receiver: PartFamily = {
         'fal-folding',
         'telescoping',
         'plank',
+        'skeleton-folding',
       ),
       from: [{ port: 'stock', param: 'style' }],
     },
@@ -1998,6 +2045,7 @@ const receiver: PartFamily = {
           }
         : baseTravel;
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
+    const traced = tracedSmgFor(params.section);
     const context: ReceiverContext = {
       params,
       bore,
@@ -2021,7 +2069,7 @@ const receiver: PartFamily = {
       keepOuts: receiverKeepOuts(context),
       axes: [
         { kind: 'bore', origin: [rearFaceX, 0, 0], dir: X },
-        ...(params.section === 'compact-smg' ? [compactSmgSightAxis()] : []),
+        ...(traced ? [tracedSmgSightAxis(traced)] : []),
       ],
     };
   },
@@ -2302,7 +2350,7 @@ const boltHandleParams = {
   feed: { ...choice('box', 'top', 'tube'), from: [{ port: 'base', param: 'feed' }] },
   handleProfile: { ...choice('standard', 'awm', 'sporter'), from: [{ port: 'base', param: 'handleProfile' }] },
   section: {
-    ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+    ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
     from: [{ port: 'base', param: 'section' }],
   },
 };
@@ -2479,16 +2527,17 @@ const SMG_HANDLE_STEM_HALF_U = GRID - BOLT_CARRIER_RUNNING_CLEARANCE_U;
 
 /**
  * The cocking tube's outer half-square, slot length and the wall left between the slot's front and the tube's.
- * The compact SMG's slot runs from its traced notch forward until the knob's hand space meets the front sight
+ * A traced SMG's slot runs from its traced notch forward until the knob's hand space meets the front sight
  * block; other tubes keep a one-GRID wall round the handle's bore and at the slot's front.
  */
 const smgTubeFor = (
   section: string | undefined,
 ): { readonly halfU: number; readonly slotLengthU: number; readonly frontWallU: number } => {
-  if (section !== 'compact-smg') {
+  const traced = tracedSmgFor(section);
+  if (!traced) {
     return { halfU: 2 * GRID, slotLengthU: SMG_HANDLE_PROPORTIONS.generic.slotLengthU, frontWallU: GRID };
   }
-  const { chargingHandle, frontSight, handguard } = COMPACT_SMG_PROPORTIONS;
+  const { chargingHandle, frontSight, handguard } = traced;
   const restX = frontSight.block.x[0] - chargingHandle.knob.radiusU - CARRIER_HANDLE_STYLES.smg.handClearanceU;
   const slotFrontX = restX + SMG_HANDLE_STEM_SLOT_HALF_U;
   return {
@@ -2501,7 +2550,7 @@ const smgTubeFor = (
 /** Travel and notch turn; the stem's share takes its part of the slot's length. */
 const smgHandleTravel = (section: string | undefined): { readonly travelU: number; readonly turnDegrees: number } => {
   const { slotLengthU } = smgTubeFor(section);
-  const { notchTurnDegrees } = COMPACT_SMG_PROPORTIONS.chargingHandle;
+  const { notchTurnDegrees } = smgChargingHandleFor(section);
   // The notch opens only the tube's upper-left quarter, so a turn past a right angle would leave it.
   if (!(slotLengthU > 2 * SMG_HANDLE_STEM_SLOT_HALF_U && notchTurnDegrees > 0 && notchTurnDegrees <= 90)) {
     throw new RangeError('The SMG handle slot must be longer than its stem and its notch turn at most 90 degrees.');
@@ -2552,8 +2601,8 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
   };
 };
 
-const smgHandleShape = (): Solid[] => {
-  const { radiusU, radial, rimRoundU } = COMPACT_SMG_PROPORTIONS.chargingHandle.knob;
+const smgHandleShape = (section: string | undefined): Solid[] => {
+  const { radiusU, radial, rimRoundU } = smgChargingHandleFor(section).knob;
   // A quarter arc rounds the knob's outer rim, from its side to its end face.
   const rim = [0, 1, 2, 3].map((step): Vec2 => {
     const angle = (step * Math.PI) / 6;
@@ -2586,12 +2635,12 @@ const smgSlidingHandle: PartFamily = {
   name: 'smg-handle',
   params: {
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'mount', param: 'section' }],
     },
   },
   build(params): PartDef {
-    const solids = smgHandleShape();
+    const solids = smgHandleShape(params.section);
     const [minimum, maximum] = solidsBounds(solids);
     const clearance = CARRIER_HANDLE_STYLES.smg.handClearanceU;
     const { travelU: travel, turnDegrees } = smgHandleTravel(params.section);
@@ -2655,7 +2704,7 @@ const boltCarrier: GunPartFamily = {
     handleStyle: choice('auto', ...Object.keys(CARRIER_HANDLE_STYLES)),
     handleProfile: choice('standard', 'awm', 'sporter'),
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'mount', param: 'section' }],
     },
     feed: { ...choice('box', 'top', 'tube'), from: [{ port: 'mount', param: 'feed' }] },
@@ -2798,11 +2847,14 @@ const boltCarrier: GunPartFamily = {
  *   trigger       trigger and grip anchor for tube-fed, top-fed, and revolver designs
  */
 /**
- * The compact SMG's traced trigger housing, magazine well, trigger and guard. The lower's frame hangs from the
- * receiver's bottom face, so a traced gun-frame y moves by that face's height.
+ * A traced SMG's trigger housing, magazine well, trigger and guard. The lower's frame hangs from the receiver's
+ * bottom face, so a traced gun-frame y moves by that face's height.
  */
-const compactSmgLower = (top: PortDef, withGuard: boolean): PartDef => {
-  const { lower: traced, grip, magazine, receiver: body } = COMPACT_SMG_PROPORTIONS;
+const tracedSmgLower = (
+  { lower: traced, grip, magazine, receiver: body }: TracedSmgProportions,
+  top: PortDef,
+  withGuard: boolean,
+): PartDef => {
   const origin: Vec2 = [0, body.bottomU];
   const fromGun = ([x, y]: readonly [number, number]): Vec3 => [x, y - origin[1], 0];
   const halfWidth = traced.halfWidthU;
@@ -2876,7 +2928,7 @@ const lower: PartFamily = {
   params: {
     boltCalibre: { ...boltCalibreParam, from: [{ port: 'top', param: 'boltCalibre' }] },
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'top', param: 'section' }],
     },
     layout: { values: Object.keys(LOWER_LAYOUTS), default: 'conventional' },
@@ -3073,8 +3125,9 @@ const lower: PartFamily = {
     if (params.section === 'sporter') {
       return sporterLower(top, conventionalWell);
     }
-    if (params.section === 'compact-smg') {
-      return compactSmgLower(top, params.triggerGuard !== 'missing');
+    const traced = tracedSmgFor(params.section);
+    if (traced) {
+      return tracedSmgLower(traced, top, params.triggerGuard !== 'missing');
     }
     const recessedConventional = params.layout === 'conventional' && params.magazineWell === 'recessed';
     const integralRearExtension = params.integral === 'yes' ? (wellDepth - MAGAZINE_WELL_DEPTH) / 2 : 0;
@@ -3475,11 +3528,9 @@ const barrelLength = (params: Readonly<Record<string, string>>): number => {
   if (params.section === 'sporter') {
     return SPORTER_PROPORTIONS.barrel.lengthU[sizeClass];
   }
-  if (params.section === 'compact-smg') {
-    return (
-      COMPACT_SMG_PROPORTIONS.barrel.tipU[params.muzzle === 'plain' ? 'plain' : 'threaded'] -
-      COMPACT_SMG_PROPORTIONS.barrel.breechU
-    );
+  const traced = tracedSmgFor(params.section);
+  if (traced) {
+    return traced.barrel.tipU[params.muzzle === 'plain' ? 'plain' : 'threaded'] - traced.barrel.breechU;
   }
   return params.section === 'ak' ? akBarrelLength(sizeClass) : { S: 26, M: 36, L: 46 }[sizeClass];
 };
@@ -3516,8 +3567,9 @@ const standardHandguardLength = (length: SizeClass, section: string | undefined)
   if (section === 'sporter') {
     return SPORTER_PROPORTIONS.foreEnd.lengthU[length];
   }
-  if (section === 'compact-smg') {
-    return COMPACT_SMG_PROPORTIONS.handguard.lengthU;
+  const traced = tracedSmgFor(section);
+  if (traced) {
+    return traced.handguard.lengthU;
   }
   const reach = snapAkGrid(barrelLength({ length, section: section ?? 'standard' }) * HANDGUARD_REACH.barrelFraction);
   return section === 'ak' ? Math.min(reach, akGasStationX(length) + AK_PROPORTIONS.gasBlock.rearX) : reach;
@@ -3587,14 +3639,34 @@ const akMuzzleDevice: PartFamily = {
 };
 
 /**
- * The compact SMG's front sight housing, hooded post and muzzle collar, traced in the gun frame and shifted
- * by `seatX` into the barrel's. Sights are added only because they look like the reference gun's.
+ * A traced SMG's front sight housing, hooded post, optional wheel and muzzle collar, traced in the gun frame and
+ * shifted by `seatX` into the barrel's. Sights are added only because they look like the reference gun's.
  */
-const compactSmgBarrelDetails = (seatX: number): Solid[] => {
-  const { block, tower, hood, post, wheel } = COMPACT_SMG_PROPORTIONS.frontSight;
-  const { collar } = COMPACT_SMG_PROPORTIONS.barrel;
+const tracedSmgBarrelDetails = ({ frontSight, barrel, rearSight }: TracedSmgProportions, seatX: number): Solid[] => {
+  const { block, tower, hood, post, wheel } = frontSight;
+  const { collar } = barrel;
   const along = (x: readonly [number, number]): [number, number] => [x[0] + seatX, x[1] + seatX];
-  const [wheelFrom, wheelTo] = along(wheel.x);
+  const wheelSolids = (): Solid[] => {
+    if (!wheel) {
+      return [];
+    }
+    const [wheelFrom, wheelTo] = along(wheel.x);
+    return [
+      {
+        id: 'front-sight-wheel',
+        kind: 'revolved',
+        axis: 'x',
+        origin: [0, wheel.centreY, 0],
+        profile: [
+          [wheelFrom, 0],
+          [wheelFrom, wheel.radiusU],
+          [wheelTo, wheel.radiusU],
+          [wheelTo, 0],
+        ],
+        slot: 'metal',
+      },
+    ];
+  };
   const box = (id: string, x: readonly [number, number], y: readonly [number, number], halfWidth: number) => {
     const [x0, x1] = along(x);
     return metalSolid(id, [x0, y[0], -halfWidth], [x1, y[1], halfWidth]);
@@ -3605,8 +3677,8 @@ const compactSmgBarrelDetails = (seatX: number): Solid[] => {
   return [
     box('front-sight-block', block.x, block.y, block.halfWidthU),
     box('front-sight-tower', tower.x, tower.y, tower.halfWidthU),
-    // The sight line runs parallel to the bore, so the post's tip stands at the drum aperture's height.
-    box(BUILT_IN_FRONT_POST, post.x, [post.baseY, COMPACT_SMG_PROPORTIONS.rearSight.aperture.centreY], post.halfWidthU),
+    // The sight line runs parallel to the bore, so the post's tip stands at the rear aperture's height.
+    box(BUILT_IN_FRONT_POST, post.x, [post.baseY, rearSight.aperture.centreY], post.halfWidthU),
     {
       id: 'front-sight-hood',
       kind: 'revolved',
@@ -3622,19 +3694,7 @@ const compactSmgBarrelDetails = (seatX: number): Solid[] => {
       ],
       slot: 'metal',
     },
-    {
-      id: 'front-sight-wheel',
-      kind: 'revolved',
-      axis: 'x',
-      origin: [0, wheel.centreY, 0],
-      profile: [
-        [wheelFrom, 0],
-        [wheelFrom, wheel.radiusU],
-        [wheelTo, wheel.radiusU],
-        [wheelTo, 0],
-      ],
-      slot: 'metal',
-    },
+    ...wheelSolids(),
     {
       id: 'muzzle-collar',
       kind: 'revolved',
@@ -3661,7 +3721,7 @@ const barrel: PartFamily = {
       from: [{ port: 'rear', param: 'actionFrame' }],
     },
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'rear', param: 'section' }],
     },
     profile: choice('standard', 'heavy', 'pistol'),
@@ -3690,18 +3750,19 @@ const barrel: PartFamily = {
     const len = barrelLength(params);
     const r = Math.ceil((PISTOL_BARREL_RADIUS[bore] * (params.profile === 'heavy' ? 1.5 : 1)) / GRID) * GRID;
     const handguardLengthClass = cls(params, 'handguardLength');
-    const barrelSeatX = params.section === 'compact-smg' ? -COMPACT_SMG_PROPORTIONS.barrel.breechU : 0;
+    const traced = tracedSmgFor(params.section);
+    const barrelSeatX = traced ? -traced.barrel.breechU : 0;
     let fore: number;
     if (params.handguardLayout === 'ak') {
       fore = akHandguardLength(handguardLengthClass);
     } else if (params.handguardLayout === 'ar') {
       fore = arHandguardLength(handguardLengthClass);
-    } else if (params.section === 'ak' || params.section === 'sporter' || params.section === 'compact-smg') {
+    } else if (params.section === 'ak' || params.section === 'sporter' || traced) {
       fore = standardHandguardLength(lengthClass, params.section);
     } else {
       fore = snapAkGrid(len * HANDGUARD_REACH.barrelFraction);
     }
-    if (params.section === 'compact-smg') {
+    if (traced) {
       fore += barrelSeatX;
     }
     const tubeLengthPercent = params.tubeLengthPercent ?? '75';
@@ -3711,11 +3772,8 @@ const barrel: PartFamily = {
       tubeEnd > fore
         ? [{ id: 'support-lug', mount: 'lug', gender: 'female', pos: [fore, -tubeDrop, 0], normal: NEG_X, up: Y }]
         : [];
-    const tube = octagonalPrism('tube', params.section === 'compact-smg' ? COMPACT_SMG_PROPORTIONS.barrel.radiusU : r, [
-      barrelSeatX,
-      len,
-    ]);
-    const compactSmgSights = params.section === 'compact-smg' ? compactSmgBarrelDetails(barrelSeatX) : [];
+    const tube = octagonalPrism('tube', traced ? traced.barrel.radiusU : r, [barrelSeatX, len]);
+    const tracedSmgSights = traced ? tracedSmgBarrelDetails(traced, barrelSeatX) : [];
     const arLayout = params.section === 'ar' ? arLayoutFor(params.actionFrame) : undefined;
     const breechX = params.section === 'ar' ? -arLayout!.barrelExtensionLengthU : 0;
     const extension =
@@ -3733,7 +3791,7 @@ const barrel: PartFamily = {
     const muzzleBore = params.section === 'pump' ? 'smoothbore' : 'rifled';
     return {
       family: 'barrel',
-      solids: [...extension, tube, ...compactSmgSights],
+      solids: [...extension, tube, ...tracedSmgSights],
       ports: [
         {
           id: 'rear',
@@ -3853,7 +3911,7 @@ const frontSight: PartFamily = {
   params: {
     bore: { ...size, from: [{ port: 'base', param: 'bore' }] },
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'base', param: 'section' }],
     },
     style: choice('ar', 'ak', 'sporting'),
@@ -3957,7 +4015,7 @@ const sportingRearSight: PartFamily = {
   params: {
     bore: { ...size, from: [{ port: 'base', param: 'bore' }] },
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'base', param: 'section' }],
     },
   },
@@ -4225,7 +4283,7 @@ const handguard: PartFamily = {
   params: {
     length: { ...size, from: [{ port: 'front', param: 'length' }] },
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'rear', param: 'section' }],
     },
     boltCalibre: { ...boltCalibreParam, from: [{ port: 'rear', param: 'boltCalibre' }] },
@@ -4282,33 +4340,37 @@ const handguard: PartFamily = {
       params.section === 'ak'
         ? Math.min(RECEIVER_FRONT_HALF_HEIGHT, AK_GAS_CYLINDER_Y - AK_GAS_CYLINDER_HALF_WIDTH)
         : RECEIVER_FRONT_HALF_HEIGHT;
-    const compactSmg = params.section === 'compact-smg' && params.fit === 'receiver';
-    // The compact SMG's traced outer size keeps one wall's thickness, giving up clearance before wall.
-    const compactCeiling = compactSmg ? COMPACT_SMG_PROPORTIONS.handguard.outerU : ceiling;
+    const tracedSmg = params.fit === 'receiver' ? tracedSmgFor(params.section) : undefined;
+    const tracedOuter = tracedSmg?.handguard;
+    // A traced SMG's outer size keeps one wall's thickness, giving up clearance before wall.
+    const tracedCeiling = tracedOuter
+      ? Math.min(tracedOuter.topU, -tracedOuter.bottomU, tracedOuter.halfWidthU)
+      : ceiling;
     const inner =
       params.fit === 'too-tight'
         ? BARREL_RADIUS[bore] - 0.5
         : Math.min(
             Math.max(BARREL_RADIUS[bore] + HANDGUARD_CLEARANCE[(params.clearance ?? 'M') as SizeClass], extensionFloor),
-            Math.min(ceiling, compactCeiling) - HANDGUARD_WALL_THICKNESS,
+            Math.min(ceiling, tracedCeiling) - HANDGUARD_WALL_THICKNESS,
           );
     const akLayout = params.layout === 'ak';
     let outerY: number;
     if (params.fit === 'oversized') {
       outerY = RECEIVER_FRONT_HALF_HEIGHT + 1;
-    } else if (compactSmg) {
-      outerY = COMPACT_SMG_PROPORTIONS.handguard.outerU;
+    } else if (tracedOuter) {
+      outerY = tracedOuter.topU;
     } else if (akLayout) {
       outerY = AK_PROPORTIONS.handguard.upperTopU;
     } else {
       outerY = Math.min(ceiling, inner + HANDGUARD_WALL_THICKNESS);
     }
+    const bottomY = tracedOuter ? tracedOuter.bottomU : -outerY;
     const topY = tracedRail?.topU ?? outerY;
     let outerZ: number;
     if (params.fit === 'oversized') {
       outerZ = RECEIVER_FRONT_HALF_WIDTH + 1;
-    } else if (compactSmg) {
-      outerZ = COMPACT_SMG_PROPORTIONS.handguard.outerU;
+    } else if (tracedOuter) {
+      outerZ = tracedOuter.halfWidthU;
     } else {
       outerZ = Math.min(RECEIVER_FRONT_HALF_WIDTH, inner + HANDGUARD_WALL_THICKNESS);
     }
@@ -4317,11 +4379,12 @@ const handguard: PartFamily = {
     const handleStyleKey = (params.handleStyle ?? 'none') as keyof typeof CARRIER_HANDLE_STYLES;
     const handleStyle = CARRIER_HANDLE_STYLES[handleStyleKey];
     const hasCockingTube = handleStyle.owner === 'handguard' && handleStyle.shape === 'mp5-cocking-tube';
-    // The compact SMG's tube runs centred over the bore to the front sight block, which caps it.
+    // A traced SMG's tube runs centred over the bore to the front sight block, which caps it.
     const { halfU: tubeHalf } = smgTubeFor(params.section);
+    const tracedTube = tracedSmgFor(params.section)?.chargingHandle.tube;
     let cockingTube: ReturnType<typeof smgCockingTube> | undefined;
-    if (hasCockingTube && params.section === 'compact-smg') {
-      cockingTube = smgCockingTube(len, [COMPACT_SMG_PROPORTIONS.chargingHandle.tube.centreY, 0], params.section);
+    if (hasCockingTube && tracedTube) {
+      cockingTube = smgCockingTube(len, [tracedTube.centreY, 0], params.section);
     } else if (hasCockingTube) {
       cockingTube = smgCockingTube(
         len - SMG_HANDLE_FRONT_CLEARANCE_U,
@@ -4382,9 +4445,12 @@ const handguard: PartFamily = {
     } else {
       bodySolids = [
         solid('top', [0, inner, -outerZ], [len, topY, outerZ]),
-        solid('bottom', [0, -outerY, -outerZ], [len, -inner, outerZ]),
+        solid('bottom', [0, bottomY, -outerZ], [len, -inner, outerZ]),
         solid('left', [0, -inner, -outerZ], [len, inner, -inner]),
         solid('right', [0, -inner, inner], [len, inner, outerZ]),
+        ...(tracedOuter?.rails ?? []).flatMap((rail) =>
+          tracedRailSolids(`rail-${rail.face}`, rail, { topU: topY, bottomU: bottomY, halfWidthU: outerZ }),
+        ),
       ];
     }
     return {
@@ -4421,7 +4487,7 @@ const handguard: PartFamily = {
                 gender: 'female' as const,
                 pos: [
                   HANDGUARD_RAIL_END_MARGIN_U,
-                  akLayout ? AK_PROPORTIONS.handguard.lowerBottomU : snapGrid(-outerY),
+                  akLayout ? AK_PROPORTIONS.handguard.lowerBottomU : snapGrid(bottomY),
                   0,
                 ] as Vec3,
                 normal: NEG_Y,
@@ -4659,7 +4725,7 @@ const grip: PartFamily = {
     length: size,
     well: choice('none', 'magazine'),
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'top', param: 'section' }],
     },
     actionFrame: {
@@ -4668,8 +4734,9 @@ const grip: PartFamily = {
     },
   },
   build(params): PartDef {
-    if (params.section === 'compact-smg') {
-      return tracedGrip(COMPACT_SMG_PROPORTIONS.grip);
+    const smgTrace = tracedSmgFor(params.section)?.grip;
+    if (smgTrace) {
+      return tracedGrip(smgTrace);
     }
     const arTrace = params.section === 'ar' ? AR_LOWER_PROPORTIONS[params.actionFrame ?? '']?.grip : undefined;
     if (arTrace) {
@@ -5253,8 +5320,8 @@ const magazineGeometryFor = (
  * struts forward by the difference of the two lengths, while the latch housing and lever stay on the end cap.
  */
 const compactSmgTelescopingStock = (collapsed: boolean): Solid[] => {
-  const { stock } = COMPACT_SMG_PROPORTIONS;
-  const { rearX } = COMPACT_SMG_PROPORTIONS.receiver;
+  const { stock, receiver } = TRACED_SMG_SECTIONS['compact-smg'];
+  const { rearX } = receiver;
   const origin: Vec2 = [rearX, 0];
   const traced = stock.pad.flat();
   const padRearX = Math.min(...traced.map(([x]) => x));
@@ -5284,9 +5351,36 @@ const compactSmgTelescopingStock = (collapsed: boolean): Solid[] => {
   return [...pad, strut(-1), strut(1), box('latch-housing', stock.latch), box('latch-lever', stock.lever)];
 };
 
-/** The compact SMG's traced curved magazine; its frame is the lower's magazine port, unturned. */
-const compactSmgMagazine = (): PartDef => {
-  const { port, halfWidthU, pieces } = COMPACT_SMG_PROPORTIONS.magazine;
+/**
+ * An open-frame stock in the stock frame, whose origin is the receiver's rear face on the bore. The frame is traced
+ * extended, and its plate's rear face must sit at the published length behind the receiver's.
+ */
+const skeletonStockSolids = (stock: SkeletonStockProportions, receiverRearX: number): Solid[] => {
+  const origin: Vec2 = [receiverRearX, 0];
+  const plateRearX = Math.min(...stock.plate.points.map(([x]) => x));
+  if (Math.abs(receiverRearX - stock.lengthU - plateRearX) > 1e-9) {
+    throw new Error('The skeleton stock’s traced butt plate is not at its published length.');
+  }
+  const { hinge } = stock;
+  return [
+    solid(
+      'hinge',
+      [hinge.x[0] - receiverRearX, hinge.y[0], -hinge.halfWidthU],
+      [hinge.x[1] - receiverRearX, hinge.y[1], hinge.halfWidthU],
+    ),
+    extrudedPolygon('butt-plate', tracedProfile(stock.plate.points, origin), [
+      -stock.plate.halfWidthU,
+      stock.plate.halfWidthU,
+    ]),
+    ...Object.entries(stock.bars).map(([name, points]) =>
+      extrudedPolygon(`frame-${name}`, tracedProfile(points, origin), [-stock.frameHalfWidthU, stock.frameHalfWidthU]),
+    ),
+  ];
+};
+
+/** A traced SMG's magazine; its frame is the lower's magazine port, unturned. */
+const tracedSmgMagazine = ({ magazine }: TracedSmgProportions): PartDef => {
+  const { port, halfWidthU, pieces } = magazine;
   const solids = pieces.map((piece, index) =>
     extrudedPolygon(`body-${index + 1}`, tracedProfile(piece, port), [-halfWidthU, halfWidthU]),
   );
@@ -5321,7 +5415,7 @@ export const magazine: PartFamily = {
     orientation: choice(...MAGAZINE_ORIENTATIONS),
     variant: choice(...AK_MAGAZINE_CURVE_VARIANTS),
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'top', param: 'section' }],
     },
   },
@@ -5343,8 +5437,9 @@ export const magazine: PartFamily = {
       throw new Error(STRAIGHT_STANAG_LENGTH_REFUSAL);
     }
     const measured = magazineProfileContent(params.profile);
-    if (params.section === 'compact-smg' && profile === 'smg') {
-      return compactSmgMagazine();
+    const traced = tracedSmgFor(params.section);
+    if (traced && profile === 'smg') {
+      return tracedSmgMagazine(traced);
     }
     let magazineLength: { readonly size: SizeClass; readonly length: number };
     if (measured === undefined) {
@@ -5553,11 +5648,12 @@ const stock: PartFamily = {
       'thumbhole',
       'telescoping',
       'plank',
+      'skeleton-folding',
     ),
     pose: choice('extended', 'collapsed'),
     combDegrees: choice(...sportingStockParams.combDegrees),
     section: {
-      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'),
+      ...choice('standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'),
       from: [{ port: 'front', param: 'section' }],
     },
   },
@@ -5578,6 +5674,17 @@ const stock: PartFamily = {
       return {
         family: 'stock',
         solids: compactSmgTelescopingStock(params.pose === 'collapsed'),
+        ports: [port],
+        keepOuts: [],
+        axes: [cheekDatum],
+      };
+    }
+    if (params.style === 'skeleton-folding') {
+      // Only the polymer SMG's stock is traced; it is built extended, since its fold has no motion yet.
+      const { stock: skeleton, receiver: body } = TRACED_SMG_SECTIONS['polymer-smg'];
+      return {
+        family: 'stock',
+        solids: skeletonStockSolids(skeleton, body.rearX),
         ports: [port],
         keepOuts: [],
         axes: [cheekDatum],
@@ -5711,7 +5818,7 @@ const sight: PartFamily = {
   params: {
     type: { values: OPTIC_TYPE_IDS, default: 'mini-reflex' },
     mountSection: {
-      values: ['standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg'],
+      values: ['standard', 'ar', 'pump', 'ak', 'sporter', 'compact-smg', 'polymer-smg'],
       default: 'standard',
       from: [{ port: 'base', param: 'section' }],
     },

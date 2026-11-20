@@ -1,4 +1,5 @@
 import { GRID } from '@skelly/construct/foundation/conventions.ts';
+import { stockReachU } from './tracedSmgProportions.ts';
 import { mmToU } from './units.ts';
 
 const snap = (value: number): number => Math.round(value / GRID) * GRID;
@@ -10,9 +11,8 @@ const citedBarrelLengthU = snap(mmToU(225));
 const barrelBreechU = barrelTipThreadedU - citedBarrelLengthU;
 const receiverRearX = -24.25;
 
-/** The stock's reach behind the receiver's rear face, for an overall length from the threaded muzzle tip. */
 const stockLengthU = (overallLengthMm: number): number =>
-  snap(mmToU(overallLengthMm) - barrelTipThreadedU + receiverRearX);
+  stockReachU(overallLengthMm, barrelTipThreadedU, receiverRearX);
 
 /**
  * Side-photo trace estimates in the gun frame: x from the receiver's front face, y from the bore.
@@ -34,7 +34,8 @@ export const COMPACT_SMG_PROPORTIONS = {
   },
   // The drum is an inclined disc on its base; the photo shows its side.
   rearSight: {
-    drum: [
+    name: 'drum',
+    profile: [
       [-18.75, 4],
       [-16, 3.5],
       [-15.5, 4.5],
@@ -63,10 +64,10 @@ export const COMPACT_SMG_PROPORTIONS = {
     hood: { x: [12.75, 14.25], centreY: 4.5, outerRadiusU: 1.4, wallU: 0.25 },
     // The knurled wheel that stands proud of the housing's front face under the hood.
     wheel: { x: [14.25, 14.5], centreY: 2.375, radiusU: 0.875 },
-    // The post's tip is the drum aperture's height; see `parts.ts`, `compactSmgBarrelDetails`.
+    // The post's tip is the drum aperture's height; see `parts.ts`, `tracedSmgBarrelDetails`.
     post: { x: [13.25, 13.75], baseY: 3.25, halfWidthU: 0.125 },
   },
-  handguard: { lengthU: 11, outerU: 1.75 },
+  handguard: { lengthU: 11, topU: 1.75, bottomU: -1.75, halfWidthU: 1.75 },
   // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
   // hand space clears the receiver's front face. notchTurnSeconds is a visual estimate for the notch turn.
   chargingHandle: {

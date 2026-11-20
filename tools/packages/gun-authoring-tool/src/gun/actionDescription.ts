@@ -20,7 +20,7 @@ import {
   describedActionKindOf,
   type GunPartFamily,
 } from './actionRoles.ts';
-import { COMPACT_SMG_PROPORTIONS } from './compactSmgProportions.ts';
+import { smgChargingHandleFor } from './tracedSmgSections.ts';
 import { boltCycleMotion, type CycleMode, type CycleMotion, cycleMotion, pumpCycleMotion } from './cycle.ts';
 import { localEjectionPoint } from './ejection.ts';
 
@@ -120,7 +120,9 @@ export const resolveGunAction = (resolved: Resolved): ResolvedGunAction | undefi
   const parts = coupledParts(resolved, carrier);
   // A turning hand-only handle on an automatic action is a notch hold, such as the SMG's.
   const handNotch = Object.values(parts).some(({ motion, modes }) => hingeOf(motion) && !modes.includes('fire'));
-  const notchTurnSeconds = handNotch ? COMPACT_SMG_PROPORTIONS.chargingHandle.notchTurnSeconds : undefined;
+  const notchTurnSeconds = handNotch
+    ? smgChargingHandleFor(resolved.params.get(receiverId)?.section?.value).notchTurnSeconds
+    : undefined;
   let cycle: CycleMotion;
   if (kind === 'bolt') {
     cycle = boltCycleMotion(carrier.motion, resolved.domain.units.metresPerUnit, boltEjectAt);
