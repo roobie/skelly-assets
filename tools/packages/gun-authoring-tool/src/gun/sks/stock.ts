@@ -19,18 +19,18 @@ const channel = (name: string, inlet: Inlet): WoodInlet => ({
   opening: (profile) => {
     const xs = profile.map(([x]) => x);
     const ys = profile.map(([, y]) => y);
-    const [front, back] = inlet.x;
-    if (Math.max(...xs) <= front || Math.min(...xs) >= back) {
+    const [rear, front] = inlet.x;
+    if (Math.max(...xs) <= rear || Math.min(...xs) >= front) {
       return undefined;
     }
     // An open side reaches past the cell, so the cut runs out through the wood's face.
     const low = 'above' in inlet ? inlet.above : Math.min(...ys) - 1;
     const high = 'below' in inlet ? inlet.below : Math.max(...ys) + 1;
     return [
+      [rear, low],
       [front, low],
-      [back, low],
-      [back, high],
       [front, high],
+      [rear, high],
     ];
   },
 });

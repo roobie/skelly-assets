@@ -17,7 +17,7 @@ The record has no visible-edge SVG. The contours are written once, in gun units,
 
 The photo is not dimensioned, so it is scaled from the published overall length, and the published barrel length places the breech, which the receiver hides. The muzzle is traced; the two lengths then fix the breech and the butt plate's heel, so the gun spans its published lengths whatever the photo's perspective does to them. The origin is the receiver's front face, where the handguard starts, as for the other traced guns (`docs/bolt-action-export.md`, "Reference registration").
 
-A traced shape yields to a gun rule where the two disagree. The trigger guard's corners round off less than the photo's loop, because the guard rule needs its bars to meet its sides.
+A traced shape yields to a gun rule where the two disagree, since the rule guards how every gun works and the trace only estimates how this one looks.
 
 ## Why its own parts
 
