@@ -132,6 +132,13 @@ export function versionSection(changelog, version) {
   return `${(next < 0 ? body : body.slice(0, next)).trim()}\n`;
 }
 
+/** The steps of an upgrade block, one per list item, each without its bullet. */
+const upgradeSteps = (block) =>
+  listItems(block.trim())
+    .split(/^- /m)
+    .map((step) => step.trim())
+    .filter(Boolean);
+
 /**
  * Every upgrade step told since `version` was released: the pending notes' and those of the changelog's newer
  * sections, which release preparation gathered before the tag is built.
@@ -140,7 +147,9 @@ export function upgradesSince(changelog, notes, version) {
   const start = changelog.search(sectionStart(version));
   if (start < 0) throw new Error(`${CHANGELOG} has no section for ${plainVersion(version)}`);
   const gathered = [...changelog.slice(0, start).matchAll(/^### Upgrading.*\n([\s\S]*?)(?=^##|(?![\s\S]))/gm)];
-  return [...gathered.map(([, steps]) => steps.trim()), ...notes.flatMap(({ upgrade }) => upgrade ?? [])];
+  return [...gathered.map(([, block]) => block), ...notes.flatMap(({ upgrade }) => upgrade ?? [])].flatMap(
+    upgradeSteps,
+  );
 }
 
 /** Every upgrade step told since `version` in the repository at `root`. */

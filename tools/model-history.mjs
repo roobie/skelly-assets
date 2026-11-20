@@ -120,12 +120,14 @@ export function standings(history, hashes, renames = {}) {
 }
 
 /**
- * The ids a release's history holds that a later build drops unannounced: neither held, renamed, nor named in one of
- * `upgrades`, the upgrade steps told since that release. A consumer's saved id must keep resolving or be told it no
- * longer will, and a model with no successor is a step the consumer takes.
+ * The ids a release's history holds that a later build drops unannounced: neither held, renamed, nor named in a drop
+ * step of `upgrades`, the upgrade steps told since that release, a drop step being one that starts with "Drop" (see
+ * changes/README.md). A consumer's saved id must keep resolving or be told it no longer will, and a model with no
+ * successor is a step the consumer takes; a step that only mentions the id, such as one re-placing it, tells the
+ * consumer nothing of its going.
  */
 export function silentRetirements(history, hashes, renames, upgrades) {
-  const told = (id) => upgrades.some((step) => step.includes(`\`${id}\``));
+  const told = (id) => upgrades.some((step) => /^Drop\b/.test(step) && step.includes(`\`${id}\``));
   return Object.keys(history.models)
     .filter((id) => !Object.hasOwn(hashes, renames[id] ?? id) && !told(id))
     .sort();

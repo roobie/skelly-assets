@@ -123,8 +123,12 @@ test('the upgrade steps since a release are the pending notes and the sections g
     '## 0.1.0 - 2000-01-01\n\n### Added\n\n- A.\n',
   ].join('\n');
   const pending = [parseNote(breaking('C.', '- Step four.'), 'c.md'), parseNote(note('fixed', 'F.'), 'f.md')];
-  assert.deepEqual(upgradesSince(changelog, pending, 'v0.2.0'), ['- Step three.', '- Step four.']);
-  assert.deepEqual(upgradesSince(changelog, [], 'v0.1.0'), ['- Step three.', '- Step two.']);
+  assert.deepEqual(upgradesSince(changelog, pending, 'v0.2.0'), ['Step three.', 'Step four.']);
+  assert.deepEqual(upgradesSince(changelog, [], 'v0.1.0'), ['Step three.', 'Step two.']);
+  // Each list item is a step of its own, its continuation lines with it; a prose block is one step.
+  const steps = (upgrade) => upgradesSince(changelog, [parseNote(breaking('C.', upgrade), 'c.md')], '0.3.0');
+  assert.deepEqual(steps('- One,\n  continued.\n- Two.'), ['One,\n  continued.', 'Two.']);
+  assert.deepEqual(steps('Just do it.'), ['Just do it.']);
   assert.deepEqual(upgradesSince(changelog, [], '0.3.0'), []);
   assert.throws(() => upgradesSince(changelog, [], 'v0.0.1'), /no section for 0\.0\.1/);
 });

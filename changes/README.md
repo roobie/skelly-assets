@@ -20,7 +20,8 @@ A breaking note also says what a consumer must do, after a line `Upgrade:`. A co
 more releases in a single commit, with the changes the new assets need, so each release gathers its notes' steps
 into one "Upgrading from" list rather than leaving them to be dug out of the changes. A renamed id needs no step of
 its own beyond applying the release's `renames.json`, which maps every retired id to its current one. A released id
-with no successor is named in a step that drops it, which CI holds every build to.
+with no successor is named in a step that starts with "Drop", which CI holds every build to: a step that
+only mentions an id, such as one re-placing it, does not tell a consumer it is gone.
 
 ```md
 ---
