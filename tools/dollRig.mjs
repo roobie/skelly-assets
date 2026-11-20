@@ -105,6 +105,45 @@ export function restOffset({ at, mirror, turn }, head, nodeRotation) {
   };
 }
 
+// How far a doll measured off a skeleton may seat a part or turn a node from the skeleton's rest: its rounding. The
+// derivation is exact, so a miss is a bug, which half a voxel would hide.
+const SKELETON_TOLERANCE = 1e-4;
+
+/**
+ * Each bone's node at rest in the model frame, from a skeleton's local rotations (models/dolls/ual/skeleton.json), its
+ * root's included: the skeleton's heads are in the frame its root turns upright.
+ * @param {Readonly<Record<string, { parent: string | null; rotation: number[] }>>} skeleton
+ */
+function skeletonRotations(skeleton) {
+  const world = new Map();
+  const of = (name) => {
+    if (!world.has(name)) {
+      const { parent, rotation } = skeleton[name];
+      const local = quatToMat3(rotation);
+      world.set(name, parent === null ? local : mulMM(of(parent), local));
+    }
+    return world.get(name);
+  };
+  return of;
+}
+
+// A doll measured off a skeleton (its rig content's `skeleton`) seats each part copy's origin on its bone's head there,
+// and rests each node turned as the skeleton's is, so a game playing the skeleton's clips moves the doll's parts with
+// the joints they were measured from. Rotations are compared as matrices, which a quaternion's sign does not change.
+export function checkSkeleton(bones, skeleton) {
+  const rotationOf = skeletonRotations(skeleton);
+  for (const { id, at, nodeRotation } of bones) {
+    if (!skeleton[id]) throw new Error(`rig: bone ${id} is no bone of the skeleton it is measured off`);
+    const miss = Math.hypot(...sub(at, skeleton[id].head));
+    if (miss > SKELETON_TOLERANCE)
+      throw new Error(`rig: ${id}'s part lies ${miss.toFixed(5)} m from the skeleton's head, ${skeleton[id].head}`);
+    const want = rotationOf(id);
+    const given = quatToMat3(nodeRotation);
+    if (want.some((c, i) => Math.abs(c - given[i]) > SKELETON_TOLERANCE))
+      throw new Error(`rig: ${id}'s node rests turned ${nodeRotation}, not ${mat3ToQuat(want)} as the skeleton's`);
+  }
+}
+
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
 // `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
 // limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, so a
@@ -170,6 +209,7 @@ export function dollRig(doll, dressing) {
     }
   }
   const ordered = parentsFirst(bones);
+  if (content.skeleton) checkSkeleton(ordered, content.skeleton);
   const byId = new Map(ordered.map((bone) => [bone.id, bone]));
   const children = new Map(ordered.map((bone) => [bone.id, ordered.filter((other) => other.parent === bone.id)]));
   return {

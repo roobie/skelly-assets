@@ -146,6 +146,33 @@ test("a bone's head, reach and joint frame follow the turn, the left a mirror im
   close([left.frame.x, left.frame.y, left.frame.z].flat(), [0, 1, 0, 1, 0, 0, 0, 0, -1]);
 });
 
+// The skeleton the toy is measured off: each bone's head where its part's origin lies, and its node's rotation stored
+// local to its parent's, as a GLB's are.
+const skeleton = (() => {
+  const world = (id) => quatToMat3(bone(id).node.rotation);
+  return Object.fromEntries(
+    rig.bones.map(({ id, parent, head }) => [
+      id,
+      {
+        parent,
+        head,
+        rotation: mat3ToQuat(parent === null ? world(id) : mulMM(transpose(world(parent)), world(id))),
+      },
+    ]),
+  );
+})();
+const measured = (bones) => dollRig(doll, { ...dressing, rig: { ...rigContent, skeleton: bones } });
+
+test("a doll measured off a skeleton seats each part on its bone's head and rests each node as the skeleton's", () => {
+  assert.doesNotThrow(() => measured(skeleton));
+  const off = { ...skeleton, 'fore.L': { ...skeleton['fore.L'], head: add(skeleton['fore.L'].head, [0, 0.0002, 0]) } };
+  assert.throws(() => measured(off), /fore\.L's part lies 0\.00020 m from the skeleton's head/);
+  const turned = mat3ToQuat(mulMM(quatToMat3(skeleton.spine.rotation), rotAxis([0, 1, 0], 0.05)));
+  assert.throws(() => measured({ ...skeleton, spine: { ...skeleton.spine, rotation: turned } }), /spine's node rests/);
+  const { 'upper.R': _, ...missing } = skeleton;
+  assert.throws(() => measured(missing), /upper\.R is no bone of the skeleton/);
+});
+
 test("the left's limits mirror the axes in the mirror plane as they were written, under the turn", () => {
   const [right, left] = [bone('upper.R'), bone('upper.L')];
   assert.deepEqual(right.limits, { flex: [-10, 20], twist: [-30, 40], abduct: [-5, 60] });
