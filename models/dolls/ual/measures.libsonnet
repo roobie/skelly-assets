@@ -10,16 +10,16 @@ local playerLeg = import 'models/measures/leg.libsonnet';
 local head = skeleton.head;
 local the(measures, names) = { [name]: measures[name] for name in names };
 
-// The skeleton is symmetric across x, so each limb is measured on the left, the reference side.
-// The arm is drawn as the figure's right arm hanging (+x toward the palm's face, +z toward the thumb), and the doll
-// rests it turned a quarter about z into the T-pose, so a left delta (out along +x, palm face down) lands in it as
-// (-y, -x, z).
+// The skeleton is symmetric across x, so each limb is measured on the left, the reference side. The arm's deltas are
+// taken into the frame the arm is drawn in, the right arm hanging, as the doll rests that drawing turned into the
+// mannequin's T-pose.
 local armDelta(from, to) = local d = skeleton.delta(from + '_l', to + '_l'); [-d[1], -d[0], d[2]];
 // The leg hangs as the skeleton's does, so the right leg's delta is the left's mirrored.
 local legDelta(from, to) = local d = skeleton.delta(from + '_l', to + '_l'); [-d[0], d[1], d[2]];
 
 // Where the bust's drawing frame stands in the doll frame: on the centre line at the hips' foot, where the pelvis is
-// drawn up from. A height of the bust's measures is from there.
+// drawn up from. A height of the bust's measures is from there. The hips' foot is flesh, set by hand against the
+// mannequin, as no joint marks it.
 local bustBase = [0, 0.84, 0];
 local level(bone) = head(bone)[1] - bustBase[1];
 // The bone each of the bust family's segments turns with, its joint at the bone's head.
@@ -29,7 +29,6 @@ local segmentBones = {
 };
 local bust = {
   base:: bustBase,
-  segmentBones:: segmentBones,
   origins: {
     [segment]: [head(segmentBones[segment])[i] - bustBase[i] for i in [0, 1, 2]]
     for segment in std.objectFields(segmentBones)
@@ -122,7 +121,8 @@ local leg = {
   thighWidth: 0.155, thighDepth: 0.19,
   shinWidth: 0.11, shinDepth: 0.135,
   shoeWidth: 0.11,
-  // The toes' tips and the heel's back, from the ankle's joint along z.
+  // The toes' tips and the heel's back, from the ankle's joint along z: flesh, set by hand against the mannequin's
+  // shoe, since its skeleton ends the toes at ball_leaf, short of their tips, and has no heel.
   toeReach: 0.2408, heelReach: 0.0612,
 } + the(playerLeg, [
   'thighChamfer', 'shinChamfer', 'shoeChamfer', 'kneeOverlap', 'ankleOverlap', 'upperSideInset', 'upperLengthInset',
