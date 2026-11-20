@@ -1,3 +1,4 @@
+import type { ExtrudedPolygonSolid } from '@skelly/construct/shapes/solid.ts';
 import { Mesh, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
@@ -107,6 +108,28 @@ describe('a doll whose skeleton is not the player body', () => {
     expect(() => moved('chest', 0)).not.toThrow();
     expect(() => moved('chest', 0.01)).toThrow(/armpit/);
     expect(() => moved('ribs', origins.chest![1]! - origins.ribs![1]! + 0.001)).toThrow(/in turn/);
+  });
+
+  it('keeps the girdle under the neck on the chest it hangs from, and the slope off it on the clavicles', () => {
+    const chest = params(toy.parts.bust, 'toy_bust_chest');
+    const neckFoot = Number(chest.neckWidth) / 2;
+    const slabs = (segment: string) =>
+      bust(params(toy.parts.bust, `toy_bust_${segment}`)).filter(
+        (solid): solid is ExtrudedPolygonSolid => solid.kind === 'extruded-polygon',
+      );
+    // Each slab of a part above the clavicle cut, as its height range and its reach across x in the bust's frame.
+    const above = (segment: string) =>
+      slabs(segment)
+        .filter(({ z }) => z[1] + origin(segment)[1]! > Number(chest.clavicleCut) + 1e-9)
+        .map(({ z, profile }) => ({
+          top: z[1] + origin(segment)[1]!,
+          xs: profile.map(([, x]) => x + origin(segment)[0]!),
+        }));
+    const neckBottom = slabs('neck').find(({ id }) => id === 'neck')!.z[0] + origin('neck')[1]!;
+    expect(Math.max(...above('chest').map(({ top }) => top))).toBeCloseTo(neckBottom, 9);
+    for (const { xs } of above('chest')) expect(Math.max(...xs.map(Math.abs))).toBeLessThanOrEqual(neckFoot + 1e-9);
+    for (const { xs } of above('clavicle_l')) expect(Math.min(...xs)).toBeGreaterThanOrEqual(neckFoot - 1e-9);
+    for (const { xs } of above('clavicle_r')) expect(Math.max(...xs)).toBeLessThanOrEqual(-neckFoot + 1e-9);
   });
 
   it("refuses a joint at another height than its measures'", () => {

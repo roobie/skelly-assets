@@ -267,18 +267,22 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
     // A spine segment is a whole part of one region, so it needs no region of its own.
     const at = (height: number) => height - origin;
     const { ribs: ribsCut, clavicle } = spineCuts(d);
+    // A clavicle lifts the girdle's slope off the neck's foot; the neck hangs from the chest, so the chest keeps the
+    // girdle's top under the neck for it to stand on.
+    const neckFoot = d.neckWidth / 2;
+    const girdle = cut(slope, 'y', at(clavicle), 1);
     switch (d.segment) {
       case 'waist':
         return cut(trunk, 'y', at(ribsCut), -1);
       case 'ribs':
         return cut(trunk, 'y', at(ribsCut), 1);
       case 'chest':
-        return cut(slope, 'y', at(clavicle), -1);
+        return [...cut(slope, 'y', at(clavicle), -1), ...cut(cut(girdle, 'x', -neckFoot, 1), 'x', neckFoot, -1)];
       // The deltoid caps the arm the clavicle carries, so it rides the clavicle whole, however low it reaches.
       case 'clavicle_l':
-        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, 1), deltoids.left];
+        return [...cut(girdle, 'x', neckFoot, 1), deltoids.left];
       case 'clavicle_r':
-        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, -1), deltoids.right];
+        return [...cut(girdle, 'x', -neckFoot, -1), deltoids.right];
     }
   }
   if (d.segment === 'neck') {

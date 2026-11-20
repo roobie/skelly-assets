@@ -26,6 +26,7 @@ local bustOrigins = {
   chest: [0, armpit, 0.012],
   clavicle_l: [0.03, clavicleCut - 0.01, 0.01],
   clavicle_r: [-0.03, clavicleCut - 0.01, 0.01],
+  neck: [0, girdle.chestTop, -0.008],
 };
 local bustPart(segment) = h.part(segment, 'bust', 1, girdle.bustParams {
   segment: segment,

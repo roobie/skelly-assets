@@ -170,7 +170,9 @@ than drawing each anew, so the split body has the silhouette the whole one has; 
 of the trunk, so the trunk is not moved onto them. The ribs and the chest are cut where their joints stand, so the
 cut and the joint cannot disagree. A region `covers` names is then a union of whole parts, which needs no piece of
 its own. The chest's joint must be the armpit, because a garment's trunk ends there and a region that ended
-elsewhere would hide skin it does not enclose. See
+elsewhere would hide skin it does not enclose. A clavicle lifts only the girdle's slope; the girdle's top under the
+neck stays on the chest, because the neck hangs from the chest and parts that are not joined may not overlap, so the
+neck could stand on nothing else. See
 `src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
 
 A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and
