@@ -210,6 +210,10 @@ catalogue does, so its cache key does not depend on which side loaded it. Releas
 
 Keep engine import caches in consumers; `.gdignore` excludes the authoring tree from Godot scanning.
 
+The UAL doll's rest skeleton is measured once from Quaternius's mannequin, a third-party reference kept apart from the
+models in `../models/references/`, so no later change re-reads a 7 MB GLB. `node tools/ual-skeleton.mjs` writes
+`../models/dolls/ual/skeleton.json` from it, and `test/ual-skeleton.test.mjs` fails when either drifts.
+
 ## Review renders
 
 Pictures let a reviewer, human or agent, check the looks of a batch or a whole fleet at once instead of opening each

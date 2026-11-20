@@ -351,6 +351,8 @@ The licence depends on the path; [`REUSE.toml`](REUSE.toml) states it for each o
   [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You may use, share and adapt them for
   non-commercial purposes, with attribution to Björn Roberg, and you must share adaptations under the same licence.
   For a commercial licence, contact the author.
+- **Third-party references** (`models/references/`): kept to measure against, not shipped, under the licence their
+  author gave; Quaternius's Universal Animation Library is [CC0 1.0](LICENSES/CC0-1.0.txt).
 - **The pipelines and the showcase page** (`tools/`, `site/`): [EUPL-1.2](LICENSES/EUPL-1.2.txt).
 
 The full licence texts are in [`LICENSES/`](LICENSES).
