@@ -28,11 +28,15 @@ before(() => {
 });
 after(() => rmSync(scratch, { recursive: true, force: true }));
 
-// The bust and the helmets as built over the bust's measures with the head `headHeight` tall: each exported in-process.
-async function builtOver(headHeight) {
-  const overlay = join(scratch, String(headHeight));
+// The bust and the helmets as built over the bust's measures with the head drawn `headHeight` tall and `headDepth` deep:
+// each exported in-process.
+async function builtOver(headHeight, headDepth) {
+  const overlay = join(scratch, `${headHeight}-${headDepth}`);
   mkdirSync(join(overlay, 'models/measures'), { recursive: true });
-  writeFileSync(join(overlay, BUST), `(import '${join(REPOSITORY, BUST)}') + { headHeight: ${headHeight} }`);
+  writeFileSync(
+    join(overlay, BUST),
+    `(import '${join(REPOSITORY, BUST)}') + { headHeight: ${headHeight}, headDepth: ${headDepth} }`,
+  );
   const { settings, rows } = JSON.parse(await evaluateJsonnetAsync(ROWS, REPOSITORY_ROOT, { overlay }));
   const built = (id) => {
     const row = rows.find((r) => r.id === id);
@@ -52,10 +56,13 @@ async function builtOver(headHeight) {
   return { built, bust: built('player_bust') };
 }
 
-// The helmets are drawn from the head measures, so a shorter or taller head than the bust's still hides inside each.
-for (const headHeight of [0.235, 0.3]) {
-  test(`every solid helmet hides a head ${headHeight} tall`, async () => {
-    const { built, bust } = await builtOver(headHeight);
+// The helmets are drawn from the head measures, so a smaller or larger head than the bust's still hides inside each.
+for (const [headHeight, headDepth] of [
+  [0.235, 0.2],
+  [0.3, 0.24],
+]) {
+  test(`every solid helmet hides a head ${headHeight} tall and ${headDepth} deep`, async () => {
+    const { built, bust } = await builtOver(headHeight, headDepth);
     const head = bust.meshes.find(({ part }) => part === 'head');
     assert.ok(head);
     const helmets = readHelmets(REPOSITORY_ROOT);

@@ -21,8 +21,7 @@
   // above the slope's end, so the slope runs on over a low rounded cap rather than into a ball.
   deltoidRadius: 0.051, deltoidCrown: 0.007,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
-  // The head is as tall as the UAL mannequin's (models/dolls/ual/measures.libsonnet), so one set of head gear fits both.
-  headWidth: 0.165, headHeight: 0.268, headDepth: 0.2, jawHeight: 0.09, hairCover: 0.07,
+  headWidth: 0.165, headHeight: 0.268, headDepth: 0.214, jawHeight: 0.09, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.
   eyeShare: 0.58,
   // How far the hair lies off the skull, and the exponent of the plan superellipse the face, skull and hair share.
