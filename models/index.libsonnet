@@ -209,6 +209,7 @@ std.flattenArrays([
   import 'models/catalogue/sets/batch-206.libsonnet',
   import 'models/catalogue/sets/batch-207.libsonnet',
   import 'models/catalogue/sets/cans.libsonnet',
+  import 'models/catalogue/sets/cavalry-sabre.libsonnet',
   import 'models/catalogue/sets/clothing-bags.libsonnet',
   import 'models/catalogue/sets/contents.libsonnet',
   import 'models/catalogue/sets/equipment.libsonnet',

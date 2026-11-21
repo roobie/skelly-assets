@@ -209,6 +209,7 @@
   'batch-206': import 'models/catalogue/sets/batch-206.libsonnet',
   'batch-207': import 'models/catalogue/sets/batch-207.libsonnet',
   'cans': import 'models/catalogue/sets/cans.libsonnet',
+  'cavalry-sabre': import 'models/catalogue/sets/cavalry-sabre.libsonnet',
   'clothing-bags': import 'models/catalogue/sets/clothing-bags.libsonnet',
   'contents': import 'models/catalogue/sets/contents.libsonnet',
   'equipment': import 'models/catalogue/sets/equipment.libsonnet',

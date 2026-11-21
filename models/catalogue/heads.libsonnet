@@ -210,6 +210,7 @@ local heads = import 'tools/jsonnet/heads.libsonnet';
   'models/catalogue/sets/batch-206.libsonnet': heads.of(import 'models/catalogue/sets/batch-206.libsonnet'),
   'models/catalogue/sets/batch-207.libsonnet': heads.of(import 'models/catalogue/sets/batch-207.libsonnet'),
   'models/catalogue/sets/cans.libsonnet': heads.of(import 'models/catalogue/sets/cans.libsonnet'),
+  'models/catalogue/sets/cavalry-sabre.libsonnet': heads.of(import 'models/catalogue/sets/cavalry-sabre.libsonnet'),
   'models/catalogue/sets/clothing-bags.libsonnet': heads.of(import 'models/catalogue/sets/clothing-bags.libsonnet'),
   'models/catalogue/sets/contents.libsonnet': heads.of(import 'models/catalogue/sets/contents.libsonnet'),
   'models/catalogue/sets/equipment.libsonnet': heads.of(import 'models/catalogue/sets/equipment.libsonnet'),
