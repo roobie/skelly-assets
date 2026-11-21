@@ -1,11 +1,35 @@
 import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
-import { citedBarrel, stockReachU } from './tracedSmgProportions.ts';
+import {
+  citedBarrel,
+  leaningWell,
+  type StraightMagazine,
+  stockReachU,
+  wellOpeningAtLevel,
+} from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 16;
 // The reference shows only a threaded muzzle; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 15;
 const receiverRearX = -22.5;
 const receiverTopU = 3.5;
+const receiverBottomU = -2.5;
+// A straight box tilted forward: its top hides in the well, which hugs it in thin walls down to about the guard's
+// depth.
+const magazine = {
+  port: [-7, -3],
+  body: [
+    [-9, -3],
+    [-5.25, -3],
+    [-1.5, -20],
+    [-5.25, -20],
+  ],
+  halfWidthU: 1,
+} as const satisfies StraightMagazine;
+const magwell = {
+  x: [-9.5, -4.75],
+  y: [-5.5, receiverBottomU],
+  ...leaningWell(magazine, { faceU: 0.05, sideU: 0.25 }),
+} as const;
 
 /**
  * Side-reference trace estimates in the gun frame: x from the receiver's front face, y from the bore. The
@@ -17,15 +41,15 @@ export const POLYMER_SMG_PROPORTIONS = {
     rearX: receiverRearX,
     frontX: 0,
     topU: receiverTopU,
-    bottomU: -2.5,
+    bottomU: receiverBottomU,
     halfWidthU: 2.5,
     chamferU: 0.25,
     topFlatHalfWidthU: 2.25,
     // A short chamfer rounds the slab's top rear edge into the stock hinge.
     endCapSlope: { from: [receiverRearX, 3], to: [-22, receiverTopU] },
     rearLug: { x: [receiverRearX, -22], y: [-3.25, -2.5] },
-    // The floor opens over the magazine well's inner span, not the section's default.
-    magazineWellX: [-9.25, -4.25],
+    // The floor opens over the leaning well's opening where it meets the receiver, not the section's default.
+    magazineWellX: wellOpeningAtLevel(magwell, magazine.port, receiverBottomU),
     // A full-length top rail on a riser, ahead of the rear sight.
     rail: {
       face: 'top',
@@ -101,7 +125,7 @@ export const POLYMER_SMG_PROPORTIONS = {
       [-9.5, -4],
       [-9.5, -2.5],
     ],
-    magwell: { x: [-9.5, -4], y: [-7, -2.5], wallU: 0.25, innerHalfWidthU: 1.25 },
+    magwell,
     trigger: [
       [-15, -4.25],
       [-14.5, -6.25],
@@ -141,17 +165,12 @@ export const POLYMER_SMG_PROPORTIONS = {
       ],
     ],
   },
-  // A straight box tilted forward: its top hides in the well, its floorplate stands proud of the body.
+  // The floorplate stands proud of the body.
   magazine: {
-    port: [-7, -3],
-    halfWidthU: 1,
+    port: magazine.port,
+    halfWidthU: magazine.halfWidthU,
     pieces: [
-      [
-        [-9, -3],
-        [-5.25, -3],
-        [-1.5, -20],
-        [-5.25, -20],
-      ],
+      magazine.body,
       [
         [-5.5, -20],
         [-1.25, -20],

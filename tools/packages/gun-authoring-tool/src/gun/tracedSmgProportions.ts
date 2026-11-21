@@ -1,3 +1,4 @@
+import { GRID } from '@skelly/construct/foundation/conventions.ts';
 import { mmToU, snap } from './units.ts';
 
 type Span = readonly [number, number];
@@ -17,6 +18,67 @@ export const citedBarrel = (citedLengthMm: number, threadedTipU: number) => {
  */
 export const stockReachU = (overallLengthMm: number, muzzleTipU: number, receiverRearX: number): number =>
   snap(mmToU(overallLengthMm) - muzzleTipU + receiverRearX);
+
+/** How far a straight edge traced from `top` down to `bottom` leans forward of upright, in degrees. */
+export const forwardLeanDegrees = ([topX, topY]: Point, [bottomX, bottomY]: Point): number =>
+  (Math.atan2(bottomX - topX, topY - bottomY) * 180) / Math.PI;
+
+/**
+ * A frame that leans forward by `leanDegrees` about `pivot`, for shapes authored upright: `leaned` turns an upright
+ * point into the gun frame, `across` reads a gun-frame point's upright x, and `atLevel` is where the leaning line
+ * through upright `x` crosses the level gun-frame height `y`.
+ */
+export const leaningFrame = ([pivotX, pivotY]: Point, leanDegrees: number) => {
+  const lean = (leanDegrees * Math.PI) / 180;
+  const [cos, sin] = [Math.cos(lean), Math.sin(lean)];
+  const leaned = (x: number, y: number): Point => [
+    pivotX + cos * (x - pivotX) - sin * (y - pivotY),
+    pivotY + sin * (x - pivotX) + cos * (y - pivotY),
+  ];
+  return {
+    cos,
+    leaned,
+    across: ([x, y]: Point): number => pivotX + cos * (x - pivotX) + sin * (y - pivotY),
+    atLevel: (x: number, y: number): Point => leaned(x, pivotY + (y - pivotY - sin * (x - pivotX)) / cos),
+  };
+};
+
+/** A straight magazine's body, traced rear top, front top, front bottom, rear bottom, and the port it hangs from. */
+export interface StraightMagazine {
+  readonly port: Point;
+  readonly body: readonly [Point, Point, Point, Point];
+  readonly halfWidthU: number;
+}
+
+/**
+ * The lean and opening of a well that hugs a straight magazine: it leans along the body's rear face about the port,
+ * and its opening clears the body by `faceU` across the lean and by `sideU` at each side.
+ */
+export const leaningWell = (
+  { port, body, halfWidthU }: StraightMagazine,
+  clearance: { readonly faceU: number; readonly sideU: number },
+) => {
+  const [rearTop, , , rearBottom] = body;
+  const leanDegrees = forwardLeanDegrees(rearTop, rearBottom);
+  const across = body.map(leaningFrame(port, leanDegrees).across);
+  return {
+    leanDegrees,
+    opening: {
+      x: [Math.min(...across) - clearance.faceU, Math.max(...across) + clearance.faceU] as const,
+      halfWidthU: halfWidthU + clearance.sideU,
+    },
+  };
+};
+
+/** Where a leaning well's opening crosses the level height `y`, rear to front, rounded out to the grid. */
+export const wellOpeningAtLevel = (
+  { leanDegrees, opening }: Pick<TracedSmgProportions['lower']['magwell'], 'leanDegrees' | 'opening'>,
+  port: Point,
+  y: number,
+): Span => {
+  const { atLevel } = leaningFrame(port, leanDegrees);
+  return [Math.floor(atLevel(opening.x[0], y)[0] / GRID) * GRID, Math.ceil(atLevel(opening.x[1], y)[0] / GRID) * GRID];
+};
 
 /**
  * A toothed accessory rail on one face of a part: a base strip standing off the face and a row of teeth on it.
@@ -109,7 +171,16 @@ export interface TracedSmgProportions {
   readonly lower: {
     readonly halfWidthU: number;
     readonly housing: Polygon;
-    readonly magwell: Box2 & { readonly wallU: number; readonly innerHalfWidthU: number };
+    /**
+     * The well, stood upright about the magazine port: `x` spans its outer faces and `opening` the slot the
+     * magazine rides in. It leans forward with the magazine by `leanDegrees`, turned about the port, so its walls
+     * run along the magazine; its mouth at `y[0]` stays square to the lean, and its top at `y[1]` stays level where
+     * it meets the receiver.
+     */
+    readonly magwell: Box2 & {
+      readonly leanDegrees: number;
+      readonly opening: { readonly x: Span; readonly halfWidthU: number };
+    };
     readonly trigger: Polygon;
     readonly triggerFinger: Box2;
     /** The guard's inner edge, rear to front: two rear-wall points, the bottom pair, two front-wall points. */

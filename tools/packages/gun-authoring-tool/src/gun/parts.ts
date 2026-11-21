@@ -137,7 +137,12 @@ import {
 import { SPORTER_PROPORTIONS } from './sporterProportions.ts';
 import { taperedStockSolids } from './taperedStock.ts';
 import { TOO_SMALL_TO_VOXELIZE } from './tooSmallToVoxelize.ts';
-import type { SkeletonStockProportions, TracedRail, TracedSmgProportions } from './tracedSmgProportions.ts';
+import {
+  leaningFrame,
+  type SkeletonStockProportions,
+  type TracedRail,
+  type TracedSmgProportions,
+} from './tracedSmgProportions.ts';
 import {
   byTracedSmgSection,
   isTracedSmgSection,
@@ -304,6 +309,19 @@ const keepOut = (
     ...(options?.allowPort ? { allowPort: options.allowPort } : {}),
     ...(options?.allowFamilies ? { allowFamilies: options.allowFamilies } : {}),
   };
+};
+/** A keep-out over a convex prism along local z, its box the prism's bounds. */
+const prismKeepOut = (
+  id: string,
+  profile: readonly Vec2[],
+  z: readonly [number, number],
+  allowPort?: string,
+): KeepOut => {
+  const xs = profile.map(([x]) => x);
+  const ys = profile.map(([, y]) => y);
+  const min: Vec3 = [Math.min(...xs), Math.min(...ys), z[0]];
+  const max: Vec3 = [Math.max(...xs), Math.max(...ys), z[1]];
+  return { ...keepOut(id, min, max, allowPort), profile, z };
 };
 /** Who may stand in a volume the action enters by design: the carrier fitted to the receiver and any bolt-handle part. */
 const ACTION_ALLOWANCE = { allowPort: 'bolt-carrier', allowFamilies: ['bolt-handle'] } as const;
@@ -2861,6 +2879,26 @@ const boltCarrier: GunPartFamily = {
  *   conventional  magazine ahead of the grip
  *   trigger       trigger and grip anchor for tube-fed, top-fed, and revolver designs
  */
+/** Refuses a traced well whose walls would turn inside out or whose top would sink below its mouth. */
+const assertTracedWell = (
+  { x, y: [mouthY, topY], leanDegrees, opening }: TracedSmgProportions['lower']['magwell'],
+  lowerHalfWidthU: number,
+  { cos, leaned }: ReturnType<typeof leaningFrame>,
+): void => {
+  if (!(cos > 0)) {
+    throw new Error(`lower.magwell.leanDegrees ${leanDegrees} must lean less than a right angle.`);
+  }
+  if (x.some((face) => leaned(face, mouthY)[1] >= topY)) {
+    throw new Error('lower.magwell.y must keep its level top above its leaning mouth at both outer faces.');
+  }
+  if (!(x[0] < opening.x[0] && opening.x[0] < opening.x[1] && opening.x[1] < x[1])) {
+    throw new Error('lower.magwell.opening.x must lie strictly inside lower.magwell.x, rear to front.');
+  }
+  if (!(lowerHalfWidthU > opening.halfWidthU)) {
+    throw new Error('lower.halfWidthU must exceed lower.magwell.opening.halfWidthU to leave the side walls.');
+  }
+};
+
 /**
  * A traced SMG's trigger housing, magazine well, trigger and guard. The lower's frame hangs from the receiver's
  * bottom face, so a traced gun-frame y moves by that face's height.
@@ -2874,16 +2912,37 @@ const tracedSmgLower = (
   const fromGun = ([x, y]: readonly [number, number]): Vec3 => [x, y - origin[1], 0];
   const halfWidth = traced.halfWidthU;
   const { magwell, guard } = traced;
-  const [wellBottom, wellTop] = [magwell.y[0] - origin[1], magwell.y[1] - origin[1]];
-  const wellInner = magwell.innerHalfWidthU;
-  const wellRearX = magazine.pieces[0]![0]![0] - magwell.wallU;
-  const wellFrontX = magwell.x[1] - magwell.wallU;
+  const { opening } = magwell;
+  const [mouthY, topY] = magwell.y;
+  // The well is authored upright about the magazine port and leans forward with the magazine about it.
+  const portY = magazine.port[1];
+  const frame = leaningFrame(magazine.port, magwell.leanDegrees);
+  const { leaned, atLevel } = frame;
+  assertTracedWell(magwell, halfWidth, frame);
+  /** A strip of the well between upright `x0` and `x1`, from its square mouth to its level top. */
+  const wellStrip = (id: string, [x0, x1]: readonly [number, number], z: readonly [number, number]) =>
+    extrudedPolygon(
+      id,
+      tracedProfile([atLevel(x0, topY), leaned(x0, mouthY), leaned(x1, mouthY), atLevel(x1, topY)], origin),
+      z,
+    );
   const wellSolids = [
-    solid('well-rear', [magwell.x[0], wellBottom, -halfWidth], [wellRearX, wellTop, halfWidth]),
-    solid('well-front', [wellFrontX, wellBottom, -halfWidth], [magwell.x[1], wellTop, halfWidth]),
-    solid('well-wall-left', [wellRearX, wellBottom, -halfWidth], [wellFrontX, wellTop, -wellInner]),
-    solid('well-wall-right', [wellRearX, wellBottom, wellInner], [wellFrontX, wellTop, halfWidth]),
+    wellStrip('well-rear', [magwell.x[0], opening.x[0]], [-halfWidth, halfWidth]),
+    wellStrip('well-front', [opening.x[1], magwell.x[1]], [-halfWidth, halfWidth]),
+    wellStrip('well-wall-left', opening.x, [-halfWidth, -opening.halfWidthU]),
+    wellStrip('well-wall-right', opening.x, [opening.halfWidthU, halfWidth]),
   ];
+  // The magazine's path runs down the well's lean from the port, the magazine's top.
+  const magazinePathReachU = 40;
+  const magazinePath = tracedProfile(
+    [
+      leaned(opening.x[0], portY),
+      leaned(opening.x[0], portY - magazinePathReachU),
+      leaned(opening.x[1], portY - magazinePathReachU),
+      leaned(opening.x[1], portY),
+    ],
+    origin,
+  );
   // The trigger-guard rule reads four bars of one wall thickness; each sloped wall is the hull of its
   // traced corner, which stays clear of the finger space.
   const wall = TRIGGER_GUARD.verticalWall;
@@ -2925,12 +2984,7 @@ const tracedSmgLower = (
         [traced.triggerFinger.x[0], traced.triggerFinger.y[0] - origin[1], -1],
         [traced.triggerFinger.x[1], traced.triggerFinger.y[1] - origin[1], 1],
       ),
-      keepOut(
-        'magazine-path',
-        [wellRearX, -40, -wellInner],
-        [wellFrontX, magazine.port[1] - origin[1], wellInner],
-        'magazine',
-      ),
+      prismKeepOut('magazine-path', magazinePath, [-opening.halfWidthU, opening.halfWidthU], 'magazine'),
     ],
     axes: [],
   };

@@ -89,7 +89,8 @@ export const COMPACT_SMG_PROPORTIONS = {
       [-7, -1.5],
       [-20, -1.5],
     ],
-    magwell: { x: [-7, -3], y: [-5.5, -1.5], wallU: 0.25, innerHalfWidthU: 1.25 },
+    // The curved magazine's top runs straight up into an upright well.
+    magwell: { x: [-7, -3], y: [-5.5, -1.5], leanDegrees: 0, opening: { x: [-6.25, -3.25], halfWidthU: 1.25 } },
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
       [-13, -6],
