@@ -143,8 +143,8 @@ export function formFile(entry, form) {
 
 /**
  * A built tree's models, whose manifest is `manifest`, in `form` (`formFile`): `glbOf(id)` and `anchorsOf(id)` read a
- * model's file and its anchors, which are the voxel build's in either form, and `head` is the player bust's head as one
- * mesh in the bust model frame.
+ * model's file and its anchors, which are the voxel build's in either form, `head` is the player bust's head as one
+ * mesh in the bust model frame and `headBrow` the bust's brow anchor.
  */
 export function builtModels(built, manifest, form = 'voxel') {
   const entryOf = (id) => {
@@ -157,7 +157,7 @@ export function builtModels(built, manifest, form = 'voxel') {
     JSON.parse(readFileSync(join(built, thingEntryFile(entryOf(id).pack, id)), 'utf8')).anchors ?? {};
   const head = modelMeshes(glbOf(BUST)).find(({ part }) => part === 'head');
   if (!head) throw new Error(`${BUST} has no head part`);
-  return { glbOf, anchorsOf, head };
+  return { glbOf, anchorsOf, head, headBrow: anchorsOf(BUST).brow };
 }
 
 /**

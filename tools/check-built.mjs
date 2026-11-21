@@ -1,6 +1,6 @@
 // Check fresh builds of the complete tree (tools/build-all.mjs). The first fresh tree must satisfy its manifest and the
 // declared packs (tools/manifest.mjs, treeDifferences), fit the head-gear straps to the head (tools/strap-fit.mjs) and
-// seat the rigid head shells clear of it (tools/head-fit.mjs);
+// seat the rigid head shells clear of it and the solid helmets round it (tools/head-fit.mjs);
 // every further fresh tree must equal the first byte for byte, which shows the build is deterministic across
 // independent runs.
 // Usage: node tools/check-built.mjs [--fresh dir ...]. With no --fresh it builds one tree into a folder under tools/.build.
@@ -11,7 +11,7 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { buildAll } from './build-all.mjs';
 import { makeBuildDir } from './buildDir.mjs';
-import { treeSeatFindings } from './head-fit.mjs';
+import { treeHelmetFindings, treeSeatFindings } from './head-fit.mjs';
 import { declaredPacks } from './layout.mjs';
 import { MANIFEST, treeDifferences } from './manifest.mjs';
 import { treeStrapFindings } from './strap-fit.mjs';
@@ -48,6 +48,7 @@ function freshDifferences([reference, ...others]) {
     ...treeDifferences({ files, manifest, declared: declaredPacks(repo) }),
     ...treeStrapFindings(reference, manifest, repo),
     ...treeSeatFindings(reference, manifest, repo),
+    ...treeHelmetFindings(reference, manifest, repo),
     ...others.flatMap((other) => treeMismatches(reference, other)),
   ];
 }
