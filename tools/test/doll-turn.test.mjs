@@ -467,17 +467,35 @@ test('a turn that is no angle about a doll axis is refused', () => {
   assert.throws(refused({ axis: [0, 0, 2], degrees: 90 }), /not a doll axis/);
 });
 
-test('a loose wearable placed on a turned part is refused', () => {
+test('a loose wearable on a turned part rests against it as it hangs and swings with it about its anchor', () => {
+  const swung = { ...dressing, limbs: [{ ...dressing.limbs[0], turn: { axis: [0, 0, 1], degrees: -7 } }] };
+  const places = [{ slot: 'arms', part: 'upper', against: [-1, 0, 0], sink: 0.5 }];
+  const watch = box([-0.02, -0.1, -0.02], [0.02, 0, 0.02]);
+  const sites = wornSites(
+    { id: 'watch', tags: { slot: ['arms'] } },
+    { dressing: { ...swung, places }, doll: dollOf(swung, figure), models: [], boxOf: () => watch },
+  );
+  const { at, turn } = sites[sites.length - 1];
+  const about = doll.anchors.shoulder_right;
+  const swing = (p) => add(mulMV(rotAxis([0, 0, 1], -7), sub(p, about)), about);
+  // As the upper arm hangs it spans x -0.15 to -0.05 and y 0 to 0.4 here, so the watch rests half sunk on its outer face,
+  // at x -0.15, halfway down it.
+  const hung = (p) => add(p, [-0.15, 0.25, 0]);
+  for (const corner of [watch.min, watch.max, [0.02, -0.1, -0.02]])
+    close(add(mulMV(quatToMat3(turn), corner), at), swing(hung(corner)), 'watch');
+});
+
+test('a loose wearable across both copies of a turned part is refused, since they turn apart', () => {
   assert.throws(
     () =>
       wornSites(
-        { id: 'glove', tags: { slot: ['hands'] } },
+        { id: 'sleeves', tags: { slot: ['arms'] } },
         {
-          dressing: { ...dressing, places: [{ slot: 'hands', part: 'upper', against: [0, 0, 0], sink: 0 }] },
+          dressing: { ...dressing, places: [{ slot: 'arms', part: 'upper', both: true, against: [0, 0, 0], sink: 0 }] },
           doll,
           models: [],
         },
       ),
-    /rests turned/,
+    /turned apart/,
   );
 });

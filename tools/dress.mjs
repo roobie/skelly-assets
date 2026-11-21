@@ -196,6 +196,18 @@ const rotate = ([x, y, z, w], v) => {
   );
 };
 /**
+ * The turn by `b` then `a`.
+ * @param {Quaternion} a
+ * @param {Quaternion} b
+ * @returns {Quaternion}
+ */
+const product = ([ax, ay, az, aw], [bx, by, bz, bw]) => [
+  aw * bx + ax * bw + ay * bz - az * by,
+  aw * by - ax * bz + ay * bw + az * bx,
+  aw * bz + ax * by - ay * bx + az * bw,
+  aw * bw - ax * bx - ay * by - az * bz,
+];
+/**
  * @param {Box} box
  * @param {Quaternion} turn
  */
@@ -685,8 +697,9 @@ function rest(box, region, { against, sink }) {
 
 /**
  * How `model` is worn on `doll`, or why it cannot be: a worn piece is drawn in each copy of a doll part its body must
- * hold, and a wearable with no pieces is placed by its anchor, which the doll's bust must have, or rested unturned
- * against its place's part, so that it is never stood on the doll as a prop beside parts it has no place on.
+ * hold, and a wearable with no pieces is placed by its anchor, which the doll's bust must have, or rested against its
+ * place's part, on one copy if the doll rests that part turned, so that it is never stood on the doll as a prop beside
+ * parts it has no place on.
  * @param {DressModel} model
  * @param {object} options
  * @param {DollDressing} options.dressing
@@ -717,9 +730,9 @@ function wornPlan(model, { dressing, doll, models }) {
   const copies = doll.parts.get(place.part);
   if (!copies) return { refusal: `the doll has no part ${place.part} for its place` };
   const rested = place.both ? copies : copies.slice(0, 1);
-  return rested.some(({ turn }) => turn)
+  return rested.length > 1 && rested.some(({ turn }) => turn)
     ? {
-        refusal: `placed loose on the ${place.part}, which the doll rests turned; a loose wearable has no placing against a turned part yet`,
+        refusal: `placed loose across both copies of the ${place.part}, which the doll rests turned apart, so one model cannot follow both`,
       }
     : { rested, place };
 }
@@ -738,7 +751,8 @@ export function wornRefusal(model, options) {
 /**
  * The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
  * for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its own anchor of
- * the place's name at the bust anchor (its origin if it has none), or its box rested against the place's part.
+ * the place's name at the bust anchor (its origin if it has none), or its box rested against the place's part and
+ * turned with it.
  * `boxOf` gives a loose model's box and `anchorsOf` its anchors, both in its own frame.
  * @param {DressModel} model
  * @param {object} options
@@ -776,17 +790,25 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     return [...sites, { model: model.id, at: difference(anchored, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
   }
   const { rested, place } = plan;
-  const region = union(rested.map(({ box }) => box));
+  // A turned copy is rested against as it hangs, and the model then swung with it, so the model meets the part's own
+  // faces along its own axes, as a worn piece does, rather than the looser box of the turned part.
+  const [first] = rested;
+  const hanging =
+    rested.length === 1 && first?.hanging && first.turn ? { ...first.hanging, turn: first.turn } : undefined;
+  const region = hanging ? hanging.box : union(rested.map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).
-  const at = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
+  const hung = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
+  const own = lying ? STAND : undefined;
+  const at = hanging ? sum(rotate(hanging.turn, difference(hung, hanging.about)), hanging.about) : hung;
+  const turn = hanging ? (own ? product(hanging.turn, own) : hanging.turn) : own;
   return [
     ...sites,
     {
       model: model.id,
       at,
-      ...(lying ? { turn: STAND } : {}),
+      ...(turn ? { turn } : {}),
       ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
     },
   ];
