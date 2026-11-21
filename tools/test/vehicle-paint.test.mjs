@@ -40,7 +40,6 @@ const bodies = (indexImport, ids) =>
       `
   local byId = { [row.id]: row for row in std.flattenArrays(std.objectValues(import ${JSON.stringify(indexImport)})) };
   { [id]: byId[id].parts[0] for id in ${JSON.stringify([...ids])} }`,
-      repo,
     ),
   );
 
@@ -62,9 +61,9 @@ function shown(part, finish) {
 // Merging rows that differ only in paint moves a vehicle's paint from its own row onto the sites that fit the lender.
 // Every former site must still be there, where it was, showing the same part in the same paint.
 test('a merged vehicle still places a part at every former site', () => {
-  const merged = JSON.parse(evaluateJsonnet(`import '${PLACEMENTS_SOURCE}'`, repo));
+  const merged = JSON.parse(evaluateJsonnet(`import '${PLACEMENTS_SOURCE}'`));
   withOwnPressings((copy) => {
-    const former = JSON.parse(evaluateJsonnet(`import ${JSON.stringify(join(copy, 'placements.libsonnet'))}`, repo));
+    const former = JSON.parse(evaluateJsonnet(`import ${JSON.stringify(join(copy, 'placements.libsonnet'))}`));
     assert.deepEqual(Object.keys(merged).sort(), Object.keys(former).sort());
     const moved = [];
     for (const [vehicle, { sites }] of Object.entries(merged)) {

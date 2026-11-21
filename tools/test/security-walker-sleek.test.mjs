@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import { exportPool, exportRecipes } from '../build.mjs';
 import { DEFAULT_CACHE } from '../generation.mjs';
@@ -10,7 +10,6 @@ import { thingEntryFile } from '../layout.mjs';
 import { solid } from '../pieceSolid.mjs';
 import { meeting } from './pieces.mjs';
 
-const root = resolve(import.meta.dirname, '../..');
 const data = JSON.parse(
   evaluateJsonnet(
     `{
@@ -24,7 +23,6 @@ const data = JSON.parse(
   base: (import 'models/vehicles/mech_walker_vehicle_1.placements.libsonnet').sites,
   sleek: (import 'models/vehicles/security_walker_sleek.placements.libsonnet').sites,
 }`,
-    root,
   ),
 );
 const { spec, base, sleek } = data;
@@ -39,14 +37,12 @@ const moved = (part, at) =>
   JSON.parse(
     evaluateJsonnet(
       `local k=import 'models/vehicles/kit.libsonnet'; [k.moved(p,${JSON.stringify(at)}) for p in ${JSON.stringify(pieces(rows.get(part)))}]`,
-      root,
     ),
   );
 const drawn = (p) =>
   JSON.parse(
     evaluateJsonnet(
       `local k=import 'models/vehicles/kit.libsonnet'; [k.moved(${p.mirror ? 'k.far(q)' : 'q'},${JSON.stringify(p.at)}) for q in ${JSON.stringify(pieces(rows.get(p.part)))}]`,
-      root,
     ),
   );
 const atY = (site, y) => ({ ...site, at: [site.at[0], y, site.at[2]] });
