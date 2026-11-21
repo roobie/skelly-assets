@@ -61,9 +61,12 @@ export const COMPACT_SMG_PROPORTIONS = {
     // An estimate of the shooter's eye behind the drum with the cheek on the stock.
     eyeReliefU: 6,
   },
-  // Closed on the breech, the bolt reaches back over the whole magazine opening, holding the top round down. It is as
-  // wide as the polymer SMG's; the receiver's floor, close under the bore, keeps it lower.
-  bolt: { lengthU: 4.5, halfHeightU: 0.75, halfWidthU: 1.25 },
+  // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port. It is as wide as the
+  // polymer SMG's; the receiver's floor, close under the bore, keeps it lower. It recoils far enough for its face to
+  // clear the magazine's opening.
+  bolt: { lengthU: 4.75, halfHeightU: 0.75, halfWidthU: 1.25, travelU: 4.25 },
+  // The MP5's published rate (HK MP5 specification).
+  cyclicRpm: 800,
   chamberedCase: NINE_MM_CASE,
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {

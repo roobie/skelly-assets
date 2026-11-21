@@ -2164,7 +2164,8 @@ const receiver: PartFamily = {
         : { ...baseTravel, restX: breechX + carrierEnvelope(carrierPattern, carrierFit).x[0] };
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
     const portWindow = tracedBolt
-      ? caseEjectionPortWindow(tracedBolt.chamberedCase, tracedBolt.barrel.breechU, travel.length, carrierY)
+      ? (tracedBolt.ejectionPort ??
+        caseEjectionPortWindow(tracedBolt.chamberedCase, tracedBolt.barrel.breechU, travel.length, carrierY))
       : ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
     const context: ReceiverContext = {
       params,
@@ -2581,8 +2582,13 @@ const carrierHandleSolids = (styleKey: CarrierHandleStyle, pattern: BoltCarrierP
 };
 
 const carrierTravelLength = (params: Readonly<Record<string, string>>): number => {
-  if ((params.pattern ?? carrierPatternFor(params)) === 'bolt') {
+  const pattern = params.pattern ?? carrierPatternFor(params);
+  if (pattern === 'bolt') {
     return boltStrokeUnits(boltCartridge(params.boltCalibre));
+  }
+  const traced = tracedCarrier(pattern, params.section);
+  if (traced) {
+    return traced.bolt.travelU;
   }
   const klass = receiverTravelClass(params);
   return klass === 'ar' ? arLayoutFor(params.actionFrame).carrierTravelU : BOLT_TRAVEL[klass].length;
@@ -2964,8 +2970,11 @@ const boltCarrier: GunPartFamily = {
       tags: [ACTION_CARRIER_ROLES[pattern]],
     };
   },
-  // Only the AR pattern's frame table carries a cyclic rate.
-  cyclicRpm: (params) => (params.pattern === 'ar' ? AR_CYCLIC_RPM[arLayoutFor(params.actionFrame).frameId] : undefined),
+  // Only the AR pattern's frame table and a traced SMG's table carry a cyclic rate.
+  cyclicRpm: (params) =>
+    params.pattern === 'ar'
+      ? AR_CYCLIC_RPM[arLayoutFor(params.actionFrame).frameId]
+      : tracedCarrier(params.pattern, params.section)?.cyclicRpm,
 };
 
 // ---- lower ----

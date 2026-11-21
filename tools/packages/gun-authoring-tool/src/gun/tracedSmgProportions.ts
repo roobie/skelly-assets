@@ -151,10 +151,19 @@ export interface TracedSmgProportions {
     readonly aperture: { readonly eyeX: number; readonly centreY: number; readonly halfU: number };
     readonly eyeReliefU: number;
   };
-  /** The bolt, centred on the bore: its length and its section's half-sizes. */
-  readonly bolt: { readonly lengthU: number; readonly halfHeightU: number; readonly halfWidthU: number };
+  /** The bolt, centred on the bore: its length, its section's half-sizes and how far it recoils. */
+  readonly bolt: {
+    readonly lengthU: number;
+    readonly halfHeightU: number;
+    readonly halfWidthU: number;
+    readonly travelU: number;
+  };
+  /** The published cyclic rate, which bounds how long the bolt's travel may take. */
+  readonly cyclicRpm: number;
   /** The chambered case, which the ejection port must clear. */
   readonly chamberedCase: { readonly lengthU: number; readonly headDiameterU: number };
+  /** The ejection port's opening through the port-side wall; without it the port is sized from the case. */
+  readonly ejectionPort?: Box2;
   readonly barrel: {
     readonly breechU: number;
     readonly citedLengthU: number;

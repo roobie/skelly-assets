@@ -81,10 +81,15 @@ export const POLYMER_SMG_PROPORTIONS = {
     aperture: { eyeX: -19.5, centreY: 5.5, halfU: 0.25 },
     eyeReliefU: 6,
   },
-  // Closed on the breech, the bolt reaches back over the whole magazine opening, holding the top round down. Its
-  // section is about 29 mm square, as tall as the reference's ejection-port frame, which shows the bolt filling it.
-  bolt: { lengthU: 7.75, halfHeightU: 1.25, halfWidthU: 1.25 },
+  // Closed on the breech, the bolt fills the whole ejection port, as the reference shows it through the opening.
+  // It is centred on the bore, so it stands as far below the bore as the port's top stands above it. It recoils as
+  // far as the cocking handle's slot lets the handle pull it, which leaves the spent case under the port.
+  bolt: { lengthU: 9.25, halfHeightU: 1.5, halfWidthU: 1.25, travelU: 6.25 },
+  // The UMP9's published rate (Heckler & Koch UMP, Wikipedia): slower than the compact SMG's, as its long travel needs.
+  cyclicRpm: 700,
   chamberedCase: NINE_MM_CASE,
+  // The reference's dark opening inside the port's frame, which stands a little above the bore.
+  ejectionPort: { x: [-10.5, -5.75], y: [-0.5, 1.5] },
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
     ...citedBarrel(200, barrelTipThreadedU),

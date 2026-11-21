@@ -3,6 +3,7 @@ import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boundsOfPoints, obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
 import { BOLT_CARRIER_RUNNING_CLEARANCE_U, EJECTION_PORT_RULES, RECEIVER_SECTION_WALL_U } from '../src/gun/parts.ts';
+import type { TracedSmgProportions } from '../src/gun/tracedSmgProportions.ts';
 import { TRACED_SMG_SECTIONS, type TracedSmgSection } from '../src/gun/tracedSmgSections.ts';
 import { owner, resolveDesign } from './tracedSmgFixture.ts';
 
@@ -37,22 +38,45 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
     expect(high[2]).toBeLessThanOrEqual(receiver.halfWidthU - inset);
   });
 
-  it('opens the ejection port over the spent case at full recoil, sized from the case', () => {
-    const resolved = resolveDesign(`${section}.json`);
-    const { keepOuts } = resolved.defs.get(owner(resolved, 'receiver'))!;
-    const span = (id: string, axis: number) => {
-      const { center, half } = keepOuts.find((entry) => entry.id === id)!.box;
-      return [center[axis]! - half[axis]!, center[axis]! + half[axis]!] as const;
-    };
+  const resolved = resolveDesign(`${section}.json`);
+  const { keepOuts } = resolved.defs.get(owner(resolved, 'receiver'))!;
+  const span = (id: string, axis: number) => {
+    const { center, half } = keepOuts.find((entry) => entry.id === id)!.box;
+    return [center[axis]! - half[axis]!, center[axis]! + half[axis]!] as const;
+  };
+  const [travelRear, travelFront] = span('bolt-travel', 0);
+  // The closed bolt's face, carried back by the built travel, is where it stops in recoil.
+  const faceAtRecoil = high[0] - (travelFront - travelRear);
+
+  describe('its ejection port', () => {
     const port = { x: span('ejection', 0), y: span('ejection', 1) };
-    const { lengthFactor, diameterFactor } = EJECTION_PORT_RULES.caseClearance;
-    // The travel's rear end is where the bolt face, with the case's head on it, stops in recoil.
-    const [headAtRecoil] = span('bolt-travel', 0);
-    expect(port.x[0]).toBeLessThanOrEqual(headAtRecoil);
-    expect(port.x[1]).toBeGreaterThanOrEqual(headAtRecoil + chamberedCase.lengthU);
-    expect(port.y[0]).toBeLessThanOrEqual(-chamberedCase.headDiameterU / 2);
-    expect(port.y[1]).toBeGreaterThanOrEqual(chamberedCase.headDiameterU / 2);
-    expect(Math.abs(port.x[1] - port.x[0] - lengthFactor * chamberedCase.lengthU)).toBeLessThanOrEqual(GRID);
-    expect(Math.abs(port.y[1] - port.y[0] - diameterFactor * chamberedCase.headDiameterU)).toBeLessThanOrEqual(GRID);
+    // The spent case's head rides the bolt's face back.
+    const headAtRecoil = faceAtRecoil;
+    const table: TracedSmgProportions = TRACED_SMG_SECTIONS[section];
+    const traced = table.ejectionPort;
+
+    it('lies over the spent case at full recoil and clears it', () => {
+      expect(port.x[0]).toBeLessThanOrEqual(headAtRecoil);
+      expect(port.x[1]).toBeGreaterThanOrEqual(headAtRecoil + chamberedCase.lengthU);
+      expect(port.y[0]).toBeLessThanOrEqual(-chamberedCase.headDiameterU / 2);
+      expect(port.y[1]).toBeGreaterThanOrEqual(chamberedCase.headDiameterU / 2);
+    });
+
+    it('shows the closed bolt across its whole opening', () => {
+      expect(low[0]).toBeLessThanOrEqual(port.x[0]);
+      expect(high[0]).toBeGreaterThanOrEqual(port.x[1]);
+      expect(low[1]).toBeLessThanOrEqual(port.y[0]);
+      expect(high[1]).toBeGreaterThanOrEqual(port.y[1]);
+    });
+
+    it(traced ? 'is the traced opening' : 'is sized from the case where the reference shows none', () => {
+      if (traced) {
+        expect(port).toEqual(traced);
+        return;
+      }
+      const { lengthFactor, diameterFactor } = EJECTION_PORT_RULES.caseClearance;
+      expect(Math.abs(port.x[1] - port.x[0] - lengthFactor * chamberedCase.lengthU)).toBeLessThanOrEqual(GRID);
+      expect(Math.abs(port.y[1] - port.y[0] - diameterFactor * chamberedCase.headDiameterU)).toBeLessThanOrEqual(GRID);
+    });
   });
 });
