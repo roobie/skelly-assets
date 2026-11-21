@@ -2,14 +2,17 @@
 // pose can be reviewed without opening the page. The drawing is the posing page's own (site/pose.mjs): this builds the
 // showcase from the tree and drives the page in headless Chromium.
 // Usage: node tools/pose-sheet.mjs [--built built] [--out look/poses] [--size 384] [--views review] [--probe] [--skin]
-//   [--focus bone] [--wear id,id] [--screenshot] <pose> [<pose> ...]
-// A pose is a fixture's name (models/poses) or the path of a pose file. `--wear` dresses the doll in those wearables,
-// `--probe` runs the clearance probe and marks its findings, `--skin` runs the camera skin check, `--focus` frames the
-// views on one bone and what hangs from it (a hand and its fingers), `--views eye` draws from the figure's own eyes
-// beside the front three-quarter, `--screenshot` also saves the page with its controls. Writes
-// <out>/<pose>[-<wear joined by +>].png, with --skin <out>/skin-<pose>[-<wear>].png and with --screenshot
-// <out>/ui-<pose>[-<wear>].png; prints one line per pose with the limits that held, the reach residuals, the grips, the
-// clearance findings and the covered skin each view shows.
+//   [--focus bone] [--doll id] [--wear id,id] [--screenshot] [<pose> ...]
+// A pose is a fixture's name (models/poses) or the path of a pose file; with none the doll stands at rest, drawn as the
+// pose `rest`. `--doll` draws that doll of the dressing (models/dressing.libsonnet) rather than the player, whose rig
+// the fixtures are written for; `--wear` dresses it in those wearables, each piece on the part its doll's `slots` map its
+// segment to, and names any it has no place for with the reason. `--probe` runs the clearance probe and marks its findings, `--skin` runs the
+// camera skin check, `--focus` frames the views on one bone and what hangs from it (a hand and its fingers), `--views
+// eye` draws from the figure's own eyes beside the front three-quarter, `--screenshot` also saves the page with its
+// controls, which show the player. Writes <out>/[<doll>-]<pose>[-<wear joined by +>].png, with --skin
+// <out>/skin-[<doll>-]<pose>[-<wear>].png and with --screenshot <out>/ui-<pose>[-<wear>].png; prints one line per pose
+// with the limits that held, the reach residuals, the grips, the clearance findings and the covered skin each view
+// shows.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -27,12 +30,13 @@ const { values, positionals } = parseArgs({
     probe: { type: 'boolean', default: false },
     focus: { type: 'string' },
     skin: { type: 'boolean', default: false },
+    doll: { type: 'string' },
     wear: { type: 'string', default: '' },
     screenshot: { type: 'boolean', default: false },
   },
 });
-if (positionals.length === 0) {
-  console.error('pose-sheet: name a pose fixture or a pose file');
+if (values.doll !== undefined && values.screenshot) {
+  console.error('pose-sheet: the page with its controls shows the player alone, so --screenshot takes no --doll');
   process.exit(2);
 }
 const built = resolve(values.built);
@@ -41,13 +45,17 @@ const wear = values.wear.split(',').filter(Boolean);
 const size = Number(values.size);
 const UI_VIEWPORT = { width: 1400, height: 900 };
 
-// A fixture by name, or a pose file read here so the page need not reach outside the site.
-const poses = positionals.map((given) =>
-  given.endsWith('.json')
-    ? { name: basename(given, '.json'), pose: JSON.parse(readFileSync(resolve(given), 'utf8')) }
-    : { name: given, pose: given },
-);
-const fileName = (prefix, name) => `${prefix}${name}${wear.length > 0 ? `-${wear.join('+')}` : ''}.png`;
+// A fixture by name, or a pose file read here so the page need not reach outside the site; the doll at rest when none.
+const poses =
+  positionals.length === 0
+    ? [{ name: 'rest', pose: undefined }]
+    : positionals.map((given) =>
+        given.endsWith('.json')
+          ? { name: basename(given, '.json'), pose: JSON.parse(readFileSync(resolve(given), 'utf8')) }
+          : { name: given, pose: given },
+      );
+const fileName = (prefix, name) =>
+  `${prefix}${values.doll ? `${values.doll}-` : ''}${name}${wear.length > 0 ? `-${wear.join('+')}` : ''}.png`;
 const writePng = (path, dataUrl) => writeFileSync(path, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
 
 const list = (angles) => angles.map((a) => a.toFixed(1)).join('/');
@@ -89,6 +97,7 @@ try {
   for (const { name, pose } of poses) {
     try {
       const { png, ...facts } = await page.evaluate((asked) => window.posed(asked), {
+        doll: values.doll,
         wear,
         pose,
         size,

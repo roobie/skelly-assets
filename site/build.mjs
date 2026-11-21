@@ -22,7 +22,16 @@ import { applyJointDelta, applyMotion, applyOverlay, decodeFrame, sampleClip } f
 import { ASSEMBLY_SUFFIX, readAssemblies } from '../tools/assemblies.mjs';
 import { formOf, modelComponents } from '../tools/components.mjs';
 import { dollRig } from '../tools/dollRig.mjs';
-import { dollDressing, isWearable, modelBox, PLAYER, readDoll, readDressing, wornSites } from '../tools/dress.mjs';
+import {
+  dollDressings,
+  isWearable,
+  modelBox,
+  PLAYER,
+  readDoll,
+  readDressing,
+  wornRefusal,
+  wornSites,
+} from '../tools/dress.mjs';
 import { outputPath, readMobRows } from '../tools/layout.mjs';
 import { hashModels, standings, vehicleStanding } from '../tools/model-history.mjs';
 import { mat3ToQuat } from '../tools/packages/mobgen/src/core/math.ts';
@@ -167,9 +176,10 @@ const paintOf = (finish) => {
 const modelsById = new Map(models.map((model) => [model.id, model]));
 
 // Each wearable worn on the doll, as the sites the browser composes its worn view from (tools/dress.mjs). A tree with no
-// wearable, such as one of mobs alone, needs no doll. The pages show the player alone until they take a doll to show.
+// wearable, such as one of mobs alone, needs no doll. The player's are the pages' own; each other doll's go in `dolls/`.
 const wearables = new Set(models.filter((model) => isWearable(model, models)));
-const dressing = dollDressing(readDressing(root), PLAYER);
+const dressings = dollDressings(readDressing(root));
+const dressing = dressings.find(({ id }) => id === PLAYER);
 const doll = wearables.size > 0 ? readDoll(built, manifest, dressing) : undefined;
 const boxOf = (id) => modelBox(readFileSync(join(built, modelsById.get(id).file)));
 const anchorsOf = (id) => {
@@ -407,6 +417,25 @@ if (doll) {
   );
   mkdirSync(join(out, 'poses'));
   for (const name of poses) cpSync(join(root, POSES, `${name}.json`), join(out, 'poses', `${name}.json`));
+  // Each other doll's rig, its bare sites and the sites of each wearable it can wear, for the pose page to show it at
+  // rest or in a pose file written for its rig; the poses, clips and sequences above are the player's, named by its
+  // bones. A wearable the doll has no place for is not drawn on it, and `skipped` says why, so the page names it rather
+  // than leave it out unseen.
+  mkdirSync(join(out, 'dolls'));
+  for (const other of dressings.filter(({ id }) => id !== PLAYER)) {
+    const otherDoll = readDoll(built, manifest, other);
+    const worn = {};
+    const skipped = {};
+    for (const model of wearables) {
+      const refusal = wornRefusal(model, { dressing: other, doll: otherDoll, models });
+      if (refusal) skipped[model.id] = refusal;
+      else worn[model.id] = wornSites(model, { dressing: other, doll: otherDoll, models, boxOf, anchorsOf });
+    }
+    writeFileSync(
+      join(out, 'dolls', `${other.id}.json`),
+      JSON.stringify({ ...dollRig(otherDoll, other), doll: otherDoll.sites, worn, skipped }),
+    );
+  }
 }
 if (!values['no-tree'])
   cpSync(built, join(out, 'built'), { recursive: true, filter: (src) => !src.endsWith('.import') });

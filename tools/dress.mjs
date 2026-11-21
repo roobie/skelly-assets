@@ -498,7 +498,9 @@ const surfacePart = (surface) => surface.split('#')[0];
 
 /**
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
- * doll's regions with a surface on that part, since a consumer hides by those names and no other.
+ * doll's regions drawn as a piece of that part, since a consumer hides by those names and no other: it hides the
+ * primitives of a part that a name marks, and a region that holds the whole part marks none, so a shell over it names
+ * the part.
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
  */
@@ -510,12 +512,16 @@ export function coversProblems(models, dressing) {
     const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
     if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
     const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
-      surfaces.some((surface) => surfacePart(surface) === part),
+      surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
     );
     const names = [part, ...regions.map(([region]) => region)];
     return covers
       .filter((name) => !names.includes(name))
-      .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
+      .map((name) =>
+        dressing.regions[name]?.includes(part)
+          ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
+          : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
+      );
   });
 }
 
@@ -674,6 +680,60 @@ function rest(box, region, { against, sink }) {
   });
 }
 
+/** @typedef {ReturnType<typeof wornPieces>[number] & { copies: readonly PartCopy[] }} DrawnPiece */
+
+/**
+ * How `model` is worn on `doll`, or why it cannot be: a worn piece is drawn in each copy of a doll part its body must
+ * hold, and a wearable with no pieces is placed by its anchor, which the doll's bust must have, or rested unturned
+ * against its place's part, so that it is never stood on the doll as a prop beside parts it has no place on.
+ * @param {DressModel} model
+ * @param {object} options
+ * @param {DollDressing} options.dressing
+ * @param {Doll} options.doll
+ * @param {readonly DressModel[]} options.models
+ * @returns {{ refusal: string } | { pieces: readonly DrawnPiece[] } | { anchored: Vec3; place: AnchorPlace } | { rested: readonly PartCopy[]; place: RestPlace }}
+ */
+function wornPlan(model, { dressing, doll, models }) {
+  const pieces = wornPieces(model.id, models, dressing);
+  if (pieces.length > 0) {
+    /** @type {DrawnPiece[]} */
+    const drawn = [];
+    const missing = new Set();
+    for (const piece of pieces) {
+      const copies = doll.parts.get(piece.part);
+      if (copies) drawn.push({ ...piece, copies });
+      else missing.add(piece.part);
+    }
+    return missing.size > 0
+      ? { refusal: `the doll has no part ${[...missing].join(', ')}, which its pieces are drawn in` }
+      : { pieces: drawn };
+  }
+  const place = placeOf(model, dressing);
+  if (place.anchor !== undefined) {
+    const at = doll.anchors[place.anchor];
+    return at ? { anchored: at, place } : { refusal: `the doll has no anchor ${place.anchor} to place it at` };
+  }
+  const copies = doll.parts.get(place.part);
+  if (!copies) return { refusal: `the doll has no part ${place.part} for its place` };
+  const rested = place.both ? copies : copies.slice(0, 1);
+  return rested.some(({ turn }) => turn)
+    ? {
+        refusal: `placed loose on the ${place.part}, which the doll rests turned; a loose wearable has no placing against a turned part yet`,
+      }
+    : { rested, place };
+}
+
+/**
+ * Why `model` cannot be shown worn on `doll`, or nothing when it can.
+ * @param {DressModel} model
+ * @param {Parameters<typeof wornPlan>[1]} options
+ * @returns {string | undefined}
+ */
+export function wornRefusal(model, options) {
+  const plan = wornPlan(model, options);
+  return 'refusal' in plan ? plan.refusal : undefined;
+}
+
 /**
  * The sites that show `model` worn on the doll: the doll's own, then each worn piece in every copy of its part, or,
  * for a wearable with no pieces, the loose model placed by its first slot in the dressing's `places`: its own anchor of
@@ -688,21 +748,16 @@ function rest(box, region, { against, sink }) {
  * @param {(id: string) => Readonly<Record<string, Vec3>>} options.anchorsOf
  */
 export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, anchorsOf }) {
-  const { sites, parts, anchors } = doll;
-  /** @param {string} part */
-  const copiesOf = (part) => {
-    const copies = parts.get(part);
-    if (!copies) throw new Error(`${model.id}: the doll has no part ${part}`);
-    return copies;
-  };
-  const pieces = wornPieces(model.id, models, dressing);
-  if (pieces.length > 0) {
+  const plan = wornPlan(model, { dressing, doll, models });
+  if ('refusal' in plan) throw new Error(`${model.id}: ${plan.refusal}`);
+  const { sites } = doll;
+  if ('pieces' in plan) {
     // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part, and a piece
     // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs).
     return [
       ...sites,
-      ...pieces.flatMap(({ model: piece, part, covers, soleLift }) =>
-        copiesOf(part).map(({ side, at, mirror, turn, site }) => ({
+      ...plan.pieces.flatMap(({ model: piece, part, covers, soleLift, copies }) =>
+        copies.map(({ side, at, mirror, turn, site }) => ({
           model: piece,
           part,
           side,
@@ -715,19 +770,12 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
       ),
     ];
   }
-  const place = placeOf(model, dressing);
-  if (place.anchor !== undefined) {
-    const at = anchors[place.anchor];
-    if (!at) throw new Error(`${model.id}: the doll has no anchor ${place.anchor} to place it at`);
-    return [...sites, { model: model.id, at: difference(at, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
+  if ('anchored' in plan) {
+    const { anchored, place } = plan;
+    return [...sites, { model: model.id, at: difference(anchored, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
   }
-  const copies = copiesOf(place.part);
-  const resting = place.both ? copies : copies.slice(0, 1);
-  if (resting.some(({ turn }) => turn))
-    throw new Error(
-      `${model.id}: placed loose on the ${place.part}, which the doll rests turned; a loose wearable has no placing against a turned part yet`,
-    );
-  const region = union(resting.map(({ box }) => box));
+  const { rested, place } = plan;
+  const region = union(rested.map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).

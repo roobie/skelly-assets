@@ -2,8 +2,6 @@
 // each row's kind. The gun rows' sources are relative to the repository root, where GAT's loader resolves them.
 local taxonomy = import 'tools/jsonnet/lib/taxonomy.libsonnet';
 local catalogue = import 'models/catalogue/packs.libsonnet';
-// The worn sling shells are no catalogue rows, so the pack names them.
-local shells = ['weapon_sling_worn', 'weapon_sling_worn_jacket'];
-local items = catalogue.recipe('skelly.firearms') + catalogue.items(catalogue.rows(shells));
+local items = catalogue.recipe('skelly.firearms') + catalogue.items(catalogue.rows(catalogue.worn('skelly.firearms')));
 // The whole pack is modern firearms; each row names its own shelf and weapon class.
 taxonomy.inherit({ tags: { setting: ['modern'] } }, items + (import 'packages/gun-authoring-tool/exports/deadvox.jsonnet'))

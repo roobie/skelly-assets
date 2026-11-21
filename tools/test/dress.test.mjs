@@ -16,6 +16,7 @@ import {
   readDressing,
   wornOnParts,
   wornPieces,
+  wornRefusal,
   wornSites,
 } from '../dress.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
@@ -308,6 +309,33 @@ test('a wearable none of whose slots has a place is refused', () => {
   assert.throws(
     () => wornSites(ring, { dressing, doll, models: [ring], boxOf: () => box([0, 0, 0], [1, 1, 1]) }),
     /ring/,
+  );
+});
+
+test('a wearable is refused with its reason where the doll has no place to wear it, never stood on it as a prop', () => {
+  const winged = { ...dressing, slots: { ...dressing.slots, wing: { slot: 'back', part: 'wing' } } };
+  const piece = (id, tags = { fit: ['worn'] }) => model(id, tags);
+  const models = [
+    model('cape', { slot: ['back'] }),
+    piece('cape_worn_body'),
+    piece('cape_worn_wing'),
+    model('tunic', { slot: ['torso'] }),
+    piece('tunic_worn_body'),
+    model('mask', { slot: ['face'] }),
+    model('crown', { slot: ['head'] }),
+  ];
+  const refusal = (id) =>
+    wornRefusal(
+      models.find((m) => m.id === id),
+      { dressing: winged, doll, models },
+    );
+  assert.match(refusal('cape'), /no part wing, which its pieces are drawn in/);
+  assert.equal(refusal('tunic'), undefined);
+  assert.match(refusal('mask'), /no anchor nose/);
+  assert.equal(refusal('crown'), undefined);
+  assert.throws(
+    () => wornSites(models[0], { dressing: winged, doll, models, boxOf: () => box([0, 0, 0], [1, 1, 1]) }),
+    /cape: the doll has no part wing/,
   );
 });
 

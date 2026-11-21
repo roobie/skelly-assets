@@ -14,6 +14,14 @@ local unmapped = std.setDiff(std.set(segments), std.set(std.objectFields(slots))
 local unknown = std.setDiff(std.set(std.objectFields(slots)), std.set(segments));
 assert unmapped == [] && unknown == [] : 'worn slot map: segments with no slot %s, keys that are no segment %s' % [unmapped, unknown];
 local segmentOf(id) = std.reverse(std.split(id, '_'))[0];
+// A worn piece's id taken apart, `<garment>_worn` or `<garment>_worn_<segment>`, or null for any other id: a name that
+// merely holds the word is no piece.
+local pieceOf(id) =
+  local words = std.split(id, '_');
+  local n = std.length(words);
+  if n >= 2 && words[n - 1] == 'worn' then { garment: std.join('_', words[:n - 1]), segment: null }
+  else if n >= 3 && words[n - 2] == 'worn' then { garment: std.join('_', words[:n - 2]), segment: words[n - 1] }
+  else null;
 {
   // The ground row of the garment a worn family is fitted for, whose authored title and finish the shells reuse, found
   // among the rows of the set file `rows` the kit names, so a kit's key holds that one set and not every set.
@@ -22,6 +30,10 @@ local segmentOf(id) = std.reverse(std.split(id, '_'))[0];
     assert std.length(found) == 1 : 'the set file the worn kit names holds no ground row `%s`' % id;
     found[0],
   groundTitle(rows, id):: self.groundRow(rows, id).title,
+  // A worn piece's id taken apart, { garment, segment }, the segment null for a piece in the doll's piece part; null for
+  // an id that is no worn piece. The tail is the id's last word, whatever it names: a carried piece worn over the jacket,
+  // `<gear>_worn_jacket`, has `jacket`, which is a layer and no part.
+  piece(id):: pieceOf(id),
   // `own` is the taxonomy of the garment the shells belong to; each shell adds its slot and fit.
   shells(own, rows):: [
     row + { taxonomy: taxonomy.over(own, { tags: { slot: [slots[segmentOf(row.id)].slot], fit: ['worn'] } }) }
