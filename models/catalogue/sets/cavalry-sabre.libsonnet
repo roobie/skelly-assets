@@ -64,10 +64,11 @@ local bow = {
 // Each branch springs from the plate's mid-plane on its outer side at `root`, [y, z], and runs round the outside of
 // the hand through `line`, [along, out, across] in the hilt's frame, to end inside the bow.
 local branches = [
-  { root: [-0.016, 0.022], line: [[0.018, -0.03, 0.034], [0.038, -0.048, 0.024], [0.05, -0.061, 0.0015]] },
-  { root: [-0.036, 0.022], line: [[0.03, -0.046, 0.032], [0.062, -0.056, 0.02], [0.08, -0.056, 0.0015]] },
+  { root: [-0.016, 0.022], line: [[0.018, -0.03, 0.034], [0.038, -0.048, 0.024], [0.05, -0.0609, 0]] },
+  { root: [-0.036, 0.022], line: [[0.03, -0.046, 0.032], [0.062, -0.056, 0.02], [0.08, -0.0556, 0]] },
 ];
-local branchSize = { width: 0.005, thickness: 0.005 };
+// The branches are lighter than the bow, so an end arriving at any slant still fits inside it.
+local branchSize = { width: 2 * grain, thickness: 2 * grain };
 // The rear quillon curls back from the plate's spine side toward the hand, ending in a ball, as [x, y] points.
 local quillon = { line: [[-0.0025, 0.012], [-0.006, 0.024], [-0.014, 0.031], [-0.024, 0.034]], width: 0.005, thickness: 0.008, finial: 0.004 };
 
@@ -76,6 +77,8 @@ local quillon = { line: [[-0.0025, 0.012], [-0.006, 0.024], [-0.014, 0.031], [-0
 local palmMargin = (gripLength - arm.palmWidth) / 2;
 assert palmMargin >= grain : 'the grip leaves a palm %g m of wire, under a voxel' % palmMargin;
 assert bladeLength - fullerLength > falseEdgeFromTip : 'the fuller runs into the false edge';
+// The plate's mid-plane, in x: the blade and the bars run into it there, where the plate holds them whatever the cant.
+local midPlate = -plateThickness / 2;
 
 // ---- the blade ----
 
@@ -104,7 +107,7 @@ local bodySteps = 60;
 local pointSteps = 8;
 // The fuller's end and the false edge's start are stations, so each band changes at a segment's end.
 // The first station is inside the plate, so the blade runs into it rather than meeting its face.
-local stations = std.set([-plateThickness / 2] + [pointStart * i / bodySteps for i in std.range(0, bodySteps)]
+local stations = std.set([midPlate] +[pointStart * i / bodySteps for i in std.range(0, bodySteps)]
                          + [pointStart + pointLength * i / pointSteps for i in std.range(1, pointSteps)]
                          + [fullerLength, falseEdgeStart]);
 local last = std.length(stations) - 1;
@@ -155,8 +158,9 @@ local chamfers(mid, reach) =
 local hiltBlock(id, slot, a0, a1, o0, o1, halfZ, chamfer) =
   h.prism(id, slot, 'z', [hiltXY([a0, o0]), hiltXY([a1, o0]), hiltXY([a1, o1]), hiltXY([a0, o1])], -halfZ, halfZ)
   + { clip: chamfers((o0 + o1) / 2, (o1 - o0) / 2 + halfZ - chamfer) };
-// The grip and the backstrap start this far into the plate, at its mid-plane, so their canted ends sink into it whole
-// and no seam opens against its flat face.
+// The grip's seat and the backstrap start this far into the plate, at its mid-plane, so their canted ends sink into it
+// whole and no seam opens against its flat face. It is an `along` in the hilt's frame, measured down the grip from the
+// plate's hilt-side face, not an x like `midPlate`.
 local seat = -plateThickness / 2;
 
 local capStart = gripLength;
@@ -184,12 +188,11 @@ local wireTurn(k) =
           [hiltXY([a, -half]), hiltXY([a + wire.width, -half]), hiltXY([a + wire.width + wire.slant, half]), hiltXY([a + wire.slant, half])],
           -halfZ, halfZ)
   + { clip: chamfers(0, grip.halfHeight + grip.halfWidth - grip.chamfer + wire.proud) };
-// The bars' roots stand on the plate's mid-plane, where the plate holds them whatever the cant.
-local midPlate = -plateThickness / 2;
 
 local hilt = [
   h.prism('plate', 'guard', 'x', plateOutline, -plateThickness, 0),
-  // The held grip is only the part the hand closes on; its seat inside the plate is a piece of its own.
+  // The held grip is only the part the hand closes on; its seat inside the plate is a piece of its own, so the hand's
+  // fraction of the grip's bounds stays on the part it closes on.
   hiltBlock('grip', 'grip', 0, gripLength, -grip.halfHeight, grip.halfHeight, grip.halfWidth, grip.chamfer),
   hiltBlock('grip-seat', 'grip', seat, 0, -grip.halfHeight, grip.halfHeight, grip.halfWidth, grip.chamfer),
   h.prism('backstrap', 'guard', 'z',

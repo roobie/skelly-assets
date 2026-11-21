@@ -3,13 +3,13 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local grown = import 'grown.libsonnet';
 local s = import 'woodland.spec.libsonnet';
-local add = h.vec.add, mul = h.vec.mul, dot = h.vec.dot, cross = h.vec.cross, unit = h.vec.unit;
+local add = h.vec.add, sub = h.vec.sub, mul = h.vec.mul, dot = h.vec.dot, cross = h.vec.cross, unit = h.vec.unit;
 local polar(radius, angle, y=0) = [radius * std.cos(angle), y, radius * std.sin(angle)];
 // A tapered octagonal branch between authored endpoints. Caps and radial planes form one convex solid;
 // no rotation feature or general hull primitive is added to the exporter.
 local branch(id, slot, a, b, r0, r1, floor=s.rootFloor) =
-  local length = std.sqrt(dot(add(b, mul(a, -1)), add(b, mul(a, -1))));
-  local d = unit(add(b, mul(a, -1)));
+  local length = std.sqrt(dot(sub(b, a), sub(b, a)));
+  local d = unit(sub(b, a));
   local u = unit(cross(d, if std.abs(d[1]) < 0.9 then [0, 1, 0] else [0, 0, 1]));
   local v = cross(d, u);
   local taper = (r0 - r1) / length;
@@ -105,8 +105,8 @@ local fern = [lump('crown', 'trunk', [0, 0.06, 0], [0.08, 0.1, 0.08], 0, 0)] + s
     local split = 0.4 / 0.84;
     local base = [0, 0.04, 0];
     // Use the actual two stalk segments, including their alternating tip heights, so leaflets cannot float.
-    local c = if t < split then add(base, mul(add(mid, mul(base, -1)), t / split))
-              else add(mid, mul(add(end, mul(mid, -1)), (t - split) / (1 - split)));
+    local c = if t < split then add(base, mul(sub(mid, base), t / split))
+              else add(mid, mul(sub(end, mid), (t - split) / (1 - split)));
     local length = 0.24 * std.sin(t * std.pi);
     [
       local tip = add(c, polar(length, a + side * 1.08));

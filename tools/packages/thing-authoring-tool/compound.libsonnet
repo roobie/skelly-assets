@@ -109,12 +109,14 @@ local turnedMiddle(p, i) =
   // an axis and cannot turn, so this is how a piece lies askew.
   clipped(id, slot, lo, hi, planes):
     $.prism(id, slot, 'y', [[lo[2], lo[0]], [lo[2], hi[0]], [hi[2], hi[0]], [hi[2], lo[0]]], lo[1], hi[1]) + { clip: planes },
-  // A straight bar of rectangular section from `p` to `q` at any slant, its width lying in the plane `normal` is
-  // normal to and its thickness along it.
+  // A straight bar of rectangular section from `p` to `q` at any slant. Only `normal`'s part across the bar counts: the
+  // thickness lies along that part and the width across both it and the bar, so `normal` must not lie along the bar.
   slantBar(id, slot, p, q, width, thickness, normal):
     local v = $.vec;
     local d = v.sub(q, p), length = std.sqrt(v.dot(d, d));
-    local along = v.unit(d), side = v.unit(v.cross(along, normal)), up = v.cross(side, along);
+    local along = v.unit(d), across = v.cross(along, normal);
+    assert v.dot(across, across) > 1e-12 * v.dot(normal, normal) : 'slant bar %s: its normal lies along it' % id;
+    local side = v.unit(across), up = v.cross(side, along);
     local centre = v.mul(v.add(p, q), 0.5);
     local faces = [[along, length / 2], [side, width / 2], [up, thickness / 2]];
     local corners = [
@@ -130,18 +132,21 @@ local turnedMiddle(p, i) =
       for s in [1, -1]
     ]),
   // A bar of rectangular section bent along [x, y, z] points, one slanted bar per run. Each run's width lies in the
-  // plane of it and the next, so the width follows the curve, and runs overrun each inner joint by half the width so
-  // the joints close; the chain's two ends stop at their points, to seat inside what they meet.
+  // plane of it and its neighbours, so the width follows the curve, and runs overrun each inner joint by half the width
+  // so the joints close; the chain's two ends stop at their points, to seat inside what they meet. Where the chain runs
+  // straight its plane is any one holding the run.
   bentBar(prefix, slot, points, width, thickness):
     local v = $.vec, n = std.length(points);
     [
       local a = points[std.max(i - 1, 0)], b = points[i], c = points[i + 1], e = points[std.min(i + 2, n - 1)];
-      local plane = v.cross(v.sub(c, b), v.sub(if i + 2 < n then e else c, a));
-      local overrun = v.mul(v.unit(v.sub(c, b)), width / 2);
+      local d = v.unit(v.sub(c, b));
+      local plane = v.cross(d, v.sub(if i + 2 < n then e else c, a));
+      local straight = v.cross(d, if std.abs(d[2]) < 0.9 then [0, 0, 1] else [0, 1, 0]);
+      local overrun = v.mul(d, width / 2);
       $.slantBar('%s-%d' % [prefix, i], slot,
                  if i > 0 then v.sub(b, overrun) else b,
                  if i + 2 < n then v.add(c, overrun) else c,
-                 width, thickness, if v.dot(plane, plane) > 1e-12 then plane else [0, 0, 1])
+                 width, thickness, if v.dot(plane, plane) > 1e-12 then plane else straight)
       for i in std.range(0, n - 2)
     ],
   // A syringe lying along x with its needle cap at +x, for a vaccine, an oil dose or a drawn injection. `dose` is the
