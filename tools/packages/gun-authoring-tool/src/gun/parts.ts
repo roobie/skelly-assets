@@ -786,9 +786,29 @@ export const BOLT_CARRIER_ENVELOPES = {
   bolt: { x: [-2.5, 2.5], y: [-0.75, 0.75], z: [-0.75, 0.75] },
 } as const;
 type BoltCarrierPattern = keyof typeof BOLT_CARRIER_ENVELOPES;
-type CarrierEnvelope = (typeof BOLT_CARRIER_ENVELOPES)[BoltCarrierPattern];
-const carrierEnvelope = (pattern: BoltCarrierPattern, frameId: string | undefined): CarrierEnvelope =>
-  pattern === 'ar' ? arCarrierEnvelope(arLayoutFor(frameId)) : BOLT_CARRIER_ENVELOPES[pattern];
+interface CarrierEnvelope {
+  readonly x: readonly [number, number];
+  readonly y: readonly [number, number];
+  readonly z: readonly [number, number];
+}
+/** What a carrier's envelope follows besides its pattern: the AR frame, or the traced receiver it runs in. */
+interface CarrierFit {
+  readonly frameId?: string | undefined;
+  readonly section?: string | undefined;
+}
+/** A traced SMG's bolt, centred on the bore, with its origin on the bolt's face. */
+const tracedSmgCarrierEnvelope = ({ bolt }: TracedSmgProportions): CarrierEnvelope => ({
+  x: [0, bolt.lengthU],
+  y: [-bolt.halfHeightU, bolt.halfHeightU],
+  z: [-bolt.halfWidthU, bolt.halfWidthU],
+});
+const carrierEnvelope = (pattern: BoltCarrierPattern, { frameId, section }: CarrierFit = {}): CarrierEnvelope => {
+  const traced = tracedSmgFor(section);
+  if (pattern === 'smg' && traced) {
+    return tracedSmgCarrierEnvelope(traced);
+  }
+  return pattern === 'ar' ? arCarrierEnvelope(arLayoutFor(frameId)) : BOLT_CARRIER_ENVELOPES[pattern];
+};
 
 export const CARRIER_HANDLE_STYLES = {
   ar: { shape: 'rear-t', owner: 'ar-charging-handle', motion: 'hand', handClearanceU: 0.25 },
@@ -819,9 +839,9 @@ const ejectionPortWindow = (
   pattern: BoltCarrierPattern,
   restX: number,
   carrierY: number,
-  arLayout?: ARActionLayout,
+  { arLayout, section }: { readonly arLayout?: ARActionLayout | undefined; readonly section?: string | undefined } = {},
 ) => {
-  const envelope = carrierEnvelope(pattern, arLayout?.frameId);
+  const envelope = carrierEnvelope(pattern, { frameId: arLayout?.frameId, section });
   const margin = EJECTION_PORT_MARGIN_U;
   let xMin = restX - envelope.x[1] - margin;
   let xMax = restX - envelope.x[0] + margin;
@@ -902,7 +922,9 @@ const carrierHandleStyleFor = (params: Readonly<Record<string, string>>): Carrie
 
 const carrierAxisY = (pattern: BoltCarrierPattern, receiverDrop: number, section?: string): number => {
   let y = 1.25;
-  if (pattern === 'ak') {
+  if (pattern === 'smg' && isTracedSmgSection(section)) {
+    y = 0;
+  } else if (pattern === 'ak') {
     y = AK_PROPORTIONS.carrierAxisU;
   } else if (pattern === 'ar') {
     y = 0;
@@ -916,8 +938,8 @@ const carrierAxisY = (pattern: BoltCarrierPattern, receiverDrop: number, section
   return y - receiverDrop;
 };
 
-export const carrierCavityBounds = (pattern: BoltCarrierPattern, carrierY: number, frameId?: string) => {
-  const envelope = carrierEnvelope(pattern, frameId);
+export const carrierCavityBounds = (pattern: BoltCarrierPattern, carrierY: number, fit: CarrierFit = {}) => {
+  const envelope = carrierEnvelope(pattern, fit);
   if (pattern === 'bolt') {
     const centreY = carrierY + (envelope.y[0] + envelope.y[1]) / 2;
     const centreZ = (envelope.z[0] + envelope.z[1]) / 2;
@@ -1146,7 +1168,7 @@ const receiverShellSolids = ({
   const resolvedSectionData: ReceiverSectionData | undefined =
     sectionData ?? (isSectionedReceiver(section) ? RECEIVER_SECTION[section] : undefined);
   const [xMin, xMax] = [resolvedSectionData ? resolvedSectionData.faces.rear : -16, frontFaceX] as const;
-  const cavity = carrierCavityBounds(carrierPattern, carrierY, arLayout?.frameId);
+  const cavity = carrierCavityBounds(carrierPattern, carrierY, { frameId: arLayout?.frameId, section });
   if (section === 'sporter') {
     return cutSporterAction({
       solids: octagonalTubeWalls(
@@ -2098,16 +2120,21 @@ const receiver: PartFamily = {
       throw new Error(`receiver ${params.section}: top flat is too narrow for its rail.`);
     }
     const carrierPattern = carrierPatternFor(params);
+    const carrierFit = { frameId: arLayout?.frameId, section: params.section };
+    const traced = tracedSmgFor(params.section);
+    // A carrier whose face closes on a known breech rests with its face there.
+    let breechX: number | undefined;
+    if (params.section === 'ar') {
+      breechX = frontFaceX - arLayout!.barrelExtensionLengthU;
+    } else if (traced && carrierPattern === 'smg') {
+      breechX = traced.barrel.breechU;
+    }
     const baseTravel = { ...BOLT_TRAVEL[receiverTravelClass(params)], length: carrierTravelLength(params) };
     const travel: BoltTravel =
-      params.section === 'ar'
-        ? {
-            ...baseTravel,
-            restX: frontFaceX - arLayout!.barrelExtensionLengthU + carrierEnvelope('ar', arLayout!.frameId).x[0],
-          }
-        : baseTravel;
+      breechX === undefined
+        ? baseTravel
+        : { ...baseTravel, restX: breechX + carrierEnvelope(carrierPattern, carrierFit).x[0] };
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
-    const traced = tracedSmgFor(params.section);
     const context: ReceiverContext = {
       params,
       bore,
@@ -2119,7 +2146,7 @@ const receiver: PartFamily = {
       receiverBottom,
       receiverTop,
       carrierPattern,
-      portWindow: ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout),
+      portWindow: ejectionPortWindow(carrierPattern, travel.restX, carrierY, { arLayout, section: params.section }),
       travel,
       carrierY,
       arLayout,
@@ -2784,7 +2811,7 @@ const boltCarrier: GunPartFamily = {
   build(params): PartDef {
     const pattern = (params.pattern ?? 'ar') as BoltCarrierPattern;
     const handleStyle = carrierHandleStyleFor(params);
-    const envelope = carrierEnvelope(pattern, params.actionFrame);
+    const envelope = carrierEnvelope(pattern, { frameId: params.actionFrame, section: params.section });
     let boreScale = 1;
     if (params.bore === 'L') {
       boreScale = 1.2;
@@ -2794,8 +2821,8 @@ const boltCarrier: GunPartFamily = {
     const snap = (n: number) => Math.round(n / GRID) * GRID;
     const block = (id: string, min: Vec3, max: Vec3): Solid =>
       solid(id, [snap(min[0]), snap(min[1]), snap(min[2])], [snap(max[0]), snap(max[1]), snap(max[2])]);
-    const bodyX: readonly [number, number] =
-      pattern === 'ar' || pattern === 'pump' || pattern === 'ak' ? envelope.x : [-1.5, 1.5];
+    // The Barrett's heavy block spans its envelope around a shorter body.
+    const bodyX: readonly [number, number] = pattern === 'barrett' ? [-1.5, 1.5] : envelope.x;
     const bodyZ = envelope.z;
     const solids: Solid[] = [
       pattern === 'bolt'
@@ -3104,7 +3131,7 @@ const lower: PartFamily = {
         portY = SPORTER_PROPORTIONS.magazine.feedPortY - SPORTER_PROPORTIONS.lower.mountY;
       } else if (layout === 'ar' && orientation.kind === 'straight') {
         const feedLipY = Math.min(
-          carrierEnvelope('ar', params.actionFrame).y[0] - BOLT_CARRIER_RUNNING_CLEARANCE_U,
+          carrierEnvelope('ar', { frameId: params.actionFrame }).y[0] - BOLT_CARRIER_RUNNING_CLEARANCE_U,
           -arLayout!.barrelExtensionDiameterU / 2 - BOLT_CARRIER_RUNNING_CLEARANCE_U,
         );
         const targetPortY = arLayout!.receiverBelowBoreU + feedLipY - MAGAZINE_INSERTION;

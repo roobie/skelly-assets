@@ -31,7 +31,7 @@ Some photo detail is beyond the build's primitives and stays a known difference.
 
 The design sits on the `compactSmg` template; see `src/gun/templates.ts`, `compactSmg`. Its traced parts come from the traced-SMG builders in `src/gun/parts.ts`, which read the section's table through `src/gun/tracedSmgSections.ts`, `TRACED_SMG_SECTIONS`:
 
-- **Receiver and end cap.** The receiver's section ties its outline and cavity to the table; see `RECEIVER_SECTION` and `tracedSmgReceiverDetails`. The receiver carries the gun's sight axis, since the drum rear sight is part of it; see `tracedSmgSightAxis`. The section forces the `smg` carrier pattern (`carrierPatternFor`), because the other patterns' carriers do not fit its cavity.
+- **Receiver and end cap.** The receiver's section ties its outline and cavity to the table; see `RECEIVER_SECTION` and `tracedSmgReceiverDetails`. The receiver carries the gun's sight axis, since the drum rear sight is part of it; see `tracedSmgSightAxis`. The section forces the `smg` carrier pattern (`carrierPatternFor`), because the other patterns' carriers do not fit its cavity. The bolt rides on the bore and closes on the breech. Its size is the table's, not the receiver's interior: a bolt that fills the shell reads as oversized. See `tracedSmgCarrierEnvelope`.
 - **Barrel and front sight.** The barrel carries the front sight and muzzle collar; see `tracedSmgBarrelDetails`. The hood ring stands between the drum aperture and the post, so its bore must leave the aiming line from the aperture to the post tip clear.
 - **Cocking tube.** Its walls are open, so the handle stem rides in a real slot; see `smgCockingTube`.
 - **Handguard.** It hangs below the cocking tube and leaves the magazine well clear.

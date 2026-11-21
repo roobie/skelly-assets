@@ -151,6 +151,8 @@ export interface TracedSmgProportions {
     readonly aperture: { readonly eyeX: number; readonly centreY: number; readonly halfU: number };
     readonly eyeReliefU: number;
   };
+  /** The bolt, centred on the bore: its length and its section's half-sizes. */
+  readonly bolt: { readonly lengthU: number; readonly halfHeightU: number; readonly halfWidthU: number };
   readonly barrel: {
     readonly breechU: number;
     readonly citedLengthU: number;
