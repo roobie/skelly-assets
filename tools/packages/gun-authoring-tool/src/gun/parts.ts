@@ -142,6 +142,7 @@ import {
   type SkeletonStockProportions,
   type TracedRail,
   type TracedSmgProportions,
+  wellOpeningAtLevel,
 } from './tracedSmgProportions.ts';
 import {
   byTracedSmgSection,
@@ -1015,9 +1016,8 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
  * A traced SMG's chamfered box, its end cap clipped along the traced slope. The cavity ends where the slope meets the
  * roof, so the rear wall carries the whole slope.
  */
-const tracedSmgReceiverSection = ({ receiver }: TracedSmgProportions) => {
-  const { topU, bottomU, halfWidthU, chamferU, topFlatHalfWidthU, rearX, frontX, endCapSlope, magazineWellX } =
-    receiver;
+const tracedSmgReceiverSection = ({ receiver, lower, magazine }: TracedSmgProportions) => {
+  const { topU, bottomU, halfWidthU, chamferU, topFlatHalfWidthU, rearX, frontX, endCapSlope } = receiver;
   const flatZ = halfWidthU - chamferU;
   const [[slopeX0, slopeY0], [slopeX1, slopeY1]] = [endCapSlope.from, endCapSlope.to];
   const slope = (slopeY1 - slopeY0) / (slopeX1 - slopeX0);
@@ -1034,7 +1034,9 @@ const tracedSmgReceiverSection = ({ receiver }: TracedSmgProportions) => {
       [topU - chamferU, -halfWidthU],
       [topU, -flatZ],
     ] as readonly Vec2[],
-    ...(magazineWellX ? { magazineWellX } : {}),
+    // The floor opens over the leaning well's opening where it meets the receiver, as wide as the opening.
+    magazineWellX: wellOpeningAtLevel(lower.magwell, magazine.port, bottomU),
+    magazineWellHalfWidthU: lower.magwell.opening.halfWidthU,
     faces: {
       top: { y: topU, halfWidth: topFlatHalfWidthU },
       portSide: halfWidthU,
@@ -1196,6 +1198,12 @@ const receiverShellSolids = ({
         : undefined;
     // End a sloped receiver's cavity in the full-height section; its rear wall carries the entire slope.
     const rearSlopeRun = 'rearSlopeRun' in data ? data.rearSlopeRun : undefined;
+    const magazineWellHalfWidth =
+      section === 'ar'
+        ? (arLayout ?? AR_ACTION_LAYOUT).magwellOpeningWidthU / 2
+        : 'magazineWellHalfWidthU' in data
+          ? data.magazineWellHalfWidthU
+          : 1.25;
     const spec: ReceiverSectionSpec = {
       id: `receiver-${section}`,
       outline: data.outline.map(([y, z]) => [y - receiverDrop, z] as const),
@@ -1218,13 +1226,7 @@ const receiverShellSolids = ({
             magazineWell: {
               x: 'magazineWellX' in data ? data.magazineWellX : ([-7, -1.5] as const),
               sectionAxis: 1 as const,
-              section:
-                section === 'ar'
-                  ? ([
-                      -(arLayout ?? AR_ACTION_LAYOUT).magwellOpeningWidthU / 2,
-                      (arLayout ?? AR_ACTION_LAYOUT).magwellOpeningWidthU / 2,
-                    ] as const)
-                  : ([-1.25, 1.25] as const),
+              section: [-magazineWellHalfWidth, magazineWellHalfWidth] as const,
             },
           }
         : {}),

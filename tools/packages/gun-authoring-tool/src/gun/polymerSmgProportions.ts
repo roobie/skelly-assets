@@ -1,12 +1,11 @@
 import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
 import {
+  type BoxMagazine,
+  boxMagazinePieces,
   citedBarrel,
   forwardLeanDegrees,
   leaningWell,
-  type StraightMagazine,
   stockReachU,
-  straightMagazinePieces,
-  wellOpeningAtLevel,
 } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 16;
@@ -30,7 +29,7 @@ const magazine = {
   body: { x: [-2, 1.75], y: [-17, 0] },
   floorplate: { x: [-2.25, 2], y: [-17.75, -17] },
   halfWidthU: 1,
-} as const satisfies StraightMagazine;
+} as const satisfies BoxMagazine;
 const magwell = {
   x: [-9.5, -4.75],
   y: [-5.5, receiverBottomU],
@@ -54,8 +53,6 @@ export const POLYMER_SMG_PROPORTIONS = {
     // A short chamfer rounds the slab's top rear edge into the stock hinge.
     endCapSlope: { from: [receiverRearX, 3], to: [-22, receiverTopU] },
     rearLug: { x: [receiverRearX, -22], y: [-3.25, -2.5] },
-    // The floor opens over the leaning well's opening where it meets the receiver, not the section's default.
-    magazineWellX: wellOpeningAtLevel(magwell, magazine.port, receiverBottomU),
     // A full-length top rail on a riser, ahead of the rear sight.
     rail: {
       face: 'top',
@@ -186,7 +183,7 @@ export const POLYMER_SMG_PROPORTIONS = {
   magazine: {
     port: magazine.port,
     halfWidthU: magazine.halfWidthU,
-    pieces: straightMagazinePieces(magazine),
+    pieces: boxMagazinePieces(magazine),
   },
   // The side-folding skeleton stock, traced extended: an open frame of bars between a hinge block on the
   // receiver's rear face and the butt plate. The overall length runs from the muzzle tip to the plate's rear face.

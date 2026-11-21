@@ -44,39 +44,66 @@ export const leaningFrame = ([pivotX, pivotY]: Point, leanDegrees: number) => {
 };
 
 /**
- * A straight box magazine authored upright in its own frame, x forward and y up its axis from the port, and leaned
- * forward by `leanDegrees` about the port: every corner stays square.
+ * A box magazine authored upright in its own frame, x forward and y up its axis from the port, and leaned forward by
+ * `leanDegrees` about the port. Its straight `body` is the top the well hugs. Below the body it may `bend` forward
+ * through `degrees`, about a centre `radiusU` in front of its front face, in `pieces` straight pieces whose joints run
+ * square across it. The `floorplate` is authored as if the bend were straightened, and turns with the bend's end, so the
+ * body and floorplate stay square at every corner.
  */
-export interface StraightMagazine {
+export interface BoxMagazine {
   readonly port: Point;
   readonly leanDegrees: number;
   readonly body: Box2;
+  readonly bend?: { readonly radiusU: number; readonly degrees: number; readonly pieces: number };
   readonly floorplate: Box2;
   readonly halfWidthU: number;
 }
 
-/** The straight magazine's body and floorplate, leaned into the gun frame. */
-export const straightMagazinePieces = ({ port, leanDegrees, body, floorplate }: StraightMagazine): Polygon[] => {
+/** The box magazine's body, bend and floorplate, top to bottom, leaned into the gun frame. */
+export const boxMagazinePieces = ({ port, leanDegrees, body, bend, floorplate }: BoxMagazine): Polygon[] => {
   const { leaned } = leaningFrame(port, leanDegrees);
   const [portX, portY] = port;
-  return [body, floorplate].map(({ x: [x0, x1], y: [y0, y1] }) =>
-    (
-      [
-        [x0, y1],
-        [x0, y0],
-        [x1, y0],
-        [x1, y1],
-      ] as const
-    ).map(([x, y]) => leaned(portX + x, portY + y)),
-  );
+  const inGun = (points: Polygon): Polygon => points.map(([x, y]) => leaned(portX + x, portY + y));
+  const box = ({ x: [x0, x1], y: [y0, y1] }: Box2): Polygon => [
+    [x0, y1],
+    [x0, y0],
+    [x1, y0],
+    [x1, y1],
+  ];
+  if (bend === undefined) {
+    return [box(body), box(floorplate)].map(inGun);
+  }
+  const { radiusU, degrees, pieces } = bend;
+  const [rearX, frontX] = body.x;
+  const centre: Point = [frontX + radiusU, body.y[0]];
+  /** A point of the straightened magazine turned through `turn` radians about the bend's centre. */
+  const turned = (turn: number, [x, y]: Point): Point => {
+    const [dx, dy] = [x - centre[0], y - centre[1]];
+    return [
+      centre[0] + Math.cos(turn) * dx - Math.sin(turn) * dy,
+      centre[1] + Math.sin(turn) * dx + Math.cos(turn) * dy,
+    ];
+  };
+  const turnAt = (piece: number) => (((degrees * piece) / pieces) * Math.PI) / 180;
+  const bendPieces = Array.from({ length: pieces }, (_, piece): Polygon => {
+    const [above, below] = [turnAt(piece), turnAt(piece + 1)];
+    return [
+      turned(above, [rearX, body.y[0]]),
+      turned(below, [rearX, body.y[0]]),
+      turned(below, [frontX, body.y[0]]),
+      turned(above, [frontX, body.y[0]]),
+    ];
+  });
+  const plate = box(floorplate).map((point) => turned(turnAt(pieces), point));
+  return [box(body), ...bendPieces, plate].map(inGun);
 };
 
 /**
- * The lean and opening of a well that hugs a straight magazine: it leans with the magazine about the port, and its
- * opening clears the body by `faceU` front and rear and by `sideU` at each side.
+ * The lean and opening of a well that hugs a box magazine's straight body: it leans with the magazine about the port,
+ * and its opening clears the body by `faceU` front and rear and by `sideU` at each side.
  */
 export const leaningWell = (
-  { port: [portX], leanDegrees, body, halfWidthU }: StraightMagazine,
+  { port: [portX], leanDegrees, body, halfWidthU }: BoxMagazine,
   clearance: { readonly faceU: number; readonly sideU: number },
 ) => ({
   leanDegrees,
@@ -138,8 +165,6 @@ export interface TracedSmgProportions {
     readonly topFlatHalfWidthU: number;
     readonly endCapSlope: { readonly from: Point; readonly to: Point };
     readonly rearLug: Box2;
-    /** The opening through the shell's floor; without it the section's default stands. */
-    readonly magazineWellX?: Span;
     readonly rail?: TracedRail;
   };
   readonly rearSight: {

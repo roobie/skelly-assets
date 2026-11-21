@@ -1,11 +1,45 @@
-import { citedBarrel, stockReachU, type TracedSmgProportions } from './tracedSmgProportions.ts';
+import { GRID } from '@skelly/construct/foundation/conventions.ts';
+import {
+  type BoxMagazine,
+  boxMagazinePieces,
+  citedBarrel,
+  leaningWell,
+  stockReachU,
+  type TracedSmgProportions,
+} from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 17.5;
 // The photo shows only threaded muzzles; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 16.5;
+// The cited barrel length runs from the threaded muzzle tip back to the breech.
+const barrel = citedBarrel(225, barrelTipThreadedU);
 const receiverRearX = -24.25;
 // The receiver's floor ahead of the magazine well, which the photo puts about 2 below the bore.
 const receiverBottomU = -2;
+// The photo's magazine bends steadily forward below the well, from about 12 degrees at the mouth to about 35 at the
+// floorplate, so no straight box fits it: one leaning at its average rake would push the well into the trigger
+// housing. Its straight top leans as the photo's rear face does at the mouth and runs down to the mouth, where the
+// bend starts; the bend's radius and sweep are fitted to the photo's front and rear faces and its floorplate's tilt,
+// all within about 0.15.
+const magazine = {
+  port: [-5, -3],
+  leanDegrees: 12,
+  body: { x: [-1.5, 1.5], y: [-2.5, 0] },
+  bend: { radiusU: 28, degrees: 24.5, pieces: 4 },
+  floorplate: { x: [-1.5, 1.5], y: [-3.25, -2.5] },
+  halfWidthU: 1,
+} as const satisfies BoxMagazine;
+const magazinePieces = boxMagazinePieces(magazine);
+// The well hugs the straight top down to its mouth, where the bend starts.
+const magwell = {
+  x: [-7, -3],
+  y: [magazine.port[1] + magazine.body.y[0], receiverBottomU],
+  ...leaningWell(magazine, { faceU: 0.05, sideU: 0.25 }),
+} as const;
+// The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
+// can rise in front of it.
+const magazineRearX = Math.min(...magazinePieces.flat().map(([x]) => x));
+const boltTravelU = Math.ceil((barrel.breechU - magazineRearX) / GRID) * GRID;
 
 /**
  * The notched cocking tube and knob traced from the compact SMG's photo. Every SMG handle starts from it: an untraced
@@ -63,17 +97,15 @@ export const COMPACT_SMG_PROPORTIONS = {
     eyeReliefU: 6,
   },
   // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port, a square section
-  // centred on the bore that the receiver's floor just clears. It recoils far enough for its face to clear the
-  // magazine's opening.
-  bolt: { lengthU: 5, halfHeightU: 1.25, halfWidthU: 1.25, travelU: 4.25 },
+  // centred on the bore that the receiver's floor just clears.
+  bolt: { lengthU: 5, halfHeightU: 1.25, halfWidthU: 1.25, travelU: boltTravelU },
   // The MP5's published rate (HK MP5 specification).
   cyclicRpm: 800,
   // The photo shows the left side, which has no port, so the opening is proportioned as the polymer SMG's drawing
   // has it: its top flush with the bolt's, about two-thirds the bolt's height, over the spent case at full recoil.
   ejectionPort: { x: [-7, -3], y: [-0.5, 1.25] },
-  // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
-    ...citedBarrel(225, barrelTipThreadedU),
+    ...barrel,
     tipU: { threaded: barrelTipThreadedU, plain: barrelTipPlainU },
     radiusU: 0.625,
     collar: { x: [14.75, 15.25], radiusU: 0.875 },
@@ -100,13 +132,7 @@ export const COMPACT_SMG_PROPORTIONS = {
       [-7, receiverBottomU],
       [-20, receiverBottomU],
     ],
-    // The curved magazine's top runs straight up into an upright well.
-    magwell: {
-      x: [-7, -3],
-      y: [-5.5, receiverBottomU],
-      leanDegrees: 0,
-      opening: { x: [-6.25, -3.25], halfWidthU: 1.25 },
-    },
+    magwell,
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
       [-13, -6],
@@ -154,42 +180,7 @@ export const COMPACT_SMG_PROPORTIONS = {
       ],
     ],
   },
-  // The magazine's top hides in the well; the pieces run down its curve.
-  magazine: {
-    port: [-4.5, -3],
-    halfWidthU: 1,
-    pieces: [
-      [
-        [-6, -3],
-        [-6, -5.5],
-        [-3.25, -4.75],
-        [-3.25, -3],
-      ],
-      [
-        [-6, -5.5],
-        [-5, -9],
-        [-1.75, -9],
-        [-3.25, -4.75],
-      ],
-      [
-        [-5, -9],
-        [-3.25, -13],
-        [0.25, -13],
-        [-1.75, -9],
-      ],
-      [
-        [-3.25, -13],
-        [-1.25, -16.5],
-        [2, -16.5],
-        [0.25, -13],
-      ],
-      [
-        [-1.25, -16.5],
-        [-0.5, -18.25],
-        [2, -16.5],
-      ],
-    ],
-  },
+  magazine: { port: magazine.port, halfWidthU: magazine.halfWidthU, pieces: magazinePieces },
   // Overall lengths run from the muzzle tip to the butt pad's rear face. The pad and struts are traced
   // extended; collapsing slides them forward by the difference of the published lengths.
   stock: {
