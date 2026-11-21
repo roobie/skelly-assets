@@ -13,15 +13,23 @@ const recipes = join(repository, 'models/recipes');
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+const importOf = (path: string) => `import ${JSON.stringify(path)}`;
+const catalogue = importOf(join(repository, 'models/index.libsonnet'));
+
 // The catalogue is its row files' rows, so the row file that holds an item makes the same row the catalogue does. The
-// manifest is read afresh, since a refresh while the server runs may move a row to another file.
-const catalogueSource = (itemId: string) =>
-  join(repository, rowFileOf(JSON.parse(readFileSync(manifest, 'utf8')) as CatalogueManifest, itemId));
+// manifest names that file as of the last refresh, which may run beside the server, so it is read afresh; a row moved
+// to another file or added since that refresh is found in the whole catalogue, slowly but rightly.
+const catalogueRows = (itemId: string) => {
+  const file = rowFileOf(JSON.parse(readFileSync(manifest, 'utf8')) as CatalogueManifest, itemId);
+  if (file === undefined) return catalogue;
+  const own = importOf(join(repository, file));
+  return `(if std.member([x.id for x in ${own}], ${JSON.stringify(itemId)}) then ${own} else ${catalogue})`;
+};
 
 // The recipe file of each row, read from the twins, which hold every row id and which the dev server's start made
 // current; a row added to a recipe later is found at the next start.
 let recipeOf: ReadonlyMap<string, string> | undefined;
-const recipeSource = (rowId: string) => {
+const recipeRows = (rowId: string) => {
   recipeOf ??= new Map(
     readdirSync(recipes)
       .filter((name) => name.endsWith('.json'))
@@ -33,16 +41,17 @@ const recipeSource = (rowId: string) => {
   );
   const source = recipeOf.get(rowId);
   if (source === undefined) throw new Error(`No recipe file holds row ${rowId}`);
-  return source;
+  return importOf(source);
 };
 
-const sourceOf: Readonly<Record<Half, (id: string) => string>> = { item: catalogueSource, row: recipeSource };
+// Each half's rows that hold an id, as Jsonnet.
+const rowsOf: Readonly<Record<Half, (id: string) => string>> = { item: catalogueRows, row: recipeRows };
 
 // Each half in a process of its own, so the item draws without waiting on its recipe row, or failing with it.
 export const evaluateHalf = async (half: Half, id: string): Promise<HalfResult> => {
   try {
     const expression = `
-      local found = [x for x in import ${JSON.stringify(sourceOf[half](id))} if x.id == ${JSON.stringify(id)}];
+      local found = [x for x in ${rowsOf[half](id)} if x.id == ${JSON.stringify(id)}];
       assert std.length(found) == 1 : ${JSON.stringify(`Expected one row ${id}, found `)} + std.length(found);
       found[0]`;
     return { value: JSON.parse(await evaluateJsonnetAsync(expression, undefined, { label: `${half} ${id}` })) };

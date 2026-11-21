@@ -9,9 +9,6 @@ export type { CatalogueManifest };
 export const catalogueIds = ({ shards }: CatalogueManifest): string[] =>
   Object.values(shards).flatMap(({ ids }) => ids);
 
-/** The row file that holds row `id`, by its path from the repository root. */
-export const rowFileOf = ({ shards }: CatalogueManifest, id: string): string => {
-  const holder = Object.entries(shards).find(([, { ids }]) => ids.includes(id));
-  if (holder === undefined) throw new Error(`No row file holds row ${id}`);
-  return holder[0];
-};
+/** The row file that holds row `id`, by its path from the repository root, none when no row file does. */
+export const rowFileOf = ({ shards }: CatalogueManifest, id: string): string | undefined =>
+  Object.entries(shards).find(([, { ids }]) => ids.includes(id))?.[0];
