@@ -59,8 +59,11 @@ local h = {
   cupTop: head.chin - self.slack,
   cupBottom: self.cupTop - 0.013,
   // The visor reaches below the chin, so a blow from the front meets it rather than the jaw.
-  visorBottom: -0.13,
+  visorBottom: head.chin - 0.03,
   visorTop: 0.042,
+  // The curtain flares out just above the chin and falls past it, so it covers the nape whatever the head's height.
+  curtainFlare: head.chin + 0.025,
+  curtainBottom: head.chin - 0.025,
 };
 // A squared dome, a superellipse of exponent four: a round dome low enough to look right would cut the hair's crown.
 local dome(steps) =
@@ -89,8 +92,8 @@ local pieces =
   + arc('band', 'shell', [h.outer + 0.004, h.visorInner], [-h.pivotBearing, h.pivotBearing], 10, [h.pivotHeight - 0.014, h.brow], h.back)
   + arc('visor', 'visor', [h.visorInner, h.visorOuter], [-90, 90], 10, [h.visorBottom, h.visorTop], h.back)
   // The curtain hangs from the skirt round the back and flares as it falls, to keep a blow off the neck.
-  + arc('curtain_upper', 'curtain', [h.inner + 0.005, h.outer + 0.004], [h.pivotBearing, 360 - h.pivotBearing], 20, [-0.075, h.skirtBottom + 0.005], h.back)
-  + arc('curtain_lower', 'curtain', [h.outer - 0.002, h.outer + 0.012], [h.pivotBearing, 360 - h.pivotBearing], 20, [-0.125, -0.075], h.back)
+  + arc('curtain_upper', 'curtain', [h.inner + 0.005, h.outer + 0.004], [h.pivotBearing, 360 - h.pivotBearing], 20, [h.curtainFlare, h.skirtBottom + 0.005], h.back)
+  + arc('curtain_lower', 'curtain', [h.outer - 0.002, h.outer + 0.012], [h.pivotBearing, 360 - h.pivotBearing], 20, [h.curtainBottom, h.curtainFlare], h.back)
   + pivot('left') + pivot('right')
   + strap(1) + strap(-1)
   + [box('chin_cup', 'strap', [-0.098, h.cupBottom, -0.005], [0.098, h.cupTop, 0.06])];

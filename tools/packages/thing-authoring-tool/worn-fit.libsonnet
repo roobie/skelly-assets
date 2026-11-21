@@ -735,6 +735,14 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   },
   // The base that seats a head piece with height `y` of it over the eyes, such as a visor's slit.
   eyesAt(y):: self.headroom(0).eyes - y,
+  // The box a solid helmet seated at `base` draws its shell in: the head's plan grown by `wall`, given as [at either
+  // side, at the face and the back, under the chin, over the hair's top], so the shell follows the head it encloses.
+  helmetBox(base, wall)::
+    local head = self.headroom(base);
+    {
+      min: [-(head.halfX + wall[0]), head.chin - wall[2], -(head.halfZ + wall[1])],
+      max: [head.halfX + wall[0], head.top + wall[3], head.halfZ + wall[1]],
+    },
   // A head piece's `brow` anchor, the point of it at height `y` that the showcase seats at the bust's, the hairline on
   // the hair's plan centre (models/dressing.libsonnet); `headroom(base).brow` seats it. It
   // is given as a share of the bounds `min`..`max` of its solid `solid`, which must hold that point; the share is

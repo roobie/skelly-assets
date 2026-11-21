@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { seatFindings, treeSeatFindings } from '../head-fit.mjs';
+import { helmetFindings, seatFindings, treeHelmetFindings, treeSeatFindings } from '../head-fit.mjs';
 import { boxes } from './boxes.mjs';
 
 // A box head 40 mm wide and 50 mm deep, standing 40 mm tall up to its top at y = 1, and a box shell of 4 mm walls round
@@ -65,4 +65,38 @@ test('a shell seated into the head is reported, whether too low or turned across
 
 test('an empty seat table is a finding, not a pass', () => {
   assert.deepEqual(treeSeatFindings('', { models: [] }, undefined, {}), ['models/head-seats.libsonnet seats no shell']);
+});
+
+// A solid helmet 10 mm off the head at the sides, standing up to `top` in its own frame, with its brow anchor seated 30
+// mm under the head's top, so the head stands up to 0.07 in the helmet's frame.
+const HEAD_BROW = [0, 0.97, 0];
+const helmetFindingsOf = (meshes) =>
+  helmetFindings({ head: HEAD, headBrow: HEAD_BROW, meshes, brow: [0, 0.04, 0], model: 'helmet' });
+const block = (bottom, top) => [
+  [-0.03, bottom, -0.035],
+  [0.03, top, 0.035],
+];
+
+test('a solid helmet round the head hides it', () => {
+  assert.deepEqual(helmetFindingsOf([boxes(block(0, 0.08))]), []);
+});
+
+test('a solid helmet too short for the head shows the head over its top', () => {
+  const [only, ...rest] = helmetFindingsOf([boxes(block(0, 0.06))]);
+  assert.deepEqual(rest, []);
+  assert.match(only, /^helmet: \d+ points of the head show outside it, the highest at \(-?0\.0\d+, 0\.070, /);
+});
+
+test('a hollow the helmet closes round the head hides what of the head it holds', () => {
+  const cap = shell(0.006).map(({ positions, indices }) => ({
+    positions: positions.map((value, i) => (i % 3 === 1 ? value + 0.055 : value)),
+    indices,
+  }));
+  assert.deepEqual(helmetFindingsOf([boxes(block(0, 0.055)), ...cap]), []);
+});
+
+test('an empty helmet list is a finding, not a pass', () => {
+  assert.deepEqual(treeHelmetFindings('', { models: [] }, undefined, []), [
+    'models/head-helmets.libsonnet lists no helmet',
+  ]);
 });

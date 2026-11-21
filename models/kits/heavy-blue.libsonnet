@@ -109,32 +109,36 @@ local shinAdd = [
 
 // The helm: wider and deeper than the trooper's, a moulded shell sloping in to a chamfered, domed crown under a tall
 // crest, a skirt flared out over the nape, cheek guards, ear discs and a heavy peaked brow. Its brow anchor is the point
-// of its shell that a seat with the visor over the eyes puts at the hairline.
-local visor = { min: [-0.085, 0.155, 0.145], max: [0.085, 0.19, 0.162] };
-local shell = { min: [-0.145, 0.035, -0.155], max: [0.145, 0.3, 0.155] };
-local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
+// of its shell that a seat with the visor over the eyes puts at the hairline. The shell is drawn round the head that
+// seat puts it on (`fit.helmetBox`), and each fitting from the face of the shell it stands on, as the trooper's are
+// (models/kits/trooper.libsonnet).
+local slit = [0.155, 0.19];
+local helmetBase = fit.eyesAt((slit[0] + slit[1]) / 2);
+local shell = fit.helmetBox(helmetBase, [0.0575, 0.046, 0.001, 0.023]);
+local side = shell.max[0], front = shell.max[2], back = shell.min[2], foot = shell.min[1], top = shell.max[1];
+local visor = { min: [-0.085, slit[0], front - 0.01], max: [0.085, slit[1], front + 0.007] };
 local helmet = [
-  h.taperedBlock('skirt', 'trim', [-0.158, 0, -0.185], [0.158, 0.04, 0.17], 0.05, [0.012, 0.012, 0.03], 0),
+  h.taperedBlock('skirt', 'trim', [-(side + 0.013), foot - 0.035, back - 0.03], [side + 0.013, foot + 0.005, front + 0.015], 0.05, [0.012, 0.012, 0.03], 0),
   h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.035, [0.022, 0.012, 0.022], 0.05),
-  round(h.dome('crown', 'plate', 0.07, 0.03, 0.012, 'y', [0, 0.295, -0.005])),
-  h.prism('crest', 'insignia', 'x', [[0.27, 0.125], [0.335, 0.08], [0.35, -0.07], [0.27, -0.12]], -0.016, 0.016),
-  h.prism('brow', 'trim', 'x', [[0.186, 0.138], [0.19, 0.172], [0.21, 0.184], [0.226, 0.145]], -0.08, 0.08),
+  round(h.dome('crown', 'plate', 0.07, 0.03, 0.012, 'y', [0, top - 0.005, -0.005])),
+  h.prism('crest', 'insignia', 'x', [[top - 0.03, 0.125], [top + 0.035, 0.08], [top + 0.05, -0.07], [top - 0.03, -0.12]], -0.016, 0.016),
+  h.prism('brow', 'trim', 'x', [[0.186, front - 0.017], [0.19, front + 0.017], [0.21, front + 0.029], [0.226, front - 0.01]], -0.08, 0.08),
   h.box('visor', 'lens', visor.min, visor.max),
-  h.prism('faceplate', 'plate', 'x', [[0.04, 0.15], [0.17, 0.15], [0.145, 0.19], [0.06, 0.196]], -0.085, 0.085),
+  h.prism('faceplate', 'plate', 'x', [[foot + 0.005, front - 0.005], [0.17, front - 0.005], [0.145, front + 0.035], [foot + 0.025, front + 0.041]], -0.085, 0.085),
 ] + [
-  h.box('grille-%d' % i, 'grille', [-0.055, 0.07 + i * 0.022, 0.185], [0.055, 0.081 + i * 0.022, 0.2])
+  h.box('grille-%d' % i, 'grille', [-0.055, foot + 0.035 + i * 0.022, front + 0.03], [0.055, foot + 0.046 + i * 0.022, front + 0.045])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'plate', [[-0.172, 0.125][i], 0.05, -0.04], [[-0.125, 0.172][i], 0.2, 0.14])
+  h.box('cheek-%d' % i, 'plate', [[-(side + 0.027), side - 0.02][i], foot + 0.015, -0.04], [[-(side - 0.02), side + 0.027][i], 0.2, front - 0.015])
   for i in [0, 1]
 ] + [
-  round(h.rod('ear-%d' % i, 'trim', 0.055, [-0.2, 0.17][i], [-0.17, 0.2][i], 0.13))
+  round(h.rod('ear-%d' % i, 'trim', 0.055, [-(side + 0.055), side + 0.025][i], [-(side + 0.025), side + 0.055][i], 0.13))
   for i in [0, 1]
 ] + [
-  h.box('bolt-%d' % i, 'rivet', [[-0.175, 0.145][i], 0.06, 0.1], [[-0.145, 0.175][i], 0.085, 0.12])
+  h.box('bolt-%d' % i, 'rivet', [[-(side + 0.03), side][i], foot + 0.025, 0.1], [[-side, side + 0.03][i], foot + 0.05, 0.12])
   for i in [0, 1]
 ] + [
-  round(h.rod('filter', 'trim', 0.03, 0.2, 0.26, 0.08)) + { origin: [-0.235, 0.08, 0.09] },
+  round(h.rod('filter', 'trim', 0.03, -(side + 0.09), -(side + 0.03), foot + 0.045, 0.09)),
 ];
 
 local body = fit.trooper('armor_heavy', livery, title='Heavy body armour');

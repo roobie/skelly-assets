@@ -58,10 +58,9 @@ local bust = {
   neckWidth: 0.12,
   neckHeight: self.chin - head('neck_01')[1],
   neckOverlap: head('Head')[1] - self.chin,
-  headWidth: 0.165, headHeight: 0.268, headDepth: 0.214, jawHeight: 0.09,
 } + the(playerBust, [
-  'torsoChamfer', 'chestChamfer', 'eyeShare', 'hairCover', 'hairThickness', 'facePower', 'hairSweep', 'hairRise',
-  'hairCrownShare', 'hairCrownBack', 'hairLayerCount',
+  'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare', 'hairCover',
+  'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack', 'hairLayerCount',
 ]);
 
 local fingers = ['index', 'middle', 'ring', 'pinky'];
