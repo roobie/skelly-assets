@@ -5,6 +5,8 @@ const barrelTipThreadedU = 17.5;
 // The photo shows only threaded muzzles; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 16.5;
 const receiverRearX = -24.25;
+// The receiver's floor ahead of the magazine well, which the photo puts about 2 below the bore.
+const receiverBottomU = -2;
 
 /**
  * The notched cocking tube and knob traced from the compact SMG's photo. Every SMG handle starts from it: an untraced
@@ -35,14 +37,14 @@ export const COMPACT_SMG_PROPORTIONS = {
     rearX: receiverRearX,
     frontX: 0,
     topU: 3.25,
-    bottomU: -1.5,
+    bottomU: receiverBottomU,
     halfWidthU: 2.25,
     chamferU: 0.25,
     topFlatHalfWidthU: 1.75,
     // The end cap slopes forward from its rear face to the roof.
     endCapSlope: { from: [receiverRearX, 1.25], to: [-23, 3.25] },
     // The block under the receiver's rear that the trigger housing pins to.
-    rearLug: { x: [-23.25, -20], y: [-3.5, -1.5] },
+    rearLug: { x: [-23.25, -20], y: [-3.5, receiverBottomU] },
   },
   // The drum is an inclined disc on its base; the photo shows its side.
   rearSight: {
@@ -61,13 +63,16 @@ export const COMPACT_SMG_PROPORTIONS = {
     // An estimate of the shooter's eye behind the drum with the cheek on the stock.
     eyeReliefU: 6,
   },
-  // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port. It is as wide as the
-  // polymer SMG's; the receiver's floor, close under the bore, keeps it lower. It recoils far enough for its face to
-  // clear the magazine's opening.
-  bolt: { lengthU: 4.75, halfHeightU: 0.75, halfWidthU: 1.25, travelU: 4.25 },
+  // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port, a square section
+  // centred on the bore that the receiver's floor just clears. It recoils far enough for its face to clear the
+  // magazine's opening.
+  bolt: { lengthU: 5, halfHeightU: 1.25, halfWidthU: 1.25, travelU: 4.25 },
   // The MP5's published rate (HK MP5 specification).
   cyclicRpm: 800,
   chamberedCase: NINE_MM_CASE,
+  // The photo shows the left side, which has no port, so the opening is proportioned as the polymer SMG's drawing
+  // has it: its top flush with the bolt's, about two-thirds the bolt's height, over the spent case at full recoil.
+  ejectionPort: { x: [-7, -3], y: [-0.5, 1.25] },
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
     ...citedBarrel(225, barrelTipThreadedU),
@@ -94,11 +99,11 @@ export const COMPACT_SMG_PROPORTIONS = {
       [-20, -3.75],
       [-18.5, -5.75],
       [-7, -5.75],
-      [-7, -1.5],
-      [-20, -1.5],
+      [-7, receiverBottomU],
+      [-20, receiverBottomU],
     ],
     // The curved magazine's top runs straight up into an upright well.
-    magwell: { x: [-7, -3], y: [-5.5, -1.5], leanDegrees: 0, opening: { x: [-6.25, -3.25], halfWidthU: 1.25 } },
+    magwell: { x: [-7, -3], y: [-5.5, receiverBottomU], leanDegrees: 0, opening: { x: [-6.25, -3.25], halfWidthU: 1.25 } },
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
       [-13, -6],
@@ -208,6 +213,6 @@ export const COMPACT_SMG_PROPORTIONS = {
     padHalfWidthU: 1.5,
     strut: { frontX: receiverRearX, y: [-1.75, -0.25], z: [1.25, 1.75] },
     latch: { x: [-27.25, receiverRearX], y: [-2, 0.75], halfWidthU: 1.5 },
-    lever: { x: [receiverRearX, -23.25], y: [-3.75, -1.75], halfWidthU: 0.25 },
+    lever: { x: [receiverRearX, -23.25], y: [-3.75, receiverBottomU], halfWidthU: 0.25 },
   },
 } as const;
