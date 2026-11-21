@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
-import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { meeting, shapes } from './pieces.mjs';
-
-const repo = resolve(import.meta.dirname, '../..');
 
 // Each exhaust fitted both ways at one spot, with the rows each way fits. Pieces are compared in the vehicle frame,
 // each part's moved to where its site puts it, so a mismatch is one fitting drawing something the other does not. An
@@ -27,7 +24,6 @@ const exhausts = Object.entries(
     }
     for name in exhaust.names
   }`,
-      repo,
     ),
   ),
 );

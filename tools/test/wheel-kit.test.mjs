@@ -1,11 +1,8 @@
 import assert from 'node:assert/strict';
-import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { workerPool } from '../workerPool.mjs';
 import { shapes, touches } from './pieces.mjs';
-
-const repo = resolve(import.meta.dirname, '../..');
 
 // Each wheel fitted at one near-side spot with each kind of brake its class offers, each part moved to where its site
 // puts it; the wheel's tyre and rim rows in the wheel's frame at that spot; and a drum brake's backing plate, shoes and
@@ -43,7 +40,6 @@ const fittings = JSON.parse(
     }
     for name in std.objectFields(wheels)
   }`,
-    repo,
   ),
 );
 

@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
-import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { meeting, shapes } from './pieces.mjs';
-
-const repo = resolve(import.meta.dirname, '../..');
 
 // Each assembly of every kit fitted both ways at one spot, with the rows each way fits: the fused part alone, or the
 // core and each accessory at its own site. Pieces are compared in the vehicle frame, the accessories' moved to where
@@ -36,7 +33,6 @@ const fittings = JSON.parse(
     for kind in std.objectFields(kits)
     for name in kits[kind].names
   }`,
-    repo,
   ),
 );
 
