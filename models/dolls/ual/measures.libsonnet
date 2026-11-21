@@ -4,6 +4,7 @@
 // two dolls share one drawing style, so the chamfers, overlaps and shares that shape the flesh rather than size it
 // are the player's.
 local skeleton = import 'skeleton.libsonnet';
+local joints = import 'joints.libsonnet';
 local playerBust = import 'models/measures/bust.libsonnet';
 local playerArm = import 'models/measures/arm.libsonnet';
 local playerLeg = import 'models/measures/leg.libsonnet';
@@ -14,13 +15,8 @@ local the(measures, names) = { [name]: measures[name] for name in names };
 // taken into the frame the arm is drawn in, the right arm hanging, as the doll rests that drawing turned into the
 // mannequin's T-pose.
 local armDelta(from, to) = local d = skeleton.delta(from + '_l', to + '_l'); [-d[1], -d[0], d[2]];
-// The leg hangs as the skeleton's does, so the right leg's delta is the left's mirrored.
-local legDelta(from, to) = local d = skeleton.delta(from + '_l', to + '_l'); [-d[0], d[1], d[2]];
 
-// Where the bust's drawing frame stands in the doll frame: on the centre line at the hips' foot, where the pelvis is
-// drawn up from. A height of the bust's measures is from there. The hips' foot is flesh, set by hand against the
-// mannequin, as no joint marks it.
-local bustBase = [0, 0.84, 0];
+local bustBase = joints.bustBase;
 local level(bone) = head(bone)[1] - bustBase[1];
 // The bone each of the bust family's segments turns with, its joint at the bone's head.
 local segmentBones = {
@@ -109,15 +105,8 @@ local arm = {
   'fingerFrontShare', 'thumbProjection', 'knuckleVolar',
 ]);
 
-local leg = {
-  local knee = legDelta('thigh', 'calf'),
-  local ankle = legDelta('thigh', 'foot'),
-  origins: { thigh: [0, 0, 0], shin: knee, foot: ankle },
-  // The toes bend about ball's head, which the foot is cut across at.
-  ballJoint: legDelta('thigh', 'ball'),
-  length: head('thigh_l')[1],
-  thighLength: -knee[1],
-  shoeHeight: head('foot_l')[1],
+local leg = joints.leg {
+  thighTop: playerLeg.hipsOverlap - level('thigh_l'),
   thighWidth: 0.155, thighDepth: 0.19,
   shinWidth: 0.11, shinDepth: 0.135,
   shoeWidth: 0.11,

@@ -35,7 +35,8 @@ local plinthTop = plinth.base.height + plinth.die.height + plinth.cornice.height
 
 // Degrees, as turns in the world. The figure faces +z; its left is +x.
 local pose = {
-  // Each leg swings `stride` forward (left) or back (right) and `splay` out, and each foot turns `toeOut` out.
+  // Each leg's hip-to-ankle line swings `stride` forward (left) or back (right) and `splay` out, and each foot turns
+  // `toeOut` out.
   stride: 6,
   splay: 7,
   toeOut: 12,
@@ -81,7 +82,8 @@ local isShare(field) = std.endsWith(field, 'Share') || std.endsWith(field, 'Shar
 local scaledMeasures(m) = {
   [f]: local v = m[f];
     if std.type(v) == 'number' && !isShare(f) then v * k
-    else if f == 'knuckleBack' then times(v, k)
+    else if f == 'knuckleBack' || f == 'ballJoint' then times(v, k)
+    else if f == 'origins' then { [joint]: times(v[joint], k) for joint in std.objectFields(v) }
     else v
   for f in std.objectFields(m)
 };
@@ -95,9 +97,8 @@ local lifeGirdle = girdle(bust);
 local shoulderX = lifeGirdle.deltoid.x;
 local shoulderY = lifeGirdle.deltoid.y;
 local chestTop = lifeGirdle.chestTop;
-local hipX = bust.pelvisWidth / 4;
-local hipY = bust.pelvisHeight * 0.12;
-local ankleDrop = leg.length - leg.thighLength - leg.shoeHeight;
+local hipX = leg.hip[0];
+local hipY = leg.hip[1];
 // The sabaton's sole lies under the bare foot, so the figure stands that much higher on the plinth.
 local soleLift = [r for r in plate if r.id == 'sabaton_plate_worn_foot'][0].soleLift;
 // The head's joint, which the armet's seat is measured from, so its slit falls at the doll's eyes.
@@ -106,10 +107,13 @@ local headJoint = chestTop + bust.neckHeight + bust.neckOverlap;
 // the thumb runs clear.
 local palmFace = [arm.palmThickness / 2, -arm.palmLength / 2, -0.01];
 
-// The legs' turns; both swing the same angle, so the hips stand where both soles meet the plinth.
-local legTurn(side) = rot.mul(rot.x(-side * pose.stride), rot.z(side * pose.splay));
+// The legs' turns. The ankle stands behind the hip, so each leg turns back by the splayed hip-to-ankle line's rake as
+// well, and both lines swing the same angle: so the hips stand where both soles meet the plinth.
+local splayedAnkle = rot.apply(rot.z(pose.splay), leg.origins.foot);
+local rake = std.atan(splayedAnkle[2] / splayedAnkle[1]) * 180 / std.pi;
+local legTurn(side) = rot.mul(rot.x(-side * pose.stride - rake), rot.z(side * pose.splay));
 local footTurn(side) = rot.y(side * pose.toeOut);
-local legDrop = (leg.length - leg.shoeHeight) * rot.apply(legTurn(1), [0, 1, 0])[1];
+local legDrop = -rot.apply(legTurn(1), leg.origins.foot)[1];
 
 // Each side's arm turns: upper arm, forearm and palm.
 local armTurns = {
@@ -133,11 +137,11 @@ local frames =
   local harness = frame(rot.id, [0, plinthTop + k * (leg.shoeHeight + soleLift + legDrop - hipY), 0]);
   local legFrames(name, side) =
     local thigh = frame(legTurn(side), at(harness, [side * hipX, hipY, 0]));
-    local greave = frame(legTurn(side), at(thigh, [0, -leg.thighLength, 0]));
+    local greave = frame(legTurn(side), at(thigh, leg.thighBone));
     {
       ['thigh-' + name]: thigh,
       ['greave-' + name]: greave,
-      ['sabaton-' + name]: frame(footTurn(side), at(greave, [0, -ankleDrop, 0])),
+      ['sabaton-' + name]: frame(footTurn(side), at(greave, leg.shinBone)),
     };
   local armFrames(name, side, curl) =
     local turns = armTurns[name];
@@ -317,11 +321,13 @@ local armParts(name) = [
   for b in std.range(0, hand.phalanges - 1)
 ];
 
-// One side's leg: the doll's thigh, the greave with the sabaton's shaft, and the sabaton.
+// One side's leg: the doll's thigh, the greave with the sabaton's shaft, and the sabaton, its toe brought back from
+// the ball onto the foot, since the stone's toes do not bend.
 local legParts(name) = [
   segment('thigh-' + name, 'avatarLeg', legMeasures, { segment: 'thigh' }, 0.1),
   carved('greave-' + name, figureKg * 0.05, platePieces('legguard_plate_worn_shin') + [p { id: 'shaft-' + p.id } for p in platePieces('sabaton_plate_worn_shaft')]),
-  carved('sabaton-' + name, figureKg * 0.02, platePieces('sabaton_plate_worn_foot')),
+  carved('sabaton-' + name, figureKg * 0.02, platePieces('sabaton_plate_worn_foot')
+                                             + [p { id: 'toe-' + p.id } for p in h.moved(platePieces('sabaton_plate_worn_toe'), times(leg.footBone, k))]),
 ];
 
 [

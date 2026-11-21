@@ -1,6 +1,5 @@
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local shoulder(side) = { part: 'torso', solid: 'shoulder-' + side, fraction: [0.5, 0.5, 0.5] };
-local hip(x) = { part: 'pelvis', solid: 'pelvis', fraction: [x, 0.12, 0.5] };
 // Shared finishes keep exposed skin continuous across separately posed parts.
 local skin = 'body-skin-player';
 local underwear = 'cloth-pants-player';
@@ -86,7 +85,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       { from: 'torso.neck', to: 'neck.neck' },
     ],
     // The pivots code poses from: the neck where the torso meets the head, the head's own pivot above it, a
-    // shoulder at each deltoid cap's centre and a hip under each side of the pelvis. Left is the figure's left, +x.
+    // shoulder at each deltoid cap's centre and a hip at the leg's hip joint. Left is the figure's left, +x.
     // The brow, where the hair meets the face, is where a hat's brim sits (models/dressing.libsonnet).
     anchors: {
       spine: { part: 'torso', solid: 'waist', fraction: [0.5, (0.2 - bust.pelvisHeight) / bust.waistHeight, 0.5] },
@@ -97,8 +96,8 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
       shoulder_left: shoulder('left'),
       shoulder_right: shoulder('right'),
-      hip_left: hip(0.75),
-      hip_right: hip(0.25),
+      hip_left: { part: 'pelvis', at: leg.hip },
+      hip_right: { part: 'pelvis', at: [-leg.hip[0], leg.hip[1], leg.hip[2]] },
     },
   },
   {
@@ -141,26 +140,27 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
     voxelGrain: bust.voxelGrain,
-    // One segment per part so a stance bends the leg at the knee and ankle; each segment is drawn about its own joint
-    // and mates to the segment above it there, so the whole stands exactly as one piece would.
+    // One segment per part so a stance bends the leg at the knee, the ankle and the ball, where the toes bend; each
+    // segment is drawn about its own joint and mates to the segment above it there, so the whole stands exactly as one
+    // piece would.
     parts: [
-      legSegment('thigh', 7, { skin: skin }, [jointSocket('knee', [0, -leg.thighLength, 0])]),
-      legSegment('shin', 3, { skin: skin }, [
-        jointPin('knee'),
-        jointSocket('ankle', [0, leg.shoeHeight - leg.length + leg.thighLength, 0]),
-      ]),
-      legSegment('foot', 1, foot, [jointPin('ankle')]),
+      legSegment('thigh', 7, { skin: skin }, [jointSocket('knee', leg.thighBone)]),
+      legSegment('shin', 3, { skin: skin }, [jointPin('knee'), jointSocket('ankle', leg.shinBone)]),
+      legSegment('foot', 0.8, foot, [jointPin('ankle'), jointSocket('ball', leg.footBone)]),
+      legSegment('ball', 0.2, foot, [jointPin('ball')]),
     ],
     connections: [
       { from: 'thigh.knee', to: 'shin.knee' },
       { from: 'shin.ankle', to: 'foot.ankle' },
+      { from: 'foot.ball', to: 'ball.ball' },
     ],
     // The pivots code poses from: the hip the leg hangs from and strides about, sitting at the bust's hip anchor, and
-    // each joint below it. The shin overlaps the foot so the joint stays closed when it bends.
+    // each joint below it.
     anchors: {
-      hip: { part: 'thigh', solid: 'thigh', fraction: [0.5, 1, 0.5] },
-      knee: { part: 'thigh', solid: 'thigh', fraction: [0.5, 0, 0.5] },
-      ankle: { part: 'shin', solid: 'shin', fraction: [0.5, leg.ankleOverlap / (leg.length - leg.shoeHeight - leg.thighLength + leg.kneeOverlap + leg.ankleOverlap), 0.5] },
+      hip: { part: 'thigh', at: [0, 0, 0] },
+      knee: { part: 'thigh', at: leg.thighBone },
+      ankle: { part: 'shin', at: leg.shinBone },
+      ball: { part: 'foot', at: leg.footBone },
     },
   },
 ]

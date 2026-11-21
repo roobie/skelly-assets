@@ -83,21 +83,21 @@ local palmAdd = [
 // Thigh: a thick cuisse with a big front plate. Bulk goes front and back, as the legs stand close together and the
 // hand hangs beside them.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
-local thighAdd = [
-  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, -0.04, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
-  h.box('cuisse-plate', 'plate', [-tw * 0.45, -leg.thighLength + 0.06, (td + 0.07) / 2 - 0.004], [tw * 0.45, -0.075, (td + 0.07) / 2 + 0.02]),
-  fit.besideHand('cuisse-rim', 'insignia', -0.07, -0.04, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
+local thighAdd = fit.onThigh([
+  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, fit.crotch - 0.02, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
+  h.box('cuisse-plate', 'plate', [-tw * 0.45, -leg.thighLength + 0.06, (td + 0.07) / 2 - 0.004], [tw * 0.45, fit.crotch - 0.055, (td + 0.07) / 2 + 0.02]),
+  fit.besideHand('cuisse-rim', 'insignia', fit.crotch - 0.05, fit.crotch - 0.02, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
 ] + [
   fit.besideHand('strap-%d' % i, 'strap', y, y + 0.03, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03)
   for i in [0, 1]
-  for y in [[-0.18, -0.32][i]]
-];
+  for y in [fit.downThigh([0.4, 0.75][i])]
+]);
 
 // Shin: a big knee cop over a bulky greave.
 local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
 local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
 local kneeD = sd + 0.06;
-local shinAdd = [
+local shinAdd = fit.onShin([
   oct('knee', 'plate', -0.08, 0.075, sw + 0.075, kneeD, 0.035),
   h.box('knee-guard', 'plate', [-0.07, -0.085, kneeD / 2 - 0.004], [0.07, 0.09, kneeD / 2 + 0.024]),
   round(h.dome('knee-cop', 'trim', 0.045, 0.024, 0.008, 'z', [0, 0, kneeD / 2 + 0.024])),
@@ -105,7 +105,7 @@ local shinAdd = [
   h.prism('greave-ridge', 'trim', 'y', [[(sd + 0.05) / 2 - 0.002, -0.02], [(sd + 0.05) / 2 + 0.018, 0], [(sd + 0.05) / 2 - 0.002, 0.02]],
           -shinLength + 0.03, -0.1),
   oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.012, sw + 0.06, sd + 0.06, leg.shinChamfer / 2 + 0.02),
-];
+]);
 
 // The helm: wider and deeper than the trooper's, a moulded shell sloping in to a chamfered, domed crown under a tall
 // crest, a skirt flared out over the nape, cheek guards, ear discs and a heavy peaked brow. Its brow anchor is the point
@@ -148,10 +148,10 @@ local gloves = fit.hands('gloves_heavy', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
 }, 'Heavy gauntlets');
 local boots = fit.feet('boots_heavy', bootFinish,
-                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Heavy boots');
+                       { room: 0.07, w: 0.15, s: 0.045, toe: 0.13, instep: 0.065, top: 0.19, laces: 0 }, { covers: ['foot'] }, title='Heavy boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
-  oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03);
+  fit.onShin([oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03)])[0];
 
 local forArmour = {
   body: function(r) remake(r, starts(['chest', 'slab', 'chevron', 'rivet', 'belt', 'buckle']), bodyAdd),

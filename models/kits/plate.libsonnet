@@ -99,22 +99,22 @@ local fore = [
 
 // Thigh: a cuisse with a rim at the hip and a strap or two. Bulk goes front and back, as the legs stand close together.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
-local thigh = [
-  oct('cuisse', 'plate', -leg.thighLength + 0.02, -0.05, tw + 0.02, td + 0.03, leg.thighChamfer / 2 + 0.015),
-  oct('cuisse-rim', 'trim', -0.065, -0.05, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
+local thigh = fit.onThigh([
+  oct('cuisse', 'plate', -leg.thighLength + 0.02, fit.crotch - 0.03, tw + 0.02, td + 0.03, leg.thighChamfer / 2 + 0.015),
+  oct('cuisse-rim', 'trim', fit.crotch - 0.045, fit.crotch - 0.03, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
   oct('cuisse-hem', 'trim', -leg.thighLength + 0.02, -leg.thighLength + 0.034, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
-  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.03) / 2 - 0.002, -0.016], [(td + 0.03) / 2 + 0.014, 0], [(td + 0.03) / 2 - 0.002, 0.016]], -leg.thighLength + 0.06, -0.08),
+  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.03) / 2 - 0.002, -0.016], [(td + 0.03) / 2 + 0.014, 0], [(td + 0.03) / 2 - 0.002, 0.016]], -leg.thighLength + 0.06, fit.crotch - 0.06),
 ] + [
   oct('strap-%d' % i, 'strap', y, y + 0.022, tw + 0.032, td + 0.042, leg.thighChamfer / 2 + 0.015)
   for i in [0, 1]
-  for y in [[-0.2, -0.3][i]]
-];
+  for y in [fit.downThigh([0.45, 0.7][i])]
+]);
 
 // Shin: a poleyn (knee cop with a fan) over a greave with a front ridge.
 local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
 local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
 local kneeD = sd + 0.04;
-local shin = [
+local shin = fit.onShin([
   oct('poleyn', 'plate', -0.07, 0.065, sw + 0.05, kneeD, 0.03),
   round(h.dome('poleyn-cop', 'trim', 0.058, 0.032, 0.009, 'z', [0, 0, kneeD / 2 - 0.004])),
   round(h.turned('poleyn-fan', 'trim', 'x', [[0, 0], [0, 0.05], [0.008, 0.042], [0.016, 0]], [sw / 2 + 0.014, 0, 0])),
@@ -122,7 +122,7 @@ local shin = [
   h.prism('greave-ridge', 'trim', 'y', [[(sd + 0.025) / 2 - 0.002, -0.016], [(sd + 0.025) / 2 + 0.014, 0], [(sd + 0.025) / 2 - 0.002, 0.016]], -shinLength + 0.03, -0.1),
   oct('greave-rim', 'trim', -shinLength - leg.ankleOverlap, -shinLength + 0.012, sw + 0.04, sd + 0.035, leg.shinChamfer / 2 + 0.015),
   oct('greave-top', 'trim', -0.075, -0.062, sw + 0.04, sd + 0.035, leg.shinChamfer / 2 + 0.015),
-];
+]);
 
 // Gauntlet: a flared steel cuff (from `hands`) and a plate with a knuckle bar over the back of the hand.
 local palmX = arm.palmThickness / 2 + fit.layers.normal, palmZ = arm.palmWidth / 2 + fit.layers.normal;
@@ -134,7 +134,7 @@ local palmAdd = [
 // Sabaton shaft: lames up the ankle.
 local shaftAdd(r) =
   local shaft = [p for p in std.parseJson(r.parts[0].params.pieces) if p.id == 'shaft'][0];
-  [oct('lame-%d' % i, 'collar', shaft.start + 0.04 + i * 0.045, shaft.start + 0.07 + i * 0.045, 0.14, 0.14, 0.03) for i in [0, 1]];
+  fit.onShin([oct('lame-%d' % i, 'collar', shaft.start + 0.04 + i * 0.045, shaft.start + 0.07 + i * 0.045, 0.14, 0.14, 0.03) for i in [0, 1]]);
 
 // The armet: a rounded skull with a low comb, a neck flange, and a pointed visor over a vision slit with breaths below.
 // Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline. The skull is
@@ -169,7 +169,7 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'trim', ridge: 'rivet' },
 }, 'Plate gauntlets');
 local boots = fit.feet('sabaton_plate', sabaton,
-                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
+                       { room: 0.08, w: 0.13, s: 0.04, toe: 0.115, instep: 0.065, top: 0.19, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
 
 // Each item's rows, in item order. The breastplate encloses the trunk and the greave the shin, so each hides that skin;
 // the shoulders stay drawn under the pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates

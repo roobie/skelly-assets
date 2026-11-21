@@ -11,6 +11,15 @@ local hand = import 'models/measures/hand.libsonnet';
 // How far each layer stands off the skin. An outer layer clears every inner one on the same segment.
 local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };
 
+// The thigh's frame stands at the hip joint, which lies inside the pelvis, so a thigh piece is placed from where the
+// thigh shows: the hips' foot (`crotch`), and `downThigh(share)`, that share of the way from there to the knee.
+local crotch = -leg.hip[1];
+local downThigh(share) = crotch - share * (leg.thighLength + crotch);
+// The knee and the ankle need not stand under the hip, and a segment's flesh stands halfway along its bone, so a thigh
+// or shin piece, authored about its joint's upright, is moved onto the line its segment's flesh stands about.
+local onThigh(pieces) = h.moved(pieces, leg.thighAxis);
+local onShin(pieces) = h.moved(pieces, leg.shinAxis);
+
 // The plan outline of an octagon `w` across x and `d` along z, corners cut by `c`, as a y prism's [z, x] points.
 local outline(w, d, c) = [
   [-d / 2 + c, -w / 2], [d / 2 - c, -w / 2], [d / 2, -w / 2 + c], [d / 2, w / 2 - c],
@@ -48,6 +57,8 @@ local slopeY = girdle.slopeY;
 local deltoidY = girdle.deltoidY;
 // Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
 local armInner = deltoid.x - arm.upperWidth / 2;
+// How far down the thigh's frame the hanging hand's fingertips reach.
+local fingertips = deltoid.y - leg.hip[1] - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
 // A sleeve's head covers the deltoid, so its depth follows the deltoid's rather than the arm's, eased so the cloth
 // hangs loose over it.
 local sleeveEase = 0.018;
@@ -89,7 +100,8 @@ local hood(slot, lining, chestD, depth) =
     + { clip: trapezius(top) },
   ];
 
-local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: 0.004 };
+local shellGrain = 0.004;
+local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: shellGrain };
 
 // A worn shell's row. `covers` names the doll parts or regions the shell encloses at rest, which a consumer stops
 // drawing while it is worn, so it lists nothing the shell leaves showing. No upper sleeve encloses its part: the elbow's
@@ -146,10 +158,15 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   oct: oct,
   handClear: handClear,
   besideHand: besideHand,
+  crotch: crotch,
+  downThigh: downThigh,
+  onThigh: onThigh,
+  onShin: onShin,
+  fingertips: fingertips,
   // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
   // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
   // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
-  refit(r, pieces, grain=0.004):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
+  refit(r, pieces, grain=shellGrain):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
                                   + { [k]: r[k] for k in ['title', 'covers', 'soleLift'] if std.objectHas(r, k) },
 
   // A shell over the shoulders follows the bust's: `trapezius(rise)` cuts a piece to the slope set out by `rise`,
@@ -362,25 +379,24 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     // beside the sleeve the thigh's bell is narrower than the sleeve stands off the hip, and the pelvis shell covers
     // the thigh there. Below the sleeve it widens to just inside the hanging hand, below the fingertips it flares,
     // and the shin's bell flares on to the hem.
-    // The shoulder joint is the deltoid cap's centre and each hip a quarter of the pelvis in from its side.
-    local jointX = deltoid.x, jointY = deltoid.y;
-    local hipX = bust.pelvisWidth / 4;
-    local sleeveClear = jointX - inner - 0.012 - hipX;
-    local handClear = jointX - arm.palmThickness / 2 - 0.006 - hipX;
-    // Heights in the thigh's frame, taking the hip as the bust's base: the sleeve's end, lowest at its deep back edge,
-    // which dips as the elbow bends, and the fingertips.
-    local sleeveEnd = jointY - arm.upperLength - reach - 0.03;
-    local fingertips = jointY - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
+    // The shoulder joint is the deltoid cap's centre.
+    local jointX = deltoid.x;
+    local sleeveClear = jointX - inner - 0.012 - leg.hip[0];
+    local handClear = jointX - arm.palmThickness / 2 - 0.006 - leg.hip[0];
+    // Heights in the thigh's frame: the sleeve's end, lowest at its deep back edge, which dips as the elbow bends, and
+    // the pelvis shell's hem.
+    local sleeveEnd = deltoid.y - leg.hip[1] - arm.upperLength - reach - 0.03;
+    local thighHem = crotch + hem;
     local bell(id, slot, rings) = h.turned(id, slot, 'y', [[rings[0][0], 0]] + rings + [[rings[std.length(rings) - 1][0], 0]]);
     local kneeR = handClear + 0.035, hemR = kneeR + 0.04;
-    local thigh = [
-      bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [hem - 0.01, handClear],
+    local thigh = onThigh([
+      bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [thighHem - 0.01, handClear],
                                [sleeveEnd, sleeveClear], [0.03, sleeveClear - 0.01]]),
-    ];
-    local shin = [
+    ]);
+    local shin = onShin([
       bell('skirt', sl.cloth, [[-s.hem, hemR], [0.06, kneeR - 0.015]]),
       bell('hem', sl.trim, [[-s.hem, hemR + 0.006], [-s.hem + 0.02, hemR + 0.006 - 0.004]]),
-    ];
+    ]);
     // The thigh's bell is narrow by the hip, where the pelvis shell covers the leg, and the shin's ends at the hem, so
     // neither encloses its part.
     fitted([
@@ -509,16 +525,16 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
     local kneeD = sd + 0.035;
-    local thigh = [
-      oct('cuisse', 'plate', -leg.thighLength + 0.03, -0.05, tw + 0.016, td + 0.02, leg.thighChamfer / 2 + 0.012),
-      h.box('cuisse-plate', 'plate', [-tw * 0.4, -leg.thighLength + 0.07, (td + 0.02) / 2 - 0.004], [tw * 0.4, -0.08, (td + 0.02) / 2 + 0.012]),
-      oct('cuisse-rim', 'insignia', -0.065, -0.05, tw + 0.024, td + 0.028, leg.thighChamfer / 2 + 0.012),
+    local thigh = onThigh([
+      oct('cuisse', 'plate', -leg.thighLength + 0.03, crotch - 0.03, tw + 0.016, td + 0.02, leg.thighChamfer / 2 + 0.012),
+      h.box('cuisse-plate', 'plate', [-tw * 0.4, -leg.thighLength + 0.07, (td + 0.02) / 2 - 0.004], [tw * 0.4, crotch - 0.06, (td + 0.02) / 2 + 0.012]),
+      oct('cuisse-rim', 'insignia', crotch - 0.045, crotch - 0.03, tw + 0.024, td + 0.028, leg.thighChamfer / 2 + 0.012),
     ] + [
       oct('strap-%d' % i, 'strap', y, y + 0.025, tw + 0.022, td + 0.026, leg.thighChamfer / 2 + 0.012)
       for i in [0, 1]
-      for y in [[-0.17, -0.31][i]]
-    ];
-    local shin = [
+      for y in [downThigh([0.375, 0.725][i])]
+    ]);
+    local shin = onShin([
       oct('knee', 'plate', -0.065, 0.06, sw + 0.03, kneeD, 0.025),
       h.box('knee-guard', 'plate', [-0.055, -0.07, kneeD / 2 - 0.004], [0.055, 0.075, kneeD / 2 + 0.02]),
       h.dome('knee-cop', 'trim', 0.035, 0.018, 0.006, 'z', [0, 0, kneeD / 2 + 0.02]),
@@ -526,7 +542,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       h.prism('greave-ridge', 'trim', 'y', [[(sd + 0.012) / 2 - 0.002, -0.014], [(sd + 0.012) / 2 + 0.012, 0], [(sd + 0.012) / 2 - 0.002, 0.014]],
               -shinLength + 0.03, -0.08),
       oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.01, sw + 0.02, sd + 0.02, leg.shinChamfer / 2 + 0.012),
-    ];
+    ]);
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
       shell(id + '_worn_thigh', thigh, finish, [], title=named(title, 'thigh')),
@@ -546,17 +562,17 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('seat', sl.cloth, -0.01, bust.pelvisHeight + 0.015, seatW, seatD, around(cut, g)),
       oct('waistband', sl.trim, bust.pelvisHeight - 0.02, bust.pelvisHeight + 0.02, seatW + 0.006, seatD + 0.006, around(cut, g + 0.003)),
     ];
-    local thigh = [
+    local thigh = onThigh([
       oct('leg', sl.cloth, -leg.thighLength - 0.02, 0.025, leg.thighWidth + 2 * g, leg.thighDepth + 2 * g, around(leg.thighChamfer / 2, g)),
-    ];
+    ]);
     // In the knee's frame the ankle sits a shin below. The cuff stands taller than the ankle bone rises above the
     // ankle and ends a centimetre above it, clear of the instep.
-    local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
+    local ankle = leg.shinBone[1];
     local cuff = [ankle + 0.01, ankle + 0.07];
     local shinW = leg.shinWidth + 2 * (g + s.ease), shinD = leg.shinDepth + 2 * (g + s.ease), shinCut = around(leg.shinChamfer / 2, g + s.ease);
-    local shin = [oct('leg', sl.cloth, cuff[1] - 0.005, 0.025, shinW, shinD, shinCut)]
-                 + ring('cuff', sl.cloth, cuff[0] + 0.03, cuff[1], shinW, shinD, shinCut, 0.008)
-                 + ring('hem', sl.trim, cuff[0], cuff[0] + 0.03, shinW + 0.004, shinD + 0.004, around(shinCut, 0.002), 0.01);
+    local shin = onShin([oct('leg', sl.cloth, cuff[1] - 0.005, 0.025, shinW, shinD, shinCut)]
+                        + ring('cuff', sl.cloth, cuff[0] + 0.03, cuff[1], shinW, shinD, shinCut, 0.008)
+                        + ring('hem', sl.trim, cuff[0], cuff[0] + 0.03, shinW + 0.004, shinD + 0.004, around(shinCut, 0.002), 0.01));
     // The knee's cap reaches below the thigh's leg, where the shin's takes over, and the cuff stops above the ankle, so
     // neither leg encloses its part.
     fitted([
@@ -573,22 +589,22 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
     local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
-    local thigh = [
-      oct('cuisse', sl.shell, -leg.thighLength + 0.02, -0.06, tw, td, leg.thighChamfer / 2 + 0.01),
-      oct('cuisse-rim', sl.rim, -0.075, -0.06, tw + 0.008, td + 0.008, leg.thighChamfer / 2 + 0.01),
+    local thigh = onThigh([
+      oct('cuisse', sl.shell, -leg.thighLength + 0.02, crotch - 0.04, tw, td, leg.thighChamfer / 2 + 0.01),
+      oct('cuisse-rim', sl.rim, crotch - 0.055, crotch - 0.04, tw + 0.008, td + 0.008, leg.thighChamfer / 2 + 0.01),
     ] + [
       oct('strap-%d' % i, sl.strap, y, y + 0.02, tw + 0.006, td + 0.006, leg.thighChamfer / 2 + 0.01)
       for i in [0, 1]
-      for y in [[-0.16, -0.3][i]]
-    ];
-    local shin = [
+      for y in [downThigh([0.35, 0.7][i])]
+    ]);
+    local shin = onShin([
       // The knee cop bulges forward over the joint, with a fan on the outside.
       oct('poleyn', sl.cop, -0.05, 0.05, sw + 0.02, sd + 0.02, 0.025),
       h.turned('poleyn-boss', sl.cop, 'z', [[0, 0], [0, 0.045], [0.012, 0.035], [0.02, 0]], [0, 0, (sd + 0.02) / 2]),
     ] + (if s.greaves then [
       oct('greave', sl.shell, -shinLength - leg.ankleOverlap, -0.045, sw, sd, leg.shinChamfer / 2 + 0.01),
       oct('greave-rim', sl.rim, -shinLength - leg.ankleOverlap, -shinLength + 0.005, sw + 0.008, sd + 0.008, leg.shinChamfer / 2 + 0.01),
-    ] else []);
+    ] else []));
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
       shell(id + '_worn_thigh', thigh, finish, [], title=named(title, 'thigh')),
@@ -656,42 +672,46 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       ground: h.lifted(palm, fingerLength + g + arm.palmLength) + h.lifted(fingers, fingerLength + g),
     },
 
-  // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,
-  // laces). The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it, and
-  // it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
+  // Boots and shoes from the ground row's own boot spec `b`: width w, sole s, the toe cap's height `toe` over the bare
+  // sole, laces, and what follows the foot it is worn on: `room`, how much longer the boot is than the foot's reach,
+  // and the rises of the vamp's `instep` and the shaft's `top` above the ankle, so a longer foot or a higher ankle takes
+  // the same boot. The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it,
+  // and it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
   // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
   // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
-  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee. `ball`,
-  // for a doll whose foot bends at the ball, cuts the toes off the foot piece as a `toe` piece that bends with them:
-  // `joint`, the ball's joint in the foot's frame, and `part`, the doll part beyond it, which the toe encloses when the
-  // vamp covers the sole it belongs to.
+  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee. The foot
+  // bends at the ball, so the toes are cut off the foot piece as a `toe` piece that bends with them; `ball` gives the
+  // ball's `joint` in the foot's frame and `part`, the doll part beyond it, which the toe encloses when the vamp covers
+  // the sole it belongs to.
   feet(id, finish, b, spec={}, title=null)::
-    local s = { layer: 'normal', ease: 0, covers: [], ball: null } + spec;
+    local s = { layer: 'normal', ease: 0, covers: [], ball: { joint: leg.footBone, part: 'ball' } } + spec;
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
-    local z0 = footZ - b.l / 2, zt = footZ + b.l / 2 - b.w / 2, zs = z0 + 0.12;
+    local l = leg.toeReach + leg.heelReach + b.room;
+    local instep = leg.shoeHeight + b.instep;  // The vamp's height over the bare sole.
+    local z0 = footZ - l / 2, zt = footZ + l / 2 - b.w / 2, zs = z0 + 0.12;
     local y(v) = ankleY + v;
     local foot = [
       h.box('sole', 'sole', [-b.w / 2 - 0.004, y(0), z0 - 0.004], [b.w / 2 + 0.004, y(b.s), zt]),
       h.disc('sole-toe', 'sole', b.w / 2 + 0.004, y(0), y(b.s), 0, zt),
       h.box('heel', 'sole', [-b.w / 2 - 0.004, y(0), z0 - 0.006], [b.w / 2 + 0.004, y(b.s + 0.01), z0 + 0.07]),
-      h.prism('vamp', 'upper', 'x', [[y(b.s), z0], [y(b.s), zt], [y(b.s + b.toe), zt], [y(b.s + b.instep), zs], [y(b.s + b.instep), z0]], -b.w / 2, b.w / 2),
+      h.prism('vamp', 'upper', 'x', [[y(b.s), z0], [y(b.s), zt], [y(b.s + b.toe), zt], [y(b.s + instep), zs], [y(b.s + instep), z0]], -b.w / 2, b.w / 2),
       h.turned('toe', 'toe', 'y', [[0, 0], [0, b.w / 2], [b.toe * 0.6, b.w / 2], [b.toe, b.w * 0.3], [b.toe, 0]], [0, y(b.s), zt]),
     ] + (if b.laces == 0 then [] else [
-      local zl = zs + f * (zt - zs) * 0.6, yl = y(b.s + b.instep + f * 0.6 * (b.toe - b.instep));
+      local zl = zs + f * (zt - zs) * 0.6, yl = y(b.s + instep + f * 0.6 * (b.toe - instep));
       h.box('instep-lace-%d' % i, 'laces', [-b.w * 0.28, yl - 0.004, zl - 0.004], [b.w * 0.28, yl + 0.002, zl])
       for i in [0, 1]
       for f in [[0.35, 0.75][i]]
     ]);
-    // The shaft, in the knee's frame: the ankle sits a shin below the knee.
-    local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
+    // The shaft, in the knee's frame, about the shin: the ankle sits a shin below the knee.
+    local ankle = leg.shinBone[1];
     local shaftW = std.max(b.w * 0.92, leg.shinWidth + 2 * (g + s.ease)), shaftD = std.max(0.116, leg.shinDepth + 2 * (g + s.ease));
     // The shaft reaches below the ankle, past the shin's end, so no skin shows over a low vamp.
-    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + ankleY + b.top;
-    local rise = top - 0.02 - (ankle + ankleY + b.s + b.instep);
-    local shaft = [
+    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + b.top;
+    local rise = top - 0.02 - (ankle + ankleY + b.s + instep);
+    local shaft = onShin([
       oct('shaft', 'upper', base, top - 0.02, shaftW, shaftD, 0.02),
       oct('collar', 'collar', top - 0.02, top, shaftW + 0.008, shaftD + 0.008, 0.022),
     ] + (if b.laces == 0 then [] else [
@@ -700,22 +720,31 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       local yl = base + 0.01 + i * rise / (b.laces - 1);
       h.box('lace-%d' % i, 'laces', [-b.w * 0.3, yl, shaftD / 2 + 0.006], [b.w * 0.3, yl + 0.004, shaftD / 2 + 0.009])
       for i in std.range(0, b.laces - 1)
-    ]);
+    ]));
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
-    // The round toe caps are handed whole to the toe or the foot by where their middle stands from the ball.
-    local cutAtBall(keep) = h.cut(foot, 'z', s.ball.joint[2], keep, whole=true);
-    local split = if s.ball == null then [] else unshared(foot, [cutAtBall(-1), cutAtBall(1)]);
+    // The doll's foot and toes are voxelised past their cut at the ball by up to half the doll's grain, and each shell
+    // piece may stop short of its own cut by half its grain, so the foot and toe pieces each reach both halves past the
+    // ball to enclose the skin of their part, overlapping one another there as the doll's parts do. A turned piece is
+    // not sliced but handed whole to the side of the ball holding its middle, so it lands in only one of them.
+    local reach = (bust.voxelGrain + shellGrain) / 2;
+    local cutAtBall(keep) = std.flattenArrays([
+      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * reach), keep, whole=true)
+      for p in foot
+    ]);
+    local footPieces = cutAtBall(-1), toePieces = cutAtBall(1);
+    local split = unshared(foot, [footPieces, toePieces]);
     assert split == [] : '%s: the cut left %s in none or in both of its foot and toe' % [id, split];
-    local shod = shell(id + '_worn_foot', if s.ball == null then foot else cutAtBall(-1), footFinish, s.covers, title=named(title, 'foot'));
-    local toe = if s.ball == null then [] else [
-      shell(id + '_worn_toe', h.moved(cutAtBall(1), [-c for c in s.ball.joint]), footFinish,
-            if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe')),
-    ];
-    fitted([shod { soleLift: b.s }] + toe
+    // A turned piece handed to the rigid foot would stay put while the toes bend under it.
+    local stiff = [p.id for p in footPieces if p.kind == 'turned'];
+    assert stiff == [] : '%s: %s stand behind the ball, where the toes would bend under them' % [id, stiff];
+    local shod = shell(id + '_worn_foot', footPieces, footFinish, s.covers, title=named(title, 'foot'));
+    local toe = shell(id + '_worn_toe', h.moved(toePieces, [-c for c in s.ball.joint]), footFinish,
+                      if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe'));
+    fitted([shod { soleLift: b.s }, toe]
            + (if shafted then [shell(id + '_worn_shaft', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
-      ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),
+      ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(h.moved(shaft, [-c for c in leg.shinBone]), -ankleY) else []),
     },
 
   // The head a rigid head piece seated at `base` encloses, in that seat's frame: the hair's plan half-widths, deeper

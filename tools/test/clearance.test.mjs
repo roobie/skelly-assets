@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { clearanceProbe, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import { clearanceProbe, coverage, posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { applyPoint, IDENTITY_M, length, rotAxis, rotZ } from '../../site/kinematics.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
@@ -106,6 +106,21 @@ test('a piece passing through a part beneath its face covers that face, and noth
     pokes.every(({ bone, point }) => bone === 'fore' && point[1] >= -0.4),
     'the forearm below the cuff is not covered',
   );
+});
+
+test("a ray in the plane of a shell's foot leaves its part through the last face it meets, not never", () => {
+  // A block with a slab standing on its middle and running on past it: the ray from the block's face straight in runs
+  // along the slab's foot, which counts it inside the slab past the block's far face, where it meets no face again. A
+  // piece the ray meets further on lies past the middle of the part, so it covers nothing of the block's face. The sizes
+  // are powers of two, so the ray lies exactly in the foot's plane.
+  const block = boxMesh([0.25, 0.25, 0.25]);
+  const slab = boxMesh([0.5, 0.25, 0.25], [-0.125, 0.125, 0]);
+  const spine = { bones: [{ id: 'spine', parent: null, head: [0, 0.125, 0], tail: [0, -0.125, 0] }] };
+  const rest = {
+    body: [{ bone: 'spine', part: 'torso', mesh: union(block, slab) }],
+    pieces: [{ piece: 'bag', bone: 'spine', mesh: boxMesh([0.0625, 0.0625, 0.0625], [-0.25, 0, 0]) }],
+  };
+  assert.equal(coverage(spine, rest)('spine', { point: [0.125, 0, 0], normal: [1, 0, 0] }), -1);
 });
 
 test("a piece hung against a part's side covers none of the rest of the part", () => {

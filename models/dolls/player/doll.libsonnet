@@ -31,7 +31,8 @@
     // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
     trunk: ['torso#trunk'],
     shoulders: ['torso#shoulders'],
-    // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it: heel, instep and toes.
+    // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it behind the ball: heel and
+    // instep. The toes beyond are the ball part, which a shoe's toe piece covers.
     ankle: ['foot#ankle'],
     sole: ['foot#sole'],
   },

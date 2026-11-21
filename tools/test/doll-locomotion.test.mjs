@@ -53,7 +53,7 @@ test("each walk's planted foot runs back at a steady pace, half the stride over 
       const step = strideMetres / 2 / half;
       planted.slice(1).forEach((at, k) => {
         const moved = planted[k][2] - at[2];
-        assert.ok(Math.abs(moved - step) < 1e-3, `${name} ${foot} frame ${k}: moved ${moved} m, a steady step ${step}`);
+        assert.ok(Math.abs(moved - step) < 1e-5, `${name} ${foot} frame ${k}: moved ${moved} m, a steady step ${step}`);
         assert.ok(Math.abs(at[0] - planted[0][0]) < 1e-6, `${name} ${foot}: drifts sideways`);
       });
     });

@@ -221,13 +221,18 @@ describe('a doll whose skeleton is not the player body', () => {
     });
   });
 
-  it("cuts the boot's toe off at the ball, in the ball's frame", () => {
+  it("cuts the boot's toe off at the ball, in the ball's frame, the foot and toe overlapping across it", () => {
     const { boot } = toy.garments;
     const vampZ = (id: string) => piece(boot, id, 'vamp').profile!.map(([, z]) => z!);
-    expect(Math.min(...vampZ('toy_boot_worn_toe'))).toBeCloseTo(0, 9);
     const ball = JSON.parse(params(toy.parts.leg, 'toy_leg_ball').ballJoint!)[2] as number;
     const foot = JSON.parse(params(toy.parts.leg, 'toy_leg_ball').origins!).foot[2] as number;
-    expect(Math.max(...vampZ('toy_boot_worn_foot'))).toBeCloseTo(ball - foot, 9);
-    expect(boot.find(({ id }) => id === 'toy_boot_worn_toe')).toMatchObject({ covers: ['ball'] });
+    const toe = boot.find(({ id }) => id === 'toy_boot_worn_toe')!;
+    const reach = (VOXEL.voxelGrain + (toe.voxelGrain as number)) / 2;
+    expect(Math.min(...vampZ('toy_boot_worn_toe'))).toBeCloseTo(-reach, 9);
+    // The vamp may end short of the overlap's far side, where the boot's toe stops.
+    const footEnd = Math.max(...vampZ('toy_boot_worn_foot'));
+    expect(footEnd).toBeGreaterThan(ball - foot);
+    expect(footEnd).toBeLessThanOrEqual(ball - foot + reach + 1e-9);
+    expect(toe).toMatchObject({ covers: ['ball'] });
   });
 });

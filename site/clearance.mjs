@@ -338,11 +338,16 @@ function reachOf(bones) {
 }
 
 // How far the ray from `p` on the surface under `node`, pointing into it, runs before it leaves it: past the faces where
-// the shells it is built of overlap, to the first beyond which none encloses it.
+// the shells it is built of overlap, to the first beyond which none encloses it. A ray lying in the plane of a shell's
+// side can count as inside that shell past the last face it meets, so where nothing lies further on, that face is where
+// it leaves.
 function runThrough(node, p, dir) {
-  let t = 0;
-  while (t < Infinity && (t === 0 || winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0))
-    t += firstHit(node, add(p, scale(dir, t)), dir, Infinity);
+  let t = firstHit(node, p, dir, Infinity);
+  while (t < Infinity && winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0) {
+    const step = firstHit(node, add(p, scale(dir, t)), dir, Infinity);
+    if (step === Infinity) break;
+    t += step;
+  }
   return t;
 }
 

@@ -20,6 +20,8 @@
   thigh: { flex: [-20, 120], twist: [-40, 40], abduct: [-20, 50] },
   knee: { flex: [0, 140], twist: [0, 0], abduct: [0, 0] },
   ankle: { flex: [-30, 45], twist: [-10, 10], abduct: [-20, 20] },
+  // The toes bend up off the ground further than down.
+  ball: { flex: [-60, 30], twist: [0, 0], abduct: [0, 0] },
   // A finger's joints from the knuckle out: the knuckle hyperextends a little and spreads; the joints beyond it only
   // curl, the middle one furthest.
   phalanges: [{ flex: [-20, 90], abduct: [-15, 15] }, { flex: [0, 110], abduct: [0, 0] }, { flex: [0, 80], abduct: [0, 0] }],
