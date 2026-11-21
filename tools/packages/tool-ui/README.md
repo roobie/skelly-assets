@@ -19,7 +19,8 @@ independent of a browser.
 Orbit controls live here so tools do not copy input handling or acquire each other's
 viewer dependencies; see `src/orbit.ts`, `createOrbitControls`. A minimal preview shares
 scene and framing setup through `src/preview.ts`, `createPreview`, while an authoring
-tool still owns which assembly it displays.
+tool still owns which assembly it displays. Its room environment, `roomEnvironment`, is
+shared too, so every tool's metals reflect the same surroundings an offline render gives them.
 
 Camera persistence and assembly parameter state belong here because neither depends on
 firearm policy; see `src/cameraState.ts`, `parseCameraState` and `src/paramPanel.ts`,

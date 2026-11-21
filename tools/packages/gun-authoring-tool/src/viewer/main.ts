@@ -23,6 +23,7 @@ import {
   parseOverrides,
   setParam,
 } from '@skelly/tool-ui/param-panel';
+import { roomEnvironment } from '@skelly/tool-ui/preview';
 import {
   Box3,
   Color,
@@ -48,7 +49,7 @@ import { withAttachmentInstanceAppearances } from '../gun/attachments.ts';
 import { loadGunDesign } from '../gun/designLoader.ts';
 import { gunDomain } from '../gun/domain.ts';
 import { TEMPLATES } from '../gun/templates.ts';
-import { type AmmoMeshes, ammoEnvironment, ammoFinishFromQuery, buildAmmoMeshes } from './ammoLayer.ts';
+import { type AmmoMeshes, ammoFinishFromQuery, buildAmmoMeshes } from './ammoLayer.ts';
 import { createCycleView } from './cycleView.ts';
 import {
   availablePartItems,
@@ -242,7 +243,8 @@ const ammoMeshes: AmmoMeshes | undefined = ammoCartridge
   ? buildAmmoMeshes(
       ammoCartridge,
       ammoFinishFromQuery(ammoCartridge, initialQuery.get('ammoCase')),
-      ammoEnvironment(renderer),
+      // The viewer draws the round for the page's whole life, so its environment is never released.
+      roomEnvironment(renderer).texture,
     )
   : undefined;
 const showMagazine = initialQuery.has('mag');
