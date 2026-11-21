@@ -95,8 +95,8 @@ local lifeGirdle = girdle(bust);
 local shoulderX = lifeGirdle.deltoid.x;
 local shoulderY = lifeGirdle.deltoid.y;
 local chestTop = lifeGirdle.chestTop;
-local hipX = bust.pelvisWidth / 4;
-local hipY = bust.pelvisHeight * 0.12;
+local hipX = leg.hip[0];
+local hipY = leg.hip[1];
 local ankleDrop = leg.length - leg.thighLength - leg.shoeHeight;
 // The sabaton's sole lies under the bare foot, so the figure stands that much higher on the plinth.
 local soleLift = [r for r in plate if r.id == 'sabaton_plate_worn_foot'][0].soleLift;

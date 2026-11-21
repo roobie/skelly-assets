@@ -1,6 +1,5 @@
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
 local shoulder(side) = { part: 'torso', solid: 'shoulder-' + side, fraction: [0.5, 0.5, 0.5] };
-local hip(x) = { part: 'pelvis', solid: 'pelvis', fraction: [x, 0.12, 0.5] };
 // Shared finishes keep exposed skin continuous across separately posed parts.
 local skin = 'body-skin-player';
 local underwear = 'cloth-pants-player';
@@ -86,7 +85,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       { from: 'torso.neck', to: 'neck.neck' },
     ],
     // The pivots code poses from: the neck where the torso meets the head, the head's own pivot above it, a
-    // shoulder at each deltoid cap's centre and a hip under each side of the pelvis. Left is the figure's left, +x.
+    // shoulder at each deltoid cap's centre and a hip at the leg's hip joint. Left is the figure's left, +x.
     // The brow, where the hair meets the face, is where a hat's brim sits (models/dressing.libsonnet).
     anchors: {
       spine: { part: 'torso', solid: 'waist', fraction: [0.5, (0.2 - bust.pelvisHeight) / bust.waistHeight, 0.5] },
@@ -97,8 +96,8 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
       shoulder_left: shoulder('left'),
       shoulder_right: shoulder('right'),
-      hip_left: hip(0.75),
-      hip_right: hip(0.25),
+      hip_left: { part: 'pelvis', at: leg.hip },
+      hip_right: { part: 'pelvis', at: [-leg.hip[0], leg.hip[1], leg.hip[2]] },
     },
   },
   {

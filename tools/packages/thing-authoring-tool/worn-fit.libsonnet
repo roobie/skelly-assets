@@ -11,6 +11,11 @@ local hand = import 'models/measures/hand.libsonnet';
 // How far each layer stands off the skin. An outer layer clears every inner one on the same segment.
 local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };
 
+// The thigh's frame stands at the hip joint, which lies inside the pelvis, so a thigh piece is placed from where the
+// thigh shows: the hips' foot (`crotch`), and `downThigh(share)`, that share of the way from there to the knee.
+local crotch = -leg.hip[1];
+local downThigh(share) = crotch - share * (leg.thighLength + crotch);
+
 // The plan outline of an octagon `w` across x and `d` along z, corners cut by `c`, as a y prism's [z, x] points.
 local outline(w, d, c) = [
   [-d / 2 + c, -w / 2], [d / 2 - c, -w / 2], [d / 2, -w / 2 + c], [d / 2, w / 2 - c],
@@ -48,6 +53,8 @@ local slopeY = girdle.slopeY;
 local deltoidY = girdle.deltoidY;
 // Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
 local armInner = deltoid.x - arm.upperWidth / 2;
+// How far down the thigh's frame the hanging hand's fingertips reach.
+local fingertips = deltoid.y - leg.hip[1] - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
 // A sleeve's head covers the deltoid, so its depth follows the deltoid's rather than the arm's, eased so the cloth
 // hangs loose over it.
 local sleeveEase = 0.018;
@@ -146,6 +153,9 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   oct: oct,
   handClear: handClear,
   besideHand: besideHand,
+  crotch: crotch,
+  downThigh: downThigh,
+  fingertips: fingertips,
   // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
   // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
   // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
@@ -362,19 +372,18 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     // beside the sleeve the thigh's bell is narrower than the sleeve stands off the hip, and the pelvis shell covers
     // the thigh there. Below the sleeve it widens to just inside the hanging hand, below the fingertips it flares,
     // and the shin's bell flares on to the hem.
-    // The shoulder joint is the deltoid cap's centre and each hip a quarter of the pelvis in from its side.
-    local jointX = deltoid.x, jointY = deltoid.y;
-    local hipX = bust.pelvisWidth / 4;
-    local sleeveClear = jointX - inner - 0.012 - hipX;
-    local handClear = jointX - arm.palmThickness / 2 - 0.006 - hipX;
-    // Heights in the thigh's frame, taking the hip as the bust's base: the sleeve's end, lowest at its deep back edge,
-    // which dips as the elbow bends, and the fingertips.
-    local sleeveEnd = jointY - arm.upperLength - reach - 0.03;
-    local fingertips = jointY - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
+    // The shoulder joint is the deltoid cap's centre.
+    local jointX = deltoid.x;
+    local sleeveClear = jointX - inner - 0.012 - leg.hip[0];
+    local handClear = jointX - arm.palmThickness / 2 - 0.006 - leg.hip[0];
+    // Heights in the thigh's frame: the sleeve's end, lowest at its deep back edge, which dips as the elbow bends, and
+    // the pelvis shell's hem.
+    local sleeveEnd = deltoid.y - leg.hip[1] - arm.upperLength - reach - 0.03;
+    local thighHem = crotch + hem;
     local bell(id, slot, rings) = h.turned(id, slot, 'y', [[rings[0][0], 0]] + rings + [[rings[std.length(rings) - 1][0], 0]]);
     local kneeR = handClear + 0.035, hemR = kneeR + 0.04;
     local thigh = [
-      bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [hem - 0.01, handClear],
+      bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [thighHem - 0.01, handClear],
                                [sleeveEnd, sleeveClear], [0.03, sleeveClear - 0.01]]),
     ];
     local shin = [
@@ -510,13 +519,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
     local kneeD = sd + 0.035;
     local thigh = [
-      oct('cuisse', 'plate', -leg.thighLength + 0.03, -0.05, tw + 0.016, td + 0.02, leg.thighChamfer / 2 + 0.012),
-      h.box('cuisse-plate', 'plate', [-tw * 0.4, -leg.thighLength + 0.07, (td + 0.02) / 2 - 0.004], [tw * 0.4, -0.08, (td + 0.02) / 2 + 0.012]),
-      oct('cuisse-rim', 'insignia', -0.065, -0.05, tw + 0.024, td + 0.028, leg.thighChamfer / 2 + 0.012),
+      oct('cuisse', 'plate', -leg.thighLength + 0.03, crotch - 0.03, tw + 0.016, td + 0.02, leg.thighChamfer / 2 + 0.012),
+      h.box('cuisse-plate', 'plate', [-tw * 0.4, -leg.thighLength + 0.07, (td + 0.02) / 2 - 0.004], [tw * 0.4, crotch - 0.06, (td + 0.02) / 2 + 0.012]),
+      oct('cuisse-rim', 'insignia', crotch - 0.045, crotch - 0.03, tw + 0.024, td + 0.028, leg.thighChamfer / 2 + 0.012),
     ] + [
       oct('strap-%d' % i, 'strap', y, y + 0.025, tw + 0.022, td + 0.026, leg.thighChamfer / 2 + 0.012)
       for i in [0, 1]
-      for y in [[-0.17, -0.31][i]]
+      for y in [downThigh([0.375, 0.725][i])]
     ];
     local shin = [
       oct('knee', 'plate', -0.065, 0.06, sw + 0.03, kneeD, 0.025),
@@ -574,12 +583,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
     local thigh = [
-      oct('cuisse', sl.shell, -leg.thighLength + 0.02, -0.06, tw, td, leg.thighChamfer / 2 + 0.01),
-      oct('cuisse-rim', sl.rim, -0.075, -0.06, tw + 0.008, td + 0.008, leg.thighChamfer / 2 + 0.01),
+      oct('cuisse', sl.shell, -leg.thighLength + 0.02, crotch - 0.04, tw, td, leg.thighChamfer / 2 + 0.01),
+      oct('cuisse-rim', sl.rim, crotch - 0.055, crotch - 0.04, tw + 0.008, td + 0.008, leg.thighChamfer / 2 + 0.01),
     ] + [
       oct('strap-%d' % i, sl.strap, y, y + 0.02, tw + 0.006, td + 0.006, leg.thighChamfer / 2 + 0.01)
       for i in [0, 1]
-      for y in [[-0.16, -0.3][i]]
+      for y in [downThigh([0.35, 0.7][i])]
     ];
     local shin = [
       // The knee cop bulges forward over the joint, with a fan on the outside.

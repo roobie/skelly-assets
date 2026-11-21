@@ -33,8 +33,8 @@ local segment(id, family, measures, segment, massKg, slots, ports) = {
 };
 local shoulderX = girdle.deltoid.x;
 local shoulderY = girdle.deltoid.y;
-local hipX = bust.pelvisWidth / 4;
-local hipY = bust.pelvisHeight * 0.12;
+local hipX = leg.hip[0];
+local hipY = leg.hip[1];
 local plate = 0.012;
 local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
   local sides = [['left', 1], ['right', -1]];

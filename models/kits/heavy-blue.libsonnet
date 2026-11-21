@@ -84,13 +84,13 @@ local palmAdd = [
 // hand hangs beside them.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
 local thighAdd = [
-  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, -0.04, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
-  h.box('cuisse-plate', 'plate', [-tw * 0.45, -leg.thighLength + 0.06, (td + 0.07) / 2 - 0.004], [tw * 0.45, -0.075, (td + 0.07) / 2 + 0.02]),
-  fit.besideHand('cuisse-rim', 'insignia', -0.07, -0.04, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
+  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, fit.crotch - 0.02, tw + 0.045, td + 0.07, leg.thighChamfer / 2 + 0.03),
+  h.box('cuisse-plate', 'plate', [-tw * 0.45, -leg.thighLength + 0.06, (td + 0.07) / 2 - 0.004], [tw * 0.45, fit.crotch - 0.055, (td + 0.07) / 2 + 0.02]),
+  fit.besideHand('cuisse-rim', 'insignia', fit.crotch - 0.05, fit.crotch - 0.02, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03),
 ] + [
   fit.besideHand('strap-%d' % i, 'strap', y, y + 0.03, tw + 0.055, td + 0.08, leg.thighChamfer / 2 + 0.03)
   for i in [0, 1]
-  for y in [[-0.18, -0.32][i]]
+  for y in [fit.downThigh([0.4, 0.75][i])]
 ];
 
 // Shin: a big knee cop over a bulky greave.

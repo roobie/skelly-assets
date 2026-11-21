@@ -25,7 +25,7 @@ const data = JSON.parse(
     own: [r.id for r in own],
     sites: [s + { pieces: pieces(s) } for s in placements.sites],
     bust: import 'models/measures/bust.libsonnet',
-    leg: import 'models/measures/leg.libsonnet',
+    leg: (import 'models/measures/leg.libsonnet') { hip::: super.hip },
     deltoid: (import 'models/girdle.libsonnet')(self.bust).deltoid,
   }`,
     root,
@@ -285,12 +285,14 @@ test('a rail bar pushed against the side meets it, so the rail clearance check c
   assert.ok(meeting(shifted(bar, [0, 0, -spec.rails.standoff]), drawn('hull'), 0.01).touches);
 });
 
-// The player's doll crouching, from its own measures: the thighs level, so the hips sit at the shin and foot's height
-// below the bust upright on them, and as wide as its shoulders. Its depth is a level thigh and the shin in front of it.
+// The player's doll crouching, from its own measures: the thighs level, so the hip joints sit at the shin and foot's
+// height and the bust stands upright on the hips' foot below them, and as wide as its shoulders. Its depth is a level
+// thigh and the shin in front of it.
 const crouch = {
   height:
     leg.length -
-    leg.thighLength +
+    leg.thighLength -
+    leg.hip[1] +
     bust.pelvisHeight +
     bust.waistHeight +
     bust.ribHeight +

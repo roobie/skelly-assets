@@ -97,17 +97,17 @@ local palmAdd = [
 ];
 
 // Thigh: a faceted cuisse with a glowing line down the front and hydraulic pistons at the sides. The hand hangs beside
-// the thigh's outer side at rest, its fingertips reaching mid-thigh (measures/arm.libsonnet), so the plates stop short
-// of it there and the outer piston runs only below the fingertips.
+// the thigh's outer side at rest, its fingertips reaching down the thigh, so the plates stop short of it there and the
+// outer piston runs only below the fingertips.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
-local belowFingertips = -leg.thighLength / 2 - 0.02;
+local belowFingertips = fit.fingertips - 0.02;
 local thighAdd = [
-  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, -0.04, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.02),
-  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.04) / 2 - 0.002, -0.03], [(td + 0.04) / 2 + 0.03, 0], [(td + 0.04) / 2 - 0.002, 0.03]], -leg.thighLength + 0.06, -0.07),
-  h.box('cuisse-line', 'glow', [-0.008, -leg.thighLength + 0.09, (td + 0.04) / 2 + 0.028], [0.008, -0.1, (td + 0.04) / 2 + 0.034]),
-  fit.besideHand('cuisse-hip', 'trim', -0.075, -0.04, tw + 0.045, td + 0.05, leg.thighChamfer / 2 + 0.02),
+  fit.besideHand('cuisse', 'plate', -leg.thighLength + 0.02, fit.crotch - 0.02, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.02),
+  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.04) / 2 - 0.002, -0.03], [(td + 0.04) / 2 + 0.03, 0], [(td + 0.04) / 2 - 0.002, 0.03]], -leg.thighLength + 0.06, fit.crotch - 0.05),
+  h.box('cuisse-line', 'glow', [-0.008, -leg.thighLength + 0.09, (td + 0.04) / 2 + 0.028], [0.008, fit.crotch - 0.08, (td + 0.04) / 2 + 0.034]),
+  fit.besideHand('cuisse-hip', 'trim', fit.crotch - 0.055, fit.crotch - 0.02, tw + 0.045, td + 0.05, leg.thighChamfer / 2 + 0.02),
 ] + piston('thigh-piston-l', -tw / 2 - 0.022, 0.02, -leg.thighLength + 0.03, belowFingertips)
-  + piston('thigh-piston-r', tw / 2 + 0.022, 0.02, -leg.thighLength + 0.03, -0.09);
+  + piston('thigh-piston-r', tw / 2 + 0.022, 0.02, -leg.thighLength + 0.03, fit.crotch - 0.07);
 
 // Shin: an angular knee guard, a greave with a front blade, a light line and a piston behind the calf.
 local shinLength = leg.length - leg.thighLength - leg.shoeHeight;

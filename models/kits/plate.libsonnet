@@ -100,14 +100,14 @@ local fore = [
 // Thigh: a cuisse with a rim at the hip and a strap or two. Bulk goes front and back, as the legs stand close together.
 local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
 local thigh = [
-  oct('cuisse', 'plate', -leg.thighLength + 0.02, -0.05, tw + 0.02, td + 0.03, leg.thighChamfer / 2 + 0.015),
-  oct('cuisse-rim', 'trim', -0.065, -0.05, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
+  oct('cuisse', 'plate', -leg.thighLength + 0.02, fit.crotch - 0.03, tw + 0.02, td + 0.03, leg.thighChamfer / 2 + 0.015),
+  oct('cuisse-rim', 'trim', fit.crotch - 0.045, fit.crotch - 0.03, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
   oct('cuisse-hem', 'trim', -leg.thighLength + 0.02, -leg.thighLength + 0.034, tw + 0.03, td + 0.04, leg.thighChamfer / 2 + 0.015),
-  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.03) / 2 - 0.002, -0.016], [(td + 0.03) / 2 + 0.014, 0], [(td + 0.03) / 2 - 0.002, 0.016]], -leg.thighLength + 0.06, -0.08),
+  h.prism('cuisse-ridge', 'trim', 'y', [[(td + 0.03) / 2 - 0.002, -0.016], [(td + 0.03) / 2 + 0.014, 0], [(td + 0.03) / 2 - 0.002, 0.016]], -leg.thighLength + 0.06, fit.crotch - 0.06),
 ] + [
   oct('strap-%d' % i, 'strap', y, y + 0.022, tw + 0.032, td + 0.042, leg.thighChamfer / 2 + 0.015)
   for i in [0, 1]
-  for y in [[-0.2, -0.3][i]]
+  for y in [fit.downThigh([0.45, 0.7][i])]
 ];
 
 // Shin: a poleyn (knee cop with a fan) over a greave with a front ridge.
