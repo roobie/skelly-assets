@@ -5,7 +5,7 @@
 // whose look its owner judged there; see docs/decisions/0021-doll-locomotion.md.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { clampJointAngles, sub } from '../site/kinematics.mjs';
+import { add, clampJointAngles, cross, dot, jointRotation, length, mulMV, scale, sub } from '../site/kinematics.mjs';
 import { compilePose } from '../site/poseFile.mjs';
 import { dollRig } from './dollRig.mjs';
 import { dollDressing, PLAYER, readDoll, readDressing } from './dress.mjs';
@@ -15,28 +15,29 @@ import { outputPath } from './layout.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const DEG = Math.PI / 180;
+const DOWN = [0, -1, 0];
 
 export const readLocomotion = (root = repo) =>
   JSON.parse(evaluateJsonnet("import 'models/poses/locomotion.libsonnet'", root));
 
 const boneOf = (rig, id) => rig.bones.find((bone) => bone.id === id);
-const length = (v) => Math.hypot(...v);
 const rounded = (angles) => Object.fromEntries(Object.entries(angles).map(([id, turn]) => [id, r4(turn)]));
 
 /**
- * The leg `thigh` hangs with its knee bent `bendDeg`: `upright`, the thigh's flex that stands the ankle under the hip,
- * and `reach`, the hip to the ankle. A gait swings this hip-to-ankle line, so the knee's bend never moves the foot.
+ * The leg `thigh` hangs with its knee bent `bendDeg` from rest: `upright`, the thigh's flex that stands the ankle under
+ * the hip, and `reach`, the hip to the ankle. A gait swings this hip-to-ankle line, so the knee's bend never moves the
+ * foot. Each joint bends about its own flex axis, and the leg's bones need not stand in one line at rest: a knee and an
+ * ankle may stand behind the hip, the shin raking back.
  */
 export function legAt(rig, thigh, bendDeg) {
+  const hip = boneOf(rig, thigh);
   const [shin] = rig.bones.filter((bone) => bone.parent === thigh);
   const [foot] = rig.bones.filter((bone) => bone.parent === shin.id);
-  const upper = length(sub(shin.head, boneOf(rig, thigh).head));
-  const lower = length(sub(foot.head, shin.head));
-  const bend = bendDeg * DEG;
-  return {
-    upright: Math.atan2(lower * Math.sin(bend), upper + lower * Math.cos(bend)) / DEG,
-    reach: Math.hypot(upper + lower * Math.cos(bend), lower * Math.sin(bend)),
-  };
+  const line = add(sub(shin.head, hip.head), mulMV(jointRotation(shin, [bendDeg, 0, 0]), sub(foot.head, shin.head)));
+  // The thigh's flex turns only the line's part square to its axis, so that part is what it stands upright and swings.
+  const axis = hip.frame.x;
+  const swung = sub(line, scale(axis, dot(line, axis)));
+  return { upright: Math.atan2(dot(axis, cross(swung, DOWN)), dot(swung, DOWN)) / DEG, reach: length(swung) };
 }
 
 /** The ground a loop of `walk` covers, both feet: each foot, planted, sweeps back twice its leg's reach by the swing. */

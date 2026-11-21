@@ -15,6 +15,10 @@ local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };
 // thigh shows: the hips' foot (`crotch`), and `downThigh(share)`, that share of the way from there to the knee.
 local crotch = -leg.hip[1];
 local downThigh(share) = crotch - share * (leg.thighLength + crotch);
+// The knee and the ankle need not stand under the hip, and a segment's flesh stands halfway along its bone, so a thigh
+// or shin piece, authored about its joint's upright, is moved onto the line its segment's flesh stands about.
+local onThigh(pieces) = h.moved(pieces, leg.thighAxis);
+local onShin(pieces) = h.moved(pieces, leg.shinAxis);
 
 // The plan outline of an octagon `w` across x and `d` along z, corners cut by `c`, as a y prism's [z, x] points.
 local outline(w, d, c) = [
@@ -155,6 +159,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   besideHand: besideHand,
   crotch: crotch,
   downThigh: downThigh,
+  onThigh: onThigh,
+  onShin: onShin,
   fingertips: fingertips,
   // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
   // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
@@ -382,14 +388,14 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local thighHem = crotch + hem;
     local bell(id, slot, rings) = h.turned(id, slot, 'y', [[rings[0][0], 0]] + rings + [[rings[std.length(rings) - 1][0], 0]]);
     local kneeR = handClear + 0.035, hemR = kneeR + 0.04;
-    local thigh = [
+    local thigh = onThigh([
       bell('skirt', sl.cloth, [[-leg.thighLength - 0.05, kneeR], [fingertips - 0.02, handClear], [thighHem - 0.01, handClear],
                                [sleeveEnd, sleeveClear], [0.03, sleeveClear - 0.01]]),
-    ];
-    local shin = [
+    ]);
+    local shin = onShin([
       bell('skirt', sl.cloth, [[-s.hem, hemR], [0.06, kneeR - 0.015]]),
       bell('hem', sl.trim, [[-s.hem, hemR + 0.006], [-s.hem + 0.02, hemR + 0.006 - 0.004]]),
-    ];
+    ]);
     // The thigh's bell is narrow by the hip, where the pelvis shell covers the leg, and the shin's ends at the hem, so
     // neither encloses its part.
     fitted([
@@ -518,7 +524,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
     local kneeD = sd + 0.035;
-    local thigh = [
+    local thigh = onThigh([
       oct('cuisse', 'plate', -leg.thighLength + 0.03, crotch - 0.03, tw + 0.016, td + 0.02, leg.thighChamfer / 2 + 0.012),
       h.box('cuisse-plate', 'plate', [-tw * 0.4, -leg.thighLength + 0.07, (td + 0.02) / 2 - 0.004], [tw * 0.4, crotch - 0.06, (td + 0.02) / 2 + 0.012]),
       oct('cuisse-rim', 'insignia', crotch - 0.045, crotch - 0.03, tw + 0.024, td + 0.028, leg.thighChamfer / 2 + 0.012),
@@ -526,8 +532,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('strap-%d' % i, 'strap', y, y + 0.025, tw + 0.022, td + 0.026, leg.thighChamfer / 2 + 0.012)
       for i in [0, 1]
       for y in [downThigh([0.375, 0.725][i])]
-    ];
-    local shin = [
+    ]);
+    local shin = onShin([
       oct('knee', 'plate', -0.065, 0.06, sw + 0.03, kneeD, 0.025),
       h.box('knee-guard', 'plate', [-0.055, -0.07, kneeD / 2 - 0.004], [0.055, 0.075, kneeD / 2 + 0.02]),
       h.dome('knee-cop', 'trim', 0.035, 0.018, 0.006, 'z', [0, 0, kneeD / 2 + 0.02]),
@@ -535,7 +541,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       h.prism('greave-ridge', 'trim', 'y', [[(sd + 0.012) / 2 - 0.002, -0.014], [(sd + 0.012) / 2 + 0.012, 0], [(sd + 0.012) / 2 - 0.002, 0.014]],
               -shinLength + 0.03, -0.08),
       oct('greave-rim', 'insignia', -shinLength - leg.ankleOverlap, -shinLength + 0.01, sw + 0.02, sd + 0.02, leg.shinChamfer / 2 + 0.012),
-    ];
+    ]);
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
       shell(id + '_worn_thigh', thigh, finish, [], title=named(title, 'thigh')),
@@ -555,17 +561,17 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('seat', sl.cloth, -0.01, bust.pelvisHeight + 0.015, seatW, seatD, around(cut, g)),
       oct('waistband', sl.trim, bust.pelvisHeight - 0.02, bust.pelvisHeight + 0.02, seatW + 0.006, seatD + 0.006, around(cut, g + 0.003)),
     ];
-    local thigh = [
+    local thigh = onThigh([
       oct('leg', sl.cloth, -leg.thighLength - 0.02, 0.025, leg.thighWidth + 2 * g, leg.thighDepth + 2 * g, around(leg.thighChamfer / 2, g)),
-    ];
+    ]);
     // In the knee's frame the ankle sits a shin below. The cuff stands taller than the ankle bone rises above the
     // ankle and ends a centimetre above it, clear of the instep.
-    local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
+    local ankle = leg.shinBone[1];
     local cuff = [ankle + 0.01, ankle + 0.07];
     local shinW = leg.shinWidth + 2 * (g + s.ease), shinD = leg.shinDepth + 2 * (g + s.ease), shinCut = around(leg.shinChamfer / 2, g + s.ease);
-    local shin = [oct('leg', sl.cloth, cuff[1] - 0.005, 0.025, shinW, shinD, shinCut)]
-                 + ring('cuff', sl.cloth, cuff[0] + 0.03, cuff[1], shinW, shinD, shinCut, 0.008)
-                 + ring('hem', sl.trim, cuff[0], cuff[0] + 0.03, shinW + 0.004, shinD + 0.004, around(shinCut, 0.002), 0.01);
+    local shin = onShin([oct('leg', sl.cloth, cuff[1] - 0.005, 0.025, shinW, shinD, shinCut)]
+                        + ring('cuff', sl.cloth, cuff[0] + 0.03, cuff[1], shinW, shinD, shinCut, 0.008)
+                        + ring('hem', sl.trim, cuff[0], cuff[0] + 0.03, shinW + 0.004, shinD + 0.004, around(shinCut, 0.002), 0.01));
     // The knee's cap reaches below the thigh's leg, where the shin's takes over, and the cuff stops above the ankle, so
     // neither leg encloses its part.
     fitted([
@@ -582,22 +588,22 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local shinLength = leg.length - leg.thighLength - leg.shoeHeight;
     local tw = leg.thighWidth + 2 * g, td = leg.thighDepth + 2 * g;
     local sw = leg.shinWidth + 2 * g, sd = leg.shinDepth + 2 * g;
-    local thigh = [
+    local thigh = onThigh([
       oct('cuisse', sl.shell, -leg.thighLength + 0.02, crotch - 0.04, tw, td, leg.thighChamfer / 2 + 0.01),
       oct('cuisse-rim', sl.rim, crotch - 0.055, crotch - 0.04, tw + 0.008, td + 0.008, leg.thighChamfer / 2 + 0.01),
     ] + [
       oct('strap-%d' % i, sl.strap, y, y + 0.02, tw + 0.006, td + 0.006, leg.thighChamfer / 2 + 0.01)
       for i in [0, 1]
       for y in [downThigh([0.35, 0.7][i])]
-    ];
-    local shin = [
+    ]);
+    local shin = onShin([
       // The knee cop bulges forward over the joint, with a fan on the outside.
       oct('poleyn', sl.cop, -0.05, 0.05, sw + 0.02, sd + 0.02, 0.025),
       h.turned('poleyn-boss', sl.cop, 'z', [[0, 0], [0, 0.045], [0.012, 0.035], [0.02, 0]], [0, 0, (sd + 0.02) / 2]),
     ] + (if s.greaves then [
       oct('greave', sl.shell, -shinLength - leg.ankleOverlap, -0.045, sw, sd, leg.shinChamfer / 2 + 0.01),
       oct('greave-rim', sl.rim, -shinLength - leg.ankleOverlap, -shinLength + 0.005, sw + 0.008, sd + 0.008, leg.shinChamfer / 2 + 0.01),
-    ] else []);
+    ] else []));
     // The cuisse leaves the hip and the knee's cap bare.
     fitted([
       shell(id + '_worn_thigh', thigh, finish, [], title=named(title, 'thigh')),
@@ -698,13 +704,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       for i in [0, 1]
       for f in [[0.35, 0.75][i]]
     ]);
-    // The shaft, in the knee's frame: the ankle sits a shin below the knee.
-    local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
+    // The shaft, in the knee's frame, about the shin: the ankle sits a shin below the knee.
+    local ankle = leg.shinBone[1];
     local shaftW = std.max(b.w * 0.92, leg.shinWidth + 2 * (g + s.ease)), shaftD = std.max(0.116, leg.shinDepth + 2 * (g + s.ease));
     // The shaft reaches below the ankle, past the shin's end, so no skin shows over a low vamp.
     local base = ankle - leg.ankleOverlap - 0.004, top = ankle + b.top;
     local rise = top - 0.02 - (ankle + ankleY + b.s + instep);
-    local shaft = [
+    local shaft = onShin([
       oct('shaft', 'upper', base, top - 0.02, shaftW, shaftD, 0.02),
       oct('collar', 'collar', top - 0.02, top, shaftW + 0.008, shaftD + 0.008, 0.022),
     ] + (if b.laces == 0 then [] else [
@@ -713,7 +719,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       local yl = base + 0.01 + i * rise / (b.laces - 1);
       h.box('lace-%d' % i, 'laces', [-b.w * 0.3, yl, shaftD / 2 + 0.006], [b.w * 0.3, yl + 0.004, shaftD / 2 + 0.009])
       for i in std.range(0, b.laces - 1)
-    ]);
+    ]));
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
     // The round toe caps are handed whole to the toe or the foot by where their middle stands from the ball.
@@ -728,7 +734,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     fitted([shod { soleLift: b.s }] + toe
            + (if shafted then [shell(id + '_worn_shaft', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
-      ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(shaft, -ankle - ankleY) else []),
+      ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(h.moved(shaft, [-c for c in leg.shinBone]), -ankleY) else []),
     },
 
   // The head a rigid head piece seated at `base` encloses, in that seat's frame: the hair's plan half-widths, deeper

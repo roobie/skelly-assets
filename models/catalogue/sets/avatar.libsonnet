@@ -143,11 +143,8 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     // One segment per part so a stance bends the leg at the knee and ankle; each segment is drawn about its own joint
     // and mates to the segment above it there, so the whole stands exactly as one piece would.
     parts: [
-      legSegment('thigh', 7, { skin: skin }, [jointSocket('knee', [0, -leg.thighLength, 0])]),
-      legSegment('shin', 3, { skin: skin }, [
-        jointPin('knee'),
-        jointSocket('ankle', [0, leg.shoeHeight - leg.length + leg.thighLength, 0]),
-      ]),
+      legSegment('thigh', 7, { skin: skin }, [jointSocket('knee', leg.thighBone)]),
+      legSegment('shin', 3, { skin: skin }, [jointPin('knee'), jointSocket('ankle', leg.shinBone)]),
       legSegment('foot', 1, foot, [jointPin('ankle')]),
     ],
     connections: [
@@ -155,11 +152,11 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       { from: 'shin.ankle', to: 'foot.ankle' },
     ],
     // The pivots code poses from: the hip the leg hangs from and strides about, sitting at the bust's hip anchor, and
-    // each joint below it. The shin overlaps the foot so the joint stays closed when it bends.
+    // each joint below it.
     anchors: {
-      hip: { part: 'thigh', solid: 'thigh', fraction: [0.5, 1, 0.5] },
-      knee: { part: 'thigh', solid: 'thigh', fraction: [0.5, 0, 0.5] },
-      ankle: { part: 'shin', solid: 'shin', fraction: [0.5, leg.ankleOverlap / (leg.length - leg.shoeHeight - leg.thighLength + leg.kneeOverlap + leg.ankleOverlap), 0.5] },
+      hip: { part: 'thigh', at: [0, 0, 0] },
+      knee: { part: 'thigh', at: leg.thighBone },
+      ankle: { part: 'shin', at: leg.shinBone },
     },
   },
 ]
