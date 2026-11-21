@@ -1,9 +1,55 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { finite, minValue, pipe, string, transform } from 'valibot';
+import {
+  finite,
+  type GenericSchema,
+  minValue,
+  number,
+  picklist,
+  pipe,
+  record,
+  string,
+  transform,
+  tuple,
+} from 'valibot';
 
 export const scalar = pipe(string(), transform(Number), finite());
 export const positive = pipe(scalar, minValue(Number.MIN_VALUE));
+/** A parameter carrying structured content, as the catalogue passes arrays and objects: JSON text. */
+export const json = <T>(schema: GenericSchema<unknown, T>) =>
+  pipe(
+    string(),
+    transform((text): unknown => JSON.parse(text)),
+    schema,
+  );
+const coordinate = pipe(number(), finite());
+export const point3 = tuple([coordinate, coordinate, coordinate]);
+/**
+ * Where each segment's joint lies in the frame its limb or body is drawn in, for a body whose joints are not on the
+ * centre line it is drawn about. A part is handed over about its own joint, the pivot its bone turns it about.
+ */
+export const jointOrigins = <const S extends string>(segments: readonly S[]) =>
+  json(record(picklist(segments), point3));
+/** How far a place given as content may lie from where the measures derive it: a rounding of the measures and no more. */
+export const MEASURE_TOLERANCE = 1e-6;
+/**
+ * A joint is given whole, as its skeleton has it, while the measures lay out the flesh along the limb; a joint at
+ * another height than the measures' would turn its part about a point the flesh does not end at.
+ */
+export const requireJointHeights = (
+  joints: Readonly<Partial<Record<string, Vec3>>>,
+  heights: Readonly<Partial<Record<string, number>>>,
+  what: string,
+): void => {
+  for (const [segment, height] of Object.entries(heights)) {
+    const joint = joints[segment];
+    if (joint && height !== undefined && Math.abs(joint[1] - height) > MEASURE_TOLERANCE) {
+      throw new Error(
+        `The ${what}'s ${segment} joint stands at ${joint[1]}, not at ${height} where its measures put it`,
+      );
+    }
+  }
+};
 /** Extruded solids must be convex, with the profile wound counterclockwise. */
 export const requireConvex = (profile: readonly Vec2[], what: string): void => {
   for (let i = 0; i < profile.length; i++) {

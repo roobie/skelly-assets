@@ -7,6 +7,7 @@ read_if:
   - you make part of an item glow or rename a glowing material
   - you mark which of a part's finish slots take paint
   - you make a worn shell hide the doll parts or regions under it
+  - you give a doll's body more bones or joints off its centre line
   - you investigate skin authoring or voxel deformation topology
 ---
 
@@ -149,3 +150,28 @@ its shell. The regions, and so the names `covers` may use besides the part, are
 content in a doll's record, `models/dolls/<id>/doll.libsonnet`, `regions`. See `src/families/body.ts`, `region`,
 `tools/dollRig.mjs`, `coverGaps`, and `tools/packages/thing-core/src/schema.ts`,
 `NeutralModelSchema`.
+
+## Body families
+
+A doll's skeleton is not the player's: its joints may sit off the line a limb is drawn about, and its trunk and feet
+may bend where the player's do not. So the body families take each joint's place and each extra bend as optional
+content, and with none given they draw the player's parts unchanged, which keeps every existing doll's models as
+they are.
+
+A joint is given whole, as the doll's skeleton has it, and its height must be the one the measures lay the flesh out
+from, or the part would turn about a point its flesh does not end at. A limb segment's flesh stands on the middle of
+its bone, so a bone that runs off the centre line carries its flesh with it; the flesh is drawn upright rather than
+leaning with the bone, because the voxel families draw no slanted solids. The round cap that lets a joint bend sits
+on the joint, and the part is handed over about its own joint, because that is the point its bone turns it about.
+A bust cut into spine and clavicle parts, or a foot cut at its ball, shares one drawn mass among the parts rather
+than drawing each anew, so the split body has the silhouette the whole one has; a spine's joints sit toward the back
+of the trunk, so the trunk is not moved onto them. The ribs and the chest are cut where their joints stand, so the
+cut and the joint cannot disagree. A region `covers` names is then a union of whole parts, which needs no piece of
+its own. The chest's joint must be the armpit, because a garment's trunk ends there and a region that ended
+elsewhere would hide skin it does not enclose. See
+`src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
+
+A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and
+bends with it; a shell that spanned a bend would leave the flesh under it uncovered or pierce it. A round piece goes
+whole to the side holding its middle, because halving a turned piece would leave it open. See `worn-fit.libsonnet`,
+the torso's `spine` and the feet's `ball`, and `compound.libsonnet`, `cut` and `moved`.

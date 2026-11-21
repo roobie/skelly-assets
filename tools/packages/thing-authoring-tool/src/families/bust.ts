@@ -1,10 +1,91 @@
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid } from '@skelly/construct/shapes/solid.ts';
-import { array, integer, number, parse, picklist, pipe, strictObject, string, transform, tuple } from 'valibot';
-import { block, dome, oval, ovalCut, region } from './body.ts';
-import { positive, spheroid } from './shapes.ts';
+import {
+  array,
+  type InferOutput,
+  integer,
+  number,
+  optional,
+  parse,
+  picklist,
+  pipe,
+  strictObject,
+  string,
+  transform,
+  tuple,
+} from 'valibot';
+import { block, cut, dome, oval, ovalCut, region, translate } from './body.ts';
+import { jointOrigins, MEASURE_TOLERANCE, positive, requireJointHeights, spheroid } from './shapes.ts';
 
+/**
+ * The segments a trunk bending along its spine is cut into: the waist, the ribs and the chest, each cut where its
+ * joint stands, and each shoulder girdle, which a clavicle lifts on its own from `clavicleCut`.
+ */
+const SPINE_SEGMENTS = ['waist', 'ribs', 'chest', 'clavicle_l', 'clavicle_r'] as const;
 /** The bust's segments: the head is its own part so a stance can lift it about the neck while the torso leans. */
-const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
+const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head', ...SPINE_SEGMENTS] as const;
+
+const BustParams = strictObject({
+  segment: picklist(BUST_SEGMENTS),
+  /**
+   * Each segment's joint in the bust's frame; without it every joint lies on the centre line. The ribs' and the
+   * chest's joints are where the trunk is cut for a spine that bends in three, and the chest's is the armpit, so the
+   * trunk and the shoulders a garment covers are each whole parts.
+   */
+  origins: optional(jointOrigins(BUST_SEGMENTS)),
+  /** The height the clavicles lift the shoulder girdles from, for a spine that bends in three. */
+  clavicleCut: optional(positive),
+  /** How far the neck reaches up into the head; its top is the head's joint. */
+  neckOverlap: positive,
+  pelvisWidth: positive,
+  pelvisDepth: positive,
+  pelvisHeight: positive,
+  waistWidth: positive,
+  waistDepth: positive,
+  waistHeight: positive,
+  ribWidth: positive,
+  ribDepth: positive,
+  ribHeight: positive,
+  chestWidth: positive,
+  chestDepth: positive,
+  chestHeight: positive,
+  /** How far up the chest the armpit lies, as a share of its height: the trunk region's top. */
+  armpit: positive,
+  /** The lower chest's width as a share of the chest's, so it stays inside the hanging arm and a sleeveless shell can enclose it. */
+  chestLowShare: positive,
+  torsoChamfer: positive,
+  chestChamfer: positive,
+  /** The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. */
+  girdle: pipe(
+    string(),
+    transform((text): unknown => JSON.parse(text)),
+    strictObject({
+      trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
+      deltoid: strictObject({ x: number(), y: number(), radius: number(), halfHeight: number() }),
+    }),
+  ),
+  neckWidth: positive,
+  neckHeight: positive,
+  headWidth: positive,
+  headHeight: positive,
+  headDepth: positive,
+  jawHeight: positive,
+  /** How far up the head the eyes lie, as a share of its height. */
+  eyeShare: positive,
+  hairCover: positive,
+  hairThickness: positive,
+  facePower: positive,
+  hairSweep: positive,
+  hairRise: positive,
+  hairCrownShare: positive,
+  hairCrownBack: positive,
+  hairLayerCount: pipe(positive, integer()),
+  hairRing: pipe(
+    string(),
+    transform((text): unknown => JSON.parse(text)),
+    strictObject({ bottom: number(), top: number(), rows: array(tuple([number(), number(), number()])) }),
+  ),
+});
+type Bust = InferOutput<typeof BustParams>;
 
 // The player's head and torso: origin at the pelvis base on the centre line, y up, face toward +z. Stacked rounded
 // slabs taper hips to shoulders, the girdle's top slopes off the neck, a deltoid spheroid is centred on each shoulder
@@ -15,71 +96,59 @@ const BUST_SEGMENTS = ['pelvis', 'torso', 'neck', 'head'] as const;
 // The head segment is drawn about the neck's top, the joint it turns about. The model's anchors name solids here, so
 // a joint follows the solid that seats its limb.
 export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
-  const d = parse(
-    strictObject({
-      segment: picklist(BUST_SEGMENTS),
-      /** How far the neck reaches up into the head; its top is the head's joint. */
-      neckOverlap: positive,
-      pelvisWidth: positive,
-      pelvisDepth: positive,
-      pelvisHeight: positive,
-      waistWidth: positive,
-      waistDepth: positive,
-      waistHeight: positive,
-      ribWidth: positive,
-      ribDepth: positive,
-      ribHeight: positive,
-      chestWidth: positive,
-      chestDepth: positive,
-      chestHeight: positive,
-      /** How far up the chest the armpit lies, as a share of its height: the trunk region's top. */
-      armpit: positive,
-      /** The lower chest's width as a share of the chest's, so it stays inside the hanging arm and a sleeveless shell can enclose it. */
-      chestLowShare: positive,
-      torsoChamfer: positive,
-      chestChamfer: positive,
-      /** The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. */
-      girdle: pipe(
-        string(),
-        transform((text): unknown => JSON.parse(text)),
-        strictObject({
-          trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
-          deltoid: strictObject({ x: number(), y: number(), radius: number(), halfHeight: number() }),
-        }),
-      ),
-      neckWidth: positive,
-      neckHeight: positive,
-      headWidth: positive,
-      headHeight: positive,
-      headDepth: positive,
-      jawHeight: positive,
-      /** How far up the head the eyes lie, as a share of its height. */
-      eyeShare: positive,
-      hairCover: positive,
-      hairThickness: positive,
-      facePower: positive,
-      hairSweep: positive,
-      hairRise: positive,
-      hairCrownShare: positive,
-      hairCrownBack: positive,
-      hairLayerCount: pipe(positive, integer()),
-      hairRing: pipe(
-        string(),
-        transform((text): unknown => JSON.parse(text)),
-        strictObject({ bottom: number(), top: number(), rows: array(tuple([number(), number(), number()])) }),
-      ),
-    }),
-    params,
-  );
+  const d = parse(BustParams, params);
+  const heights = levels(d);
+  if (d.origins) {
+    // The pelvis is the root, and a clavicle turns where its bone does, below the girdle it lifts; the ribs and the
+    // chest are cut where their joints stand, so none of those has a height of the measures' to meet.
+    requireJointHeights(
+      d.origins,
+      { torso: heights.waist, waist: heights.waist, neck: heights.shoulders, head: heights.crown + d.neckOverlap },
+      'bust',
+    );
+  }
+  const joint = d.origins
+    ? d.origins[d.segment]
+    : ([0, d.segment === 'head' ? heights.crown + d.neckOverlap : 0, 0] as const);
+  if (!joint) {
+    throw new Error(`The bust's origins give no joint for its ${d.segment}`);
+  }
+  // Heights are drawn about the joint as they are laid out, so a segment's own frame needs no second pass for them.
+  return translate(drawn(d, joint[1]), [-joint[0], 0, -joint[2]]);
+};
+const levels = (d: Bust) => {
   const waist = d.pelvisHeight;
   const ribs = waist + d.waistHeight;
   const chest = ribs + d.ribHeight;
   const shoulders = chest + d.chestHeight;
   const crown = shoulders + d.neckHeight;
+  return { waist, ribs, chest, shoulders, crown, armpit: chest + d.chestHeight * d.armpit };
+};
+/** Where a trunk bending in three is cut: at its ribs' and its chest's joints, and where its clavicles lift. */
+const spineCuts = (d: Bust) => {
+  const ribs = d.origins?.ribs?.[1];
+  const chest = d.origins?.chest?.[1];
+  const clavicle = d.clavicleCut;
+  if (ribs === undefined || chest === undefined || clavicle === undefined) {
+    throw new Error(
+      `The bust's ${d.segment} is a cut of the trunk, which needs its ribs' and chest's joints and clavicleCut`,
+    );
+  }
+  const at = levels(d);
+  // The trunk and the shoulders are regions a garment hides, and a region is whole parts only when it ends at a cut.
+  if (Math.abs(at.armpit - chest) > MEASURE_TOLERANCE) {
+    throw new Error(`The bust's armpit, ${at.armpit}, is not at its chest's joint, ${chest}`);
+  }
+  if (!(at.waist < ribs && ribs < chest && chest < clavicle && clavicle < at.shoulders)) {
+    throw new Error("The bust's spine cuts must rise from its waist to its shoulders in turn");
+  }
+  return { ribs, clavicle };
+};
+const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
+  const { waist, ribs, chest, shoulders, crown } = levels(d);
   const top = crown + d.headHeight;
   const halfX = d.headWidth / 2;
   const halfZ = d.headDepth / 2;
-  const origin = d.segment === 'head' ? crown + d.neckOverlap : 0;
   const ys = (bottom: number, topY: number): [number, number] => [bottom - origin, topY - origin];
   const eyeY = crown + d.headHeight * d.eyeShare;
   const brow = crown + d.jawHeight;
@@ -134,14 +203,14 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
       oval('pelvis', 'underwear', ys(0, waist), { halfX: d.pelvisWidth / 2, halfZ: d.pelvisDepth / 2, power: 3 }),
     ];
   }
-  if (d.segment === 'torso') {
+  if (d.segment !== 'neck' && d.segment !== 'head') {
     const chestHalfX = d.chestWidth / 2;
     const chestHalfZ = d.chestDepth / 2;
-    // The trapezius: the girdle's top falls from the neck's foot to the chest's side. The torso is drawn in the bust's
-    // frame, so the girdle's planes cut it as given.
+    // The trapezius: the girdle's top falls from the neck's foot to the chest's side. The girdle's planes are given in
+    // the bust's frame, so they rise with the segment's joint as its heights do.
     const sloped = (solid: ExtrudedPolygonSolid): ExtrudedPolygonSolid => ({
       ...solid,
-      clip: d.girdle.trapezius,
+      clip: d.girdle.trapezius.map(({ normal, offset }) => ({ normal, offset: offset - normal[1] * origin })),
       display: { ...solid.display, bevel: false },
     });
     // A pectoral: a lens on the chest's front plane, its lower edge the visible fold.
@@ -153,39 +222,55 @@ export const bust = (params: Readonly<Record<string, string>>): (ExtrudedPolygon
         cz: chestHalfZ - 0.011,
         power: 2,
       });
-    // Regions a worn shell's `covers` names, so a garment hides the skin it encloses: the trunk below the armpit,
-    // and the girdle above it, which stays drawn under a garment that leaves the shoulders bare.
-    return [
-      ...region('trunk', [
-        oval('waist', 'skin', ys(waist, ribs), {
-          halfX: d.waistWidth / 2,
-          halfZ: d.waistDepth / 2,
-          power: 3,
-          cz: 0.002,
-        }),
-        oval('ribs', 'skin', ys(ribs, chest), { halfX: d.ribWidth / 2, halfZ: d.ribDepth / 2, power: 3 }),
-        // The chest widens from the ribs over a short step, then carries the plane of the pectorals. Below the armpit
-        // it stays inside the hanging arm, so a sleeveless shell can enclose it without passing through the arm.
-        oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * d.armpit), {
-          halfX: chestHalfX * d.chestLowShare,
-          halfZ: chestHalfZ - 0.002,
-          power: 3.2,
-        }),
-      ]),
-      ...region('shoulders', [
-        sloped(
-          oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), {
-            halfX: chestHalfX,
-            halfZ: chestHalfZ - 0.006,
-            power: 3.6,
-          }),
-        ),
-        sloped(pec('pec-left', 1)),
-        sloped(pec('pec-right', -1)),
-        deltoid('shoulder-left', 1),
-        deltoid('shoulder-right', -1),
-      ]),
+    const trunk = [
+      oval('waist', 'skin', ys(waist, ribs), {
+        halfX: d.waistWidth / 2,
+        halfZ: d.waistDepth / 2,
+        power: 3,
+        cz: 0.002,
+      }),
+      oval('ribs', 'skin', ys(ribs, chest), { halfX: d.ribWidth / 2, halfZ: d.ribDepth / 2, power: 3 }),
+      // The chest widens from the ribs over a short step, then carries the plane of the pectorals. Below the armpit
+      // it stays inside the hanging arm, so a sleeveless shell can enclose it without passing through the arm.
+      oval('chest-low', 'skin', ys(chest, chest + d.chestHeight * d.armpit), {
+        halfX: chestHalfX * d.chestLowShare,
+        halfZ: chestHalfZ - 0.002,
+        power: 3.2,
+      }),
     ];
+    const slope = [
+      sloped(
+        oval('chest', 'skin', ys(chest + d.chestHeight * d.armpit, shoulders), {
+          halfX: chestHalfX,
+          halfZ: chestHalfZ - 0.006,
+          power: 3.6,
+        }),
+      ),
+      sloped(pec('pec-left', 1)),
+      sloped(pec('pec-right', -1)),
+    ];
+    const deltoids = { left: deltoid('shoulder-left', 1), right: deltoid('shoulder-right', -1) };
+    if (d.segment === 'torso') {
+      // Regions a worn shell's `covers` names, so a garment hides the skin it encloses: the trunk below the armpit,
+      // and the girdle above it, which stays drawn under a garment that leaves the shoulders bare.
+      return [...region('trunk', trunk), ...region('shoulders', [...slope, deltoids.left, deltoids.right])];
+    }
+    // A spine segment is a whole part of one region, so it needs no region of its own.
+    const at = (height: number) => height - origin;
+    const { ribs: ribsCut, clavicle } = spineCuts(d);
+    switch (d.segment) {
+      case 'waist':
+        return cut(trunk, 'y', at(ribsCut), -1);
+      case 'ribs':
+        return cut(trunk, 'y', at(ribsCut), 1);
+      case 'chest':
+        return cut(slope, 'y', at(clavicle), -1);
+      // The deltoid caps the arm the clavicle carries, so it rides the clavicle whole, however low it reaches.
+      case 'clavicle_l':
+        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, 1), deltoids.left];
+      case 'clavicle_r':
+        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, -1), deltoids.right];
+    }
   }
   if (d.segment === 'neck') {
     return [
