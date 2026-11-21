@@ -576,11 +576,18 @@ fixtureTest('a file that imports a stand-in by its root-relative path is served'
 // The catalogue's rows come out one to a file, listed by a manifest, and only a row that changed is written again.
 const mtimeOf = (path) => statSync(path).mtimeMs;
 const readManifest = ({ catalogue }) => JSON.parse(readFileSync(catalogue.manifest, 'utf8'));
-const manifestOf = (fixture) => readManifest(fixture).ids;
+const manifestOf = (fixture) => Object.values(readManifest(fixture).shards).flatMap(({ ids }) => ids);
 
 fixtureTest('the catalogue is a file for each row and a manifest of their ids in order', async (fixture) => {
   await fixture.refreshRows();
   assert.deepEqual(manifestOf(fixture), ['a', 'b']);
+  assert.deepEqual(
+    Object.entries(readManifest(fixture).shards).map(([path, { ids }]) => [path, ids]),
+    [
+      ['rows/a.libsonnet', ['a']],
+      ['rows/b.libsonnet', ['b']],
+    ],
+  );
   assert.deepEqual(readdirSync(fixture.catalogue.folder).sort(), ['a.json', 'b.json']);
   assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
 });
@@ -636,12 +643,12 @@ fixtureTest('rows written from another fragment than the current one are written
   await fixture.refreshRows();
   // What a checkout of another branch leaves: the twins' stamp is current, the rows are another fragment's.
   const manifest = readManifest(fixture);
-  manifest.shards['rows/a.libsonnet'] = 'another fragment';
+  manifest.shards['rows/a.libsonnet'].digest = 'another fragment';
   writeFileSync(fixture.catalogue.manifest, JSON.stringify(manifest));
   writeFileSync(fixture.rowFile('a'), '{"id":"a","value":9}');
   await fixture.refreshRows();
   assert.deepEqual(JSON.parse(readFileSync(fixture.rowFile('a'), 'utf8')), { id: 'a', value: 1 });
-  assert.notEqual(readManifest(fixture).shards['rows/a.libsonnet'], 'another fragment');
+  assert.notEqual(readManifest(fixture).shards['rows/a.libsonnet'].digest, 'another fragment');
 });
 
 fixtureTest('a partial file of a refresh that died is swept, and that of one that lives is not', async (fixture) => {

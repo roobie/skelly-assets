@@ -8,12 +8,9 @@ import {
   Group,
   Mesh,
   MeshStandardMaterial,
-  PMREMGenerator,
   SRGBColorSpace,
   type Texture,
-  type WebGLRenderer,
 } from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { Cartridge } from '../ammo/cartridge.ts';
 import { roundProfiles } from '../ammo/roundProfile.ts';
 import { type CartridgeFinish, cartridgeFinish } from '../gun/cartridgeFinish.ts';
@@ -33,14 +30,6 @@ export interface AmmoMeshes {
   readonly caseLengthUnits: number;
   readonly headDiameterUnits: number;
 }
-
-/** Build an image-based environment so metallic case and jacket materials stay legible. */
-export const ammoEnvironment = (renderer: WebGLRenderer): Texture => {
-  const generator = new PMREMGenerator(renderer);
-  const { texture } = generator.fromScene(new RoomEnvironment(), 0.04);
-  generator.dispose();
-  return texture;
-};
 
 /** One material per slot, drawn as the export draws it, so the viewer shows the cartridge's exported look. */
 const finishMaterials = (finish: CartridgeFinish, env: Texture) => {

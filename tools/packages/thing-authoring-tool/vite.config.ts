@@ -3,7 +3,7 @@ import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { normalizePath, type Plugin, type WebSocketClient } from 'vite';
 import { defineConfig } from 'vitest/config';
-import { LIVE_ROW, LIVE_VIEW, parseView, type RowMessage } from './src/live.ts';
+import { LIVE_ROW, LIVE_VIEW, parseView } from './src/live.ts';
 
 // Manual sweeps have no per-test timer; their complete export is intentionally exhaustive.
 const sweepTimeout = process.env.TAT_SWEEPS === '1' ? { testTimeout: 0 } : {};
@@ -30,18 +30,17 @@ const liveRows = (): Plugin => ({
   name: 'thing-live-rows',
   apply: 'serve',
   async configureServer({ config, watcher, ws }) {
-    const [{ evaluateRow }, { liveRows: create }] = await Promise.all([
+    const [{ evaluateHalf }, { liveRows: create }] = await Promise.all([
       serverModule<typeof import('./server/evaluateRow.ts')>('evaluateRow.ts'),
       serverModule<typeof import('./server/liveRows.ts')>('liveRows.ts'),
     ]);
     const rows = create<WebSocketClient>(
-      async (view) => {
-        const result = await evaluateRow(view);
-        if ('error' in result) config.logger.error(`Jsonnet did not evaluate ${view.item}:\n${result.error}`);
+      async (half, id) => {
+        const result = await evaluateHalf(half, id);
+        if ('error' in result) config.logger.error(`Jsonnet did not evaluate ${half} ${id}:\n${result.error}`);
         return result;
       },
-      (page, view, result) =>
-        page.send({ type: 'custom', event: LIVE_ROW, data: { view, result } satisfies RowMessage }),
+      (page, message) => page.send({ type: 'custom', event: LIVE_ROW, data: message }),
     );
     const known = new WeakSet<WebSocketClient>();
     ws.on(LIVE_VIEW, (data: unknown, page) => {

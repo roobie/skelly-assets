@@ -4,8 +4,9 @@
 // bytes change and nothing a dev server watches moves but that. The folder is not the source of truth, because a
 // refresh races its readers and its sibling refreshes: the manifest is, and the files it does not list are strays,
 // swept by readdir. A reader may see the catalogue half way between two refreshes; a row file is never half written.
-// The manifest also records the fragment each row file's rows were written from, since the twins' stamp records twins
-// and a checkout on another branch moves it without touching this folder.
+// The manifest lists the ids under the row file that holds them, so a reader that evaluates one row's Jsonnet can
+// evaluate its file alone. It also records the fragment each row file's rows were written from, since the twins' stamp
+// records twins and a checkout on another branch moves it without touching this folder.
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
@@ -13,7 +14,10 @@ import { jsonText, replaceFileIfChanged } from './generated-json.mjs';
 import { ID_PATTERN } from './packages/thing-core/src/schema.ts';
 
 /** @typedef {{ folder: string, manifest: string }} CatalogueOutput Where the rows go, and the manifest that lists them. */
-/** @typedef {{ shards: Record<string, string>, ids: string[] }} Manifest Each row file's fragment digest, and every row's id. */
+/**
+ * @typedef {{ shards: Record<string, { digest: string, ids: string[] }> }} CatalogueManifest Each row file's fragment
+ * digest and its rows' ids, the row files in catalogue order.
+ */
 /**
  * @typedef {object} Shard The rows of one row file.
  * @property {string} path The row file, which names it in a failure.
@@ -27,11 +31,17 @@ const ROW_SUFFIX = '.json';
 const PARTIAL = /\.json\.(\d+)\.partial$/;
 const PARTIAL_LIFETIME_MS = 60 * 60 * 1000;
 
-/** @returns {Manifest | undefined} The manifest as the last refresh wrote it, none when there is no sound one. */
+/** @returns {CatalogueManifest | undefined} The manifest as the last refresh wrote it, none when there is no sound one. */
 const readManifest = (/** @type {string} */ path) => {
   try {
     const manifest = JSON.parse(readFileSync(path, 'utf8'));
-    return Array.isArray(manifest?.ids) && typeof manifest.shards === 'object' ? manifest : undefined;
+    const shards = manifest?.shards;
+    return typeof shards === 'object' &&
+      shards !== null &&
+      !Array.isArray(shards) &&
+      Object.values(shards).every((shard) => typeof shard?.digest === 'string' && Array.isArray(shard.ids))
+      ? manifest
+      : undefined;
   } catch (error) {
     if (error instanceof SyntaxError || /** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT')
       return undefined;
@@ -59,9 +69,11 @@ const fileOf = (/** @type {string} */ id) => `${id}${ROW_SUFFIX}`;
 export const catalogueIsCurrent = ({ folder, manifest }, digests) => {
   const written = readManifest(manifest);
   if (written === undefined) return false;
-  if (JSON.stringify(Object.entries(written.shards)) !== JSON.stringify(Object.entries(digests))) return false;
+  const shards = Object.entries(written.shards);
+  const writtenDigests = shards.map(([path, { digest }]) => [path, digest]);
+  if (JSON.stringify(writtenDigests) !== JSON.stringify(Object.entries(digests))) return false;
   const present = namesIn(folder);
-  return written.ids.every((id) => present.has(fileOf(id)));
+  return shards.every(([, { ids }]) => ids.every((id) => present.has(fileOf(id))));
 };
 
 /**
@@ -118,14 +130,15 @@ export const writeCatalogueRows = ({ folder, manifest }, shards) => {
   const before = readManifest(manifest)?.shards;
   const present = namesIn(folder);
   for (const { path, digest, ids: own, rows } of shards) {
-    if (before?.[path] === digest && own.every((id) => present.has(fileOf(id)))) continue;
+    if (before?.[path]?.digest === digest && own.every((id) => present.has(fileOf(id)))) continue;
     for (const row of /** @type {{ id: string }[]} */ (JSON.parse(rows())))
       replaceFileIfChanged(join(folder, fileOf(row.id)), jsonText(row));
   }
-  replaceFileIfChanged(
-    manifest,
-    jsonText({ shards: Object.fromEntries(shards.map(({ path, digest }) => [path, digest])), ids }),
-  );
+  /** @type {CatalogueManifest} */
+  const written = {
+    shards: Object.fromEntries(shards.map(({ path, digest, ids: own }) => [path, { digest, ids: [...own] }])),
+  };
+  replaceFileIfChanged(manifest, jsonText(written));
   const listed = new Set(ids.map(fileOf));
   for (const name of namesIn(folder)) {
     const path = join(folder, name);

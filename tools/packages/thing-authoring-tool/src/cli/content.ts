@@ -3,12 +3,13 @@
 // reads the same files through Vite instead; see `viewerContent.ts`.
 import { readFileSync } from 'node:fs';
 import { type Catalogue, loadItem, type ToolItem } from '../catalogue.ts';
+import { type CatalogueManifest, catalogueIds } from '../catalogueManifest.ts';
 import { settings } from '../settings.ts';
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
 
 /** Every row's id, in the catalogue's order. */
-export const itemIds = () => (readJson('../../item-ids.json') as { ids: readonly string[] }).ids;
+export const itemIds = () => catalogueIds(readJson('../../item-ids.json') as CatalogueManifest);
 
 const readRow = (id: string) => {
   try {
