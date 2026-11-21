@@ -2717,8 +2717,9 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
       [restX, y + SMG_HANDLE_STEM_SLOT_HALF_U + 2 * GRID, z - half],
       'smg-handle',
     ),
-    // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the stem's turn up
-    // into the notch.
+    // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the notch. The notch
+    // is the box bounding the tube's whole upper-left quarter, not the stem's sweep, so it holds any notch turn up to
+    // the right angle `smgHandleTravel` allows.
     channel: [
       { x: [0, tubeEnd], y: [y - half, y + half], z: [z - half, z + half] },
       { x: [slotRearX, slotFrontX], y: stemSlot, z: [z - stemReach, z - half] },
