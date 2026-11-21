@@ -214,7 +214,11 @@ const feedIssuesForLower = (r: Resolved, receiver: PortRef, lower: PortRef): Iss
   const receiverParams = r.params.get(receiver.part)!;
   const feed = receiverParams.feed!.value;
   const lowerDef = r.defs.get(lower.part)!;
-  const hasWell = lowerDef.ports.some((port) => port.mount === 'magazine') || hasGripMagazineWell(r, lower.part);
+  // A lower built around its own fixed magazine holds the rounds a well's magazine would.
+  const hasWell =
+    r.params.get(lower.part)?.integral?.value === 'yes' ||
+    lowerDef.ports.some((port) => port.mount === 'magazine') ||
+    hasGripMagazineWell(r, lower.part);
   const layout = r.params.get(lower.part)?.layout?.value;
   const what = layout ? `${lower.part} (${layout})` : lower.part;
   // A top-loaded action over a lower built without a well is a single-shot: the round goes into the chamber by hand.

@@ -16,6 +16,7 @@ import {
 } from './arFrames.ts';
 import { AR_MODULAR_TEMPLATES } from './arModular/index.ts';
 import type { OpticTypeId } from './optics.ts';
+import { SKS_TEMPLATES } from './sks/index.ts';
 import type { TracedSmgSection } from './tracedSmgSections.ts';
 
 const sightMix = (...weights: readonly (readonly [OpticTypeId, number])[]): readonly OpticTypeId[] =>
@@ -719,4 +720,5 @@ export const TEMPLATES: readonly Template[] = [
   pumpShotgun,
   antiMateriel,
   ...AR_MODULAR_TEMPLATES,
+  ...SKS_TEMPLATES,
 ];

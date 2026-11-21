@@ -11,14 +11,18 @@ import {
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import type { Motion } from '@skelly/motion/motion';
 import pistolAction from '../../../../../models/guns/tables/pistolAction.json' with { type: 'json' };
+import sksAction from '../../../../../models/guns/tables/sksAction.json' with { type: 'json' };
 import { slideOf } from './actionMotion.ts';
 
-export type GunAction = 'ak' | 'ar' | 'smg' | 'slide';
+export type GunAction = 'ak' | 'ar' | 'sks' | 'smg' | 'slide';
 export type CycleMode = 'fire' | 'hand';
+export type TriggerMode = 'semi' | 'auto';
 
 export interface ActionCycleProfile {
   readonly rpm: number;
   readonly holdOpenOnEmpty: boolean;
+  /** Present where the action fires only one way, so the export can say so. */
+  readonly triggerMode?: TriggerMode;
   readonly ejectAt: number;
   /** Unit vector in gungen's frame, +Z right and +X muzzleward; the export turns it into the file's axes. */
   readonly ejectDirection: Vec3;
@@ -34,6 +38,13 @@ export interface ActionCycleProfile {
 
 const unit = (v: Vec3): Vec3 => scale(v, 1 / length(v));
 
+/** A cycle profile kept as content, whose JSON widens its vector and trigger mode. */
+const contentProfile = (profile: typeof pistolAction | typeof sksAction): ActionCycleProfile => ({
+  ...profile,
+  ejectDirection: unit(profile.ejectDirection as unknown as Vec3),
+  triggerMode: profile.triggerMode as TriggerMode,
+});
+
 /** A middling rate for an automatic carrier whose family reports none. */
 const GENERIC_FALLBACK_RPM = 600;
 
@@ -42,7 +53,8 @@ const GENERIC_FALLBACK_RPM = 600;
  * SMG cyclic rate: about 800 rpm (HK MP5 specification); its bolt does not hold open on an empty magazine.
  */
 export const ACTION_CYCLE_PROFILES: Readonly<Record<GunAction, ActionCycleProfile>> = {
-  slide: { ...pistolAction, ejectDirection: unit(pistolAction.ejectDirection as unknown as Vec3) },
+  slide: contentProfile(pistolAction),
+  sks: contentProfile(sksAction),
   ak: {
     rpm: 600,
     holdOpenOnEmpty: false,
@@ -274,6 +286,7 @@ export interface CycleMotion {
   readonly ejectDirection: Vec3;
   readonly holdOpenOnEmpty: boolean;
   readonly rpm?: number;
+  readonly triggerMode?: TriggerMode;
 }
 
 export interface AutomaticCycleMotion extends CycleMotion {
@@ -412,6 +425,7 @@ export const cycleMotion = (
     ejectDirection: profile.ejectDirection,
     holdOpenOnEmpty: profile.holdOpenOnEmpty,
     rpm: profile.rpm,
+    ...(profile.triggerMode ? { triggerMode: profile.triggerMode } : {}),
   };
 };
 

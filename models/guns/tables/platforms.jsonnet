@@ -108,6 +108,7 @@ local bores = { rifled: standard(), smoothbore: standard() };
       shared: picatinny { stock: 'ar-buffer-tube', grip: 'ar-grip' },
     },
     ak: { sizeClasses: ['ak'] },
+    sks: { sizeClasses: ['sks'] },
     // Short and magnum actions share scope rails.
     'bolt-rifle': { sizeClasses: ['short-action', 'magnum-action'], shared: picatinny },
     'battle-rifle': { sizeClasses: ['battle-rifle'] },

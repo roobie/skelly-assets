@@ -1,14 +1,11 @@
 import type { PartDef, PortDef } from '@skelly/construct/assembly/schema.ts';
-import {
-  boxFromMinMax,
-  clippedExtrudedPolygonPolyhedron,
-  polyhedronVolume,
-} from '@skelly/construct/shapes/geometry.ts';
+import { boxFromMinMax, clippedExtrudedPolygonPolyhedron } from '@skelly/construct/shapes/geometry.ts';
 import type { Box, Solid, Vec2 } from '@skelly/construct/shapes/solid.ts';
 import physical from '../../../../../models/guns/tables/physical.json' with { type: 'json' };
 import { type SectionPocket, subtractAxialPockets, subtractConvexSection } from './receiverSection.ts';
 import { roundedTriggerGuardSolids, TRIGGER_BLADE_ID } from './roundedTriggerGuard.ts';
 import { SPORTER_PROPORTIONS as P } from './sporterProportions.ts';
+import { inletWood } from './stockWood.ts';
 
 type Station = readonly [x: number, top: number, bottom: number];
 
@@ -96,46 +93,27 @@ export const sporterLower = (
   };
 };
 
-export const sporterStock = (solids: readonly Solid[]): Solid[] =>
-  solids.flatMap((solid) => {
-    if (solid.kind !== 'extruded-polygon' || solid.slot !== 'furniture') {
-      return [solid];
-    }
-    const { tang } = P;
-    const left = tang.rearX - P.receiver.rearX;
-    const right = tang.frontX - P.receiver.rearX;
-    if (Math.max(...solid.profile.map(([x]) => x)) <= left) {
-      return [solid];
-    }
-    const roof = Math.max(...solid.profile.map(([, y]) => y), tang.topU - P.stock.seatY);
-    const opening: Vec2[] = [
-      [left, tang.rearBottomU - P.stock.seatY],
-      [right, tang.bottomU - P.stock.seatY],
-      [right, roof],
-      [left, roof],
-    ];
-    const bands = [solid.z[0], -tang.halfWidthU, tang.halfWidthU, solid.z[1]].filter(
-      (z) => z >= solid.z[0] && z <= solid.z[1],
-    );
-    return bands.slice(0, -1).flatMap((start, band) => {
-      const end = bands[band + 1]!;
-      const profiles =
-        start >= -tang.halfWidthU && end <= tang.halfWidthU
-          ? subtractConvexSection(solid.profile, opening)
-          : [solid.profile];
-      return profiles
-        .map(
-          (profile, piece): Solid => ({ ...solid, id: `${solid.id}-tang-${band}-${piece}`, profile, z: [start, end] }),
-        )
-        .filter((piece) => {
-          if (piece.kind !== 'extruded-polygon') {
-            return false;
-          }
-          const polyhedron = clippedExtrudedPolygonPolyhedron(piece);
-          return polyhedron !== undefined && polyhedronVolume(polyhedron) > 1e-9;
-        });
-    });
+export const sporterStock = (solids: readonly Solid[]): Solid[] => {
+  const { tang } = P;
+  const left = tang.rearX - P.receiver.rearX;
+  const right = tang.frontX - P.receiver.rearX;
+  return inletWood(solids, {
+    name: 'tang',
+    halfWidth: tang.halfWidthU,
+    opening: (profile) => {
+      if (Math.max(...profile.map(([x]) => x)) <= left) {
+        return undefined;
+      }
+      const roof = Math.max(...profile.map(([, y]) => y), tang.topU - P.stock.seatY);
+      return [
+        [left, tang.rearBottomU - P.stock.seatY],
+        [right, tang.bottomU - P.stock.seatY],
+        [right, roof],
+        [left, roof],
+      ];
+    },
   });
+};
 
 export const sporterActionDetails = (): Solid[] => [
   ...P.pillars.map((pillar, index) =>

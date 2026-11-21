@@ -47,6 +47,7 @@ describe('the exported butt anchor sits on the rear face the voxelized stock dra
         'design archetype-ar.json',
         'design pipe-rifle.json',
         'design archetype-pump-shotgun.json',
+        'design sks-carbine.json',
       ]),
     );
   });
