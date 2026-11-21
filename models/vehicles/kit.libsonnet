@@ -42,7 +42,7 @@ local shoulderLugs(width, base, outer, count) = [
   for i in std.range(0, count - 1)
 ];
 local rad(degrees) = degrees * std.pi / 180;
-local vec = (import 'packages/thing-authoring-tool/compound.libsonnet').vec;
+local vec = (import '../../tools/packages/thing-authoring-tool/compound.libsonnet').vec;
 local add = vec.add, sub = vec.sub, dot = vec.dot, cross = vec.cross;
 local beyond(cut) = { normal: [-x for x in cut.normal], offset: -cut.offset };
 local inset(cut, depth) = cut { offset: cut.offset - depth * std.sqrt(dot(cut.normal, cut.normal)) };
