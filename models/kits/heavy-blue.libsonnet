@@ -31,10 +31,13 @@ local chestTop = ribTop + bust.chestHeight;
 local beltY = waistTop - 0.1;
 local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local chestDepth = 0.31;
+// The chest plate and its front slab are cut to the shoulders' slope under the trooper's deltoid caps, which this set
+// keeps.
+local shoulderRise = fit.trooperChestRise;
 local bodyAdd = [
-  oct('chest', 'plate', ribTop - 0.04, chestTop + 0.005, 0.5, chestDepth, 0.1),
+  oct('chest', 'plate', ribTop - 0.04, chestTop + shoulderRise, 0.5, chestDepth, 0.1) + { clip: fit.trapezius(shoulderRise) },
   h.prism('slab', 'plate', 'z', [[-0.21, ribTop - 0.03], [0.21, ribTop - 0.03], [0.24, chestTop - 0.02], [-0.24, chestTop - 0.02]],
-          chestDepth / 2 - 0.006, chestDepth / 2 + 0.03),
+          chestDepth / 2 - 0.006, chestDepth / 2 + 0.03) + { clip: fit.trapezius(shoulderRise) },
   h.box('panel-frame', 'trim', [-0.065, ribTop + 0.025, chestDepth / 2 + 0.03], [0.065, ribTop + 0.105, chestDepth / 2 + 0.036]),
   h.box('panel', 'insignia', [-0.045, ribTop + 0.04, chestDepth / 2 + 0.036], [0.045, ribTop + 0.09, chestDepth / 2 + 0.042]),
   oct('belt', 'strap', beltY, beltY + 0.085, lowW + 0.06, lowD + 0.06, bust.torsoChamfer / 2),

@@ -493,6 +493,14 @@ it('exports the player bust with joint anchors that seat the limbs symmetrically
   expect(anchors.shoulder_left![0]).toBeCloseTo(-anchors.shoulder_right![0]);
   expect(anchors.hip_left![0]).toBeCloseTo(-anchors.hip_right![0]);
 });
+it('pivots the player bust arms on the shoulder joints its girdle draws the deltoids about', () => {
+  const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
+  const anchors = row.generate().modelEntry.anchors!;
+  const torso = catalogue.items.find(({ id }) => id === 'player_bust')!.parts.find(({ id }) => id === 'torso')!;
+  const { x, y } = JSON.parse(torso.params.girdle!).deltoid;
+  expect(anchors.shoulder_left).toEqual([x, y, 0]);
+  expect(anchors.shoulder_right).toEqual([-x, y, 0]);
+});
 
 it.each([
   [

@@ -18,7 +18,8 @@ local dollFinish = { flesh: 'latex-pale', hair: 'leather-chestnut', dress: 'clot
 // back on the belly, with the forearms bent forward and in under it; `masses` gives the stand's and the doll's mass.
 local bust = import 'models/measures/bust.libsonnet';
 local band = import 'models/head-band.libsonnet';
-local bustMeasures = bust { hairRing: band.hairRing };
+local girdle = (import 'models/girdle.libsonnet')(bust);
+local bustMeasures = girdle.bustParams { hairRing: band.hairRing };
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
@@ -30,8 +31,8 @@ local segment(id, family, measures, segment, massKg, slots, ports) = {
   params: { [k]: std.toString((measures { segment: segment })[k]) for k in std.objectFields(measures { segment: segment }) },
   finish: { [slot]: plastic for slot in slots },
 };
-local shoulderX = bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
-local shoulderY = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight - bust.shoulderHeight / 2 - bust.deltoidDrop;
+local shoulderX = girdle.deltoid.x;
+local shoulderY = girdle.deltoid.y;
 local hipX = bust.pelvisWidth / 4;
 local hipY = bust.pelvisHeight * 0.12;
 local plate = 0.012;

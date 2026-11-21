@@ -26,11 +26,12 @@ const data = JSON.parse(
     sites: [s + { pieces: pieces(s) } for s in placements.sites],
     bust: import 'models/measures/bust.libsonnet',
     leg: import 'models/measures/leg.libsonnet',
+    deltoid: (import 'models/girdle.libsonnet')(self.bust).deltoid,
   }`,
     root,
   ),
 );
-const { spec, own, sites, bust, leg } = data;
+const { spec, own, sites, bust, leg, deltoid } = data;
 const site = Object.fromEntries(sites.map((s) => [s.id, s]));
 const drawn = (...ids) => ids.flatMap((id) => site[id].pieces);
 const sides = ['near', 'far'];
@@ -297,7 +298,7 @@ const crouch = {
     bust.neckHeight +
     bust.headHeight +
     bust.hairThickness,
-  width: bust.chestWidth + 2 * (bust.shoulderWidth - bust.deltoidInset),
+  width: 2 * (deltoid.x + deltoid.radius),
   depth: leg.thighLength + leg.shinDepth,
 };
 // How far the hull, its fittings and its seats may reach into the crouching doll on its way in: a little clipping

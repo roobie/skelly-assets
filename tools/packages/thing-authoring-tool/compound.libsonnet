@@ -281,7 +281,7 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
         else { profile: [[q[0] + dy, q[1]] for q in p.profile] }
       )
       else { origin: local o = std.get(p, 'origin', [0, 0, 0]); [o[0], o[1] + dy, o[2]] }
-    )
+    ) + (if std.objectHas(p, 'clip') then { clip: [c { offset: c.offset + c.normal[1] * dy } for c in p.clip] } else {})
     for p in pieces
   ],
   // The same pieces made k times larger about the origin, for oversized cuts of a model.
@@ -290,7 +290,7 @@ local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', a
       if p.kind == 'box' then { min: [v * k for v in p.min], max: [v * k for v in p.max] }
       else if p.kind == 'prism' then { profile: [[v * k for v in q] for q in p.profile], start: p.start * k, end: p.end * k }
       else { profile: [[v * k for v in q] for q in p.profile] } + (if std.objectHas(p, 'origin') then { origin: [v * k for v in p.origin] } else {})
-    )
+    ) + (if std.objectHas(p, 'clip') then { clip: [c { offset: c.offset * k } for c in p.clip] } else {})
     for p in pieces
   ],
   // curvedPlate with each strip filled down to the height of its outer edge, so neighbouring strips meet without a

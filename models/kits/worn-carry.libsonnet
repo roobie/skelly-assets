@@ -13,6 +13,16 @@ local mirrored(id, slot, xs, ys, zs) = [
   box('%s_left' % id, slot, [xs[0], ys[0], zs[0]], [xs[1], ys[1], zs[1]]),
   box('%s_right' % id, slot, [-xs[1], ys[0], zs[0]], [-xs[0], ys[1], zs[1]]),
 ];
+// `mirrored` for a strap lying over the trapezius between its slope set out by `rises[0]` and `rises[1]`, and for one
+// hanging from the slope set out by `rise` down to `foot`.
+local sloped(id, slot, xs, zs, rises) = [
+  wornFit.slopeBand('%s_left' % id, slot, xs, zs, rises),
+  wornFit.slopeBand('%s_right' % id, slot, [-xs[1], -xs[0]], zs, rises),
+];
+local slopedHung(id, slot, xs, zs, foot, rise) = [
+  wornFit.slopeHung('%s_left' % id, slot, xs, zs, foot, rise),
+  wornFit.slopeHung('%s_right' % id, slot, [-xs[1], -xs[0]], zs, foot, rise),
+];
 
 local level(bottom, height, width, depth, chamfer) = {
   y: [bottom, bottom + height], hx: width / 2, hz: depth / 2, c: chamfer / 2,
@@ -30,8 +40,8 @@ local torso = if overJacket then {
   ribs: level(self.waist.y[1], bust.ribHeight, bust.ribWidth, bust.ribDepth, bust.torsoChamfer),
   chest: level(self.ribs.y[1], bust.chestHeight, bust.chestWidth, bust.chestDepth, bust.chestChamfer),
 };
-// Over the jacket the shoulders are its yoke's top.
-local shoulderTop = if overJacket then shell.yoke.y[1] else torso.chest.y[1];
+// How far the shoulders gear lies on stand off the body's: over the jacket, its shell's top.
+local rise = if overJacket then shell.chest.rise else 0;
 local grain = 0.004;
 // A sample just below the garment's outward step can fill a cell above it; end the narrow waist on a voxel face.
 local waistTop = std.floor(torso.waist.y[1] / grain) * grain;
@@ -101,10 +111,13 @@ local ring(id, slot, l, offsets, heights, sides) =
 local vestShell(id, slot, offsets, waistOffsets, bottom, flanks) =
   ring(id + '_waist', slot, torso.waist, waistOffsets, [bottom, waistTop], SIDES.open + flanks)
   + ring(id + '_ribs', slot, torso.ribs, offsets, torso.ribs.y, SIDES.open)
-  + ring(id + '_chest', slot, torso.chest, offsets, [torso.chest.y[0], shoulderTop + offsets[1]], SIDES.open)
-  // Shoulder straps join the front and back panels over the top, clear of the collar and the deltoids.
-  + mirrored(id + '_shoulder', slot, fit.vestStrapLane, [shoulderTop + offsets[0], shoulderTop + offsets[1]],
-             [-(torso.chest.hz + offsets[1]), torso.chest.hz + offsets[1]]);
+  + [
+    piece { clip: wornFit.trapezius(rise + offsets[1]) }
+    for piece in ring(id + '_chest', slot, torso.chest, offsets, [torso.chest.y[0], torso.chest.y[1] + offsets[1]], SIDES.open)
+  ]
+  // Shoulder straps join the front and back panels over the trapezius, clear of the collar and the deltoids.
+  + sloped(id + '_shoulder', slot, fit.vestStrapLane, [-(torso.chest.hz + offsets[1]), torso.chest.hz + offsets[1]],
+           [rise + offsets[0], rise + offsets[1]]);
 
 local utilityVest =
   local front = torso.waist.hz + fit.vestWaist[1];
@@ -129,9 +142,9 @@ local packStraps(backTo) =
   local o = fit.packStrap;
   local front = [torso.chest.hz + o[0], torso.chest.hz + o[1]];
   local back = [-(torso.chest.hz + o[1]), -(torso.chest.hz + o[0])];
-  mirrored('strap_front', 'strap', fit.packStrapLane, [fit.packStrapBottom, shoulderTop + o[1]], front)
-  + mirrored('strap_over', 'strap', fit.packStrapLane, [shoulderTop + o[0], shoulderTop + o[1]], [back[0], front[1]])
-  + mirrored('strap_back', 'strap', fit.packStrapLane, [backTo, shoulderTop + o[1]], back)
+  slopedHung('strap_front', 'strap', fit.packStrapLane, front, fit.packStrapBottom, rise + o[1])
+  + sloped('strap_over', 'strap', fit.packStrapLane, [back[0], front[1]], [rise + o[0], rise + o[1]])
+  + slopedHung('strap_back', 'strap', fit.packStrapLane, back, backTo, rise + o[1])
   + mirrored('buckle', 'trim', [fit.packStrapLane[0] - 0.004, fit.packStrapLane[1] + 0.004],
              [fit.packStrapBottom - 0.012, fit.packStrapBottom + 0.012], [front[1], front[1] + 0.008]);
 
@@ -194,11 +207,10 @@ local wornAtom(id, title, massKg, pieces, finish, taxonomy=null) = {
 // to the slung gun's stock. Its foot meets the gun where
 // https://github.com/roobie/skelly, `packages/deadvox/src/content/base/models-firearms.libsonnet`, `slung`, hangs it.
 local sling =
-  local deltoidX = if overJacket then torso.chest.hx - fit.slingInset
-                  else bust.chestWidth / 2 + bust.shoulderWidth / 2 - bust.deltoidInset;
-  local deltoidTop = if overJacket then shoulderTop + fit.slingClearance else shoulderTop - bust.deltoidDrop;
-  local half = if overJacket then torso.chest.hz + fit.slingClearance else bust.shoulderDepth / 2;
+  local deltoidX = if overJacket then torso.chest.hx - fit.slingInset else wornFit.deltoid.x;
+  local half = if overJacket then torso.chest.hz + fit.slingClearance else wornFit.deltoid.radius;
   local xs = [-deltoidX - 0.012, -deltoidX + 0.012];
+  local deltoidTop = wornFit.shoulderY(xs, rise) + (if overJacket then fit.slingClearance else 0);
   local pad = [deltoidTop + 0.004, deltoidTop + 0.012];
   [
     box('pad', 'strap', [xs[0], pad[0], -half - 0.014], [xs[1], pad[1], half + 0.014]),

@@ -6,12 +6,20 @@
   chestWidth: 0.4, chestDepth: 0.22, chestHeight: 0.15,
   // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers.
   armpit: 0.4,
-  // The lower chest's width as a share of the chest's, so it stays inside the hanging arm and a sleeveless shell can
-  // enclose it.
-  chestLowShare: 0.94,
+  // The lower chest's width as a share of the chest's: narrow enough that a sleeveless shell of the under layer fits
+  // between it and the hanging arm, which the worn fit asserts.
+  chestLowShare: 0.92,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
-  shoulderWidth: 0.09, shoulderHeight: 0.12, shoulderDepth: 0.12, deltoidInset: 0.012, deltoidDrop: 0.01,
+  // The shoulder joint, which the arm pivots on: how far out past the chest's side and how far below its top. The rig
+  // and the baked poses were judged on this joint, so moving it asks for them to be judged again.
+  shoulderJointOut: 0.031, shoulderJointBelow: 0.07,
+  // How far the girdle's top falls from the neck's foot to the chest's side, so the shoulders slope as the trapezius
+  // does rather than stand square; worn shells over the shoulders follow it.
+  trapeziusDrop: 0.04,
+  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands only `deltoidCrown`
+  // above the slope's end, so the slope runs on over a low rounded cap rather than into a ball.
+  deltoidRadius: 0.051, deltoidCrown: 0.007,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
   headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.
