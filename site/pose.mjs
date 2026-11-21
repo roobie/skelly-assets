@@ -315,13 +315,11 @@ function drawTile(obj, size, views, { framed = obj, shown = [obj] } = {}) {
   return tile.toDataURL('image/png');
 }
 
-// The figure's eyes: half the head's height above the head's joint, a little inside its face, looking the way the head
+// The figure's eyes, the rig's `eye` from the head's joint, where the poses aim the look from, looking the way the head
 // faces; the head is not drawn from there, as the camera stands inside it.
-const EYES_INSIDE_FACE = 0.02;
 function eyesOf(figure) {
-  const { bone, joint } = figure.bones.get('head');
-  const { min, max } = bone.bind.box;
-  const eye = joint.localToWorld(new THREE.Vector3(0, (max[1] - min[1]) / 2, max[2] - bone.head[2] - EYES_INSIDE_FACE));
+  const { joint } = figure.bones.get('head');
+  const eye = joint.localToWorld(new THREE.Vector3(...figure.rig.eye));
   const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(joint.getWorldQuaternion(new THREE.Quaternion()));
   return { eye, forward, head: joint };
 }
