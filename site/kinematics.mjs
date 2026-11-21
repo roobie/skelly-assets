@@ -169,6 +169,17 @@ export const frameAbout = (head, tail, flexAxis) => {
 // ---- forward kinematics ----
 
 export const applyPoint = ({ r, t }, p) => add(mulMV(r, p), t);
+// `b`, then `a`.
+export const composed = (a, b) => ({ r: mulMM(a.r, b.r), t: applyPoint(a, b.t) });
+
+// A bound part's box where it is exact, with the rest placing that carries it into the rig frame: a part the doll rests
+// turned (tools/dollRig.mjs, `bind.hanging`) is boxed as it hangs before the turn swings it about the anchor it hangs
+// from, as its box turned would be a looser one at any angle but a quarter turn.
+export const boundBox = ({ box, turn, hanging }) => {
+  if (!turn) return { box, rest: { r: IDENTITY_M, t: [0, 0, 0] } };
+  const r = quatToMat3(turn);
+  return { box: hanging.box, rest: { r, t: sub(hanging.about, mulMV(r, hanging.about)) } };
+};
 
 // World transform (rest -> posed) of every bone; `bones` are parents-first. A bone with no rotation keeps its rest
 // orientation. T_b = T_parent ∘ translate(head) ∘ R_b ∘ translate(-head), the root also translated by pose.root.

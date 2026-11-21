@@ -23,6 +23,7 @@ local segmentBones = {
   pelvis: 'pelvis', waist: 'spine_01', ribs: 'spine_02', chest: 'spine_03',
   clavicle_l: 'clavicle_l', clavicle_r: 'clavicle_r', neck: 'neck_01', head: 'Head',
 };
+local trunk = joints.trunk;
 local bust = {
   base:: bustBase,
   origins: {
@@ -33,12 +34,9 @@ local bust = {
   // spine_03, which is so the armpit.
   pelvisHeight: level('spine_01'),
   pelvisWidth: 0.32, pelvisDepth: 0.22,
-  waistWidth: 0.25, waistDepth: 0.205, waistHeight: 0.17,
-  ribWidth: 0.31, ribDepth: 0.235, ribHeight: 0.06,
-  chestWidth: 0.34, chestDepth: 0.28,
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   chestHeight: level('neck_01') - chestFoot,
-  armpit: (level('spine_03') - chestFoot) / self.chestHeight,
+  armpit: (trunk.chestJoint - chestFoot) / self.chestHeight,
   chestLowShare: 0.95,
   // The clavicles lift the girdle from halfway between the armpit and the shoulders' top.
   clavicleCut: (level('spine_03') + level('neck_01')) / 2,
@@ -46,15 +44,13 @@ local bust = {
   shoulderJointOut: head('upperarm_l')[0] - self.chestWidth / 2,
   shoulderJointBelow: head('neck_01')[1] - head('upperarm_l')[1],
   shoulderJointForward: head('upperarm_l')[2] - bustBase[2],
-  trapeziusDrop: 0.02,
-  deltoidRadius: 0.065, deltoidCrown: 0.03,
-  // The neck runs from its joint to the chin, and on into the head to the head's joint. The chin is flesh, set by hand
-  // against the mannequin, as no joint marks it.
-  chin:: 1.555,
-  neckWidth: 0.12,
-  neckHeight: self.chin - head('neck_01')[1],
-  neckOverlap: head('Head')[1] - self.chin,
-} + the(playerBust, [
+  deltoidRadius: 0.065,
+  // The neck runs on past the chin into the head, to the head's joint.
+  neckOverlap: head('Head')[1] - trunk.chin,
+} + the(trunk, [
+  'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
+  'trapeziusDrop', 'deltoidCrown', 'neckWidth', 'neckHeight',
+]) + the(playerBust, [
   'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare', 'hairCover',
   'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack', 'hairLayerCount',
 ]);

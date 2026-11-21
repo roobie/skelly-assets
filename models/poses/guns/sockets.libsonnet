@@ -25,8 +25,10 @@ local forend = { from: 'support', into: [-0.5, 0.866, 0], axis: [0.557, 0.321, 0
   rifle_pipe: { grip: pistol, support: forend },
   // The support anchor stands on the pump's lower right edge; the palm cradles its middle. The pump's long, dropped
   // stock fills the pocket from the chest to the raised arm, so it bears a little inboard and stands a little out of it.
+  // With the elbow raised and drawn back as the pump's bladed guard holds it, the forearm pronates to its limit, so the
+  // palm closes on the stock wrist from above as well as from the side, where the wrist need not turn past its own.
   shotgun_pump: {
-    grip: pistol,
+    grip: pistol { into: [0.848, -0.349, -0.399] },
     support: forend { offset: [0.028, 0, -0.07] },
     butt: { from: 'butt', offset: [-0.01, 0, -0.01] },
   },

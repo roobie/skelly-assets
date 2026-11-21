@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
+import { applyPoint, boneTransforms, boundBox, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
@@ -139,10 +139,12 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
     const item = held[`hand.${side}`];
     const solid = posedSolid(haft, item);
     const transforms = boneTransforms(rig.bones, decodeFrame(frame));
-    const gap = (id) =>
-      Math.min(
-        ...lattice(bones.get(id).bind.box).map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)),
-      );
+    // A turned part is sampled on its box as it hangs, carried by its rest turn, where that box bounds it exactly.
+    const gap = (id) => {
+      const { box, rest } = boundBox(bones.get(id).bind);
+      const at = (p) => applyPoint(transforms.get(id), applyPoint(rest, p));
+      return Math.min(...lattice(box).map((p) => signedDepth(solid, at(p), 0.1)));
+    };
     const digits = rig.bones.filter((bone) => bone.digit && bone.id.endsWith(`.${side}`));
     for (const bone of digits)
       assert.ok(gap(bone.id) > -0.0015, `${bone.id} sinks ${(-gap(bone.id) * 1000).toFixed(1)} mm into the haft`);

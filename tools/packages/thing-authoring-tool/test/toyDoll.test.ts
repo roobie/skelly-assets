@@ -200,7 +200,9 @@ describe('a doll whose skeleton is not the player body', () => {
       return solid.origin;
     };
     const [x, y, z] = centre(girdle.deltoid);
-    expect(centre({ ...girdle.deltoid, z: 0.02 })).toEqual([x, y, z + 0.02]);
+    const [sx, sy, sz] = centre({ ...girdle.deltoid, z: girdle.deltoid.z! + 0.02 });
+    expect([sx, sy]).toEqual([x, y]);
+    expect(sz).toBeCloseTo(z + 0.02, 9);
   });
 
   it("cuts the torso garment at the bust's spine joints, each shell in its part's frame", () => {

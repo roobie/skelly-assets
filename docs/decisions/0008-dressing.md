@@ -30,8 +30,11 @@ anchor of the same name, so a limb authored with its joint off its origin still 
 
 A worn piece is drawn in the frame of the doll part its segment names, in every copy of that part, because that is
 the frame the piece is authored in for the game. Pieces fitted over other clothing are left out, since the doll wears
-each item alone. A piece's frame is a doll part's origin, so a doll part turned off its model's axes is refused
-rather than drawn askew.
+each item alone. A piece's frame is a doll part's origin, so a doll part turned off its model's axes, such as an arm
+swung out at rest, turns its pieces with it: a piece is authored once against the part as it hangs, and fits however a
+doll rests the part. A wearable with no worn pieces is placed against such a part as it hangs and then turned with it,
+since the turned part's box is a looser bound at any angle but a quarter turn; across both copies of a turned part it
+is refused, as the copies turn apart and one model cannot follow both.
 
 A wearable with no worn pieces is placed by its slot: against the doll part its slot's place names, centred across
 and sunk into it by a share of its own depth. This shows where it belongs and roughly how big it is beside the body,

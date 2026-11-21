@@ -38,26 +38,28 @@ local beltY = waistTop - 0.1;
 local lowD = bust.pelvisDepth + 2 * g;
 local chestD = bust.chestDepth + 2 * g + 0.03;
 local front = chestD / 2 + 0.012, back = -chestD / 2;
+// The breast, its light strips and the pack's vents keep their places from the chest's side.
+local chestSide = bust.chestWidth / 2;
 // The chest and its breast plate are cut to the shoulders' slope under the trooper's deltoid caps, which this set
 // keeps.
 local shoulderRise = fit.trooperChestRise;
 local bodyAdd = [
-  oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, 0.43, chestD, 0.07) + { clip: fit.trapezius(shoulderRise) },
+  oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, bust.chestWidth + 0.03, chestD, 0.07) + { clip: fit.trapezius(shoulderRise) },
   // Angular breast plate: a wedge that juts forward at the bottom of the chest.
-  h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -0.19, 0.19)
+  h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -(chestSide - 0.01), chestSide - 0.01)
   + { clip: fit.trapezius(shoulderRise) },
   h.prism('breast-lower', 'trim', 'x', [[ribTop - 0.07, front - 0.01], [ribTop - 0.07, front + 0.03], [ribTop - 0.025, front + 0.045], [ribTop - 0.03, front - 0.01]], -0.12, 0.12),
   // The core: a dark frame round a glowing diamond.
   h.prism('core-frame', 'trim', 'z', [[0, ribTop + 0.0], [0.07, ribTop + 0.065], [0, ribTop + 0.13], [-0.07, ribTop + 0.065]], front + 0.03, front + 0.05),
   h.prism('core', 'glow', 'z', [[0, ribTop + 0.025], [0.045, ribTop + 0.065], [0, ribTop + 0.105], [-0.045, ribTop + 0.065]], front + 0.05, front + 0.062),
-  h.box('breast-line-l', 'glow', [-0.165, ribTop + 0.0, front + 0.036], [-0.15, chestTop - 0.05, front + 0.046]),
-  h.box('breast-line-r', 'glow', [0.15, ribTop + 0.0, front + 0.036], [0.165, chestTop - 0.05, front + 0.046]),
+  h.box('breast-line-l', 'glow', [-(chestSide - 0.035), ribTop + 0.0, front + 0.036], [-(chestSide - 0.05), chestTop - 0.05, front + 0.046]),
+  h.box('breast-line-r', 'glow', [chestSide - 0.05, ribTop + 0.0, front + 0.036], [chestSide - 0.035, chestTop - 0.05, front + 0.046]),
   h.box('belt-line', 'glow', [-0.15, beltY + 0.03, lowD / 2 + 0.014], [0.15, beltY + 0.042, lowD / 2 + 0.022]),
   oct('belt', 'strap', beltY, beltY + 0.07, bust.pelvisWidth + 2 * g + 0.03, lowD + 0.03, 0.05),
   h.box('buckle', 'trim', [-0.05, beltY + 0.005, lowD / 2 + 0.012], [0.05, beltY + 0.065, lowD / 2 + 0.03]),
   // Pack: angular side vents, two glowing windows and exhaust vanes up past the shoulders.
-  h.box('pack-vent-l', 'trim', [-0.15, ribTop + 0.0, back - 0.09], [-0.13, chestTop - 0.02, back + 0.0]),
-  h.box('pack-vent-r', 'trim', [0.13, ribTop + 0.0, back - 0.09], [0.15, chestTop - 0.02, back + 0.0]),
+  h.box('pack-vent-l', 'trim', [-(chestSide - 0.05), ribTop + 0.0, back - 0.09], [-(chestSide - 0.07), chestTop - 0.02, back + 0.0]),
+  h.box('pack-vent-r', 'trim', [chestSide - 0.07, ribTop + 0.0, back - 0.09], [chestSide - 0.05, chestTop - 0.02, back + 0.0]),
 ] + [
   h.box('pack-cell-%d' % i, 'glow', [-0.09 + i * 0.1, ribTop + 0.02, back - 0.121], [-0.02 + i * 0.1, chestTop - 0.04, back - 0.109])
   for i in [0, 1]

@@ -25,8 +25,9 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
     },
   },
   stances: {
-    // The weapon carried low across the body, its end down by the left foot.
-    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.19, -0.42, 0.17], 20, 25, 80, [-0.74, -0.67, 0], [-0.47, -0.79, -0.39]) },
+    // The weapon shouldered, so the walking hips swing clear of it: resting on the right shoulder by the neck, its end
+    // up behind it, both hands on the handle in front of the chest.
+    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.06, -0.06, 0.26], -155, 0, 80) },
     guard: guard,
   },
   // Walked as the idle stands, both hands on the weapon: swung in one hand, a two-hand weapon hangs into the body. It
@@ -35,20 +36,25 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
   strikes: {
     overhead: heavy {
       windup: guard { body+: { spine: [-10, -5, 0] }, weapon: held([0.2, 0.2, 0], -170, 0, 106, [-0.3, 0.49, 0.82], [0.72, 0.36, 0.6]) },
-      hit: guard { body+: { spine: [18, 0, 0] }, weapon: held([0.22, -0.2, 0.42], -15, 0, 60, [-0.6, -1, 0], [0.1, -1, 0]) },
-      follow: guard { body+: { spine: [28, 0, 0] }, weapon: held([0.22, -0.41, 0.25], 10, 0, 54, [-0.6, -1, 0], [-0.37, -0.93, 0]) },
+      // Through the hit and follow, as through the thrust's, the handle rolls toward the thumbs, and at the hit the end
+      // rides a little high, with the left elbow out and back: the left hand, at the handle's end, then closes on it
+      // without bending past its wrist. At the follow the right elbow tucks back, so the hand reaches the low handle.
+      hit: guard { body+: { spine: [18, 0, 0] }, weapon: held([0.22, -0.2, 0.42], -25, 0, 80, [-0.6, -1, 0], [0.4, -0.5, -0.6]) },
+      follow: guard { body+: { spine: [28, 0, 0] }, weapon: held([0.22, -0.4, 0.24], 10, 0, 74, [-0.6, -1, -0.3], [0.4, -0.5, -0.6]) },
     },
     side: heavy {
       windup: guard { body+: { spine: [4, -40, 0] }, weapon: held([0.07, -0.08, 0.11], -70, -140, -54, [-0.91, -0.27, 0.31], [0.3, -1, 0]) },
-      hit: guard { body+: { spine: [10, 0, 0] }, weapon: held([0.22, -0.15, 0.4], -25, 5, 110) },
-      follow: guard { body+: { spine: [12, 50, 0] }, weapon: held([0.43, -0.06, 0.22], 0, 112, -12, [-0.3, -1, 0], [-0.2, -0.98, 0]) },
+      // The left elbow drops back through the hit and lifts forward through the follow, so the left wrist, at the
+      // handle's end, keeps square to the handle as it sweeps across.
+      hit: guard { body+: { spine: [10, 0, 0] }, weapon: held([0.22, -0.15, 0.4], -25, 5, 110, left=[0.6, -1, -0.25]) },
+      follow: guard { body+: { spine: [12, 50, 0] }, weapon: held([0.43, -0.06, 0.22], 0, 112, -12, [-0.3, -1, 0], [-0.2, -0.98, 0.6]) },
     },
     thrust: {
       shares: { windup: 16, strike: 12, follow: 22, recovery: 50 },
       seconds: 0.9,
       windup: guard { body+: { spine: [4, -15, 0] }, weapon: held([0.15, -0.3, 0.05], -10, 5, 80, left=[0.1, -1, 0]) },
-      hit: guard { body+: { spine: [12, 5, 0] }, weapon: held([0.2, -0.15, 0.43], -15, 5, 60, [-0.6, -1, 0], [0.1, -1, 0]) },
-      follow: guard { body+: { spine: [12, 0, 0] }, weapon: held([0.22, -0.18, 0.41], -16, 5, 66, [-0.6, -1, 0], [0.1, -1, 0]) },
+      hit: guard { body+: { spine: [12, 5, 0] }, weapon: held([0.2, -0.15, 0.43], -25, 5, 80, [-0.6, -1, 0], [0.4, -0.5, -0.6]) },
+      follow: guard { body+: { spine: [12, 0, 0] }, weapon: held([0.22, -0.18, 0.41], -16, 5, 86, [-0.6, -1, 0], [0.1, -1, 0]) },
     },
   },
 }

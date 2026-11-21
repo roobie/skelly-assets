@@ -44,10 +44,10 @@ local pose = {
   head: { turn: 14, lift: 6 },
   // The sword arm hangs `forward` and `abduct` out; the hand lies flat on the pommel, fingers forward and turned
   // `inward`, the wrist bent back `wrist` so the forearm slopes down to it.
-  sword: { abduct: 17, forward: 20, inward: 10, wrist: 35 },
+  sword: { abduct: 27, forward: 12, inward: 10, wrist: 35 },
   // The shield arm hangs `abduct` out, the palm flat to the shield's back; the shield turns `turn` to face out and
   // forward and leans its top `lean` in.
-  shield: { abduct: 20, turn: 50, lean: 4 },
+  shield: { abduct: 24, turn: 50, lean: 4 },
   // Each phalanx's curl, knuckle first, and the thumb's bones likewise: the sword hand's fingers droop over the
   // pommel, the shield hand's lie flat.
   swordFingers: [12, 10, 8],
@@ -94,15 +94,13 @@ local legMeasures = scaledMeasures(leg);
 
 // The doll's joints in its own frames, life-size (models/catalogue/sets/avatar.libsonnet).
 local lifeGirdle = girdle(bust);
-local shoulderX = lifeGirdle.deltoid.x;
-local shoulderY = lifeGirdle.deltoid.y;
-local chestTop = lifeGirdle.chestTop;
+local shoulder(side) = [side * lifeGirdle.deltoid.x, lifeGirdle.deltoid.y, lifeGirdle.deltoid.z];
 local hipX = leg.hip[0];
 local hipY = leg.hip[1];
 // The sabaton's sole lies under the bare foot, so the figure stands that much higher on the plinth.
 local soleLift = [r for r in plate if r.id == 'sabaton_plate_worn_foot'][0].soleLift;
 // The head's joint, which the armet's seat is measured from, so its slit falls at the doll's eyes.
-local headJoint = chestTop + bust.neckHeight + bust.neckOverlap;
+local headJoint = bust.joints.head[1];
 // Where a flat hand meets what it rests on: the middle of the palm's face, a little to the little finger's side so
 // the thumb runs clear.
 local palmFace = [arm.palmThickness / 2, -arm.palmLength / 2, -0.01];
@@ -145,7 +143,7 @@ local frames =
     };
   local armFrames(name, side, curl) =
     local turns = armTurns[name];
-    local pauldron = frame(turns.upper, at(harness, [side * shoulderX, shoulderY, 0]));
+    local pauldron = frame(turns.upper, at(harness, shoulder(side)));
     local vambrace = frame(turns.fore, at(pauldron, [0, -arm.upperLength, 0]));
     local palm = frame(turns.palm, at(vambrace, [0, -arm.foreLength, 0]));
     // A digit's bones down from its root, each curled about its own joint.

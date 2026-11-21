@@ -10,6 +10,8 @@ import { COINCIDENT, coveredSurface, posedSolid, runAlong, signedDepth } from '.
 import { hides } from '../site/hiding.mjs';
 import {
   add,
+  applyPoint,
+  boundBox,
   dot,
   frameAbout,
   IDENTITY_M,
@@ -234,7 +236,7 @@ export function dollRig(doll, dressing) {
           site: copy.site,
           box: copy.box,
           mirror: Boolean(copy.mirror),
-          ...(copy.turn ? { turn: copy.turn } : {}),
+          ...(copy.turn ? { turn: copy.turn, hanging: copy.hanging } : {}),
         },
         at: copy.at,
         ...(spec.reach
@@ -268,7 +270,10 @@ export function dollRig(doll, dressing) {
     bones: ordered.map(({ along, flexAxis, pole, at, nodeRotation, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
-      const reach = Math.max(...corners(bone.bind.box).map((corner) => dot(sub(corner, bone.head), along)));
+      const exact = boundBox(bone.bind);
+      const reach = Math.max(
+        ...corners(exact.box).map((corner) => dot(sub(applyPoint(exact.rest, corner), bone.head), along)),
+      );
       const tail = own.length === 1 ? own[0].head : add(bone.head, scale(along, reach));
       const reaching = pole && { reach: { chain: [byId.get(bone.parent)?.parent, bone.parent], pole } };
       if (reaching && !reaching.reach.chain.every(Boolean))

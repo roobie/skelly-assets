@@ -1,26 +1,36 @@
 // The player bust's measures, hips to crown. Worn shells fit around these, so the bust and its gear share one source.
+// The trunk's joints, levels and girths are the UAL doll's (models/dolls/ual/joints.libsonnet), so one garment fits
+// both dolls; the pelvis, the lower chest and the deltoid are the player's own, as its drawing needs. Each joint is
+// above the hips' foot, the bust's frame.
+local ual = (import 'models/dolls/ual/joints.libsonnet').trunk;
+local spine = ual.spine, neck = ual.neck, head = ual.head, shoulder = ual.shoulder;
+local the(measures, names) = { [name]: measures[name] for name in names };
 {
-  pelvisWidth: 0.33, pelvisDepth: 0.2, pelvisHeight: 0.17,
-  waistWidth: 0.3, waistDepth: 0.19, waistHeight: 0.17,
-  ribWidth: 0.35, ribDepth: 0.21, ribHeight: 0.12,
-  chestWidth: 0.4, chestDepth: 0.22, chestHeight: 0.15,
-  // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers.
-  armpit: 0.4,
+  // The pivots the rig turns the trunk, the neck and the head about. Hidden, as the bust family draws no joint.
+  joints:: { spine: spine, neck: neck, head: head },
+  pelvisWidth: 0.33, pelvisDepth: 0.2, pelvisHeight: spine[1],
+  local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
+  // The chest's top is the neck's joint.
+  chestHeight: neck[1] - chestFoot,
+  // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers, so
+  // it and the shoulders over it each stay whole parts where a spine bending in three would cut the chest from the ribs.
+  armpit: (ual.chestJoint - chestFoot) / self.chestHeight,
   // The lower chest's width as a share of the chest's: narrow enough that a sleeveless shell of the under layer fits
   // between it and the hanging arm, which the worn fit asserts.
-  chestLowShare: 0.92,
+  chestLowShare: 0.86,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
-  // The shoulder joint, which the arm pivots on: how far out past the chest's side and how far below its top. The rig
-  // and the baked poses were judged on this joint, so moving it asks for them to be judged again.
-  shoulderJointOut: 0.031, shoulderJointBelow: 0.07,
-  // How far the girdle's top falls from the neck's foot to the chest's side, so the shoulders slope as the trapezius
-  // does rather than stand square; worn shells over the shoulders follow it.
-  trapeziusDrop: 0.04,
-  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands only `deltoidCrown`
-  // above the slope's end, so the slope runs on over a low rounded cap rather than into a ball.
-  deltoidRadius: 0.051, deltoidCrown: 0.007,
-  neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
+  // The shoulder joint, which the arm pivots on: how far out past the chest's side, how far below its top and how far
+  // ahead of the trunk's centre line. The rig and the baked poses were judged on this joint, so moving it asks for them
+  // to be judged again.
+  shoulderJointOut: shoulder[0] - self.chestWidth / 2,
+  shoulderJointBelow: neck[1] - shoulder[1],
+  shoulderJointForward: shoulder[2],
+  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands `deltoidCrown` above
+  // the slope's end, so the slope runs on over a rounded cap. Its plan follows the upper arm it caps.
+  deltoidRadius: 0.051,
+  // The neck runs from its joint to the chin, and on into the head to the head's joint.
+  neckOverlap: head[1] - neck[1] - self.neckHeight,
   headWidth: 0.165, headHeight: 0.268, headDepth: 0.214, jawHeight: 0.09, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.
   eyeShare: 0.58,
@@ -34,8 +44,15 @@
   // How far the head's attachment frame sits under the eyes, where the game wears goggles and lamps
   // (models/head-band.libsonnet), and so how far it sits above the top of the neck. Hidden, as no body part takes them.
   headFrameUnderEyes:: 0.03594,
-  headFrameRise:: self.headHeight * self.eyeShare - self.neckOverlap - self.headFrameUnderEyes,
+  headFrameRise:: self.eye[1] - self.headFrameUnderEyes,
+  // Where the figure looks from, from the head's joint: level with the drawn eyes, on the centre line and
+  // `eyeBehindFace` behind the face's front, where the eyeballs' centres lie. Hidden, as no body part takes them.
+  eyeBehindFace:: 0.027,
+  eye:: [0, self.headHeight * self.eyeShare - self.neckOverlap, self.headDepth / 2 - self.eyeBehindFace - head[2]],
   // The grain the doll's models are voxelised at (the player bust and its limbs), which the head's drawn surface
   // inherits. Hidden, as no body part takes it.
   voxelGrain:: 0.006,
-}
+} + the(ual, [
+  'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
+  'trapeziusDrop', 'deltoidCrown', 'neckWidth', 'neckHeight',
+])

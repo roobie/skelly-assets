@@ -1,5 +1,6 @@
 // The player doll, one of the dolls of models/dressing.libsonnet: the doll a game's player is drawn as. What the
 // dressing rule needs of a doll is read from here (tools/dress.mjs, `dollDressing`).
+local armRest = import 'models/arm-rest.libsonnet';
 {
   // Where the doll's rig is released: the pack of its parts, and the file that rig is written to.
   pack: 'skelly.body',
@@ -10,12 +11,12 @@
   // a rig file's bone binds index, so a limb added later goes last. A limb a doll rests turned off the way its model
   // hangs (down -y), as a T-pose arm, adds `turn: { axis, degrees }` for the side that is not `mirrored`; the mirrored
   // side turns as its mirror image, so one turn serves both. The axis is one of the doll's, [±1, 0, 0] or alike, and
-  // the degrees a multiple of 90, so a turned part's box stays exact for what reads it. The player's limbs hang, so it
-  // has none. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its origin in
-  // the doll frame; the player's doll frame is its bust's.
+  // the degrees any. The player's arm is swung out clear of the trunk (models/arm-rest.libsonnet), the right's swing
+  // turning it toward -x. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its
+  // origin in the doll frame; the player's doll frame is its bust's.
   bust: 'player_bust',
   limbs: [
-    { name: 'arm', model: 'player_arm', anchor: 'shoulder' },
+    { name: 'arm', model: 'player_arm', anchor: 'shoulder', turn: { axis: [0, 0, 1], degrees: -armRest.degrees } },
     { name: 'leg', model: 'player_leg', anchor: 'hip' },
   ],
   sides: ['right', 'left'],
