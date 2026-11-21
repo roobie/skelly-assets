@@ -140,16 +140,19 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     exportMass: 'parts',
     taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
     voxelGrain: bust.voxelGrain,
-    // One segment per part so a stance bends the leg at the knee and ankle; each segment is drawn about its own joint
-    // and mates to the segment above it there, so the whole stands exactly as one piece would.
+    // One segment per part so a stance bends the leg at the knee, the ankle and the ball, where the toes bend; each
+    // segment is drawn about its own joint and mates to the segment above it there, so the whole stands exactly as one
+    // piece would.
     parts: [
       legSegment('thigh', 7, { skin: skin }, [jointSocket('knee', leg.thighBone)]),
       legSegment('shin', 3, { skin: skin }, [jointPin('knee'), jointSocket('ankle', leg.shinBone)]),
-      legSegment('foot', 1, foot, [jointPin('ankle')]),
+      legSegment('foot', 0.8, foot, [jointPin('ankle'), jointSocket('ball', leg.footBone)]),
+      legSegment('ball', 0.2, foot, [jointPin('ball')]),
     ],
     connections: [
       { from: 'thigh.knee', to: 'shin.knee' },
       { from: 'shin.ankle', to: 'foot.ankle' },
+      { from: 'foot.ball', to: 'ball.ball' },
     ],
     // The pivots code poses from: the hip the leg hangs from and strides about, sitting at the bust's hip anchor, and
     // each joint below it.
@@ -157,6 +160,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       hip: { part: 'thigh', at: [0, 0, 0] },
       knee: { part: 'thigh', at: leg.thighBone },
       ankle: { part: 'shin', at: leg.shinBone },
+      ball: { part: 'foot', at: leg.footBone },
     },
   },
 ]

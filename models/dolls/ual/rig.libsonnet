@@ -73,7 +73,6 @@ local thumbBones = {
     thigh: leg('thigh', 'pelvis') { flexAxis: [-1, 0, 0], limits: joints.thigh },
     calf: leg('calf', 'thigh') { flexAxis: [1, 0, 0], limits: joints.knee },
     foot: leg('foot', 'calf') { along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: joints.poles.foot }, limits: joints.ankle },
-    // The toes bend up off the ground further than down.
-    ball: leg('ball', 'foot') { along: [0, 0, 1], flexAxis: [1, 0, 0], limits: { flex: [-60, 30], twist: [0, 0], abduct: [0, 0] } },
+    ball: leg('ball', 'foot') { along: [0, 0, 1], flexAxis: [1, 0, 0], limits: joints.ball },
   } + thumbBones + fingerBones,
 }

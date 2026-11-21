@@ -76,7 +76,8 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     ] + [
       segment('thigh-' + s[0], 'avatarLeg', leg, 'thigh', 1, ['skin'], [pin('hip'), socket('knee', leg.thighBone)]),
       segment('shin-' + s[0], 'avatarLeg', leg, 'shin', 0.6, ['skin'], [pin('knee'), socket('ankle', leg.shinBone)]),
-      segment('foot-' + s[0], 'avatarLeg', leg, 'foot', 0.2, ['skin'], [pin('ankle')]),
+      segment('foot-' + s[0], 'avatarLeg', leg, 'foot', 0.16, ['skin'], [pin('ankle'), socket('ball', leg.footBone)]),
+      segment('ball-' + s[0], 'avatarLeg', leg, 'ball', 0.04, ['skin'], [pin('ball')]),
     ] for s in sides]) + (if doll == null then [] else [
       h.compound('doll', dollMassKg, doll, {}).parts[0] + { id: 'doll', item: 'talking_doll', finish: dollFinish, ports: [pin('back', [0, 0, -1], [0, 1, 0], [0, 0, -0.06])] },
     ]),
@@ -102,6 +103,7 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       { from: 'pelvis.hip-%s' % s[0], to: 'thigh-%s.hip' % s[0] },
       { from: 'thigh-%s.knee' % s[0], to: 'shin-%s.knee' % s[0] },
       { from: 'shin-%s.ankle' % s[0], to: 'foot-%s.ankle' % s[0] },
+      { from: 'foot-%s.ball' % s[0], to: 'ball-%s.ball' % s[0] },
     ] for s in sides]) + (if doll == null then [] else [{ from: 'torso.doll', to: 'doll.back' }]),
     voxelGrain: 0.01,
   };

@@ -100,7 +100,8 @@ local hood(slot, lining, chestD, depth) =
     + { clip: trapezius(top) },
   ];
 
-local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: 0.004 };
+local shellGrain = 0.004;
+local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: shellGrain };
 
 // A worn shell's row. `covers` names the doll parts or regions the shell encloses at rest, which a consumer stops
 // drawing while it is worn, so it lists nothing the shell leaves showing. No upper sleeve encloses its part: the elbow's
@@ -165,7 +166,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // A fitted row drawn from other pieces, at voxel grain `grain`, that keeps what the row declares: its title, what it
   // covers and its sole lift. A set restyling a template's shells keeps their enclosure, so their declarations stand;
   // the showcase build's check refuses one a restyle opens (docs/decisions/0012-hidden-body.md).
-  refit(r, pieces, grain=0.004):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
+  refit(r, pieces, grain=shellGrain):: row(r.id, pieces, r.parts[0].finish) + { voxelGrain: grain }
                                   + { [k]: r[k] for k in ['title', 'covers', 'soleLift'] if std.objectHas(r, k) },
 
   // A shell over the shoulders follows the bust's: `trapezius(rise)` cuts a piece to the slope set out by `rise`,
@@ -679,12 +680,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
   // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
   // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
-  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee. `ball`,
-  // for a doll whose foot bends at the ball, cuts the toes off the foot piece as a `toe` piece that bends with them:
-  // `joint`, the ball's joint in the foot's frame, and `part`, the doll part beyond it, which the toe encloses when the
-  // vamp covers the sole it belongs to.
+  // 'foot' past the ankle's cap too. The shaft declares nothing: the shin rises above its collar to the knee. The foot
+  // bends at the ball, so the toes are cut off the foot piece as a `toe` piece that bends with them; `ball` gives the
+  // ball's `joint` in the foot's frame and `part`, the doll part beyond it, which the toe encloses when the vamp covers
+  // the sole it belongs to.
   feet(id, finish, b, spec={}, title=null)::
-    local s = { layer: 'normal', ease: 0, covers: [], ball: null } + spec;
+    local s = { layer: 'normal', ease: 0, covers: [], ball: { joint: leg.footBone, part: 'ball' } } + spec;
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
@@ -722,16 +723,25 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ]));
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
-    // The round toe caps are handed whole to the toe or the foot by where their middle stands from the ball.
-    local cutAtBall(keep) = h.cut(foot, 'z', s.ball.joint[2], keep, whole=true);
-    local split = if s.ball == null then [] else unshared(foot, [cutAtBall(-1), cutAtBall(1)]);
+    // The doll's foot and toes are voxelised past their cut at the ball by up to half the doll's grain, and each shell
+    // piece may stop short of its own cut by half its grain, so the foot and toe pieces each reach both halves past the
+    // ball to enclose the skin of their part, overlapping one another there as the doll's parts do. A turned piece is
+    // not sliced but handed whole to the side of the ball holding its middle, so it lands in only one of them.
+    local reach = (bust.voxelGrain + shellGrain) / 2;
+    local cutAtBall(keep) = std.flattenArrays([
+      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * reach), keep, whole=true)
+      for p in foot
+    ]);
+    local footPieces = cutAtBall(-1), toePieces = cutAtBall(1);
+    local split = unshared(foot, [footPieces, toePieces]);
     assert split == [] : '%s: the cut left %s in none or in both of its foot and toe' % [id, split];
-    local shod = shell(id + '_worn_foot', if s.ball == null then foot else cutAtBall(-1), footFinish, s.covers, title=named(title, 'foot'));
-    local toe = if s.ball == null then [] else [
-      shell(id + '_worn_toe', h.moved(cutAtBall(1), [-c for c in s.ball.joint]), footFinish,
-            if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe')),
-    ];
-    fitted([shod { soleLift: b.s }] + toe
+    // A turned piece handed to the rigid foot would stay put while the toes bend under it.
+    local stiff = [p.id for p in footPieces if p.kind == 'turned'];
+    assert stiff == [] : '%s: %s stand behind the ball, where the toes would bend under them' % [id, stiff];
+    local shod = shell(id + '_worn_foot', footPieces, footFinish, s.covers, title=named(title, 'foot'));
+    local toe = shell(id + '_worn_toe', h.moved(toePieces, [-c for c in s.ball.joint]), footFinish,
+                      if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe'));
+    fitted([shod { soleLift: b.s }, toe]
            + (if shafted then [shell(id + '_worn_shaft', shaft, finish, [], title=named(title, 'shaft'))] else [])) + {
       // One boot on the floor, the shaft brought from the knee's frame to the ankle's, for a ground model.
       ground: h.lifted(foot, -ankleY) + (if shafted then h.lifted(h.moved(shaft, [-c for c in leg.shinBone]), -ankleY) else []),

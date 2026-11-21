@@ -117,6 +117,7 @@ local thumbBones = {
     shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0], limits: joints.knee },
     foot: leg { part: 'foot', parent: 'shin', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], reach: { pole: joints.poles.foot },
                 limits: joints.ankle },
+    ball: leg { part: 'ball', parent: 'foot', pivot: 'origin', along: [0, 0, 1], flexAxis: [1, 0, 0], limits: joints.ball },
   } + thumbBones + fingerBones,
   presets: import 'models/poses/hands.libsonnet',
 }

@@ -10,7 +10,7 @@ local playerSlots = import 'models/worn-slots.libsonnet';
 // phalanges keep their order, the knuckle's first, as the two hands keep their fingers'.
 local part = {
   body: 'spine_03', upper: 'upperarm', fore: 'lowerarm', palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf',
-  foot: 'foot', shaft: 'calf',
+  foot: 'foot', toe: 'ball', shaft: 'calf',
 } + {
   [playerHand.part(playerHand.fingers[i], k)]: hand.part(hand.fingers[i], k)
   for i in std.range(0, std.length(hand.fingers) - 1)

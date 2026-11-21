@@ -82,7 +82,7 @@ local isShare(field) = std.endsWith(field, 'Share') || std.endsWith(field, 'Shar
 local scaledMeasures(m) = {
   [f]: local v = m[f];
     if std.type(v) == 'number' && !isShare(f) then v * k
-    else if f == 'knuckleBack' then times(v, k)
+    else if f == 'knuckleBack' || f == 'ballJoint' then times(v, k)
     else if f == 'origins' then { [joint]: times(v[joint], k) for joint in std.objectFields(v) }
     else v
   for f in std.objectFields(m)
@@ -321,11 +321,13 @@ local armParts(name) = [
   for b in std.range(0, hand.phalanges - 1)
 ];
 
-// One side's leg: the doll's thigh, the greave with the sabaton's shaft, and the sabaton.
+// One side's leg: the doll's thigh, the greave with the sabaton's shaft, and the sabaton, its toe brought back from
+// the ball onto the foot, since the stone's toes do not bend.
 local legParts(name) = [
   segment('thigh-' + name, 'avatarLeg', legMeasures, { segment: 'thigh' }, 0.1),
   carved('greave-' + name, figureKg * 0.05, platePieces('legguard_plate_worn_shin') + [p { id: 'shaft-' + p.id } for p in platePieces('sabaton_plate_worn_shaft')]),
-  carved('sabaton-' + name, figureKg * 0.02, platePieces('sabaton_plate_worn_foot')),
+  carved('sabaton-' + name, figureKg * 0.02, platePieces('sabaton_plate_worn_foot')
+                                             + [p { id: 'toe-' + p.id } for p in h.moved(platePieces('sabaton_plate_worn_toe'), times(leg.footBone, k))]),
 ];
 
 [

@@ -29,11 +29,12 @@ test("the player's foot reaches as far as UAL's, toe and heel", () => {
 });
 
 // The built rig, not the measures, so a part's socket or anchor that strays from the joint it stands on shows here.
-test("the player's built hip, knee and ankle stand where UAL's do, the shin raking back as UAL's does", () => {
+test("the player's built hip, knee, ankle and ball stand where UAL's do, the shin raking back as UAL's does", () => {
   for (const [bone, joint] of [
     ['thigh.L', 'thigh_l'],
     ['shin.L', 'calf_l'],
     ['foot.L', 'foot_l'],
+    ['ball.L', 'ball_l'],
   ]) {
     const head = boneOf(bone).head;
     for (const [i, axis] of ['x', 'y', 'z'].entries()) {

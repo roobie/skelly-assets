@@ -31,6 +31,7 @@
     "legguard_trooper_worn_shin",
     "boots_trooper_worn_shaft",
     "boots_trooper_worn_foot",
+    "boots_trooper_worn_toe",
     "helmet_heavy",
     "armor_heavy_worn_body",
     "armor_heavy_worn_upper",
@@ -55,6 +56,7 @@
     "legguard_heavy_worn_shin",
     "boots_heavy_worn_shaft",
     "boots_heavy_worn_foot",
+    "boots_heavy_worn_toe",
     "helmet_plate_armet",
     "armor_plate_worn_body",
     "armor_plate_worn_upper",
@@ -79,6 +81,7 @@
     "legguard_plate_worn_shin",
     "sabaton_plate_worn_shaft",
     "sabaton_plate_worn_foot",
+    "sabaton_plate_worn_toe",
     "helmet_power",
     "armor_power_worn_body",
     "armor_power_worn_upper",
@@ -102,6 +105,7 @@
     "legguard_power_worn_thigh",
     "legguard_power_worn_shin",
     "boots_power_worn_shaft",
-    "boots_power_worn_foot"
+    "boots_power_worn_foot",
+    "boots_power_worn_toe"
   ]
 }
