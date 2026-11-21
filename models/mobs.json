@@ -1,86 +1,21 @@
 {
-  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh): each builds from a mobgen template. pack names the content pack that declares the row's files: by default they are assets/models/actors/<id>.glb, actors/<id>.body.json, actors/<id>.clips.json and actors/<id>.genome.json under it, written to built/<pack>/ through tools/layout.mjs, outputPath. Rows preserve the generator's rest frame, so consumers compose the same roots and quaternion rotations; scale is carried with that rest-frame geometry. Their type defaults to id and model to template. lookAt selects the mobgen look profile when one is authored; plans without a profile may omit it, so consumers must not require a value nobody authored. walkCycles is a positive integer selecting how many two-step gait cycles a standing humanoid walk contains; crawls selects whether a humanoid row bakes a crawling clip set: built data holds only what a game uses, so a row no game crawls sets it false (the player, whose prone stance is a fixed pose, and the skelly.bestiary humanoids), since a crawl stride there would have no owner. crawl_stride is the metres one crawl cycle covers, baked as the crawl walk's strideMetres: a walk loop clip states its own true distance, so the crawl clip carries an authored stride like the standing walk, and the asset row is the one place crawl pace is tuned. walk_frames and attack_frames select sampling density, and attack_frames also samples an acid body's finite death clips. lod_divisor divides the template's 0.5 m source voxel when positive; 0 keeps full detail. Defaults apply to every row; a row may override any of them, and its taxonomy inherits the defaults' by the rule in models/TAXONOMY.md. A row narrows its template to the source sprite: brief records what was read for the next author; params override template parameter ranges (a number, {min,max}, or {choices}); materials are the sampled palette (name -> {color, emissive}), whose names no longer follow template hue parameters; and parts are signature shapes on a bone at its head, tail or midpoint, in metres from there and optionally mirrored. attack_clip selects a shared-rig attack instead of the template's, idle selects slack or aggravated motion, budgets replaces template budget entries for a reshaped body, and budget_headroom widens top voxel budgets when added parts need room. Plans without mobgen region maps omit regions, boxes and severableParts, so consumers do not receive invented region values.",
+  "_doc": "Rows of the mob export (tools/mobs.mjs, run by tools/build_mobs.sh): each builds <glb> and <clips> from a mobgen template. lod_divisor: the LOD voxel is the template's 0.5 m block over this, 0 keeps mobgen's full detail. Defaults apply to every row; a row may override any of them. A row narrows the template to its sprite: `brief` (what was read from the sprite, for the next person), `params` (the template's param ranges it overrides: a number, {min,max} or {choices}), `materials` (the palette sampled from the sprite: name -> {color, emissive}; a name here no longer follows the template's hue params) and `parts` (signature features: a shape on a bone at its head/tail/mid, metres from there, mirrored to the other side's bone; see PartSpec in tools/packages/mobgen/src/core/template.ts). A row may also set `attack_clip` (the shared-rig attack to play instead of its template's: an id of mobgen's attackClips.jsonnet, lunge-grab or swipe) `idle` (slack or aggravated), `budgets` (template budget entries it replaces, for a body reshaped past the template) and `budget_headroom` (a factor widening the template's voxel budgets at the top, for a row whose parts add many voxels). A game judges a row with its own sheet tool (arpg1: tools/mob_sheet.sh).",
   "defaults": {
     "seed": 7,
-    "scale": 1,
     "lod_divisor": 10,
     "walk_speed": 1.4,
-    "walkCycles": 1,
     "walk_frames": 24,
     "attack_frames": 24,
-    "idle": "slack",
-    "crawls": true,
-    "crawl_stride": 1.2,
-    "taxonomy": {"category": "creatures"}
-  },
-  "severed": {
-    "_doc": "The severed parts the mob export bakes (tools/severedParts.mjs): the parts a cut at each cut point, a bone a cut may start at, leaves from each type under mobs, which names the pack of the rows it is cut from and the title the type gives its parts. Parts follow the type, not the row, so a type's variants share one set of parts, cut from the type's first row in that pack. A type is named only when a game cuts it at those bones, since built data holds only what a game uses. cuts titles each cut point by bone id, after the type's title. A cut point bakes its whole part and one part for each set of cut points below it a cut there may find already gone, since each of those left as a part of its own and its mass must not be counted twice; without titles each such cut point by bone id, after the title of the part it is missing from. pack is where the parts are placed, beside the other body parts, with taxonomy. materials names each mobgen material, and the cut face, by the catalogue material it is drawn as (models/finishes.jsonnet), so a game classes a part's wear as it does any drawn model's.",
-    "pack": "skelly.body",
-    "taxonomy": {"category": "body-parts", "tags": {"material": ["flesh"]}},
-    "mobs": {
-      "skelly.deadvox.actors": {
-        "shambler": "Shambler",
-        "military_shambler": "Military shambler",
-        "farmer_shambler": "Farmer shambler",
-        "worker_shambler": "Worker shambler",
-        "medic_shambler": "Medic shambler",
-        "brute_shambler": "Brute shambler",
-        "runner": "Runner",
-        "crawler": "Crawler",
-        "acid_zombie": "Acid zombie"
-      }
-    },
-    "cuts": {
-      "head": "head",
-      "skull": "head",
-      "maw": "jaw",
-      "upperArm.L": "left arm",
-      "upperArm.R": "right arm",
-      "arm.L": "left arm",
-      "arm.R": "right arm",
-      "forearm.L": "left forearm",
-      "forearm.R": "right forearm",
-      "fore.L": "left forearm",
-      "fore.R": "right forearm",
-      "hand.L": "left hand",
-      "hand.R": "right hand",
-      "thigh.L": "left leg",
-      "thigh.R": "right leg",
-      "shin.L": "left shin",
-      "shin.R": "right shin",
-      "foot.L": "left foot",
-      "foot.R": "right foot"
-    },
-    "without": {
-      "maw": "without jaw",
-      "forearm.L": "without forearm",
-      "forearm.R": "without forearm",
-      "fore.L": "without forearm",
-      "fore.R": "without forearm",
-      "hand.L": "without hand",
-      "hand.R": "without hand",
-      "shin.L": "without shin",
-      "shin.R": "without shin",
-      "foot.L": "without foot",
-      "foot.R": "without foot"
-    },
-    "materials": {
-      "cut": "body-gore", "gore": "body-gore", "acid": "body-gore",
-      "skin": "body-skin-sickly", "bruise": "body-skin-sickly", "mottle": "body-skin-sickly", "crust": "body-skin-sickly",
-      "hair": "body-hair", "eye": "body-eye", "mouth": "body-mouth", "claw": "body-bone",
-      "shirt": "cloth-shirt-faded", "pants": "cloth-pants-grey", "trousers": "cloth-pants-grey", "shoe": "rubber-black"
-    }
+    "idle": "slack"
   },
   "mobs": [
     {
       "id": "shambler",
-      "title": "Shambler",
-      "taxonomy": {"keywords": ["zombie", "undead"]},
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "humanoid",
+      "template": "shambler",
       "seed": 7,
       "lod_divisor": 10,
+      "glb": "shambler.glb",
+      "clips": "shambler_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/undead/ghoul.png, seen from the front. Silhouette: a hunched, wide-stanced ghoul, broad shoulders, small dark head sunk between them, long arms hanging out and bent with huge splayed clawed hands (as big as the head), a thin torso with a torn open red Y on the chest, thick legs apart in a lurch. Palette (sampled): skin grey-green #5a6c5a / light #7a907a, shadow and legs near-black grey #383838, hands and chest dark red-brown #4a1818 / #783828, eyes yellow #ffff00 glowing in a dark face. Signature: glowing yellow eyes, big dark-red clawed hands, red torn chest. Motion: a lurching stagger with the arms out and ready to grab.",
       "params": {
         "height": {"min": 1.62, "max": 1.72},
@@ -140,12 +75,11 @@
     },
     {
       "id": "cutter",
-      "title": "Cutter",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "humanoid",
+      "template": "shambler",
       "seed": 7,
       "lod_divisor": 10,
+      "glb": "cutter.glb",
+      "clips": "cutter_clips.json",
       "attack_clip": "swipe",
       "idle": "aggravated",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/hobgoblin_new.png, seen from the front. Silhouette: a squat, broad red goblin in a fighting crouch, wide shoulders, big hands low and out to the sides (one reaching), short thick legs apart with clawed feet, a small head in a grey iron cap with a dark brim, a wide open snarling mouth. Palette (sampled): skin red #942416 / dark red #5c160d / bright #c5311d, grey straps and cap #483e3c / #705d55, black #1f1f1f, eyes yellow. Signature: the red skin, the grey cap, two dark straps crossed over the chest, the open snarl. Motion: a ready crouch, arms out, then a hacking swipe.",
@@ -210,13 +144,12 @@
     },
     {
       "id": "hexcaller",
-      "title": "Hexcaller",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "slim-humanoid",
+      "template": "runner",
       "seed": 7,
       "lod_divisor": 10,
       "budget_headroom": 1.4,
+      "glb": "hexcaller.glb",
+      "clips": "hexcaller_clips.json",
       "attack_clip": "swipe",
       "idle": "slack",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/gnoll_shaman.png, seen from the front. Silhouette: a lean, bent gnoll, a narrow tall frame stooped forward, one long thin arm thrust out ahead pointing a hex, the other bent back, a small head with a long white-bearded muzzle and red glaring eyes, a short brown loincloth, long yellow digitigrade legs with big feet. Palette (sampled): fur tan #a08430 / light #c09e3a / shadow #604f1d, loincloth and strap brown #57322b / #3d241c, beard white, eyes red #e02020 glowing. Signature: the white beard muzzle, glowing red eyes, the pointing arm, the brown kilt. Motion: a stooped prowl with one arm pointing, a hexing jab.",
@@ -277,13 +210,12 @@
     },
     {
       "id": "gorehorn",
-      "title": "Gorehorn",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "broad-humanoid",
+      "template": "brute",
       "seed": 7,
       "lod_divisor": 7,
       "budget_headroom": 3.4,
+      "glb": "gorehorn.glb",
+      "clips": "gorehorn_clips.json",
       "attack_clip": "swipe",
       "idle": "aggravated",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/minotaur.png, seen from the front. Silhouette: an enormous body-builder torso, shoulders far wider than the hips, huge arms bulging and crossed up in front, the small red-brown bull head sunk low between the shoulders with grey horns curving out and up, a narrow waist over red-brown fur breeches and short legs ending in white hooves. Palette (sampled): flesh #e5a282 / light #ffb691 / shade #a5765e, head and breeches red-brown #a02800 / #802000 / #601800, horns and hooves grey-white #c0c0c0. Signature: the horns, the tiny head in huge shoulders, the vast arms. Motion: a heavy slow stalk with the head lowered, a goring swipe.",
@@ -345,14 +277,12 @@
     },
     {
       "id": "bogling",
-      "title": "Bogling",
-      "taxonomy": {"keywords": ["zombie", "undead"]},
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "broad-humanoid",
+      "template": "brute",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 2.6,
+      "glb": "bogling.glb",
+      "clips": "bogling_clips.json",
       "attack_clip": "lunge-grab",
       "idle": "slack",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/undead/bog_body.png, seen from the front. Silhouette: a stocky, headless-looking mass of a man, blocky shoulders and thick arms hanging at the sides, a short thick body and short legs, an irregular lumpy outline as if wrapped in moss. Palette (sampled): near-black green #0b1600 / #141800, mid moss #213b05, bright moss #3d5a14, peat brown #694e1b. Signature: the camouflage of moss and peat blotches over a dark body, and the lack of any face. Motion: a slow sodden trudge, a heavy two-armed grab.",
@@ -448,11 +378,11 @@
     },
     {
       "id": "rimewalker",
-      "title": "Rimewalker",
-      "pack": "skelly.bestiary",
       "template": "dog",
       "seed": 7,
       "lod_divisor": 7,
+      "glb": "rimewalker.glb",
+      "clips": "rimewalker_clips.json",
       "budgets": {"totalVoxels": {"min": 400, "max": 3200}, "totalTriangles": {"min": 400, "max": 12000}},
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/ice_beast.png, side-on. Silhouette: a hulking, hunched four-legged frost beast, low and wide, huge shoulders and forelimbs with the head sunk low at the front, thick bent legs, a jagged white ice crest down the back. Palette (sampled): steel blue #3f6497 / #386287, mid ice #67a6c0, pale cyan highlights #a7ffff, white rime #f9f9fb, shadow teal #004d4d (lifted here for the layer's light). Signature: white ice crest and spikes along the spine, cyan claws, glowing eyes. Motion: a heavy prowling trot, a pounce with the jaws open.",
       "params": {
@@ -1154,13 +1084,12 @@
     },
     {
       "id": "spitter",
-      "title": "Spitter",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "slim-humanoid",
+      "template": "runner",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 1.6,
+      "glb": "spitter.glb",
+      "clips": "spitter_clips.json",
       "attack_clip": "swipe",
       "idle": "slack",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/demons/ice_devil.png, seen from the front. Silhouette: a lean muscular humanoid devil, wide square shoulders tapering to a narrow waist, long arms hanging with long clawed hands spread at the sides, straight legs, a small head with two big horns swept back and out like wings, two magenta eyes. Palette (sampled): ice white #ffffff / pale cyan #c0ffff / #a8e0e0 / grey-cyan shade #78a0a0, bright cyan speckles #00ffff over the body, magenta eyes #ff0080. Signature: the swept-back horns, the glowing magenta eyes, the cyan speckles, the long claws. Motion: an upright stalk, a clawed rake as it casts.",
@@ -1231,15 +1160,13 @@
     },
     {
       "id": "drencher",
-      "title": "Drencher",
-      "taxonomy": {"keywords": ["elemental"]},
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "broad-humanoid",
+      "template": "brute",
       "seed": 7,
       "lod_divisor": 6,
       "budget_headroom": 4.8,
       "budgets": {"totalTriangles": {"min": 300, "max": 12000}},
+      "glb": "drencher.glb",
+      "clips": "drencher_clips.json",
       "attack_clip": "swipe",
       "idle": "slack",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/nonliving/water_elemental_new.png, seen from the front. Silhouette: a squat, wide blob of a torso, rounded top with no distinct neck or head, short thick legs bowed out at the knees, long arms hanging at the sides ending in rounded fists. Palette (sampled): pale blue water #88b3f4 / #709bf7, mid blue #5877ae, dark blue-grey shade #334464 / #2d3f64, green weed strands #1a8a3a hanging across the chest and belt, a small brown patch #8a5a28 on the right belly. Signature: the dome-shaped water body, weed strands, brown patch. Motion: a heavy wobbling trudge, a sweeping two-armed splash.",
@@ -1312,12 +1239,11 @@
     },
     {
       "id": "skitter",
-      "title": "Skitter",
-      "taxonomy": {"keywords": ["insect"]},
-      "pack": "skelly.bestiary",
       "template": "insect",
       "seed": 7,
       "lod_divisor": 0,
+      "glb": "skitter.glb",
+      "clips": "skitter_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/giant_cockroach_new.png, three-quarter view. Silhouette: a giant cockroach, low and broad, a glossy oval brown carapace with a lighter tan sheen on top, a small dark head with red eyes in front, two very long thin orange feelers sweeping forward and up, six thin dark-brown legs splayed out to the sides. Palette (sampled): carapace amber #c88a20 / #b07818, shadow brown #5d3500 / #492703, sheen #e8b030, feelers orange #ffb835, head and legs near-black brown #2e0d00, eyes red. Signature: the long orange feelers and the glossy shell. Motion: a fast alternating-tripod scuttle, a quick rear-up and bite.",
       "params": {
         "height": {"min": 0.17, "max": 0.18},
@@ -1328,12 +1254,11 @@
     },
     {
       "id": "brood_queen",
-      "title": "Brood queen",
-      "taxonomy": {"keywords": ["insect"]},
-      "pack": "skelly.bestiary",
       "template": "insect",
       "seed": 7,
       "lod_divisor": 0,
+      "glb": "brood_queen.glb",
+      "clips": "brood_queen_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/animals/queen_ant_new.png, three-quarter view. Silhouette: a queen ant. A huge swollen glossy pink egg-sac abdomen low at the back, a narrow waist, a reddish-brown segmented thorax raised well above it, a head with two long bent feelers, six long thin rust-red legs splayed wide. Palette (sampled): abdomen pink #f0a090 over salmon #d45133, thorax and head red-brown #a43a21 / #74291a, outlines near-black red #470e03, legs and feelers rust #c64629. Signature: the enormous abdomen on a thin waist and the raised front body, unlike the skitter's flat oval. Motion: the insect plan's tripod scuttle, rear-up and bite. Built with the insect plan's ant params (thoraxLength, thoraxRaise, abdomenSize, abdomenDrop, waist, hindLegsOnThorax); the abdomen's pink is painted by the row's parts.",
       "params": {
         "height": 0.22,
@@ -1374,12 +1299,11 @@
     },
     {
       "id": "cinderling",
-      "title": "Cinderling",
-      "taxonomy": {"keywords": ["elemental"]},
-      "pack": "skelly.bestiary",
       "template": "floater",
       "seed": 7,
       "lod_divisor": 10,
+      "glb": "cinderling.glb",
+      "clips": "cinderling_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/nonliving/fire_elemental_new.png, front on. Silhouette: a small head with two dark eye slits on a torso of flame, two thin flame arms flung out and down, the body tapering into one long curling flame tail instead of legs, ragged flame tongues licking up from the head and shoulders. Palette (sampled): yellow-white core #fff08a, yellow #ffd21a, orange #ff9a10, red edges #e0300a. Signature: the long curling tail, the dark eye slits, the bright core. Motion: hovers; the tail sways in a travelling wave; a cast thrusts the arms forward. Glows: every material carries emission (vertex alpha) so it reads as a light source.",
       "params": {
         "height": 1.6,
@@ -1441,12 +1365,11 @@
     },
     {
       "id": "stormwisp",
-      "title": "Stormwisp",
-      "taxonomy": {"keywords": ["elemental"]},
-      "pack": "skelly.bestiary",
       "template": "floater",
       "seed": 7,
       "lod_divisor": 7,
+      "glb": "stormwisp.glb",
+      "clips": "stormwisp_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/nonliving/orb_of_electricity.png. Silhouette: a roughly spherical crackling orb with ragged edges, no limbs. Palette (sampled): bright pink-white core #ffd8ff, hot pink #f060ff, violet #9a40f0, dark purple edges #5a20d0. Signature: the brighter core and the jagged spikes of lightning all round. Motion: hovers; the spikes jitter; a cast flares and lunges. Glows: every material carries emission (vertex alpha) so it reads as a light source.",
       "params": {
         "height": 1.25,
@@ -1508,10 +1431,7 @@
     },
     {
       "id": "cinder_matron",
-      "title": "Cinder matron",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "broad-humanoid",
+      "template": "brute",
       "seed": 7,
       "lod_divisor": 6,
       "budget_headroom": 4.0,
@@ -1521,6 +1441,8 @@
           "max": 12000
         }
       },
+      "glb": "cinder_matron.glb",
+      "clips": "cinder_matron_clips.json",
       "attack_clip": "swipe",
       "idle": "aggravated",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/fire_giant_new.png, seen from the front. Silhouette: a huge hulking giant, massive shoulders and arms, a small head sunk between them, a tan-brown loincloth, grey-brown short legs. Palette (sampled): red skin #a40f0f / #8a1515 / #6d0a0a, dark hair and brow #4e0707, loincloth #ac5f26 / #805940, legs #3e2e26 / #5a4338, flames yellow #f3c81e, #f3aa1e and orange #e56713 rising off the shoulders and the back. Signature: flames from the shoulders and back (glow = vertex alpha), the mass of the arms. Motion: a heavy slow stalk, a crushing swipe.",
@@ -2068,11 +1990,7 @@
     },
     {
       "id": "gloom_warden",
-      "title": "Gloom warden",
-      "taxonomy": {"keywords": ["undead"]},
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "slim-humanoid",
+      "template": "runner",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 3.0,
@@ -2082,6 +2000,8 @@
           "max": 12000
         }
       },
+      "glb": "gloom_warden.glb",
+      "clips": "gloom_warden_clips.json",
       "attack_clip": "swipe",
       "idle": "slack",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/death_knight.png, seen from the front. Silhouette: a tall gaunt knight in black plate with red-glowing trim (belt, knees), a pale skull face, a teal-dark cloak hanging behind, crackling cyan energy round the head and shoulders. Palette (sampled): plate #212121 / #2f2f2f / #101010 with highlights #494949, cloak #152b2b / #234445 / #346364, energy #477a81 and brighter cyan, red trim. Signature: the skull face, red trim, the cloak, the energy (glow = vertex alpha). Motion: a measured stride, a heavy overhand swipe; it charges.",
@@ -2567,11 +2487,10 @@
     },
     {
       "id": "tempest_sovereign",
-      "title": "Tempest sovereign",
-      "taxonomy": {"keywords": ["dragon"]},
-      "pack": "skelly.bestiary",
       "template": "dragon",
       "lod_divisor": 4,
+      "glb": "tempest_sovereign.glb",
+      "clips": "tempest_sovereign_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/dragons/storm_dragon_new.png, front on. Silhouette: a deep royal-blue dragon reared up on its hind legs, a long S-curved neck, a horned head with yellow eyes and white horns, a golden-yellow ribbed belly running down the front of neck and torso, pale-tan membrane wings spread up behind, clawed forelimbs with white talons, a thick tail. Palette (sampled): body blue #2c3fd6, dark blue mottling #1a2a9c, belly gold #e0a416, rib #a87408, wing tan #cdb868, eyes yellow #ffe030. Signature: the golden belly ribs, the tan wings, the reared stance. Motion: a heavy stomp with tail sway and wing beat; a lunging bite with a claw swipe; idle is one frame (rest pose). Glows: the eyes and sparse cyan flecks over the body (vertex alpha) for a storm.",
       "params": {
         "height": 3.5,
@@ -2642,11 +2561,10 @@
     },
     {
       "id": "mire_mother",
-      "title": "Mire mother",
-      "taxonomy": {"keywords": ["dragon"]},
-      "pack": "skelly.bestiary",
       "template": "dragon",
       "lod_divisor": 4,
+      "glb": "mire_mother.glb",
+      "clips": "mire_mother_clips.json",
       "brief": "Sprite assets/third_party/dungeon-crawl-32x32/monster/dragons/swamp_dragon_new.png, front on. The storm dragon's build in mottled olive swamp green with darker spots, a pale yellow-green ribbed belly, red membrane wings, glowing green eyes, white horns and talons. Palette (sampled): body olive #6a7a22, dark spots #34501a, belly #c8d070, rib #98a448, wing red #c82018, eyes green #60ff40. Signature: the red wings against the green body, the pale ribbed belly. Motion: as the tempest sovereign, a bit slower and heavier. Glows: the eyes, and a few murky green flecks.",
       "params": {
         "height": 3.5,
@@ -2717,10 +2635,7 @@
     },
     {
       "id": "mourner",
-      "title": "Mourner",
-      "crawls": false,
-      "pack": "skelly.bestiary",
-      "template": "slim-humanoid",
+      "template": "runner",
       "seed": 7,
       "lod_divisor": 8,
       "budget_headroom": 3.0,
@@ -2730,6 +2645,8 @@
           "max": 12000
         }
       },
+      "glb": "mourner.glb",
+      "clips": "mourner_clips.json",
       "attack_clip": "swipe",
       "idle": "slack",
       "brief": "Owner-chosen design, not the flayed_ghost sprite. A veiled widow: a tall, thin, hunched figure in a long hooded shroud of muted violet that hides the legs and drags at the hem, no face, only a dark opening in the hood, one arm held out with a censer glowing green (the colour of its mend skill). A ranged entropy caster that keeps its distance and heals. Palette: shroud #9060b0 / #6e4690 (mob colour 0.75,0.5,0.85), void #0c0610, iron #5c5c68, censer glow #50f080 emissive.",
@@ -2866,19 +2783,11 @@
       ]
     },
     {
-      "id": "leaper",
-      "title": "Leaper",
-      "pack": "skelly.bestiary",
-      "template": "leaper",
-      "lod_divisor": 0,
-      "walk_speed": 0.58
-    },
-    {
       "id": "mutant_rat",
-      "title": "Mutant rat",
-      "pack": "skelly.bestiary",
       "template": "critter",
       "lod_divisor": 0,
+      "glb": "mutant_rat.glb",
+      "clips": "mutant_rat_clips.json",
       "brief": "Ahg3's farm-contract vermin (DESIGN.md beat 4): fast, weak, many, met in swarms. No sprite; the design reads: a hunched, mangy, dog-ugly rat a little bigger than a real one (about 0.2 m tall, 0.75 m with its tail), high-backed over a long body, head low and teeth bared. Silhouette for the tactics camera: the humped back with a tumour bulging off one shoulder, a long bare pink tail trailing, red eyes. Palette: dirty brown-grey fur #6b5a4a mottled darker #4a3e34, a dun belly, bare pink-grey mange patches on the flanks, a pale yellow-flesh tumour with a few sickly green glowing sores, pink tail, feet, ears and nose, yellow incisors. Motion: the critter plan's quick diagonal scurry with the tail swinging, a short spring and bite.",
       "params": {
         "height": 0.15,
@@ -2896,66 +2805,38 @@
         "limp": 0.15
       },
       "materials": {
-        "skin": {
-          "color": "#6b5a4a"
-        },
-        "bruise": {
-          "color": "#4a3e34"
-        },
-        "belly": {
-          "color": "#8a7a62"
-        },
-        "ear": {
-          "color": "#a8787a"
-        },
-        "nose": {
-          "color": "#c47c7c"
-        },
-        "tail": {
-          "color": "#b48a84"
-        },
-        "paw": {
-          "color": "#b48a84"
-        },
-        "eye": {
-          "color": "#ff3020",
-          "emissive": 0.9
-        },
-        "mouth": {
-          "color": "#3a1010"
-        },
-        "mange": {
-          "color": "#a88078"
-        },
-        "tumour": {
-          "color": "#d8b07c"
-        },
-        "sore": {
-          "color": "#a8e040",
-          "emissive": 0.8
-        },
-        "tooth": {
-          "color": "#e8d080"
-        }
+        "skin": {"color": "#6b5a4a"},
+        "bruise": {"color": "#4a3e34"},
+        "belly": {"color": "#8a7a62"},
+        "ear": {"color": "#a8787a"},
+        "nose": {"color": "#c47c7c"},
+        "tail": {"color": "#b48a84"},
+        "paw": {"color": "#b48a84"},
+        "eye": {"color": "#ff3020", "emissive": 0.9},
+        "mouth": {"color": "#3a1010"},
+        "mange": {"color": "#a88078"},
+        "tumour": {"color": "#d8b07c"},
+        "sore": {"color": "#a8e040", "emissive": 0.8},
+        "tooth": {"color": "#e8d080"}
       },
       "parts": [
         {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.035, 0.035, -0.03], "radii": [0.04, 0.036, 0.042]}},
-        {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.062, 0.005, 0], "radii": [0.022, 0.022, 0.022]}},
+        {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.062, 0.005, 0.0], "radii": [0.022, 0.022, 0.022]}},
         {"bone": "spine", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [0.018, 0.066, -0.06], "radii": [0.018, 0.018, 0.018]}},
         {"bone": "spine", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [0.06, 0.06, -0.035], "radii": [0.02, 0.02, 0.02]}},
         {"bone": "spine", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [0.075, 0.02, 0.01], "radii": [0.014, 0.014, 0.014]}},
-        {"bone": "pelvis", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [-0.055, 0, 0.02], "radii": [0.03, 0.035, 0.045]}},
+        {"bone": "pelvis", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [-0.055, 0.0, 0.02], "radii": [0.03, 0.035, 0.045]}},
         {"bone": "spine", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [-0.05, 0.02, -0.01], "radii": [0.03, 0.025, 0.03]}},
-        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.04, 0.03, 0], "radii": [0.025, 0.03, 0.03]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.04, 0.03, 0.0], "radii": [0.025, 0.03, 0.03]}},
         {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [0, -0.012, 0.008], "b": [0, -0.036, 0.004], "ra": 0.009, "rb": 0.007}}
       ]
     },
     {
       "id": "rat_brute",
-      "title": "Rat brute",
-      "pack": "skelly.bestiary",
       "template": "critter",
       "lod_divisor": 20,
+      "glb": "rat_brute.glb",
+      "clips": "rat_brute_clips.json",
       "brief": "Ahg3's farm-contract big rat (DESIGN.md beat 4: a few among the swarm are 'big as dogs'). No sprite; the design reads: the mutant rat's family grown to a dog's size (about 0.55 m tall at the hump, over a metre with its tail), heavier in the shoulders and haunch, thick legs that a sniper's aimed leg shot can find, a big head with long yellow incisors and the jaw hanging open. Silhouette for the tactics camera: a hunched dog-sized rat with a raw red flank where the ribs show through, a cluster of tumours on the haunch and a shorter, thicker tail. Palette: darker brown fur #5a4a3c mottled #3c3028, a dun belly, raw red flesh #9a3a30 with pale bone ribs, pink-grey bald patches, pale tumours with green glowing sores, red glowing eyes, pink tail, feet and nose. Motion: the critter plan's heavy diagonal trot with the tail swinging, a spring and bite.",
       "params": {
         "height": 0.36,
@@ -2973,69 +2854,37 @@
         "limp": 0.1
       },
       "materials": {
-        "skin": {
-          "color": "#5a4a3c"
-        },
-        "bruise": {
-          "color": "#3c3028"
-        },
-        "belly": {
-          "color": "#7a6a55"
-        },
-        "ear": {
-          "color": "#8a6060"
-        },
-        "nose": {
-          "color": "#b06a6a"
-        },
-        "tail": {
-          "color": "#a07a74"
-        },
-        "paw": {
-          "color": "#a07a74"
-        },
-        "eye": {
-          "color": "#ff4020",
-          "emissive": 0.9
-        },
-        "mouth": {
-          "color": "#3a1010"
-        },
-        "mange": {
-          "color": "#a07a70"
-        },
-        "raw": {
-          "color": "#9a3a30"
-        },
-        "rib": {
-          "color": "#e0d4b0"
-        },
-        "tumour": {
-          "color": "#d0a874"
-        },
-        "sore": {
-          "color": "#a8e040",
-          "emissive": 0.8
-        },
-        "tooth": {
-          "color": "#e8d080"
-        }
+        "skin": {"color": "#5a4a3c"},
+        "bruise": {"color": "#3c3028"},
+        "belly": {"color": "#7a6a55"},
+        "ear": {"color": "#8a6060"},
+        "nose": {"color": "#b06a6a"},
+        "tail": {"color": "#a07a74"},
+        "paw": {"color": "#a07a74"},
+        "eye": {"color": "#ff4020", "emissive": 0.9},
+        "mouth": {"color": "#3a1010"},
+        "mange": {"color": "#a07a70"},
+        "raw": {"color": "#9a3a30"},
+        "rib": {"color": "#e0d4b0"},
+        "tumour": {"color": "#d0a874"},
+        "sore": {"color": "#a8e040", "emissive": 0.8},
+        "tooth": {"color": "#e8d080"}
       },
       "parts": [
-        {"bone": "spine", "at": "mid", "op": "carve", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.21, 0, 0], "radii": [0.06, 0.08, 0.12]}},
-        {"bone": "spine", "at": "mid", "op": "paint", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.185, 0, 0], "radii": [0.07, 0.1, 0.14]}},
+        {"bone": "spine", "at": "mid", "op": "carve", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.21, 0.0, 0.0], "radii": [0.06, 0.08, 0.12]}},
+        {"bone": "spine", "at": "mid", "op": "paint", "onto": ["skin", "bruise", "belly"], "material": "raw", "shape": {"kind": "ellipsoid", "center": [0.185, 0.0, 0.0], "radii": [0.07, 0.1, 0.14]}},
         {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, -0.085], "b": [0.16, -0.075, -0.07300000000000001], "ra": 0.012, "rb": 0.011}},
-        {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, 0], "b": [0.16, -0.075, 0.012], "ra": 0.012, "rb": 0.011}},
+        {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, 0.0], "b": [0.16, -0.075, 0.012], "ra": 0.012, "rb": 0.011}},
         {"bone": "spine", "at": "mid", "material": "rib", "shape": {"kind": "capsule", "a": [0.15, 0.075, 0.085], "b": [0.16, -0.075, 0.097], "ra": 0.012, "rb": 0.011}},
         {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.14, 0.08, 0.02], "radii": [0.07, 0.065, 0.075]}},
         {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.09, 0.13, -0.05], "radii": [0.045, 0.045, 0.045]}},
         {"bone": "pelvis", "at": "head", "material": "tumour", "shape": {"kind": "ellipsoid", "center": [-0.19, 0.02, 0.08], "radii": [0.04, 0.04, 0.04]}},
-        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [-0.18, 0.12, 0], "radii": [0.04, 0.04, 0.04]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [-0.18, 0.12, 0.0], "radii": [0.04, 0.04, 0.04]}},
         {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["tumour"], "material": "sore", "shape": {"kind": "ellipsoid", "center": [-0.1, 0.17, -0.06], "radii": [0.025, 0.025, 0.025]}},
-        {"bone": "neck", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.09, 0.04, 0], "radii": [0.06, 0.06, 0.06]}},
+        {"bone": "neck", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.09, 0.04, 0.0], "radii": [0.06, 0.06, 0.06]}},
         {"bone": "pelvis", "at": "mid", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.15, -0.02, 0.06], "radii": [0.06, 0.07, 0.07]}},
-        {"bone": "spine", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0, 0.14, 0], "radii": [0.06, 0.04, 0.08]}},
-        {"bone": "hindUpper.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "ellipsoid", "center": [0, 0.02, 0], "radii": [0.07, 0.1, 0.08]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["skin", "bruise"], "material": "mange", "shape": {"kind": "ellipsoid", "center": [0.0, 0.14, 0.0], "radii": [0.06, 0.04, 0.08]}},
+        {"bone": "hindUpper.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "ellipsoid", "center": [0.0, 0.02, 0.0], "radii": [0.07, 0.1, 0.08]}},
         {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [-0.014, -0.02, 0.02], "b": [-0.014, -0.08, 0.01], "ra": 0.016, "rb": 0.012}},
         {"bone": "head", "at": "tail", "material": "tooth", "shape": {"kind": "capsule", "a": [0.014, -0.02, 0.02], "b": [0.014, -0.08, 0.01], "ra": 0.016, "rb": 0.012}},
         {"bone": "foreLower.L", "at": "mid", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0.06, 0], "b": [0, -0.05, 0], "ra": 0.04, "rb": 0.032}},
@@ -3043,83 +2892,145 @@
       ]
     },
     {
-      "id": "mech_walker_mob_1",
-      "title": "Security walker",
-      "pack": "skelly.bestiary.mech",
-      "template": "security-walker",
+      "id": "scale_lizard",
+      "template": "critter",
       "lod_divisor": 0,
-      "walk_speed": 0.91
+      "glb": "scale_lizard.glb",
+      "clips": "scale_lizard_clips.json",
+      "brief": "Ahg3's wasteland scavenger lizard, a step up from the rats on the odd-jobs board. No sprite; the design reads: a monitor-sized lizard grown wrong in the fallout (about 0.25 m high, 1.3 m nose to tail tip), low and long on splayed, sprawling legs, a heavy tapering tail, a flat wedge head with bulging eyes. Silhouette for the tactics camera: a row of bony spines down the back and the tail's root, their tips glowing, and a line of glowing pustules along each flank, so it reads at range and in the dark. Palette: dusty olive scales #6a7048 mottled darker #444c30, a sickly yellow belly, bone-coloured spines, acid-green glow #9cff50, yellow-green glowing eyes. Motion: the critter plan's diagonal gait with the legs sprawled out sideways and the tail swinging, a lunge and snap.",
+      "params": {
+        "height": 0.17,
+        "bodyLength": 2.8,
+        "girth": 1.8,
+        "arch": 0.05,
+        "legSplay": 1.0,
+        "headScale": 1.3,
+        "snoutLength": 1.35,
+        "earSize": 0,
+        "tailLength": 3.8,
+        "tailGirth": 0.6,
+        "headTilt": 0,
+        "jawOpen": 0.25,
+        "limp": 0
+      },
+      "materials": {
+        "skin": {"color": "#6a7048"},
+        "bruise": {"color": "#444c30"},
+        "belly": {"color": "#b0a468"},
+        "ear": {"color": "#6a7048"},
+        "nose": {"color": "#5c6240"},
+        "tail": {"color": "#626a42"},
+        "paw": {"color": "#545a38"},
+        "eye": {"color": "#d8ff40", "emissive": 0.9},
+        "mouth": {"color": "#5a1a20"},
+        "spine": {"color": "#c8b890"},
+        "pustule": {"color": "#a0b060"},
+        "glow": {"color": "#9cff50", "emissive": 1.0}
+      },
+      "parts": [
+        {"bone": "pelvis", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.082, -0.0357], "b": [0.0, 0.122, -0.0157], "ra": 0.017, "rb": 0.006}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.116, -0.0157], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "pelvis", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0874, -0.1309], "b": [0.0, 0.1324, -0.1109], "ra": 0.017, "rb": 0.006}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.1264, -0.1109], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "pelvis", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0929, -0.2261], "b": [0.0, 0.1429, -0.2061], "ra": 0.017, "rb": 0.006}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.1369, -0.2061], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "spine", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0652, -0.0714], "b": [0.0, 0.1202, -0.0514], "ra": 0.018, "rb": 0.006}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.1142, -0.0514], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "spine", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0586, -0.1547], "b": [0.0, 0.1186, -0.1347], "ra": 0.018, "rb": 0.006}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.1126, -0.1347], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "spine", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.053, -0.2261], "b": [0.0, 0.108, -0.2061], "ra": 0.018, "rb": 0.006}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.102, -0.2061], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "tail", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0242, 0.0484], "b": [0.0, 0.0642, 0.0634], "ra": 0.014, "rb": 0.006}},
+        {"bone": "tail", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.0582, 0.0634], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "tail", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, -0.0107, 0.1292], "b": [0.0, 0.0293, 0.1442], "ra": 0.014, "rb": 0.006}},
+        {"bone": "tail", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.0233, 0.1442], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "tail2", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.022, 0.0484], "b": [0.0, 0.054, 0.0634], "ra": 0.014, "rb": 0.006}},
+        {"bone": "tail2", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.048, 0.0634], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "tail2", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.0, 0.0015, 0.1292], "b": [0.0, 0.0335, 0.1442], "ra": 0.014, "rb": 0.006}},
+        {"bone": "tail2", "at": "head", "op": "paint", "onto": ["spine"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0, 0.0275, 0.1442], "radii": [0.014, 0.016, 0.014]}},
+        {"bone": "spine", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [0.0753, -0.0276, -0.0595], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0873, -0.0276, -0.0595], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "spine", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [-0.0753, -0.0276, -0.0595], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [-0.0873, -0.0276, -0.0595], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "spine", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [0.0753, -0.036, -0.1666], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0873, -0.036, -0.1666], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "spine", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [-0.0753, -0.036, -0.1666], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "spine", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [-0.0873, -0.036, -0.1666], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "pelvis", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [0.0753, -0.0196, -0.0595], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0873, -0.0196, -0.0595], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "pelvis", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [-0.0753, -0.0196, -0.0595], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [-0.0873, -0.0196, -0.0595], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "pelvis", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [0.0753, -0.0134, -0.1666], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [0.0873, -0.0134, -0.1666], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "pelvis", "at": "head", "material": "pustule", "shape": {"kind": "ellipsoid", "center": [-0.0753, -0.0134, -0.1666], "radii": [0.016, 0.016, 0.018]}},
+        {"bone": "pelvis", "at": "head", "op": "paint", "onto": ["pustule"], "material": "glow", "shape": {"kind": "ellipsoid", "center": [-0.0873, -0.0134, -0.1666], "radii": [0.012, 0.012, 0.012]}},
+        {"bone": "foreUpper.L", "at": "head", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0, 0], "b": [-0.119, -0.0204, -0.0068], "ra": 0.026, "rb": 0.022}},
+        {"bone": "foreLower.L", "at": "head", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0, 0], "b": [-0.017, -0.0871, -0.0068], "ra": 0.022, "rb": 0.018}},
+        {"bone": "hindUpper.L", "at": "head", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0, 0], "b": [-0.119, -0.0255, 0.0204], "ra": 0.03, "rb": 0.022}},
+        {"bone": "hindLower.L", "at": "head", "mirror": true, "material": "skin", "shape": {"kind": "capsule", "a": [0, 0, 0], "b": [-0.017, -0.0837, -0.0136], "ra": 0.022, "rb": 0.018}},
+        {"bone": "head", "at": "head", "material": "skin", "shape": {"kind": "ellipsoid", "center": [0, -0.004, -0.085], "radii": [0.052, 0.03, 0.095]}},
+        {"bone": "head", "at": "head", "material": "eye", "shape": {"kind": "ellipsoid", "center": [0.042, 0.022, -0.045], "radii": [0.017, 0.017, 0.019]}},
+        {"bone": "head", "at": "head", "material": "eye", "shape": {"kind": "ellipsoid", "center": [-0.042, 0.022, -0.045], "radii": [0.017, 0.017, 0.019]}},
+        {"bone": "head", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [0.03, 0.035, -0.02], "b": [0.04, 0.05, 0.03], "ra": 0.012, "rb": 0.006}},
+        {"bone": "head", "at": "head", "material": "spine", "shape": {"kind": "capsule", "a": [-0.03, 0.035, -0.02], "b": [-0.04, 0.05, 0.03], "ra": 0.012, "rb": 0.006}}
+      ]
     },
-    {"type":"shambler","title":"Shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 4","template":"humanoid","model":"humanoid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 5","template":"humanoid","model":"humanoid","seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 6","template":"humanoid","model":"humanoid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 7","template":"humanoid","model":"humanoid","seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"shambler","title":"Shambler 8","template":"humanoid","model":"humanoid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 4","template":"humanoid","model":"humanoid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 5","template":"humanoid","model":"humanoid","seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 6","template":"humanoid","model":"humanoid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 7","template":"humanoid","model":"humanoid","seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"military_shambler","title":"Military shambler 8","template":"humanoid","model":"humanoid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 4","template":"humanoid","model":"humanoid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 5","template":"humanoid","model":"humanoid","seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 6","template":"humanoid","model":"humanoid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 7","template":"humanoid","model":"humanoid","seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"farmer_shambler","title":"Farmer shambler 8","template":"humanoid","model":"humanoid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 4","template":"humanoid","model":"humanoid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 5","template":"humanoid","model":"humanoid","seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 6","template":"humanoid","model":"humanoid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 7","template":"humanoid","model":"humanoid","seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"worker_shambler","title":"Worker shambler 8","template":"humanoid","model":"humanoid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 1","template":"humanoid","model":"humanoid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 2","template":"humanoid","model":"humanoid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 3","template":"humanoid","model":"humanoid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 4","template":"humanoid","model":"humanoid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 5","template":"humanoid","model":"humanoid","seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 6","template":"humanoid","model":"humanoid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 7","template":"humanoid","model":"humanoid","seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"medic_shambler","title":"Medic shambler 8","template":"humanoid","model":"humanoid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 1","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 2","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 3","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 4","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 5","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 6","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 7","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"brute_shambler","title":"Brute shambler 8","template":"broad-humanoid","model":"broad-humanoid","crawl_stride":1.6,"seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 1","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 2","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 3","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 4","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 5","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 6","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 7","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"runner","title":"Runner 8","template":"slim-humanoid","model":"slim-humanoid","crawl_stride":1.6,"seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 1","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 2","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 3","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 5","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":5,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 6","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 7","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":7,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"crawler","title":"Crawler 11","template":"legless-humanoid","model":"legless-humanoid","crawl_stride":0.9,"seed":11,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"amalgam","title":"Amalgam","template":"fused-mass","model":"fused-mass","seed":1,"scale":4,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 1","template":"acid","model":"acid","seed":1,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 2","template":"acid","model":"acid","seed":2,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 3","template":"acid","model":"acid","seed":3,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 4","template":"acid","model":"acid","seed":4,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 6","template":"acid","model":"acid","seed":6,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"acid_zombie","title":"Acid zombie 8","template":"acid","model":"acid","seed":8,"scale":1,"pack":"skelly.deadvox.actors","lod_divisor":0,"walkCycles":4,"taxonomy":{"keywords":["zombie","undead"]}},
-    {"type":"player","title":"Player animation clips","template":"humanoid","model":"humanoid","crawls":false,"seed":1,"scale":1,"pack":"skelly.body","lod_divisor":0,"walkCycles":4}
+    {
+      "id": "scrap_beetle",
+      "template": "insect",
+      "lod_divisor": 0,
+      "glb": "scrap_beetle.glb",
+      "clips": "scrap_beetle_clips.json",
+      "brief": "Ahg3's farm-contract scrap beetle (DESIGN.md beat 1: clear vermin, mutant rats and scrap beetles). No sprite; the design reads: a knee-high armoured beetle (about 0.3 m high, 0.7 m long), a domed blue-black carapace that has grown around the old world's junk, short stubby feelers and thick legs, a length of rusted rebar jutting from its head as a horn. Silhouette for the tactics camera: the dome lumpy with fused scrap, a rusted riveted sheet over one wing case, a faded yellow enamel sign with a red stripe over the other, a hubcap set into the thorax shield, a pipe along one flank. Palette: chitin #2a2e34 with a dull grey sheen, rust #8a4520 and darker #5a2a14, grey steel #7c7f80 with bright rivets, sign enamel #c8a83a striped #9a2a20, dim orange eyes. Motion: the insect plan's tripod scuttle, a rear-up and a ramming bite.",
+      "params": {
+        "height": 0.28,
+        "bodyLength": 0.9,
+        "girth": 0.65,
+        "headScale": 1.05,
+        "antennaLength": 0.5,
+        "legSpread": 0.85,
+        "legThickness": 1.25,
+        "mandibleOpen": 6,
+        "abdomenSize": 1.3
+      },
+      "materials": {
+        "shell": {"color": "#2a2e34"},
+        "sheen": {"color": "#3a4448"},
+        "dark": {"color": "#14161a"},
+        "head": {"color": "#22252a"},
+        "eye": {"color": "#ff9020", "emissive": 0.7},
+        "antenna": {"color": "#3a3e44"},
+        "leg": {"color": "#1e2024"},
+        "bone": {"color": "#1e2024"},
+        "rust": {"color": "#8a4520"},
+        "rust_dk": {"color": "#5a2a14"},
+        "metal": {"color": "#7c7f80"},
+        "rivet": {"color": "#c0c0b8"},
+        "enamel": {"color": "#c8a83a"},
+        "stripe": {"color": "#9a2a20"}
+      },
+      "parts": [
+        {"bone": "abdomen", "at": "head", "material": "rust", "shape": {"kind": "box", "center": [0.1, 0.0833, 0.2974], "half": [0.1, 0.028, 0.12], "round": 0.006}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["shell", "sheen", "dark"], "material": "rust", "shape": {"kind": "box", "center": [0.1, 0.0833, 0.2974], "half": [0.1, 0.057999999999999996, 0.12], "round": 0}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [0.025, 0.1113, 0.2024], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [0.025, 0.1113, 0.3924], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [0.175, 0.1113, 0.2024], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [0.175, 0.1113, 0.3924], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["rust"], "material": "rust_dk", "shape": {"kind": "ellipsoid", "center": [0.13, 0.1113, 0.3374], "radii": [0.05, 0.03, 0.06]}},
+        {"bone": "abdomen", "at": "head", "material": "enamel", "shape": {"kind": "box", "center": [-0.09, 0.0841, 0.1674], "half": [0.09, 0.024, 0.1], "round": 0.006}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["shell", "sheen", "dark"], "material": "enamel", "shape": {"kind": "box", "center": [-0.09, 0.0841, 0.1674], "half": [0.09, 0.054, 0.1], "round": 0}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["enamel"], "material": "stripe", "shape": {"kind": "box", "center": [-0.09, 0.1081, 0.1674], "half": [0.1, 0.03, 0.025], "round": 0}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["enamel", "stripe"], "material": "rust", "shape": {"kind": "ellipsoid", "center": [-0.15, 0.1081, 0.1074], "radii": [0.045, 0.03, 0.045]}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [-0.16, 0.1081, 0.2474], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [-0.02, 0.1081, 0.0874], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "abdomen", "at": "head", "material": "metal", "shape": {"kind": "capsule", "a": [-0.2503, 0.0156, 0.0374], "b": [-0.2603, 0.0356, 0.4774], "ra": 0.032, "rb": 0.032}},
+        {"bone": "abdomen", "at": "head", "op": "paint", "onto": ["metal"], "material": "rust", "shape": {"kind": "box", "center": [-0.2503, 0.0256, 0.3174], "half": [0.05, 0.05, 0.03], "round": 0}},
+        {"bone": "thorax", "at": "head", "material": "metal", "shape": {"kind": "ellipsoid", "center": [0, 0.0616, -0.098], "radii": [0.11, 0.03, 0.1]}},
+        {"bone": "thorax", "at": "head", "op": "paint", "onto": ["shell", "sheen", "dark"], "material": "metal", "shape": {"kind": "ellipsoid", "center": [0, 0.0616, -0.098], "radii": [0.11, 0.06, 0.1]}},
+        {"bone": "thorax", "at": "head", "op": "paint", "onto": ["metal"], "material": "rust_dk", "shape": {"kind": "ellipsoid", "center": [0.06, 0.0816, -0.048], "radii": [0.04, 0.03, 0.04]}},
+        {"bone": "thorax", "at": "head", "material": "rivet", "shape": {"kind": "ellipsoid", "center": [0, 0.0916, -0.098], "radii": [0.02, 0.02, 0.02]}},
+        {"bone": "head", "at": "head", "material": "rust", "shape": {"kind": "capsule", "a": [0, 0.05, -0.06], "b": [0, 0.15, -0.18], "ra": 0.026, "rb": 0.018}}
+      ]
+    }
   ]
 }
