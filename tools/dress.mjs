@@ -498,7 +498,9 @@ const surfacePart = (surface) => surface.split('#')[0];
 
 /**
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
- * doll's regions with a surface on that part, since a consumer hides by those names and no other.
+ * doll's regions drawn as a piece of that part, since a consumer hides by those names and no other: it hides the
+ * primitives of a part that a name marks, and a region that holds the whole part marks none, so a shell over it names
+ * the part.
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
  */
@@ -510,12 +512,16 @@ export function coversProblems(models, dressing) {
     const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
     if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
     const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
-      surfaces.some((surface) => surfacePart(surface) === part),
+      surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
     );
     const names = [part, ...regions.map(([region]) => region)];
     return covers
       .filter((name) => !names.includes(name))
-      .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);
+      .map((name) =>
+        dressing.regions[name]?.includes(part)
+          ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
+          : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
+      );
   });
 }
 

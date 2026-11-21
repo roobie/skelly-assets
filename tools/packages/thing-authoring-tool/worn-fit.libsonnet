@@ -101,16 +101,29 @@ local shell(model, pieces, finish, covers, title=null) =
   row(model, pieces, finish) + (if covers == [] then {} else { covers: covers }) + (if title == null then {} else { title: title });
 local fitted(shells) = { rows: shells };
 
+// The ids of the turned pieces of `pieces` that do not stand in exactly one of `shares`, the lists they were cut into: a
+// cut hands a turned piece whole to one side, so one dropped from every share would go missing, and one kept in two
+// would be drawn twice.
+local unshared(pieces, shares) = [
+  p.id
+  for p in pieces
+  if p.kind == 'turned' && std.sum([std.length([q for q in share if q.id == p.id]) for share in shares]) != 1
+];
+
 // A body shell's pieces shared out among the spine parts of a doll that bends its trunk, cut where the bust is, at the
 // belly's and the body's joints, so each shell bends with the flesh it lies on, and each moved into its part's frame.
 // Each hides what it encloses, but where a sleeveless body (`bare`) leaves the chest above the armpit showing.
 local spineShells(id, pieces, finish, spine, bare, title) =
   local ribs = spine.belly.origin[1], chest = spine.body.origin[1];
+  // A round piece the cut crosses, such as a deltoid's cap, goes whole to the band holding its middle.
+  local cutAt(at, keep, from=pieces) = h.cut(from, 'y', at, keep, whole=true);
   local bands = [
-    { segment: 'waist', pieces: h.cut(pieces, 'y', ribs, -1), encloses: true },
-    { segment: 'belly', pieces: h.cut(h.cut(pieces, 'y', ribs, 1), 'y', chest, -1), encloses: true },
-    { segment: 'body', pieces: h.cut(pieces, 'y', chest, 1), encloses: !bare },
+    { segment: 'waist', pieces: cutAt(ribs, -1), encloses: true },
+    { segment: 'belly', pieces: cutAt(chest, -1, cutAt(ribs, 1)), encloses: true },
+    { segment: 'body', pieces: cutAt(chest, 1), encloses: !bare },
   ];
+  local lost = unshared(pieces, [band.pieces for band in bands]);
+  assert lost == [] : '%s: the cut left %s in none or in several of its parts' % [id, lost];
   [
     local part = spine[band.segment];
     shell(id + '_worn_' + band.segment, h.moved(band.pieces, [-c for c in part.origin]), finish, if band.encloses then part.covers else [],
@@ -690,9 +703,13 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     ]);
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
-    local shod = shell(id + '_worn_foot', if s.ball == null then foot else h.cut(foot, 'z', s.ball.joint[2], -1), footFinish, s.covers, title=named(title, 'foot'));
+    // The round toe caps are handed whole to the toe or the foot by where their middle stands from the ball.
+    local cutAtBall(keep) = h.cut(foot, 'z', s.ball.joint[2], keep, whole=true);
+    local split = if s.ball == null then [] else unshared(foot, [cutAtBall(-1), cutAtBall(1)]);
+    assert split == [] : '%s: the cut left %s in none or in both of its foot and toe' % [id, split];
+    local shod = shell(id + '_worn_foot', if s.ball == null then foot else cutAtBall(-1), footFinish, s.covers, title=named(title, 'foot'));
     local toe = if s.ball == null then [] else [
-      shell(id + '_worn_toe', h.moved(h.cut(foot, 'z', s.ball.joint[2], 1), [-c for c in s.ball.joint]), footFinish,
+      shell(id + '_worn_toe', h.moved(cutAtBall(1), [-c for c in s.ball.joint]), footFinish,
             if std.member(s.covers, 'sole') || std.member(s.covers, 'foot') then [s.ball.part] else [], title=named(title, 'toe')),
     ];
     fitted([shod { soleLift: b.s }] + toe

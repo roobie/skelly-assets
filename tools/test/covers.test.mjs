@@ -6,7 +6,7 @@ import { installJsonnetSources } from '../sources.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 
-test('a covers name is the part its piece is drawn on or a region with a surface on that part', () => {
+test('a covers name is the part its piece is drawn on or a region drawn as a piece of that part', () => {
   const dressing = {
     piece: 'chest',
     slots: { cuff: { part: 'sleeve' }, collar: { part: 'neck' } },
@@ -26,19 +26,21 @@ test('a covers name is the part its piece is drawn on or a region with a surface
     ],
     dressing,
   );
-  assert.equal(problems.length, 5);
-  assert.match(problems[0], /vest_worn covers sleeve/);
-  assert.match(problems[1], /mitt_worn_cuff covers belly/);
-  assert.match(problems[2], /hood_worn_collar covers belly/);
-  assert.match(problems[3], /segment tail/);
-  assert.match(problems[4], /coat declares .* no worn piece/);
+  assert.equal(problems.length, 6);
+  // The throat holds the whole neck, so the neck's primitives mark no piece a consumer could hide by its name.
+  assert.match(problems[0], /scarf_worn_collar covers throat, which holds its part neck whole.*name neck/);
+  assert.match(problems[1], /vest_worn covers sleeve/);
+  assert.match(problems[2], /mitt_worn_cuff covers belly/);
+  assert.match(problems[3], /hood_worn_collar covers belly/);
+  assert.match(problems[4], /segment tail/);
+  assert.match(problems[5], /coat declares .* no worn piece/);
 });
 
 // The authored items, which carry what each worn shell covers into its export.
 await installJsonnetSources();
 const { items } = (await import('../packages/thing-authoring-tool/src/cli/content.ts')).readCatalogue();
 
-test('every worn shell names in covers only its doll part or the regions with a surface on it', () => {
+test('every worn shell names in covers only its doll part or the regions drawn as pieces of it', () => {
   assert.ok(
     items.some(({ covers }) => covers),
     'no item declares what it covers, so nothing was checked',

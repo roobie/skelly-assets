@@ -23,9 +23,10 @@
   // What a sided bone's id takes after its name, by side.
   boneSuffix: { right: '.R', left: '.L' },
   rig: import 'models/dolls/player/rig.libsonnet',
-  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions with a surface on that
+  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions drawn as a piece of that
   // part (docs/decisions/0012-hidden-body.md), each by the surfaces that make it, a whole part or `<part>#<piece>`, a
-  // piece the doll's export keeps of a part cut into regions.
+  // piece the doll's export keeps of a part cut into regions. A region that holds a part whole is named on it by the
+  // part, since a consumer hides by the names a part's primitives carry.
   regions: {
     // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
     trunk: ['torso#trunk'],

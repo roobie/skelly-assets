@@ -148,7 +148,7 @@ holds no list of garments. The doll draws each region it may hide as its own pie
 garment that leaves the shoulders bare hides only the trunk, and a boot whose ankle cap
 rises into a shaft hides only the sole. A shell declares only what it encloses at rest, so
 hiding it never opens a hole; the build checks every declaring item for skin left outside
-its shell. The regions, and so the names `covers` may use besides the part, are
+its shell. The regions, and so the names `covers` may use besides the part, those drawn as a piece of it, are
 content in a doll's record, `models/dolls/<id>/doll.libsonnet`, `regions`. See `src/families/body.ts`, `region`,
 `tools/dollRig.mjs`, `coverGaps`, and `tools/packages/thing-core/src/schema.ts`,
 `NeutralModelSchema`.
@@ -168,14 +168,16 @@ on the joint, and the part is handed over about its own joint, because that is t
 A bust cut into spine and clavicle parts, or a foot cut at its ball, shares one drawn mass among the parts rather
 than drawing each anew, so the split body has the silhouette the whole one has; a spine's joints sit toward the back
 of the trunk, so the trunk is not moved onto them. The ribs and the chest are cut where their joints stand, so the
-cut and the joint cannot disagree. A region `covers` names is then a union of whole parts, which needs no piece of
-its own. The chest's joint must be the armpit, because a garment's trunk ends there and a region that ended
-elsewhere would hide skin it does not enclose. A clavicle lifts only the girdle's slope; the girdle's top under the
+cut and the joint cannot disagree. A region is then a union of whole parts, which needs no piece of its own: a shell
+over such a part names the part in `covers`, since a consumer hides by the names a part's primitives carry. The
+chest's joint must be the armpit, because a garment's trunk ends there and a region that ended elsewhere would hide
+skin it does not enclose. A clavicle lifts only the girdle's slope; the girdle's top under the
 neck stays on the chest, because the neck hangs from the chest and parts that are not joined may not overlap, so the
 neck could stand on nothing else. See
 `src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
 
 A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and
-bends with it; a shell that spanned a bend would leave the flesh under it uncovered or pierce it. A round piece goes
-whole to the side holding its middle, because halving a turned piece would leave it open. See `worn-fit.libsonnet`,
+bends with it; a shell that spanned a bend would leave the flesh under it uncovered or pierce it. Halving a turned
+piece would leave it open, so a cut refuses one it crosses unless the caller hands it whole to the side of the joint
+holding its middle, as the boot's round toe is. See `worn-fit.libsonnet`,
 the torso's `spine` and the feet's `ball`, and `compound.libsonnet`, `cut` and `moved`.

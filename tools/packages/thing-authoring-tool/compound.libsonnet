@@ -23,10 +23,11 @@ local cutProfile(profile, c, limit, keep) =
   local m = std.length(kept);
   // A point on the cut line is its own crossing, which would repeat it.
   [kept[i] for i in std.range(0, m - 1) if std.abs(kept[i][0] - kept[(i + 1) % m][0]) + std.abs(kept[i][1] - kept[(i + 1) % m][1]) > 1e-9];
-// Where a turned piece's middle lies along axis `i`.
-local turnedMiddle(p, i) =
+// How far a turned piece reaches along axis `i`, as [from, to].
+local turnedExtent(p, i) =
   local o = std.get(p, 'origin', [0, 0, 0])[i];
-  if axisIndex(p.axis) == i then o + (std.minArray([q[0] for q in p.profile]) + std.maxArray([q[0] for q in p.profile])) / 2 else o;
+  if axisIndex(p.axis) == i then [o + std.minArray([q[0] for q in p.profile]), o + std.maxArray([q[0] for q in p.profile])]
+  else local r = std.maxArray([q[1] for q in p.profile]); [o - r, o + r];
 {
   item: item,
   part: part,
@@ -363,16 +364,26 @@ local turnedMiddle(p, i) =
   lifted(pieces, dy): self.moved(pieces, [0, dy, 0]),
   // The pieces cut to the side of the plane `axis = at` that `keep` names (1 keeps above, -1 below), dropping any left
   // empty, so one shell can be shared out among the parts of a body that bends where the shell does not. A turned piece
-  // is not sliced, since its profile is not a section: it goes whole to the side holding its middle.
-  cut(pieces, axis, at, keep): std.flattenArrays([
+  // is not sliced, since its profile is not a section, so one the plane crosses is refused unless the caller hands such
+  // pieces whole: given `whole`, it goes to the side of the plane holding its middle.
+  cut(pieces, axis, at, keep, whole=false): std.flattenArrays([
     local i = axisIndex(axis);
     local clamp(lo, hi) = if keep > 0 then [std.max(lo, at), hi] else [lo, std.min(hi, at)];
     if p.kind == 'box' then (
       local r = clamp(p.min[i], p.max[i]);
       if r[1] > r[0] then [p { min: with(p.min, i, r[0]), max: with(p.max, i, r[1]) }] else []
     ) else if p.kind == 'turned' then (
-      local middle = turnedMiddle(p, i);
-      if (if keep > 0 then middle >= at else middle < at) then [p] else []
+      local extent = turnedExtent(p, i);
+      // How far it reaches past the plane into the side kept and into the other.
+      local kept = if keep > 0 then extent[1] - at else at - extent[0];
+      local dropped = if keep > 0 then at - extent[0] else extent[1] - at;
+      if dropped <= 0 then [p]
+      else if kept <= 0 then []
+      else (
+        assert whole : '%s straddles the cut at %s = %g' % [p.id, axis, at];
+        local middle = (extent[0] + extent[1]) / 2;
+        if (if keep > 0 then middle >= at else middle < at) then [p] else []
+      )
     ) else if p.axis == axis then (
       local r = clamp(p.start, p.end);
       if r[1] > r[0] then [p { start: r[0], end: r[1] }] else []
