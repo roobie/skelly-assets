@@ -70,9 +70,7 @@ local rot = {
   t(a):: [[a[j][i] for j in [0, 1, 2]] for i in [0, 1, 2]],
   apply(m, v):: [std.sum([m[i][n] * v[n] for n in [0, 1, 2]]) for i in [0, 1, 2]],
 };
-local add(a, b) = [a[i] + b[i] for i in [0, 1, 2]];
-local sub(a, b) = [a[i] - b[i] for i in [0, 1, 2]];
-local times(v, s) = [x * s for x in v];
+local add = h.vec.add, sub = h.vec.sub, times = h.vec.mul;
 
 // A part's frame in the world, and a point given life-size in that frame, in the world.
 local frame(turn, origin) = { turn: turn, origin: origin };
