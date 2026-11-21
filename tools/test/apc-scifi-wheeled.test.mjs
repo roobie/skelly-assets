@@ -286,23 +286,31 @@ test('a rail bar pushed against the side meets it, so the rail clearance check c
 });
 
 // The player's doll crouching, from its own measures: the thighs level, so the hip joints sit at the shin and foot's
-// height and the bust stands upright on the hips' foot below them, and as wide as its shoulders. Its depth is a level
-// thigh and the shin in front of it.
+// height, and the bust hinged forward at them, as a crouching body stoops to keep its head low. Its top is the back of
+// the crown, which the hinge lifts as it lowers the rest. It is as wide as its shoulders, and its depth is a level thigh
+// and the shin in front of it, which the hinged bust stays within.
+const CROUCH_HINGE_DEG = 20;
+const hinge = (CROUCH_HINGE_DEG * Math.PI) / 180;
+const hipJoint = leg.length - leg.thighLength;
+const bustAboveHip =
+  bust.pelvisHeight +
+  bust.waistHeight +
+  bust.ribHeight +
+  bust.chestHeight +
+  bust.neckHeight +
+  bust.headHeight +
+  bust.hairThickness -
+  leg.hip[1];
 const crouch = {
-  height:
-    leg.length -
-    leg.thighLength -
-    leg.hip[1] +
-    bust.pelvisHeight +
-    bust.waistHeight +
-    bust.ribHeight +
-    bust.chestHeight +
-    bust.neckHeight +
-    bust.headHeight +
-    bust.hairThickness,
+  height: hipJoint + bustAboveHip * Math.cos(hinge) + (bust.headDepth / 2) * Math.sin(hinge),
   width: 2 * (deltoid.x + deltoid.radius),
   depth: leg.thighLength + leg.shinDepth,
 };
+
+test('the crouching bust leans forward within the reach of its thighs, never back', () => {
+  assert.ok(CROUCH_HINGE_DEG >= 0, 'the bust leans back');
+  assert.ok(bustAboveHip * Math.sin(hinge) + (bust.headDepth / 2) * Math.cos(hinge) <= crouch.depth);
+});
 // How far the hull, its fittings and its seats may reach into the crouching doll on its way in: a little clipping
 // of a stooped head or a shoulder against a door frame passes, a blocked aisle does not.
 const CROUCH_OVERLAP_ALLOWED = 0.1;
