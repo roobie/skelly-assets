@@ -60,7 +60,7 @@ local jacket = fit.torso('toy_jacket', { cloth: 'paint-charcoal', zip: 'paint-ch
   },
 }, title='Toy jacket');
 local boot = fit.feet('toy_boot', { upper: 'paint-charcoal', toe: 'paint-charcoal', sole: 'paint-charcoal', collar: 'paint-charcoal' },
-                      { l: 0.3, w: 0.13, s: 0.025, toe: 0.085, instep: 0.11, top: 0.18, laces: 0 },
+                      { room: 0.03, w: 0.13, s: 0.025, toe: 0.085, instep: 0.04, top: 0.09, laces: 0 },
                       { covers: ['sole'], ball: { joint: [ballJoint[i] - footOrigin[i] for i in [0, 1, 2]], part: 'ball' } },
                       title='Toy boot');
 

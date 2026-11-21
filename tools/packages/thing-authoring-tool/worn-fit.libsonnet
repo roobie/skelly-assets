@@ -656,9 +656,11 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       ground: h.lifted(palm, fingerLength + g + arm.palmLength) + h.lifted(fingers, fingerLength + g),
     },
 
-  // Boots and shoes from the ground row's own boot spec `b` (length l, width w, sole s, toe, instep, shaft top `top`,
-  // laces). The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it, and
-  // it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
+  // Boots and shoes from the ground row's own boot spec `b`: width w, sole s, the toe cap's height `toe` over the bare
+  // sole, laces, and what follows the foot it is worn on: `room`, how much longer the boot is than the foot's reach,
+  // and the rises of the vamp's `instep` and the shaft's `top` above the ankle, so a longer foot or a higher ankle takes
+  // the same boot. The foot rides the ankle; a shaft above the ankle rides the knee so a flexed ankle does not pierce it,
+  // and it widens to clear the shin whatever the ground boot's proportions, and by `ease` more for a loose boot worn over
   // trousers. A shoe whose top stays below the ankle has no shaft. The sole lies under the bare foot, not round it, so
   // the foot piece declares the sole as the lift a consumer stands the shod figure on. `covers` is what of the foot the
   // vamp encloses at rest, which depends on how high it rises: the foot's 'sole' region past the bare instep, the whole
@@ -671,16 +673,18 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local g = layers[s.layer];
     local ankleY = -leg.shoeHeight - b.s;  // The sole's floor, from the ankle: a sole under the bare foot's.
     local footZ = leg.toeReach - (leg.toeReach + leg.heelReach) / 2;  // The body foot's centre, ahead of the ankle.
-    local z0 = footZ - b.l / 2, zt = footZ + b.l / 2 - b.w / 2, zs = z0 + 0.12;
+    local l = leg.toeReach + leg.heelReach + b.room;
+    local instep = leg.shoeHeight + b.instep;  // The vamp's height over the bare sole.
+    local z0 = footZ - l / 2, zt = footZ + l / 2 - b.w / 2, zs = z0 + 0.12;
     local y(v) = ankleY + v;
     local foot = [
       h.box('sole', 'sole', [-b.w / 2 - 0.004, y(0), z0 - 0.004], [b.w / 2 + 0.004, y(b.s), zt]),
       h.disc('sole-toe', 'sole', b.w / 2 + 0.004, y(0), y(b.s), 0, zt),
       h.box('heel', 'sole', [-b.w / 2 - 0.004, y(0), z0 - 0.006], [b.w / 2 + 0.004, y(b.s + 0.01), z0 + 0.07]),
-      h.prism('vamp', 'upper', 'x', [[y(b.s), z0], [y(b.s), zt], [y(b.s + b.toe), zt], [y(b.s + b.instep), zs], [y(b.s + b.instep), z0]], -b.w / 2, b.w / 2),
+      h.prism('vamp', 'upper', 'x', [[y(b.s), z0], [y(b.s), zt], [y(b.s + b.toe), zt], [y(b.s + instep), zs], [y(b.s + instep), z0]], -b.w / 2, b.w / 2),
       h.turned('toe', 'toe', 'y', [[0, 0], [0, b.w / 2], [b.toe * 0.6, b.w / 2], [b.toe, b.w * 0.3], [b.toe, 0]], [0, y(b.s), zt]),
     ] + (if b.laces == 0 then [] else [
-      local zl = zs + f * (zt - zs) * 0.6, yl = y(b.s + b.instep + f * 0.6 * (b.toe - b.instep));
+      local zl = zs + f * (zt - zs) * 0.6, yl = y(b.s + instep + f * 0.6 * (b.toe - instep));
       h.box('instep-lace-%d' % i, 'laces', [-b.w * 0.28, yl - 0.004, zl - 0.004], [b.w * 0.28, yl + 0.002, zl])
       for i in [0, 1]
       for f in [[0.35, 0.75][i]]
@@ -689,8 +693,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     local ankle = -(leg.length - leg.thighLength - leg.shoeHeight);
     local shaftW = std.max(b.w * 0.92, leg.shinWidth + 2 * (g + s.ease)), shaftD = std.max(0.116, leg.shinDepth + 2 * (g + s.ease));
     // The shaft reaches below the ankle, past the shin's end, so no skin shows over a low vamp.
-    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + ankleY + b.top;
-    local rise = top - 0.02 - (ankle + ankleY + b.s + b.instep);
+    local base = ankle - leg.ankleOverlap - 0.004, top = ankle + b.top;
+    local rise = top - 0.02 - (ankle + ankleY + b.s + instep);
     local shaft = [
       oct('shaft', 'upper', base, top - 0.02, shaftW, shaftD, 0.02),
       oct('collar', 'collar', top - 0.02, top, shaftW + 0.008, shaftD + 0.008, 0.022),

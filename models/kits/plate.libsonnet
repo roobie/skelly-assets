@@ -169,7 +169,7 @@ local gloves = fit.hands('gauntlet_plate', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'trim', ridge: 'rivet' },
 }, 'Plate gauntlets');
 local boots = fit.feet('sabaton_plate', sabaton,
-                       { l: 0.35, w: 0.13, s: 0.04, toe: 0.115, instep: 0.155, top: 0.32, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
+                       { room: 0.08, w: 0.13, s: 0.04, toe: 0.115, instep: 0.065, top: 0.19, laces: 0 }, { covers: ['foot'] }, title='Plate sabatons');
 
 // Each item's rows, in item order. The breastplate encloses the trunk and the greave the shin, so each hides that skin;
 // the shoulders stay drawn under the pauldrons, which ride the upper arm, and so do the arms and thighs, whose plates

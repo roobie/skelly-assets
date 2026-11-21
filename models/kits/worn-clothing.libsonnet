@@ -15,10 +15,10 @@ local hoodieShells = fit.torso('hoodie', { cloth: 'cloth-red', trim: 'cloth-char
 local jeansShells = fit.trousers('jeans', { cloth: 'cloth-pants-player', trim: 'cloth-charcoal' }, title=worn.groundTitle(ground, 'jeans'));
 // Rubber boots stand loose over trousers.
 local rubberBoots = fit.feet('rubber_boots', { upper: 'rubber-black', toe: 'rubber-black', sole: 'rubber-offblack', collar: 'rubber-offblack' },
-                             { l: 0.3, w: 0.13, s: 0.025, toe: 0.085, instep: 0.11, top: 0.405, laces: 0 }, { ease: 0.016, covers: ['sole'] }, worn.groundTitle(ground, 'rubber_boots'));
+                             { room: 0.03, w: 0.13, s: 0.025, toe: 0.085, instep: 0.02, top: 0.29, laces: 0 }, { ease: 0.016, covers: ['sole'] }, worn.groundTitle(ground, 'rubber_boots'));
 // High-tops: a shoe that stopped below the ankle bone would pass beneath it, so the probe would take it as covered.
 local sneakers = fit.feet('sneakers', { upper: 'cloth-pants-player', toe: 'rubber-black', sole: 'rubber-black', collar: 'rubber-black' },
-                          { l: 0.3, w: 0.13, s: 0.025, toe: 0.075, instep: 0.09, top: 0.18, laces: 0 }, title=worn.groundTitle(ground, 'sneakers'));
+                          { room: 0.03, w: 0.13, s: 0.025, toe: 0.075, instep: 0, top: 0.065, laces: 0 }, title=worn.groundTitle(ground, 'sneakers'));
 worn.shells(clothing(['fabric']), jacketShells.rows + hoodieShells.rows + jeansShells.rows)
 + worn.shells(clothing(['rubber']), rubberBoots.rows)
 + worn.shells(clothing(['fabric', 'rubber']), sneakers.rows)

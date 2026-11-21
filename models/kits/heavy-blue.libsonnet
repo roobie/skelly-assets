@@ -148,7 +148,7 @@ local gloves = fit.hands('gloves_heavy', gauntlet, {
   slots: { hand: 'hand', cuff: 'plate', hem: 'insignia', ridge: 'rivet' },
 }, 'Heavy gauntlets');
 local boots = fit.feet('boots_heavy', bootFinish,
-                       { l: 0.34, w: 0.15, s: 0.045, toe: 0.13, instep: 0.155, top: 0.325, shaft: 0.15, laces: 0 }, { covers: ['foot'] }, title='Heavy boots');
+                       { room: 0.07, w: 0.15, s: 0.045, toe: 0.13, instep: 0.065, top: 0.19, laces: 0 }, { covers: ['foot'] }, title='Heavy boots');
 local shaftGuard(row) =
   local shaft = find(row, 'shaft');
   oct('shaft-guard', 'toe', shaft.start + 0.015, shaft.end - 0.01, 0.185, 0.175, 0.03);
