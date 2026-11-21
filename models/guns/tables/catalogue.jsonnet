@@ -305,7 +305,7 @@ local ar15Item(id, role, params) =
     row('carry-bar', 'handle-bar', {}, 0.1),
     row('bipod', 'bipod', {}, 0.8),
     row('monopod', 'monopod', {}, 0.25),
-    // The SKS's parts share its cited 3.85 kg unloaded weight less the 0.3 kg of the bayonet it ships without (https://en.wikipedia.org/wiki/SKS).
+    // The SKS's parts share its cited 3.85 kg unloaded weight (https://en.wikipedia.org/wiki/SKS), less an estimated 0.3 kg for the bayonet it ships without.
     row('sks-receiver', 'sks-receiver', {}, 0.9),
     row('sks-bolt-carrier', 'sks-bolt-carrier', {}, 0.35),
     row('sks-barrel', 'sks-barrel', {}, 0.75),

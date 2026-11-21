@@ -5,6 +5,7 @@ import { ejectionAnchor, findSolid, frameAt, muzzlePortAnchor, stockAnchors } fr
 import { SKS_PROPORTIONS as P } from '../sksProportions.ts';
 import { tracedLine } from '../stockWood.ts';
 import { SKS_KNOB_ID } from './action.ts';
+import { SKS_NOSE_X } from './stock.ts';
 
 /** The knob's rear face at its middle, where the fingers take it to draw the carrier back. */
 const knobAnchor = (_params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
@@ -18,13 +19,12 @@ const knobAnchor = (_params: Readonly<Record<string, string>>, part: PartDef): G
 
 /**
  * Any stock's butt and hold, and the support hand under the fore-end, since the SKS's stock is its fore-end too. The
- * hand cups the belly midway between the magazine and the fore-end's nose, so it closes on the magazine's front no
- * more than it overhangs the nose.
+ * hand cups the belly midway between the magazine and the fore-end's nose, so it keeps the same margin from the
+ * magazine's front as from the nose.
  */
 const sksStockAnchors = (params: Readonly<Record<string, string>>, part: PartDef): GunPartAnchors => {
   const magazineFront = Math.max(...P.lower.magazine.map(([x]) => x));
-  const noseX = P.stock.top[P.stock.top.length - 1]![0];
-  const supportX = (magazineFront + noseX) / 2;
+  const supportX = (magazineFront + SKS_NOSE_X) / 2;
   return { ...stockAnchors(params, part), support: frameAt([supportX, tracedLine(P.stock.bottom)(supportX), 0]) };
 };
 

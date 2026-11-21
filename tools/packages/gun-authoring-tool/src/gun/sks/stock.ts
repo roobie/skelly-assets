@@ -10,6 +10,9 @@ import { mountPort } from './joints.ts';
 const S = P.stock;
 const MERGE_GROUP = 'sks-stock-wood';
 
+/** The fore-end's nose, where the stock's traced top line ends. */
+export const SKS_NOSE_X = S.top[S.top.length - 1]![0];
+
 type Inlet = (typeof S.inlets)[keyof typeof S.inlets];
 
 /** A metal part's channel through the wood's side profile, wherever a cell reaches into its span. */
@@ -56,8 +59,9 @@ export const sksStock: GunPartFamily = {
     // The plate's front face is raked like its back; the wood behind the toe's station is one wedge against it.
     const plateHeelX = heelX + plateU;
     const woodRearX = toeX + plateU;
-    const noseX = S.top[S.top.length - 1]![0];
-    const stations = [...S.top, ...S.bottom, ...S.halfWidth].map(([x]) => x).filter((x) => x > woodRearX && x < noseX);
+    const stations = [...S.top, ...S.bottom, ...S.halfWidth]
+      .map(([x]) => x)
+      .filter((x) => x > woodRearX && x < SKS_NOSE_X);
     const plate: readonly Vec2[] = [
       [toeX, bottom(toeX)],
       [woodRearX, bottom(woodRearX)],
@@ -65,7 +69,7 @@ export const sksStock: GunPartFamily = {
       [heelX, top(heelX)],
     ];
     const wood: Solid[] = [
-      ...woodRegion(contour, 'stock', [noseX, woodRearX], stations),
+      ...woodRegion(contour, 'stock', [SKS_NOSE_X, woodRearX], stations),
       woodCell(
         { mergeGroup: MERGE_GROUP, id: 'stock-heel', role: 'stock-heel' },
         [
