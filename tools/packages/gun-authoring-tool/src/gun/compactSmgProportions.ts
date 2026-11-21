@@ -3,6 +3,7 @@ import {
   type BoxMagazine,
   boxMagazinePieces,
   citedBarrel,
+  leaningFrame,
   leaningWell,
   stockReachU,
   type TracedSmgProportions,
@@ -36,6 +37,11 @@ const magwell = {
   y: [magazine.port[1] + magazine.body.y[0], receiverBottomU],
   ...leaningWell(magazine, { faceU: 0.05, sideU: 0.25 }),
 } as const;
+const housingBottomU = -5.75;
+// The housing's front runs down the well's leaning rear face, so no gap opens between them.
+const housingFront = [housingBottomU, receiverBottomU].map((y) =>
+  leaningFrame(magazine.port, magazine.leanDegrees).atLevel(magwell.x[0], y),
+);
 // The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
 // can rise in front of it.
 const magazineRearX = Math.min(...magazinePieces.flat().map(([x]) => x));
@@ -125,13 +131,7 @@ export const COMPACT_SMG_PROPORTIONS = {
   lower: {
     halfWidthU: 1.5,
     // The housing's flat bottom is the grip's mount face.
-    housing: [
-      [-20, -3.75],
-      [-18.5, -5.75],
-      [-7, -5.75],
-      [-7, receiverBottomU],
-      [-20, receiverBottomU],
-    ],
+    housing: [[-20, -3.75], [-18.5, housingBottomU], ...housingFront, [-20, receiverBottomU]],
     magwell,
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
