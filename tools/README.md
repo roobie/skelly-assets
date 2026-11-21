@@ -248,7 +248,11 @@ it becomes a clip. It draws through the posing page, `../site/pose.mjs`, which h
 the part it is drawn in, and compiles the file by `../site/poseFile.mjs`, `compilePose`, as the page does, so the
 sheet shows what the page shows. With `--probe` it marks where the pose shows the body through the garment
 (`../site/clearance.mjs`, `clearanceProbe`), and with `--skin` it draws what of the covered body each review view
-shows (`../site/skin.mjs`, `skinCheck`); see `../docs/decisions/0011-clearance-classified.md`. The clearance sweep,
+shows (`../site/skin.mjs`, `skinCheck`); see `../docs/decisions/0011-clearance-classified.md`. With `--doll` it draws
+another doll of the dressing, wearing the garments the player does, each piece placed on the part its doll's `slots` map
+its segment to: the garments are not fitted to that body, so what the sheet shows is how far they are from fitting
+it. A wearable the doll has no place for is refused with the reason, never stood on it as a loose prop; the fixtures
+name the player's bones, so such a doll stands at rest or takes a pose file written for its own rig. The clearance sweep,
 `clearance-sweep.mjs`, runs both on every wearable riding the doll's bones in every pose fixture, because a change
 to the doll or the rig moves every fit at once. The sheets and the sweep reach the showcase through one served site
 and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.

@@ -42,8 +42,32 @@ const ready = (async () => {
     fetch('rig.json').then((r) => r.json()),
   ]);
   registerModels(models);
-  return { models: new Map(models.map((model) => [model.id, model])), rig };
+  const byId = new Map(models.map((model) => [model.id, model]));
+  return { models: byId, rig, wornOf: (id) => ({ worn: byId.get(id)?.worn }) };
 })();
+
+// The page's data for the doll `doll`, the player's when none is named: another doll's rig and worn sites are its own
+// (site/build.mjs, dolls/), the models the tree's. A wearable the doll was not dressed in says why.
+const dolls = new Map();
+function dataOf(doll) {
+  if (doll === undefined) return ready;
+  if (!dolls.has(doll))
+    dolls.set(
+      doll,
+      Promise.all([
+        ready,
+        fetch(`dolls/${doll}.json`).then((r) => {
+          if (!r.ok) throw new Error(`no doll ${doll} in the built site`);
+          return r.json();
+        }),
+      ]).then(([{ models }, { worn, skipped, ...rig }]) => ({
+        models,
+        rig,
+        wornOf: (id) => ({ worn: worn[id], skipped: skipped[id] }),
+      })),
+    );
+  return dolls.get(doll);
+}
 
 const loadPoseFile = (name) =>
   fetch(`poses/${name}.json`).then((r) => {
@@ -58,13 +82,14 @@ const siteKey = ({ model, at, mirror, turn }) =>
 
 // The doll's own sites, first and in the rig's site order, and the worn pieces of each wearable. A wearable's `worn`
 // begins with the doll's sites (tools/dress.mjs, `wornSites`), which count once however many wearables are worn.
-function dressedSites({ models, rig }, wear) {
+function dressedSites({ rig, wornOf }, wear) {
   const sites = [...rig.doll];
   const seen = new Set(sites.map(siteKey));
   for (const id of wear) {
-    const model = models.get(id);
-    if (!model?.worn) throw new Error(`${id} is no wearable of the built tree`);
-    for (const site of model.worn) {
+    const { worn, skipped } = wornOf(id);
+    if (skipped) throw new Error(`${id} is not worn on ${rig.id}: ${skipped}`);
+    if (!worn) throw new Error(`${id} is no wearable of the built tree`);
+    for (const site of worn) {
       if (seen.has(siteKey(site))) continue;
       seen.add(siteKey(site));
       sites.push(site);
@@ -119,7 +144,7 @@ function worldMesh(object) {
 export async function buildFigure(data, wear) {
   const { rig } = data;
   const sites = dressedSites(data, wear);
-  const loaded = await loadEntry({ id: `posed ${wear.join(',') || 'doll'}`, sites });
+  const loaded = await loadEntry({ id: `posed ${rig.id} ${wear.join(',') || 'bare'}`, sites });
   const dressed = loaded.scene.clone(true);
   const groups = [...dressed.children];
   const root = new THREE.Group();
@@ -438,7 +463,7 @@ async function holdPose(figure, rig, file) {
 // the figure and its probe once.
 let kept;
 async function keptFigure(data, wear, skin) {
-  const key = JSON.stringify({ wear, skin });
+  const key = JSON.stringify({ doll: data.rig.id, wear, skin });
   if (kept?.key !== key) {
     const figure = await buildFigure(data, wear);
     if (skin) addCoveredSkin(figure, figure.clearance().surface);
@@ -452,6 +477,7 @@ async function keptFigure(data, wear, skin) {
 // `views` is `eye`, with the pieces that ride its bones, the compile report, the clearance probe's findings and the
 // skin check when asked, and the frame the pose compiled to.
 async function posed({
+  doll,
   wear = [],
   pose,
   size = 384,
@@ -460,7 +486,7 @@ async function posed({
   skin = false,
   focus,
 } = {}) {
-  const data = await ready;
+  const data = await dataOf(doll);
   const figure = await keptFigure(data, wear, skin);
   const file = typeof pose === 'string' ? await loadPoseFile(pose) : (pose ?? standing(data.rig));
   const { frame, report, carries } = await holdPose(figure, data.rig, file);
