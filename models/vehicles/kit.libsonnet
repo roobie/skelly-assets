@@ -42,14 +42,13 @@ local shoulderLugs(width, base, outer, count) = [
   for i in std.range(0, count - 1)
 ];
 local rad(degrees) = degrees * std.pi / 180;
-local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+local vec = (import 'packages/thing-authoring-tool/compound.libsonnet').vec;
+local add = vec.add, sub = vec.sub, dot = vec.dot, cross = vec.cross;
 local beyond(cut) = { normal: [-x for x in cut.normal], offset: -cut.offset };
 local inset(cut, depth) = cut { offset: cut.offset - depth * std.sqrt(dot(cut.normal, cut.normal)) };
 // The plane through three (x, y, z) points, as a normal and its offset; which side it faces is left to the caller.
 local planeThrough(a, b, c) =
-  local u = [b[i] - a[i] for i in [0, 1, 2]];
-  local v = [c[i] - a[i] for i in [0, 1, 2]];
-  local n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+  local n = cross(sub(b, a), sub(c, a));
   { normal: n, offset: dot(n, a) };
 // A cut reflected across the centre plane, onto the far side.
 local farCut(cut) = cut { normal: [cut.normal[0], cut.normal[1], -cut.normal[2]] };
@@ -170,7 +169,7 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
     local na = unit(a.normal);
     local nb = unit(b.normal);
     {
-      normal: [na[i] + nb[i] for i in [0, 1, 2]],
+      normal: add(na, nb),
       offset: a.offset / std.sqrt(dot(a.normal, a.normal)) + b.offset / std.sqrt(dot(b.normal, b.normal))
               - leg * std.sqrt(1 - std.pow(dot(na, nb), 2)),
     },
@@ -368,8 +367,8 @@ local far(piece) = piece + { id: piece.id + '_far' } + (
   moved(piece, by):
     local shift(profile, a, b) = [[p[0] + by[a], p[1] + by[b]] for p in profile];
     local cut = if std.objectHas(piece, 'clip') then { clip: [c { offset: c.offset + dot(c.normal, by) } for c in piece.clip] } else {};
-    (if piece.kind == 'box' then piece { min: [piece.min[i] + by[i] for i in [0, 1, 2]], max: [piece.max[i] + by[i] for i in [0, 1, 2]] }
-     else if piece.kind == 'turned' then piece { origin: [piece.origin[i] + by[i] for i in [0, 1, 2]] }
+    (if piece.kind == 'box' then piece { min: add(piece.min, by), max: add(piece.max, by) }
+     else if piece.kind == 'turned' then piece { origin: add(piece.origin, by) }
      else
        local along = { x: [0, 1, 2], y: [1, 2, 0], z: [2, 0, 1] }[piece.axis];
        piece { profile: shift(piece.profile, along[1], along[2]), start: piece.start + by[along[0]], end: piece.end + by[along[0]] })

@@ -16,7 +16,7 @@ it('hinges the boot lid on its top front edge, so it lifts its tail and never sw
     local spec = import 'models/vehicles/saloon.spec.libsonnet';
     frame.rows([row for row in body.rows('fixture', 'Fixture', spec) if row.id == 'fixture_boot_lid'])
   `,
-      resolve(import.meta.dirname, '../../../..'),
+      resolve(import.meta.dirname, '../../..'),
     ),
   );
   const loaded = loadCatalogue({

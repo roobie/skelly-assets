@@ -11,7 +11,7 @@ local girdle = (import 'models/girdle.libsonnet')(bust);
 local band = import 'models/head-band.libsonnet';
 local playerBust = import 'models/measures/bust.libsonnet';
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
-local sub(a, b) = [a[i] - b[i] for i in [0, 1, 2]];
+local sub = (import 'packages/thing-authoring-tool/compound.libsonnet').vec.sub;
 // The two dolls are drawn at one grain and in one skin, so they stand side by side alike.
 local grain = playerBust.voxelGrain;
 local skin = 'body-skin-player';

@@ -35,7 +35,7 @@ const { grain, vehicles, doorPairs, rows } = JSON.parse(
     rows: [row for row in rows if std.member(parts, row.id)],
   }
 `,
-    resolve(import.meta.dirname, '../../../..'),
+    resolve(import.meta.dirname, '../../..'),
   ),
 ) as {
   grain: number;

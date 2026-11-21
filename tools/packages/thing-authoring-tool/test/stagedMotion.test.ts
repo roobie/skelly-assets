@@ -25,7 +25,7 @@ const panel = (pins: string, motion: string, reach = 0.85) => {
     frame.rows([k.compound('panel', 20, [k.box('panel', 'paint', [-1, 0, 0.8], [0, 1, ${reach}])] + pins, { paint: 'paint-silver' },
       motion=${motion}) + { title: 'Panel' }])
   `,
-      resolve(import.meta.dirname, '../../../..'),
+      resolve(import.meta.dirname, '../../..'),
     ),
   );
   const loaded = loadCatalogue({
