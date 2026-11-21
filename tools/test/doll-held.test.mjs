@@ -447,6 +447,19 @@ test('at guard the bore points level and straight ahead', () => {
   }
 });
 
+// A shouldered gun is leaned into, so a guard that tips the chest or the head back, as a twist far round with a lean
+// or a tilt across it can, reads as recoiling from the gun.
+test('at guard the trunk and the head stand upright or lean forward, never back', () => {
+  assert.ok(stancesOf('guard').length > 0);
+  for (const name of stancesOf('guard')) {
+    const { posed } = gunStance(name);
+    for (const id of ['spine', 'head']) {
+      const back = -Math.asin(mulMV(posed.get(id).r, [0, 1, 0])[2]) * DEG;
+      assert.ok(back <= 1e-6, `${name}: the ${id} leans ${back.toFixed(1)}° back`);
+    }
+  }
+});
+
 test('at idle the muzzle points down ahead of the toes', () => {
   assert.ok(stancesOf('idle').length > 0);
   for (const name of stancesOf('idle')) {

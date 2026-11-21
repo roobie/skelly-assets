@@ -2,7 +2,7 @@
 // the figure and the figure so stood, so a frame's points are read off the figure as the pose file will stand it, the
 // head turned to look at a point, and the layout pose files are written in.
 import { decodeFrame } from '../site/clipFrames.mjs';
-import { add, applyPoint, boneTransforms, sub } from '../site/kinematics.mjs';
+import { add, applyPoint, boneTransforms, mulMV, sub } from '../site/kinematics.mjs';
 import { compilePose } from '../site/poseFile.mjs';
 
 const DEG = Math.PI / 180;
@@ -38,8 +38,16 @@ export function shoulderPoints(rig, angles) {
   return (hand, p) => applyPoint(chest, add(bone(bone(hand).reach.chain[0]).head, p));
 }
 
-// One axis of a look shared between two joints in proportion to how far each turns that way.
-const share = (angle, [lowA, highA], [lowB, highB]) => {
+// A look is turned again until its face misses by less than this many degrees on every axis, or for at most so many
+// passes, as one held past a joint's limit never closes.
+const LOOK_TOLERANCE = 0.01;
+const LOOK_PASSES = 32;
+
+// One axis of a look shared between two joints in proportion to how far each turns that way, past what each already
+// turns (`fromA`, `fromB`), so a neck jutted forward keeps less of its forward bend for the look.
+const share = (angle, limitsA, limitsB, fromA = 0, fromB = 0) => {
+  const [lowA, highA] = limitsA.map((limit) => limit - fromA),
+    [lowB, highB] = limitsB.map((limit) => limit - fromB);
   const a = angle >= 0 ? highA : -lowA,
     b = angle >= 0 ? highB : -lowB;
   return [(angle * a) / (a + b), (angle * b) / (a + b)];
@@ -49,29 +57,39 @@ const share = (angle, [lowA, highA], [lowB, highB]) => {
  * The neck and head angles that bring the eyes (the rig's `eye`, in the head's frame) onto `target` past the trunk's
  * own lean and twist, as `bearing` carries the head: tilted `tilt` degrees toward the figure's right, jutted forward by
  * the neck bending `jut` degrees forward and the head as far back, and leant `lean` degrees forward of the line the
- * eyes look along, as a head bowed over a stock looks out from under the brow. Turning the head moves the eyes, so the
- * aim is taken again from where they end.
+ * eyes look along, as a head bowed over a stock looks out from under the brow. The tilt and lean are the face's own,
+ * against the world's upright: each pass measures the posed face's heading, pitch and tilt and turns the look by what
+ * they miss, since the neck's and head's tilt is taken about the trunk's forward axis, and once the trunk twists away
+ * from the target, a tilt about that axis lifts the face and leans the head back. Turning the head moves the eyes, so
+ * the aim is taken again from where they end.
  */
 export function lookAt(rig, angles, target, { tilt = 0, jut = 0, lean = 0 } = {}) {
   const bone = (id) => rig.bones.find((b) => b.id === id);
-  const trunk = ['pelvis', 'spine'].map((id) => angles[id] ?? [0, 0, 0]);
-  const [neckTilt, headTilt] = share(tilt, bone('neck').limits.abduct, bone('head').limits.abduct);
   let pitch = 0,
     twist = 0,
+    roll = tilt,
     look;
-  for (let pass = 0; pass < 4; pass++) {
-    const [neckPitch, headPitch] = share(pitch, bone('neck').limits.flex, bone('head').limits.flex);
+  for (let pass = 0; pass < LOOK_PASSES; pass++) {
+    const [neckPitch, headPitch] = share(pitch, bone('neck').limits.flex, bone('head').limits.flex, jut, lean - jut);
     const [neckTwist, headTwist] = share(twist, bone('neck').limits.twist, bone('head').limits.twist);
+    const [neckTilt, headTilt] = share(roll, bone('neck').limits.abduct, bone('head').limits.abduct);
     look = {
       neck: r4([neckPitch + jut, neckTwist, neckTilt]),
       head: r4([headPitch - jut + lean, headTwist, headTilt]),
     };
-    const d = sub(
-      target,
-      applyPoint(posedAt(rig, { ...angles, ...look }).get('head'), add(bone('head').head, rig.eye)),
-    );
-    pitch = -Math.atan2(d[1], Math.hypot(d[0], d[2])) / DEG - trunk.reduce((sum, a) => sum + a[0], 0);
-    twist = Math.atan2(d[0], d[2]) / DEG - trunk.reduce((sum, a) => sum + a[1], 0);
+    const head = posedAt(rig, { ...angles, ...look }).get('head');
+    const d = sub(target, applyPoint(head, add(bone('head').head, rig.eye)));
+    const [x, y, z] = mulMV(head.r, [0, 0, 1]);
+    const up = mulMV(head.r, [0, 1, 0]);
+    const miss = [
+      -Math.atan2(d[1], Math.hypot(d[0], d[2])) / DEG + lean + Math.asin(y) / DEG,
+      (Math.atan2(d[0], d[2]) - Math.atan2(x, z)) / DEG,
+      tilt - Math.asin((x * up[2] - z * up[0]) / Math.hypot(x, z)) / DEG,
+    ];
+    if (miss.every((m) => Math.abs(m) < LOOK_TOLERANCE)) break;
+    pitch += miss[0];
+    twist += miss[1];
+    roll += miss[2];
   }
   return look;
 }
