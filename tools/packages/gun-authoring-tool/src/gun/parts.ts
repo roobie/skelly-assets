@@ -1014,13 +1014,22 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
 };
 
 /**
+ * A traced SMG receiver's right top corner in its section, as (y, z): from the top flat's edge down the shoulder to
+ * where the side stands upright.
+ */
+const tracedSmgShoulder = ({ topU, halfWidthU, chamferU, taper }: TracedSmgProportions['receiver']) =>
+  taper
+    ? { top: [topU, halfWidthU * taper.topWidthShare] as const, side: [taper.fromY, halfWidthU] as const }
+    : { top: [topU, halfWidthU - chamferU] as const, side: [topU - chamferU, halfWidthU] as const };
+
+/**
  * A traced SMG's chamfered box, narrowing toward its top where the table tapers it, its end cap clipped along the
  * traced slope. The cavity ends where the slope meets the roof, so the rear wall carries the whole slope.
  */
 const tracedSmgReceiverSection = ({ receiver, lower, magazine }: TracedSmgProportions) => {
   const { topU, bottomU, halfWidthU, chamferU, taper, rearX, frontX, endCapSlope } = receiver;
   const [y, z] = [[bottomU, topU] as const, [-halfWidthU, halfWidthU] as const];
-  const topFlatHalfWidth = taper ? halfWidthU * taper.topWidthShare : halfWidthU - chamferU;
+  const [, topFlatHalfWidth] = tracedSmgShoulder(receiver).top;
   const [[slopeX0, slopeY0], [slopeX1, slopeY1]] = [endCapSlope.from, endCapSlope.to];
   const slope = (slopeY1 - slopeY0) / (slopeX1 - slopeX0);
   return {
@@ -1844,13 +1853,71 @@ const tracedRailSolids = (id: string, rail: TracedRail, faces: RailFaces): Solid
 };
 
 /**
- * The rear lug the trigger housing pins to, the traced top rail, and the rear sight on its optional base, pierced
- * along the bore by its aperture.
+ * A rear sight's base clamped across a traced receiver's top: a plate over the top flat, as wide as the jaws that
+ * run down the shoulders on either side and bear on them.
+ */
+const tracedSmgSightClamp = (
+  receiver: TracedSmgProportions['receiver'],
+  { x, plateU, jawU, jawToY }: NonNullable<TracedSmgProportions['rearSight']['clamp']>,
+): Solid[] => {
+  const {
+    top: [topY, topZ],
+    side: [sideY, sideZ],
+  } = tracedSmgShoulder(receiver);
+  const jawFootZ = topZ + ((jawToY - topY) / (sideY - topY)) * (sideZ - topZ);
+  const outerZ = topZ + jawU;
+  const jaw = (side: string, sign: number): Solid => ({
+    id: `rear-sight-clamp-${side}`,
+    kind: 'extruded-polygon',
+    axis: 'x',
+    z: x,
+    profile: tracedProfile([
+      [topY, sign * topZ],
+      [topY, sign * outerZ],
+      [jawToY, sign * (jawFootZ + jawU)],
+      [jawToY, sign * jawFootZ],
+    ]),
+    slot: 'metal',
+  });
+  return [
+    metalSolid('rear-sight-clamp-plate', [x[0], topY, -outerZ], [x[1], topY + plateU, outerZ]),
+    jaw('left', -1),
+    jaw('right', 1),
+  ];
+};
+
+/** A rear sight's axle across the gun, one stub out of each side of the body it carries. */
+const tracedSmgSightAxle = (
+  bodyHalfWidth: number,
+  { centre: [x, y], radiusU, halfLengthU }: NonNullable<TracedSmgProportions['rearSight']['axle']>,
+): Solid[] =>
+  (
+    [
+      ['left', -halfLengthU, -bodyHalfWidth],
+      ['right', bodyHalfWidth, halfLengthU],
+    ] as const
+  ).map(([side, from, to]) => ({
+    id: `rear-sight-axle-${side}`,
+    kind: 'revolved',
+    axis: 'z',
+    origin: [x, y, 0],
+    profile: [
+      [from, 0],
+      [from, radiusU],
+      [to, radiusU],
+      [to, 0],
+    ],
+    slot: 'metal',
+  }));
+
+/**
+ * The rear lug the trigger housing pins to, the traced top rail, and the rear sight: its body pierced along the bore
+ * by its aperture, and the clamp, ears and axle a sight may carry.
  */
 const tracedSmgReceiverDetails = ({ receiver, lower, rearSight }: TracedSmgProportions): Solid[] => {
   const { rearLug } = receiver;
   const lugHalfWidth = lower.halfWidthU;
-  const { name, base, halfWidthU, aperture } = rearSight;
+  const { name, halfWidthU, aperture, clamp, ears, axle } = rearSight;
   const profile = tracedProfile(rearSight.profile);
   const cut = (plane: ClipPlane): Vec2[] =>
     clipPolygon(
@@ -1866,13 +1933,18 @@ const tracedSmgReceiverDetails = ({ receiver, lower, rearSight }: TracedSmgPropo
   return [
     solid('rear-lug', [rearLug.x[0], rearLug.y[0], -lugHalfWidth], [rearLug.x[1], rearLug.y[1], lugHalfWidth]),
     ...(receiver.rail ? tracedRailSolids('receiver-top-rail', receiver.rail, receiver) : []),
-    ...(base
-      ? [metalSolid('rear-sight-base', [base.x[0], base.y[0], -halfWidthU], [base.x[1], base.y[1], halfWidthU])]
-      : []),
     sightPiece('left', profile, [-halfWidthU, -aperture.halfU]),
     sightPiece('right', profile, [aperture.halfU, halfWidthU]),
     sightPiece('top', cut({ normal: [0, -1, 0], offset: -holeTop }), [-aperture.halfU, aperture.halfU]),
     sightPiece('bottom', cut({ normal: [0, 1, 0], offset: holeBottom }), [-aperture.halfU, aperture.halfU]),
+    ...(clamp ? tracedSmgSightClamp(receiver, clamp) : []),
+    ...(ears
+      ? [
+          sightPiece('ear-left', tracedProfile(ears.profile), [-ears.z[1], -ears.z[0]]),
+          sightPiece('ear-right', tracedProfile(ears.profile), ears.z),
+        ]
+      : []),
+    ...(axle ? tracedSmgSightAxle(halfWidthU, axle) : []),
   ];
 };
 

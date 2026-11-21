@@ -3,6 +3,7 @@ import {
   type BoxMagazine,
   boxMagazinePieces,
   citedBarrel,
+  discProfile,
   leaningFrame,
   leaningWell,
   stockReachU,
@@ -44,6 +45,8 @@ const housingFront = [housingBottomU, receiverBottomU].map((y) =>
 );
 // The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
 // can rise in front of it.
+// The rear sight's drum, whose centre its aperture and axle share, stands on its clamp's plate.
+const rearDrum = { centre: [-18.25, 4.25], radiusU: 0.75 } as const;
 const magazineRearX = Math.min(...magazinePieces.flat().map(([x]) => x));
 const boltTravelU = Math.ceil((barrel.breechU - magazineRearX) / GRID) * GRID;
 
@@ -87,22 +90,31 @@ export const COMPACT_SMG_PROPORTIONS = {
     // The block under the receiver's rear that the trigger housing pins to.
     rearLug: { x: [-23.25, -20], y: [-3.5, receiverBottomU] },
   },
-  // The drum is an inclined disc on its base; the photo shows its side.
+  // The rotary diopter: a drum turning on an axle across the gun, between two ears on a base clamped over the
+  // receiver's top. The photo shows the ears' side, rounded at the rear over the drum and with the axle's end at the
+  // drum's centre, and a front that slopes down from their peak.
   rearSight: {
     name: 'drum',
-    profile: [
-      [-18.75, 4],
-      [-16, 3.5],
-      [-15.5, 4.5],
-      [-17, 5],
-      [-18, 4.75],
-    ],
-    base: { x: [-19, -16.25], y: [3.25, 3.5] },
+    profile: discProfile(rearDrum.centre, rearDrum.radiusU, 16),
     halfWidthU: 0.75,
-    // The eye looks through a square hole across the drum's thickest part, at least one gun voxel each way.
-    aperture: { eyeX: -16.75, centreY: 4.25, halfU: 0.25 },
+    // The eye looks through a square hole across the drum's centre, at least one gun voxel each way.
+    aperture: { eyeX: rearDrum.centre[0], centreY: rearDrum.centre[1], halfU: 0.25 },
     // An estimate of the shooter's eye behind the drum with the cheek on the stock.
     eyeReliefU: 6,
+    clamp: { x: [-19, -16], plateU: 0.25, jawU: 0.25, jawToY: 2.75 },
+    ears: {
+      profile: [
+        [-19, 3.5],
+        [-16, 3.5],
+        [-15.75, 4.5],
+        [-17, 5],
+        [-18.25, 5],
+        [-18.75, 4.75],
+        [-19, 4.25],
+      ],
+      z: [0.75, 1.25],
+    },
+    axle: { centre: rearDrum.centre, radiusU: 0.25, halfLengthU: 1.5 },
   },
   // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port, a square section
   // centred on the bore that the receiver's floor just clears.

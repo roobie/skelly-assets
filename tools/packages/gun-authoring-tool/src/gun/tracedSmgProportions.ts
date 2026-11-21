@@ -24,6 +24,19 @@ export const forwardLeanDegrees = ([topX, topY]: Point, [bottomX, bottomY]: Poin
   (Math.atan2(bottomX - topX, topY - bottomY) * 180) / Math.PI;
 
 /**
+ * A disc's side profile as a regular polygon of `sides` corners around `centre`, counter-clockwise. As on a turned
+ * solid with sides, `radiusU` is the distance to each flat, and with a multiple of four sides the flats face up, down,
+ * forward and back, so the disc stands on its bottom flat.
+ */
+export const discProfile = ([centreX, centreY]: Point, radiusU: number, sides: number): Polygon => {
+  const cornerRadius = radiusU / Math.cos(Math.PI / sides);
+  return Array.from({ length: sides }, (_, index): Point => {
+    const angle = (Math.PI * (2 * index + 1)) / sides;
+    return [centreX + cornerRadius * Math.cos(angle), centreY + cornerRadius * Math.sin(angle)];
+  });
+};
+
+/**
  * A frame that leans forward by `leanDegrees` about `pivot`, for shapes authored upright: `leaned` turns an upright
  * point into the gun frame, `across` reads a gun-frame point's upright x, and `atLevel` is where the leaning line
  * through upright `x` crosses the level gun-frame height `y`.
@@ -174,11 +187,23 @@ export interface TracedSmgProportions {
   readonly rearSight: {
     /** Names the sight's solids, which the aperture splits into left, right, top and bottom pieces. */
     readonly name: string;
+    /** The side profile of the body the aperture pierces, standing `halfWidthU` either side of the bore's plane. */
     readonly profile: Polygon;
-    readonly base?: Box2;
     readonly halfWidthU: number;
     readonly aperture: { readonly eyeX: number; readonly centreY: number; readonly halfU: number };
     readonly eyeReliefU: number;
+    /**
+     * A base clamped across the receiver's top: a `plateU` thick plate over the top flat and, `jawU` thick, a jaw down
+     * each of the receiver's shoulders to `jawToY`.
+     */
+    readonly clamp?: { readonly x: Span; readonly plateU: number; readonly jawU: number; readonly jawToY: number };
+    /** Guards rising either side of the body: their side profile, standing `z` out from the bore's plane. */
+    readonly ears?: { readonly profile: Polygon; readonly z: Span };
+    /**
+     * The axle the body turns on, across the gun. It stands out of the body's sides to `halfLengthU` and not through
+     * the body, where the aperture crosses its line.
+     */
+    readonly axle?: { readonly centre: Point; readonly radiusU: number; readonly halfLengthU: number };
   };
   /** The bolt, centred on the bore: its length, its section's half-sizes and how far it recoils. */
   readonly bolt: {

@@ -27,6 +27,8 @@ A traced shape yields to a gun rule where the two disagree. The trigger guard is
 
 The receiver narrows toward its top, as the MP5's pressed-steel receiver does under its claw-mount top. The side photo shows where the taper starts, as the first upward-facing band, but not how wide the top is. The table gives that width as a share of the receiver's, so it stays a proportion of whatever width the receiver is traced to rather than a dimension the photo cannot support.
 
+The rear sight is the MP5's rotary drum diopter, because a bump on the receiver reads as no sight at all. The side photo shows only the ears: rounded at the rear over the drum, the axle's end at the drum's centre, and a front sloping down from their peak. The drum, its axle and the clamp's jaws are hidden behind them, so they are sized to fit what the photo shows: the drum fills the ears' rounded rear, and the clamp grips the tapered top that the sight sits on. The aperture crosses the drum at its centre, so the axle stops at the drum's sides rather than blocking the sight line. The drum is only a few gun voxels across, so the voxel export keeps its hole open but squares off its round.
+
 Some photo detail is beyond the build's primitives and stays a known difference. The hood is a ring around the bore's axis, so from the side it shows square corners where the photo's hood is rounded and tapers toward the top. Knurling on the knob and the sight wheel is finer than the gun voxel grain (`src/gun/gunVoxel.json`), so those surfaces are smooth.
 
 ## Parts and joins
