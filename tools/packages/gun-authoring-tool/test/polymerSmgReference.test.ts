@@ -1,4 +1,5 @@
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
+import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { IDENTITY } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
@@ -125,7 +126,12 @@ it('opens the receiver floor over the well opening from rear to front where the 
   }
 });
 
-it('runs the handguard on flush with the receiver front, top, bottom and sides', () => {
+const reach = (bounds: readonly (readonly [Vec3, Vec3])[], axis: 1 | 2) => [
+  Math.min(...bounds.map(([low]) => low[axis])),
+  Math.max(...bounds.map(([, high]) => high[axis])),
+];
+
+it('runs the handguard on flush with the receiver top and bottom, narrower than it as far as the nose block', () => {
   const { receiver } = POLYMER_SMG_PROPORTIONS;
   // The body's walls, without the rails standing off them or the metal tube inside.
   const walls = resolved.defs
@@ -134,12 +140,14 @@ it('runs the handguard on flush with the receiver front, top, bottom and sides',
       ['top', 'bottom', 'left', 'right'].some((face) => id === face || id.startsWith(`${face}-`)),
     )
     .map(localSolidBounds);
-  const reach = (axis: 1 | 2) => [
-    Math.min(...walls.map(([low]) => low[axis])),
-    Math.max(...walls.map(([, high]) => high[axis])),
-  ];
-  expect(reach(1)).toEqual([receiver.bottomU, receiver.topU]);
-  expect(reach(2)).toEqual([-receiver.halfWidthU, receiver.halfWidthU]);
+  const block = resolved.defs
+    .get('barrel')!
+    .solids.filter(({ id }) => id === 'front-sight-block')
+    .map(localSolidBounds);
+  expect(reach(walls, 1)).toEqual([receiver.bottomU, receiver.topU]);
+  const [, handguardHalfWidth] = reach(walls, 2);
+  expect(handguardHalfWidth).toBeLessThan(receiver.halfWidthU);
+  expect(reach(block, 2)).toEqual(reach(walls, 2));
 });
 
 it('refuses to collapse the skeleton stock, whose fold has no pose yet', () => {

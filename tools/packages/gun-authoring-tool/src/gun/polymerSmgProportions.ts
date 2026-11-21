@@ -15,7 +15,10 @@ const barrelTipPlainU = 15;
 const receiverRearX = -22.5;
 const receiverTopU = 3.5;
 const receiverBottomU = -2.5;
-const receiverHalfWidthU = 2.5;
+const receiverHalfWidthU = 2;
+const receiverChamferU = 0.25;
+// The handguard and the nose block it runs into are much narrower than the receiver behind them.
+const frontHalfWidthU = 1.5;
 // A straight box tilted forward along the reference's rear face, square at every corner: its top hides in the well,
 // which hugs it in thin walls down to about the guard's depth, and its floorplate stands proud of the body where the
 // reference's lands.
@@ -44,8 +47,8 @@ export const POLYMER_SMG_PROPORTIONS = {
     topU: receiverTopU,
     bottomU: receiverBottomU,
     halfWidthU: receiverHalfWidthU,
-    chamferU: 0.25,
-    topFlatHalfWidthU: 2.25,
+    chamferU: receiverChamferU,
+    topFlatHalfWidthU: receiverHalfWidthU - receiverChamferU,
     // A short chamfer rounds the slab's top rear edge into the stock hinge.
     endCapSlope: { from: [receiverRearX, 3], to: [-22, receiverTopU] },
     rearLug: { x: [receiverRearX, -22], y: [-3.25, -2.5] },
@@ -86,18 +89,18 @@ export const POLYMER_SMG_PROPORTIONS = {
   },
   // The handguard's nose block caps the cocking tube; a tall hood ring guards the post.
   frontSight: {
-    block: { x: [8.25, 12], y: [-2.75, 2.75], halfWidthU: 2.25 },
+    block: { x: [8.25, 12], y: [-2.75, 2.75], halfWidthU: frontHalfWidthU },
     tower: { x: [8.75, 11.25], y: [2.75, 4.5], halfWidthU: 1 },
     hood: { x: [8.75, 11.25], centreY: 5.5, outerRadiusU: 1, wallU: 0.25 },
     post: { x: [9.75, 10.25], baseY: 4.5, halfWidthU: 0.125 },
   },
-  // The reference runs the handguard on flush with the receiver's front, the cocking tube sunk in its top; slotted
-  // rails run along both sides and the bottom, ahead of the receiver and behind the nose block.
+  // The reference runs the handguard on flush with the receiver's top and bottom, the cocking tube sunk in its top;
+  // slotted rails run along both sides and the bottom, ahead of the receiver and behind the nose block.
   handguard: {
     lengthU: 8.25,
     topU: receiverTopU,
     bottomU: receiverBottomU,
-    halfWidthU: receiverHalfWidthU,
+    halfWidthU: frontHalfWidthU,
     rails: (['left', 'right', 'bottom'] as const).map((face) => ({
       face,
       x: [0.75, 7.5] as const,
@@ -109,12 +112,12 @@ export const POLYMER_SMG_PROPORTIONS = {
       toothLengthU: 0.5,
     })),
   },
-  // The same notched tube and knob as the compact SMG's, lower on the receiver; the knob stands off the wider
-  // handguard's side far enough to turn up into the notch clear of its top edge.
+  // The same notched tube and knob as the compact SMG's, lower on the receiver; the knob stands off the handguard's
+  // side far enough to turn up into the notch clear of its top edge.
   chargingHandle: {
     ...SMG_CHARGING_HANDLE,
     tube: { ...SMG_CHARGING_HANDLE.tube, centreY: 2 },
-    knob: { ...SMG_CHARGING_HANDLE.knob, radial: [3, 3.75] },
+    knob: { ...SMG_CHARGING_HANDLE.knob, radial: [2.25, 3] },
   },
   // One polymer piece: the housing, the large guard and the well, with the grip's front as the guard's rear.
   lower: {
