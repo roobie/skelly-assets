@@ -164,8 +164,8 @@ local can(damage) =
   // and the near side of the skirt swings out from the rim rather than into it.
   local tipAxis = [away[1], 0, -away[0]];
   local pivot = if d.tip == 0 then [0, 0, 0] else [away[0] * skirtIn, -lid.skirt, away[1] * skirtIn];
-  local turn(v) = local c = cosd(d.tip), s = sind(d.tip), k = tipAxis, kv = k[0] * v[0] + k[1] * v[1] + k[2] * v[2];
-    local cross = [k[1] * v[2] - k[2] * v[1], k[2] * v[0] - k[0] * v[2], k[0] * v[1] - k[1] * v[0]];
+  local turn(v) = local c = cosd(d.tip), s = sind(d.tip), k = tipAxis, kv = h.vec.dot(k, v);
+    local cross = h.vec.cross(k, v);
     [v[i] * c + cross[i] * s + k[i] * kv * (1 - c) for i in [0, 1, 2]];
   {
     exportMass: 'parts',
