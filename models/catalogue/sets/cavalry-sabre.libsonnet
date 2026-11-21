@@ -49,20 +49,23 @@ local wire = { pitch: 0.008, width: 0.0025, proud: grain, slant: 0.004 };
 local backstrap = { thickness: 0.003, halfWidth: 0.006 };
 local cap = { proud: 0.002, crown: 0.4 };
 // The plate's outline across the blade, [y, z]: narrow on the spine side where the quillon leaves it and broad on the
-// edge side and outward (+z), where the bow and the branches spring from it.
-local plateOutline = [[0.016, -0.009], [0.016, 0.009], [-0.012, 0.026], [-0.05, 0.024], [-0.058, 0.008], [-0.058, -0.007], [-0.046, -0.011]];
-// The bow's line in the hilt's frame, [along the grip from the plate, out from its axis toward the spine], and its bar's
-// width in its plane and thickness across it. It stands far enough off the grip for a closed hand inside it.
+// edge side and outward (+z), where the bow and the branches spring from it. It covers the grip's end and the
+// backstrap's, which run into it.
+local plateOutline = [[0.02, -0.013], [0.02, 0.009], [-0.012, 0.026], [-0.05, 0.024], [-0.058, 0.008], [-0.058, -0.007], [-0.046, -0.013]];
+// The bow springs from the plate's mid-plane at `root`, [y], and runs on through `line` in the hilt's frame, [along the
+// grip from the plate, out from its axis toward the spine], to end inside the cap. Its bar is `width` in its plane and
+// `thickness` across it. It stands far enough off the grip for a closed hand inside it.
 local bow = {
-  line: [[0, -0.05], [0.012, -0.058], [0.04, -0.062], [0.075, -0.058], [0.1, -0.046], [0.114, -0.03], [0.118, -0.017]],
+  root: -0.05,
+  line: [[0.012, -0.058], [0.04, -0.062], [0.075, -0.058], [0.1, -0.046], [0.114, -0.03], [0.121, -0.013]],
   width: 0.006,
   thickness: 0.008,
 };
-// Each branch from the plate's outer side, out round the outside of the hand to the bow, as [along, out, across] points
-// in the hilt's frame.
+// Each branch springs from the plate's mid-plane on its outer side at `root`, [y, z], and runs round the outside of
+// the hand through `line`, [along, out, across] in the hilt's frame, to end inside the bow.
 local branches = [
-  [[0.002, -0.016, 0.022], [0.018, -0.03, 0.034], [0.038, -0.048, 0.024], [0.05, -0.058, 0.004]],
-  [[0.002, -0.036, 0.022], [0.03, -0.046, 0.032], [0.062, -0.056, 0.02], [0.08, -0.057, 0.003]],
+  { root: [-0.016, 0.022], line: [[0.018, -0.03, 0.034], [0.038, -0.048, 0.024], [0.05, -0.061, 0.0015]] },
+  { root: [-0.036, 0.022], line: [[0.03, -0.046, 0.032], [0.062, -0.056, 0.02], [0.08, -0.056, 0.0015]] },
 ];
 local branchSize = { width: 0.005, thickness: 0.005 };
 // The rear quillon curls back from the plate's spine side toward the hand, ending in a ball, as [x, y] points.
@@ -92,13 +95,16 @@ local backDepth(x) = if x <= pointStart then 0 else tipDrop * std.pow((x - point
 local edgeDepth(x) =
   if x <= pointStart then baseWidth + (tipWidth - baseWidth) * x / pointStart
   else tipDrop + (tipWidth - tipDrop) * (1 - std.pow((x - pointStart) / pointLength, 2));
+// Inside the plate the section is the shoulder's.
 local at(x, share) =
-  local n = inward(x), d = backDepth(x) + share * (edgeDepth(x) - backDepth(x));
-  [x + d * n[0], backY(x) + d * n[1]];
+  local c = std.max(x, 0);
+  local n = inward(c), d = backDepth(c) + share * (edgeDepth(c) - backDepth(c));
+  [x + d * n[0], backY(c) + d * n[1]];
 local bodySteps = 60;
 local pointSteps = 8;
 // The fuller's end and the false edge's start are stations, so each band changes at a segment's end.
-local stations = std.set([pointStart * i / bodySteps for i in std.range(0, bodySteps)]
+// The first station is inside the plate, so the blade runs into it rather than meeting its face.
+local stations = std.set([-plateThickness / 2] + [pointStart * i / bodySteps for i in std.range(0, bodySteps)]
                          + [pointStart + pointLength * i / pointSteps for i in std.range(1, pointSteps)]
                          + [fullerLength, falseEdgeStart]);
 local last = std.length(stations) - 1;
@@ -134,59 +140,24 @@ local alongDir = [-std.cos(cant), -std.sin(cant)];
 local outDir = [-std.sin(cant), std.cos(cant)];
 local hiltXY(p) = [origin[0] + p[0] * alongDir[0] + p[1] * outDir[0], origin[1] + p[0] * alongDir[1] + p[1] * outDir[1]];
 local hiltXYZ(p) = hiltXY(p) + [p[2]];
-// A block in the hilt's frame from `along` a0 to a1 and `out` o0 to o1, across z within halfZ, its four long edges
-// chamfered by `chamfer` so its section is an octagon.
-local hiltBlock(id, slot, a0, a1, o0, o1, halfZ, chamfer) =
-  local mid = (o0 + o1) / 2, half = (o1 - o0) / 2;
+// The planes chamfering the four long edges of a piece lying along the grip, its section's middle `mid` out from the
+// axis and each plane `reach` from it as out and across add up, so the section is an octagon.
+local chamfers(mid, reach) =
   local centre = hiltXY([0, mid]);
-  local offset = half + halfZ - chamfer;
-  h.prism(id, slot, 'z', [hiltXY([a0, o0]), hiltXY([a1, o0]), hiltXY([a1, o1]), hiltXY([a0, o1])], -halfZ, halfZ) + {
-    clip: [
-      local n = [so * outDir[0], so * outDir[1], sz];
-      { normal: n, offset: n[0] * centre[0] + n[1] * centre[1] + offset }
-      for so in [1, -1]
-      for sz in [1, -1]
-    ],
-  };
-
-// A straight bar of rectangular section from p to q, its width lying across `normal`'s plane and its thickness along
-// it, overrunning each end by half its width so a chain of them meets without a gap at a bend. A convex prism cannot
-// lie askew, so it is the box round the bar cut down by the bar's six faces.
-local sub(a, b) = [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-local cross(a, b) = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-local unit(a) = local l = std.sqrt(dot(a, a)); [a[0] / l, a[1] / l, a[2] / l];
-local bar(id, slot, p, q, width, thickness, normal) =
-  local d = sub(q, p), length = std.sqrt(dot(d, d));
-  local along = unit(d), side = unit(cross(along, normal)), up = cross(side, along);
-  local centre = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
-  local faces = [[along, length / 2 + width / 2], [side, width / 2], [up, thickness / 2]];
-  local corners = [
-    [centre[k] + a * faces[0][0][k] * faces[0][1] + b * faces[1][0][k] * faces[1][1] + c * faces[2][0][k] * faces[2][1] for k in [0, 1, 2]]
-    for a in [1, -1]
-    for b in [1, -1]
-    for c in [1, -1]
-  ];
-  local low = [std.minArray([c[k] for c in corners]) for k in [0, 1, 2]];
-  local high = [std.maxArray([c[k] for c in corners]) for k in [0, 1, 2]];
-  h.prism(id, slot, 'z', [[low[0], low[1]], [high[0], low[1]], [high[0], high[1]], [low[0], high[1]]], low[2], high[2]) + {
-    clip: [
-      local n = [s * f[0][k] for k in [0, 1, 2]];
-      { normal: n, offset: dot(n, centre) + f[1] }
-      for f in faces
-      for s in [1, -1]
-    ],
-  };
-// A bar bent along 3D points, one straight bar per run; the bend's plane at each run is the plane of the run and the
-// next, so the width lies along the curve.
-local bentBar(prefix, slot, points, width, thickness) =
-  local n = std.length(points);
   [
-    local a = points[std.max(i - 1, 0)], b = points[i], c = points[i + 1], e = points[std.min(i + 2, n - 1)];
-    local plane = cross(sub(c, b), sub(if i + 2 < n then e else c, a));
-    bar('%s-%d' % [prefix, i], slot, b, c, width, thickness, if dot(plane, plane) > 1e-12 then plane else [0, 0, 1])
-    for i in std.range(0, n - 2)
+    local n = [so * outDir[0], so * outDir[1], sz];
+    { normal: n, offset: n[0] * centre[0] + n[1] * centre[1] + reach }
+    for so in [1, -1]
+    for sz in [1, -1]
   ];
+// A block in the hilt's frame from `along` a0 to a1 and `out` o0 to o1, across z within halfZ, its four long edges
+// chamfered by `chamfer`.
+local hiltBlock(id, slot, a0, a1, o0, o1, halfZ, chamfer) =
+  h.prism(id, slot, 'z', [hiltXY([a0, o0]), hiltXY([a1, o0]), hiltXY([a1, o1]), hiltXY([a0, o1])], -halfZ, halfZ)
+  + { clip: chamfers((o0 + o1) / 2, (o1 - o0) / 2 + halfZ - chamfer) };
+// The grip and the backstrap start this far into the plate, at its mid-plane, so their canted ends sink into it whole
+// and no seam opens against its flat face.
+local seat = -plateThickness / 2;
 
 local capStart = gripLength;
 local capEnd = gripLength + capLength;
@@ -203,44 +174,35 @@ local capOutline = [
   [capStart + capLength * 0.6, strapTop],
   [capStart, strapTop],
 ];
-local capCentre = hiltXY([0, (strapTop + capBottom) / 2]);
+assert plateOutline[0][0] >= strapTop : 'the backstrap stands above the plate it runs into';
 local turns = std.floor(gripLength / wire.pitch);
 local wireOffset = (gripLength - (turns - 1) * wire.pitch - wire.width - wire.slant) / 2;
 // One turn of wire round the grip, slanting along it from the edge side to the spine as a wrap does.
 local wireTurn(k) =
   local a = wireOffset + k * wire.pitch, half = grip.halfHeight + wire.proud, halfZ = grip.halfWidth + wire.proud;
-  local centre = hiltXY([0, 0]), offset = grip.halfHeight + grip.halfWidth - grip.chamfer + wire.proud;
   h.prism('wire-%d' % k, 'wire', 'z',
           [hiltXY([a, -half]), hiltXY([a + wire.width, -half]), hiltXY([a + wire.width + wire.slant, half]), hiltXY([a + wire.slant, half])],
-          -halfZ, halfZ) + {
-    clip: [
-      local n = [so * outDir[0], so * outDir[1], sz];
-      { normal: n, offset: n[0] * centre[0] + n[1] * centre[1] + offset }
-      for so in [1, -1]
-      for sz in [1, -1]
-    ],
-  };
+          -halfZ, halfZ)
+  + { clip: chamfers(0, grip.halfHeight + grip.halfWidth - grip.chamfer + wire.proud) };
+// The bars' roots stand on the plate's mid-plane, where the plate holds them whatever the cant.
+local midPlate = -plateThickness / 2;
 
 local hilt = [
   h.prism('plate', 'guard', 'x', plateOutline, -plateThickness, 0),
+  // The held grip is only the part the hand closes on; its seat inside the plate is a piece of its own.
   hiltBlock('grip', 'grip', 0, gripLength, -grip.halfHeight, grip.halfHeight, grip.halfWidth, grip.chamfer),
+  hiltBlock('grip-seat', 'grip', seat, 0, -grip.halfHeight, grip.halfHeight, grip.halfWidth, grip.chamfer),
   h.prism('backstrap', 'guard', 'z',
-          [hiltXY([0, grip.halfHeight - grain]), hiltXY([capStart, grip.halfHeight - grain]), hiltXY([capStart, strapTop]), hiltXY([0, strapTop])],
+          [hiltXY([seat, grip.halfHeight - grain]), hiltXY([capStart, grip.halfHeight - grain]), hiltXY([capStart, strapTop]), hiltXY([seat, strapTop])],
           -backstrap.halfWidth, backstrap.halfWidth),
-  h.prism('cap', 'guard', 'z', [hiltXY(p) for p in capOutline], -capHalfZ, capHalfZ) + {
-    clip: [
-      local n = [so * outDir[0], so * outDir[1], sz];
-      { normal: n, offset: n[0] * capCentre[0] + n[1] * capCentre[1] + (strapTop - capBottom) / 2 + capHalfZ - grip.chamfer }
-      for so in [1, -1]
-      for sz in [1, -1]
-    ],
-  },
+  h.prism('cap', 'guard', 'z', [hiltXY(p) for p in capOutline], -capHalfZ, capHalfZ)
+  + { clip: chamfers((strapTop + capBottom) / 2, (strapTop - capBottom) / 2 + capHalfZ - grip.chamfer) },
   h.ball('quillon-finial', 'guard', quillon.finial, quillon.line[3][0], quillon.line[3][1], 0),
 ] + [wireTurn(k) for k in std.range(0, turns - 1)]
-+ h.bend('bow', 'guard', [hiltXY(p) for p in bow.line], bow.width, -bow.thickness / 2, bow.thickness / 2)
++ h.bend('bow', 'guard', [[midPlate, bow.root]] + [hiltXY(p) for p in bow.line], bow.width, -bow.thickness / 2, bow.thickness / 2)
 + h.bend('quillon', 'guard', quillon.line, quillon.width, -quillon.thickness / 2, quillon.thickness / 2)
 + std.flattenArrays([
-  bentBar('branch-%d' % i, 'guard', [hiltXYZ(p) for p in branches[i]], branchSize.width, branchSize.thickness)
+  h.bentBar('branch-%d' % i, 'guard', [[midPlate] + branches[i].root] + [hiltXYZ(p) for p in branches[i].line], branchSize.width, branchSize.thickness)
   for i in std.range(0, std.length(branches) - 1)
 ]);
 
@@ -259,9 +221,10 @@ local edgeAt = stationAt(bladeLength * 2 / 3);
     grip: 'leather-black',
     wire: 'brass-dull',
   }) + h.gripOn('cavalry_sabre', 'grip') + {
-    // Held as the other blades are, unrolled with its edge down and its point ahead: a tool's quarter roll would turn
-    // the edge to one side. The palm centres on the grip, between the plate and the cap.
-    handling+: { fraction: [0.5, 0.5, 0.5], hold: 'forward', roll: 0 },
+    // Held as the other blades are, unrolled with its edge down and along its grip: a tool's quarter roll would turn
+    // the edge to one side. Their grips lie along their blades; this one is canted, so the hand follows the grip and
+    // the point drops by the cant. The palm centres on the grip, between the plate and the cap.
+    handling+: { fraction: [0.5, 0.5, 0.5], turn: [0, 0, -gripCantDeg], hold: 'forward', roll: 0 },
     title: 'Cavalry sabre',
     voxelGrain: grain,
     taxonomy: { category: 'weapons', tags: { weapon: ['blade'], material: ['metal'] }, keywords: ['sword', 'melee', 'military'] },
