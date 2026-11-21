@@ -1,9 +1,11 @@
 import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
 import {
   citedBarrel,
+  forwardLeanDegrees,
   leaningWell,
   type StraightMagazine,
   stockReachU,
+  straightMagazinePieces,
   wellOpeningAtLevel,
 } from './tracedSmgProportions.ts';
 
@@ -13,16 +15,14 @@ const barrelTipPlainU = 15;
 const receiverRearX = -22.5;
 const receiverTopU = 3.5;
 const receiverBottomU = -2.5;
-// A straight box tilted forward: its top hides in the well, which hugs it in thin walls down to about the guard's
-// depth.
+// A straight box tilted forward along the reference's rear face, square at every corner: its top hides in the well,
+// which hugs it in thin walls down to about the guard's depth, and its floorplate stands proud of the body where the
+// reference's lands.
 const magazine = {
   port: [-7, -3],
-  body: [
-    [-9, -3],
-    [-5.25, -3],
-    [-1.5, -20],
-    [-5.25, -20],
-  ],
+  leanDegrees: forwardLeanDegrees([-9, -3], [-5.25, -20]),
+  body: { x: [-2, 1.75], y: [-17, 0] },
+  floorplate: { x: [-2.25, 2], y: [-17.75, -17] },
   halfWidthU: 1,
 } as const satisfies StraightMagazine;
 const magwell = {
@@ -165,19 +165,10 @@ export const POLYMER_SMG_PROPORTIONS = {
       ],
     ],
   },
-  // The floorplate stands proud of the body.
   magazine: {
     port: magazine.port,
     halfWidthU: magazine.halfWidthU,
-    pieces: [
-      magazine.body,
-      [
-        [-5.5, -20],
-        [-1.25, -20],
-        [-1.25, -20.75],
-        [-5.5, -20.75],
-      ],
-    ],
+    pieces: straightMagazinePieces(magazine),
   },
   // The side-folding skeleton stock, traced extended: an open frame of bars between a hinge block on the
   // receiver's rear face and the butt plate. The overall length runs from the muzzle tip to the plate's rear face.

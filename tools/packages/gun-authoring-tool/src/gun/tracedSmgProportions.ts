@@ -43,32 +43,48 @@ export const leaningFrame = ([pivotX, pivotY]: Point, leanDegrees: number) => {
   };
 };
 
-/** A straight magazine's body, traced rear top, front top, front bottom, rear bottom, and the port it hangs from. */
+/**
+ * A straight box magazine authored upright in its own frame, x forward and y up its axis from the port, and leaned
+ * forward by `leanDegrees` about the port: every corner stays square.
+ */
 export interface StraightMagazine {
   readonly port: Point;
-  readonly body: readonly [Point, Point, Point, Point];
+  readonly leanDegrees: number;
+  readonly body: Box2;
+  readonly floorplate: Box2;
   readonly halfWidthU: number;
 }
 
+/** The straight magazine's body and floorplate, leaned into the gun frame. */
+export const straightMagazinePieces = ({ port, leanDegrees, body, floorplate }: StraightMagazine): Polygon[] => {
+  const { leaned } = leaningFrame(port, leanDegrees);
+  const [portX, portY] = port;
+  return [body, floorplate].map(({ x: [x0, x1], y: [y0, y1] }) =>
+    (
+      [
+        [x0, y1],
+        [x0, y0],
+        [x1, y0],
+        [x1, y1],
+      ] as const
+    ).map(([x, y]) => leaned(portX + x, portY + y)),
+  );
+};
+
 /**
- * The lean and opening of a well that hugs a straight magazine: it leans along the body's rear face about the port,
- * and its opening clears the body by `faceU` across the lean and by `sideU` at each side.
+ * The lean and opening of a well that hugs a straight magazine: it leans with the magazine about the port, and its
+ * opening clears the body by `faceU` front and rear and by `sideU` at each side.
  */
 export const leaningWell = (
-  { port, body, halfWidthU }: StraightMagazine,
+  { port: [portX], leanDegrees, body, halfWidthU }: StraightMagazine,
   clearance: { readonly faceU: number; readonly sideU: number },
-) => {
-  const [rearTop, , , rearBottom] = body;
-  const leanDegrees = forwardLeanDegrees(rearTop, rearBottom);
-  const across = body.map(leaningFrame(port, leanDegrees).across);
-  return {
-    leanDegrees,
-    opening: {
-      x: [Math.min(...across) - clearance.faceU, Math.max(...across) + clearance.faceU] as const,
-      halfWidthU: halfWidthU + clearance.sideU,
-    },
-  };
-};
+) => ({
+  leanDegrees,
+  opening: {
+    x: [portX + body.x[0] - clearance.faceU, portX + body.x[1] + clearance.faceU] as const,
+    halfWidthU: halfWidthU + clearance.sideU,
+  },
+});
 
 /** Where a leaning well's opening crosses the level height `y`, rear to front, rounded out to the grid. */
 export const wellOpeningAtLevel = (

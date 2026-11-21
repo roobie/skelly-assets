@@ -1,6 +1,7 @@
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { IDENTITY } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { beforeAll, expect, it } from 'vitest';
 import { FAMILIES } from '../src/gun/parts.ts';
 import { POLYMER_SMG_PROPORTIONS } from '../src/gun/polymerSmgProportions.ts';
@@ -52,6 +53,41 @@ it('hugs the leaning magazine body inside the well opening, front, rear and side
   expectSnugClearance(Math.min(...across) - opening.x[0]);
   expectSnugClearance(opening.x[1] - Math.max(...across));
   expectSnugClearance(opening.halfWidthU - magazine.halfWidthU);
+});
+
+/** The unit direction of each edge of a part's traced prism, wound counter-clockwise. */
+const edgeDirections = (part: string, solidId: string): Vec2[] => {
+  const solid = resolved.defs.get(part)!.solids.find(({ id }) => id === solidId)!;
+  if (solid.kind !== 'extruded-polygon') {
+    throw new Error(`${part}'s ${solidId} is a traced prism.`);
+  }
+  return solid.profile.map(([x0, y0], index) => {
+    const [x1, y1] = solid.profile[(index + 1) % solid.profile.length]!;
+    const length = Math.hypot(x1 - x0, y1 - y0);
+    return [(x1 - x0) / length, (y1 - y0) / length];
+  });
+};
+/** The direction of a traced prism's bottom face: wound counter-clockwise, it is the edge running most forward. */
+const bottomFace = (part: string, solidId: string): Vec2 =>
+  edgeDirections(part, solidId).reduce((best, edge) => (edge[0] > best[0] ? edge : best));
+const cross = ([ax, ay]: Vec2, [bx, by]: Vec2): number => ax * by - ay * bx;
+
+it('builds the magazine as a box square at every corner, its floorplate square to its sides', () => {
+  const body = edgeDirections('magazine', 'body-1');
+  const plate = edgeDirections('magazine', 'body-2');
+  for (const [index, edge] of body.entries()) {
+    const next = body[(index + 1) % body.length]!;
+    expect(Math.abs(edge[0] * next[0] + edge[1] * next[1])).toBeLessThan(1e-9);
+  }
+  for (const edge of plate) {
+    expect(Math.min(Math.abs(cross(edge, body[0]!)), Math.abs(cross(edge, body[1]!)))).toBeLessThan(1e-9);
+  }
+});
+
+it('cuts the well mouth parallel to the magazine floorplate', () => {
+  const floorplate = bottomFace('magazine', 'body-2');
+  expect(Math.abs(cross(bottomFace('lower', 'well-rear'), floorplate))).toBeLessThan(1e-9);
+  expect(Math.abs(cross(bottomFace('lower', 'well-front'), floorplate))).toBeLessThan(1e-9);
 });
 
 it('keeps the magazine path an exact leaning prism, not a box', () => {
