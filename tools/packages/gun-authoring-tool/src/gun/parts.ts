@@ -796,6 +796,9 @@ interface CarrierFit {
   readonly frameId?: string | undefined;
   readonly section?: string | undefined;
 }
+/** The traced SMG whose bolt a carrier is: an SMG carrier in a traced section; any other carrier is undefined. */
+const tracedCarrier = (pattern: string | undefined, section: unknown): TracedSmgProportions | undefined =>
+  pattern === 'smg' ? tracedSmgFor(section) : undefined;
 /** A traced SMG's bolt, centred on the bore, with its origin on the bolt's face. */
 const tracedSmgCarrierEnvelope = ({ bolt }: TracedSmgProportions): CarrierEnvelope => ({
   x: [0, bolt.lengthU],
@@ -803,8 +806,8 @@ const tracedSmgCarrierEnvelope = ({ bolt }: TracedSmgProportions): CarrierEnvelo
   z: [-bolt.halfWidthU, bolt.halfWidthU],
 });
 const carrierEnvelope = (pattern: BoltCarrierPattern, { frameId, section }: CarrierFit = {}): CarrierEnvelope => {
-  const traced = tracedSmgFor(section);
-  if (pattern === 'smg' && traced) {
+  const traced = tracedCarrier(pattern, section);
+  if (traced) {
     return tracedSmgCarrierEnvelope(traced);
   }
   return pattern === 'ar' ? arCarrierEnvelope(arLayoutFor(frameId)) : BOLT_CARRIER_ENVELOPES[pattern];
@@ -946,7 +949,7 @@ const carrierHandleStyleFor = (params: Readonly<Record<string, string>>): Carrie
 
 const carrierAxisY = (pattern: BoltCarrierPattern, receiverDrop: number, section?: string): number => {
   let y = 1.25;
-  if (pattern === 'smg' && isTracedSmgSection(section)) {
+  if (tracedCarrier(pattern, section)) {
     y = 0;
   } else if (pattern === 'ak') {
     y = AK_PROPORTIONS.carrierAxisU;
@@ -2146,12 +2149,13 @@ const receiver: PartFamily = {
     const carrierPattern = carrierPatternFor(params);
     const carrierFit = { frameId: arLayout?.frameId, section: params.section };
     const traced = tracedSmgFor(params.section);
+    const tracedBolt = tracedCarrier(carrierPattern, params.section);
     // A carrier whose face closes on a known breech rests with its face there.
     let breechX: number | undefined;
     if (params.section === 'ar') {
       breechX = frontFaceX - arLayout!.barrelExtensionLengthU;
-    } else if (traced && carrierPattern === 'smg') {
-      breechX = traced.barrel.breechU;
+    } else if (tracedBolt) {
+      breechX = tracedBolt.barrel.breechU;
     }
     const baseTravel = { ...BOLT_TRAVEL[receiverTravelClass(params)], length: carrierTravelLength(params) };
     const travel: BoltTravel =
@@ -2159,10 +2163,9 @@ const receiver: PartFamily = {
         ? baseTravel
         : { ...baseTravel, restX: breechX + carrierEnvelope(carrierPattern, carrierFit).x[0] };
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
-    const portWindow =
-      traced && carrierPattern === 'smg'
-        ? caseEjectionPortWindow(traced.chamberedCase, traced.barrel.breechU, travel.length, carrierY)
-        : ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
+    const portWindow = tracedBolt
+      ? caseEjectionPortWindow(tracedBolt.chamberedCase, tracedBolt.barrel.breechU, travel.length, carrierY)
+      : ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
     const context: ReceiverContext = {
       params,
       bore,
