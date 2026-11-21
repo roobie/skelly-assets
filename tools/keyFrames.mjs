@@ -39,9 +39,10 @@ export function shoulderPoints(rig, angles) {
 }
 
 // A look is turned again until its face misses by less than this many degrees on every axis, or for at most so many
-// passes, as one held past a joint's limit never closes.
+// passes, as one held past a joint's limit never closes. A head bowed and tilted at once overshoots each pass by a
+// little less than it did the last, so it closes slowly.
 const LOOK_TOLERANCE = 0.01;
-const LOOK_PASSES = 32;
+const LOOK_PASSES = 96;
 
 // One axis of a look shared between two joints in proportion to how far each turns that way, past what each already
 // turns (`fromA`, `fromB`), so a neck jutted forward keeps less of its forward bend for the look.
@@ -61,7 +62,8 @@ const share = (angle, limitsA, limitsB, fromA = 0, fromB = 0) => {
  * against the world's upright: each pass measures the posed face's heading, pitch and tilt and turns the look by what
  * they miss, since the neck's and head's tilt is taken about the trunk's forward axis, and once the trunk twists away
  * from the target, a tilt about that axis lifts the face and leans the head back. Turning the head moves the eyes, so
- * the aim is taken again from where they end.
+ * the aim is taken again from where they end. A look that never settles throws, so a target out of the neck's and
+ * head's reach fails the pose rather than writing a head left wherever the last pass turned it.
  */
 export function lookAt(rig, angles, target, { tilt = 0, jut = 0, lean = 0 } = {}) {
   const bone = (id) => rig.bones.find((b) => b.id === id);
@@ -86,12 +88,12 @@ export function lookAt(rig, angles, target, { tilt = 0, jut = 0, lean = 0 } = {}
       (Math.atan2(d[0], d[2]) - Math.atan2(x, z)) / DEG,
       tilt - Math.asin((x * up[2] - z * up[0]) / Math.hypot(x, z)) / DEG,
     ];
-    if (miss.every((m) => Math.abs(m) < LOOK_TOLERANCE)) break;
+    if (miss.every((m) => Math.abs(m) < LOOK_TOLERANCE)) return look;
     pitch += miss[0];
     twist += miss[1];
     roll += miss[2];
   }
-  return look;
+  throw new Error(`the eyes do not settle on [${target}] in ${LOOK_PASSES} passes, the look ${JSON.stringify(look)}`);
 }
 
 // A pose file's JSON laid out as the hand-written ones are: one key per line, each value on its key's line while it fits.
