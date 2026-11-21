@@ -1774,6 +1774,32 @@ interface RailFaces {
  * A traced rail's base strip and its teeth, standing out of one face of a body. Each tooth starts on the pitch
  * from the rail's rear end; one that would overhang the rail's front end is left off.
  */
+/** A box with axial pockets cut through it; one no pocket reaches stays a box. */
+const pocketedBox = (id: string, min: Vec3, max: Vec3, pockets: readonly SectionPocket[]): Solid[] => {
+  const reaching = pockets.filter(({ x, y, z }) =>
+    [x, y, z].every(([low, high], axis) => low < max[axis]! && high > min[axis]!),
+  );
+  if (reaching.length === 0) {
+    return [solid(id, min, max)];
+  }
+  const [[x0, y0, z0], [x1, y1, z1]] = [min, max];
+  return subtractAxialPockets(
+    {
+      id,
+      kind: 'extruded-polygon',
+      axis: 'x',
+      z: [x0, x1],
+      profile: [
+        [y0, z0],
+        [y1, z0],
+        [y1, z1],
+        [y0, z1],
+      ],
+    },
+    reaching,
+  );
+};
+
 const tracedRailSolids = (id: string, rail: TracedRail, faces: RailFaces): Solid[] => {
   const outward = rail.face === 'bottom' || rail.face === 'left' ? -1 : 1;
   const faceU = { top: faces.topU, bottom: faces.bottomU, left: -faces.halfWidthU, right: faces.halfWidthU }[rail.face];
@@ -2614,6 +2640,8 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
     metalSolid(id, [from, y + half - GRID, z - half], [to, y + half, z + half - GRID]);
   const leftWall = (id: string, from: number, to: number) =>
     metalSolid(id, [from, y - half + GRID, z - half], [to, y + half - GRID, z - half + GRID]);
+  const stemReach = smgChargingHandleFor(section).knob.radial[0];
+  const stemSlot = [y - SMG_HANDLE_STEM_SLOT_HALF_U, y + SMG_HANDLE_STEM_SLOT_HALF_U] as const;
   return {
     solids: [
       metalSolid('smg-cocking-tube-bottom', [0, y - half, z - half], [tubeEnd, y - half + GRID, z + half]),
@@ -2631,6 +2659,17 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
       [restX, y + SMG_HANDLE_STEM_SLOT_HALF_U + 2 * GRID, z - half],
       'smg-handle',
     ),
+    // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the stem's turn up
+    // into the notch.
+    channel: [
+      { x: [0, tubeEnd], y: [y - half, y + half], z: [z - half, z + half] },
+      { x: [slotRearX, slotFrontX], y: stemSlot, z: [z - stemReach, z - half] },
+      {
+        x: [slotRearX, notchFrontX],
+        y: [stemSlot[0], y + stemReach],
+        z: [z - stemReach, z + SMG_HANDLE_STEM_SLOT_HALF_U],
+      },
+    ] satisfies SectionPocket[],
   };
 };
 
@@ -4513,7 +4552,8 @@ const handguard: PartFamily = {
       bodySolids = akHandguardSolids(len);
     } else {
       bodySolids = [
-        solid('top', [0, inner, -outerZ], [len, topY, outerZ]),
+        // A cocking tube sunk into the top leaves its channel open.
+        ...pocketedBox('top', [0, inner, -outerZ], [len, topY, outerZ], cockingTube?.channel ?? []),
         solid('bottom', [0, bottomY, -outerZ], [len, -inner, outerZ]),
         solid('left', [0, -inner, -outerZ], [len, inner, -inner]),
         solid('right', [0, -inner, inner], [len, inner, outerZ]),

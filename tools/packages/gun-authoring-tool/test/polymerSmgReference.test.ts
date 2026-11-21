@@ -125,6 +125,23 @@ it('opens the receiver floor over the well opening from rear to front where the 
   }
 });
 
+it('runs the handguard on flush with the receiver front, top, bottom and sides', () => {
+  const { receiver } = POLYMER_SMG_PROPORTIONS;
+  // The body's walls, without the rails standing off them or the metal tube inside.
+  const walls = resolved.defs
+    .get('handguard')!
+    .solids.filter(({ id }) =>
+      ['top', 'bottom', 'left', 'right'].some((face) => id === face || id.startsWith(`${face}-`)),
+    )
+    .map(localSolidBounds);
+  const reach = (axis: 1 | 2) => [
+    Math.min(...walls.map(([low]) => low[axis])),
+    Math.max(...walls.map(([, high]) => high[axis])),
+  ];
+  expect(reach(1)).toEqual([receiver.bottomU, receiver.topU]);
+  expect(reach(2)).toEqual([-receiver.halfWidthU, receiver.halfWidthU]);
+});
+
 it('refuses to collapse the skeleton stock, whose fold has no pose yet', () => {
   expect(() => FAMILIES.stock!.build({ style: 'skeleton-folding', pose: 'collapsed' })).toThrow(/collapsed/);
 });
