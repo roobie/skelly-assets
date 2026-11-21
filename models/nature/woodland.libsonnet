@@ -3,15 +3,8 @@
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local grown = import 'grown.libsonnet';
 local s = import 'woodland.spec.libsonnet';
-local add(a, b) = [a[i] + b[i] for i in [0, 1, 2]];
-local mul(a, k) = [v * k for v in a];
-local dot(a, b) = std.sum([a[i] * b[i] for i in [0, 1, 2]]);
-local cross(a, b) = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-local unit(a) = mul(a, 1 / std.sqrt(dot(a, a)));
+local add = h.vec.add, mul = h.vec.mul, dot = h.vec.dot, cross = h.vec.cross, unit = h.vec.unit;
 local polar(radius, angle, y=0) = [radius * std.cos(angle), y, radius * std.sin(angle)];
-local flat(id, slot, lo, hi, planes) = h.prism(id, slot, 'y', [
-  [lo[2], lo[0]], [lo[2], hi[0]], [hi[2], hi[0]], [hi[2], lo[0]],
-], lo[1], hi[1]) + { clip: planes };
 // A tapered octagonal branch between authored endpoints. Caps and radial planes form one convex solid;
 // no rotation feature or general hull primitive is added to the exporter.
 local branch(id, slot, a, b, r0, r1, floor=s.rootFloor) =
@@ -23,7 +16,7 @@ local branch(id, slot, a, b, r0, r1, floor=s.rootFloor) =
   local radius = std.max(r0, r1) * 1.1;
   local lo = [std.min(a[i], b[i]) - radius for i in [0, 1, 2]];
   local hi = [std.max(a[i], b[i]) + radius for i in [0, 1, 2]];
-  flat(id, slot, lo, hi, [
+  h.clipped(id, slot, lo, hi, [
     { normal: mul(d, -1), offset: -dot(d, a) }, { normal: d, offset: dot(d, b) },
     { normal: [0, -1, 0], offset: -floor },
   ] + [
@@ -35,7 +28,7 @@ local branch(id, slot, a, b, r0, r1, floor=s.rootFloor) =
 // Faceted opaque crown/rock volumes. Unequal plane offsets give authored asymmetry without runtime randomness.
 local lump(id, slot, c, r, seed, floor=-100) =
   local lo = [c[i] - r[i] for i in [0, 1, 2]], hi = [c[i] + r[i] for i in [0, 1, 2]];
-  flat(id, slot, lo, hi, [{ normal: [0, -1, 0], offset: -floor }] + [
+  h.clipped(id, slot, lo, hi, [{ normal: [0, -1, 0], offset: -floor }] + [
     local length = std.sqrt(x * x + y * y + z * z);
     local n = [x / r[0] / length, y / r[1] / length, z / r[2] / length];
     local skew = if length == 1 then 0 else 0.08 * std.sin(seed * 2.3 + x * 1.7 + y * 3.1 + z * 2.7);
@@ -136,7 +129,7 @@ local grassBlade(i) =
   local height = 0.28 + (i % 5) * 0.055;
   local outline = [[-0.035, 0], [0.035, 0], [0.18, height * 0.6], [0.24, height]];
   local min = [base[0] - 0.3, 0, base[2] - 0.3], max = [base[0] + 0.3, height, base[2] + 0.3];
-  flat('blade-%d' % i, 'leaf', min, max, [
+  h.clipped('blade-%d' % i, 'leaf', min, max, [
     { normal: n, offset: dot(n, base) + 0.02 }, { normal: mul(n, -1), offset: -dot(n, base) + 0.02 },
   ] + [
     local p = outline[j], q = outline[(j + 1) % 4];

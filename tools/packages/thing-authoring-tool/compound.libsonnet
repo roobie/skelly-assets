@@ -96,6 +96,54 @@ local turnedMiddle(p, i) =
     local c = std.cos(std.pi / 8), s = std.sin(std.pi / 8);
     $.bend(prefix + '-wide', slot, pts, [2 * c * q for q in rs], z - s * depth, z + s * depth)
     + $.bend(prefix + '-deep', slot, pts, [2 * s * q for q in rs], z - c * depth, z + c * depth),
+  // Arithmetic on [x, y, z] points and directions, for the rows that lay pieces askew.
+  vec: {
+    add(a, b): [a[i] + b[i] for i in [0, 1, 2]],
+    sub(a, b): [a[i] - b[i] for i in [0, 1, 2]],
+    mul(a, k): [v * k for v in a],
+    dot(a, b): std.sum([a[i] * b[i] for i in [0, 1, 2]]),
+    cross(a, b): [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+    unit(a): self.mul(a, 1 / std.sqrt(self.dot(a, a))),
+  },
+  // A convex solid cut from the box `lo`..`hi` by `planes`, each keeping dot(normal, p) <= offset. A prism lies along
+  // an axis and cannot turn, so this is how a piece lies askew.
+  clipped(id, slot, lo, hi, planes):
+    $.prism(id, slot, 'y', [[lo[2], lo[0]], [lo[2], hi[0]], [hi[2], hi[0]], [hi[2], lo[0]]], lo[1], hi[1]) + { clip: planes },
+  // A straight bar of rectangular section from `p` to `q` at any slant, its width lying in the plane `normal` is
+  // normal to and its thickness along it.
+  slantBar(id, slot, p, q, width, thickness, normal):
+    local v = $.vec;
+    local d = v.sub(q, p), length = std.sqrt(v.dot(d, d));
+    local along = v.unit(d), side = v.unit(v.cross(along, normal)), up = v.cross(side, along);
+    local centre = v.mul(v.add(p, q), 0.5);
+    local faces = [[along, length / 2], [side, width / 2], [up, thickness / 2]];
+    local corners = [
+      v.add(centre, v.add(v.mul(along, a * length / 2), v.add(v.mul(side, b * width / 2), v.mul(up, c * thickness / 2))))
+      for a in [1, -1]
+      for b in [1, -1]
+      for c in [1, -1]
+    ];
+    $.clipped(id, slot, [std.minArray([c[k] for c in corners]) for k in [0, 1, 2]], [std.maxArray([c[k] for c in corners]) for k in [0, 1, 2]], [
+      local n = v.mul(f[0], s);
+      { normal: n, offset: v.dot(n, centre) + f[1] }
+      for f in faces
+      for s in [1, -1]
+    ]),
+  // A bar of rectangular section bent along [x, y, z] points, one slanted bar per run. Each run's width lies in the
+  // plane of it and the next, so the width follows the curve, and runs overrun each inner joint by half the width so
+  // the joints close; the chain's two ends stop at their points, to seat inside what they meet.
+  bentBar(prefix, slot, points, width, thickness):
+    local v = $.vec, n = std.length(points);
+    [
+      local a = points[std.max(i - 1, 0)], b = points[i], c = points[i + 1], e = points[std.min(i + 2, n - 1)];
+      local plane = v.cross(v.sub(c, b), v.sub(if i + 2 < n then e else c, a));
+      local overrun = v.mul(v.unit(v.sub(c, b)), width / 2);
+      $.slantBar('%s-%d' % [prefix, i], slot,
+                 if i > 0 then v.sub(b, overrun) else b,
+                 if i + 2 < n then v.add(c, overrun) else c,
+                 width, thickness, if v.dot(plane, plane) > 1e-12 then plane else [0, 0, 1])
+      for i in std.range(0, n - 2)
+    ],
   // A syringe lying along x with its needle cap at +x, for a vaccine, an oil dose or a drawn injection. `dose` is the
   // filled share of the barrel. Slots: barrel, dose, stopper, plunger, hub, cap.
   syringe(length, radius, dose=0.8, capLength=null):
