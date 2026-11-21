@@ -12,7 +12,7 @@ const receiverBottomU = -2;
  * section's handle takes its knob and notch turn, and a traced gun overrides only what its reference shows differently.
  */
 export const SMG_CHARGING_HANDLE = {
-  tube: { centreY: 2.5, halfU: 0.75 },
+  tube: { centreY: 2.5, halfU: 0.75, rearX: 0 },
   // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
   // hand space clears the receiver's front face.
   notchX: 1,

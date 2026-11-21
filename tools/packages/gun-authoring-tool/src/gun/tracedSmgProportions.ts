@@ -189,7 +189,8 @@ export interface TracedSmgProportions {
     readonly rails?: readonly TracedRail[];
   };
   readonly chargingHandle: {
-    readonly tube: { readonly centreY: number; readonly halfU: number };
+    /** `rearX` is the tube's rear end from the receiver's front face; a negative one runs it back into the receiver. */
+    readonly tube: { readonly centreY: number; readonly halfU: number; readonly rearX: number };
     readonly notchX: number;
     readonly knob: { readonly radiusU: number; readonly radial: Span; readonly rimRoundU: number };
     readonly notchTurnDegrees: number;

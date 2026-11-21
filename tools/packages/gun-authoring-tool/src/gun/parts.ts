@@ -1927,6 +1927,12 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
       z: [-PUMP_LOADING_PORT_HALF_WIDTH_U, PUMP_LOADING_PORT_HALF_WIDTH_U],
     });
   }
+  // A traced SMG's cocking tube may run back into the receiver, which leaves its channel open there.
+  const tracedTubeGun = tracedSmgFor(params.section);
+  if (tracedTubeGun) {
+    const { channel } = tracedSmgCockingTube(tracedTubeGun, params.section);
+    internalPockets.push(...channel.filter(({ x }) => x[0] < frontFaceX));
+  }
   const shell = receiverShellSolids({
     section: params.section ?? 'standard',
     feed: params.feed!,
@@ -2623,26 +2629,35 @@ const SMG_HANDLE_STEM_SLOT_HALF_U = GRID;
 const SMG_HANDLE_STEM_HALF_U = GRID - BOLT_CARRIER_RUNNING_CLEARANCE_U;
 
 /**
- * The cocking tube's outer half-square, slot length and the wall left between the slot's front and the tube's.
- * A traced SMG's slot runs from its traced notch forward until the knob's hand space meets the front sight
- * block; other tubes keep a one-GRID wall round the handle's bore and at the slot's front.
+ * The cocking tube's outer half-square, rear end, slot length and the wall left between the slot's front and the
+ * tube's. A traced SMG's tube starts where its table puts it, and its slot runs from its traced notch forward until
+ * the knob's hand space meets the front sight block; other tubes start at the receiver's front face and keep a
+ * one-GRID wall round the handle's bore and at the slot's front.
  */
 const smgTubeFor = (
   section: string | undefined,
-): { readonly halfU: number; readonly slotLengthU: number; readonly frontWallU: number } => {
+): { readonly halfU: number; readonly rearX: number; readonly slotLengthU: number; readonly frontWallU: number } => {
   const traced = tracedSmgFor(section);
   if (!traced) {
-    return { halfU: 2 * GRID, slotLengthU: SMG_HANDLE_PROPORTIONS.generic.slotLengthU, frontWallU: GRID };
+    return { halfU: 2 * GRID, rearX: 0, slotLengthU: SMG_HANDLE_PROPORTIONS.generic.slotLengthU, frontWallU: GRID };
   }
   const { chargingHandle, frontSight, handguard } = traced;
   const restX = frontSight.block.x[0] - chargingHandle.knob.radiusU - CARRIER_HANDLE_STYLES.smg.handClearanceU;
   const slotFrontX = restX + SMG_HANDLE_STEM_SLOT_HALF_U;
   return {
     halfU: chargingHandle.tube.halfU,
+    rearX: chargingHandle.tube.rearX,
     slotLengthU: slotFrontX - (chargingHandle.notchX - SMG_HANDLE_STEM_SLOT_HALF_U),
     frontWallU: handguard.lengthU - slotFrontX,
   };
 };
+
+/**
+ * The handle's path volumes are boxes round its whole sweep. A tube run back into the receiver takes the stem through
+ * the receiver's carved slot and notch, which is its real path there, so the receiver may stand inside those boxes.
+ */
+const smgHandlePathAllowance = (section: string | undefined, allowPort: string) =>
+  smgTubeFor(section).rearX < 0 ? { allowPort, allowFamilies: ['receiver'] } : allowPort;
 
 /** Travel and notch turn; the stem's share takes its part of the slot's length. */
 const smgHandleTravel = (section: string | undefined): { readonly travelU: number; readonly turnDegrees: number } => {
@@ -2659,17 +2674,17 @@ const smgHandleTravel = (section: string | undefined): { readonly travelU: numbe
 };
 
 /**
- * A square cocking tube from the receiver's front face to `tubeEnd`, slotted on the shooter's left and
- * notched upward at the slot's rear end. `centre` is the bore axis's y and z in the handguard frame.
+ * A square cocking tube from its rear end to `tubeEnd`, slotted on the shooter's left and notched upward at the
+ * slot's rear end. `centre` is the bore axis's y and z in the handguard frame.
  */
 const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], section: string | undefined) => {
-  const { slotLengthU, halfU: half, frontWallU } = smgTubeFor(section);
+  const { slotLengthU, halfU: half, rearX, frontWallU } = smgTubeFor(section);
   const { travelU } = smgHandleTravel(section);
   const [y, z] = centre;
   // A wall strip closes the slot's front end, so the handle rests inside the tube.
   const slotFrontX = tubeEnd - frontWallU;
   const slotRearX = slotFrontX - slotLengthU;
-  if (slotRearX < GRID) {
+  if (slotRearX < rearX + GRID) {
     throw new RangeError('The SMG handle slot does not fit its cocking tube.');
   }
   const notchFrontX = slotRearX + 2 * SMG_HANDLE_STEM_SLOT_HALF_U;
@@ -2682,11 +2697,11 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
   const stemSlot = [y - SMG_HANDLE_STEM_SLOT_HALF_U, y + SMG_HANDLE_STEM_SLOT_HALF_U] as const;
   return {
     solids: [
-      metalSolid('smg-cocking-tube-bottom', [0, y - half, z - half], [tubeEnd, y - half + GRID, z + half]),
-      metalSolid('smg-cocking-tube-far', [0, y - half + GRID, z + half - GRID], [tubeEnd, y + half, z + half]),
-      topWall('smg-cocking-tube-top-rear', 0, slotRearX),
+      metalSolid('smg-cocking-tube-bottom', [rearX, y - half, z - half], [tubeEnd, y - half + GRID, z + half]),
+      metalSolid('smg-cocking-tube-far', [rearX, y - half + GRID, z + half - GRID], [tubeEnd, y + half, z + half]),
+      topWall('smg-cocking-tube-top-rear', rearX, slotRearX),
       topWall('smg-cocking-tube-top-front', notchFrontX, tubeEnd),
-      leftWall('smg-cocking-tube-left-rear', 0, slotRearX),
+      leftWall('smg-cocking-tube-left-rear', rearX, slotRearX),
       leftWall('smg-cocking-tube-left-front', slotFrontX, tubeEnd),
     ],
     mount: [restX, y, z] as Vec3,
@@ -2695,13 +2710,13 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
       'smg-handle-travel',
       [restX - travelU, y - SMG_HANDLE_STEM_SLOT_HALF_U, z - half - 1],
       [restX, y + SMG_HANDLE_STEM_SLOT_HALF_U + 2 * GRID, z - half],
-      'smg-handle',
+      smgHandlePathAllowance(section, 'smg-handle'),
     ),
     // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the notch. The notch
     // is the box bounding the tube's whole upper-left quarter, not the stem's sweep, so it holds any notch turn up to
     // the right angle `smgHandleTravel` allows.
     channel: [
-      { x: [0, tubeEnd], y: [y - half, y + half], z: [z - half, z + half] },
+      { x: [rearX, tubeEnd], y: [y - half, y + half], z: [z - half, z + half] },
       { x: [slotRearX, slotFrontX], y: stemSlot, z: [z - stemReach, z - half] },
       {
         x: [slotRearX, notchFrontX],
@@ -2711,6 +2726,10 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
     ] satisfies SectionPocket[],
   };
 };
+
+/** A traced SMG's cocking tube runs centred over the bore to its handguard's front, where the sight block caps it. */
+const tracedSmgCockingTube = (traced: TracedSmgProportions, section: string | undefined) =>
+  smgCockingTube(traced.handguard.lengthU, [traced.chargingHandle.tube.centreY, 0], section);
 
 const smgHandleShape = (section: string | undefined): Solid[] => {
   const { radiusU, radial, rimRoundU } = smgChargingHandleFor(section).knob;
@@ -2770,7 +2789,7 @@ const smgSlidingHandle: PartFamily = {
           'smg-handle-sweep',
           [minimum[0] - clearance, Math.max(minimum[1] - clearance, -0.25), minimum[2] - clearance],
           [maximum[0] + travel + clearance, maximum[1] + clearance, maximum[2] + clearance],
-          'mount',
+          smgHandlePathAllowance(params.section, 'mount'),
         ),
       ],
       axes: [],
@@ -4529,12 +4548,11 @@ const handguard: PartFamily = {
     const handleStyleKey = (params.handleStyle ?? 'none') as keyof typeof CARRIER_HANDLE_STYLES;
     const handleStyle = CARRIER_HANDLE_STYLES[handleStyleKey];
     const hasCockingTube = handleStyle.owner === 'handguard' && handleStyle.shape === 'mp5-cocking-tube';
-    // A traced SMG's tube runs centred over the bore to the front sight block, which caps it.
     const { halfU: tubeHalf } = smgTubeFor(params.section);
-    const tracedTube = tracedSmgFor(params.section)?.chargingHandle.tube;
+    const tracedTubeGun = tracedSmgFor(params.section);
     let cockingTube: ReturnType<typeof smgCockingTube> | undefined;
-    if (hasCockingTube && tracedTube) {
-      cockingTube = smgCockingTube(len, [tracedTube.centreY, 0], params.section);
+    if (hasCockingTube && tracedTubeGun) {
+      cockingTube = tracedSmgCockingTube(tracedTubeGun, params.section);
     } else if (hasCockingTube) {
       cockingTube = smgCockingTube(
         len - SMG_HANDLE_FRONT_CLEARANCE_U,

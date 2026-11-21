@@ -82,8 +82,9 @@ export const POLYMER_SMG_PROPORTIONS = {
   },
   // Closed on the breech, the bolt fills the whole ejection port, as the reference shows it through the opening.
   // It is centred on the bore, so it stands as far below the bore as the port's top stands above it. It recoils as
-  // far as the cocking handle's slot lets the handle pull it, which leaves the spent case under the port.
-  bolt: { lengthU: 9.25, halfHeightU: 1.5, halfWidthU: 1.25, travelU: 6.25 },
+  // far as the cocking handle's slot lets the handle pull it, which takes its face behind the magazine's opening and
+  // leaves the spent case under the port.
+  bolt: { lengthU: 9.25, halfHeightU: 1.5, halfWidthU: 1.25, travelU: 8.25 },
   // The UMP9's published rate (Heckler & Koch UMP, Wikipedia): slower than the compact SMG's, as its long travel needs.
   cyclicRpm: 700,
   // The reference's dark opening inside the port's frame, which stands a little above the bore.
@@ -120,12 +121,15 @@ export const POLYMER_SMG_PROPORTIONS = {
       toothLengthU: 0.5,
     })),
   },
-  // The same notched tube and knob as the compact SMG's, lower on the receiver; the knob stands off the handguard's
-  // side far enough to turn up into the notch clear of its top edge.
+  // The same notched tube and knob as the compact SMG's, lower on the receiver. The reference's slot reaches back to
+  // about -2, into the receiver; the tube stops at the closed bolt's face, which it would otherwise overlap, so the
+  // notch sits one wall ahead of that. The knob stands off the receiver's wider side far enough to turn up into that
+  // notch clear of its top edge.
   chargingHandle: {
     ...SMG_CHARGING_HANDLE,
-    tube: { ...SMG_CHARGING_HANDLE.tube, centreY: 2 },
-    knob: { ...SMG_CHARGING_HANDLE.knob, radial: [2.25, 3] },
+    tube: { ...SMG_CHARGING_HANDLE.tube, centreY: 2, rearX: -1.5 },
+    notchX: -1,
+    knob: { ...SMG_CHARGING_HANDLE.knob, radial: [2.5, 3.25] },
   },
   // One polymer piece: the housing, the large guard and the well, with the grip's front as the guard's rear.
   lower: {

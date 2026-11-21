@@ -3,7 +3,7 @@ import { boundsOfPoints, obbPolyhedron, worldSolid } from '@skelly/construct/sha
 import { describe, expect, it } from 'vitest';
 import { BOLT_CARRIER_RUNNING_CLEARANCE_U, RECEIVER_SECTION_WALL_U } from '../src/gun/parts.ts';
 import { TRACED_SMG_SECTIONS, type TracedSmgSection } from '../src/gun/tracedSmgSections.ts';
-import { NINE_MM_CASE, owner, resolveDesign } from './tracedSmgFixture.ts';
+import { NINE_MM_CASE, owner, resolveDesign, worldXs } from './tracedSmgFixture.ts';
 
 const worldBounds = (section: TracedSmgSection, family: string, solidId: string): readonly [Vec3, Vec3] => {
   const resolved = resolveDesign(`${section}.json`);
@@ -45,6 +45,10 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
   const [travelRear, travelFront] = span('bolt-travel', 0);
   // The closed bolt's face, carried back by the built travel, is where it stops in recoil.
   const faceAtRecoil = high[0] - (travelFront - travelRear);
+
+  it('recoils the bolt’s face behind the magazine, so the next round can rise in front of it', () => {
+    expect(faceAtRecoil).toBeLessThanOrEqual(Math.min(...worldXs(resolved, 'magazine')));
+  });
 
   describe('its ejection port', () => {
     const port = { x: span('ejection', 0), y: span('ejection', 1) };
