@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { evaluateJsonnetAsync } from '../../../jsonnet/index.mjs';
-import { evaluateRow } from '../server/evaluateRow.ts';
+import { evaluateHalf } from '../server/evaluateRow.ts';
 
 // One row of each kind of row file: an authored set, a numbered batch, a code-built kit and a vehicle.
 const IDS = ['katana', 'fruit_press', 'armor_trooper_worn_upper', 'saloon_shell'];
@@ -15,5 +15,5 @@ it('evaluates a row from its own file as the whole catalogue has it', { timeout:
     ),
   ) as { id: string }[];
   expect(catalogue.map(({ id }) => id).sort()).toEqual([...IDS].sort());
-  for (const row of catalogue) expect(await evaluateRow({ item: row.id })).toEqual({ item: row });
+  for (const row of catalogue) expect(await evaluateHalf('item', row.id)).toEqual({ value: row });
 });

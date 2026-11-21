@@ -9,7 +9,8 @@
       header { padding: 0.8rem 1rem; display: flex; align-items: center; gap: 1rem; }
       h1 { font-size: 1rem; margin: 0; }
       canvas { display: block; width: 100vw; height: calc(100vh - 4rem); }
-      #error, #compile-error { color: #ffb3a8; white-space: pre-wrap; }
+      #error, #compile-error, #row-error { color: #ffb3a8; white-space: pre-wrap; }
+      #row-error::before { content: 'Recipe row: '; font-weight: bold; }
     </style>
   </head>
   <body>
@@ -19,6 +20,7 @@
       <span>Drag to orbit and change elevation. Right-drag to pan. Scroll to zoom.</span>
     </header>
     <pre id="compile-error" hidden></pre>
+    <pre id="row-error" hidden></pre>
     <pre id="error" hidden></pre>
     <canvas id="view" aria-label="Assembly preview"></canvas>
     <script type="module" src="/src/main.ts"></script>

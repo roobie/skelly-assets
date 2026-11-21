@@ -26,12 +26,6 @@ export interface Entry {
   readonly recipe?: RecipeRow;
 }
 
-/** An item and, where a recipe exports it, that recipe's row, both loaded and checked. */
-export interface Shown {
-  readonly item: ToolItem;
-  readonly row?: ReturnType<typeof loadThingRecipe>[number];
-}
-
 export const entries: readonly Entry[] = [
   ...recipeRows.map((recipe) => ({ id: recipe.id, label: recipe.source, source: recipe.source, recipe })),
   ...catalogueIds(manifest)
@@ -39,16 +33,21 @@ export const entries: readonly Entry[] = [
     .map((id) => ({ id, label: id, source: id })),
 ];
 
-/** What an item and its recipe row, neither yet checked, draw: as the refresh wrote them or as the server evaluated. */
-export const shown = (item: unknown, recipe: unknown): Shown => {
-  const loaded = loadItem(item, settings);
-  const [row] = recipe === undefined ? [] : loadThingRecipe([recipe], { ...settings, items: [loaded] });
-  return { item: loaded, ...(row ? { row } : {}) };
+/**
+ * An item as the refresh wrote it or as the server evaluated it, checked on its own, since it draws the model without
+ * its recipe row.
+ */
+export const checkItem = (item: unknown): ToolItem => loadItem(item, settings);
+
+/** A recipe row as the refresh wrote it or as the server evaluated it, checked against the item it exports. */
+export const checkRow = (item: ToolItem, row: unknown) => {
+  const [checked] = loadThingRecipe([row], { ...settings, items: [item] });
+  return checked!;
 };
 
 /** The entry's item as the refresh wrote it. */
-export const readEntry = async ({ source, recipe }: Entry): Promise<Shown> => {
+export const readItem = async ({ source }: Entry): Promise<unknown> => {
   const file = itemFiles[`../items/${source}.json`];
   if (file === undefined) throw new Error(`The catalogue has no row ${source}`);
-  return shown(await file(), recipe);
+  return file();
 };

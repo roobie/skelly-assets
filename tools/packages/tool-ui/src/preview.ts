@@ -53,9 +53,9 @@ export const createPreview = (canvas: HTMLCanvasElement) => {
     controls.update();
     renderer.render(scene, camera);
   });
-  const frame = (object: Object3D, centre?: readonly [number, number, number]) => {
+  const frame = (object: Object3D) => {
     const bounds = new Box3().setFromObject(object);
-    const target = centre ? new Vector3(...centre) : bounds.getCenter(new Vector3());
+    const target = bounds.getCenter(new Vector3());
     const distance = bounds.getSize(new Vector3()).length() / Math.sin((camera.fov * Math.PI) / 360);
     controls.target.copy(target);
     camera.position.copy(target).add(new Vector3(1, 0.7, 1).normalize().multiplyScalar(distance));
@@ -64,5 +64,12 @@ export const createPreview = (canvas: HTMLCanvasElement) => {
     camera.updateProjectionMatrix();
     controls.update();
   };
-  return { scene, frame };
+  /** Turns the camera about `centre`, keeping its distance and angles, which the author may have set since the frame. */
+  const orbitAbout = (centre: readonly [number, number, number]) => {
+    const shift = new Vector3(...centre).sub(controls.target);
+    controls.target.add(shift);
+    camera.position.add(shift);
+    controls.update();
+  };
+  return { scene, frame, orbitAbout };
 };

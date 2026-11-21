@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnetAsync } from '../../../jsonnet/index.mjs';
 import { type CatalogueManifest, rowFileOf } from '../src/catalogueManifest.ts';
-import type { RowResult, RowView } from '../src/live.ts';
+import type { Half, HalfResult } from '../src/live.ts';
 
 const repository = resolve(import.meta.dirname, '../../../..');
 const manifest = resolve(import.meta.dirname, '../item-ids.json');
@@ -36,22 +36,16 @@ const recipeSource = (rowId: string) => {
   return source;
 };
 
-const only = (rows: string, id: string) => `only(${rows}, ${JSON.stringify(id)})`;
+const sourceOf: Readonly<Record<Half, (id: string) => string>> = { item: catalogueSource, row: recipeSource };
 
-// One expression, so one process: the item and its row evaluate together or fail together.
-export const evaluateRow = async ({ item, row }: RowView): Promise<RowResult> => {
+// Each half in a process of its own, so the item draws without waiting on its recipe row, or failing with it.
+export const evaluateHalf = async (half: Half, id: string): Promise<HalfResult> => {
   try {
-    const fields = [
-      `item: ${only(`import ${JSON.stringify(catalogueSource(item))}`, item)}`,
-      ...(row === undefined ? [] : [`row: ${only(`import ${JSON.stringify(recipeSource(row))}`, row)}`]),
-    ];
     const expression = `
-      local only(rows, id) =
-        local found = [x for x in rows if x.id == id];
-        assert std.length(found) == 1 : 'Expected one row ' + id + ', found ' + std.length(found);
-        found[0];
-      { ${fields.join(', ')} }`;
-    return JSON.parse(await evaluateJsonnetAsync(expression, undefined, { label: `row ${item}` }));
+      local found = [x for x in import ${JSON.stringify(sourceOf[half](id))} if x.id == ${JSON.stringify(id)}];
+      assert std.length(found) == 1 : ${JSON.stringify(`Expected one row ${id}, found `)} + std.length(found);
+      found[0]`;
+    return { value: JSON.parse(await evaluateJsonnetAsync(expression, undefined, { label: `${half} ${id}` })) };
   } catch (error) {
     return { error: message(error) };
   }
