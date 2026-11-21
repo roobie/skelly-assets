@@ -25,8 +25,9 @@ local heavy = { shares: { windup: 22, strike: 13, follow: 25, recovery: 40 }, se
     },
   },
   stances: {
-    // The weapon carried low across the body, its end down by the left foot.
-    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.19, -0.42, 0.17], 20, 25, 80, [-0.74, -0.67, 0], [-0.47, -0.79, -0.39]) },
+    // The weapon shouldered, so the walking hips swing clear of it: resting on the right shoulder by the neck, its end
+    // up behind it, both hands on the handle in front of the chest.
+    idle: { body: body { 'thigh.L': [2, 0, 4], 'thigh.R': [0, 0, -4] }, weapon: held([0.06, -0.06, 0.26], -155, 0, 80) },
     guard: guard,
   },
   // Walked as the idle stands, both hands on the weapon: swung in one hand, a two-hand weapon hangs into the body. It
