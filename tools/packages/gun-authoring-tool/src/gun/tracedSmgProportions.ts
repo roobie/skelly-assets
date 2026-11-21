@@ -162,7 +162,11 @@ export interface TracedSmgProportions {
     readonly bottomU: number;
     readonly halfWidthU: number;
     readonly chamferU: number;
-    readonly topFlatHalfWidthU: number;
+    /**
+     * A receiver that narrows toward its top: its sides run straight up to `fromY`, then lean in to a top flat
+     * `topWidthShare` of the receiver's width. Without it, the top corners are chamfered as the bottom ones are.
+     */
+    readonly taper?: { readonly fromY: number; readonly topWidthShare: number };
     readonly endCapSlope: { readonly from: Point; readonly to: Point };
     readonly rearLug: Box2;
     readonly rail?: TracedRail;

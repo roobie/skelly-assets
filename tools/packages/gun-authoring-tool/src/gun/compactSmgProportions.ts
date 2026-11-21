@@ -79,7 +79,9 @@ export const COMPACT_SMG_PROPORTIONS = {
     bottomU: receiverBottomU,
     halfWidthU: 2.25,
     chamferU: 0.25,
-    topFlatHalfWidthU: 1.75,
+    // The pressed receiver narrows toward the claw-mount top. The photo's side shows the first upward-facing band at
+    // about 2.25; it is side-on, so the top's width is a share of the receiver's, estimated from the MP5's section.
+    taper: { fromY: 2.25, topWidthShare: 0.6 },
     // The end cap slopes forward from its rear face to the roof.
     endCapSlope: { from: [receiverRearX, 1.25], to: [-23, 3.25] },
     // The block under the receiver's rear that the trigger housing pins to.

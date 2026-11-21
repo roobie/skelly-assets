@@ -92,6 +92,7 @@ import {
   octagonalProfile,
   octagonalSectionChamfered,
   octagonalTubeWalls,
+  taperedSectionChamfered,
 } from './octagon.ts';
 import { getOptic, OPTIC_TYPE_IDS } from './optics.ts';
 import { plankForeEndSolids, plankStockAxes, plankStockSolids } from './pipeRifle.ts';
@@ -1013,32 +1014,26 @@ export const arReceiverSection = (layout: ARActionLayout): ARReceiverSectionData
 };
 
 /**
- * A traced SMG's chamfered box, its end cap clipped along the traced slope. The cavity ends where the slope meets the
- * roof, so the rear wall carries the whole slope.
+ * A traced SMG's chamfered box, narrowing toward its top where the table tapers it, its end cap clipped along the
+ * traced slope. The cavity ends where the slope meets the roof, so the rear wall carries the whole slope.
  */
 const tracedSmgReceiverSection = ({ receiver, lower, magazine }: TracedSmgProportions) => {
-  const { topU, bottomU, halfWidthU, chamferU, topFlatHalfWidthU, rearX, frontX, endCapSlope } = receiver;
-  const flatZ = halfWidthU - chamferU;
+  const { topU, bottomU, halfWidthU, chamferU, taper, rearX, frontX, endCapSlope } = receiver;
+  const [y, z] = [[bottomU, topU] as const, [-halfWidthU, halfWidthU] as const];
+  const topFlatHalfWidth = taper ? halfWidthU * taper.topWidthShare : halfWidthU - chamferU;
   const [[slopeX0, slopeY0], [slopeX1, slopeY1]] = [endCapSlope.from, endCapSlope.to];
   const slope = (slopeY1 - slopeY0) / (slopeX1 - slopeX0);
   return {
     clip: [{ normal: [-slope, 1, 0] as Vec3, offset: slopeY0 - slope * slopeX0 }],
     rearSlopeRun: slopeX1 - rearX,
-    outline: [
-      [topU, flatZ],
-      [topU - chamferU, halfWidthU],
-      [bottomU + chamferU, halfWidthU],
-      [bottomU, flatZ],
-      [bottomU, -flatZ],
-      [bottomU + chamferU, -halfWidthU],
-      [topU - chamferU, -halfWidthU],
-      [topU, -flatZ],
-    ] as readonly Vec2[],
+    outline: taper
+      ? taperedSectionChamfered(y, z, chamferU, taper.fromY, [-topFlatHalfWidth, topFlatHalfWidth])
+      : octagonalSectionChamfered(y, z, chamferU),
     // The floor opens over the leaning well's opening where it meets the receiver, as wide as the opening.
     magazineWellX: wellOpeningAtLevel(lower.magwell, magazine.port, bottomU),
     magazineWellHalfWidthU: lower.magwell.opening.halfWidthU,
     faces: {
-      top: { y: topU, halfWidth: topFlatHalfWidthU },
+      top: { y: topU, halfWidth: topFlatHalfWidth },
       portSide: halfWidthU,
       handleSides: [-halfWidthU, halfWidthU],
       front: frontX,

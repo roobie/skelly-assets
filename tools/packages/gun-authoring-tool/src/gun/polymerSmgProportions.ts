@@ -49,7 +49,6 @@ export const POLYMER_SMG_PROPORTIONS = {
     bottomU: receiverBottomU,
     halfWidthU: receiverHalfWidthU,
     chamferU: receiverChamferU,
-    topFlatHalfWidthU: receiverHalfWidthU - receiverChamferU,
     // A short chamfer rounds the slab's top rear edge into the stock hinge.
     endCapSlope: { from: [receiverRearX, 3], to: [-22, receiverTopU] },
     rearLug: { x: [receiverRearX, -22], y: [-3.25, -2.5] },

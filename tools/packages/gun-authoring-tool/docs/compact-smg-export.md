@@ -25,6 +25,8 @@ The bore line runs through the muzzle axis and is horizontal in the photo, so th
 
 A traced shape yields to a gun rule where the two disagree. The trigger guard is the main case: finger clearance and connected guard geometry take precedence over the traced curve; see `src/gun/rules.ts`, `triggerGuardGeometryFits`. The front-sight post likewise yields to a sight line parallel to the bore rather than the photo's apparent height; see [Sights](#rulings).
 
+The receiver narrows toward its top, as the MP5's pressed-steel receiver does under its claw-mount top. The side photo shows where the taper starts, as the first upward-facing band, but not how wide the top is. The table gives that width as a share of the receiver's, so it stays a proportion of whatever width the receiver is traced to rather than a dimension the photo cannot support.
+
 Some photo detail is beyond the build's primitives and stays a known difference. The hood is a ring around the bore's axis, so from the side it shows square corners where the photo's hood is rounded and tapers toward the top. Knurling on the knob and the sight wheel is finer than the gun voxel grain (`src/gun/gunVoxel.json`), so those surfaces are smooth.
 
 ## Parts and joins

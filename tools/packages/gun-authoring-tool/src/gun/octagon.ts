@@ -12,19 +12,25 @@ export const OCTAGON_CORNER = Math.SQRT2 - 1;
 export const CHAMFER_WALL_INSET = 2 - Math.SQRT2;
 
 /**
- * The eight-sided section in the box `y` by `z` whose flats face both transverse axes, from the spans along Y of its Z
- * flats and along Z of its Y flats. Points are (Y, Z), for an extrusion along X, and every section starts at the same
- * corner and turns the same way, so any two of them pair vertex for vertex.
+ * The eight-sided section in the box `y` by `z` whose flats face both transverse axes, from the span along Y of its Z
+ * flats and the spans along Z of its bottom and top Y flats. Points are (Y, Z), for an extrusion along X, and every
+ * section starts at the same corner and turns the same way, so any two of them pair vertex for vertex.
  */
-const octagonInBox = ([y0, y1]: Span, [z0, z1]: Span, [ya, yb]: Span, [za, zb]: Span): readonly Vec2[] => [
-  [y1, zb],
+const octagonInBox = (
+  [y0, y1]: Span,
+  [z0, z1]: Span,
+  [ya, yb]: Span,
+  [bottomZa, bottomZb]: Span,
+  [topZa, topZb]: Span,
+): readonly Vec2[] => [
+  [y1, topZb],
   [yb, z1],
   [ya, z1],
-  [y0, zb],
-  [y0, za],
+  [y0, bottomZb],
+  [y0, bottomZa],
   [ya, z0],
   [yb, z0],
-  [y1, za],
+  [y1, topZa],
 ];
 
 /**
@@ -34,12 +40,22 @@ const octagonInBox = ([y0, y1]: Span, [z0, z1]: Span, [ya, yb]: Span, [za, zb]: 
 export const octagonalSection = (y: Span, z: Span): readonly Vec2[] => {
   const [centreY, centreZ] = [(y[0] + y[1]) / 2, (z[0] + z[1]) / 2];
   const [cornerY, cornerZ] = [((y[1] - y[0]) / 2) * OCTAGON_CORNER, ((z[1] - z[0]) / 2) * OCTAGON_CORNER];
-  return octagonInBox(y, z, [centreY - cornerY, centreY + cornerY], [centreZ - cornerZ, centreZ + cornerZ]);
+  const flat: Span = [centreZ - cornerZ, centreZ + cornerZ];
+  return octagonInBox(y, z, [centreY - cornerY, centreY + cornerY], flat, flat);
 };
 
 /** The box `y` by `z` with each corner cut at 45 degrees, `chamfer` back along both of its sides. */
-export const octagonalSectionChamfered = (y: Span, z: Span, chamfer: number): readonly Vec2[] =>
-  octagonInBox(y, z, [y[0] + chamfer, y[1] - chamfer], [z[0] + chamfer, z[1] - chamfer]);
+export const octagonalSectionChamfered = (y: Span, z: Span, chamfer: number): readonly Vec2[] => {
+  const flat: Span = [z[0] + chamfer, z[1] - chamfer];
+  return octagonInBox(y, z, [y[0] + chamfer, y[1] - chamfer], flat, flat);
+};
+
+/**
+ * The box `y` by `z` that narrows toward its top: its bottom corners are cut at 45 degrees, `chamfer` back along both
+ * sides, and its sides run straight up to `taperFromY`, then lean in to a top flat spanning `topZ`.
+ */
+export const taperedSectionChamfered = (y: Span, z: Span, chamfer: number, taperFromY: number, topZ: Span) =>
+  octagonInBox(y, z, [y[0] + chamfer, taperFromY], [z[0] + chamfer, z[1] - chamfer], topZ);
 
 /** A regular octagon `flatRadius` from `centre` to each flat. */
 export const octagonalProfile = (flatRadius: number, [centreY, centreZ]: Vec2 = [0, 0]): readonly Vec2[] =>
