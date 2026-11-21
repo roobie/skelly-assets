@@ -836,35 +836,12 @@ export const CARRIER_HANDLE_STYLES = {
 export const EJECTION_PORT_RULES = {
   marginU: EJECTION_PORT_MARGIN_U,
   pumpShellMinimum: { lengthU: PUMP_SHELL_LOADED_LENGTH_U, endClearanceU: EJECTION_PORT_MARGIN_U },
-  // A port sized from the case it throws out, in case lengths along the bore and head diameters across it.
-  caseClearance: { lengthFactor: 1.5, diameterFactor: 1.2 },
 } as const;
 
 interface PortWindow {
   readonly x: readonly [number, number];
   readonly y: readonly [number, number];
 }
-
-/**
- * A port the spent case clears: at full recoil the case's head rides the bolt face, so the port centres on where the
- * case then lies, grown by the case-clearance factors, its edges at the nearest grid lines.
- */
-const caseEjectionPortWindow = (
-  chamberedCase: TracedSmgProportions['chamberedCase'],
-  breechX: number,
-  travelLength: number,
-  carrierY: number,
-): PortWindow => {
-  const { lengthFactor, diameterFactor } = EJECTION_PORT_RULES.caseClearance;
-  const centreX = breechX - travelLength + chamberedCase.lengthU / 2;
-  const halfX = (lengthFactor * chamberedCase.lengthU) / 2;
-  const halfY = (diameterFactor * chamberedCase.headDiameterU) / 2;
-  const toGrid = (value: number) => Math.round(value / GRID) * GRID;
-  return {
-    x: [toGrid(centreX - halfX), toGrid(centreX + halfX)],
-    y: [toGrid(carrierY - halfY), toGrid(carrierY + halfY)],
-  };
-};
 
 const ejectionPortWindow = (
   pattern: BoltCarrierPattern,
@@ -2163,10 +2140,7 @@ const receiver: PartFamily = {
         ? baseTravel
         : { ...baseTravel, restX: breechX + carrierEnvelope(carrierPattern, carrierFit).x[0] };
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
-    const portWindow = tracedBolt
-      ? (tracedBolt.ejectionPort ??
-        caseEjectionPortWindow(tracedBolt.chamberedCase, tracedBolt.barrel.breechU, travel.length, carrierY))
-      : ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
+    const portWindow = tracedBolt?.ejectionPort ?? ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
     const context: ReceiverContext = {
       params,
       bore,

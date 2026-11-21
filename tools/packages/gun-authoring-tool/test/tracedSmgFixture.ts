@@ -5,14 +5,37 @@ import type { Resolved } from '@skelly/construct/assembly/schema.ts';
 import { GRID } from '@skelly/construct/foundation/conventions.ts';
 import { applyPoint, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import nineMmJson from '../../../../models/guns/cartridges/9x19.json' with { type: 'json' };
+import { formatCartridgeParseError, parseCartridge } from '../src/ammo/parseCartridge.ts';
 import { DESIGNS } from '../src/cli/content.ts';
 import { GUN_ANCHORS } from '../src/gun/anchorData.ts';
 import { loadGunDesign } from '../src/gun/designLoader.ts';
 import { gunDomain } from '../src/gun/domain.ts';
-import { uToMm } from '../src/gun/units.ts';
+import { mmToU, uToMm } from '../src/gun/units.ts';
 
 /** A traced estimate sits on the gun grid, so it may miss its published figure by half a grid step. */
 export const GRID_TOLERANCE_MM = uToMm(GRID / 2);
+
+/** The 9x19 case the traced SMGs throw out: its length and its widest part, rim or head. */
+export const NINE_MM_CASE = (() => {
+  const parsed = parseCartridge(nineMmJson);
+  if (!parsed.ok) {
+    throw new Error(`Invalid 9x19 cartridge data: ${formatCartridgeParseError(parsed.error)}`);
+  }
+  const { cartridge } = parsed;
+  if (
+    cartridge.kind !== 'metallic' ||
+    cartridge.case.length.value === null ||
+    cartridge.case.rim.diameter.value === null ||
+    cartridge.case.body.diameterAtHead.value === null
+  ) {
+    throw new Error('9x19 cartridge data must give a sourced case length and head diameters.');
+  }
+  return {
+    lengthU: mmToU(cartridge.case.length.value),
+    widestDiameterU: mmToU(Math.max(cartridge.case.rim.diameter.value, cartridge.case.body.diameterAtHead.value)),
+  };
+})();
 
 /** A design resolved in the gun frame, with some of its parts' params overridden. */
 export const resolveDesign = (file: string, params: Record<string, Record<string, string>> = {}): Resolved => {

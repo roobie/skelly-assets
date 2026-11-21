@@ -1,4 +1,3 @@
-import { NINE_MM_CASE } from './nineMmCase.ts';
 import { citedBarrel, stockReachU, type TracedSmgProportions } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 17.5;
@@ -69,7 +68,6 @@ export const COMPACT_SMG_PROPORTIONS = {
   bolt: { lengthU: 5, halfHeightU: 1.25, halfWidthU: 1.25, travelU: 4.25 },
   // The MP5's published rate (HK MP5 specification).
   cyclicRpm: 800,
-  chamberedCase: NINE_MM_CASE,
   // The photo shows the left side, which has no port, so the opening is proportioned as the polymer SMG's drawing
   // has it: its top flush with the bolt's, about two-thirds the bolt's height, over the spent case at full recoil.
   ejectionPort: { x: [-7, -3], y: [-0.5, 1.25] },
@@ -103,7 +101,12 @@ export const COMPACT_SMG_PROPORTIONS = {
       [-20, receiverBottomU],
     ],
     // The curved magazine's top runs straight up into an upright well.
-    magwell: { x: [-7, -3], y: [-5.5, receiverBottomU], leanDegrees: 0, opening: { x: [-6.25, -3.25], halfWidthU: 1.25 } },
+    magwell: {
+      x: [-7, -3],
+      y: [-5.5, receiverBottomU],
+      leanDegrees: 0,
+      opening: { x: [-6.25, -3.25], halfWidthU: 1.25 },
+    },
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
       [-13, -6],

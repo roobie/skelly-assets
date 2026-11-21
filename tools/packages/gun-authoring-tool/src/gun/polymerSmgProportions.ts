@@ -1,5 +1,4 @@
 import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
-import { NINE_MM_CASE } from './nineMmCase.ts';
 import {
   citedBarrel,
   forwardLeanDegrees,
@@ -87,7 +86,6 @@ export const POLYMER_SMG_PROPORTIONS = {
   bolt: { lengthU: 9.25, halfHeightU: 1.5, halfWidthU: 1.25, travelU: 6.25 },
   // The UMP9's published rate (Heckler & Koch UMP, Wikipedia): slower than the compact SMG's, as its long travel needs.
   cyclicRpm: 700,
-  chamberedCase: NINE_MM_CASE,
   // The reference's dark opening inside the port's frame, which stands a little above the bore.
   ejectionPort: { x: [-10.5, -5.75], y: [-0.5, 1.5] },
   // The cited barrel length runs from the threaded muzzle tip back to the breech.

@@ -1,11 +1,9 @@
-import { GRID } from '@skelly/construct/foundation/conventions.ts';
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boundsOfPoints, obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
-import { BOLT_CARRIER_RUNNING_CLEARANCE_U, EJECTION_PORT_RULES, RECEIVER_SECTION_WALL_U } from '../src/gun/parts.ts';
-import type { TracedSmgProportions } from '../src/gun/tracedSmgProportions.ts';
+import { BOLT_CARRIER_RUNNING_CLEARANCE_U, RECEIVER_SECTION_WALL_U } from '../src/gun/parts.ts';
 import { TRACED_SMG_SECTIONS, type TracedSmgSection } from '../src/gun/tracedSmgSections.ts';
-import { owner, resolveDesign } from './tracedSmgFixture.ts';
+import { NINE_MM_CASE, owner, resolveDesign } from './tracedSmgFixture.ts';
 
 const worldBounds = (section: TracedSmgSection, family: string, solidId: string): readonly [Vec3, Vec3] => {
   const resolved = resolveDesign(`${section}.json`);
@@ -16,7 +14,7 @@ const worldBounds = (section: TracedSmgSection, family: string, solidId: string)
 };
 
 describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s action', (section) => {
-  const { receiver, barrel, bolt, chamberedCase } = TRACED_SMG_SECTIONS[section];
+  const { receiver, barrel, bolt, ejectionPort } = TRACED_SMG_SECTIONS[section];
   const [low, high] = worldBounds(section, 'bolt-carrier', 'carrier-body');
 
   it('closes the bolt on the breech, its length the table’s', () => {
@@ -52,14 +50,12 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
     const port = { x: span('ejection', 0), y: span('ejection', 1) };
     // The spent case's head rides the bolt's face back.
     const headAtRecoil = faceAtRecoil;
-    const table: TracedSmgProportions = TRACED_SMG_SECTIONS[section];
-    const traced = table.ejectionPort;
 
     it('lies over the spent case at full recoil and clears it', () => {
       expect(port.x[0]).toBeLessThanOrEqual(headAtRecoil);
-      expect(port.x[1]).toBeGreaterThanOrEqual(headAtRecoil + chamberedCase.lengthU);
-      expect(port.y[0]).toBeLessThanOrEqual(-chamberedCase.headDiameterU / 2);
-      expect(port.y[1]).toBeGreaterThanOrEqual(chamberedCase.headDiameterU / 2);
+      expect(port.x[1]).toBeGreaterThanOrEqual(headAtRecoil + NINE_MM_CASE.lengthU);
+      expect(port.y[0]).toBeLessThanOrEqual(-NINE_MM_CASE.widestDiameterU / 2);
+      expect(port.y[1]).toBeGreaterThanOrEqual(NINE_MM_CASE.widestDiameterU / 2);
     });
 
     it('shows the closed bolt across its whole opening', () => {
@@ -69,14 +65,8 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
       expect(high[1]).toBeGreaterThanOrEqual(port.y[1]);
     });
 
-    it(traced ? 'is the traced opening' : 'is sized from the case where the reference shows none', () => {
-      if (traced) {
-        expect(port).toEqual(traced);
-        return;
-      }
-      const { lengthFactor, diameterFactor } = EJECTION_PORT_RULES.caseClearance;
-      expect(Math.abs(port.x[1] - port.x[0] - lengthFactor * chamberedCase.lengthU)).toBeLessThanOrEqual(GRID);
-      expect(Math.abs(port.y[1] - port.y[0] - diameterFactor * chamberedCase.headDiameterU)).toBeLessThanOrEqual(GRID);
+    it('is the table’s opening', () => {
+      expect(port).toEqual(ejectionPort);
     });
   });
 });

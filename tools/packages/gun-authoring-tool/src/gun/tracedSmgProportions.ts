@@ -160,10 +160,8 @@ export interface TracedSmgProportions {
   };
   /** The published cyclic rate, which bounds how long the bolt's travel may take. */
   readonly cyclicRpm: number;
-  /** The chambered case, which the ejection port must clear. */
-  readonly chamberedCase: { readonly lengthU: number; readonly headDiameterU: number };
-  /** The ejection port's opening through the port-side wall; without it the port is sized from the case. */
-  readonly ejectionPort?: Box2;
+  /** The ejection port's opening through the port-side wall. */
+  readonly ejectionPort: Box2;
   readonly barrel: {
     readonly breechU: number;
     readonly citedLengthU: number;
