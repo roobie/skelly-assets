@@ -43,10 +43,10 @@ const housingBottomU = -5.75;
 const housingFront = [housingBottomU, receiverBottomU].map((y) =>
   leaningFrame(magazine.port, magazine.leanDegrees).atLevel(magwell.x[0], y),
 );
-// The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
-// can rise in front of it.
 // The rear sight's drum, whose centre its aperture and axle share, stands on its clamp's plate.
 const rearDrum = { centre: [-18.25, 4.25], radiusU: 0.75 } as const;
+// The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
+// can rise in front of it.
 const magazineRearX = Math.min(...magazinePieces.flat().map(([x]) => x));
 const boltTravelU = Math.ceil((barrel.breechU - magazineRearX) / GRID) * GRID;
 

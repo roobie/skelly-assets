@@ -74,8 +74,9 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
     const receiverSolids = placedSolidsOf(receiverId);
     const tubeSolids = placedSolidsOf(handguardId, (id) => id.startsWith('smg-cocking-tube'));
 
-    it('leaves its bore clear of the receiver where it runs back into it', () => {
-      const { centreY, halfU, rearX } = chargingHandle.tube;
+    const { centreY, halfU, rearX } = chargingHandle.tube;
+    // Only a tube that runs back into the receiver has a bore there to keep clear.
+    it.runIf(rearX < receiver.frontX)('leaves its bore clear of the receiver where it runs back into it', () => {
       const boreHalf = halfU - GRID;
       const bore = worldSolid(IDENTITY, {
         id: 'tube-bore',

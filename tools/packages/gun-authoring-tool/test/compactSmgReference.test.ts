@@ -1,3 +1,5 @@
+import { TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
+import { boundsOfPoints, distanceWorld, obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import { expect, it } from 'vitest';
 import { COMPACT_SMG_PROPORTIONS } from '../src/gun/compactSmgProportions.ts';
 import { RECEIVER_SECTION } from '../src/gun/parts.ts';
@@ -62,10 +64,26 @@ it('narrows the receiver from straight sides to its top flat, the share of its w
 });
 
 it('clamps the drum sight over the receiver top, the drum standing on the plate between its ears', () => {
-  const { topU } = COMPACT_SMG_PROPORTIONS.receiver;
-  const { name, profile, halfWidthU, aperture, clamp, ears, axle } = COMPACT_SMG_PROPORTIONS.rearSight;
+  const { name, clamp } = COMPACT_SMG_PROPORTIONS.rearSight;
   const resolved = resolveDesign('compact-smg.json');
-  const solids = new Map(resolved.defs.get(owner(resolved, 'receiver'))!.solids.map((solid) => [solid.id, solid]));
+  const receiverId = owner(resolved, 'receiver');
+  const solids = new Map(resolved.defs.get(receiverId)!.solids.map((solid) => [solid.id, solid]));
+  const placed = (id: string) => {
+    const solid = solids.get(id);
+    if (!solid) {
+      throw new Error(`the sight needs its ${id}`);
+    }
+    return worldSolid(resolved.placed.get(receiverId)!, solid);
+  };
+  const bounds = (id: string) => {
+    const world = placed(id);
+    return boundsOfPoints(('vertices' in world ? world : obbPolyhedron(world)).vertices);
+  };
+  // A solid's z span on one side of the bore, measured outward from it: its inner face, then its outer face.
+  const outward = (id: string, sign: number): readonly [number, number] => {
+    const [low, high] = bounds(id);
+    return sign > 0 ? [low[2], high[2]] : [-high[2], -low[2]];
+  };
   // Each jaw's inner face lies along the receiver's shoulder, from the top flat's edge down to the jaw's foot.
   for (const side of ['left', 'right']) {
     const jaw = solids.get(`rear-sight-clamp-${side}`);
@@ -77,11 +95,26 @@ it('clamps the drum sight over the receiver top, the drum standing on the plate 
     expect(Math.min(...inner)).toBeGreaterThan(-1e-9);
     expect(Math.min(...jaw.profile.map(([y]) => y))).toBe(clamp.jawToY);
   }
-  expect(Math.min(...profile.map(([, y]) => y))).toBeCloseTo(topU + clamp.plateU, 9);
-  expect(ears.z[0]).toBe(halfWidthU);
-  expect(ears.z[1]).toBeLessThan(axle.halfLengthU);
-  expect([aperture.eyeX, aperture.centreY]).toEqual(axle.centre);
-  expect(solids.has(`rear-sight-${name}-ear-left`) && solids.has(`rear-sight-${name}-ear-right`)).toBe(true);
+  expect(bounds(`rear-sight-${name}-left`)[0][1]).toBeCloseTo(bounds('rear-sight-clamp-plate')[1][1], 9);
+  // The aperture is the gap between the drum's two pierced halves.
+  const [apertureHalf] = outward(`rear-sight-${name}-right`, 1);
+  for (const [side, sign] of [
+    ['left', -1],
+    ['right', 1],
+  ] as const) {
+    const [, drumSide] = outward(`rear-sight-${name}-${side}`, sign);
+    const ear = `rear-sight-${name}-ear-${side}`;
+    const stub = `rear-sight-axle-${side}`;
+    const [earInner, earOuter] = outward(ear, sign);
+    const [stubInner, stubOuter] = outward(stub, sign);
+    expect(earInner).toBeCloseTo(drumSide, 9);
+    expect(distanceWorld(placed(ear), placed(`rear-sight-${name}-${side}`))).toBeLessThan(TOLERANCE.contact);
+    // The export's sight-line check skips revolved solids, so this is what keeps the axle out of the aperture.
+    expect(stubInner).toBeGreaterThanOrEqual(apertureHalf);
+    expect(stubInner).toBeCloseTo(drumSide, 9);
+    expect(stubOuter).toBeGreaterThan(earOuter);
+    expect(distanceWorld(placed(stub), placed(ear))).toBeLessThan(TOLERANCE.contact);
+  }
 });
 
 it.each([
