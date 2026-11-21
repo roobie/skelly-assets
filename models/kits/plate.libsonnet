@@ -136,26 +136,30 @@ local shaftAdd(r) =
   [oct('lame-%d' % i, 'collar', shaft.start + 0.04 + i * 0.045, shaft.start + 0.07 + i * 0.045, 0.14, 0.14, 0.03) for i in [0, 1]];
 
 // The armet: a rounded skull with a low comb, a neck flange, and a pointed visor over a vision slit with breaths below.
-// Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline.
-local slit = { min: [-0.085, 0.178, 0.112], max: [0.085, 0.192, 0.122] };
-local skull = { radius: 0.135, y0: 0.03, y1: 0.27 };
-local helmetBase = fit.eyesAt((slit.min[1] + slit.max[1]) / 2);
+// Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline. The skull is
+// drawn round the head that seat puts it on, short of the hair's top, which the crown closes over; each fitting stands
+// on the face of the skull it meets, so a taller or deeper head carries them with it.
+local slitHeights = [0.178, 0.192];
+local helmetBase = fit.eyesAt((slitHeights[0] + slitHeights[1]) / 2);
+local head = fit.headroom(helmetBase);
+local radius = head.reach + 0.023, foot = head.chin - 0.019, top = head.top - 0.02;
+local slit = { min: [-0.085, slitHeights[0], radius - 0.023], max: [0.085, slitHeights[1], radius - 0.013] };
 local helmet = [
-  round(h.disc('flange', 'trim', 0.15, 0, 0.034)),
-  round(h.disc('shell', 'plate', skull.radius, skull.y0, skull.y1)),
-  round(h.dome('crown', 'plate', 0.135, 0.085, 0.014, 'y', [0, 0.265, 0])),
-  round(h.disc('brim', 'trim', 0.142, 0.255, 0.27)),
-  h.box('comb', 'trim', [-0.012, 0.27, -0.12], [0.012, 0.325, 0.11]),
+  round(h.disc('flange', 'trim', radius + 0.015, foot - 0.03, foot + 0.004)),
+  round(h.disc('shell', 'plate', radius, foot, top)),
+  round(h.dome('crown', 'plate', radius, 0.085, 0.014, 'y', [0, top - 0.005, 0])),
+  round(h.disc('brim', 'trim', radius + 0.007, top - 0.015, top)),
+  h.box('comb', 'trim', [-0.012, top, -(radius - 0.015)], [0.012, top + 0.055, radius - 0.025]),
   // Pointed visor, hinged at the sides, over a pale slit.
-  h.prism('visor', 'plate', 'x', [[0.15, 0.115], [0.25, 0.115], [0.255, 0.14], [0.215, 0.185], [0.15, 0.17]], -0.1, 0.1),
-  h.prism('bevor', 'plate', 'x', [[0.03, 0.115], [0.15, 0.115], [0.15, 0.165], [0.1, 0.205], [0.04, 0.17]], -0.09, 0.09),
+  h.prism('visor', 'plate', 'x', [[0.15, radius - 0.02], [0.25, radius - 0.02], [0.255, radius + 0.005], [0.215, radius + 0.05], [0.15, radius + 0.035]], -0.1, 0.1),
+  h.prism('bevor', 'plate', 'x', [[foot, radius - 0.02], [0.15, radius - 0.02], [0.15, radius + 0.03], [foot + 0.07, radius + 0.07], [foot + 0.01, radius + 0.035]], -0.09, 0.09),
   h.box('slit', 'lens', slit.min, slit.max),
-  h.box('visor-ridge', 'trim', [-0.01, 0.15, 0.17], [0.01, 0.245, 0.19]),
+  h.box('visor-ridge', 'trim', [-0.01, 0.15, radius + 0.035], [0.01, 0.245, radius + 0.055]),
 ] + [
-  h.box('breath-%d' % i, 'lens', [0.02 + (i % 2) * 0.03 - 0.014, 0.065 + (i - i % 2) * 0.017, 0.185], [0.02 + (i % 2) * 0.03 - 0.004, 0.073 + (i - i % 2) * 0.017, 0.2])
+  h.box('breath-%d' % i, 'lens', [0.02 + (i % 2) * 0.03 - 0.014, foot + 0.035 + (i - i % 2) * 0.017, radius + 0.05], [0.02 + (i % 2) * 0.03 - 0.004, foot + 0.043 + (i - i % 2) * 0.017, radius + 0.065])
   for i in [0, 1, 2, 3]
 ] + [
-  round(h.rod('pivot-%d' % i, 'rivet', 0.02, [-0.165, 0.138][i], [-0.138, 0.165][i], 0.18))
+  round(h.rod('pivot-%d' % i, 'rivet', 0.02, [-(radius + 0.03), radius + 0.003][i], [-(radius + 0.003), radius + 0.03][i], 0.18))
   for i in [0, 1]
 ];
 
@@ -186,8 +190,7 @@ local set = {
     rows: [h.compound('helmet_plate_armet', 3.0, helmet, livery + { lens: 'rubber-black' }) + {
       title: 'Plate armet',
       voxelGrain: 0.006,
-      anchors: { brow: fit.browAnchor('helmet_plate_armet', 'shell', [-skull.radius, skull.y0, -skull.radius], [skull.radius, skull.y1, skull.radius],
-                                      fit.headroom(helmetBase).brow) },
+      anchors: { brow: fit.browAnchor('helmet_plate_armet', 'shell', [-radius, foot, -radius], [radius, top, radius], head.brow) },
     }],
   },
 };

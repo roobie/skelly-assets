@@ -124,11 +124,15 @@ local shinAdd = [
 
 // The helm: an angular shell sloping in to a swept crown chamfered along its sides, a skirt flared out over the nape, a
 // glowing visor slit under a peaked brow, vents, light strips on the cheeks and a rear fin. Its brow anchor is the point
-// of its shell that a seat with the visor slit over the eyes puts at the hairline.
-local visor = { min: [-0.08, 0.155, 0.135], max: [0.08, 0.185, 0.15] };
-local shell = { min: [-0.125, 0.03, -0.14], max: [0.125, 0.25, 0.14] };
+// of its shell that a seat with the visor slit over the eyes puts at the hairline. The shell is drawn round the head
+// that seat puts it on (`fit.helmetBox`), stopping short of the hair's top, which the crown closes over, and each
+// fitting from the face of the shell it stands on, as the trooper's are (models/kits/trooper.libsonnet).
+local slit = [0.155, 0.185];
+local helmetBase = fit.eyesAt((slit[0] + slit[1]) / 2);
+local shell = fit.helmetBox(helmetBase, [0.0375, 0.031, 0.004, -0.025]);
+local side = shell.max[0], front = shell.max[2], back = shell.min[2], foot = shell.min[1], top = shell.max[1];
+local visor = { min: [-0.08, slit[0], front - 0.005], max: [0.08, slit[1], front + 0.01] };
 local taper = [0.015, 0.008, 0.015];
-local helmetBase = fit.eyesAt((visor.min[1] + visor.max[1]) / 2);
 local shellBlock = h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, taper, 0);
 // The crown carries on the shell's own faces, so it reads as one moulding with it: the shell's sloped sides and cut
 // corners, and its 45-degree cuts in from the top's outline at the sides and front. Its back rises sheer from the
@@ -136,22 +140,22 @@ local shellBlock = h.taperedBlock('shell', 'plate', shell.min, shell.max, 0.03, 
 local backChamfer(plane) = plane.normal[1] == 1 && plane.normal[2] < 0;
 local crownCut = [plane for plane in shellBlock.clip if !backChamfer(plane)];
 local helmet = [
-  h.taperedBlock('skirt', 'trim', [-0.135, 0, -0.165], [0.135, 0.035, 0.15], 0.04, [0.01, 0.01, 0.025], 0),
+  h.taperedBlock('skirt', 'trim', [-(side + 0.01), foot - 0.03, back - 0.025], [side + 0.01, foot + 0.005, front + 0.01], 0.04, [0.01, 0.01, 0.025], 0),
   shellBlock,
-  h.prism('crown', 'plate', 'x', [[0.25, -0.14], [0.25, 0.14], [0.29, 0.07], [0.31, -0.06], [0.29, -0.14]], -0.115, 0.115)
+  h.prism('crown', 'plate', 'x', [[top, back], [top, front], [top + 0.04, 0.07], [top + 0.06, -0.06], [top + 0.04, back]], -(side - 0.01), side - 0.01)
   + { clip: crownCut },
-  h.prism('brow', 'trim', 'x', [[0.19, 0.12], [0.225, 0.1], [0.235, 0.17], [0.2, 0.17]], -0.075, 0.075),
+  h.prism('brow', 'trim', 'x', [[0.19, front - 0.02], [0.225, front - 0.04], [0.235, front + 0.03], [0.2, front + 0.03]], -0.075, 0.075),
   h.box('visor', 'glow', visor.min, visor.max),
-  h.prism('jaw', 'plate', 'x', [[0.035, 0.12], [0.15, 0.13], [0.15, 0.175], [0.05, 0.17]], -0.075, 0.075),
-  h.prism('fin', 'trim', 'x', [[0.28, -0.12], [0.34, -0.1], [0.37, -0.14], [0.27, -0.14]], -0.012, 0.012),
+  h.prism('jaw', 'plate', 'x', [[foot + 0.005, front - 0.02], [0.15, front - 0.01], [0.15, front + 0.035], [foot + 0.02, front + 0.03]], -0.075, 0.075),
+  h.prism('fin', 'trim', 'x', [[top + 0.03, back + 0.02], [top + 0.09, back + 0.04], [top + 0.12, back], [top + 0.02, back]], -0.012, 0.012),
 ] + [
-  h.box('vent-%d' % i, 'strap', [-0.04, 0.07 + i * 0.022, 0.17], [0.04, 0.081 + i * 0.022, 0.18])
+  h.box('vent-%d' % i, 'strap', [-0.04, foot + 0.04 + i * 0.022, front + 0.03], [0.04, foot + 0.051 + i * 0.022, front + 0.04])
   for i in [0, 1, 2]
 ] + [
-  h.box('cheek-%d' % i, 'trim', [[-0.14, 0.11][i], 0.06, -0.06], [[-0.11, 0.14][i], 0.2, 0.12])
+  h.box('cheek-%d' % i, 'trim', [[-(side + 0.015), side - 0.015][i], foot + 0.03, -0.06], [[-(side - 0.015), side + 0.015][i], 0.2, 0.12])
   for i in [0, 1]
 ] + [
-  h.box('cheek-light-%d' % i, 'glow', [[-0.146, 0.14][i], 0.1, 0.0], [[-0.14, 0.146][i], 0.16, 0.1])
+  h.box('cheek-light-%d' % i, 'glow', [[-(side + 0.021), side + 0.015][i], 0.1, 0.0], [[-(side + 0.015), side + 0.021][i], 0.16, 0.1])
   for i in [0, 1]
 ];
 

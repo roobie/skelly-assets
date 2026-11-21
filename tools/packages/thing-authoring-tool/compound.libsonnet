@@ -5,7 +5,7 @@ local params(values) = { [key]: if std.type(values[key]) == 'array' then std.man
 local part(id, family, massKg, dimensions, finish, ports=[]) = { id: id, family: family, massKg: massKg, params: params(dimensions), finish: finish, ports: ports };
 local item(id, family, massKg, dimensions, finish) = { id: id, exportMass: 'parts', parts: [part(id, family, massKg, dimensions, finish)], connections: [] };
 // A cylinder along x from `x0` to `x1`, its axis at height `y`.
-local rod(id, slot, radius, x0, x1, y) = { id: id, slot: slot, kind: 'turned', axis: 'x', profile: [[0, 0], [0, radius], [x1 - x0, radius], [x1 - x0, 0]], origin: [x0, y, 0] };
+local rod(id, slot, radius, x0, x1, y, z=0) = { id: id, slot: slot, kind: 'turned', axis: 'x', profile: [[0, 0], [0, radius], [x1 - x0, radius], [x1 - x0, 0]], origin: [x0, y, z] };
 local axisIndex(axis) = std.find(axis, ['x', 'y', 'z'])[0];
 // The axes a prism's profile points lie along, by the prism's own axis (see `prism`).
 local profileAxes = { x: ['y', 'z'], y: ['z', 'x'], z: ['x', 'y'] };
