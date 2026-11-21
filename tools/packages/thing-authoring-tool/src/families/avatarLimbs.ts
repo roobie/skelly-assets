@@ -1,6 +1,18 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, minValue, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
+import {
+  array,
+  maxValue,
+  minValue,
+  number,
+  optional,
+  parse,
+  picklist,
+  pipe,
+  strictObject,
+  string,
+  transform,
+} from 'valibot';
 import { block, cut, oval, region, taper, translate } from './body.ts';
 import { json, point3, positive, requireConvex, requireJointHeights, scalar, spheroid } from './shapes.ts';
 
@@ -359,6 +371,8 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
       segment: picklist(LEG_SEGMENTS),
       length: positive,
       thighLength: positive,
+      /** Where the thigh's flesh ends, at or below the hip joint, for a joint that lies inside the hips. */
+      thighTop: pipe(scalar, maxValue(0)),
       thighWidth: positive,
       thighDepth: positive,
       shinWidth: positive,
@@ -424,7 +438,7 @@ export const avatarLeg = (params: Readonly<Record<string, string>>): LimbSolid[]
             ...taper(
               'thigh-flesh',
               'skin',
-              ys(knee + d.thighLength * 0.12, 0),
+              ys(knee + d.thighLength * 0.12, d.thighTop),
               [
                 { halfX: shinHalfX * 1.1, halfZ: shinHalfZ * 1.1 },
                 { halfX: thighHalfX, halfZ: thighHalfZ },

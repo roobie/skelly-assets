@@ -7,6 +7,10 @@ local ual = (import 'models/dolls/ual/joints.libsonnet').leg;
 {
   // The left hip joint above the hips' foot, the bust's frame; the right one mirrors it across x.
   hip:: ual.hip,
+  // The joint lies inside the pelvis, so the thigh's flesh ends just inside the hips' foot rather than at the joint,
+  // where it would break out through the pelvis's rounded foot.
+  hipsOverlap:: 0.02,
+  thighTop: self.hipsOverlap - ual.hip[1],
   length: ual.length, thighLength: ual.thighLength, thighWidth: 0.15, thighDepth: 0.19,
   shinWidth: 0.11, shinDepth: 0.12,
   shoeHeight: ual.shoeHeight, shoeWidth: 0.1, toeReach: 0.2408, heelReach: 0.0612,

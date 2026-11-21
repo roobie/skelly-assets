@@ -9,3 +9,4 @@ Upgrade:
 - Read `player_bust`'s `hip_left` and `hip_right` anchors again: they stand on the hip joints, 89 mm either side of the middle and 92 mm above the hips' foot.
 - Advance the walks by each clip's own `strideMetres`, which grows by about 13%, rather than by a stride you measured.
 - Refit anything drawn around the player's thighs, which are 190 mm deep rather than 160 mm.
+- Give every `avatarLeg` part a `thighTop`, the height below the hip joint where the thigh's flesh ends; `0` keeps a thigh that runs up to the joint.

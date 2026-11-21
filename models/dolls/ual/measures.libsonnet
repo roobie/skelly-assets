@@ -106,6 +106,7 @@ local arm = {
 ]);
 
 local leg = joints.leg {
+  thighTop: playerLeg.hipsOverlap - level('thigh_l'),
   thighWidth: 0.155, thighDepth: 0.19,
   shinWidth: 0.11, shinDepth: 0.135,
   shoeWidth: 0.11,
