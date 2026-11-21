@@ -1927,11 +1927,10 @@ const receiverSolids = (context: ReceiverContext): Solid[] => {
       z: [-PUMP_LOADING_PORT_HALF_WIDTH_U, PUMP_LOADING_PORT_HALF_WIDTH_U],
     });
   }
-  // A traced SMG's cocking tube may run back into the receiver, which leaves its channel open there.
+  // A cocking tube run back into the receiver leaves its channel open there.
   const tracedTubeGun = tracedSmgFor(params.section);
-  if (tracedTubeGun) {
-    const { channel } = tracedSmgCockingTube(tracedTubeGun, params.section);
-    internalPockets.push(...channel.filter(({ x }) => x[0] < frontFaceX));
+  if (tracedTubeGun && tubeEntersReceiver(params.section, handleStyleKey)) {
+    internalPockets.push(...tracedSmgCockingTube(tracedTubeGun, params.section).channel);
   }
   const shell = receiverShellSolids({
     section: params.section ?? 'standard',
@@ -2652,12 +2651,23 @@ const smgTubeFor = (
   };
 };
 
+/** Whether a cocking-tube handle's tube runs back past the traced receiver's front face, its stem through the receiver. */
+const tubeEntersReceiver = (section: string | undefined, handleStyle: CarrierHandleStyle): boolean => {
+  const traced = tracedSmgFor(section);
+  return (
+    CARRIER_HANDLE_STYLES[handleStyle].shape === 'mp5-cocking-tube' &&
+    traced !== undefined &&
+    traced.chargingHandle.tube.rearX < traced.receiver.frontX
+  );
+};
+
 /**
- * The handle's path volumes are boxes round its whole sweep. A tube run back into the receiver takes the stem through
- * the receiver's carved slot and notch, which is its real path there, so the receiver may stand inside those boxes.
+ * The stem's path volumes are boxes round its sweep. Where the tube runs into the receiver the stem rides the
+ * receiver's carved slot and notch, its real path there, so the receiver may stand inside those boxes; the stop sweep
+ * still certifies the real solids.
  */
-const smgHandlePathAllowance = (section: string | undefined, allowPort: string) =>
-  smgTubeFor(section).rearX < 0 ? { allowPort, allowFamilies: ['receiver'] } : allowPort;
+const smgStemPathAllowance = (section: string | undefined, allowPort: string) =>
+  tubeEntersReceiver(section, 'smg') ? { allowPort, allowFamilies: ['receiver'] } : allowPort;
 
 /** Travel and notch turn; the stem's share takes its part of the slot's length. */
 const smgHandleTravel = (section: string | undefined): { readonly travelU: number; readonly turnDegrees: number } => {
@@ -2674,12 +2684,36 @@ const smgHandleTravel = (section: string | undefined): { readonly travelU: numbe
 };
 
 /**
+ * Boxes over the stem's turn into the notch, along `x`: about the bore at `centre`, the stem fans up by `turnDegrees`
+ * from pointing out of the slot at the shooter's left, `reach` long and `half` wide either side of its axis. The slot
+ * already holds the band level with it; each GRID band of height above that spans what the fan sweeps across it, from
+ * the turned stem's upper edge out to its far corner's arc.
+ */
+const stemTurnPockets = (
+  x: readonly [number, number],
+  [y, z]: readonly [number, number],
+  reach: number,
+  half: number,
+  turnDegrees: number,
+): SectionPocket[] => {
+  const turn = (turnDegrees * Math.PI) / 180;
+  const corner = Math.hypot(reach, half);
+  const top = turn + Math.atan2(half, reach) >= Math.PI / 2 ? corner : reach * Math.sin(turn) + half * Math.cos(turn);
+  return Array.from({ length: Math.ceil((top - half) / GRID) }, (_, band) => {
+    const low = half + band * GRID;
+    const inner = low / Math.tan(turn) - half / Math.sin(turn);
+    const outer = Math.sqrt(corner ** 2 - low ** 2);
+    return { x, y: [y + low, y + Math.min(low + GRID, top)], z: [z - outer, z - inner] };
+  });
+};
+
+/**
  * A square cocking tube from its rear end to `tubeEnd`, slotted on the shooter's left and notched upward at the
  * slot's rear end. `centre` is the bore axis's y and z in the handguard frame.
  */
 const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], section: string | undefined) => {
   const { slotLengthU, halfU: half, rearX, frontWallU } = smgTubeFor(section);
-  const { travelU } = smgHandleTravel(section);
+  const { travelU, turnDegrees } = smgHandleTravel(section);
   const [y, z] = centre;
   // A wall strip closes the slot's front end, so the handle rests inside the tube.
   const slotFrontX = tubeEnd - frontWallU;
@@ -2710,19 +2744,14 @@ const smgCockingTube = (tubeEnd: number, centre: readonly [number, number], sect
       'smg-handle-travel',
       [restX - travelU, y - SMG_HANDLE_STEM_SLOT_HALF_U, z - half - 1],
       [restX, y + SMG_HANDLE_STEM_SLOT_HALF_U + 2 * GRID, z - half],
-      smgHandlePathAllowance(section, 'smg-handle'),
+      smgStemPathAllowance(section, 'smg-handle'),
     ),
-    // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the notch. The notch
-    // is the box bounding the tube's whole upper-left quarter, not the stem's sweep, so it holds any notch turn up to
-    // the right angle `smgHandleTravel` allows.
+    // What a body built round the tube leaves open: the tube, the stem's slot out to the knob, and the notch, which
+    // holds only the stem's turn into it.
     channel: [
       { x: [rearX, tubeEnd], y: [y - half, y + half], z: [z - half, z + half] },
       { x: [slotRearX, slotFrontX], y: stemSlot, z: [z - stemReach, z - half] },
-      {
-        x: [slotRearX, notchFrontX],
-        y: [stemSlot[0], y + stemReach],
-        z: [z - stemReach, z + SMG_HANDLE_STEM_SLOT_HALF_U],
-      },
+      ...stemTurnPockets([slotRearX, notchFrontX], centre, stemReach, SMG_HANDLE_STEM_SLOT_HALF_U, turnDegrees),
     ] satisfies SectionPocket[],
   };
 };
@@ -2774,24 +2803,27 @@ const smgSlidingHandle: PartFamily = {
     const [minimum, maximum] = solidsBounds(solids);
     const clearance = CARRIER_HANDLE_STYLES.smg.handClearanceU;
     const { travelU: travel, turnDegrees } = smgHandleTravel(params.section);
+    const low = [minimum[0] - clearance, Math.max(minimum[1] - clearance, -0.25), minimum[2] - clearance] as const;
+    const high = [maximum[0] + clearance, maximum[1] + clearance, maximum[2] + clearance] as const;
+    const swept = (id: string, from: number, to: number, allowance: Parameters<typeof keepOut>[3]) =>
+      keepOut(id, [low[0], low[1], from], [high[0] + travel, high[1], to], allowance);
+    // Local z runs out from the bore. Where the tube runs into the receiver, only the stem's share of the sweep, inside
+    // the receiver's side, may pass through it; the knob and the hand round it stay clear of everything.
+    const receiverSide = tubeEntersReceiver(params.section, 'smg')
+      ? tracedSmgFor(params.section)!.receiver.halfWidthU
+      : undefined;
+    const sweeps =
+      receiverSide === undefined
+        ? [swept('smg-handle-sweep', low[2], high[2], 'mount')]
+        : [
+            swept('smg-handle-stem-sweep', low[2], receiverSide, smgStemPathAllowance(params.section, 'mount')),
+            swept('smg-handle-sweep', receiverSide, high[2], 'mount'),
+          ];
     return {
       family: 'smg-handle',
       solids,
       ports: [{ id: 'mount', mount: 'smg-handle', gender: 'male', pos: [0, 0, 0], normal: X, up: Y, required: true }],
-      keepOuts: [
-        keepOut(
-          'smg-handle-hand',
-          [minimum[0] - clearance, Math.max(minimum[1] - clearance, -0.25), minimum[2] - clearance],
-          [maximum[0] + clearance, maximum[1] + clearance, maximum[2] + clearance],
-          'mount',
-        ),
-        keepOut(
-          'smg-handle-sweep',
-          [minimum[0] - clearance, Math.max(minimum[1] - clearance, -0.25), minimum[2] - clearance],
-          [maximum[0] + travel + clearance, maximum[1] + clearance, maximum[2] + clearance],
-          smgHandlePathAllowance(params.section, 'mount'),
-        ),
-      ],
+      keepOuts: [keepOut('smg-handle-hand', low, high, 'mount'), ...sweeps],
       axes: [],
       tags: [ACTION_PART_ROLES.handle],
       motion: {

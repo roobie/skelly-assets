@@ -1,6 +1,6 @@
+import { keepOutBetweenParts } from '@skelly/construct/assembly/rules.ts';
 import type { Resolved } from '@skelly/construct/assembly/schema.ts';
-import type { Vec3 } from '@skelly/construct/foundation/math.ts';
-import { IDENTITY } from '@skelly/construct/foundation/math.ts';
+import { applyPoint, IDENTITY, invert, type Vec3 } from '@skelly/construct/foundation/math.ts';
 import { boxFromMinMax, localSolidBounds, penetrationWorld, worldSolid } from '@skelly/construct/shapes/geometry.ts';
 import type { Vec2 } from '@skelly/construct/shapes/solid.ts';
 import { beforeAll, expect, it } from 'vitest';
@@ -124,6 +124,28 @@ it('opens the receiver floor over the well opening from rear to front where the 
   for (const solid of resolved.defs.get(shell)!.solids) {
     expect(penetrationWorld(worldSolid(resolved.placed.get(shell)!, solid), sliver), solid.id).toBeLessThan(1e-9);
   }
+});
+
+it('exempts the receiver only from the stem’s path through it, not from the knob’s and hand’s', () => {
+  const handle = owner(resolved, 'smg-handle');
+  const shell = owner(resolved, 'receiver');
+  const intruderIn = (keepOutId: string): Resolved => {
+    const { box } = resolved.defs.get(handle)!.keepOuts.find(({ id }) => id === keepOutId)!;
+    const centre = applyPoint(
+      invert(resolved.placed.get(shell)!),
+      applyPoint(resolved.placed.get(handle)!, box.center),
+    );
+    const receiverDef = resolved.defs.get(shell)!;
+    const intruder = { id: 'intruder', kind: 'box' as const, box: { center: centre, half: [0.1, 0.1, 0.1] as Vec3 } };
+    return {
+      ...resolved,
+      defs: new Map(resolved.defs).set(shell, { ...receiverDef, solids: [...receiverDef.solids, intruder] }),
+    };
+  };
+  const failedKeepOuts = (r: Resolved) => keepOutBetweenParts(r, shell, handle).map(({ keepOut }) => keepOut?.id);
+  expect(failedKeepOuts(resolved)).toEqual([]);
+  expect(failedKeepOuts(intruderIn('smg-handle-stem-sweep'))).toEqual([]);
+  expect(failedKeepOuts(intruderIn('smg-handle-sweep'))).toContain('smg-handle-sweep');
 });
 
 const reach = (bounds: readonly (readonly [Vec3, Vec3])[], axis: 1 | 2) => [
