@@ -264,6 +264,11 @@ such as a T-pose arm, is a `turn` on its site in the record and not a turn insid
 hanging as `docs/decisions/0008-dressing.md` has them; the code that reads a hand or a loose wearable off a hanging part
 refuses a turned one until it is taught to follow the turn. A doll whose bones are not the player's gives its joints'
 places and its extra cuts to the body families as content (`packages/thing-authoring-tool/README.md`, Body families).
+A doll measured off a skeleton, such as UAL's, names that skeleton in its rig, and the rig is refused unless every
+part sits on its bone's head and every node rests turned as the skeleton's, to 0.1 mm and 1e-4: a game plays the
+skeleton's own clips on the doll, so a part off its joint would swing about the wrong point. The UAL doll's measures
+(`../models/dolls/ual/measures.libsonnet`) therefore read every joint off the skeleton rather than copying numbers,
+and only what a skeleton does not give, the girths, the face and the hair, is set by hand against the mannequin.
 
 Placements are flat, so an engine fitted as an assembly comes apart in its vehicle as its sites, each from the
 vehicle's centre. Each assembly a kit builds, such as an engine with its fittings, a turret with its weapons or a

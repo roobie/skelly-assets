@@ -11,7 +11,8 @@
   // hangs (down -y), as a T-pose arm, adds `turn: { axis, degrees }` for the side that is not `mirrored`; the mirrored
   // side turns as its mirror image, so one turn serves both. The axis is one of the doll's, [±1, 0, 0] or alike, and
   // the degrees a multiple of 90, so a turned part's box stays exact for what reads it. The player's limbs hang, so it
-  // has none.
+  // has none. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its origin in
+  // the doll frame; the player's doll frame is its bust's.
   bust: 'player_bust',
   limbs: [
     { name: 'arm', model: 'player_arm', anchor: 'shoulder' },
@@ -22,13 +23,16 @@
   // What a sided bone's id takes after its name, by side.
   boneSuffix: { right: '.R', left: '.L' },
   rig: import 'models/dolls/player/rig.libsonnet',
-  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions that part is cut into,
-  // which the doll's export keeps as pieces (docs/decisions/0012-hidden-body.md). A part not listed is not cut.
+  // What a worn piece's `covers` may name besides the doll part it is drawn on: the regions with a surface on that
+  // part (docs/decisions/0012-hidden-body.md), each by the surfaces that make it, a whole part or `<part>#<piece>`, a
+  // piece the doll's export keeps of a part cut into regions.
   regions: {
     // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
-    torso: ['trunk', 'shoulders'],
+    trunk: ['torso#trunk'],
+    shoulders: ['torso#shoulders'],
     // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it: heel, instep and toes.
-    foot: ['ankle', 'sole'],
+    ankle: ['foot#ankle'],
+    sole: ['foot#sole'],
   },
   // The doll part each segment a worn piece's id ends in is drawn in, and the body slot it covers.
   slots: import 'models/worn-slots.libsonnet',

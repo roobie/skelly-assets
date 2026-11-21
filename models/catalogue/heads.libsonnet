@@ -233,6 +233,7 @@ local heads = import 'tools/jsonnet/heads.libsonnet';
   'models/catalogue/sets/packages.libsonnet': heads.of(import 'models/catalogue/sets/packages.libsonnet'),
   'models/catalogue/sets/stash-chest.libsonnet': heads.of(import 'models/catalogue/sets/stash-chest.libsonnet'),
   'models/catalogue/sets/supplies.libsonnet': heads.of(import 'models/catalogue/sets/supplies.libsonnet'),
+  'models/catalogue/sets/ual.libsonnet': heads.of(import 'models/catalogue/sets/ual.libsonnet'),
   'models/catalogue/sets/warrior-statue.libsonnet': heads.of(import 'models/catalogue/sets/warrior-statue.libsonnet'),
   'models/catalogue/sets/woodland.libsonnet': heads.of(import 'models/catalogue/sets/woodland.libsonnet'),
   'models/catalogue/sets/zweihander.libsonnet': heads.of(import 'models/catalogue/sets/zweihander.libsonnet'),

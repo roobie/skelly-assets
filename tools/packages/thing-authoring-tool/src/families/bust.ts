@@ -54,13 +54,22 @@ const BustParams = strictObject({
   chestLowShare: positive,
   torsoChamfer: positive,
   chestChamfer: positive,
-  /** The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. */
+  /**
+   * The trapezius' clip planes, one per side, and the left deltoid's centre, plan radius and half height. The centre
+   * lies on the trunk's centre line, front to back, unless it gives its `z`.
+   */
   girdle: pipe(
     string(),
     transform((text): unknown => JSON.parse(text)),
     strictObject({
       trapezius: array(strictObject({ normal: tuple([number(), number(), number()]), offset: number() })),
-      deltoid: strictObject({ x: number(), y: number(), radius: number(), halfHeight: number() }),
+      deltoid: strictObject({
+        x: number(),
+        y: number(),
+        z: optional(number(), 0),
+        radius: number(),
+        halfHeight: number(),
+      }),
     }),
   ),
   neckWidth: positive,
@@ -154,8 +163,8 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
   const brow = crown + d.jawHeight;
   // The shoulder: an upright spheroid, so the arm hangs from a cap round from above and from the front.
   const deltoid = (id: string, side: 1 | -1) => {
-    const { x, y, radius, halfHeight } = d.girdle.deltoid;
-    return spheroid(id, [side * x, y - origin, 0], [halfHeight, radius], ['y', 'skin']);
+    const { x, y, z, radius, halfHeight } = d.girdle.deltoid;
+    return spheroid(id, [side * x, y - origin, z], [halfHeight, radius], ['y', 'skin']);
   };
   const facePower = d.facePower;
   /** Where the face's rounded front lies at `x`, so a feature can sit on the surface rather than stand off it. */
@@ -258,18 +267,22 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
     // A spine segment is a whole part of one region, so it needs no region of its own.
     const at = (height: number) => height - origin;
     const { ribs: ribsCut, clavicle } = spineCuts(d);
+    // A clavicle lifts the girdle's slope off the neck's foot; the neck hangs from the chest, so the chest keeps the
+    // girdle's top under the neck for it to stand on.
+    const neckFoot = d.neckWidth / 2;
+    const girdle = cut(slope, 'y', at(clavicle), 1);
     switch (d.segment) {
       case 'waist':
         return cut(trunk, 'y', at(ribsCut), -1);
       case 'ribs':
         return cut(trunk, 'y', at(ribsCut), 1);
       case 'chest':
-        return cut(slope, 'y', at(clavicle), -1);
+        return [...cut(slope, 'y', at(clavicle), -1), ...cut(cut(girdle, 'x', -neckFoot, 1), 'x', neckFoot, -1)];
       // The deltoid caps the arm the clavicle carries, so it rides the clavicle whole, however low it reaches.
       case 'clavicle_l':
-        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, 1), deltoids.left];
+        return [...cut(girdle, 'x', neckFoot, 1), deltoids.left];
       case 'clavicle_r':
-        return [...cut(cut(slope, 'y', at(clavicle), 1), 'x', 0, -1), deltoids.right];
+        return [...cut(girdle, 'x', -neckFoot, -1), deltoids.right];
     }
   }
   if (d.segment === 'neck') {

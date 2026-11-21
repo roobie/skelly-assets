@@ -41,12 +41,14 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {string} pack the pack its rig is released in
  * @property {string} rigPath where in that pack
  * @property {string} bust
+ * @property {Vec3} [bustAt] where the bust's origin stands in the doll frame, the doll frame's own origin if not given
  * @property {readonly DollLimb[]} limbs in the order their sites are numbered
  * @property {readonly [string, string]} sides
  * @property {string} mirrored
  * @property {Readonly<Record<string, string>>} boneSuffix
  * @property {any} rig the rig's content (tools/dollRig.mjs)
- * @property {Readonly<Record<string, readonly string[]>>} regions
+ * @property {Readonly<Record<string, readonly string[]>>} regions each region by the surfaces that make it: a whole
+ * part, or `<part>#<piece>`, a piece the export keeps of a part cut into regions
  * @property {Readonly<Record<string, { part: string; slot: string }>>} slots
  * @property {Place[]} places
  */
@@ -368,7 +370,8 @@ export function modelMeshes(buffer, keep = () => true) {
 /**
  * The doll's sites, for each of its part names the copies of that part in the doll frame as
  * { side, site, at, box, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
- * draws the copy, and the bust's anchors, which are in the doll frame too. A limb's copies are placed as its site is:
+ * draws the copy, and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may
+ * keep the frame its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is:
  * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the other's),
  * then moved so its own anchor lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the
  * doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
@@ -376,7 +379,7 @@ export function modelMeshes(buffer, keep = () => true) {
  * @param {Readonly<Record<string, FigureModel>>} figure
  */
 export function dollOf(dressing, figure) {
-  const { bust, sides, mirrored: mirroredSide } = dressing;
+  const { bust, bustAt = [0, 0, 0], sides, mirrored: mirroredSide } = dressing;
   const { limbs } = dressing;
   /** @param {string} model */
   const figureOf = (model) => {
@@ -385,17 +388,22 @@ export function dollOf(dressing, figure) {
     return found;
   };
   /** @type {DollSite[]} */
-  const sites = [{ model: bust, at: [0, 0, 0] }];
+  const sites = [{ model: bust, at: bustAt }];
   /** @type {Map<string, PartCopy[]>} */
   const parts = new Map();
   /** @param {PartCopy} copy */
   const add = (copy) => parts.set(copy.part, [...(parts.get(copy.part) ?? []), copy]);
-  for (const { part, at, box } of figureOf(bust).parts) add({ part, side: 'centre', site: 0, at, box });
+  for (const { part, at, box } of figureOf(bust).parts) {
+    add({ part, side: 'centre', site: 0, at: sum(bustAt, at), box: moved(box, bustAt) });
+  }
+  const anchors = Object.fromEntries(
+    Object.entries(figureOf(bust).anchors).map(([name, at]) => [name, sum(bustAt, at)]),
+  );
   for (const { model, anchor, turn: limbTurn } of limbs) {
     const own = figureOf(model).anchors[anchor];
     const unmirroredTurn = limbTurn && turnOf(model, limbTurn);
     for (const side of sides) {
-      const hung = figureOf(bust).anchors[`${anchor}_${side}`];
+      const hung = anchors[`${anchor}_${side}`];
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
       const turn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
@@ -426,7 +434,7 @@ export function dollOf(dressing, figure) {
       }
     }
   }
-  return { sites, parts, anchors: figureOf(bust).anchors };
+  return { sites, parts, anchors };
 }
 
 // ---- dressing ----
@@ -485,9 +493,12 @@ export function wornPieces(id, models, dressing) {
   });
 }
 
+/** The doll part a region's surface lies on. @param {string} surface */
+const surfacePart = (surface) => surface.split('#')[0];
+
 /**
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
- * regions the dressing cuts that part into, since a consumer hides by those names and no other.
+ * doll's regions with a surface on that part, since a consumer hides by those names and no other.
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
  */
@@ -498,7 +509,10 @@ export function coversProblems(models, dressing) {
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
     const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
     if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
-    const names = [part, ...(dressing.regions[part] ?? [])];
+    const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
+      surfaces.some((surface) => surfacePart(surface) === part),
+    );
+    const names = [part, ...regions.map(([region]) => region)];
     return covers
       .filter((name) => !names.includes(name))
       .map((name) => `${id} covers ${name}, which is neither its part nor a region of it: ${names.join(', ')}`);

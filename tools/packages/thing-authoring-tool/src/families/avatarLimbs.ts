@@ -1,6 +1,6 @@
 import type { Vec3 } from '@skelly/construct/foundation/math.ts';
 import type { BoxSolid, ExtrudedPolygonSolid, RevolvedSolid, Vec2 } from '@skelly/construct/shapes/solid.ts';
-import { array, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
+import { array, minValue, number, optional, parse, picklist, pipe, strictObject, string, transform } from 'valibot';
 import { block, cut, oval, region, taper, translate } from './body.ts';
 import { json, point3, positive, requireConvex, requireJointHeights, scalar, spheroid } from './shapes.ts';
 
@@ -30,6 +30,7 @@ const numbers = pipe(
   transform((s) => JSON.parse(s) as number[]),
   array(number()),
 );
+const length = pipe(number(), minValue(Number.MIN_VALUE));
 const names = pipe(
   string(),
   transform((s) => JSON.parse(s) as string[]),
@@ -99,6 +100,17 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
        * does not describe; the palm ends along it.
        */
       knuckles: optional(json(array(point3))),
+      /**
+       * Each finger's phalanges' lengths, the index first and each from the knuckle, and the thumb's bones', for a hand
+       * whose digits the measures' shares do not describe, as a skeleton's do not.
+       */
+      phalanxLengths: optional(json(array(array(length)))),
+      thumbLengths: optional(json(array(length))),
+      /**
+       * A digit's far joint, or its tip, from its own joint in the arm's frame, for a digit that leans off hanging
+       * straight down, as a thumb reaching forward from the palm's edge does.
+       */
+      tail: optional(json(point3)),
     }),
     params,
   );
@@ -124,14 +136,53 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   if (d.segment === 'thumb' && !(phalanx >= 0 && phalanx < d.thumbShares.length)) {
     throw new Error(`thumb segment needs a phalanx below ${d.thumbShares.length}, not ${d.phalanx}`);
   }
-  const phalanxLength = (k: number) => d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
+  if (
+    d.phalanxLengths &&
+    (d.phalanxLengths.length !== d.fingers.length ||
+      d.phalanxLengths.some((lengths) => lengths.length !== d.phalanxShares.length))
+  ) {
+    throw new Error(`The hand's phalanxLengths need ${d.phalanxShares.length} for each of ${d.fingers.join(' ')}`);
+  }
+  if (d.thumbLengths && d.thumbLengths.length !== d.thumbShares.length) {
+    throw new Error(`The hand's thumbLengths need one for each of the thumb's ${d.thumbShares.length} bones`);
+  }
+  const phalanxLength = (k: number) =>
+    d.phalanxLengths?.[fingerAt]?.[k] ?? d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
   const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
-  const thumbLength = (k: number) => d.thumbLength * (d.thumbShares[k] ?? 0);
+  const thumbLength = (k: number) => d.thumbLengths?.[k] ?? d.thumbLength * (d.thumbShares[k] ?? 0);
   const thumbTop = thumbRoot - d.thumbShares.slice(0, phalanx).reduce((sum, _, k) => sum + thumbLength(k), 0);
   const measured = { upper: 0, fore: elbow, palm: wrist };
   if (d.origins) {
     requireJointHeights(d.origins, measured, 'arm');
   }
+  const digitLength = d.segment === 'thumb' ? thumbLength(phalanx) : phalanxLength(phalanx);
+  if (d.tail) {
+    if (d.segment !== 'finger' && d.segment !== 'thumb') {
+      throw new Error(`The arm's ${d.segment} is no digit, so it has no tail`);
+    }
+    requireJointHeights({ tail: d.tail }, { tail: -digitLength }, 'digit');
+  }
+  /**
+   * A digit's flesh, its section `xs` by `zs` about its joint, from `[bottom, top]` in its frame. One upright block for
+   * a digit hanging straight; along a leaning one, upright steps, each moved across by no more than the flesh's half
+   * width from the last so that they overlap, since the voxel families draw no slanted solid.
+   */
+  const digit = (id: string, xs: Vec2, [bottom, top]: Vec2, zs: Vec2): BoxSolid[] => {
+    const [x, , z] = d.tail ?? [0, 0, 0];
+    const halfWidth = Math.min(xs[1] - xs[0], zs[1] - zs[0]) / 2;
+    const steps = Math.max(1, Math.ceil(Math.hypot(x, z) / halfWidth));
+    const across = ([from, to]: Vec2, lean: number, share: number): Vec2 => [from + lean * share, to + lean * share];
+    return Array.from({ length: steps }, (_, i) => {
+      const middle = (i + 0.5) / steps;
+      return block(
+        i === 0 ? id : `${id}-${i}`,
+        'skin',
+        across(xs, x, middle),
+        [(bottom * (i + 1)) / steps, i === 0 ? top : (bottom * i) / steps],
+        across(zs, z, middle),
+      );
+    });
+  };
   const joints = d.origins ?? { upper: [0, 0, 0], fore: [0, elbow, 0], palm: [0, wrist, 0] };
   // Each segment's origin in the arm frame; the segment is drawn about it. A digit is drawn about its own joint
   // already, where its socket on the palm places it, so it has no joint off the arm's centre line to be moved by.
@@ -259,15 +310,10 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
         const slim = phalanx === d.phalanxShares.length - 1 ? 0.85 : 1;
         const thick = halfThick * d.fingerThicknessShare * slim;
         const half = (fingerWidth / 2) * slim;
-        return [
-          block(
-            d.finger!,
-            'skin',
-            [-thick, thick],
-            ys(phalanxTop - phalanxLength(phalanx), phalanxTop + d.handOverlap),
-            [-half, half],
-          ),
-        ];
+        return digit(d.finger!, [-thick, thick], ys(phalanxTop - phalanxLength(phalanx), phalanxTop + d.handOverlap), [
+          -half,
+          half,
+        ]);
       }
       case 'thumb': {
         // The metacarpal sinks into the palm's edge; the phalanges beyond it stand clear of the edge they hang beside,
@@ -278,15 +324,17 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
           phalanx === 0
             ? [thumbEdge, halfPalm + d.thumbProjection]
             : [halfPalm + 0.001, halfPalm + d.thumbProjection - 0.002];
-        return [
-          block(
-            'thumb',
-            'skin',
-            [-thick, thick],
-            ys(thumbTop - thumbLength(phalanx), thumbTop + (phalanx === 0 ? 0 : d.handOverlap)),
-            [zs[0] - thumbEdge, zs[1] - thumbEdge],
-          ),
-        ];
+        // The measures' thumb joint lies on the palm's edge, the flesh in front of it; a skeleton's thumb bone, which
+        // a tail follows, runs through the flesh's middle.
+        const across: Vec2 = d.tail
+          ? [(zs[0] - zs[1]) / 2, (zs[1] - zs[0]) / 2]
+          : [zs[0] - thumbEdge, zs[1] - thumbEdge];
+        return digit(
+          'thumb',
+          [-thick, thick],
+          ys(thumbTop - thumbLength(phalanx), thumbTop + (phalanx === 0 ? 0 : d.handOverlap)),
+          across,
+        );
       }
       default:
         return d.segment satisfies never;

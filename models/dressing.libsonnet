@@ -4,6 +4,7 @@
   // The dolls by id: the targets a wearable is dressed on, each in models/dolls/<id>/doll.libsonnet.
   dolls: {
     player: import 'models/dolls/player/doll.libsonnet',
+    ual: import 'models/dolls/ual/doll.libsonnet',
   },
   // The doll part a worn piece with no segment in its id, `<item>_worn`, is drawn in. A segment's part is in the doll's
   // `slots`.

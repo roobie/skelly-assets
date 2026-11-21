@@ -49,7 +49,9 @@ a handle or moving its part also moves the hand. Pose corrections stay authored 
 the geometry because the consumer's held frame need not match the tool's upright frame.
 See `src/catalogue.ts`, `buildItem`, and `packages.libsonnet`. Attachment datums, exported
 as named anchors, use the same solid reference for the same reason: a vehicle part's mount
-follows its geometry. See `models/kits/vehicle-parts.libsonnet`.
+follows its geometry. See `models/kits/vehicle-parts.libsonnet`. A doll's joint anchor is
+instead a point of its part's frame, since a skeleton's joint must land where the skeleton
+has it, not on the nearest voxel of the flesh.
 
 Equipment uses family-specific construction rather than a generic box so silhouettes and
 exposed working parts remain useful identification cues at play distance. Repair trays show
@@ -168,7 +170,9 @@ than drawing each anew, so the split body has the silhouette the whole one has; 
 of the trunk, so the trunk is not moved onto them. The ribs and the chest are cut where their joints stand, so the
 cut and the joint cannot disagree. A region `covers` names is then a union of whole parts, which needs no piece of
 its own. The chest's joint must be the armpit, because a garment's trunk ends there and a region that ended
-elsewhere would hide skin it does not enclose. See
+elsewhere would hide skin it does not enclose. A clavicle lifts only the girdle's slope; the girdle's top under the
+neck stays on the chest, because the neck hangs from the chest and parts that are not joined may not overlap, so the
+neck could stand on nothing else. See
 `src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
 
 A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and

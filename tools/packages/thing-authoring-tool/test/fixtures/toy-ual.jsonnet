@@ -26,6 +26,7 @@ local bustOrigins = {
   chest: [0, armpit, 0.012],
   clavicle_l: [0.03, clavicleCut - 0.01, 0.01],
   clavicle_r: [-0.03, clavicleCut - 0.01, 0.01],
+  neck: [0, girdle.chestTop, -0.008],
 };
 local bustPart(segment) = h.part(segment, 'bust', 1, girdle.bustParams {
   segment: segment,
@@ -75,6 +76,12 @@ local boot = fit.feet('toy_boot', { upper: 'paint-charcoal', toe: 'paint-charcoa
     ] + [
       item('toy_arm_' + hand.part('index', 0), armPart(hand.part('index', 0), { segment: 'finger', finger: 'index', phalanx: 0 })),
       item('toy_arm_' + hand.thumbPart(0), armPart(hand.thumbPart(0), { segment: 'thumb', phalanx: 0 })),
+      // A thumb bone reaching forward and toward the palm's face, as a skeleton's does from the palm's edge.
+      item('toy_arm_' + hand.thumbPart(1), armPart(hand.thumbPart(1), {
+        segment: 'thumb',
+        phalanx: 1,
+        tail: [0.016, -hand.thumbLength(1), 0.015],
+      })),
     ],
     leg: [item('toy_leg_' + segment, legPart(segment)) for segment in ['thigh', 'shin', 'foot', 'ball']],
   },

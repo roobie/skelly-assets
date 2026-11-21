@@ -118,6 +118,22 @@ test('a turned limb hangs from its anchor with its parts, origins and boxes in t
   close(doll.sites[2].at, [0.1, 0.4, 0], 'left site');
 });
 
+test('a bust stood off the doll frame origin carries its parts, its anchors and the limbs hung on them', () => {
+  const by = [0.01, 0.9, -0.02];
+  const stood = dollOf({ ...dressing, bustAt: by }, figure);
+  close(stood.sites[0].at, by, 'bust site');
+  close(stood.parts.get('torso')[0].at, by, 'torso');
+  close(stood.parts.get('torso')[0].box.min, [-0.09, 0.9, -0.12], 'torso box');
+  close(stood.anchors.shoulder_right, [-0.09, 1.3, -0.02], 'anchor');
+  for (const [i, copy] of stood.parts.get('fore').entries()) {
+    close(
+      copy.at,
+      doll.parts.get('fore')[i].at.map((c, axis) => c + by[axis]),
+      `fore ${copy.side}`,
+    );
+  }
+});
+
 test("a bone's head, reach and joint frame follow the turn, the left a mirror image of the right", () => {
   const [right, left] = [bone('upper.R'), bone('upper.L')];
   close(right.head, [-0.1, 0.4, 0]);
@@ -128,6 +144,65 @@ test("a bone's head, reach and joint frame follow the turn, the left a mirror im
   // Flex axis x turns to -y on the right and +y on the left, the axial image of a rotation across the plane.
   close([right.frame.x, right.frame.y, right.frame.z].flat(), [0, -1, 0, -1, 0, 0, 0, 0, -1]);
   close([left.frame.x, left.frame.y, left.frame.z].flat(), [0, 1, 0, 1, 0, 0, 0, 0, -1]);
+});
+
+// The skeleton the toy is measured off: each bone's head where its part's origin lies, and its node's rotation stored
+// local to its parent's, as a GLB's are.
+const skeleton = (() => {
+  const world = (id) => quatToMat3(bone(id).node.rotation);
+  return Object.fromEntries(
+    rig.bones.map(({ id, parent, head }) => [
+      id,
+      {
+        parent,
+        head,
+        rotation: mat3ToQuat(parent === null ? world(id) : mulMM(transpose(world(parent)), world(id))),
+      },
+    ]),
+  );
+})();
+const measured = (bones) => dollRig(doll, { ...dressing, rig: { ...rigContent, skeleton: bones } });
+
+test("a doll measured off a skeleton seats each part on its bone's head and rests each node as the skeleton's", () => {
+  assert.doesNotThrow(() => measured(skeleton));
+  const off = { ...skeleton, 'fore.L': { ...skeleton['fore.L'], head: add(skeleton['fore.L'].head, [0, 0.0002, 0]) } };
+  assert.throws(() => measured(off), /fore\.L's part lies 0\.00020 m from the skeleton's head/);
+  const turned = mat3ToQuat(mulMM(quatToMat3(skeleton.spine.rotation), rotAxis([0, 1, 0], 0.05)));
+  assert.throws(() => measured({ ...skeleton, spine: { ...skeleton.spine, rotation: turned } }), /spine's node rests/);
+  const { 'upper.R': _, ...missing } = skeleton;
+  assert.throws(() => measured(missing), /upper\.R is no bone of the skeleton/);
+  const rehung = { ...skeleton, 'fore.L': { ...skeleton['fore.L'], parent: 'upper.R' } };
+  assert.throws(() => measured(rehung), /fore\.L hangs from upper\.L, not upper\.R as in the skeleton/);
+  // The skeleton may hold a node above the rig's root, as UAL's `root` above its pelvis.
+  const [root] = rig.bones.filter(({ parent }) => parent === null);
+  const above = { root: { parent: null, head: [0, 0, 0], rotation: [0, 0, 0, 1] } };
+  assert.doesNotThrow(() => measured({ ...skeleton, ...above, [root.id]: { ...skeleton[root.id], parent: 'root' } }));
+});
+
+test("a limb hangs on each side from that side's own bone of a paired bust part", () => {
+  // Both girdle bones move the toy's one bust part, which is all a parent needs to be.
+  const girdle = { ...rigContent.bones.spine, parent: 'spine' };
+  const paired = dollRig(doll, {
+    ...dressing,
+    rig: {
+      ...rigContent,
+      bones: {
+        ...rigContent.bones,
+        clavicle_r: girdle,
+        clavicle_l: girdle,
+        upper: { ...rigContent.bones.upper, parent: { right: 'clavicle_r', left: 'clavicle_l' } },
+      },
+    },
+  });
+  const parentOf = (id) => paired.bones.find((b) => b.id === id).parent;
+  assert.equal(parentOf('upper.R'), 'clavicle_r');
+  assert.equal(parentOf('upper.L'), 'clavicle_l');
+  assert.equal(parentOf('fore.L'), 'upper.L');
+  const oneSided = { ...rigContent.bones.upper, parent: { right: 'spine' } };
+  assert.throws(
+    () => dollRig(doll, { ...dressing, rig: { ...rigContent, bones: { ...rigContent.bones, upper: oneSided } } }),
+    /bone upper hangs from no bone on the left/,
+  );
 });
 
 test("the left's limits mirror the axes in the mirror plane as they were written, under the turn", () => {
@@ -144,6 +219,40 @@ test("the left's limits mirror the axes in the mirror plane as they were written
     angles.map((a, i) => a * left.sense[i]),
   );
   close(mirroredPose, reflect(posed));
+});
+
+const withUpper = (upper, on = doll) =>
+  dollRig(on, { ...dressing, rig: { ...rigContent, bones: { ...rigContent.bones, upper } } });
+
+test('a bone running obliquely in its part mirrors as squarely as one running down a doll axis', () => {
+  const slanted = withUpper({ ...rigContent.bones.upper, along: [0.3, -1, 0.4] }).bones;
+  const [right, left] = ['upper.R', 'upper.L'].map((id) => slanted.find((b) => b.id === id));
+  close(left.frame.y, mirrorX(right.frame.y), 'the bone mirrored');
+  assert.deepEqual(left.sense, [1, -1, -1]);
+  const angles = [12, -20, 33];
+  const reflect = (m) => mulMM(mulMM([-1, 0, 0, 0, 1, 0, 0, 0, 1], m), [-1, 0, 0, 0, 1, 0, 0, 0, 1]);
+  close(
+    jointRotation(
+      left,
+      angles.map((a, i) => a * left.sense[i]),
+    ),
+    reflect(jointRotation(right, angles)),
+  );
+});
+
+test('a bone is refused a direction that leaves it no joint frame, or a mirrored copy turned apart from its own', () => {
+  const upper = rigContent.bones.upper;
+  assert.throws(() => withUpper({ ...upper, along: [0, 0, 0] }), /bone upper runs along no direction/);
+  assert.throws(() => withUpper({ ...upper, along: [2, 0, 0] }), /bone upper runs along its flex axis/);
+  assert.throws(() => withUpper({ ...upper, flexAxis: [1, 1, 0] }), /bone upper flexes about .* neither along x/);
+  const parts = new Map(doll.parts);
+  parts.set(
+    'upper',
+    doll.parts
+      .get('upper')
+      .map((copy) => (copy.side === 'left' ? { ...copy, turn: mat3ToQuat(rotAxis([0, 0, 1], 80)) } : copy)),
+  );
+  assert.throws(() => withUpper(upper, { ...doll, parts }), /bone upper's left copy is turned no mirror image/);
 });
 
 // The model meshes of the toy: one triangle per part, in the model frame.

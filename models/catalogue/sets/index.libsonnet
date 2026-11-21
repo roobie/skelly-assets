@@ -232,6 +232,7 @@
   'packages': import 'models/catalogue/sets/packages.libsonnet',
   'stash-chest': import 'models/catalogue/sets/stash-chest.libsonnet',
   'supplies': import 'models/catalogue/sets/supplies.libsonnet',
+  'ual': import 'models/catalogue/sets/ual.libsonnet',
   'warrior-statue': import 'models/catalogue/sets/warrior-statue.libsonnet',
   'woodland': import 'models/catalogue/sets/woodland.libsonnet',
   'zweihander': import 'models/catalogue/sets/zweihander.libsonnet',

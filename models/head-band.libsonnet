@@ -5,38 +5,43 @@
 local bust = import 'models/measures/bust.libsonnet';
 
 local grain = bust.voxelGrain;
-local crown = bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight;
-local hairLine = crown + bust.headHeight - bust.hairCover;
+local crownOf(m) = m.pelvisHeight + m.waistHeight + m.ribHeight + m.chestHeight + m.neckHeight;
+local crown = crownOf(bust);
 // Lattice positions count whole cells; the tolerance absorbs the rounding of a measure that lies on a lattice line.
 local cellsUp(length, cell) = std.ceil(length / cell - 1e-9);
 local cellsDown(length, cell) = std.floor(length / cell + 1e-9);
 
-// The ring covers whole head layers from the first lattice line at or above the hairline: two, about a strap's width.
-local ringLayers = 2;
-local ringBottom = cellsUp(hairLine, grain) * grain;
-local ringTop = ringBottom + ringLayers * grain;
-
-// The hair's plan at the hairline: the pelt round the skull and the dome's foot, which sits further back. A cell is
-// in the ring where its centre lies within the plan widened by a tenth of a grain, more than the voxeliser moves a
-// sample off a cell's centre, so the ring covers every cell the faceted hair under it fills.
-local halfX = bust.headWidth / 2 + bust.hairThickness;
-local halfZ = bust.headDepth / 2 + bust.hairThickness;
-local margin = grain / 10;
-// The pelt's half width at `t` from its centre along z, negative beyond its ends.
-local peltHalfWidth(t) =
-  if t <= 0 then halfX
-  else if t >= halfZ then -1
-  else halfX * std.pow(1 - std.pow(t / halfZ, bust.facePower), 1 / bust.facePower);
-local planHalfWidth(z) = std.max(
-  peltHalfWidth(std.abs(z) - margin),
-  peltHalfWidth(std.abs(z + bust.hairSweep) - margin),
-);
-// Rows of the ring in head cells: row `k` spans z from k to k + 1 and x from -cells to cells.
-local rows = [
-  { k: k, cells: std.floor((planHalfWidth((k + 0.5) * grain) + margin) / grain + 0.5) }
-  for k in std.range(cellsDown(-halfZ - bust.hairSweep, grain) - 1, cellsUp(halfZ, grain))
-];
-local ring = std.filter(function(row) row.cells > 0, rows);
+// The ring of hair of the bust measured by `m`, drawn at `cell`: its height, and its rows in head cells, row `k`
+// spanning z from k to k + 1 and x from -cells to cells.
+local ringOf(m, cell) =
+  local hairLine = crownOf(m) + m.headHeight - m.hairCover;
+  // The ring covers whole head layers from the first lattice line at or above the hairline: two, about a strap's width.
+  local ringLayers = 2;
+  local bottom = cellsUp(hairLine, cell) * cell;
+  // The hair's plan at the hairline: the pelt round the skull and the dome's foot, which sits further back. A cell is
+  // in the ring where its centre lies within the plan widened by a tenth of a cell, more than the voxeliser moves a
+  // sample off a cell's centre, so the ring covers every cell the faceted hair under it fills.
+  local halfX = m.headWidth / 2 + m.hairThickness;
+  local halfZ = m.headDepth / 2 + m.hairThickness;
+  local margin = cell / 10;
+  // The pelt's half width at `t` from its centre along z, negative beyond its ends.
+  local peltHalfWidth(t) =
+    if t <= 0 then halfX
+    else if t >= halfZ then -1
+    else halfX * std.pow(1 - std.pow(t / halfZ, m.facePower), 1 / m.facePower);
+  local planHalfWidth(z) = std.max(
+    peltHalfWidth(std.abs(z) - margin),
+    peltHalfWidth(std.abs(z + m.hairSweep) - margin),
+  );
+  local rows = [
+    { k: k, cells: std.floor((planHalfWidth((k + 0.5) * cell) + margin) / cell + 0.5) }
+    for k in std.range(cellsDown(-halfZ - m.hairSweep, cell) - 1, cellsUp(halfZ, cell))
+  ];
+  { bottom: bottom, top: bottom + ringLayers * cell, rows: std.filter(function(row) row.cells > 0, rows) };
+local playerRing = ringOf(bust, grain);
+local ringBottom = playerRing.bottom;
+local ringTop = playerRing.top;
+local ring = playerRing.rows;
 
 // The deadvox head frame's height in the bust model and its turn about y, and where the game wears each band-fitted
 // model in that frame. The turns are copied from the consumer, roobie/skelly: the frame's from
@@ -52,12 +57,14 @@ local worn = {
   frame: frame,
   worn: worn,
 
-  // The bust's ring of hair, in the bust model frame: its height and its rows as [back, front, half width].
-  hairRing:: {
-    bottom: ringBottom,
-    top: ringTop,
-    rows: [[row.k * grain, (row.k + 1) * grain, row.cells * grain] for row in ring],
+  // The ring of hair of the bust measured by `m`, drawn at `cell`, in that bust's model frame: its height and its rows
+  // as [back, front, half width]. The straps here are fitted to the player's, `hairRing`.
+  hairRingOf(m, cell):: local r = ringOf(m, cell); {
+    bottom: r.bottom,
+    top: r.top,
+    rows: [[row.k * cell, (row.k + 1) * cell, row.cells * cell] for row in r.rows],
   },
+  hairRing:: self.hairRingOf(bust, grain),
 
   // The strap of `model`, `wall` thick, drawn at the strap grain `cell`, as boxes in its authored frame, which the build
   // turns by `forward` degrees about y to face +z, with its `strap_<side>_inner` and `_outer` anchor points. A gear model

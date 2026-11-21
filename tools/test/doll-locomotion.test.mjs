@@ -9,8 +9,8 @@ import { exportDollRigs } from '../dollRig.mjs';
 import { exportLocomotion, gaitAngles, locomotionClips, locomotionProblems, readLocomotion } from '../locomotion.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
-// The doll alone, so the gait is checked on the legs it ships with.
-const { built, manifest, rig } = dollTree({});
+// The doll alone, so the gait is checked on the legs it ships with, and every other doll's parts for the rig export.
+const { built, manifest, rig } = dollTree({ everyDoll: true });
 const gait = readLocomotion(repo);
 const { clips, reports } = locomotionClips(rig, gait);
 const posed = (frame) => boneTransforms(rig.bones, decodeFrame(frame));
@@ -78,13 +78,19 @@ test("a lean is taken at the hips first, so the run's back swing stays within th
 
 test("each doll's rig is written at its record's path, the player's with the site of each of its models", () => {
   const { files, dolls } = exportDollRigs(built, manifest, repo);
-  assert.deepEqual(files, ['skelly.body/motions/doll.rig.json']);
+  assert.deepEqual(files, ['skelly.body/motions/doll.rig.json', 'skelly.body/dolls/ual.rig.json']);
   assert.deepEqual(dolls, [
     {
       id: 'player',
       pack: 'skelly.body',
       rig: 'motions/doll.rig.json',
       models: { bust: 'player_bust', arm: 'player_arm', leg: 'player_leg' },
+    },
+    {
+      id: 'ual',
+      pack: 'skelly.body',
+      rig: 'dolls/ual.rig.json',
+      models: { bust: 'ual_bust', arm: 'ual_arm', leg: 'ual_leg' },
     },
   ]);
   const written = JSON.parse(readFileSync(join(built, files[0]), 'utf8'));
