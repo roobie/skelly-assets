@@ -833,15 +833,43 @@ export const CARRIER_HANDLE_STYLES = {
 export const EJECTION_PORT_RULES = {
   marginU: EJECTION_PORT_MARGIN_U,
   pumpShellMinimum: { lengthU: PUMP_SHELL_LOADED_LENGTH_U, endClearanceU: EJECTION_PORT_MARGIN_U },
+  // A port sized from the case it throws out, in case lengths along the bore and head diameters across it.
+  caseClearance: { lengthFactor: 1.5, diameterFactor: 1.2 },
 } as const;
+
+interface PortWindow {
+  readonly x: readonly [number, number];
+  readonly y: readonly [number, number];
+}
+
+/**
+ * A port the spent case clears: at full recoil the case's head rides the bolt face, so the port centres on where the
+ * case then lies, grown by the case-clearance factors, its edges at the nearest grid lines.
+ */
+const caseEjectionPortWindow = (
+  chamberedCase: TracedSmgProportions['chamberedCase'],
+  breechX: number,
+  travelLength: number,
+  carrierY: number,
+): PortWindow => {
+  const { lengthFactor, diameterFactor } = EJECTION_PORT_RULES.caseClearance;
+  const centreX = breechX - travelLength + chamberedCase.lengthU / 2;
+  const halfX = (lengthFactor * chamberedCase.lengthU) / 2;
+  const halfY = (diameterFactor * chamberedCase.headDiameterU) / 2;
+  const toGrid = (value: number) => Math.round(value / GRID) * GRID;
+  return {
+    x: [toGrid(centreX - halfX), toGrid(centreX + halfX)],
+    y: [toGrid(carrierY - halfY), toGrid(carrierY + halfY)],
+  };
+};
 
 const ejectionPortWindow = (
   pattern: BoltCarrierPattern,
   restX: number,
   carrierY: number,
-  { arLayout, section }: { readonly arLayout?: ARActionLayout | undefined; readonly section?: string | undefined } = {},
-) => {
-  const envelope = carrierEnvelope(pattern, { frameId: arLayout?.frameId, section });
+  arLayout?: ARActionLayout,
+): PortWindow => {
+  const envelope = carrierEnvelope(pattern, { frameId: arLayout?.frameId });
   const margin = EJECTION_PORT_MARGIN_U;
   let xMin = restX - envelope.x[1] - margin;
   let xMax = restX - envelope.x[0] + margin;
@@ -868,11 +896,7 @@ const ejectionPortWindow = (
   };
 };
 
-export const akChargingHandleSlotWindow = (
-  carrierY: number,
-  port: ReturnType<typeof ejectionPortWindow>,
-  travel: number,
-) => {
+export const akChargingHandleSlotWindow = (carrierY: number, port: PortWindow, travel: number) => {
   const [handleMinimum, handleMaximum] = solidsBounds(akChargingHandleSolids());
   const margin = BOLT_CARRIER_RUNNING_CLEARANCE_U;
   return {
@@ -1155,7 +1179,7 @@ const receiverShellSolids = ({
   receiverDrop: number;
   carrierPattern: BoltCarrierPattern;
   carrierY: number;
-  portWindow: ReturnType<typeof ejectionPortWindow>;
+  portWindow: PortWindow;
   portSlots?: readonly SectionWindow[];
   frontFaceX: number;
   internalPockets?: readonly SectionPocket[];
@@ -1510,7 +1534,7 @@ interface ReceiverContext {
   readonly rearFaceX: number;
   readonly receiverBottom: number;
   readonly receiverTop: number;
-  readonly portWindow: ReturnType<typeof ejectionPortWindow>;
+  readonly portWindow: PortWindow;
   readonly travel: BoltTravel;
   readonly carrierPattern: BoltCarrierPattern;
   readonly carrierY: number;
@@ -2135,6 +2159,10 @@ const receiver: PartFamily = {
         ? baseTravel
         : { ...baseTravel, restX: breechX + carrierEnvelope(carrierPattern, carrierFit).x[0] };
     const carrierY = carrierAxisY(carrierPattern, receiverDrop, params.section);
+    const portWindow =
+      traced && carrierPattern === 'smg'
+        ? caseEjectionPortWindow(traced.chamberedCase, traced.barrel.breechU, travel.length, carrierY)
+        : ejectionPortWindow(carrierPattern, travel.restX, carrierY, arLayout);
     const context: ReceiverContext = {
       params,
       bore,
@@ -2146,7 +2174,7 @@ const receiver: PartFamily = {
       receiverBottom,
       receiverTop,
       carrierPattern,
-      portWindow: ejectionPortWindow(carrierPattern, travel.restX, carrierY, { arLayout, section: params.section }),
+      portWindow,
       travel,
       carrierY,
       arLayout,

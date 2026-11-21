@@ -1,3 +1,4 @@
+import { NINE_MM_CASE } from './nineMmCase.ts';
 import { citedBarrel, stockReachU, type TracedSmgProportions } from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 17.5;
@@ -63,6 +64,7 @@ export const COMPACT_SMG_PROPORTIONS = {
   // Closed on the breech, the bolt reaches back over the whole magazine opening, holding the top round down. It is as
   // wide as the polymer SMG's; the receiver's floor, close under the bore, keeps it lower.
   bolt: { lengthU: 4.5, halfHeightU: 0.75, halfWidthU: 1.25 },
+  chamberedCase: NINE_MM_CASE,
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
     ...citedBarrel(225, barrelTipThreadedU),

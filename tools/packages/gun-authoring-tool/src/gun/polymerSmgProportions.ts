@@ -1,4 +1,5 @@
 import { SMG_CHARGING_HANDLE } from './compactSmgProportions.ts';
+import { NINE_MM_CASE } from './nineMmCase.ts';
 import {
   citedBarrel,
   forwardLeanDegrees,
@@ -83,6 +84,7 @@ export const POLYMER_SMG_PROPORTIONS = {
   // Closed on the breech, the bolt reaches back over the whole magazine opening, holding the top round down. Its
   // section is about 29 mm square, as tall as the reference's ejection-port frame, which shows the bolt filling it.
   bolt: { lengthU: 7.75, halfHeightU: 1.25, halfWidthU: 1.25 },
+  chamberedCase: NINE_MM_CASE,
   // The cited barrel length runs from the threaded muzzle tip back to the breech.
   barrel: {
     ...citedBarrel(200, barrelTipThreadedU),

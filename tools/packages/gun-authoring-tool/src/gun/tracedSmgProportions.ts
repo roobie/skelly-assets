@@ -153,6 +153,8 @@ export interface TracedSmgProportions {
   };
   /** The bolt, centred on the bore: its length and its section's half-sizes. */
   readonly bolt: { readonly lengthU: number; readonly halfHeightU: number; readonly halfWidthU: number };
+  /** The chambered case, which the ejection port must clear. */
+  readonly chamberedCase: { readonly lengthU: number; readonly headDiameterU: number };
   readonly barrel: {
     readonly breechU: number;
     readonly citedLengthU: number;
