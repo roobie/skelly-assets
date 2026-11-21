@@ -36,6 +36,7 @@ local ar15Item(id, role, params) =
       carrierPattern: 'bolt', stockStyle: 'sporting', integral: 'yes', boltCalibre: '308-winchester',
     }, 0.7, 'hunting-rifle') + { title: 'Hunting rifle receiver' },
     row('receiver-compact-smg', 'receiver', { section: 'compact-smg' }, 0.7),
+    row('receiver-polymer-smg', 'receiver', { section: 'polymer-smg' }, 0.6),
     row('receiver-bolt', 'receiver', { section: 'standard', action: 'bolt' }, 0.85),
     row('receiver-battle', 'receiver', { section: 'standard', action: 'auto', carrierPattern: 'barrett' }, 1.1),
     row('receiver-smg', 'receiver', { section: 'standard', action: 'auto', carrierPattern: 'smg' }, 0.7),
@@ -100,6 +101,7 @@ local ar15Item(id, role, params) =
       magazineProfile: 'standard', magazineOrientation: 'straight', integral: 'yes', boltCalibre: '308-winchester',
     }, 0.18, 'hunting-rifle') + { title: 'Hunting rifle lower body' },
     row('lower-compact-smg', 'lower', { layout: 'conventional', section: 'compact-smg' }, 0.2),
+    row('lower-polymer-smg', 'lower', { layout: 'conventional', section: 'polymer-smg' }, 0.2),
     row('lower-conventional', 'lower', { layout: 'conventional', section: 'standard' }, 0.25),
     row('barrel-ak-short', 'barrel', { section: 'ak', length: 'S' }, 0.6),
     item('barrel_ak_medium', 'barrel', ['section', 'length'], {
@@ -134,6 +136,7 @@ local ar15Item(id, role, params) =
       handguardLength: 'L', handguardLayout: 'standard', bore: 'M', actionFrame: 'small', tubeLengthPercent: '75',
     }, 0.85, 'hunting-rifle') + { title: 'Long hunting rifle barrel' },
     row('barrel-compact-smg', 'barrel', { section: 'compact-smg' }, 0.3),
+    row('barrel-polymer-smg', 'barrel', { section: 'polymer-smg' }, 0.25),
     item('barrel_pistol', 'barrel', ['section', 'profile'], { section: 'standard', profile: 'pistol', bore: 'S', length: 'S', muzzle: 'plain', actionFrame: 'small', handguardLayout: 'standard', handguardLength: 'M', frontSightStyle: 'ar', tubeLengthPercent: '75' }, 0.12, 'pistol') + { title: 'Pistol barrel' },
     row('barrel-heavy-short', 'barrel', { section: 'standard', profile: 'heavy', length: 'S' }, 0.6),
     row('barrel-heavy-medium', 'barrel', { section: 'standard', profile: 'heavy', length: 'M' }, 0.9),
@@ -177,6 +180,7 @@ local ar15Item(id, role, params) =
       bore: 'M', style: 'fitted',
     }, 0.35, 'hunting-rifle') + { title: 'Hunting rifle handguard' },
     row('handguard-compact-smg', 'handguard', { layout: 'standard', section: 'compact-smg' }, 0.25),
+    row('handguard-polymer-smg', 'handguard', { layout: 'standard', section: 'polymer-smg' }, 0.15),
     row('handguard-standard-short', 'handguard', { layout: 'standard', section: 'standard', length: 'S' }, 0.15),
     row('handguard-standard-medium', 'handguard', { layout: 'standard', section: 'standard', length: 'M' }, 0.3),
     row('handguard-standard-long', 'handguard', { layout: 'standard', section: 'standard', length: 'L' }, 0.4),
@@ -195,6 +199,7 @@ local ar15Item(id, role, params) =
     row('grip-pump', 'grip', { section: 'pump' }, 0.1),
     row('grip-sporter', 'grip', { section: 'sporter' }, 0.1),
     row('grip-compact-smg', 'grip', { section: 'compact-smg' }, 0.1),
+    row('grip-polymer-smg', 'grip', { section: 'polymer-smg' }, 0.1),
     row('stock-ak-short', 'stock', { style: 'ak-buttstock', length: 'S' }, 0.3),
     row('stock-ak-medium', 'stock', { style: 'ak-buttstock', length: 'M' }, 0.35),
     item('stock_ak_long', 'stock', ['style', 'length'], {
@@ -225,6 +230,8 @@ local ar15Item(id, role, params) =
     // The telescoping stock is traced to one gun, so its length param does not change its build.
     row('stock-telescoping', 'stock', { style: 'telescoping' }, 0.4),
     row('stock-fal-folding', 'stock', { style: 'fal-folding' }, 0.9),
+    // The skeleton stock is traced to one gun, so its length param does not change its build.
+    row('stock-skeleton-folding', 'stock', { style: 'skeleton-folding' }, 0.3),
     item('rear_sight_ak', 'ak-rear-sight', [], {}, 0.05, 'ak') + { title: 'AK tangent rear sight' },
     item('front_sight_ak', 'front-sight', ['style'], { style: 'ak', section: 'ak', bore: 'S' }, 0.05, 'ak') + { title: 'AK front sight' },
     // The AR sight block is built to its barrel's section and bore, so the narrow-section build is its own shape.

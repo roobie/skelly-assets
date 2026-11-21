@@ -113,6 +113,7 @@ local bores = { rifled: standard(), smoothbore: standard() };
     'battle-rifle': { sizeClasses: ['battle-rifle'] },
     smg: { sizeClasses: ['smg'] },
     'compact-smg': { sizeClasses: ['compact-smg'] },
+    'polymer-smg': { sizeClasses: ['polymer-smg'] },
     pistol: { sizeClasses: ['pistol'] },
     revolver: { sizeClasses: ['revolver'] },
     'pump-shotgun': { sizeClasses: ['pump-shotgun'] },

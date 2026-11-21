@@ -1,18 +1,74 @@
 import { GRID } from '@skelly/construct/foundation/conventions.ts';
-import { mmToU } from './units.ts';
-
-const snap = (value: number): number => Math.round(value / GRID) * GRID;
+import {
+  type BoxMagazine,
+  boxMagazinePieces,
+  citedBarrel,
+  discProfile,
+  leaningFrame,
+  leaningWell,
+  stockReachU,
+  type TracedSmgProportions,
+} from './tracedSmgProportions.ts';
 
 const barrelTipThreadedU = 17.5;
 // The photo shows only threaded muzzles; the plain cut keeps the thread's length off the tip.
 const barrelTipPlainU = 16.5;
-const citedBarrelLengthU = snap(mmToU(225));
-const barrelBreechU = barrelTipThreadedU - citedBarrelLengthU;
+// The cited barrel length runs from the threaded muzzle tip back to the breech.
+const barrel = citedBarrel(225, barrelTipThreadedU);
 const receiverRearX = -24.25;
+// The receiver's floor ahead of the magazine well, which the photo puts about 2 below the bore.
+const receiverBottomU = -2;
+// The photo's magazine bends steadily forward below the well, from about 12 degrees at the mouth to about 35 at the
+// floorplate, so no straight box fits it: one leaning at its average rake would push the well into the trigger
+// housing. Its straight top leans as the photo's rear face does at the mouth and runs down to the mouth, where the
+// bend starts; the bend's radius and sweep are fitted to the photo's front and rear faces and its floorplate's tilt,
+// all within about 0.15.
+const magazine = {
+  port: [-5, -3],
+  leanDegrees: 12,
+  body: { x: [-1.5, 1.5], y: [-2.5, 0] },
+  bend: { radiusU: 28, degrees: 24.5, pieces: 4 },
+  floorplate: { x: [-1.5, 1.5], y: [-3.25, -2.5] },
+  halfWidthU: 1,
+} as const satisfies BoxMagazine;
+const magazinePieces = boxMagazinePieces(magazine);
+// The well hugs the straight top down to its mouth, where the bend starts.
+const magwell = {
+  x: [-7, -3],
+  y: [magazine.port[1] + magazine.body.y[0], receiverBottomU],
+  ...leaningWell(magazine, { faceU: 0.05, sideU: 0.25 }),
+} as const;
+const housingBottomU = -5.75;
+// The housing's front runs down the well's leaning rear face, so no gap opens between them.
+const housingFront = [housingBottomU, receiverBottomU].map((y) =>
+  leaningFrame(magazine.port, magazine.leanDegrees).atLevel(magwell.x[0], y),
+);
+// The rear sight's drum, whose centre its aperture and axle share, stands on its clamp's plate.
+const rearDrum = { centre: [-18.25, 4.25], radiusU: 0.75 } as const;
+// The bolt recoils, rounded up to the grid, until its face clears the magazine's rearmost corner, so the next round
+// can rise in front of it.
+const magazineRearX = Math.min(...magazinePieces.flat().map(([x]) => x));
+const boltTravelU = Math.ceil((barrel.breechU - magazineRearX) / GRID) * GRID;
 
-/** The stock's reach behind the receiver's rear face, for an overall length from the threaded muzzle tip. */
+/**
+ * The notched cocking tube and knob traced from the compact SMG's photo. Every SMG handle starts from it: an untraced
+ * section's handle takes its knob and notch turn, and a traced gun overrides only what its reference shows differently.
+ */
+export const SMG_CHARGING_HANDLE = {
+  tube: { centreY: 2.5, halfU: 0.75, rearX: 0 },
+  // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
+  // hand space clears the receiver's front face.
+  notchX: 1,
+  // The side photo hides the knob's reach from the tube; its stem holds it clear of the handguard's side.
+  // The close-up shows a short knob, about half as long as it is wide, with a rounded outer rim.
+  knob: { radiusU: 0.75, radial: [2, 2.75], rimRoundU: 0.25 },
+  notchTurnDegrees: 45,
+  // A visual estimate for the notch turn.
+  notchTurnSeconds: 0.1,
+} as const satisfies TracedSmgProportions['chargingHandle'];
+
 const stockLengthU = (overallLengthMm: number): number =>
-  snap(mmToU(overallLengthMm) - barrelTipThreadedU + receiverRearX);
+  stockReachU(overallLengthMm, barrelTipThreadedU, receiverRearX);
 
 /**
  * Side-photo trace estimates in the gun frame: x from the receiver's front face, y from the bore.
@@ -23,35 +79,53 @@ export const COMPACT_SMG_PROPORTIONS = {
     rearX: receiverRearX,
     frontX: 0,
     topU: 3.25,
-    bottomU: -1.5,
+    bottomU: receiverBottomU,
     halfWidthU: 2.25,
     chamferU: 0.25,
-    topFlatHalfWidthU: 1.75,
+    // The pressed receiver narrows toward the claw-mount top. The photo's side shows the first upward-facing band at
+    // about 2.25; it is side-on, so the top's width is a share of the receiver's, estimated from the MP5's section.
+    taper: { fromY: 2.25, topWidthShare: 0.6 },
     // The end cap slopes forward from its rear face to the roof.
     endCapSlope: { from: [receiverRearX, 1.25], to: [-23, 3.25] },
     // The block under the receiver's rear that the trigger housing pins to.
-    rearLug: { x: [-23.25, -20], y: [-3.5, -1.5] },
+    rearLug: { x: [-23.25, -20], y: [-3.5, receiverBottomU] },
   },
-  // The drum is an inclined disc on its base; the photo shows its side.
+  // The rotary diopter: a drum turning on an axle across the gun, between two ears on a base clamped over the
+  // receiver's top. The photo shows the ears' side, rounded at the rear over the drum and with the axle's end at the
+  // drum's centre, and a front that slopes down from their peak.
   rearSight: {
-    drum: [
-      [-18.75, 4],
-      [-16, 3.5],
-      [-15.5, 4.5],
-      [-17, 5],
-      [-18, 4.75],
-    ],
-    base: { x: [-19, -16.25], y: [3.25, 3.5] },
+    name: 'drum',
+    profile: discProfile(rearDrum.centre, rearDrum.radiusU, 16),
     halfWidthU: 0.75,
-    // The eye looks through a square hole across the drum's thickest part, at least one gun voxel each way.
-    aperture: { eyeX: -16.75, centreY: 4.25, halfU: 0.25 },
+    // The eye looks through a square hole across the drum's centre, at least one gun voxel each way.
+    aperture: { eyeX: rearDrum.centre[0], centreY: rearDrum.centre[1], halfU: 0.25 },
     // An estimate of the shooter's eye behind the drum with the cheek on the stock.
     eyeReliefU: 6,
+    clamp: { x: [-19, -16], plateU: 0.25, jawU: 0.25, jawToY: 2.75 },
+    ears: {
+      profile: [
+        [-19, 3.5],
+        [-16, 3.5],
+        [-15.75, 4.5],
+        [-17, 5],
+        [-18.25, 5],
+        [-18.75, 4.75],
+        [-19, 4.25],
+      ],
+      z: [0.75, 1.25],
+    },
+    axle: { centre: rearDrum.centre, radiusU: 0.25, halfLengthU: 1.5 },
   },
-  // The cited barrel length runs from the threaded muzzle tip back to the breech.
+  // Closed on the breech, the bolt reaches back over the whole magazine opening and ejection port, a square section
+  // centred on the bore that the receiver's floor just clears.
+  bolt: { lengthU: 5, halfHeightU: 1.25, halfWidthU: 1.25, travelU: boltTravelU },
+  // The MP5's published rate (HK MP5 specification).
+  cyclicRpm: 800,
+  // The photo shows the left side, which has no port, so the opening is proportioned as the polymer SMG's drawing
+  // has it: its top flush with the bolt's, about two-thirds the bolt's height, over the spent case at full recoil.
+  ejectionPort: { x: [-7, -3], y: [-0.5, 1.25] },
   barrel: {
-    breechU: barrelBreechU,
-    citedLengthU: citedBarrelLengthU,
+    ...barrel,
     tipU: { threaded: barrelTipThreadedU, plain: barrelTipPlainU },
     radiusU: 0.625,
     collar: { x: [14.75, 15.25], radiusU: 0.875 },
@@ -63,32 +137,16 @@ export const COMPACT_SMG_PROPORTIONS = {
     hood: { x: [12.75, 14.25], centreY: 4.5, outerRadiusU: 1.4, wallU: 0.25 },
     // The knurled wheel that stands proud of the housing's front face under the hood.
     wheel: { x: [14.25, 14.5], centreY: 2.375, radiusU: 0.875 },
-    // The post's tip is the drum aperture's height; see `parts.ts`, `compactSmgBarrelDetails`.
+    // The post's tip is the drum aperture's height; see `parts.ts`, `tracedSmgBarrelDetails`.
     post: { x: [13.25, 13.75], baseY: 3.25, halfWidthU: 0.125 },
   },
-  handguard: { lengthU: 11, outerU: 1.75 },
-  // The photo shows the knob held in the notch; notchX sits one GRID ahead of the traced 0.75 so the knob's
-  // hand space clears the receiver's front face. notchTurnSeconds is a visual estimate for the notch turn.
-  chargingHandle: {
-    tube: { centreY: 2.5, halfU: 0.75 },
-    notchX: 1,
-    // The side photo hides the knob's reach from the tube; its stem holds it clear of the handguard's side.
-    // The close-up shows a short knob, about half as long as it is wide, with a rounded outer rim.
-    knob: { radiusU: 0.75, radial: [2, 2.75], rimRoundU: 0.25 },
-    notchTurnDegrees: 45,
-    notchTurnSeconds: 0.1,
-  },
+  handguard: { lengthU: 11, topU: 1.75, bottomU: -1.75, halfWidthU: 1.75 },
+  chargingHandle: SMG_CHARGING_HANDLE,
   lower: {
     halfWidthU: 1.5,
     // The housing's flat bottom is the grip's mount face.
-    housing: [
-      [-20, -3.75],
-      [-18.5, -5.75],
-      [-7, -5.75],
-      [-7, -1.5],
-      [-20, -1.5],
-    ],
-    magwell: { x: [-7, -3], y: [-5.5, -1.5], wallU: 0.25, innerHalfWidthU: 1.25 },
+    housing: [[-20, -3.75], [-18.5, housingBottomU], ...housingFront, [-20, receiverBottomU]],
+    magwell,
     // The blade hangs from the guard's top bar inside the finger space.
     trigger: [
       [-13, -6],
@@ -136,42 +194,7 @@ export const COMPACT_SMG_PROPORTIONS = {
       ],
     ],
   },
-  // The magazine's top hides in the well; the pieces run down its curve.
-  magazine: {
-    port: [-4.5, -3],
-    halfWidthU: 1,
-    pieces: [
-      [
-        [-6, -3],
-        [-6, -5.5],
-        [-3.25, -4.75],
-        [-3.25, -3],
-      ],
-      [
-        [-6, -5.5],
-        [-5, -9],
-        [-1.75, -9],
-        [-3.25, -4.75],
-      ],
-      [
-        [-5, -9],
-        [-3.25, -13],
-        [0.25, -13],
-        [-1.75, -9],
-      ],
-      [
-        [-3.25, -13],
-        [-1.25, -16.5],
-        [2, -16.5],
-        [0.25, -13],
-      ],
-      [
-        [-1.25, -16.5],
-        [-0.5, -18.25],
-        [2, -16.5],
-      ],
-    ],
-  },
+  magazine: { port: magazine.port, halfWidthU: magazine.halfWidthU, pieces: magazinePieces },
   // Overall lengths run from the muzzle tip to the butt pad's rear face. The pad and struts are traced
   // extended; collapsing slides them forward by the difference of the published lengths.
   stock: {
@@ -198,6 +221,6 @@ export const COMPACT_SMG_PROPORTIONS = {
     padHalfWidthU: 1.5,
     strut: { frontX: receiverRearX, y: [-1.75, -0.25], z: [1.25, 1.75] },
     latch: { x: [-27.25, receiverRearX], y: [-2, 0.75], halfWidthU: 1.5 },
-    lever: { x: [receiverRearX, -23.25], y: [-3.75, -1.75], halfWidthU: 0.25 },
+    lever: { x: [receiverRearX, -23.25], y: [-3.75, receiverBottomU], halfWidthU: 0.25 },
   },
 } as const;
