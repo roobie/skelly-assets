@@ -1,6 +1,15 @@
-import type { Vec3 } from '@skelly/construct/foundation/math.ts';
-import { boundsOfPoints, obbPolyhedron, worldSolid } from '@skelly/construct/shapes/geometry.ts';
+import { GRID, TOLERANCE } from '@skelly/construct/foundation/conventions.ts';
+import { IDENTITY, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  boundsOfPoints,
+  boxFromMinMax,
+  distanceWorld,
+  obbPolyhedron,
+  penetrationWorld,
+  worldSolid,
+} from '@skelly/construct/shapes/geometry.ts';
 import { describe, expect, it } from 'vitest';
+import { resolveGunAction } from '../src/gun/actionDescription.ts';
 import { BOLT_CARRIER_RUNNING_CLEARANCE_U, RECEIVER_SECTION_WALL_U } from '../src/gun/parts.ts';
 import { TRACED_SMG_SECTIONS, type TracedSmgSection } from '../src/gun/tracedSmgSections.ts';
 import { NINE_MM_CASE, owner, resolveDesign, worldXs } from './tracedSmgFixture.ts';
@@ -14,7 +23,7 @@ const worldBounds = (section: TracedSmgSection, family: string, solidId: string)
 };
 
 describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s action', (section) => {
-  const { receiver, barrel, bolt, ejectionPort } = TRACED_SMG_SECTIONS[section];
+  const { receiver, barrel, bolt, ejectionPort, cyclicRpm, chargingHandle } = TRACED_SMG_SECTIONS[section];
   const [low, high] = worldBounds(section, 'bolt-carrier', 'carrier-body');
 
   it('closes the bolt on the breech, its length the table’s', () => {
@@ -48,6 +57,41 @@ describe.each(Object.keys(TRACED_SMG_SECTIONS) as TracedSmgSection[])('the %s ac
 
   it('recoils the bolt’s face behind the magazine, so the next round can rise in front of it', () => {
     expect(faceAtRecoil).toBeLessThanOrEqual(Math.min(...worldXs(resolved, 'magazine')));
+  });
+
+  it('fires one round per period of the published cyclic rate', () => {
+    expect(resolveGunAction(resolved)!.cycle.fire!.durationSeconds).toBeCloseTo(60 / cyclicRpm, 12);
+  });
+
+  describe('its cocking tube', () => {
+    const receiverId = owner(resolved, 'receiver');
+    const handguardId = owner(resolved, 'handguard');
+    const placedSolidsOf = (id: string, keep: (solidId: string) => boolean = () => true) =>
+      resolved.defs
+        .get(id)!
+        .solids.filter((solid) => keep(solid.id))
+        .map((solid) => ({ id: solid.id, shape: worldSolid(resolved.placed.get(id)!, solid) }));
+    const receiverSolids = placedSolidsOf(receiverId);
+    const tubeSolids = placedSolidsOf(handguardId, (id) => id.startsWith('smg-cocking-tube'));
+
+    it('leaves its bore clear of the receiver where it runs back into it', () => {
+      const { centreY, halfU, rearX } = chargingHandle.tube;
+      const boreHalf = halfU - GRID;
+      const bore = worldSolid(IDENTITY, {
+        id: 'tube-bore',
+        kind: 'box',
+        box: boxFromMinMax([rearX, centreY - boreHalf, -boreHalf], [receiver.frontX, centreY + boreHalf, boreHalf]),
+      });
+      for (const { id, shape } of receiverSolids) {
+        expect(penetrationWorld(shape, bore), id).toBeLessThan(TOLERANCE.contact);
+      }
+    });
+
+    it('touches the receiver without overlapping it', () => {
+      const pairs = tubeSolids.flatMap((tube) => receiverSolids.map((solid) => [tube.shape, solid.shape] as const));
+      expect(Math.max(...pairs.map(([tube, solid]) => penetrationWorld(tube, solid)))).toBeLessThan(TOLERANCE.contact);
+      expect(Math.min(...pairs.map(([tube, solid]) => distanceWorld(tube, solid)))).toBeLessThan(TOLERANCE.contact);
+    });
   });
 
   describe('its ejection port', () => {
