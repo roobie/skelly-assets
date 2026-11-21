@@ -8,6 +8,7 @@ local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
+local armetSeat = import 'models/armet-seat.libsonnet';
 local oct = fit.oct;
 local g = fit.layers.over;
 
@@ -139,8 +140,8 @@ local shaftAdd(r) =
 // Its brow anchor is the point of its skull that a seat with the slit over the eyes puts at the hairline. The skull is
 // drawn round the head that seat puts it on, short of the hair's top, which the crown closes over; each fitting stands
 // on the face of the skull it meets, so a taller or deeper head carries them with it.
-local slitHeights = [0.178, 0.192];
-local helmetBase = fit.eyesAt((slitHeights[0] + slitHeights[1]) / 2);
+local slitHeights = armetSeat.slit;
+local helmetBase = armetSeat.base;
 local head = fit.headroom(helmetBase);
 local radius = head.reach + 0.023, foot = head.chin - 0.019, top = head.top - 0.02;
 local slit = { min: [-0.085, slitHeights[0], radius - 0.023], max: [0.085, slitHeights[1], radius - 0.013] };

@@ -17,6 +17,7 @@ local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
 local plate = import 'models/kits/plate.libsonnet';
+local armetSeat = import 'models/armet-seat.libsonnet';
 
 // How much larger than life the figure is cut.
 local k = 1.25;
@@ -101,8 +102,8 @@ local hipY = bust.pelvisHeight * 0.12;
 local ankleDrop = leg.length - leg.thighLength - leg.shoeHeight;
 // The sabaton's sole lies under the bare foot, so the figure stands that much higher on the plinth.
 local soleLift = [r for r in plate if r.id == 'sabaton_plate_worn_foot'][0].soleLift;
-// The helmet's flange sits this far below the neck's top, so the armet's slit falls at the eyes.
-local helmetDrop = 0.04;
+// The head's joint, which the armet's seat is measured from, so its slit falls at the doll's eyes.
+local headJoint = chestTop + bust.neckHeight + bust.neckOverlap;
 // Where a flat hand meets what it rests on: the middle of the palm's face, a little to the little finger's side so
 // the thumb runs clear.
 local palmFace = [arm.palmThickness / 2, -arm.palmLength / 2, -0.01];
@@ -164,7 +165,7 @@ local frames =
     plinth: frame(rot.id, [0, 0, 0]),
     harness: harness,
     pelvis: harness,
-    armet: frame(rot.mul(rot.y(pose.head.turn), rot.x(-pose.head.lift)), at(harness, [0, chestTop + bust.neckHeight - helmetDrop, 0])),
+    armet: frame(rot.mul(rot.y(pose.head.turn), rot.x(-pose.head.lift)), at(harness, [0, headJoint + armetSeat.base, 0])),
     // The blade's flat faces forward.
     sword: frame(rot.y(90 + pose.sword.inward), at(right['palm-right'], palmFace)),
     shield: frame(shieldPalm.turn, at(shieldPalm, palmFace)),
