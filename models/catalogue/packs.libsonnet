@@ -7,8 +7,10 @@ local title = import 'tools/jsonnet/lib/title.libsonnet';
 // root-relative, so a compile's stand-in for it replaces it; see tools/sources.mjs.
 local headsOf = import 'tools/jsonnet/heads.libsonnet';
 local heads = import 'models/catalogue/heads.libsonnet';
+local wornTaxonomy = import 'packages/thing-authoring-tool/worn-taxonomy.libsonnet';
 local catalogue = headsOf.under(heads, '');
 local rows = headsOf.under(heads, 'models/catalogue/sets/');
+local kitRows = headsOf.under(heads, 'models/kits/');
 local byCategory = {
   ammunition: 'skelly.firearms',
   arcana: 'skelly.arcana',
@@ -46,6 +48,15 @@ local placed = {
   'skelly.traps': ['bear_trap'],
 };
 local placedIn = { [id]: pack for pack in std.objectFields(placed) for id in placed[pack] };
+// A worn piece goes to the pack a game dresses a body from, whatever its garment's shelf, but for a sling's, which a
+// game hands out with the guns it carries, and those the roster ships as packs of their own (models/export.json).
+local wornPlaced = {
+  'skelly.firearms': ['weapon_sling'],
+};
+local wornPlacedIn = { [garment]: pack for pack in std.objectFields(wornPlaced) for garment in wornPlaced[pack] };
+local roster = import 'models/export.json';
+local onRoster = { [id]: true for pack in std.objectFields(roster) for id in roster[pack] };
+local pieces = [row.id for row in kitRows if wornTaxonomy.piece(row.id) != null && !std.objectHas(onRoster, row.id)];
 local packOf(row) =
   assert std.objectHas(row, 'taxonomy') && std.objectHas(row.taxonomy, 'category') : 'catalogue row %s has no category' % row.id;
   local category = row.taxonomy.category;
@@ -57,6 +68,9 @@ local packOf(row) =
   packs:: { [row.id]: packOf(row) for row in rows },
   // The ids of the catalogue rows that pack `packId` exports.
   ids(packId):: std.set([id for id in std.objectFields($.packs) if $.packs[id] == packId]),
+  // The ids of the worn pieces of the kits that pack `packId` exports, but for those the roster ships as packs of
+  // their own, so a garment a kit newly fits needs no recipe edit.
+  worn(packId):: [id for id in pieces if std.get(wornPlacedIn, wornTaxonomy.piece(id).garment, 'skelly.wearables') == packId],
   // The heads of the item rows whose ids `ids` lists, in item order. Every recipe filters the whole item list, so
   // membership is a field lookup: go-jsonnet's std.setMember walks the set, and a recipe then costs rows times ids.
   // std.set drops a repeated id, which a field comprehension rejects.
