@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { holdItem, padOf } from '../../site/fingers.mjs';
+import { padOf } from '../../site/fingers.mjs';
 import {
   add,
   applyPoint,
@@ -384,6 +384,9 @@ const TURNS = {
   // A half turn is its own inverse and mirror image, so it cannot tell the mirror rule from a plain inverse; it only
   // checks the half turn itself.
   'about -x by a half turn': { axis: [-1, 0, 0], degrees: 180 },
+  // An arm swung a little clear of the hips, and a turn askew of every face, which no quarter turn can stand in for.
+  'about z by a few degrees': { axis: [0, 0, 1], degrees: 7 },
+  'about x by an oblique angle': { axis: [1, 0, 0], degrees: -35 },
 };
 // The reflection of a rotation across x = 0, and of a frame's polar axes; a rotation axis (flex) flips with it.
 const reflect = (m) => mulMM(mulMM([-1, 0, 0, 0, 1, 0, 0, 0, 1], m), [-1, 0, 0, 0, 1, 0, 0, 0, 1]);
@@ -441,16 +444,30 @@ for (const [name, turn] of Object.entries(TURNS)) {
   }
 }
 
-test('a turn that is not a quarter turn about a doll axis is refused', () => {
+test("a turn by any angle reads the turned part's faces off its box as it hangs, swung about its anchor", () => {
+  const rigOf = (degrees) => {
+    const turned = { ...dressing, limbs: [{ ...dressing.limbs[0], turn: { axis: [0, 0, 1], degrees } }] };
+    return dollRig(dollOf(turned, figure), { ...turned, rig: rigContent });
+  };
+  const hanging = rigOf(0);
+  const swung = rigOf(-7);
+  const about = doll.anchors.shoulder_right;
+  const swing = (p) => add(mulMV(rotAxis([0, 0, 1], -7), sub(p, about)), about);
+  const of = (r, id) => r.bones.find((b) => b.id === id);
+  // A looser box, the turned one's bound, would carry the reach and the pad past the part's far face and off its side.
+  close(of(swung, 'fore.R').tail, swing(of(hanging, 'fore.R').tail), 'fore reach');
+  close(padOf(of(swung, 'fore.R')), swing(padOf(of(hanging, 'fore.R'))), 'pad');
+});
+
+test('a turn that is no angle about a doll axis is refused', () => {
   const refused = (turn) => () => dollOf({ ...dressing, limbs: [{ ...dressing.limbs[0], turn }] }, figure);
-  assert.throws(refused({ axis: [0, 0, 1], degrees: -70 }), /not a multiple of 90/);
-  assert.throws(refused({ axis: [0, 0, 1], degrees: Number.NaN }), /not a multiple of 90/);
+  assert.throws(refused({ axis: [0, 0, 1], degrees: Number.NaN }), /no angle/);
   assert.throws(refused({ axis: [0.4, 0.2, 1], degrees: 90 }), /not a doll axis/);
   assert.throws(refused({ axis: [0, 0, 0], degrees: 90 }), /not a doll axis/);
   assert.throws(refused({ axis: [0, 0, 2], degrees: 90 }), /not a doll axis/);
 });
 
-test('what reads a turned part as a hanging one, or places a loose wearable on it, is refused', () => {
+test('a loose wearable placed on a turned part is refused', () => {
   assert.throws(
     () =>
       wornSites(
@@ -463,6 +480,4 @@ test('what reads a turned part as a hanging one, or places a loose wearable on i
       ),
     /rests turned/,
   );
-  assert.throws(() => padOf(bone('fore.R')), /rests this part turned/);
-  assert.throws(() => holdItem(rig, {}, 'fore.R', {}, {}), /rests this part turned/);
 });

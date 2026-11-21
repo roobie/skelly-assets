@@ -30,13 +30,17 @@ local waistTop = bust.pelvisHeight + bust.waistHeight;
 local ribTop = waistTop + bust.ribHeight;
 local chestTop = ribTop + bust.chestHeight;
 local cut = bust.torsoChamfer / 2;
-local chestW = bust.chestWidth + 2 * g + 0.03, chestD = bust.chestDepth + 2 * g + 0.045;
+// The breast stands off the chest's flanks by no more than a layer, as the arms hang close beside them: a wider one
+// passes through the hanging arm.
+local chestW = bust.chestWidth + 2 * g, chestD = bust.chestDepth + 2 * g + 0.045;
 local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local skirtTop = waistTop - 0.04;
 // The breast stands this far off the shoulders, cut to their slope.
 local shoulderRise = 0.015;
 // A shoulder strap lies on the breast's top: sunk this far into it, so no gap shows, and standing this far proud of it.
 local strapSink = 0.003, strapProud = 0.005;
+// The buckles' rivets keep their place on the breast's edge, the outer one this far inside the chest's side.
+local rivetX = bust.chestWidth / 2 - 0.01;
 local body = [
   oct('plackart', 'plate', skirtTop, ribTop + 0.01, bust.waistWidth + 2 * g + 0.02, bust.ribDepth + 2 * g + 0.03, cut),
   oct('plackart-rim', 'trim', skirtTop, skirtTop + 0.012, bust.waistWidth + 2 * g + 0.03, bust.ribDepth + 2 * g + 0.04, cut),
@@ -44,10 +48,10 @@ local body = [
   oct('breast-rim', 'trim', ribTop - 0.04, ribTop - 0.026, chestW + 0.01, chestD + 0.01, 0.07),
   // The keel: a ridge down the breast's front, turning the lance aside.
   h.prism('keel', 'trim', 'y', [[chestD / 2 - 0.004, -0.035], [chestD / 2 + 0.03, 0], [chestD / 2 - 0.004, 0.035]], ribTop - 0.03, chestTop - 0.02),
-  // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands two of the row's voxels off the
-  // deltoid, so rounding to them cannot sink it into the deltoid.
-  fit.deltoidCap('shoulder-left', 'plate', 1, 2 * fineGrain),
-  fit.deltoidCap('shoulder-right', 'plate', -1, 2 * fineGrain),
+  // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands a voxel of the row's and one of
+  // the body's off the deltoid, so rounding the deltoid out and the cap in cannot sink one into the other.
+  fit.deltoidCap('shoulder-left', 'plate', 1, fineGrain + bust.voxelGrain),
+  fit.deltoidCap('shoulder-right', 'plate', -1, fineGrain + bust.voxelGrain),
   oct('gorget-1', 'plate', chestTop - 0.01, chestTop + 0.04, bust.neckWidth + 0.09, bust.neckWidth + 0.09, 0.03, cz=-0.01),
   oct('gorget-2', 'plate', chestTop + 0.025, chestTop + 0.075, bust.neckWidth + 0.075, bust.neckWidth + 0.075, 0.028, cz=-0.01),
   oct('gorget-lip', 'trim', chestTop + 0.07, chestTop + 0.085, bust.neckWidth + 0.085, bust.neckWidth + 0.085, 0.028, cz=-0.01),
@@ -69,7 +73,7 @@ local body = [
                 [shoulderRise - strapSink, shoulderRise + strapProud])
   for k in [0, 1]
 ] + [
-  h.box('rivet-%d' % k, 'rivet', [[-0.19, 0.178][k], ribTop + 0.06, chestD / 2 - 0.03], [[-0.178, 0.19][k], ribTop + 0.075, chestD / 2 - 0.018])
+  h.box('rivet-%d' % k, 'rivet', [[-rivetX, rivetX - 0.012][k], ribTop + 0.06, chestD / 2 - 0.03], [[-(rivetX - 0.012), rivetX][k], ribTop + 0.075, chestD / 2 - 0.018])
   for k in [0, 1]
 ];
 

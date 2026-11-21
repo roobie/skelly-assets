@@ -7,6 +7,7 @@ local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
+local armRest = import 'models/arm-rest.libsonnet';
 
 // How far each layer stands off the skin. An outer layer clears every inner one on the same segment.
 local layers = { under: 0.003, normal: 0.012, over: 0.024, cloak: 0.036 };
@@ -29,9 +30,9 @@ local outline(w, d, c) = [
 // An upright octagonal shell from y0 to y1, `w` across x and `d` along z, corners cut by `c`.
 local oct(id, slot, y0, y1, w, d, c, cx=0, cz=0) = h.prism(id, slot, 'y', [[p[0] + cz, p[1] + cx] for p in outline(w, d, c)], y0, y1);
 
-// How far out from the thigh's centre line a thigh piece may reach on its outer side, a few millimetres short of the
-// hand hanging beside the thigh at rest, which a bulkier piece would sink into.
-local handClear = 0.125;
+// How far out from the thigh's centre line a piece about the thigh may reach on its outer side, a few millimetres short
+// of the hand hanging beside the thigh at rest (models/arm-rest.libsonnet), which a bulkier piece would sink into.
+local handClear = armRest.handInner - 0.006 - leg.hip[0];
 // An `oct` whose outer side (local -x: the right leg is the reference, the left its mirror) stops at `handClear`, while
 // its inner side and its depth keep their bulk.
 local besideHand(id, slot, y0, y1, w, d, c) = oct(id, slot, y0, y1, w / 2 + handClear, d, c, (w / 2 - handClear) / 2);
@@ -84,7 +85,7 @@ local deltoidCap(id, slot, side, rise) =
     local t = std.pi * i / steps;
     [(if i <= steps / 2 then r else crown) * -std.cos(t) + r, r * std.sin(t)]
     for i in std.range(1, steps - 1)
-  ] + [[r + crown, 0]], [side * deltoid.x, deltoid.y - r, 0]) + { sides: steps };
+  ] + [[r + crown, 0]], [side * deltoid.x, deltoid.y - r, deltoid.z]) + { sides: steps };
 
 // A hood lying down on the upper back, sunk a centimetre into the body shell, its lining showing at the open top.
 // A shallow hood's corners and lining shrink with it, so its outlines stay convex. Both follow the trapezius's slope,
@@ -150,8 +151,11 @@ local spineShells(id, pieces, finish, spine, bare, title) =
 local trooperShoulderRise = 0.02, trooperPauldronTop = 0.085, pauldronClear = 0.005;
 assert deltoid.halfHeight + trooperShoulderRise <= trooperPauldronTop - pauldronClear : 'the trooper caps show through its pauldrons';
 
-// Where a torso shell's hem falls on the bust, from the hips' bottom.
-local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
+// A garment's collar stands this wide round the neck, square in plan.
+local collarWidth = bust.neckWidth + 0.06;
+
+// Where a torso shell's hem falls on the bust, from the hips' bottom: 'waist' at the waist's foot.
+local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
 
 {
   layers: layers,
@@ -177,6 +181,8 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
   slopeY: slopeY,
   shoulderY: shoulderY,
   deltoidCap: deltoidCap,
+  // How far out from the centre line a garment's collar reaches, so a strap over the shoulders can run clear of it.
+  collarHalf: collarWidth / 2,
   // A strap across [x0, x1] and `zs` lying over the slope, between it set out by `rises[0]` and by `rises[1]`.
   slopeBand(id, slot, xs, zs, rises):: slopeQuad(id, slot, xs, zs, function(x) slopeY(x, rises[0]), function(x) slopeY(x, rises[1])),
   // A strap across [x0, x1] and `zs` hanging down a face from the slope set out by `rise` to the height `foot`.
@@ -187,9 +193,12 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
 
   // The torso shell's levels for `layer`, in the bust's frame from the hips' bottom, each corner cut by `chamfer`
   // grown by `round`. One level covers the hips and waist, as wide as the wider of them. Gear worn over a torso shell
-  // is seated on these (models/kits/worn-carry.libsonnet), so it follows the shell as the body changes.
+  // is seated on these (models/kits/worn-carry.libsonnet), so it follows the shell as the body changes. The ribs and
+  // chest levels are drawn from their `foot`, a lap below the level under them, so the shell shows no seam between
+  // levels; gear stepping out over the shell steps out below it.
   torsoLevels(layer, round=0)::
     local g = layers[layer];
+    local lap = 0.01;
     local waistTop = bust.pelvisHeight + bust.waistHeight;
     local ribTop = waistTop + bust.ribHeight;
     local cut = bust.torsoChamfer / 2 + round;
@@ -197,10 +206,10 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     {
       pelvis: low { y: [0, bust.pelvisHeight] },
       waist: low { y: [bust.pelvisHeight, waistTop] },
-      ribs: { y: [waistTop, ribTop], width: bust.ribWidth + 2 * g, depth: bust.ribDepth + 2 * g, chamfer: cut },
+      ribs: { y: [waistTop, ribTop], foot: waistTop - lap, width: bust.ribWidth + 2 * g, depth: bust.ribDepth + 2 * g, chamfer: cut },
       // The chest level stands off the body's top by the layer, so no face lies on it: flat over the neck's foot and
       // cut to the slope by `trapezius(rise)` beyond it.
-      chest: { y: [ribTop, chestTop + g], rise: g, width: bust.chestWidth + 2 * g, depth: bust.chestDepth + 2 * g, chamfer: bust.chestChamfer / 2 + round },
+      chest: { y: [ribTop, chestTop + g], foot: ribTop - lap, rise: g, width: bust.chestWidth + 2 * g, depth: bust.chestDepth + 2 * g, chamfer: bust.chestChamfer / 2 + round },
     },
 
   // A jacket, shirt, hoodie or coat: a body shell over the bust and, unless `sleeves` is 'none', upper and fore
@@ -267,17 +276,17 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       ];
     local body = [
       level('low', l.waist, hem, l.waist.y[1]),
-      level('ribs', l.ribs, l.ribs.y[0] - 0.01, l.ribs.y[1]),
+      level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
     ] + (if straps then [
-      level('chest', chest, l.chest.y[0] - 0.01, armpit),
+      level('chest', chest, l.chest.foot, armpit),
       panel('front', 1),
       panel('back', -1),
     ] + strap('l', -1) + strap('r', 1) else [
-      level('chest', chest, l.chest.y[0] - 0.01, bodyTop) + { clip: trapezius(l.chest.rise) },
+      level('chest', chest, l.chest.foot, bodyTop) + { clip: trapezius(l.chest.rise) },
       deltoidCap('shoulder-left', sl.body, 1, g),
       deltoidCap('shoulder-right', sl.body, -1, g),
     ]) + (if collar == 'none' then [] else [
-      oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
+      oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, collarWidth, collarWidth, 0.02, cz=-0.01),
     ]) + (if collar == 'lapel' then [
       h.prism('lapel-' + side, sl.trim, 'z', [[side * 0.03, chestTop], [side * 0.13, chestTop - 0.02], [side * 0.04, chestTop - 0.15]],
               l.chest.depth / 2, l.chest.depth / 2 + 0.008)
@@ -350,7 +359,7 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
       oct('chest', sl.cloth, ribTop - 0.01, chestTop + g, chestW, chestD, bust.chestChamfer / 2) + { clip: trapezius(g) },
       deltoidCap('shoulder-left', sl.cloth, 1, g),
       deltoidCap('shoulder-right', sl.cloth, -1, g),
-      oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.04, bust.neckWidth + 0.06, bust.neckWidth + 0.06, 0.02, cz=-0.01),
+      oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.04, collarWidth, collarWidth, 0.02, cz=-0.01),
     ] + hood(sl.hood, sl.lining, chestD, 0.07) + std.flattenArrays([star(i, s.stars[i]) for i in std.range(0, std.length(s.stars) - 1)])
       + (if s.moon == null then [] else moon(s.moon));
     // On the model arm, a right arm, the body side is +x, so a sleeve flares towards -x.
@@ -382,7 +391,6 @@ local hems = { hip: 0.04, waist: 0.17, thigh: -0.1 };
     // The shoulder joint is the deltoid cap's centre.
     local jointX = deltoid.x;
     local sleeveClear = jointX - inner - 0.012 - leg.hip[0];
-    local handClear = jointX - arm.palmThickness / 2 - 0.006 - leg.hip[0];
     // Heights in the thigh's frame: the sleeve's end, lowest at its deep back edge, which dips as the elbow bends, and
     // the pelvis shell's hem.
     local sleeveEnd = deltoid.y - leg.hip[1] - arm.upperLength - reach - 0.03;

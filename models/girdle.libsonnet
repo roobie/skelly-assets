@@ -12,14 +12,10 @@ function(m) {
   deltoid: {
     x: m.chestWidth / 2 + m.shoulderJointOut,
     y: $.chestTop - m.shoulderJointBelow,
+    z: std.get(m, 'shoulderJointForward', 0),
     radius: m.deltoidRadius,
     halfHeight: $.chestTop - m.trapeziusDrop + m.deltoidCrown - self.y,
-  } + (if std.objectHas(m, 'shoulderJointForward') then { z: m.shoulderJointForward } else {}),
-  // The rig pivots the arm on the middle of the deltoid's voxels, which lies on the joint only when the joint lies on
-  // a voxel's middle or edge; a set scaling the measures draws at its own grain and leaves the grain out.
-  local onGrain(v) = local steps = v / (m.voxelGrain / 2); std.abs(steps - std.round(steps)) < 1e-9,
-  assert !std.objectHasAll(m, 'voxelGrain') || (onGrain(self.deltoid.x) && onGrain(self.deltoid.y)) :
-         'the shoulder joint (%g, %g) lies off the half-voxel grid, so the arm would pivot off it' % [self.deltoid.x, self.deltoid.y],
+  },
   // The clip planes that cut a piece to the slope set out `rise` square to it, one per side.
   trapezius(rise):: [
     { normal: [side * m.trapeziusDrop / $.slopeLength, $.slopeRun / $.slopeLength, 0],

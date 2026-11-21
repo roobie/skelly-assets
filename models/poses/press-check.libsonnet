@@ -43,12 +43,13 @@ local pinch = {
   hands: 'pinch',
 };
 // Unsighted fire: the bore level ahead with the stock in the shoulder, the eyes over the rifle rather than on its
-// sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit; the
-// check starts and ends where a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right
+// sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit, and a
+// little back, so the upper arm opens away from the stock rather than closing over it; the check starts and ends where
+// a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right
 // elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the rifle.
 // The ejection port's anchor is the middle of the port's opening.
 local port(offset) = { from: 'ejection', offset: offset };
-local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, 0], look: { from: 'muzzle', offset: [0, 0, 3] }, left: support };
+local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, -0.3], look: { from: 'muzzle', offset: [0, 0, 3] }, left: support };
 local turned = { carry: { pitch: 15, yaw: 0, roll: -45 }, gripPole: [-0.853, -0.174, 0.492], look: port([-0.01, 0.01, 0]), tilt: 20 };
 // A press check draws the carrier only far enough to show the case head in the chamber, a short pull, not the full
 // stroke a rack takes, so the round stays in the chamber. The carrier's first movement springs the port cover open,
@@ -65,13 +66,15 @@ local coverHand = {
 local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
   rifle: 'rifle_assault',
-  // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in.
-  stance: { spine: [4, -20, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
-  // The butt pad's middle and the pocket it stands in: a point in the torso's frame, from the right shoulder joint. The
-  // pocket is ahead of the shoulder joint, on the flat of the chest just inside the arm, so the stock bears on the chest
-  // by its inner edge however the rifle rolls, rather than lying along the slope where the chest turns toward the arm.
+  // Bladed, the left shoulder forward (negative spine twist turns the figure toward its right), leaning in, far enough
+  // that the left hand reaches the handguard from a shoulder joint set back on the chest.
+  stance: { spine: [4, -35, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] },
+  // The butt pad's middle and the pocket it stands in (guns/pocket.libsonnet). The pocket is ahead of the shoulder
+  // joint, on the flat of the chest just inside the arm, so the stock bears on the chest by its inner edge however the
+  // rifle rolls, rather than lying along the slope where the chest turns toward the arm; nearer the middle, the rolled
+  // stock's lower edge would dig into the deep chest.
   butt: { from: 'butt' },
-  pocket: [0.015, -0.11, 0.07],
+  pocket: (import 'guns/pocket.libsonnet')(-0.046, 0.11, 0.04),
   // The right palm on the pistol grip, each frame giving the elbow's pole.
   sockets: sockets,
   easing: 'minimum-jerk',

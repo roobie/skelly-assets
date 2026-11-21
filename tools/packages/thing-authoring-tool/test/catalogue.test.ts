@@ -522,9 +522,9 @@ it('pivots the player bust arms on the shoulder joints its girdle draws the delt
   const row = thingRows().find((candidate) => candidate.id === 'player_bust')!;
   const anchors = row.generate().modelEntry.anchors!;
   const torso = catalogue.items.find(({ id }) => id === 'player_bust')!.parts.find(({ id }) => id === 'torso')!;
-  const { x, y } = JSON.parse(torso.params.girdle!).deltoid;
-  expect(anchors.shoulder_left).toEqual([x, y, 0]);
-  expect(anchors.shoulder_right).toEqual([-x, y, 0]);
+  const { x, y, z } = JSON.parse(torso.params.girdle!).deltoid;
+  expect(anchors.shoulder_left).toEqual([x, y, z]);
+  expect(anchors.shoulder_right).toEqual([-x, y, z]);
 });
 
 it.each([

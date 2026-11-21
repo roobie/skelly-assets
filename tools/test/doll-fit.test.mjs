@@ -2,23 +2,34 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { COINCIDENT, coveredSurface, PITCH, restClearance } from '../../site/clearance.mjs';
 import { hides } from '../../site/hiding.mjs';
-import { dot, length, normalize, scale, sub } from '../../site/kinematics.mjs';
+import { applyPoint, boundBox, dot, length, mulMV, normalize, scale, sub, transpose } from '../../site/kinematics.mjs';
 import { compilePose, soleLift } from '../../site/poseFile.mjs';
 import { CLOTHES, dollTree, shellsOf, WEAR, WORN } from './doll-tree.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
 const { rig, sitesIn, restIn } = dollTree({ wears: WORN });
 const rest = restIn(WEAR);
+const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
 
 test('a jacket of boxes standing off the torso and arms is clean at rest', () => {
   // Each box is its part's bounds grown by a centimetre: convex, so it encloses its part whatever the part's shape.
+  // It is squared on the part as it hangs, so a sleeve's box stands as far off a swung arm's hand as a straight one's.
   const EASE = 0.01;
-  const boxAround = ({ positions }) => {
-    const points = Array.from({ length: positions.length / 3 }, (_, i) => positions.slice(i * 3, i * 3 + 3));
+  const boxAround = ({ positions }, bone) => {
+    const { rest: turned } = boundBox(bones.get(bone).bind);
+    const back = { r: transpose(turned.r), t: mulMV(transpose(turned.r), scale(turned.t, -1)) };
+    const points = Array.from({ length: positions.length / 3 }, (_, i) =>
+      applyPoint(back, positions.slice(i * 3, i * 3 + 3)),
+    );
     const [min, max] = [Math.min, Math.max].map((pick, side) =>
       [0, 1, 2].map((a) => pick(...points.map((p) => p[a])) + (side ? EASE : -EASE)),
     );
-    const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => [0, 1, 2].map((a) => ((k >> a) & 1 ? max : min)[a]));
+    const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((k) =>
+      applyPoint(
+        turned,
+        [0, 1, 2].map((a) => ((k >> a) & 1 ? max : min)[a]),
+      ),
+    );
     const indices = [
       0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6, 0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7, 0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5,
     ];
@@ -26,7 +37,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
   };
   const pieces = rest.body
     .filter(({ bone }) => /^(spine|upperArm|forearm)/.test(bone))
-    .map(({ bone, mesh }) => ({ piece: `box ${bone}`, bone, mesh: boxAround(mesh) }));
+    .map(({ bone, mesh }) => ({ piece: `box ${bone}`, bone, mesh: boxAround(mesh, bone) }));
   const jacket = { body: rest.body, pieces };
   const surface = coveredSurface(rig, jacket);
   assert.ok(
@@ -39,7 +50,6 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
 test('upper sleeves narrowed inside their arms let the upper arms poke through', () => {
   // Each upper sleeve shrunk about its bone's axis until its widest reach is half the arm's, which puts it inside the
   // arm's narrowest side however much ease the jacket gives: too tight for the arm it is drawn on.
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const radial = ({ head, tail }) => {
     const axis = normalize(sub(tail, head));
     return (p) => {

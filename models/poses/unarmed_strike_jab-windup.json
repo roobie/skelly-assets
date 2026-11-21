@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 9 },
+  "rig": { "id": "doll", "revision": 10 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
@@ -9,14 +9,14 @@
     "spine": [8, -24, 0],
     "thigh.L": [18, 0, 4],
     "thigh.R": [-8, 0, -6],
-    "neck": [-2.3466, 22.7143, 0],
-    "head": [-2.3466, 17.0357, 0],
+    "neck": [-1.9329, 22.91, 0],
+    "head": [-1.9329, 17.1825, 0],
     "hand.L": [0, 0, 0],
     "hand.R": [0, 0, 0]
   },
   "hands": { "hand.L": "fist", "hand.R": "fist" },
   "reach": {
-    "hand.L": { "target": [-0.0583, 1.3982, 0.3596], "pole": [0.3, -1, 0], "twist": 0 },
-    "hand.R": { "target": [-0.262, 1.4235, 0.1472], "pole": [-0.3, -1, 0], "twist": 0 }
+    "hand.L": { "target": [-0.0579, 1.4654, 0.2869], "pole": [0.3, -1, 0], "twist": 0 },
+    "hand.R": { "target": [-0.2008, 1.4908, 0.1237], "pole": [-0.3, -1, 0], "twist": 0 }
   }
 }

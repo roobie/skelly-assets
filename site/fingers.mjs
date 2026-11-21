@@ -8,7 +8,9 @@ import { posedSolid, signedDepth } from './clearance.mjs';
 import {
   applyPoint,
   boneTransforms,
+  boundBox,
   clampJointAngles,
+  composed,
   cross,
   IDENTITY_M,
   jointAngles,
@@ -165,8 +167,9 @@ const nearest = (rig, pose, bones, solids) => {
   const transforms = boneTransforms(rig.bones, pose);
   let least = Infinity;
   for (const bone of bones) {
-    const t = transforms.get(bone.id);
-    for (const p of boxPoints(bone.bind.box))
+    const { box, rest } = boundBox(bone.bind);
+    const t = composed(transforms.get(bone.id), rest);
+    for (const p of boxPoints(box))
       for (const solid of solids) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
   }
   return least;
@@ -181,14 +184,18 @@ const BOX_FACES = [
   [0, 2, 6, 4],
   [1, 5, 7, 3],
 ];
-const boxSolid = ({ min, max }, transform) =>
-  posedSolid(
+const boxSolid = (bind, transform) => {
+  const { box, rest } = boundBox(bind);
+  return posedSolid(
     {
-      positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
+      positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) =>
+        [0, 1, 2].map((a) => ((i >> a) & 1 ? box.max[a] : box.min[a])),
+      ),
       indices: BOX_FACES.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
     },
-    transform,
+    composed(transform, rest),
   );
+};
 
 // Sweeps an angle from `from` toward `to` for the first angle where `hit` holds, in steps and then halving the step it
 // came in, so a part cannot pass through a thin item to rest beyond it: `met`, that angle, and `short`, the last before
@@ -233,7 +240,7 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
     const fingers =
       digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
     const transforms = boneTransforms(rig.bones, pose);
-    const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind.box, transforms.get(bone.id)))];
+    const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind, transforms.get(bone.id)))];
     const apart = (p, moved) => nearest(rig, p, moved, solids) > CONTACT;
     let touched = false;
     chain.forEach((bone, k) => {
@@ -332,13 +339,6 @@ export function holdIssues(rig, handId, hold) {
   return issues;
 }
 
-// The hand's socket and the digits' pads are read off a part's box as a hand hanging down -y at rest, so a part the doll
-// rests turned would put them in the wrong place without a word.
-const hangsDown = (bone) => {
-  if (bone.bind.turn)
-    throw new Error(`${bone.id}: the doll rests this part turned, and the hand's socket and pads assume it hangs`);
-};
-
 // A right-handed frame from a direction into a surface and an axis along it, as columns.
 const triad = (into, axis) => {
   const x = normalize(into);
@@ -349,16 +349,16 @@ const triad = (into, axis) => {
 
 // The hand's own socket in rest doll axes: the palm's face where `grip`, a share of the palm's length from the wrist,
 // crosses it, the palm's normal, and the thumb's direction across the palm turned `slant` degrees toward the fingers,
-// read off the palm part's box and which way the part faces.
+// read off the palm part's box as the hand hangs down -y, which the doll's rest turn then carries.
 const palmSocket = (hand, grip, slant) => {
-  hangsDown(hand);
-  const { min, max } = hand.bind.box;
+  const { box, rest } = boundBox(hand.bind);
+  const { min, max } = box;
   const sign = hand.bind.mirror ? -1 : 1;
   const a = (slant * Math.PI) / 180;
   return {
-    at: [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2],
-    into: [sign, 0, 0],
-    axis: [0, -Math.sin(a), Math.cos(a)],
+    at: applyPoint(rest, [sign > 0 ? max[0] : min[0], max[1] + grip * (min[1] - max[1]), (min[2] + max[2]) / 2]),
+    into: mulMV(rest.r, [sign, 0, 0]),
+    axis: mulMV(rest.r, [0, -Math.sin(a), Math.cos(a)]),
   };
 };
 
@@ -481,11 +481,14 @@ export function solveCCD(rig, pose, chain, target, { end: endAt, iterations = 24
 // How far back from the tip a digit's pad lies, as a share of its last phalanx.
 const PAD = 0.3;
 
-/** The pad of a digit's last bone `tip` in rest doll axes: on the face of its part the palm faces, near the tip. */
+/**
+ * The pad of a digit's last bone `tip` in rest doll axes: on the face of its part the palm faces, near the tip, read off
+ * its box as the hand hangs down -y, which the doll's rest turn then carries.
+ */
 export const padOf = (tip) => {
-  hangsDown(tip);
-  const { min, max } = tip.bind.box;
-  return [tip.bind.mirror ? min[0] : max[0], min[1] + PAD * (max[1] - min[1]), (min[2] + max[2]) / 2];
+  const { box, rest } = boundBox(tip.bind);
+  const { min, max } = box;
+  return applyPoint(rest, [tip.bind.mirror ? min[0] : max[0], min[1] + PAD * (max[1] - min[1]), (min[2] + max[2]) / 2]);
 };
 
 /**

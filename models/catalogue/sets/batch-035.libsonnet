@@ -31,8 +31,9 @@ local segment(id, family, measures, segment, massKg, slots, ports) = {
   params: { [k]: std.toString((measures { segment: segment })[k]) for k in std.objectFields(measures { segment: segment }) },
   finish: { [slot]: plastic for slot in slots },
 };
-local shoulderX = girdle.deltoid.x;
-local shoulderY = girdle.deltoid.y;
+// The shoulder joint on the figure's `side`, 1 its left, which hangs the arm swung out as the player's rests it.
+local shoulder(side) = [side * girdle.deltoid.x, girdle.deltoid.y, girdle.deltoid.z];
+local armRest = import 'models/arm-rest.libsonnet';
 local hipX = leg.hip[0];
 local hipY = leg.hip[1];
 local plate = 0.012;
@@ -54,9 +55,9 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       segment('pelvis', 'bust', bustMeasures, 'pelvis', 1.2, ['underwear'], [pin('stand', [0, -1, 0]), pin('pelvis')]
         + [socket('hip-' + s[0], [s[1] * hipX, hipY, 0]) for s in sides]),
       segment('torso', 'bust', bustMeasures, 'torso', 4, ['skin'], [socket('pelvis', [0, 0, 0]), socket('neck', [0, 0, 0])]
-        + [socket('shoulder-' + s[0], [s[1] * shoulderX, shoulderY, 0]) for s in sides]
+        + [socket('shoulder-' + s[0], shoulder(s[1]), armRest.down(s[1])) for s in sides]
         + (if doll == null then [] else [socket('doll', [0, bust.pelvisHeight + 0.02, bust.waistDepth / 2], [0, 0, 1], [0, 1, 0])])),
-      segment('neck', 'bust', bustMeasures, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0], [0, 1, 0])]),
+      segment('neck', 'bust', bustMeasures, 'neck', 0.2, ['skin'], [pin('neck'), socket('head', [0, bust.joints.head[1], 0], [0, 1, 0])]),
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
       segment('head', 'bust', bustMeasures, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[

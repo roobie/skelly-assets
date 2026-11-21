@@ -28,7 +28,9 @@ import { closeHand, handAngles, handIssues, heldSolid, holdIssues, holdItem, pin
 import {
   applyPoint,
   boneTransforms,
+  boundBox,
   clampJointAngles,
+  composed,
   IDENTITY_M,
   jointAngles,
   jointRotation,
@@ -121,8 +123,9 @@ export function clipIssues(rig, clip) {
 export const posedCorners = (rig, pose) => {
   const transforms = boneTransforms(rig.bones, pose);
   return rig.bones.flatMap((bone) => {
-    const { min, max } = bone.bind.box;
-    const t = transforms.get(bone.id);
+    const { box, rest } = boundBox(bone.bind);
+    const { min, max } = box;
+    const t = composed(transforms.get(bone.id), rest);
     return [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
       applyPoint(
         t,

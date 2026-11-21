@@ -64,7 +64,8 @@ test("a worn piece seated from its bone's bind alone follows the posed part copy
     for (const { positions } of meshes(site.model)) {
       for (let i = 0; i < positions.length; i += 3) {
         const q = positions.slice(i, i + 3);
-        const atRest = add(site.mirror ? [-q[0], q[1], q[2]] : q, site.at);
+        const flipped = site.mirror ? [-q[0], q[1], q[2]] : q;
+        const atRest = add(site.turn ? mulMV(quatToMat3(site.turn), flipped) : flipped, site.at);
         close(seatedBy(frame, bone, q), applyPoint(transforms.get(bone.id), atRest), `${site.model} on ${bone.id}`);
       }
     }

@@ -11,6 +11,7 @@ import {
   add,
   applyPoint,
   boneTransforms,
+  boundBox,
   length,
   mulMM,
   mulMV,
@@ -263,13 +264,16 @@ test("a weapon seated by a strike's held seat stands where the hit key holds it,
 // clip's held seat on its figure only within this of that point (https://github.com/roobie/skelly,
 // `packages/deadvox/test/wieldStance.test.ts`, `HAND_TOLERANCE_METRES`).
 const FIST_TOLERANCE = 0.005;
-// Where the figure's fist of `hand` closes, in the doll frame at rest: the palm's face beside the arm's grip anchor.
+// Where the figure's fist of `hand` closes, in the doll frame at rest: the palm's face beside the arm's grip anchor,
+// read as the hand hangs, before the doll's rest turn carries both.
 const fistPoint = (hand) => {
-  const { model, site, box, mirror } = hand.bind;
+  const { model, site, mirror } = hand.bind;
+  const { box, rest } = boundBox(hand.bind);
   const sign = mirror ? -1 : 1;
   const [x, y, z] = thingOf(model).anchors.grip;
-  const anchor = add(doll.sites[site].at, [sign * x, y, z]);
-  return [sign > 0 ? box.max[0] : box.min[0], anchor[1], anchor[2]];
+  const resting = add(doll.sites[site].at, mulMV(rest.r, [sign * x, y, z]));
+  const anchor = mulMV(transpose(rest.r), sub(resting, rest.t));
+  return applyPoint(rest, [sign > 0 ? box.max[0] : box.min[0], anchor[1], anchor[2]]);
 };
 
 test("a melee guard's held seat closes each hand's fist on the weapon where the player figure holds it", () => {

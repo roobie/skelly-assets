@@ -29,9 +29,8 @@ import { facetTerms } from './taxonomy.mjs';
 /**
  * A limb hung on the doll: `turn`, if the doll rests it turned off the way its model hangs (down -y), is `degrees`
  * about `axis` of the doll frame, as the side that is not `mirrored` takes it; the other side's turn is this side's
- * mirror image (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both. The turn is a
- * multiple of 90 degrees about a doll axis, so the turned part boxes stay exact boxes and nothing that reads a box
- * (a bone's reach, a hand's socket) is left with a looser one than the part fills.
+ * mirror image (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both. The axis is one of
+ * the doll's, which is all a T-pose or an arm swung clear of the hips asks for; the angle is any.
  * @typedef {{ name: string; model: string; anchor: string; turn?: { axis: Vec3; degrees: number } }} DollLimb
  */
 
@@ -85,9 +84,12 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {string} side
  * @property {number} site
  * @property {Vec3} at
- * @property {Box} box
+ * @property {Box} box where the copy lies at rest in the doll frame, a bound on it
  * @property {boolean} [mirror]
  * @property {Quaternion} [turn]
+ * @property {{ box: Box; about: Vec3 }} [hanging] on a turned copy, its box as it hangs before the turn swings it about
+ * `about`, the anchor it hangs from: the box a reader of the part's faces needs, since `box` is a looser one at any
+ * angle but a quarter turn
  */
 /** @typedef {ReturnType<typeof dollOf>} Doll */
 /** @typedef {{ anchors: Readonly<Record<string, string>>; sided: readonly string[] }} DollParts */
@@ -200,7 +202,7 @@ const rotate = ([x, y, z, w], v) => {
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
 
 /**
- * The quaternion of a limb's turn: a multiple of 90 degrees about one of the doll's axes, either way along it.
+ * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it.
  * @param {string} model the limb's model, named in what is refused
  * @param {{ axis: Vec3; degrees: number }} turn
  * @returns {Quaternion}
@@ -209,8 +211,7 @@ const turnOf = (model, { axis, degrees }) => {
   const along = axis.filter((c) => c !== 0);
   if (axis.length !== 3 || !axis.every(Number.isFinite) || along.length !== 1 || Math.abs(along[0] ?? 0) !== 1)
     throw new Error(`doll: ${model}'s turn axis ${JSON.stringify(axis)} is not a doll axis, [±1, 0, 0] or alike`);
-  if (!Number.isFinite(degrees) || degrees % 90 !== 0)
-    throw new Error(`doll: ${model}'s turn of ${degrees} degrees is not a multiple of 90`);
+  if (!Number.isFinite(degrees)) throw new Error(`doll: ${model}'s turn of ${degrees} degrees is no angle`);
   const half = (degrees * Math.PI) / 360;
   const [x, y, z] = perAxis((a) => Math.sin(half) * axis[a]);
   return [x, y, z, Math.cos(half)];
@@ -429,7 +430,7 @@ export function dollOf(dressing, figure) {
           at: sum(hung, place(difference(at, own))),
           box: moved(turn ? turned(flipped, turn) : flipped, hung),
           ...(mirror ? { mirror } : {}),
-          ...(turn ? { turn } : {}),
+          ...(turn ? { turn, hanging: { box: moved(flipped, hung), about: hung } } : {}),
         });
       }
     }

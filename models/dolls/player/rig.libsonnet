@@ -55,6 +55,8 @@
 // must then be baked as each node's local rotation, since today's bakes turn every bone on the model's axes, which only
 // an unturned node shares.
 local joints = import 'models/dolls/joints.libsonnet';
+local bust = import 'models/measures/bust.libsonnet';
+local armRest = import 'models/arm-rest.libsonnet';
 local unturned = [0, 0, 0, 1];
 local trunk = { nodeRotation: unturned };
 local arm = { nodeRotation: unturned, sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
@@ -82,12 +84,12 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 9,
+  revision: 10,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
   // The eyes, from the head's joint in the head's frame, which a generated frame turns the head to look from.
-  eye: [0, 0.11, 0.08],
+  eye: bust.eye,
   bones: {
     pelvis: trunk { part: 'pelvis', parent: null, pivot: 'origin', along: [0, 1, 0], flexAxis: [1, 0, 0],
                     limits: joints.pelvis },
@@ -97,8 +99,10 @@ local thumbBones = {
                   limits: joints.neck },
     head: trunk { part: 'head', parent: 'neck', pivot: { anchor: 'head' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                   limits: joints.head },
+    // The arm rests swung out from the trunk (models/arm-rest.libsonnet), and abduction is measured from that rest, so
+    // its range is the arm's from hanging straight, less the swing.
     upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
-                    limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30, 170] } },
+                    limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30 - armRest.degrees, 170 - armRest.degrees] } },
     forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true, limits: joints.forearm },
     // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do;
     // about the arm's flex axis a turn would move the hand in the palm's plane.

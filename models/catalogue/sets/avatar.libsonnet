@@ -1,5 +1,4 @@
 local params(values) = { [key]: std.toString(values[key]) for key in std.objectFields(values) };
-local shoulder(side) = { part: 'torso', solid: 'shoulder-' + side, fraction: [0.5, 0.5, 0.5] };
 // Shared finishes keep exposed skin continuous across separately posed parts.
 local skin = 'body-skin-player';
 local underwear = 'cloth-pants-player';
@@ -51,6 +50,8 @@ local foot = { skin: skin };
 local bust = import 'models/measures/bust.libsonnet';
 local band = import 'models/head-band.libsonnet';
 local girdle = (import 'models/girdle.libsonnet')(bust);
+// The shoulder joint on the figure's `side`, 1 its left.
+local shoulder(side) = { part: 'torso', at: [side * girdle.deltoid.x, girdle.deltoid.y, girdle.deltoid.z] };
 local bustSegment(id, massKg, finish, ports) = {
   id: id,
   family: 'bust',
@@ -74,9 +75,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     parts: [
       bustSegment('torso', 25, { skin: skin }, [jointSocket('pelvis', [0, 0, 0]), jointSocket('neck', [0, 0, 0])]),
       bustSegment('pelvis', 7, { underwear: underwear }, [jointPin('pelvis')]),
-      bustSegment('neck', 1, { skin: skin }, [jointPin('neck'), neckSocket(
-        [0, bust.pelvisHeight + bust.waistHeight + bust.ribHeight + bust.chestHeight + bust.neckHeight + bust.neckOverlap, 0],
-      )]),
+      bustSegment('neck', 1, { skin: skin }, [jointPin('neck'), neckSocket([0, bust.joints.head[1], 0])]),
       bustSegment('head', 5, { skin: skin, hair: 'body-hair', eye: 'body-eye', white: 'body-eye-white', mouth: 'body-mouth' }, [neckPin]),
     ],
     connections: [
@@ -84,18 +83,19 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       { from: 'torso.pelvis', to: 'pelvis.pelvis' },
       { from: 'torso.neck', to: 'neck.neck' },
     ],
-    // The pivots code poses from: the neck where the torso meets the head, the head's own pivot above it, a
-    // shoulder at each deltoid cap's centre and a hip at the leg's hip joint. Left is the figure's left, +x.
-    // The brow, where the hair meets the face, is where a hat's brim sits (models/dressing.libsonnet).
+    // The pivots code poses from: the spine, the neck where the torso meets the head and the head's own pivot above
+    // it, each at the bust's joint, a shoulder at each deltoid cap's centre and a hip at the leg's hip joint. Left is
+    // the figure's left, +x. The brow, where the hair meets the face, is where a hat's brim sits
+    // (models/dressing.libsonnet).
     anchors: {
-      spine: { part: 'torso', solid: 'waist', fraction: [0.5, (0.2 - bust.pelvisHeight) / bust.waistHeight, 0.5] },
-      neck: { part: 'neck', solid: 'neck', fraction: [0.5, 0, 0.5] },
-      head: { part: 'neck', solid: 'neck', fraction: [0.5, 1, 0.5] },
+      spine: { part: 'torso', at: bust.joints.spine },
+      neck: { part: 'neck', at: bust.joints.neck },
+      head: { part: 'neck', at: bust.joints.head },
       brow: { part: 'head', solid: 'hair-0', fraction: [0.5, 0, 0.5] },
       eye_left: { part: 'head', solid: 'left-eye', fraction: [0.5, 0.5, 1] },
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
-      shoulder_left: shoulder('left'),
-      shoulder_right: shoulder('right'),
+      shoulder_left: shoulder(1),
+      shoulder_right: shoulder(-1),
       hip_left: { part: 'pelvis', at: leg.hip },
       hip_right: { part: 'pelvis', at: [-leg.hip[0], leg.hip[1], leg.hip[2]] },
     },
