@@ -21,7 +21,8 @@
   // above the slope's end, so the slope runs on over a low rounded cap rather than into a ball.
   deltoidRadius: 0.051, deltoidCrown: 0.007,
   neckWidth: 0.1, neckHeight: 0.07, neckOverlap: 0.02,
-  headWidth: 0.165, headHeight: 0.235, headDepth: 0.2, jawHeight: 0.08, hairCover: 0.07,
+  // The head is as tall as the UAL mannequin's (models/dolls/ual/measures.libsonnet), so one set of head gear fits both.
+  headWidth: 0.165, headHeight: 0.268, headDepth: 0.2, jawHeight: 0.09, hairCover: 0.07,
   // How far up the head the eyes lie, as a share of its height, so a visor's slit can be set over them.
   eyeShare: 0.58,
   // How far the hair lies off the skull, and the exponent of the plan superellipse the face, skull and hair share.
@@ -31,9 +32,10 @@
   // The hair's dome: how far its top stands above the skull's, and its top layer's plan, as a share of the head's and
   // set back, so the crown's hair lies thicker behind. A rigid head piece clears each of its layers.
   hairRise: 0.006, hairCrownShare: 0.72, hairCrownBack: 0.014, hairLayerCount: 3,
-  // How far the head's attachment frame sits above the top of the neck, about mid-skull. Hidden, as no body part
-  // takes it.
-  headFrameRise:: 0.0804,
+  // How far the head's attachment frame sits under the eyes, where the game wears goggles and lamps
+  // (models/head-band.libsonnet), and so how far it sits above the top of the neck. Hidden, as no body part takes them.
+  headFrameUnderEyes:: 0.03594,
+  headFrameRise:: self.headHeight * self.eyeShare - self.neckOverlap - self.headFrameUnderEyes,
   // The grain the doll's models are voxelised at (the player bust and its limbs), which the head's drawn surface
   // inherits. Hidden, as no body part takes it.
   voxelGrain:: 0.006,
