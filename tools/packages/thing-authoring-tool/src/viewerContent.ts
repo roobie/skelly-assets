@@ -2,8 +2,9 @@
 // before it has a recipe. The list holds ids only; an item is fetched when it is opened, since the page needs one of the
 // thousands at a time and the dev server re-evaluates that one anyway.
 import type { RecipeRow } from '@skelly/thing-export/recipe.ts';
-import { ids as itemIds } from '../item-ids.json' with { type: 'json' };
+import manifest from '../item-ids.json' with { type: 'json' };
 import { loadItem, type ToolItem } from './catalogue.ts';
+import { catalogueIds } from './catalogueManifest.ts';
 import { loadThingRecipe, THING_KINDS } from './exports.ts';
 import { settings } from './settings.ts';
 
@@ -33,7 +34,9 @@ export interface Shown {
 
 export const entries: readonly Entry[] = [
   ...recipeRows.map((recipe) => ({ id: recipe.id, label: recipe.source, source: recipe.source, recipe })),
-  ...itemIds.filter((id) => !exported.has(id)).map((id) => ({ id, label: id, source: id })),
+  ...catalogueIds(manifest)
+    .filter((id) => !exported.has(id))
+    .map((id) => ({ id, label: id, source: id })),
 ];
 
 /** What an item and its recipe row, neither yet checked, draw: as the refresh wrote them or as the server evaluated. */

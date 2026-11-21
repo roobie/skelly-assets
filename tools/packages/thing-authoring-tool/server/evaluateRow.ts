@@ -1,14 +1,22 @@
-// A viewed row's data evaluated from its Jsonnet alone: Jsonnet is lazy, so keeping one row of the catalogue or of a
-// recipe pays for that row, not for the thousands beside it. This is the one place that knows where a row comes from.
+// A viewed row's data evaluated from the one file that holds it. Finding a row by its id reads every row's id, and a
+// row is built before its id can be read, so picking it out of the whole catalogue would build the thousands beside it
+// and fail on any one of them. This is the one place that knows where a row comes from.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { evaluateJsonnetAsync } from '../../../jsonnet/index.mjs';
+import { type CatalogueManifest, rowFileOf } from '../src/catalogueManifest.ts';
 import type { RowResult, RowView } from '../src/live.ts';
 
-const catalogueSource = resolve(import.meta.dirname, '../../../../models/index.libsonnet');
-const recipes = resolve(import.meta.dirname, '../../../../models/recipes');
+const repository = resolve(import.meta.dirname, '../../../..');
+const manifest = resolve(import.meta.dirname, '../item-ids.json');
+const recipes = join(repository, 'models/recipes');
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+// The catalogue is its row files' rows, so the row file that holds an item makes the same row the catalogue does. The
+// manifest is read afresh, since a refresh while the server runs may move a row to another file.
+const catalogueSource = (itemId: string) =>
+  join(repository, rowFileOf(JSON.parse(readFileSync(manifest, 'utf8')) as CatalogueManifest, itemId));
 
 // The recipe file of each row, read from the twins, which hold every row id and which the dev server's start made
 // current; a row added to a recipe later is found at the next start.
@@ -34,7 +42,7 @@ const only = (rows: string, id: string) => `only(${rows}, ${JSON.stringify(id)})
 export const evaluateRow = async ({ item, row }: RowView): Promise<RowResult> => {
   try {
     const fields = [
-      `item: ${only(`import ${JSON.stringify(catalogueSource)}`, item)}`,
+      `item: ${only(`import ${JSON.stringify(catalogueSource(item))}`, item)}`,
       ...(row === undefined ? [] : [`row: ${only(`import ${JSON.stringify(recipeSource(row))}`, row)}`]),
     ];
     const expression = `

@@ -62,7 +62,8 @@ them alone, such as the build's finish library, must not load and check every ro
 `thing-authoring-tool/item-settings.jsonnet` and `src/settings.ts`.
 The catalogue's rows are not a twin at all but a file for each row, `thing-authoring-tool/items/<id>.json`, and a
 manifest of their ids in catalogue order, `item-ids.json`, both written from the stored fragments with no Jsonnet
-evaluated. One 40 MB file made every reader parse the whole catalogue and every edit rewrite it, while a reader wants one
+evaluated. The manifest groups the ids by the row file that makes them, so the dev server evaluates a viewed row from
+that one file rather than from the whole catalogue, whose every row is built to read its id. One 40 MB file made every reader parse the whole catalogue and every edit rewrite it, while a reader wants one
 row or a few and an edit reaches one or two. A row's file is written only when its bytes change, so a geometry edit moves
 the files of the rows it reaches and nothing a dev server watches but those. The manifest, not the folder, says which
 rows exist, because a refresh races its readers: it is written after the rows and before the sweep of the files it does
