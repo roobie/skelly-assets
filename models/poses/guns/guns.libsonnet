@@ -16,7 +16,10 @@ local swayLimitDeg = { shotgun_pump: 0.5 };
 // upper arm cross the butt, and the butt sits lower in it and nearer the chest, where the dropped stock seats; at low
 // ready the butt drops further, inside the arm, the elbow swings out and forward to let the stock pass beside it, and
 // the muzzle tips down less, as a stock tipped further rides up the forearm.
+// The assault rifle's stock reaches further across the chest than the pipe rifle's, so at low ready its butt sits a
+// little further out in the shoulder, where its edge clears the walking chest.
 local stands = {
+  rifle_assault: { idle: { pocket: [0.016, 0.07, 0] } },
   shotgun_pump: {
     idle: { twist: 78, pocket: [0.07, 0.11, -0.02], pitch: 14, poles: { 'hand.R': [-1, -0.85, 0.4], 'hand.L': [-0.3, -1, 0] } },
     guard: { twist: 60, pocket: [0.01, 0.07, -0.01], poles: { 'hand.R': [-1, 0.1, -0.5], 'hand.L': [-0.2, -1, 0.2] } },
