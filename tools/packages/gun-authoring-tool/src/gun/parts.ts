@@ -1819,10 +1819,6 @@ interface RailFaces {
   readonly halfWidthU: number;
 }
 
-/**
- * A traced rail's base strip and its teeth, standing out of one face of a body. Each tooth starts on the pitch
- * from the rail's rear end; one that would overhang the rail's front end is left off.
- */
 /** A box with axial pockets cut through it; one no pocket reaches stays a box. */
 const pocketedBox = (id: string, min: Vec3, max: Vec3, pockets: readonly SectionPocket[]): Solid[] => {
   const reaching = pockets.filter(({ x, y, z }) =>
@@ -1849,6 +1845,10 @@ const pocketedBox = (id: string, min: Vec3, max: Vec3, pockets: readonly Section
   );
 };
 
+/**
+ * A traced rail's base strip and its teeth, standing out of one face of a body. Each tooth starts on the pitch
+ * from the rail's rear end; one that would overhang the rail's front end is left off.
+ */
 const tracedRailSolids = (id: string, rail: TracedRail, faces: RailFaces): Solid[] => {
   const outward = rail.face === 'bottom' || rail.face === 'left' ? -1 : 1;
   const faceU = { top: faces.topU, bottom: faces.bottomU, left: -faces.halfWidthU, right: faces.halfWidthU }[rail.face];
