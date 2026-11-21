@@ -45,8 +45,8 @@ local pinch = {
 // Unsighted fire: the bore level ahead with the stock in the shoulder, the eyes over the rifle rather than on its
 // sights, the right elbow out to the side, since a lower elbow bends the wrist on the raked grip past its limit, and a
 // little back, so the upper arm opens away from the stock rather than closing over it; the check starts and ends where
-// a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right
-// elbow lifted toward the shoulder as the grip hand rolls it, the head tilted over the rifle.
+// a shooter fires from. Turned: rolled to bring the port up toward the eyes, the right elbow lifted toward the shoulder
+// as the grip hand rolls it, the head tilted over the rifle.
 // The ejection port's anchor is the middle of the port's opening.
 local port(offset) = { from: 'ejection', offset: offset };
 local ready = { carry: { pitch: 0, yaw: 0, roll: 0 }, gripPole: [-0.94, 0, -0.3], look: { from: 'muzzle', offset: [0, 0, 3] }, left: support };

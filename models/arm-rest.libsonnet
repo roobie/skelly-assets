@@ -8,7 +8,9 @@ local bust = import 'models/measures/bust.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
 local girdle = (import 'models/girdle.libsonnet')(bust);
 
-// How far the arm's inner face stands off the trunk: enough for a sleeve's normal layer over each.
+// How far the arm's inner face stands off the trunk: more than a voxel, so their skins never meet in one, and room for
+// a sleeveless shell of the under layer between them (worn-fit.libsonnet asserts it), while the arm still hangs as near
+// the body as a resting arm does.
 local clearance = 0.01;
 // The arm's half-width across x `depth` below the shoulder joint along it, the hand's palm facing the thigh.
 local halfWidthAt(depth) =

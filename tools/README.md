@@ -268,8 +268,9 @@ body, and a garment's `wornOn`, since fitting one garment to several dolls is no
 such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models stay authored
 hanging as `docs/decisions/0008-dressing.md` has them; a hand or a loose wearable is read off a turned part as it hangs
 and swung with the turn, since the turned part's box is a looser one at any angle but a quarter turn. A loose wearable
-across both copies of a turned part is refused, as the copies turn apart and one model cannot follow both. A doll whose bones are not the player's gives its joints'
-places and its extra cuts to the body families as content (`packages/thing-authoring-tool/README.md`, Body families).
+across both copies of a turned part is refused, as the copies turn apart and one model cannot follow both. A doll whose
+bones are not the player's gives its joints' places and its extra cuts to the body families as content
+(`packages/thing-authoring-tool/README.md`, Body families).
 A doll measured off a skeleton, such as UAL's, names that skeleton in its rig, and the rig is refused unless every
 part sits on its bone's head and every node rests turned as the skeleton's, to 0.1 mm and 1e-4: a game plays the
 skeleton's own clips on the doll, so a part off its joint would swing about the wrong point. The UAL doll's measures

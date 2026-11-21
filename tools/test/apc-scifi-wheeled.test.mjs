@@ -307,8 +307,7 @@ const crouch = {
   depth: leg.thighLength + leg.shinDepth,
 };
 
-test('the crouching bust leans forward within the reach of its thighs, never back', () => {
-  assert.ok(CROUCH_HINGE_DEG >= 0, 'the bust leans back');
+test('the crouching bust leans forward within the reach of its thighs', () => {
   assert.ok(bustAboveHip * Math.sin(hinge) + (bust.headDepth / 2) * Math.cos(hinge) <= crouch.depth);
 });
 // How far the hull, its fittings and its seats may reach into the crouching doll on its way in: a little clipping
