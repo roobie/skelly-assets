@@ -499,14 +499,24 @@ function piecePart(id, { segment }, dressing) {
 }
 
 /**
- * The one doll part a piece is drawn in, for a reader that names a single part: a manifest's `wornOn` and a piece's
- * `covers` name the player's parts, each of which a slot holds whole.
+ * Why a slot's part is no single doll part, for a reader that names one: a manifest's `wornOn` and a piece's `covers`
+ * name the player's parts, each of which a slot holds whole.
  * @param {string} id
  * @param {SlotPart} part
  */
+const notOnePart = (id, part) =>
+  typeof part === 'string'
+    ? undefined
+    : `${id} is drawn in a part on each side, ${Object.values(part).join(' and ')}, not in one part`;
+
+/**
+ * The one doll part a piece is drawn in, for a reader that cannot take a problem list.
+ * @param {string} id
+ * @param {SlotPart} part
+ * @returns {string}
+ */
 function onePart(id, part) {
-  if (typeof part !== 'string')
-    throw new Error(`${id} is drawn in a part on each side, ${Object.values(part).join(' and ')}, not in one part`);
+  if (typeof part !== 'string') throw new Error(/** @type {string} */ (notOnePart(id, part)));
   return part;
 }
 
@@ -566,7 +576,9 @@ export function coversProblems(models, dressing) {
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
     const slotPart = worn.segment === undefined ? dressing.piece : dressing.slots[worn.segment]?.part;
     if (!slotPart) return [`${id}: worn segment ${worn.segment} is not in the dressing's slots`];
-    const part = onePart(id, slotPart);
+    const problem = notOnePart(id, slotPart);
+    if (problem !== undefined) return [problem];
+    const part = /** @type {string} */ (slotPart);
     const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
       surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
     );
