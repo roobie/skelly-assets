@@ -30,7 +30,7 @@ local bustOrigins = {
 local bustPart(segment) = h.part(segment, 'bust', 1, girdle.bustParams {
   segment: segment,
   hairRing: band.hairRing,
-  clavicleCut: clavicleCut,
+  clavicleCut::: clavicleCut,
   origins: bustOrigins,
 }, skin);
 

@@ -55,7 +55,8 @@ local shoulder(side) = { part: 'torso', at: [side * girdle.deltoid.x, girdle.del
 // The clavicle's joint on the figure's `side`, 1 its left.
 local clavicleJoint(side) = [side * bust.joints.clavicle[0], bust.joints.clavicle[1], bust.joints.clavicle[2]];
 // The torso and the clavicles are cut where the clavicles lift the girdle, so the shoulder comes forward on its own.
-local clavicleCut = { clavicleCut: bust.clavicleCut };
+// The bust's params hide the measure, so it is shown by `:::`.
+local clavicleCut = { clavicleCut::: bust.clavicleCut };
 local bustSegment(id, massKg, finish, ports, given={}) = {
   id: id,
   family: 'bust',
