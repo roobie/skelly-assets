@@ -1,5 +1,5 @@
-// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of the doll it is fitted to poking
-// through it at rest, and encloses what its pieces declare they cover. The cover check (tools/dollRig.mjs, `coverGaps`)
+// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of any doll poking through it at
+// rest, and encloses what its pieces declare they cover. The cover check (tools/dollRig.mjs, `coverGaps`)
 // counts a point a piece passes beneath as covered, so only the rest probe (site/clearance.mjs, `restClearance`) can
 // see the skin standing out of the piece meant to cover it. A poke is allowed by models/rest-pokes.libsonnet: `poke`
 // for one that is intended and says why, `unjudged` for one nobody has judged yet, which every run lists. Both name the
@@ -123,7 +123,7 @@ const taskHash = (task, checker) =>
     .digest('hex')
     .slice(0, 32);
 
-// The pokes and cover gaps of every fitted garment among `models` ({ id, tags }) on the doll it is fitted to, by doll
+// The pokes and cover gaps of every fitted garment among `models` ({ id, tags }) on every doll, by doll
 // then garment (`probeGarment`): from the cache folder when a garment's inputs and the checker are as they were, else
 // probed on worker threads, one garment each, and kept. `modelOf(id)` gives a model's { glb, entry }, its GLB and model
 // entry, from a built tree or as generated. With `shard`, only that shard of the garments is probed, so CI can spread a
