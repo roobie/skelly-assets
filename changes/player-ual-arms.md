@@ -12,7 +12,7 @@ The holds are re-posed for the larger hand and arm. The two-hand classes seat th
 Upgrade:
 - Re-target pose files to the doll rig's revision 11, and re-judge any pose that places the arms: the arms are longer below the elbow, shorter above it, and rest turned further out.
 - Rename every digit bone and part as above, in pose files, hand shorthands (`little` becomes `pinky`) and anything that names a finger.
-- Rename the 60 worn glove pieces that name a digit, as `<glove>_worn_<digit>_<nn>`: `gloves_trooper_worn_thumb2` becomes `gloves_trooper_worn_thumb_02`, and a knuckle phalanx gains `_01`.
+- Map saved ids through `renames.json`: the 75 worn digit pieces of the plate gauntlet and the heavy, power, trooper and leather gloves are renamed `<glove>_worn_<digit>_<nn>`, so `gloves_trooper_worn_thumb2` is `gloves_trooper_worn_thumb_02`, a knuckle's piece gains `_01`, and `little` becomes `pinky`.
 - Re-import the wield and press check clips and their pose files: the strikes' key frames and the two-hand hand spacing have changed.
 - Re-seat anything held in a power grip: the handle crosses the palm nearer the knuckles.
 - Move wristwatches and bracelets to the `wrist` slot.
