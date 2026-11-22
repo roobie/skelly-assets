@@ -57,6 +57,7 @@
 local joints = import 'models/dolls/joints.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local armRest = import 'models/arm-rest.libsonnet';
+local clavicle = import 'models/dolls/player/clavicle.libsonnet';
 local unturned = [0, 0, 0, 1];
 local trunk = { nodeRotation: unturned };
 local arm = { nodeRotation: unturned, sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
@@ -84,7 +85,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 11,
+  revision: 12,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -99,9 +100,14 @@ local thumbBones = {
                   limits: joints.neck },
     head: trunk { part: 'head', parent: 'neck', pivot: { anchor: 'head' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                   limits: joints.head },
+    // The clavicle carries the shoulder forward about the vertical through its joint by the breastbone, so a long gun's
+    // stock comes into the shoulder without the chest turning to it (models/dolls/player/clavicle.libsonnet). Its part
+    // is drawn as the right girdle, running out along -x.
+    clavicle: arm { part: 'clavicle', parent: 'spine', pivot: 'origin', along: [-1, 0, 0], flexAxis: [0, -1, 0],
+                    limits: clavicle.limits },
     // The arm rests swung out from the trunk (models/arm-rest.libsonnet), and abduction is measured from that rest, so
     // its range is the arm's from hanging straight, less the swing.
-    upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
+    upperArm: arm { part: 'upper', parent: 'clavicle', pivot: 'origin',
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30 - armRest.degrees, 170 - armRest.degrees] } },
     forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true, limits: joints.forearm },
     // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do;

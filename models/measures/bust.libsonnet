@@ -6,8 +6,12 @@ local ual = (import 'models/dolls/ual/joints.libsonnet').trunk;
 local spine = ual.spine, neck = ual.neck, head = ual.head, shoulder = ual.shoulder;
 local the(measures, names) = { [name]: measures[name] for name in names };
 {
-  // The pivots the rig turns the trunk, the neck and the head about. Hidden, as the bust family draws no joint.
-  joints:: { spine: spine, neck: neck, head: head },
+  // The pivots the rig turns the trunk, the neck, the head and the left clavicle about; the right clavicle mirrors the
+  // left across x. Hidden, as the bust family draws no joint.
+  joints:: { spine: spine, neck: neck, head: head, clavicle: ual.clavicle },
+  // The height the clavicles lift the shoulder girdles from. Hidden, as only the torso and the clavicle are cut there;
+  // other busts drawn from these measures keep their girdle whole.
+  clavicleCut:: ual.clavicleCut,
   pelvisWidth: 0.33, pelvisDepth: 0.2, pelvisHeight: spine[1],
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   // The chest's top is the neck's joint.

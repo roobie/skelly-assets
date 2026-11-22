@@ -30,8 +30,10 @@ function(m) {
   deltoidY(x, rise)::
     local a = $.deltoid.radius + rise, u = (std.abs(x) - $.deltoid.x) / a;
     if std.abs(u) >= 1 then null else $.deltoid.y + ($.deltoid.halfHeight + rise) * std.sqrt(1 - u * u),
-  // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from.
+  // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from. Only the
+  // measures' shown fields are taken, so a caller giving one the measures hide, as a clavicle's cut, shows it.
   bustParams::
     local drawnFrom = ['shoulderJointOut', 'shoulderJointBelow', 'shoulderJointForward', 'deltoidRadius', 'deltoidCrown', 'trapeziusDrop'];
-    std.foldl(std.objectRemoveKey, drawnFrom, m) + { girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid } },
+    { [key]: m[key] for key in std.objectFields(m) if !std.member(drawnFrom, key) }
+    + { girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid } },
 }

@@ -173,7 +173,8 @@ over such a part names the part in `covers`, since a consumer hides by the names
 chest's joint must be the armpit, because a garment's trunk ends there and a region that ended elsewhere would hide
 skin it does not enclose. A clavicle lifts only the girdle's slope; the girdle's top under the
 neck stays on the chest, because the neck hangs from the chest and parts that are not joined may not overlap, so the
-neck could stand on nothing else. See
+neck could stand on nothing else. A torso whose trunk stays whole but whose arms hang from clavicles, as the player's
+do, is given the clavicles' cut alone, so the shoulder can come forward without the trunk turning. See
 `src/families/body.ts`, `cut` and `translate`, `src/families/bust.ts`, `bust`, and `src/families/avatarLimbs.ts`.
 
 A garment worn on such a body is cut where the body is, so each shell rides the bone whose flesh it encloses and

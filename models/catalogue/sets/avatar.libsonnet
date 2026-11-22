@@ -52,11 +52,15 @@ local band = import 'models/head-band.libsonnet';
 local girdle = (import 'models/girdle.libsonnet')(bust);
 // The shoulder joint on the figure's `side`, 1 its left.
 local shoulder(side) = { part: 'torso', at: [side * girdle.deltoid.x, girdle.deltoid.y, girdle.deltoid.z] };
-local bustSegment(id, massKg, finish, ports) = {
+// The clavicle's joint on the figure's `side`, 1 its left.
+local clavicleJoint(side) = [side * bust.joints.clavicle[0], bust.joints.clavicle[1], bust.joints.clavicle[2]];
+// The torso and the clavicles are cut where the clavicles lift the girdle, so the shoulder comes forward on its own.
+local clavicleCut = { clavicleCut: bust.clavicleCut };
+local bustSegment(id, massKg, finish, ports, given={}) = {
   id: id,
   family: 'bust',
   massKg: massKg,
-  params: params(girdle.bustParams { segment: id, hairRing: band.hairRing }),
+  params: params(girdle.bustParams { segment: id, hairRing: band.hairRing } + given),
   finish: finish,
   ports: ports,
 };
@@ -73,7 +77,7 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     // The head is its own part so a stance lifts it about the neck's top while the torso leans; the head mates to
     // the torso there, so the whole stands exactly as one piece would.
     parts: [
-      bustSegment('torso', 25, { skin: skin }, [jointSocket('pelvis', [0, 0, 0]), jointSocket('neck', [0, 0, 0])]),
+      bustSegment('torso', 23, { skin: skin }, [jointSocket('pelvis', [0, 0, 0]), jointSocket('neck', [0, 0, 0])], clavicleCut),
       bustSegment('pelvis', 7, { underwear: underwear }, [jointPin('pelvis')]),
       bustSegment('neck', 1, { skin: skin }, [jointPin('neck'), neckSocket([0, bust.joints.head[1], 0])]),
       bustSegment('head', 5, { skin: skin, hair: 'body-hair', eye: 'body-eye', white: 'body-eye-white', mouth: 'body-mouth' }, [neckPin]),
@@ -84,9 +88,9 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       { from: 'torso.neck', to: 'neck.neck' },
     ],
     // The pivots code poses from: the spine, the neck where the torso meets the head and the head's own pivot above
-    // it, each at the bust's joint, a shoulder at each deltoid cap's centre and a hip at the leg's hip joint. Left is
-    // the figure's left, +x. The brow, where the hair meets the face, is where a hat's brim sits
-    // (models/dressing.libsonnet).
+    // it, each at the bust's joint, a clavicle at each clavicle's joint, a shoulder at each deltoid cap's centre and a
+    // hip at the leg's hip joint. Left is the figure's left, +x. The brow, where the hair meets the face, is where a
+    // hat's brim sits (models/dressing.libsonnet).
     anchors: {
       spine: { part: 'torso', at: bust.joints.spine },
       neck: { part: 'neck', at: bust.joints.neck },
@@ -94,10 +98,29 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       brow: { part: 'head', solid: 'hair-0', fraction: [0.5, 0, 0.5] },
       eye_left: { part: 'head', solid: 'left-eye', fraction: [0.5, 0.5, 1] },
       eye_right: { part: 'head', solid: 'right-eye', fraction: [0.5, 0.5, 1] },
+      clavicle_left: { part: 'torso', at: clavicleJoint(1) },
+      clavicle_right: { part: 'torso', at: clavicleJoint(-1) },
       shoulder_left: shoulder(1),
       shoulder_right: shoulder(-1),
       hip_left: { part: 'pelvis', at: leg.hip },
       hip_right: { part: 'pelvis', at: [-leg.hip[0], leg.hip[1], leg.hip[2]] },
+    },
+  },
+  {
+    id: 'player_clavicle',
+    title: 'Player clavicle',
+    exportMass: 'parts',
+    taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
+    voxelGrain: bust.voxelGrain,
+    // The right shoulder girdle the clavicle lifts off the torso, the left its mirror: the slope beyond the neck's foot
+    // and the deltoid, drawn about the clavicle's joint, so it turns there as the shoulder comes forward or rises.
+    parts: [
+      bustSegment('clavicle', 1, { skin: skin }, [], clavicleCut { segment: 'clavicle_r', origins: { clavicle_r: clavicleJoint(-1) } }),
+    ],
+    connections: [],
+    // The pivot code poses from: the clavicle's joint, sitting at the bust's clavicle anchor.
+    anchors: {
+      clavicle: { part: 'clavicle', at: [0, 0, 0] },
     },
   },
   {

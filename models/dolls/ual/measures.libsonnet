@@ -33,8 +33,7 @@ local bust = {
   chestHeight: level('neck_01') - chestFoot,
   armpit: (trunk.chestJoint - chestFoot) / self.chestHeight,
   chestLowShare: 0.95,
-  // The clavicles lift the girdle from halfway between the armpit and the shoulders' top.
-  clavicleCut: (level('spine_03') + level('neck_01')) / 2,
+  clavicleCut: trunk.clavicleCut,
   // The shoulder joint is upperarm's head: out past the chest's side, below its top and behind the centre line.
   shoulderJointOut: head('upperarm_l')[0] - self.chestWidth / 2,
   shoulderJointBelow: head('neck_01')[1] - head('upperarm_l')[1],

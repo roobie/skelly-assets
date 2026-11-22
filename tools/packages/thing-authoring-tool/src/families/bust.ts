@@ -32,7 +32,10 @@ const BustParams = strictObject({
    * trunk and the shoulders a garment covers are each whole parts.
    */
   origins: optional(jointOrigins(BUST_SEGMENTS)),
-  /** The height the clavicles lift the shoulder girdles from, for a spine that bends in three. */
+  /**
+   * The height the clavicles lift the shoulder girdles from, for a bust whose clavicles are parts of their own: a torso
+   * given it leaves them the girdle's sides.
+   */
   clavicleCut: optional(positive),
   /** How far the neck reaches up into the head; its top is the head's joint. */
   neckOverlap: positive,
@@ -133,25 +136,34 @@ const levels = (d: Bust) => {
   const crown = shoulders + d.neckHeight;
   return { waist, ribs, chest, shoulders, crown, armpit: chest + d.chestHeight * d.armpit };
 };
+/** Where the clavicles lift the shoulder girdles: above the armpit, which the trunk ends at, and below the shoulders. */
+const girdleCut = (d: Bust) => {
+  const clavicle = d.clavicleCut;
+  if (clavicle === undefined) {
+    throw new Error(`The bust's ${d.segment} is cut where its clavicles lift the girdle, which needs clavicleCut`);
+  }
+  const at = levels(d);
+  if (!(at.armpit < clavicle && clavicle < at.shoulders)) {
+    throw new Error(`The bust's clavicleCut, ${clavicle}, must lie between its armpit and its shoulders`);
+  }
+  return clavicle;
+};
 /** Where a trunk bending in three is cut: at its ribs' and its chest's joints, and where its clavicles lift. */
 const spineCuts = (d: Bust) => {
   const ribs = d.origins?.ribs?.[1];
   const chest = d.origins?.chest?.[1];
-  const clavicle = d.clavicleCut;
-  if (ribs === undefined || chest === undefined || clavicle === undefined) {
-    throw new Error(
-      `The bust's ${d.segment} is a cut of the trunk, which needs its ribs' and chest's joints and clavicleCut`,
-    );
+  if (ribs === undefined || chest === undefined) {
+    throw new Error(`The bust's ${d.segment} is a cut of the trunk, which needs its ribs' and chest's joints`);
   }
   const at = levels(d);
   // The trunk and the shoulders are regions a garment hides, and a region is whole parts only when it ends at a cut.
   if (Math.abs(at.armpit - chest) > MEASURE_TOLERANCE) {
     throw new Error(`The bust's armpit, ${at.armpit}, is not at its chest's joint, ${chest}`);
   }
-  if (!(at.waist < ribs && ribs < chest && chest < clavicle && clavicle < at.shoulders)) {
-    throw new Error("The bust's spine cuts must rise from its waist to its shoulders in turn");
+  if (!(at.waist < ribs && ribs < chest)) {
+    throw new Error("The bust's spine cuts must rise from its waist to its chest in turn");
   }
-  return { ribs, clavicle };
+  return { ribs, clavicle: girdleCut(d) };
 };
 const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | RevolvedSolid)[] => {
   const { waist, ribs, chest, shoulders, crown } = levels(d);
@@ -259,30 +271,40 @@ const drawn = (d: Bust, origin: number): (ExtrudedPolygonSolid | BoxSolid | Revo
       sloped(pec('pec-right', -1)),
     ];
     const deltoids = { left: deltoid('shoulder-left', 1), right: deltoid('shoulder-right', -1) };
+    const at = (height: number) => height - origin;
+    // A clavicle lifts the girdle's slope off the neck's foot; the neck hangs from the chest, so the chest keeps the
+    // girdle's top under the neck for it to stand on. The deltoid caps the arm the clavicle carries, so it rides the
+    // clavicle whole, however low it reaches.
+    const neckFoot = d.neckWidth / 2;
+    const girdle = (clavicle: number) => cut(slope, 'y', at(clavicle), 1);
+    const chestGirdle = (clavicle: number) => [
+      ...cut(slope, 'y', at(clavicle), -1),
+      ...cut(cut(girdle(clavicle), 'x', -neckFoot, 1), 'x', neckFoot, -1),
+    ];
     if (d.segment === 'torso') {
       // Regions a worn shell's `covers` names, so a garment hides the skin it encloses: the trunk below the armpit,
-      // and the girdle above it, which stays drawn under a garment that leaves the shoulders bare.
-      return [...region('trunk', trunk), ...region('shoulders', [...slope, deltoids.left, deltoids.right])];
+      // and the girdle above it, which stays drawn under a garment that leaves the shoulders bare. A torso given its
+      // clavicles' cut leaves them the girdle's sides.
+      return [
+        ...region('trunk', trunk),
+        ...region(
+          'shoulders',
+          d.clavicleCut === undefined ? [...slope, deltoids.left, deltoids.right] : chestGirdle(girdleCut(d)),
+        ),
+      ];
     }
     // A spine segment is a whole part of one region, so it needs no region of its own.
-    const at = (height: number) => height - origin;
-    const { ribs: ribsCut, clavicle } = spineCuts(d);
-    // A clavicle lifts the girdle's slope off the neck's foot; the neck hangs from the chest, so the chest keeps the
-    // girdle's top under the neck for it to stand on.
-    const neckFoot = d.neckWidth / 2;
-    const girdle = cut(slope, 'y', at(clavicle), 1);
     switch (d.segment) {
       case 'waist':
-        return cut(trunk, 'y', at(ribsCut), -1);
+        return cut(trunk, 'y', at(spineCuts(d).ribs), -1);
       case 'ribs':
-        return cut(trunk, 'y', at(ribsCut), 1);
+        return cut(trunk, 'y', at(spineCuts(d).ribs), 1);
       case 'chest':
-        return [...cut(slope, 'y', at(clavicle), -1), ...cut(cut(girdle, 'x', -neckFoot, 1), 'x', neckFoot, -1)];
-      // The deltoid caps the arm the clavicle carries, so it rides the clavicle whole, however low it reaches.
+        return chestGirdle(spineCuts(d).clavicle);
       case 'clavicle_l':
-        return [...cut(girdle, 'x', neckFoot, 1), deltoids.left];
+        return [...cut(girdle(girdleCut(d)), 'x', neckFoot, 1), deltoids.left];
       case 'clavicle_r':
-        return [...cut(girdle, 'x', -neckFoot, -1), deltoids.right];
+        return [...cut(girdle(girdleCut(d)), 'x', -neckFoot, -1), deltoids.right];
     }
   }
   if (d.segment === 'neck') {

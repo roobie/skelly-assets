@@ -47,8 +47,13 @@ local palmWidth = 0.1;
     head:: inBust('Head'),
     // The left shoulder joint; the right one mirrors it across x.
     shoulder:: inBust('upperarm_l'),
+    // The left clavicle's joint, where it meets the breastbone; the right one mirrors it across x.
+    clavicle:: inBust('clavicle_l'),
     // Where the spine bending in three cuts the chest from the ribs: the armpit.
     chestJoint:: inBust('spine_03')[1],
+    // The clavicles lift the girdle from halfway between the armpit and the shoulders' top, so the deltoid and the slope
+    // over it go with the arm while the chest keeps the girdle's foot.
+    clavicleCut:: (self.chestJoint + self.neck[1]) / 2,
     waistWidth: 0.25, waistDepth: 0.205, waistHeight: 0.17,
     ribWidth: 0.31, ribDepth: 0.235, ribHeight: 0.06,
     chestWidth: 0.34, chestDepth: 0.28,
