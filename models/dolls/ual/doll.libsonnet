@@ -15,6 +15,10 @@ local part = {
 local trunk = (import 'models/dolls/ual/joints.libsonnet').trunk;
 local negated(v) = [-x for x in v];
 local origin = { body: negated(trunk.chestJoint), pelvis: negated(trunk.pelvis) };
+// A piece's `covers` names its part as the player does (`as`, in the slot), which is the doll's own part here. The
+// player's trunk is the torso below the armpit; UAL's is the two spine parts below its chest part, which a piece drawn
+// in the chest hides none of.
+local unhidden = { body: ['trunk'] };
 {
   pack: 'skelly.body',
   rigPath: 'dolls/ual.rig.json',
@@ -38,8 +42,9 @@ local origin = { body: negated(trunk.chestJoint), pelvis: negated(trunk.pelvis) 
     sole: ['foot#sole', 'ball'],
   },
   slots: {
-    [segment]: playerSlots[segment] { part: std.get(part, segment, super.part) }
+    [segment]: playerSlots[segment] { part: std.get(part, segment, super.part), as: super.part }
                + (if std.objectHas(origin, segment) then { origin: origin[segment] } else {})
+               + (if std.objectHas(unhidden, segment) then { unhidden: unhidden[segment] } else {})
     for segment in std.objectFields(playerSlots)
   },
   places: [

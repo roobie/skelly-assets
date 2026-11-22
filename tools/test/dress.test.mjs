@@ -36,7 +36,7 @@ const dressing = {
   limbs: [{ name: 'arm', model: 'limb', anchor: 'shoulder' }],
   sides: ['right', 'left'],
   mirrored: 'left',
-  piece: 'chest',
+  piece: 'body',
   layers: ['over-jacket'],
   lying: ['folded'],
   places: [
@@ -269,7 +269,7 @@ test("every worn piece, over other clothing too, and every wearable with no piec
   const pieceParts = new Map(
     pieces.map(({ id }) => {
       const segment = wornPiece(id)?.segment;
-      return [id, { part: segment === undefined ? dressing.piece : wornSlots[segment].part }];
+      return [id, { part: wornSlots[segment ?? dressing.piece].part }];
     }),
   );
   const layered = sources.filter((entry) => tags(entry, 'fit').some((fit) => dressing.layers.includes(fit)));

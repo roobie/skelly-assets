@@ -33,7 +33,7 @@ const dressing = {
   sides: ['right', 'left'],
   mirrored: 'left',
   boneSuffix: { right: '.R', left: '.L' },
-  piece: 'torso',
+  piece: 'body',
   slots: { cuff: { slot: 'arms', part: 'upper' } },
   places: [],
   layers: [],

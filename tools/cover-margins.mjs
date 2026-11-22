@@ -10,7 +10,6 @@ import { coverMargins, dollRig } from './dollRig.mjs';
 import {
   coveringItems,
   dollDressings,
-  dollGarments,
   modelMeshes,
   readDoll,
   readDressing,
@@ -40,7 +39,7 @@ const worst = new Map();
 for (const dressing of dollDressings(readDressing(repo))) {
   const doll = readDoll(built, manifest, dressing);
   const rig = dollRig(doll, dressing);
-  for (const id of dollGarments(dressing, positionals.length > 0 ? positionals : coveringItems(models))) {
+  for (const id of positionals.length > 0 ? positionals : coveringItems(models)) {
     for (const row of coverMargins(
       rig,
       wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }),

@@ -13,7 +13,6 @@ import { coverGaps, dollRig } from './dollRig.mjs';
 import {
   coveringItems,
   dollDressings,
-  dollGarments,
   modelMeshes,
   readDoll,
   readDressing,
@@ -103,7 +102,7 @@ function coverSmoothFindings(built, manifest, root) {
   const gaps = dollDressings(readDressing(root)).flatMap((dressing) => {
     const doll = readDoll(built, manifest, dressing);
     const rig = dollRig(doll, dressing);
-    return dollGarments(dressing, coveringItems(models)).flatMap((id) =>
+    return coveringItems(models).flatMap((id) =>
       guarded(id, () =>
         coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf),
       ),

@@ -7,8 +7,8 @@ import { restPokeReport, restPokeResults } from '../restPoke.mjs';
 import { partGlb } from './boxes.mjs';
 
 // A doll of one torso on a one-bone rig, wearing a vest narrower than the torso across x, so each side of the torso
-// stands out of the vest it passes beneath by the difference. A second, toy doll of the same shape has no garment
-// fitted to it, so nothing is probed on it.
+// stands out of the vest it passes beneath by the difference. A second, toy doll of the same shape wears it too,
+// since a garment is fitted to every doll.
 const TORSO = [
   [-0.1, 0, -0.1],
   [0.1, 0.5, 0.1],
@@ -40,10 +40,10 @@ after(() => rmSync(root, { recursive: true, force: true }));
 mkdirSync(join(root, 'models'), { recursive: true });
 const dressing = {
   dolls: {
-    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, regions: {}, rig },
-    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, regions: {}, rig },
+    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: { body: { slot: 'torso', part: 'torso' } }, regions: {}, rig },
+    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: { body: { slot: 'torso', part: 'torso' } }, regions: {}, rig },
   },
-  piece: 'torso',
+  piece: 'body',
 };
 writeFileSync(join(root, 'models/dressing.libsonnet'), JSON.stringify(dressing));
 const files = {
@@ -65,18 +65,18 @@ test('the check finds the body poking out of the piece meant to cover it, by its
   assert.ok(Math.abs(poke.depth - SIDE) < 1e-6, `pokes by ${poke.depth} m, not ${SIDE} m`);
 });
 
-test('a garment is probed on the doll it is fitted to alone', () => {
+test('a garment is probed on every doll', () => {
   assert.deepEqual(Object.keys(probed.results), ['player', 'toy']);
   assert.deepEqual(Object.keys(probed.results.player), ['vest']);
-  assert.deepEqual(probed.results.toy, {});
+  assert.deepEqual(probed.results.toy, probed.results.player);
 });
 
 test('a garment whose inputs are unchanged is not probed again', async () => {
-  assert.equal(probed.probed, 1);
+  assert.equal(probed.probed, 2);
   const again = await restPokeResults(generated, { root, cache, workers: 1 });
   assert.deepEqual(
     { reused: again.reused, probed: again.probed, results: again.results },
-    { reused: 1, probed: 0, results: probed.results },
+    { reused: 2, probed: 0, results: probed.results },
   );
 });
 
@@ -90,23 +90,25 @@ const entry = (depth, extra = { why: 'fixture' }) => ({
   ...extra,
 });
 const none = { pokes: [], unjudged: [] };
+// The entries for the doll's poke on each doll.
+const onBoth = (depth, extra) => ['player', 'toy'].map((doll) => ({ ...entry(depth, extra), doll }));
 
 test('a poke fails unless an entry allows it to its depth', () => {
   assert.match(
     restPokeReport(probed.results, none).problems.join('\n'),
-    /vest on player: the doll's spine pokes out of vest_worn at rest by 20\.0 mm$/,
+    /vest on player: the doll's spine pokes out of vest_worn at rest by 20\.0 mm\nvest on toy: /,
   );
   assert.match(
-    restPokeReport(probed.results, { ...none, pokes: [entry(0.015)] }).problems.join('\n'),
+    restPokeReport(probed.results, { ...none, pokes: onBoth(0.015) }).problems.join('\n'),
     /more than the 15\.0 mm allowed/,
   );
-  assert.deepEqual(restPokeReport(probed.results, { ...none, pokes: [entry(0.021)] }), { problems: [], notes: [] });
+  assert.deepEqual(restPokeReport(probed.results, { ...none, pokes: onBoth(0.021) }), { problems: [], notes: [] });
 });
 
 test('an unjudged poke passes and is said on every run', () => {
   const { problems, notes } = restPokeReport(probed.results, {
     ...none,
-    unjudged: [entry(0.021, { note: 'awaiting a refit' })],
+    unjudged: onBoth(0.021, { note: 'awaiting a refit' }),
   });
   assert.deepEqual(problems, []);
   assert.match(
@@ -117,15 +119,14 @@ test('an unjudged poke passes and is said on every run', () => {
 
 test('an entry that is stale, doubled or capped loose fails', () => {
   const problems = (allowances) => restPokeReport(probed.results, { ...none, ...allowances }).problems.join('\n');
-  assert.match(problems({ pokes: [entry(0.021), { ...entry(0.01), bone: 'neck' }] }), /neck out of vest_worn is stale/);
-  assert.match(problems({ pokes: [entry(0.021)], unjudged: [entry(0.021, { note: 'twice' })] }), /listed twice/);
-  assert.match(problems({ pokes: [entry(0.025)] }), /capped at 25\.0 mm, far above the 20\.0 mm it measures/);
+  assert.match(problems({ pokes: [...onBoth(0.021), { ...entry(0.01), bone: 'neck' }] }), /neck out of vest_worn is stale/);
+  assert.match(problems({ pokes: onBoth(0.021), unjudged: [entry(0.021, { note: 'twice' })] }), /listed twice/);
+  assert.match(problems({ pokes: onBoth(0.025) }), /capped at 25\.0 mm, far above the 20\.0 mm it measures/);
 });
 
 test('an entry is judged against the doll it names', () => {
-  const problems = restPokeReport(probed.results, { ...none, pokes: [entry(0.021), { ...entry(0.021), doll: 'toy' }] });
-  assert.match(problems.problems.join('\n'), /^vest on toy: allowed rest poke of spine out of vest_worn is stale/);
-  assert.equal(problems.problems.length, 1);
+  const { problems } = restPokeReport(probed.results, { ...none, pokes: [entry(0.021)] });
+  assert.deepEqual(problems, ["vest on toy: the doll's spine pokes out of vest_worn at rest by 20.0 mm"]);
 });
 
 test('a piece that declares it covers body it does not enclose fails, whatever the entries allow', async () => {
@@ -136,7 +137,7 @@ test('a piece that declares it covers body it does not enclose fails, whatever t
   const { results } = await restPokeResults(declaring, { root, workers: 1 });
   assert.deepEqual(probed.results.player.vest.gaps, []);
   assert.match(
-    restPokeReport(results, { ...none, pokes: [entry(0.021)] }).problems.join('\n'),
+    restPokeReport(results, { ...none, pokes: onBoth(0.021) }).problems.join('\n'),
     /^vest on player: vest_worn \(\w+\) covers torso but would hide body it does not enclose: \d+ samples show/,
   );
 });

@@ -56,7 +56,12 @@ import { facetTerms } from './taxonomy.mjs';
  * The doll part a segment's pieces are drawn in and, where that part's frame is not the one the pieces were fitted in,
  * `origin`: where the fitted part's origin lies in this part's frame, so a piece fitted to the player's torso, whose
  * origin is the bust's, is drawn at the bust's on a doll whose chest part turns about its own joint.
- * @typedef {{ part: SlotPart; origin?: Vec3 }} PieceSlot
+ *
+ * A piece's `covers` names the part it was fitted in as the player calls it, and the regions of the player's cut of it.
+ * `as` is that name of the slot's part, which the doll's own part answers to, and `unhidden` the names of the player's
+ * regions that the piece cannot hide on this doll, since the doll's region of that name lies on parts the piece is not
+ * drawn in.
+ * @typedef {{ part: SlotPart; origin?: Vec3; as?: string; unhidden?: readonly string[] }} PieceSlot
  */
 
 /**
@@ -504,23 +509,38 @@ export const wornGarment = (id) => wornPiece(id)?.garment;
 const pieceOf = (model) => (tagsOf(model, 'fit').includes('worn') ? wornPiece(model.id) : undefined);
 
 /**
- * The doll part whose frame a worn piece is drawn in, with the fitted part's origin in it if it has one: the dressing's
- * `piece` part without a segment, else the segment's slot.
+ * The doll part whose frame a worn piece is drawn in, with the fitted part's origin in it if it has one: the slot of the
+ * segment its id names, or of the dressing's `piece` without one.
  * @param {string} id
  * @param {{ segment: string | undefined }} piece
  * @param {DollDressing} dressing
  * @returns {PieceSlot}
  */
 function pieceSlot(id, { segment }, dressing) {
-  if (segment === undefined) return { part: dressing.piece };
-  const slot = dressing.slots[segment];
-  if (!slot) throw new Error(`${id}: worn segment ${segment} is not in the dressing's slots`);
-  return slot.origin ? { part: slot.part, origin: slot.origin } : { part: slot.part };
+  const named = segment ?? dressing.piece;
+  const slot = dressing.slots[named];
+  if (!slot) throw new Error(`${id}: worn segment ${named} is not in the dressing's slots`);
+  const { part, origin, as, unhidden } = slot;
+  return {
+    part,
+    ...(origin ? { origin } : {}),
+    ...(as === undefined ? {} : { as }),
+    ...(unhidden ? { unhidden } : {}),
+  };
 }
 
 /**
- * Why a slot's part is no single doll part, for a reader that names one: a manifest's `wornOn` and a piece's `covers`
- * name the player's parts, each of which a slot holds whole.
+ * The names a piece's `covers` gives on the doll, for the copy of `part` it is drawn in: the player's name for the
+ * piece's part is the doll's own part, and a region the doll cannot hide from the piece is no name at all.
+ * @param {PieceSlot} slot
+ * @param {string} part
+ * @param {readonly string[]} covers
+ */
+const coversOn = ({ as, unhidden }, part, covers) =>
+  covers.filter((name) => !unhidden?.includes(name)).map((name) => (name === as ? part : name));
+
+/**
+ * Why a slot's part is no single doll part, for a reader that names one, as a manifest's `wornOn` does.
  * @param {string} id
  * @param {SlotPart} part
  */
@@ -595,23 +615,33 @@ export function coversProblems(models, dressing) {
     if (!covers) return [];
     const worn = wornPiece(id);
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
-    const slotPart = worn.segment === undefined ? dressing.piece : dressing.slots[worn.segment]?.part;
-    if (!slotPart) return [`${id}: worn segment ${worn.segment} is not in the dressing's slots`];
-    const problem = notOnePart(id, slotPart);
-    if (problem !== undefined) return [problem];
-    const part = /** @type {string} */ (slotPart);
-    const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
-      surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
-    );
-    const names = [part, ...regions.map(([region]) => region)];
-    return covers
-      .filter((name) => !names.includes(name))
-      .map((name) =>
-        dressing.regions[name]?.includes(part)
-          ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
-          : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
-      );
+    if (!dressing.slots[worn.segment ?? dressing.piece])
+      return [`${id}: worn segment ${worn.segment ?? dressing.piece} is not in the dressing's slots`];
+    const slot = pieceSlot(id, worn, dressing);
+    const parts = typeof slot.part === 'string' ? [slot.part] : Object.values(slot.part);
+    return parts.flatMap((part) => coversProblemsOn(id, part, coversOn(slot, part, covers), dressing));
   });
+}
+
+/**
+ * What is wrong with the names a piece drawn in the doll part `part` covers there.
+ * @param {string} id
+ * @param {string} part
+ * @param {readonly string[]} covers
+ * @param {DollDressing} dressing
+ */
+function coversProblemsOn(id, part, covers, dressing) {
+  const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
+    surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
+  );
+  const names = [part, ...regions.map(([region]) => region)];
+  return covers
+    .filter((name) => !names.includes(name))
+    .map((name) =>
+      dressing.regions[name]?.includes(part)
+        ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
+        : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
+    );
 }
 
 /**
@@ -642,19 +672,6 @@ export const isWearable = (model, models) =>
  * @param {readonly DressModel[]} models
  */
 export const fittedGarments = (models) => [...new Set(models.flatMap((model) => pieceOf(model)?.garment ?? []))];
-
-/**
- * The garments among `garments` whose pieces were fitted to the doll of `dressing`. A garment's pieces are fitted to
- * one doll, which the checks run on that doll alone for: a piece's shape is only meant for the doll it was drawn
- * against. Every piece is the player's until they are told apart by the doll their id names (`_worn_<doll>`), and then
- * only `fittedDoll` changes.
- * @param {DollDressing} dressing
- * @param {readonly string[]} garments
- */
-export const dollGarments = (dressing, garments) => garments.filter((garment) => fittedDoll(garment) === dressing.id);
-
-/** The doll a garment's pieces were fitted to. @param {string} _garment */
-const fittedDoll = (_garment) => PLAYER;
 
 /**
  * The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
@@ -863,10 +880,11 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     // the parts across its joints it leaves bare.
     return [
       ...sites,
-      ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies }) =>
+      ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies, ...slot }) =>
         copies.map((copy) => {
           const { part, side, mirror, turn, site } = copy;
-          const bare = covers ? leftBare(dressing, part, covers) : [];
+          const own = covers && coversOn(slot, part, covers);
+          const bare = own ? leftBare(dressing, part, own) : [];
           return {
             model: piece,
             part,
@@ -874,7 +892,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
             at: origin ? inCopy(copy, origin) : copy.at,
             ...(mirror ? { mirror } : {}),
             ...(turn ? { turn } : {}),
-            ...(covers ? { covers, bodySite: site } : {}),
+            ...(own ? { covers: own, bodySite: site } : {}),
             ...(bare.length > 0 ? { bare } : {}),
             ...(soleLift === undefined ? {} : { soleLift }),
           };
