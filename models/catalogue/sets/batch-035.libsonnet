@@ -61,10 +61,10 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       // Faceless: the eyes, mouth and moulded hair are the same plastic as the rest.
       segment('head', 'bust', bustMeasures, 'head', 1, ['skin', 'hair', 'eye', 'white', 'mouth'], [pin('head', [0, -1, 0])]),
     ] + std.flattenArrays([[
-      segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', [0, -arm.upperLength, 0]) + forearm(s[1])]),
-      segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', [0, -arm.foreLength, 0])]),
-      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket('thumb', hand.thumbRoot)]
-        + [socket(hand.fingers[i], hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
+      segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', arm.upperBone) + forearm(s[1])]),
+      segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', arm.foreBone)]),
+      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket(hand.thumbPart(0), hand.thumbRoot)]
+        + [socket(hand.part(hand.fingers[i], 0), hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
     ] + [
       segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
               [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []))

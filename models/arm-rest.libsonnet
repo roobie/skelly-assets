@@ -43,4 +43,10 @@ local swing = std.foldl(std.max, [least(corner) for corner in corners], 0);
   // How far out from the centre line the hanging hand's inner face stands at the wrist, where the swung arm brings the
   // hand nearest the thigh.
   handInner: girdle.deltoid.x + std.sin(swing) * (arm.upperLength + arm.foreLength) - arm.palmThickness / 2,
+  // How far out from the centre line the hanging arm's inner face stands at `height` above the hips' foot: its axis's
+  // place there, less its half-width there, both taken square to the swung arm.
+  innerAt(height):
+    local depth = (girdle.deltoid.y - height) / std.cos(swing);
+    local half = halfWidthAt(depth);
+    girdle.deltoid.x + std.sin(swing) * depth - half / std.cos(swing),
 }

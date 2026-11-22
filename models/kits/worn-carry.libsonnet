@@ -103,8 +103,9 @@ local octagon(l, o) =
   local hz = l.hz + o;
   local c = l.c + o * (2 - std.sqrt(2));
   [[-hz + c, -hx], [hz - c, -hx], [hz, -hx + c], [hz, hx - c], [hz - c, hx], [-hz + c, hx], [-hz, hx - c], [-hz, -hx + c]];
-// The outline's sides, numbered from the wearer's right side: 0 right, 1 to 3 the front, 4 left, 5 to 7 the back.
-local SIDES = { all: std.range(0, 7), front: [1, 2, 3], back: [5, 6, 7], open: [1, 2, 3, 5, 6, 7], flanks: [0, 4] };
+// The outline's sides, numbered from the wearer's right side: 0 right, 1 to 3 the front, 4 left, 5 to 7 the back. The
+// upper arm hangs behind the chest's back corners, 5 and 7, so beside it a shell keeps only its front and flat back.
+local SIDES = { all: std.range(0, 7), front: [1, 2, 3], back: [5, 6, 7], open: [1, 2, 3, 5, 6, 7], besideArms: [1, 2, 3, 6], flanks: [0, 4] };
 local ring(id, slot, l, offsets, heights, sides) =
   local inner = octagon(l, offsets[0]);
   local outer = octagon(l, offsets[1]);
@@ -124,7 +125,7 @@ local vestShell(id, slot, offsets, waistOffsets, bottom, flanks) =
   + ring(id + '_ribs', slot, torso.ribs, offsets, [waistTop, ribsTop], SIDES.open)
   + [
     piece { clip: wornFit.trapezius(rise + offsets[1]) }
-    for piece in ring(id + '_chest', slot, torso.chest, offsets, [ribsTop, torso.chest.y[1] + offsets[1]], SIDES.open)
+    for piece in ring(id + '_chest', slot, torso.chest, offsets, [ribsTop, torso.chest.y[1] + offsets[1]], SIDES.besideArms)
   ]
   // Shoulder straps join the front and back panels over the trapezius, clear of the collar and the deltoids.
   + sloped(id + '_shoulder', slot, fit.vestStrapLane, [-(torso.chest.hz + offsets[1]), torso.chest.hz + offsets[1]],

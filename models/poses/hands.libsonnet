@@ -9,8 +9,8 @@
 {
   open: { curl: 0.05, spread: 0.5, thumb: { across: -0.4, oppose: 0.1 } },
   fist: { curl: 1, thumb: { across: 0.6, oppose: 0.7, lift: 0.6, curl: 0.8 } },
-  point: { curl: { middle: 1, ring: 1, little: 1 }, thumb: { across: 0.5, oppose: 0.6, lift: 0.5, curl: 0.5 } },
-  pinch: { curl: { index: 0.55, middle: 0.75, ring: 0.85, little: 0.95 }, thumb: { across: 0.1, oppose: 0.9, lift: 0.9, curl: 0.3 } },
+  point: { curl: { middle: 1, ring: 1, pinky: 1 }, thumb: { across: 0.5, oppose: 0.6, lift: 0.5, curl: 0.5 } },
+  pinch: { curl: { index: 0.55, middle: 0.75, ring: 0.85, pinky: 0.95 }, thumb: { across: 0.1, oppose: 0.9, lift: 0.9, curl: 0.3 } },
   grip: { curl: 0.2, thumb: { across: 0.7, oppose: 0.4, lift: 1 } },
   support: { curl: 0.2, thumb: { across: 0.3, oppose: 0.2, lift: 0.6 } },
 }

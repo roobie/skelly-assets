@@ -56,8 +56,6 @@ local deltoid = girdle.deltoid;
 local trapezius = girdle.trapezius;
 local slopeY = girdle.slopeY;
 local deltoidY = girdle.deltoidY;
-// Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
-local armInner = deltoid.x - arm.upperWidth / 2;
 // How far down the thigh's frame the hanging hand's fingertips reach.
 local fingertips = deltoid.y - leg.hip[1] - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
 // A sleeve's head covers the deltoid, so its depth follows the deltoid's rather than the arm's, eased so the cloth
@@ -102,6 +100,9 @@ local hood(slot, lining, chestD, depth) =
   ];
 
 local shellGrain = 0.004;
+// The doll's skin is voxelised past its measures by up to half the doll's grain, and a shell may stop short of its own
+// by half its grain, so a shell meant to enclose the skin stands at least this far past the measures.
+local voxelReach = (bust.voxelGrain + shellGrain) / 2;
 local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: shellGrain };
 
 // A worn shell's row. `covers` names the doll parts or regions the shell encloses at rest, which a consumer stops
@@ -239,6 +240,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     // neckline.
     local armpit = l.ribs.y[1] + bust.armpit * bust.chestHeight + g;
     local sideX = bust.chestWidth / 2 * bust.chestLowShare + g;
+    local armInner = armRest.innerAt(armpit);
     assert !straps || sideX <= armInner : 'a sleeveless body\'s side at %g lies under the hanging arm, whose inner face is at %g' % [sideX, armInner];
     local chest = if straps then l.chest { width: 2 * sideX } else l.chest;
     local panel(name, side) =
@@ -627,7 +629,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
   hands(id, finish, spec, title=null)::
     local s = { layer: 'under', cuff: 0.05, flare: 0.006, hem: 0.006, fingers: true, backRidges: 0,
                 slots: { hand: 'hand', cuff: 'cuff', hem: 'hem', ridge: 'stitch' } } + spec;
-    local g = layers[s.layer], sl = s.slots;
+    // A glove hugs the hand, so a layer thinner than the voxel reach would let the skin through it.
+    local g = std.max(layers[s.layer], voxelReach), sl = s.slots;
     local palmX = arm.palmThickness / 2 + g, palmZ = arm.palmWidth / 2 + g;
     local wristX = arm.wristWidth / 2 + g, wristZ = arm.wristWidth / 2 + arm.wristDepthExtra + g;
     local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g, fingerZ = hand.width / 2 + g;
@@ -636,9 +639,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     // rather than standing square past the little finger's root, where a curled finger would come out through it.
     local last = std.length(hand.fingers) - 1;
     local knuckleY(i) = hand.knuckle(i)[1] - g;
-    local edgeY(from, to, z) = knuckleY(from) + (knuckleY(to) - knuckleY(from)) * (z - hand.centre(from)) / (hand.centre(to) - hand.centre(from));
+    local knuckleZ(i) = hand.knuckle(i)[2];
+    local edgeY(from, to, z) = knuckleY(from) + (knuckleY(to) - knuckleY(from)) * (z - knuckleZ(from)) / (knuckleZ(to) - knuckleZ(from));
     local outline = [[arm.handOverlap, palmZ], [edgeY(0, 1, palmZ), palmZ]]
-                    + [[knuckleY(i), hand.centre(i)] for i in std.range(1, last - 1)]
+                    + [[knuckleY(i), knuckleZ(i)] for i in std.range(1, last - 1)]
                     + [[edgeY(last, last - 1, -palmZ), -palmZ], [arm.handOverlap, -palmZ]];
     local palm = [
       h.prism('palm', sl.hand, 'x', outline, -palmX, palmX),
@@ -663,9 +667,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for k in phalanges
     ];
     // A thumb piece in its bone's frame, down the bone's length; the root piece ends just past the root, the rest reach
-    // into the bone above, each past the skin's end for the same reason as a phalanx's.
+    // into the bone above, each past the skin's end for the same reason as a phalanx's. Across the palm's edge it
+    // spans the thumb's flesh, from its joint, inset in the palm, out to the thumb's projection past the edge.
     local thumbPieces = [
-      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbProjection + 0.004 + g])] }
+      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbInset + arm.thumbProjection + g])] }
       for k in std.range(0, hand.thumbBones - 1)
     ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.
@@ -731,13 +736,11 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ]));
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
-    // The doll's foot and toes are voxelised past their cut at the ball by up to half the doll's grain, and each shell
-    // piece may stop short of its own cut by half its grain, so the foot and toe pieces each reach both halves past the
-    // ball to enclose the skin of their part, overlapping one another there as the doll's parts do. A turned piece is
-    // not sliced but handed whole to the side of the ball holding its middle, so it lands in only one of them.
-    local reach = (bust.voxelGrain + shellGrain) / 2;
+    // The foot and toe pieces each reach the voxel reach past the ball to enclose the skin of their part, overlapping
+    // one another there as the doll's parts do. A turned piece is not sliced but handed whole to the side of the ball
+    // holding its middle, so it lands in only one of them.
     local cutAtBall(keep) = std.flattenArrays([
-      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * reach), keep, whole=true)
+      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * voxelReach), keep, whole=true)
       for p in foot
     ]);
     local footPieces = cutAtBall(-1), toePieces = cutAtBall(1);

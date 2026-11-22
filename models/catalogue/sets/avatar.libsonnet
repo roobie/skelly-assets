@@ -109,12 +109,12 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     // One segment per part so the first-person view bends the arm at its joints; each segment is drawn about its
     // own joint and mates to the segment above it there, so the whole hangs exactly as one piece would.
     parts: [
-      armSegment('upper', 1.9, { skin: skin }, [jointSocket('elbow', [0, -arm.upperLength, 0])]),
-      armSegment('fore', 1.1, { skin: skin }, [jointPin('elbow'), jointSocket('wrist', [0, -arm.foreLength, 0])]),
+      armSegment('upper', 1.9, { skin: skin }, [jointSocket('elbow', arm.upperBone)]),
+      armSegment('fore', 1.1, { skin: skin }, [jointPin('elbow'), jointSocket('wrist', arm.foreBone)]),
       armSegment('palm', 0.3, { skin: skin }, [
         jointPin('wrist'),
-        jointSocket('thumb', hand.thumbRoot),
-      ] + [jointSocket(hand.fingers[i], hand.knuckle(i)) for i in std.range(0, fingerCount - 1)]),
+        jointSocket(hand.thumbPart(0), hand.thumbRoot),
+      ] + [jointSocket(hand.part(hand.fingers[i], 0), hand.knuckle(i)) for i in std.range(0, fingerCount - 1)]),
     ] + [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)]
       + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     connections: [
@@ -125,11 +125,11 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
     // The pivots code poses from: the shoulder the arm hangs from, sitting at the bust's shoulder anchor, each joint
     // below it, and the grip a held item sits at in the palm.
     anchors: {
-      shoulder: { part: 'upper', solid: 'upper-arm', fraction: [0.5, 1, 0.5] },
-      elbow: { part: 'upper', solid: 'upper-arm', fraction: [0.5, 0, 0.5] },
-      wrist: { part: 'fore', solid: 'wrist', fraction: [0.5, 0, 0.5] },
+      shoulder: { part: 'upper', at: [0, 0, 0] },
+      elbow: { part: 'upper', at: arm.upperBone },
+      wrist: { part: 'fore', at: arm.foreBone },
       knuckles: { part: 'palm', solid: 'palm', fraction: [0.5, 0, 0.5] },
-      thumb_root: { part: 'thumb', solid: 'thumb', fraction: [0.5, 1, 0] },
+      thumb_root: { part: 'palm', at: hand.thumbRoot },
       // The palm's y runs from the knuckles (0) to the wrist (1).
       grip: { part: 'palm', solid: 'palm', fraction: [0.5, 1 - hand.fistShare, 0.5] },
     },

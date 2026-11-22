@@ -103,8 +103,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       thumbVolar: positive,
       /** How far each finger's knuckle sits back from the palm's length toward the wrist, the index first. */
       knuckleBack: numbers,
-      /** How far the knuckles sit toward the palm's face; the fingers' sockets place them, the palm only ends there. */
-      knuckleVolar: positive,
       /** The shoulder's, elbow's and wrist's joints in the arm's frame; without them they lie on its centre line. */
       origins: optional(json(strictObject({ upper: point3, fore: point3, palm: point3 }))),
       /**

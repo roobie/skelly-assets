@@ -177,8 +177,11 @@ describe('a doll whose skeleton is not the player body', () => {
       if (solid?.kind !== 'box') throw new Error('the digit is drawn as no box');
       return 2 * solid.box.half[1];
     };
-    const finger = params(toy.parts.arm, 'toy_arm_index_01');
-    const thumb = params(toy.parts.arm, 'toy_arm_thumb_01');
+    // The digits as the shares alone draw them, without the lengths the toy's hand gives each bone.
+    const byShares = (given: Record<string, string>) =>
+      Object.fromEntries(Object.entries(given).filter(([key]) => key !== 'phalanxLengths' && key !== 'thumbLengths'));
+    const finger = byShares(params(toy.parts.arm, 'toy_arm_index_01'));
+    const thumb = byShares(params(toy.parts.arm, 'toy_arm_thumb_01'));
     const shares = (name: string) => JSON.parse(finger[name]!) as number[];
     const fingerFirst = Number(finger.fingerLength) * shares('fingerShares')[0]! * shares('phalanxShares')[0]!;
     const thumbFirst = Number(thumb.thumbLength) * shares('thumbShares')[0]!;

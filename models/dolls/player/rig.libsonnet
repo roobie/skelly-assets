@@ -36,7 +36,7 @@
 // children folded into it, so the player's clips play on the doll: the doll's one torso part is mobgen's spine and chest.
 //
 // A finger bone names its `digit` and, at the knuckle, its `spread`, the share of a spread of the hand it takes along
-// positive abduction, which carries a finger toward the thumb (1 for the index, -1 for the little finger), so a pose
+// positive abduction, which carries a finger toward the thumb (1 for the index, -1 for the pinky), so a pose
 // file's hand shorthand (site/fingers.mjs) can curl and spread a hand without naming bones. A finger flexes about the
 // knuckle row, the axis chosen so positive flex curls it toward the palm.
 //
@@ -84,7 +84,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 10,
+  revision: 11,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',

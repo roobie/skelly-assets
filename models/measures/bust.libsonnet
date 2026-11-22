@@ -1,6 +1,6 @@
 // The player bust's measures, hips to crown. Worn shells fit around these, so the bust and its gear share one source.
 // The trunk's joints, levels and girths are the UAL doll's (models/dolls/ual/joints.libsonnet), so one garment fits
-// both dolls; the pelvis, the lower chest and the deltoid are the player's own, as its drawing needs. Each joint is
+// both dolls; the pelvis and the lower chest are the player's own, as its drawing needs. Each joint is
 // above the hips' foot, the bust's frame.
 local ual = (import 'models/dolls/ual/joints.libsonnet').trunk;
 local spine = ual.spine, neck = ual.neck, head = ual.head, shoulder = ual.shoulder;
@@ -26,9 +26,6 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   shoulderJointOut: shoulder[0] - self.chestWidth / 2,
   shoulderJointBelow: neck[1] - shoulder[1],
   shoulderJointForward: shoulder[2],
-  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands `deltoidCrown` above
-  // the slope's end, so the slope runs on over a rounded cap. Its plan follows the upper arm it caps.
-  deltoidRadius: 0.051,
   // The neck runs from its joint to the chin, and on into the head to the head's joint.
   neckOverlap: head[1] - neck[1] - self.neckHeight,
   headWidth: 0.165, headHeight: 0.268, headDepth: 0.214, jawHeight: 0.09, hairCover: 0.07,
@@ -54,5 +51,5 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   voxelGrain:: 0.006,
 } + the(ual, [
   'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
-  'trapeziusDrop', 'deltoidCrown', 'neckWidth', 'neckHeight',
+  'trapeziusDrop', 'deltoidCrown', 'deltoidRadius', 'neckWidth', 'neckHeight',
 ])

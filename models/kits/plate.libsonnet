@@ -33,6 +33,9 @@ local cut = bust.torsoChamfer / 2;
 // The breast stands off the chest's flanks by no more than a layer, as the arms hang close beside them: a wider one
 // passes through the hanging arm.
 local chestW = bust.chestWidth + 2 * g, chestD = bust.chestDepth + 2 * g + 0.045;
+// The upper arm hangs just ahead of the breast's back corners, so they are cut no deeper than this: a deeper cut brings
+// them forward under the arm's back.
+local breastCut = 0.05;
 local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local skirtTop = waistTop - 0.04;
 // The breast stands this far off the shoulders, cut to their slope.
@@ -44,14 +47,14 @@ local rivetX = bust.chestWidth / 2 - 0.01;
 local body = [
   oct('plackart', 'plate', skirtTop, ribTop + 0.01, bust.waistWidth + 2 * g + 0.02, bust.ribDepth + 2 * g + 0.03, cut),
   oct('plackart-rim', 'trim', skirtTop, skirtTop + 0.012, bust.waistWidth + 2 * g + 0.03, bust.ribDepth + 2 * g + 0.04, cut),
-  oct('breast', 'plate', ribTop - 0.04, chestTop + shoulderRise, chestW, chestD, 0.07) + { clip: fit.trapezius(shoulderRise) },
-  oct('breast-rim', 'trim', ribTop - 0.04, ribTop - 0.026, chestW + 0.01, chestD + 0.01, 0.07),
+  oct('breast', 'plate', ribTop - 0.04, chestTop + shoulderRise, chestW, chestD, breastCut) + { clip: fit.trapezius(shoulderRise) },
+  oct('breast-rim', 'trim', ribTop - 0.04, ribTop - 0.026, chestW + 0.01, chestD + 0.01, breastCut),
   // The keel: a ridge down the breast's front, turning the lance aside.
   h.prism('keel', 'trim', 'y', [[chestD / 2 - 0.004, -0.035], [chestD / 2 + 0.03, 0], [chestD / 2 - 0.004, 0.035]], ribTop - 0.03, chestTop - 0.02),
-  // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands a voxel of the row's and one of
-  // the body's off the deltoid, so rounding the deltoid out and the cap in cannot sink one into the other.
-  fit.deltoidCap('shoulder-left', 'plate', 1, fineGrain + bust.voxelGrain),
-  fit.deltoidCap('shoulder-right', 'plate', -1, fineGrain + bust.voxelGrain),
+  // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands off the deltoid as the breast
+  // does off the shoulders, which also clears the top of the arm the deltoid caps, as that is not round.
+  fit.deltoidCap('shoulder-left', 'plate', 1, shoulderRise),
+  fit.deltoidCap('shoulder-right', 'plate', -1, shoulderRise),
   oct('gorget-1', 'plate', chestTop - 0.01, chestTop + 0.04, bust.neckWidth + 0.09, bust.neckWidth + 0.09, 0.03, cz=-0.01),
   oct('gorget-2', 'plate', chestTop + 0.025, chestTop + 0.075, bust.neckWidth + 0.075, bust.neckWidth + 0.075, 0.028, cz=-0.01),
   oct('gorget-lip', 'trim', chestTop + 0.07, chestTop + 0.085, bust.neckWidth + 0.085, bust.neckWidth + 0.085, 0.028, cz=-0.01),

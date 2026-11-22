@@ -1,25 +1,22 @@
 // The player arm's measures; shoulder to fingertip reaches mid-thigh on the standing figure.
 // Worn shells fit around these, so the arm and its gear share one source.
-{
-  upperLength: 0.3, upperWidth: 0.085, upperDepth: 0.09,
-  foreLength: 0.25, foreWidth: 0.08, wristWidth: 0.06,
-  palmLength: 0.1, palmWidth: 0.085, palmThickness: 0.032, fingerLength: 0.08, thumbLength: 0.085,
+// The lengths, the joints' places, the knuckles, the thumb's root and every digit bone's length are the UAL doll's
+// joints, and so are the girths that strayed from UAL's past what the eye can judge (models/dolls/ual/joints.libsonnet),
+// so one glove, sleeve or bracer fits both dolls; the chamfers, overlaps and shares that shape the flesh rather than
+// size it are the player's own.
+local ual = (import 'models/dolls/ual/joints.libsonnet').arm;
+local sub(a, b) = [a[i] - b[i] for i in [0, 1, 2]];
+local plan(v) = [v[0] / 2, 0, v[2] / 2];
+local upperBone = sub(ual.origins.fore, ual.origins.upper), foreBone = sub(ual.origins.palm, ual.origins.fore);
+ual {
+  // Each bone from its own joint to the next, in its part's frame: where the part's socket for the next part stands.
+  upperBone:: upperBone,
+  foreBone:: foreBone,
+  // Where each segment's flesh stands across the arm in its part's frame, as the arm family draws it: halfway along its
+  // bone. A piece worn on the segment stands about the same line.
+  upperAxis:: plan(upperBone),
+  foreAxis:: plan(foreBone),
   seamOverlap: 0.01, handOverlap: 0.005, armChamfer: 0.03, wristChamfer: 0.02,
   foreDepthExtra: 0.004, wristDepthExtra: 0.006, wristShare: 0.45,
-  fingerThicknessShare: 0.8, thumbThicknessShare: 0.7, fingerFrontShare: 0.9, thumbRootShare: 0.3,
-  thumbInset: 0.004, thumbProjection: 0.014,
-  // How far the thumb's root sits toward the palm's face: the thumb's metacarpal lies on the palm side of the hand, as
-  // the ball of the thumb, so the thumb closes round a handle from in front of the fingers rather than beside them.
-  thumbVolar: 0.008,
-  // The fingers from the thumb's side (+z) with their lengths as shares of `fingerLength`, the gap between them, each
-  // finger's phalanges as shares of its length (knuckle first), and the thumb's bones as shares of its length (the
-  // metacarpal first, then the two phalanges).
-  fingers: ['index', 'middle', 'ring', 'little'], fingerShares: [0.94, 1, 0.92, 0.78], fingerGap: 0.0035,
-  phalanxShares: [0.45, 0.3, 0.25], thumbShares: [0.4, 0.33, 0.27],
-  // How far each finger's knuckle sits back from the palm's length, toward the wrist: the knuckle row slants back
-  // toward the little finger, as a hand's metacarpal heads arc, so a closed hand steps down from index to little.
-  knuckleBack: [0, 0.002, 0.006, 0.013],
-  // How far the knuckles sit toward the palm's face: the fingers leave the hand flush with the palm and below the
-  // knuckles' ridge on the back, so a closed finger reaches round a handle rather than stopping halfway down its side.
-  knuckleVolar: 0.006,
+  fingerThicknessShare: 0.8, thumbThicknessShare: 0.7, fingerFrontShare: 0.9, thumbProjection: 0.014,
 }

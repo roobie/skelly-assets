@@ -38,17 +38,20 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const curled = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
-    const bone = bones.get(`index3.${side}`);
+    const bone = bones.get(`index_03.${side}`);
     return applyPoint(curled.get(bone.id), bone.tail);
   };
   for (const side of ['L', 'R']) {
     const hand = bones.get(`hand.${side}`),
-      knuckle = bones.get(`index.${side}`);
+      knuckle = bones.get(`index_01.${side}`),
+      last = bones.get(`index_03.${side}`);
     const intoPalm = mulMV(curled.get(hand.id).r, [hand.bind.mirror ? -1 : 1, 0, 0]);
-    // The fingers hang from the palm's mid-thickness, so a full curl ends a few millimetres toward the palm face.
+    // A full curl folds the last phalanx back past the knuckle's line, so the last joint, which the first two
+    // phalanges carry forward, is what shows the way the finger closed.
     assert.ok(
-      dot(sub(tip(side), applyPoint(curled.get(knuckle.id), knuckle.head)), intoPalm) > 0.005,
-      `the ${side} fingertip comes back toward the palm`,
+      dot(sub(applyPoint(curled.get(last.id), last.head), applyPoint(curled.get(knuckle.id), knuckle.head)), intoPalm) >
+        0.005,
+      `the ${side} finger closes toward the palm`,
     );
   }
   const [l, r] = [tip('L'), tip('R')];
@@ -92,11 +95,11 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const posed = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
-    const bone = bones.get(`thumb3.${side}`);
+    const bone = bones.get(`thumb_03.${side}`);
     return applyPoint(posed.get(bone.id), bone.tail);
   };
   for (const side of ['L', 'R']) {
-    const root = bones.get(`thumb.${side}`);
+    const root = bones.get(`thumb_01.${side}`);
     // The pad faces the way the palm does at rest, and the little finger lies at -z of either hand.
     const pad = mulMV(posed.get(root.id).r, [root.bind.mirror ? -1 : 1, 0, 0]);
     assert.ok(pad[2] < -0.5, `the ${side} thumb pad turns toward the little finger, not ${pad}`);
@@ -158,8 +161,8 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
     const angles = frameAngles(rig, frame);
     const flex = (id) => Math.abs(angles[id][0]);
     assert.ok(
-      flex(`little.${side}`) >= flex(`index.${side}`),
-      `the ${side} little finger's knuckle bends ${flex(`little.${side}`).toFixed(0)}°, less than the index's ${flex(`index.${side}`).toFixed(0)}°`,
+      flex(`pinky_01.${side}`) >= flex(`index_01.${side}`),
+      `the ${side} little finger's knuckle bends ${flex(`pinky_01.${side}`).toFixed(0)}°, less than the index's ${flex(`index_01.${side}`).toFixed(0)}°`,
     );
     // Away from the palm is the socket's `into`; a tip past the haft's middle that way has wrapped round it.
     const beyond = (tip) => dot(sub(applyPoint(transforms.get(tip.id), padOf(tip)), item.t), mulMV(item.r, [1, 0, 0]));
@@ -169,10 +172,10 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
       assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
     assert.ok(
-      gap(`thumb.${side}`) < 0.003,
-      `the ${side} thumb's root bears on the haft, not ${(gap(`thumb.${side}`) * 1000).toFixed(1)} mm off it`,
+      gap(`thumb_01.${side}`) < 0.003,
+      `the ${side} thumb's root bears on the haft, not ${(gap(`thumb_01.${side}`) * 1000).toFixed(1)} mm off it`,
     );
-    const thumbTip = bones.get(`thumb3.${side}`);
+    const thumbTip = bones.get(`thumb_03.${side}`);
     assert.ok(
       beyond(thumbTip) > 0,
       `the ${side} thumb closes over the haft's far side, not ${(-beyond(thumbTip) * 1000).toFixed(1)} mm short of its middle`,

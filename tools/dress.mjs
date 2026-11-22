@@ -459,20 +459,25 @@ export function dollOf(dressing, figure) {
 const tagsOf = (model, facet) => facetTerms(model.tags, facet);
 
 // A worn piece's garment and segment, read from its id, `<garment>_worn` or `<garment>_worn_<segment>`; nothing for a
-// model that is no worn piece. Pieces fitted over other clothing are not worn pieces here, so the doll wears each item
-// on its own.
-const PIECE_ID = /^(.+)_worn(?:_([^_]+))?$/;
+// model that is no worn piece. A segment is one word, or a digit bone's word and number, as `index_01`. Pieces fitted
+// over other clothing are not worn pieces here, so the doll wears each item on its own.
+const PIECE_ID = /^(.+)_worn(?:_([^_]+(?:_\d+)?))?$/;
+/**
+ * A worn piece's id taken apart, whether or not the model is tagged as one.
+ * @param {string} id
+ * @returns {{ garment: string; segment: string | undefined } | undefined}
+ */
+export const wornPiece = (id) => {
+  const match = PIECE_ID.exec(id);
+  return match?.[1] === undefined ? undefined : { garment: match[1], segment: match[2] };
+};
 /** The garment a worn piece's id names, whether or not the model is tagged as one. @param {string} id */
-export const wornGarment = (id) => PIECE_ID.exec(id)?.[1];
+export const wornGarment = (id) => wornPiece(id)?.garment;
 /**
  * @param {DressModel} model
  * @returns {{ garment: string; segment: string | undefined } | undefined}
  */
-function pieceOf(model) {
-  if (!tagsOf(model, 'fit').includes('worn')) return undefined;
-  const match = PIECE_ID.exec(model.id);
-  return match?.[1] === undefined ? undefined : { garment: match[1], segment: match[2] };
-}
+const pieceOf = (model) => (tagsOf(model, 'fit').includes('worn') ? wornPiece(model.id) : undefined);
 
 /**
  * The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
@@ -520,10 +525,10 @@ const surfacePart = (surface) => surface.split('#')[0];
 export function coversProblems(models, dressing) {
   return models.flatMap(({ id, covers }) => {
     if (!covers) return [];
-    const worn = /_worn(?:_([^_]+))?$/.exec(id);
+    const worn = wornPiece(id);
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
-    const part = worn[1] === undefined ? dressing.piece : dressing.slots[worn[1]]?.part;
-    if (!part) return [`${id}: worn segment ${worn[1]} is not in the dressing's slots`];
+    const part = worn.segment === undefined ? dressing.piece : dressing.slots[worn.segment]?.part;
+    if (!part) return [`${id}: worn segment ${worn.segment} is not in the dressing's slots`];
     const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
       surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
     );
@@ -546,10 +551,7 @@ export function coversProblems(models, dressing) {
 export const coveringItems = (models) => [
   ...new Set(
     models.flatMap((model) => {
-      const item =
-        model.covers && tagsOf(model, 'fit').includes('worn')
-          ? /^(.+)_worn(?:_[^_]+)?$/.exec(model.id)?.[1]
-          : undefined;
+      const item = model.covers ? pieceOf(model)?.garment : undefined;
       return item ? [item] : [];
     }),
   ),
@@ -603,10 +605,10 @@ export function placeOf(model, dressing) {
  */
 function layerTwinOf(model, dressing) {
   if (!tagsOf(model, 'fit').some((fit) => dressing.layers.includes(fit))) return undefined;
-  const match = PIECE_ID.exec(model.id);
-  if (match?.[2] === undefined)
+  const piece = wornPiece(model.id);
+  if (piece?.segment === undefined)
     throw new Error(`${model.id}: a piece fitted over other clothing is named <item>_worn_<layer>`);
-  return `${match[1]}_worn`;
+  return `${piece.garment}_worn`;
 }
 
 /**

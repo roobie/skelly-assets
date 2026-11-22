@@ -61,7 +61,7 @@ local cover(offset) = port(offset) { on: 'port-cover' };
 // The hand that shuts the cover: the index reaching, the other fingers curled out of its way.
 local coverHand = {
   hold: crease { pole: [0.5, -0.87, 0] },
-  hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
+  hands: { curl: { middle: 0.8, ring: 0.9, pinky: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
 };
 local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
