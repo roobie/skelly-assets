@@ -43,16 +43,15 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
   };
   for (const side of ['L', 'R']) {
     const hand = bones.get(`hand.${side}`),
-      knuckle = bones.get(`index_01.${side}`),
-      last = bones.get(`index_03.${side}`);
+      knuckle = bones.get(`index_01.${side}`);
+    const knuckleAt = applyPoint(curled.get(knuckle.id), knuckle.head);
+    const fromKnuckle = sub(tip(side), knuckleAt);
     const intoPalm = mulMV(curled.get(hand.id).r, [hand.bind.mirror ? -1 : 1, 0, 0]);
-    // A full curl folds the last phalanx back past the knuckle's line, so the last joint, which the first two
-    // phalanges carry forward, is what shows the way the finger closed.
-    assert.ok(
-      dot(sub(applyPoint(curled.get(last.id), last.head), applyPoint(curled.get(knuckle.id), knuckle.head)), intoPalm) >
-        0.005,
-      `the ${side} finger closes toward the palm`,
-    );
+    const towardWrist = normalize(sub(applyPoint(curled.get(hand.id), hand.head), knuckleAt));
+    // The knuckles stand at the palm's mid-thickness and the finger is longer than the palm is thick, so a full
+    // curl tucks the tip back under the knuckle row, only a few millimetres toward the palm's face.
+    assert.ok(dot(fromKnuckle, intoPalm) > 0.002, `the ${side} fingertip comes back to the palm's side`);
+    assert.ok(dot(fromKnuckle, towardWrist) > 0.02, `the ${side} fingertip folds back past the knuckle row`);
   }
   const [l, r] = [tip('L'), tip('R')];
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right fingertip mirrors the left across x');
