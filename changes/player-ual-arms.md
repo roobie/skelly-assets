@@ -1,0 +1,19 @@
+---
+type: breaking
+---
+The player's arms and hands stand on the UAL mannequin's joints and girths, and its digits carry UAL's names, so one glove, sleeve or bracer fits both dolls. The upper arm is 0.2744 m long and 0.125 m by 0.13 m thick, where before it was 0.3 m and 0.085 m by 0.09 m. The forearm is 0.2726 m long and 0.105 m wide, from 0.25 m and 0.08 m. The palm is 0.1216 m long, 0.10 m wide and 0.04 m thick, from 0.10 m, 0.085 m and 0.032 m. The middle finger is 0.1106 m long, from 0.08 m, and the thumb is 0.1057 m, from 0.085 m. The knuckles and the thumb's root stand where UAL's skeleton puts them. The digits are named `index_01`..`index_03`, `middle_01`..`middle_03`, `ring_01`..`ring_03`, `pinky_01`..`pinky_03` and `thumb_01`..`thumb_03`, the first at the knuckle or the thumb's root, where before they were `index`, `index2`, `index3`, `little`, `thumb`, `thumb2` and so on. The pose files' hand shorthand names the fourth finger `pinky`. The deltoid's plan radius is half the upper arm's depth, 0.065 m, from 0.051 m, as UAL's is, so the shoulders stand a little wider.
+
+The arms now rest swung out 13.19° from straight down, by the same rule as before: just enough that the larger hanging arm clears the ribs and hips by a centimetre. The upper arm's abduction is counted from that rest, so its range is now [-43.19°, 156.81°], where before it was [-35.65°, 164.35°]. The rig's revision is 11.
+
+Gloves, gauntlets and sleeves are fitted round the new arm and hand, on both dolls, and a glove stands at least half a voxel of the doll's and its own grain off the hand, so the skin cannot show through a thin under-layer glove. The vest's, plate cuirass's and power armour's chest cuts and the plate deltoid caps follow the wider deltoid. The warrior statue's sword and shield arms hang further out, so the larger arms clear its trunk. The dressing has a `wrist` slot, placed on the back of the forearm's end on both dolls, and watches, bracelets and the wrist pouch are worn there rather than on the upper arm.
+
+The holds are re-posed for the larger hand and arm. The two-hand classes seat the leading hand a palm's width, 0.10 m, ahead of the trailing one, from 0.09 m, and the zweihänder's grip is 0.44 m long, from 0.39 m, to keep both palms on it. The power grip seats a handle 0.72 of the palm's length from the wrist, from 0.65. The two-hand overhead, side and thrust strikes and the one-hand forehand and thrust windups bring the handle within the arm's reach.
+
+Upgrade:
+- Re-target pose files to the doll rig's revision 11, and re-judge any pose that places the arms: the arms are longer below the elbow, shorter above it, and rest turned further out.
+- Rename every digit bone and part as above, in pose files, hand shorthands (`little` becomes `pinky`) and anything that names a finger.
+- Rename the 60 worn glove pieces that name a digit, as `<glove>_worn_<digit>_<nn>`: `gloves_trooper_worn_thumb2` becomes `gloves_trooper_worn_thumb_02`, and a knuckle phalanx gains `_01`.
+- Re-import the wield and press check clips and their pose files: the strikes' key frames and the two-hand hand spacing have changed.
+- Re-seat anything held in the right hand's power grip: it closes deeper in the palm.
+- Move wristwatches and bracelets to the `wrist` slot.
+- Re-seat anything drawn over the vest, cuirass or power armour at the shoulders: their chest cuts and the plate's deltoid caps stand further out.
