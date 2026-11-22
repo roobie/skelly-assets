@@ -85,7 +85,7 @@ placed in the world keeps its line and the wrist takes up the turn. A hold that
 is no power grip, such as a hand cradling a handguard or pinching a latch, names its own seat on the palm. A melee
 hand is the other exception: a game plays its clip on a figure whose rigid fist holds an item's grip point on the
 palm's face at the arm's grip anchor, so the doll seats the handle's axis there (the hand layout's `fistShare`), the
-handle sunk into its palm, rather than its surface at the deeper power grip, which would leave the weapon two
+handle sunk into its palm, rather than its surface at the power grip, which lies further from the wrist and would leave the weapon two
 centimetres off the game's fist. The fingers
 close first and the thumb last, so it closes over the haft's far side onto the curled fingers. The thumb starts lifted
 off the palm and its root comes down onto the item from beyond, since lifting it from the palm side would drive it

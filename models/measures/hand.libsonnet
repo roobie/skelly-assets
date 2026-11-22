@@ -27,6 +27,6 @@ local count = std.length(ual.fingers);
   thumbLength(k):: ual.thumbLength(k),
   // Where a game's fist closes on a held item's grip point, as a share of the palm's length from the wrist: the arm's
   // grip anchor, and the palm seat of the doll's melee hands, so a wield clip baked on the doll seats its weapon where
-  // the game's figure holds it. The doll's own power grip (models/dolls/player/rig.libsonnet, the hand's `grip`) seats deeper.
+  // the game's figure holds it. The doll's own power grip (models/dolls/player/rig.libsonnet, the hand's `grip`) seats further from the wrist.
   fistShare: 0.5,
 }
