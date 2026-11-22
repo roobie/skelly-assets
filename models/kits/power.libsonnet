@@ -43,8 +43,11 @@ local chestSide = bust.chestWidth / 2;
 // The chest and its breast plate are cut to the shoulders' slope under the trooper's deltoid caps, which this set
 // keeps.
 local shoulderRise = fit.trooperChestRise;
-local bodyAdd = [
+// The chest lies over the girdle, so its share past the neck's foot rides the clavicles.
+local girdle = fit.girdleShares('armor_power', [
   oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, bust.chestWidth + 0.03, chestD, bust.chestBackCut) + { clip: fit.trapezius(shoulderRise) },
+]);
+local bodyAdd = girdle.trunk + [
   // Angular breast plate: a wedge that juts forward at the bottom of the chest.
   h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -(chestSide - 0.01), chestSide - 0.01)
   + { clip: fit.trapezius(shoulderRise) },
@@ -175,6 +178,7 @@ local shaftGuard(row) =
 
 local forArmour = {
   body: function(r) remake(r, starts(['chest', 'slab', 'chevron', 'rivet', 'belt', 'buckle', 'stack', 'pouch']), bodyAdd),
+  clavicle: function(r) remake(r, starts(['chest']), girdle.clavicle),
   upper: function(r) remake(r, starts(['pauldron', 'comb', 'rerebrace']), upperAdd, 0.004),
   fore: function(r) remake(r, starts(['couter', 'vambrace']), foreAdd),
   palm: function(r) remake(r, starts([]), palmAdd),

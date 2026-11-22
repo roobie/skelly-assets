@@ -4,7 +4,7 @@ local taxonomy = import '../../jsonnet/lib/taxonomy.libsonnet';
 // The segments a shell id may end in, `<item>_worn_<segment>`: the names worn-fit.libsonnet's templates give their
 // shells.
 local hand = import 'models/measures/hand.libsonnet';
-local segments = ['body', 'upper', 'fore', 'palm', 'pelvis', 'thigh', 'shin', 'foot', 'toe', 'shaft']
+local segments = ['body', 'clavicle', 'upper', 'fore', 'palm', 'pelvis', 'thigh', 'shin', 'foot', 'toe', 'shaft']
                  + [hand.thumbPart(k) for k in std.range(0, hand.thumbBones - 1)]
                  + [hand.part(finger, k) for finger in hand.fingers for k in std.range(0, hand.phalanges - 1)];
 local slots = import 'models/worn-slots.libsonnet';

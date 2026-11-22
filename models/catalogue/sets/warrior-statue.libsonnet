@@ -17,6 +17,8 @@ local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
 local plate = import 'models/kits/plate.libsonnet';
+// The statue has no clavicles, so its harness is carved whole rather than from the worn rows that share it with them.
+local harness = import 'models/kits/plate-harness.libsonnet';
 local armetSeat = import 'models/armet-seat.libsonnet';
 
 // How much larger than life the figure is cut.
@@ -333,7 +335,7 @@ local legParts(name) = [
     exportMass: 'parts',
     parts: [
       carved('plinth', plinthKg, plinthPieces) + { finish: { plinth: darkStone, moulding: stone } },
-      carved('harness', figureKg * 0.5, platePieces('armor_plate_worn_body')),
+      carved('harness', figureKg * 0.5, h.scaled(harness.pieces + harness.over, k)),
       segment('pelvis', 'bust', bustMeasures, { segment: 'pelvis' }, 0.14),
       carved('armet', figureKg * 0.03, platePieces('helmet_plate_armet')),
       carved('sword', 60, sword),

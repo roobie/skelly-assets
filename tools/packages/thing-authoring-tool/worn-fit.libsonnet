@@ -146,6 +146,36 @@ local spineShells(id, pieces, finish, spine, bare, title) =
     if band.pieces != []
   ];
 
+// The player's arms hang from clavicles that lift the shoulder girdle off the trunk (models/dolls/player/doll.libsonnet),
+// so a body shell's pieces over the girdle are shared out as the body is: above the clavicles' cut and past the neck's
+// foot they ride the right clavicle, moved into its frame, and the left one's share is dropped, since the clavicle is
+// drawn mirrored there; the rest rides the trunk. A round piece the cut crosses, such as a deltoid's cap, goes whole to
+// the side holding its middle. Only pieces that follow the girdle are shared, since a detail on one side would be
+// mirrored onto the other. Each share reaches `voxelReach` past a cut into the other's side, as the skin each encloses
+// does, so neither leaves a seam of it showing.
+local clavicleJoint = [-bust.joints.clavicle[0], bust.joints.clavicle[1], bust.joints.clavicle[2]];
+local girdleShares(id, pieces) =
+  // The side `keep` of the plane `axis = at`, reaching `reach` past it; a turned piece still goes whole by the plane
+  // itself, so every share draws it once.
+  local cut(from, axis, at, keep, reach=voxelReach) =
+    [p for p in h.cut(from, axis, at, keep, whole=true) if p.kind == 'turned']
+    + h.cut([p for p in from if p.kind != 'turned'], axis, at - keep * reach, keep);
+  local below = cut(pieces, 'y', bust.clavicleCut, -1), above = cut(pieces, 'y', bust.clavicleCut, 1);
+  local right = cut(above, 'x', -girdle.neckFoot, -1), left = cut(above, 'x', girdle.neckFoot, 1);
+  // The trunk's own share above the cut starts where the share below it ends.
+  local middle = cut(cut(cut(pieces, 'y', bust.clavicleCut, 1, -voxelReach), 'x', -girdle.neckFoot, 1), 'x', girdle.neckFoot, -1);
+  local lost = unshared(pieces, [below, right, middle, left]);
+  assert lost == [] : '%s: the clavicles\' cut left %s in none or in several of its shares' % [id, lost];
+  // A piece cut both below the clavicles and between them stays one shell's twice, so the part between is told apart.
+  { trunk: below + [p { id: p.id + '-yoke' } for p in middle], clavicle: h.moved(right, [-c for c in clavicleJoint]) };
+// A body shell of `pieces` and the pieces `over` that lie over the girdle, with its clavicles' share of those. Given
+// `shoulders`, the two enclose their parts; otherwise the body encloses only the trunk and the clavicles' share nothing.
+local bodyShells(id, pieces, over, finish, shoulders, title) =
+  local shares = girdleShares(id, over);
+  [shell(id + '_worn_body', pieces + shares.trunk, finish, if shoulders then ['torso'] else ['trunk'], title=named(title, 'body'))]
+  + (if shares.clavicle == [] then []
+     else [shell(id + '_worn_clavicle', shares.clavicle, finish, if shoulders then ['clavicle'] else [], title=named(title, 'shoulder'))]);
+
 // How far the trooper's cuirass stands off the shoulders, and how far its pauldron's top stands above the shoulder
 // joint it is worn about. The cuirass's deltoid caps stay `pauldronClear` under that top, more than one of the rows'
 // voxels, so at rest no cap shows through a pauldron.
@@ -182,6 +212,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
   slopeY: slopeY,
   shoulderY: shoulderY,
   deltoidCap: deltoidCap,
+  // The trunk's and the clavicles' shares of a body shell's pieces over the girdle, for a set drawing its own.
+  girdleShares: girdleShares,
   // How far out from the centre line a garment's collar reaches, so a strap over the shoulders can run clear of it.
   collarHalf: collarWidth / 2,
   // A strap across [x0, x1] and `zs` lying over the slope, between it set out by `rises[0]` and by `rises[1]`.
@@ -276,10 +308,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
         $.slopeBand('strap-top-' + name, sl.trim, xs, [-strapFace, strapFace], [g, g + strapT]),
         $.slopeHung('strap-back-' + name, sl.trim, xs, [-strapFace, -strapFace + strapT], neckline - 0.01, g + strapT),
       ];
-    local body = [
-      level('low', l.waist, hem, l.waist.y[1]),
-      level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
-    ] + (if straps then [
+    local over = if straps then [
       level('chest', chest, l.chest.foot, armpit),
       panel('front', 1),
       panel('back', -1),
@@ -287,7 +316,11 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       level('chest', chest, l.chest.foot, bodyTop) + { clip: trapezius(l.chest.rise) },
       deltoidCap('shoulder-left', sl.body, 1, g),
       deltoidCap('shoulder-right', sl.body, -1, g),
-    ]) + (if collar == 'none' then [] else [
+    ];
+    local body = [
+      level('low', l.waist, hem, l.waist.y[1]),
+      level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
+    ] + (if collar == 'none' then [] else [
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, collarWidth, collarWidth, 0.02, cz=-0.01),
     ]) + (if collar == 'lapel' then [
       h.prism('lapel-' + side, sl.trim, 'z', [[side * 0.03, chestTop], [side * 0.13, chestTop - 0.02], [side * 0.04, chestTop - 0.15]],
@@ -308,8 +341,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
       oct('cuff', sl.trim, -arm.foreLength - 0.004, -arm.foreLength + 0.03, arm.foreWidth + 2 * gs + 0.012, arm.upperDepth + 2 * gs + 0.008, 0.02 + s.round),
     ];
-    fitted((if s.spine == null then [shell(id + '_worn_body', body, finish, if straps then ['trunk'] else ['torso'], title=named(title, 'body'))]
-            else spineShells(id, body, finish, s.spine, straps, title))
+    fitted((if s.spine == null then bodyShells(id, body, over, finish, !straps, title)
+            else spineShells(id, body + over, finish, s.spine, straps, title))
            + (if s.sleeves == 'none' then [] else [
                 shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper sleeve')),
                 shell(id + '_worn_fore', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
@@ -358,12 +391,14 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     local body = [
       oct('waist', sl.cloth, bust.pelvisHeight - 0.01, waistTop, bust.waistWidth + 2 * g, bust.waistDepth + 2 * g, cut),
       oct('ribs', sl.cloth, waistTop - 0.01, ribTop, bust.ribWidth + 2 * g, bust.ribDepth + 2 * g, cut),
-      oct('chest', sl.cloth, ribTop - 0.01, chestTop + g, chestW, chestD, bust.chestChamfer / 2) + { clip: trapezius(g) },
-      deltoidCap('shoulder-left', sl.cloth, 1, g),
-      deltoidCap('shoulder-right', sl.cloth, -1, g),
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.04, collarWidth, collarWidth, 0.02, cz=-0.01),
     ] + hood(sl.hood, sl.lining, chestD, 0.07) + std.flattenArrays([star(i, s.stars[i]) for i in std.range(0, std.length(s.stars) - 1)])
       + (if s.moon == null then [] else moon(s.moon));
+    local over = [
+      oct('chest', sl.cloth, ribTop - 0.01, chestTop + g, chestW, chestD, bust.chestChamfer / 2) + { clip: trapezius(g) },
+      deltoidCap('shoulder-left', sl.cloth, 1, g),
+      deltoidCap('shoulder-right', sl.cloth, -1, g),
+    ];
     // On the model arm, a right arm, the body side is +x, so a sleeve flares towards -x.
     local uw = arm.upperWidth + 2 * g + 0.01, ud = sleeveHeadDepth + 2 * g;
     local upper = [
@@ -409,8 +444,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ]);
     // The thigh's bell is narrow by the hip, where the pelvis shell covers the leg, and the shin's ends at the hem, so
     // neither encloses its part.
-    fitted([
-      shell(id + '_worn_body', body, finish, ['torso'], title=named(title, 'body')),
+    fitted(bodyShells(id, body, over, finish, true, title) + [
       shell(id + '_worn_pelvis', pelvis, finish, ['pelvis'], title=named(title, 'hips')),
       shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper sleeve')),
       shell(id + '_worn_fore', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
@@ -442,9 +476,6 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
           bust.waistWidth + 2 * g + 0.012 + 0.012 * i, bust.ribDepth + 2 * g + 0.006 + 0.008 * i, cut)
       for i in [0, 1, 2]
     ] + [
-      oct('chest', 'plate', ribTop - 0.03, chestTop + trooperShoulderRise, chestW, chestD, 0.05) + { clip: trapezius(trooperShoulderRise) },
-      deltoidCap('shoulder-left', 'plate', 1, trooperShoulderRise),
-      deltoidCap('shoulder-right', 'plate', -1, trooperShoulderRise),
       h.prism('slab', 'plate', 'z', [[-0.16, ribTop - 0.02], [0.16, ribTop - 0.02], [0.19, chestTop - 0.03], [-0.19, chestTop - 0.03]],
               front - 0.004, slabFront),
     ] + [
@@ -491,6 +522,11 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for i in [0, 1]
       for k in [0, 1]
     ];
+    local over = [
+      oct('chest', 'plate', ribTop - 0.03, chestTop + trooperShoulderRise, chestW, chestD, 0.05) + { clip: trapezius(trooperShoulderRise) },
+      deltoidCap('shoulder-left', 'plate', 1, trooperShoulderRise),
+      deltoidCap('shoulder-right', 'plate', -1, trooperShoulderRise),
+    ];
     local uw = arm.upperWidth + 2 * g, ud = arm.upperDepth + 2 * g;
     local upper = [
       // The pauldron stands well proud of the shoulder: a flat top, a stepped plate, a comb and a broad rim.
@@ -520,11 +556,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ];
     // The vambrace stops short of the wrist. The body encloses the trunk but not the deltoid caps: the pauldrons over
     // them ride the upper arm, a different part copy, so the shoulders stay drawn.
-    fitted([
-      shell(id + '_worn_body', body, finish, ['trunk'], title=named(title, 'body')),
+    fitted(bodyShells(id, body, over, finish, false, title) + [
       shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper arm')),
       shell(id + '_worn_fore', fore, finish, [], title=named(title, 'forearm')),
-    ]) + { ground: h.lifted(body, -(beltY - 0.13)) },
+    ]) + { ground: h.lifted(body + over, -(beltY - 0.13)) },
 
   // Heavy trooper leg armour: thick cuisses with a front plate, a square knee guard over a domed cop, and greaves with
   // a front ridge. `ground` stands one thigh and shin on the floor. Slots as `trooper`.
