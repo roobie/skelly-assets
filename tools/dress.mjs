@@ -531,13 +531,31 @@ function pieceSlot(id, { segment }, dressing) {
 
 /**
  * The names a piece's `covers` gives on the doll, for the copy of `part` it is drawn in: the player's name for the
- * piece's part is the doll's own part, and a region the doll cannot hide from the piece is no name at all.
+ * piece's part is the doll's own part, a region the doll cannot hide from the piece is no name at all, and a region the
+ * doll holds as several whole parts, `part` among them, is the part, the only one of them the piece is drawn on.
  * @param {PieceSlot} slot
  * @param {string} part
  * @param {readonly string[]} covers
+ * @param {DollDressing} dressing
  */
-const coversOn = ({ as, unhidden }, part, covers) =>
-  covers.filter((name) => !unhidden?.includes(name)).map((name) => (name === as ? part : name));
+const coversOn = ({ as, unhidden }, part, covers, dressing) => [
+  ...new Set(
+    covers
+      .filter((name) => !unhidden?.includes(name))
+      .map((name) => (name === as || heldAmongParts(dressing, name, part) ? part : name)),
+  ),
+];
+
+/**
+ * Whether the doll's region `name` holds `part` whole beside other whole parts.
+ * @param {DollDressing} dressing
+ * @param {string} name
+ * @param {string} part
+ */
+function heldAmongParts(dressing, name, part) {
+  const wholes = (dressing.regions[name] ?? []).filter((surface) => surfacePart(surface) === surface);
+  return wholes.includes(part) && wholes.length > 1;
+}
 
 /**
  * Why a slot's part is no single doll part, for a reader that names one, as a manifest's `wornOn` does.
@@ -615,11 +633,9 @@ export function coversProblems(models, dressing) {
     if (!covers) return [];
     const worn = wornPiece(id);
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
-    if (!dressing.slots[worn.segment ?? dressing.piece])
-      return [`${id}: worn segment ${worn.segment ?? dressing.piece} is not in the dressing's slots`];
     const slot = pieceSlot(id, worn, dressing);
     const parts = typeof slot.part === 'string' ? [slot.part] : Object.values(slot.part);
-    return parts.flatMap((part) => coversProblemsOn(id, part, coversOn(slot, part, covers), dressing));
+    return parts.flatMap((part) => coversProblemsOn(id, part, coversOn(slot, part, covers, dressing), dressing));
   });
 }
 
@@ -883,7 +899,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
       ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies, ...slot }) =>
         copies.map((copy) => {
           const { part, side, mirror, turn, site } = copy;
-          const own = covers && coversOn(slot, part, covers);
+          const own = covers && coversOn(slot, part, covers, dressing);
           const bare = own ? leftBare(dressing, part, own) : [];
           return {
             model: piece,

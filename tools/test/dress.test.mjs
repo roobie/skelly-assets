@@ -6,6 +6,7 @@ import { withWornOn } from '../build.mjs';
 import { modelSources } from '../check-sources.mjs';
 import {
   coveringItems,
+  coversProblems,
   dollDressing,
   dollDressings,
   dollOf,
@@ -479,4 +480,41 @@ test('on every doll a watch rests on the back of the wrist, the hand end of the 
     assert.equal(place.part, dressing.slots.fore.part, `${dressing.id}: the watch is placed off the forearm`);
     assert.ok(place.against?.[1] < 0, `${dressing.id}: the watch does not rest at the forearm's hand end`);
   }
+});
+
+test("a piece's covers reach the sites in the doll's own names, in each copy of a part and for a region held as several parts", () => {
+  const split = {
+    ...dressing,
+    slots: {
+      body: { slot: 'torso', part: 'spine', as: 'torso' },
+      clavicle: { slot: 'torso', part: { right: 'clavicle_r', left: 'clavicle_l' }, as: 'clavicle' },
+    },
+    regions: { shoulders: ['spine', 'clavicle_r', 'clavicle_l'] },
+  };
+  const splitDoll = dollOf(split, {
+    ...figure,
+    bust: {
+      ...figure.bust,
+      parts: [
+        { part: 'spine', at: [0, 0.5, 0], box: box([-0.1, 0.4, -0.05], [0.1, 0.6, 0.05]) },
+        { part: 'clavicle_r', at: [-0.1, 0.5, 0], box: box([-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]) },
+        { part: 'clavicle_l', at: [0.1, 0.5, 0], box: box([0.05, 0.45, -0.05], [0.2, 0.55, 0.05]) },
+      ],
+    },
+  });
+  const models = [
+    model('vest', { slot: ['torso'] }),
+    { ...model('vest_worn_body', { fit: ['worn'] }), covers: ['torso', 'shoulders'] },
+    { ...model('vest_worn_clavicle', { fit: ['worn'] }), covers: ['clavicle'] },
+  ];
+  const pieces = wornSites(models[0], { dressing: split, doll: splitDoll, models }).slice(splitDoll.sites.length);
+  assert.deepEqual(
+    pieces.map(({ part, mirror, covers }) => [part, Boolean(mirror), covers]),
+    [
+      ['spine', false, ['spine']],
+      ['clavicle_r', false, ['clavicle_r']],
+      ['clavicle_l', true, ['clavicle_l']],
+    ],
+  );
+  assert.deepEqual(coversProblems(models, split), []);
 });
