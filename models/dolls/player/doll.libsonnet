@@ -41,7 +41,9 @@ local armRest = import 'models/arm-rest.libsonnet';
     ankle: ['foot#ankle'],
     sole: ['foot#sole'],
   },
-  // The doll part each segment a worn piece's id ends in is drawn in, and the body slot it covers.
+  // The doll part each segment a worn piece's id ends in is drawn in, and the body slot it covers. Pieces are fitted
+  // in these parts' frames, so another doll's slot whose part turns about another point gives the `origin` of this
+  // part's frame in its own.
   slots: import 'models/worn-slots.libsonnet',
   // Where a wearable with no worn pieces sits, by the first of its slots listed here: on the doll part `part` (every
   // side's copy with `both`, the first side's otherwise), centred across `against`, the direction from the

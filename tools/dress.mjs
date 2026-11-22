@@ -48,8 +48,15 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {any} rig the rig's content (tools/dollRig.mjs)
  * @property {Readonly<Record<string, readonly string[]>>} regions each region by the surfaces that make it: a whole
  * part, or `<part>#<piece>`, a piece the export keeps of a part cut into regions
- * @property {Readonly<Record<string, { part: SlotPart; slot: string }>>} slots
+ * @property {Readonly<Record<string, PieceSlot & { slot: string }>>} slots
  * @property {Place[]} places
+ */
+
+/**
+ * The doll part a segment's pieces are drawn in and, where that part's frame is not the one the pieces were fitted in,
+ * `origin`: where the fitted part's origin lies in this part's frame, so a piece fitted to the player's torso, whose
+ * origin is the bust's, is drawn at the bust's on a doll whose chest part turns about its own joint.
+ * @typedef {{ part: SlotPart; origin?: Vec3 }} PieceSlot
  */
 
 /**
@@ -242,6 +249,17 @@ const turnOf = (model, { axis, degrees }) => {
  * @returns {Quaternion}
  */
 const mirroredTurn = ([x, y, z, w]) => [x, -y, -z, w];
+
+/**
+ * Where a point of a part's own frame lies in the doll frame on one copy of the part, mirrored and turned as the copy is.
+ * @param {Pick<PartCopy, 'at' | 'mirror' | 'turn'>} copy
+ * @param {Vec3} p
+ * @returns {Vec3}
+ */
+const inCopy = ({ at, mirror, turn }, p) => {
+  const flipped = mirror ? mirrorX(p) : p;
+  return sum(at, turn ? rotate(turn, flipped) : flipped);
+};
 
 /**
  * A glTF node's transform as a function of a point in its own frame.
@@ -486,16 +504,18 @@ export const wornGarment = (id) => wornPiece(id)?.garment;
 const pieceOf = (model) => (tagsOf(model, 'fit').includes('worn') ? wornPiece(model.id) : undefined);
 
 /**
- * The doll part whose frame a worn piece is drawn in: the dressing's `piece` part without a segment, else the segment's.
+ * The doll part whose frame a worn piece is drawn in, with the fitted part's origin in it if it has one: the dressing's
+ * `piece` part without a segment, else the segment's slot.
  * @param {string} id
  * @param {{ segment: string | undefined }} piece
  * @param {DollDressing} dressing
+ * @returns {PieceSlot}
  */
-function piecePart(id, { segment }, dressing) {
-  if (segment === undefined) return dressing.piece;
+function pieceSlot(id, { segment }, dressing) {
+  if (segment === undefined) return { part: dressing.piece };
   const slot = dressing.slots[segment];
   if (!slot) throw new Error(`${id}: worn segment ${segment} is not in the dressing's slots`);
-  return slot.part;
+  return slot.origin ? { part: slot.part, origin: slot.origin } : { part: slot.part };
 }
 
 /**
@@ -521,8 +541,8 @@ function onePart(id, part) {
 }
 
 /**
- * The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in and what it covers of that
- * part, as its model declares, with the sole lift a foot piece declares.
+ * The worn pieces of the wearable `id`, each with the doll part whose frame it is drawn in (and the fitted part's
+ * origin in it) and what it covers of that part, as its model declares, with the sole lift a foot piece declares.
  * @param {string} id
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
@@ -535,7 +555,7 @@ export function wornPieces(id, models, dressing) {
       ...(model.covers ? { covers: model.covers } : {}),
       ...(model.soleLift === undefined ? {} : { soleLift: model.soleLift }),
     };
-    return [{ model: model.id, part: piecePart(model.id, piece, dressing), ...declared }];
+    return [{ model: model.id, ...pieceSlot(model.id, piece, dressing), ...declared }];
   });
 }
 
@@ -682,13 +702,13 @@ export function wornOnParts(models, dressing, dollParts) {
   for (const model of models) {
     const twinId = layerTwinOf(model, dressing);
     const piece = pieceOf(model);
-    if (piece) wornOn.set(model.id, { part: onePart(model.id, piecePart(model.id, piece, dressing)) });
+    if (piece) wornOn.set(model.id, { part: onePart(model.id, pieceSlot(model.id, piece, dressing).part) });
     else if (twinId !== undefined) {
       const twin = byId.get(twinId);
       const twinPiece = twin && pieceOf(twin);
       if (!twin || !twinPiece)
         throw new Error(`${model.id}: fitted over other clothing, it has no worn twin ${twinId}`);
-      wornOn.set(model.id, { part: onePart(twin.id, piecePart(twin.id, twinPiece, dressing)) });
+      wornOn.set(model.id, { part: onePart(twin.id, pieceSlot(twin.id, twinPiece, dressing).part) });
     } else if (placed(model)) wornOn.set(model.id, placedOn(model, dressing, dollParts));
   }
   return wornOn;
@@ -843,14 +863,15 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     // the parts across its joints it leaves bare.
     return [
       ...sites,
-      ...plan.pieces.flatMap(({ model: piece, covers, soleLift, copies }) =>
-        copies.map(({ part, side, at, mirror, turn, site }) => {
+      ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies }) =>
+        copies.map((copy) => {
+          const { part, side, mirror, turn, site } = copy;
           const bare = covers ? leftBare(dressing, part, covers) : [];
           return {
             model: piece,
             part,
             side,
-            at,
+            at: origin ? inCopy(copy, origin) : copy.at,
             ...(mirror ? { mirror } : {}),
             ...(turn ? { turn } : {}),
             ...(covers ? { covers, bodySite: site } : {}),

@@ -10,6 +10,11 @@ local part = {
   body: 'spine_03', clavicle: { right: 'clavicle_r', left: 'clavicle_l' }, upper: 'upperarm', fore: 'lowerarm',
   palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf', foot: 'foot', toe: 'ball', shaft: 'calf',
 };
+// The player's torso and pelvis turn about the bust's origin, where UAL's chest and pelvis turn about their own joints,
+// so a piece drawn in either is put back at the bust's origin as that part's frame holds it.
+local trunk = (import 'models/dolls/ual/joints.libsonnet').trunk;
+local negated(v) = [-x for x in v];
+local origin = { body: negated(trunk.chestJoint), pelvis: negated(trunk.pelvis) };
 {
   pack: 'skelly.body',
   rigPath: 'dolls/ual.rig.json',
@@ -32,7 +37,11 @@ local part = {
     ankle: ['foot#ankle'],
     sole: ['foot#sole', 'ball'],
   },
-  slots: { [segment]: playerSlots[segment] { part: std.get(part, segment, super.part) } for segment in std.objectFields(playerSlots) },
+  slots: {
+    [segment]: playerSlots[segment] { part: std.get(part, segment, super.part) }
+               + (if std.objectHas(origin, segment) then { origin: origin[segment] } else {})
+    for segment in std.objectFields(playerSlots)
+  },
   places: [
     { slot: 'torso', part: 'spine_03', against: [0, 0, 1], sink: 0.5 },
     { slot: 'legs', part: 'thigh', both: true, against: [0, 0, 1], sink: 0.5 },

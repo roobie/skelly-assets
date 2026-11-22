@@ -18,7 +18,7 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   chestHeight: neck[1] - chestFoot,
   // How far up the chest the armpit lies, as a share of its height: the top of the trunk a sleeveless shell covers, so
   // it and the shoulders over it each stay whole parts where a spine bending in three would cut the chest from the ribs.
-  armpit: (ual.chestJoint - chestFoot) / self.chestHeight,
+  armpit: (ual.chestJoint[1] - chestFoot) / self.chestHeight,
   // The lower chest's width as a share of the chest's: narrow enough that a sleeveless shell of the under layer fits
   // between it and the hanging arm, which the worn fit asserts.
   chestLowShare: 0.86,
