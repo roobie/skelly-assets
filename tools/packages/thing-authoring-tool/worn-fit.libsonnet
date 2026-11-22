@@ -308,16 +308,18 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
         $.slopeBand('strap-top-' + name, sl.trim, xs, [-strapFace, strapFace], [g, g + strapT]),
         $.slopeHung('strap-back-' + name, sl.trim, xs, [-strapFace, -strapFace + strapT], neckline - 0.01, g + strapT),
       ];
-    local over = if straps then [
-      level('chest', chest, l.chest.foot, armpit),
-      panel('front', 1),
-      panel('back', -1),
-    ] + strap('l', -1) + strap('r', 1) else [
+    // A sleeveless body's panels and straps stay on the trunk, whose declaration leaves the shoulders bare beneath
+    // them; a share of them on the clavicles could declare nothing, so would be taken to cover the skin it lies on.
+    local over = if straps then [] else [
       level('chest', chest, l.chest.foot, bodyTop) + { clip: trapezius(l.chest.rise) },
       deltoidCap('shoulder-left', sl.body, 1, g),
       deltoidCap('shoulder-right', sl.body, -1, g),
     ];
-    local body = [
+    local body = (if straps then [
+      level('chest', chest, l.chest.foot, armpit),
+      panel('front', 1),
+      panel('back', -1),
+    ] + strap('l', -1) + strap('r', 1) else []) + [
       level('low', l.waist, hem, l.waist.y[1]),
       level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
     ] + (if collar == 'none' then [] else [

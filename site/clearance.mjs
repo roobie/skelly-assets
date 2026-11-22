@@ -367,7 +367,9 @@ function runThrough(node, p, dir) {
  * piece cover what it only sits beside, as a belt bag beside the waist it hangs on, or what lies beneath the part's far
  * side, as a sole beneath the shin guard's rim at the ankle. A piece that declares what it `covers` of the part copy it
  * rides passes beneath only that: a tank top that covers the trunk leaves the shoulders bare, though its armholes and
- * straps lie beneath the deltoids and the pectorals.
+ * straps lie beneath the deltoids and the pectorals. Nor does it pass beneath a part across its joints that it names
+ * `bare`, one holding the rest of a region it leaves bare, as the clavicles beside that tank top's straps
+ * (tools/dress.mjs, `leftBare`).
  * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
  */
 export function coverage(rig, rest) {
@@ -386,8 +388,9 @@ export function coverage(rig, rest) {
       ),
     ]),
   );
-  const declaresBare = ({ bone, covers }, id, region) =>
-    bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
+  const declaresBare = ({ bone, covers, bare }, id, region) =>
+    (bone === id && covers !== undefined && !hides(covers, parts.get(id), region)) ||
+    (bare?.includes(parts.get(id)) ?? false);
   const beneath = (id, indices, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);

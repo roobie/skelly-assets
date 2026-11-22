@@ -156,6 +156,15 @@ test("a ray in the plane of a shell's foot leaves its part through the last face
   assert.equal(coverage(spine, rest)('spine', { point: [0.125, 0, 0], normal: [1, 0, 0] }), -1);
 });
 
+test('a piece passes beneath none of a part across its joint that it names bare', () => {
+  // The sleeve runs past the elbow over the wider forearm, whose sides would poke out of it, but leaves the forearm bare.
+  const named = { body: body.map((part) => ({ ...part, part: part.bone })), pieces: [sleeve(0.12, 0.4)] };
+  const wide = [named.body[0], { ...named.body[1], mesh: boxMesh([0.14, 0.3, 0.14], [0, -0.45, 0]) }];
+  const bare = { ...named.pieces[0], bare: ['fore'] };
+  assert.ok(clearanceProbe(rig, { body: wide, pieces: named.pieces })(still).pokes.length > 0);
+  assert.deepEqual(counted(clearanceProbe(rig, { body: wide, pieces: [bare] })(still)), CLEAN);
+});
+
 test("a piece hung against a part's side covers none of the rest of the part", () => {
   const bag = { piece: 'bag', bone: 'upper', mesh: boxMesh([0.06, 0.1, 0.06], [0.08, -0.153, 0.007]) };
   assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [bag] })(still)), CLEAN);

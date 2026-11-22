@@ -515,6 +515,25 @@ export function wornPieces(id, models, dressing) {
 const surfacePart = (surface) => surface.split('#')[0];
 
 /**
+ * The doll parts besides `part` that a piece drawn on it and declaring `covers` leaves bare: those a region holds whole
+ * beside a piece of `part` the declaration hides none of, as a tank top covering the trunk leaves the clavicles bare
+ * with the rest of the shoulders. The rest probe takes the piece to cover none of their skin (site/clearance.mjs,
+ * `coverage`).
+ * @param {DollDressing} dressing
+ * @param {string} part
+ * @param {readonly string[]} covers
+ */
+const leftBare = (dressing, part, covers) => [
+  ...new Set(
+    Object.entries(dressing.regions).flatMap(([name, surfaces]) => {
+      const drawnOnPart = surfaces.some((surface) => surface !== part && surfacePart(surface) === part);
+      if (!drawnOnPart || covers.includes(part) || covers.includes(name)) return [];
+      return surfaces.filter((surface) => surfacePart(surface) === surface && surface !== part);
+    }),
+  ),
+];
+
+/**
  * What is wrong with the worn pieces' `covers`: each name must be the doll part the piece is drawn on, or one of the
  * doll's regions drawn as a piece of that part, since a consumer hides by those names and no other: it hides the
  * primitives of a part that a name marks, and a region that holds the whole part marks none, so a shell over it names
@@ -770,7 +789,8 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
   const { sites } = doll;
   if ('pieces' in plan) {
     // A piece's site names the doll part copy it is drawn in, so a poser moves the piece with that part, and a piece
-    // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs).
+    // that covers some of that copy names the doll site drawing it, which a drawer hides it in (site/hiding.mjs), and
+    // the parts across its joints it leaves bare.
     return [
       ...sites,
       ...plan.pieces.flatMap(({ model: piece, part, covers, soleLift, copies }) =>
@@ -782,6 +802,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
           ...(mirror ? { mirror } : {}),
           ...(turn ? { turn } : {}),
           ...(covers ? { covers, bodySite: site } : {}),
+          ...(covers && leftBare(dressing, part, covers).length > 0 ? { bare: leftBare(dressing, part, covers) } : {}),
           ...(soleLift === undefined ? {} : { soleLift }),
         })),
       ),

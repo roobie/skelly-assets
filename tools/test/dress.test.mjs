@@ -48,6 +48,7 @@ const dressing = {
     { slot: 'feet', part: 'sleeve', both: true, against: [0, -1, 0], sink: 1 },
   ],
   slots: { body: { slot: 'torso', part: 'chest' }, cuff: { slot: 'arms', part: 'sleeve' } },
+  regions: { belly: ['chest#belly'], yoke: ['chest#yoke', 'sleeve'] },
 };
 const figure = {
   bust: {
@@ -112,6 +113,16 @@ test('a piece that covers some of its part names, in every copy, the doll site t
       [undefined, undefined],
     ],
   );
+});
+
+test('a piece leaves bare the parts that hold the rest of a region it hides none of', () => {
+  const sites = (covers) => {
+    const models = [model('coat', { slot: ['torso'] }), { ...model('coat_worn', { fit: ['worn'] }), covers }];
+    return wornSites(models[0], { dressing, doll, models }).slice(doll.sites.length);
+  };
+  assert.deepEqual(sites(['belly'])[0].bare, ['sleeve']);
+  assert.equal(sites(['belly', 'yoke'])[0].bare, undefined);
+  assert.equal(sites(['chest'])[0].bare, undefined);
 });
 
 test("an item is dressed to check its pieces' covers whether or not the tree holds the item itself", () => {

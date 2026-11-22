@@ -331,6 +331,7 @@ export function restMeshes(rig, sites, meshesOf) {
       piece: site.model,
       bone: boneOf(rig, site).id,
       covers: site.covers,
+      ...(site.bare ? { bare: site.bare } : {}),
       mesh: placed(wholeModel(meshesOf(site.model)), site),
     }));
   return { body, pieces };
