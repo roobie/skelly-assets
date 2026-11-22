@@ -73,9 +73,9 @@ its way to a point it still reaches.
 A power grip seats a handle deep in the palm (the hand bone's `grip` share), in the wedge between the palm and the
 lifted thumb's root, so the palm's heel and the thumb's root both bear on it and the fingers wrap right round it into
 a fist; seated at the knuckle crease, the fingers only hook it and the palm stands beside it like a paddle. The
-knuckle row slants back toward the little finger, as the metacarpal heads arc, and sits toward the palm's face, so each
-finger's root closes onto the handle and the fist steps down from index to little; a palm split in two would arch the
-same way only with another bone and part for every hand, glove and mob to carry. The handle crosses the palm slanted
+knuckle row slants back toward the little finger, as the metacarpal heads arc, so the fist steps down from index to
+little; a palm split in two would arch the same way only with another bone and part for every hand, glove and mob to
+carry. The handle crosses the palm slanted
 (the hand bone's `gripSlant`), from the index finger's root to the heel under the little finger, as a hand takes a
 shaft: held square like a bar, each finger must reach a different way round it and the little finger, whose knuckle
 sits furthest back, stands off the fist. The slant lives on the hand and a hold may give its own, so a held item
