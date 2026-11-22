@@ -32,7 +32,6 @@ local bust = {
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   chestHeight: level('neck_01') - chestFoot,
   armpit: (trunk.chestJoint[1] - chestFoot) / self.chestHeight,
-  chestLowShare: 0.95,
   clavicleCut: trunk.clavicleCut,
   // The shoulder joint is upperarm's head: out past the chest's side, below its top and behind the centre line.
   shoulderJointOut: head('upperarm_l')[0] - self.chestWidth / 2,
@@ -44,8 +43,9 @@ local bust = {
   'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
   'trapeziusDrop', 'deltoidCrown', 'deltoidRadius', 'neckWidth', 'neckHeight',
 ]) + the(playerBust, [
-  'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare', 'hairCover',
-  'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack', 'hairLayerCount',
+  'chestLowShare', 'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare',
+  'hairCover', 'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack',
+  'hairLayerCount',
 ]);
 
 local arm = joints.arm {
