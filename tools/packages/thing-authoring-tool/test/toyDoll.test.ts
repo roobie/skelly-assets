@@ -177,7 +177,8 @@ describe('a doll whose skeleton is not the player body', () => {
       if (solid?.kind !== 'box') throw new Error('the digit is drawn as no box');
       return 2 * solid.box.half[1];
     };
-    // The digits as the shares alone draw them, without the lengths the toy's hand gives each bone.
+    // The toy's hand gives every bone its length, which overrides the shares, so it is dropped to leave a digit whose
+    // span the lengths under test visibly change.
     const byShares = (given: Record<string, string>) =>
       Object.fromEntries(Object.entries(given).filter(([key]) => key !== 'phalanxLengths' && key !== 'thumbLengths'));
     const finger = byShares(params(toy.parts.arm, 'toy_arm_index_01'));
