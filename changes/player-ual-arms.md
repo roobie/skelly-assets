@@ -7,13 +7,13 @@ The arms now rest swung out 13.19° from straight down, by the same rule as befo
 
 Gloves, gauntlets and sleeves are fitted round the new arm and hand, on both dolls, and a glove stands at least half a voxel of the doll's and its own grain off the hand, so the skin cannot show through a thin under-layer glove. The vest's, plate cuirass's and power armour's chest cuts and the plate deltoid caps follow the wider deltoid. The warrior statue's sword and shield arms hang further out, so the larger arms clear its trunk. The dressing has a `wrist` slot, placed on the back of the forearm's end on both dolls, and watches, bracelets and the wrist pouch are worn there rather than on the upper arm.
 
-The holds are re-posed for the larger hand and arm. The two-hand classes seat the leading hand a palm's width, 0.10 m, ahead of the trailing one, from 0.09 m, and the zweihänder's grip is 0.44 m long, from 0.39 m, to keep both palms on it. The power grip seats a handle 0.72 of the palm's length from the wrist, from 0.65. The two-hand overhead, side and thrust strikes and the one-hand forehand and thrust windups bring the handle within the arm's reach.
+The holds are re-posed for the larger hand and arm. The two-hand classes seat the leading hand a palm's width, 0.10 m, ahead of the trailing one, from 0.09 m, and the zweihänder's grip is 0.44 m long, from 0.39 m, to keep both palms on it. The power grip seats a handle 0.72 of the palm's length from the wrist, from 0.65, so the longer fingers close on it without daylight. The two-hand overhead, side and thrust strikes and the one-hand forehand and thrust windups bring the handle within the arm's reach. The press check's left hand takes the charging handle further toward the muzzle, so the longer thumb folds back onto the T, and lets it go higher beside the receiver, within the wrist's reach.
 
 Upgrade:
 - Re-target pose files to the doll rig's revision 11, and re-judge any pose that places the arms: the arms are longer below the elbow, shorter above it, and rest turned further out.
 - Rename every digit bone and part as above, in pose files, hand shorthands (`little` becomes `pinky`) and anything that names a finger.
 - Rename the 60 worn glove pieces that name a digit, as `<glove>_worn_<digit>_<nn>`: `gloves_trooper_worn_thumb2` becomes `gloves_trooper_worn_thumb_02`, and a knuckle phalanx gains `_01`.
 - Re-import the wield and press check clips and their pose files: the strikes' key frames and the two-hand hand spacing have changed.
-- Re-seat anything held in the right hand's power grip: it closes deeper in the palm.
+- Re-seat anything held in a power grip: the handle crosses the palm nearer the knuckles.
 - Move wristwatches and bracelets to the `wrist` slot.
 - Re-seat anything drawn over the vest, cuirass or power armour at the shoulders: their chest cuts and the plate's deltoid caps stand further out.
