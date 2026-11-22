@@ -171,26 +171,25 @@ describe('a doll whose skeleton is not the player body', () => {
     expect(() => avatarArm({ ...given, segment: 'palm' })).toThrow(/no digit/);
   });
 
-  it("draws a digit at the length its hand gives, and refuses lengths that miss one of the hand's bones", () => {
+  it("draws a digit at the length its hand gives, and refuses lengths that miss one of the hand's fingers", () => {
     const span = (given: Record<string, string>) => {
       const [solid] = avatarArm(given);
       if (solid?.kind !== 'box') throw new Error('the digit is drawn as no box');
       return 2 * solid.box.half[1];
     };
-    // The toy's hand gives every bone its length, which overrides the shares, so it is dropped to leave a digit whose
-    // span the lengths under test visibly change.
-    const byShares = (given: Record<string, string>) =>
-      Object.fromEntries(Object.entries(given).filter(([key]) => key !== 'phalanxLengths' && key !== 'thumbLengths'));
-    const finger = byShares(params(toy.parts.arm, 'toy_arm_index_01'));
-    const thumb = byShares(params(toy.parts.arm, 'toy_arm_thumb_01'));
-    const shares = (name: string) => JSON.parse(finger[name]!) as number[];
-    const fingerFirst = Number(finger.fingerLength) * shares('fingerShares')[0]! * shares('phalanxShares')[0]!;
-    const thumbFirst = Number(thumb.thumbLength) * shares('thumbShares')[0]!;
-    const lengths = JSON.stringify(shares('fingers').map(() => [0.05, 0.03, 0.02]));
-    expect(span({ ...finger, phalanxLengths: lengths }) - span(finger)).toBeCloseTo(0.05 - fingerFirst, 9);
-    expect(span({ ...thumb, thumbLengths: '[0.04,0.03,0.02]' }) - span(thumb)).toBeCloseTo(0.04 - thumbFirst, 9);
-    expect(() => avatarArm({ ...finger, phalanxLengths: '[[0.05,0.03,0.02]]' })).toThrow(/phalanxLengths/);
-    expect(() => avatarArm({ ...thumb, thumbLengths: '[0.04,0.03]' })).toThrow(/thumbLengths/);
+    const finger = params(toy.parts.arm, 'toy_arm_index_01');
+    const thumb = params(toy.parts.arm, 'toy_arm_thumb_01');
+    const lengths = (given: Record<string, string>, name: string) => JSON.parse(given[name]!) as number[][];
+    const fingers = lengths(finger, 'phalanxLengths');
+    const longer = JSON.stringify(fingers.map(([first, ...rest]) => [first! + 0.01, ...rest]));
+    expect(span({ ...finger, phalanxLengths: longer }) - span(finger)).toBeCloseTo(0.01, 9);
+    const bones = JSON.parse(thumb.thumbLengths!) as number[];
+    const longerThumb = JSON.stringify([bones[0]! + 0.01, ...bones.slice(1)]);
+    expect(span({ ...thumb, thumbLengths: longerThumb }) - span(thumb)).toBeCloseTo(0.01, 9);
+    expect(() => avatarArm({ ...finger, phalanxLengths: JSON.stringify(fingers.slice(1)) })).toThrow(/phalanxLengths/);
+    expect(() =>
+      avatarArm({ ...finger, phalanxLengths: JSON.stringify([fingers[0]!.slice(1), ...fingers.slice(1)]) }),
+    ).toThrow(/phalanxLengths/);
   });
 
   it('stands the deltoid off the centre line by the front-to-back offset its girdle gives', () => {

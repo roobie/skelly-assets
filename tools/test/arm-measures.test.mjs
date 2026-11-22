@@ -30,8 +30,6 @@ test("the player's arm and hand are as thick and as long as UAL's", () => {
     'palmLength',
     'palmWidth',
     'palmThickness',
-    'fingerLength',
-    'thumbLength',
   ])
     near(player[girth], ual[girth], girth);
 });

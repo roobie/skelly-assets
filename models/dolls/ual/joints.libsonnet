@@ -76,15 +76,11 @@ local palmWidth = 0.1;
     knuckles: knuckles,
     knuckleBack: [k[1] + palmLength for k in knuckles],
     fingers: fingers, fingerGap: 0.003,
-    // The skeleton gives each digit bone's length whole (`phalanxLengths`, `thumbLengths`); the shares are its middle
-    // finger's and its thumb's, which the family still counts the bones by.
+    // Each digit bone's length, whole, as the skeleton gives it. The finger's is the middle finger's, which gear fitted
+    // over the hand reaches (hidden, as no body part takes it).
     phalanxLengths: phalanxLengths,
     thumbLengths: thumbLengths,
-    fingerLength: fingerLengths[1],
-    fingerShares: [l / fingerLengths[1] for l in fingerLengths],
-    phalanxShares: [l / fingerLengths[1] for l in phalanxLengths[1]],
-    thumbLength: sum(thumbLengths),
-    thumbShares: [l / sum(thumbLengths) for l in thumbLengths],
+    fingerLength:: fingerLengths[1],
     // The thumb's root as the palm draws its ball, from the skeleton's thumb_01 head.
     thumbRootShare: -thumbRoot[1] / palmLength,
     thumbVolar: thumbRoot[0],
