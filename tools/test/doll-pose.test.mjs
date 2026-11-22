@@ -106,7 +106,12 @@ test("a protracted clavicle brings either shoulder forward by the clavicle's rea
       const { head } = bones.get(`upperArm.${side}`);
       const moved = applyPoint(posed.get(`clavicle.${side}`), head)[2] - head[2];
       if (forward === undefined) assert.ok(moved < 0, `the retracted ${side} shoulder comes ${moved} m forward`);
-      else assert.ok(Math.abs(moved - forward) < 1e-6, `the protracted ${side} shoulder comes ${moved} m forward`);
+      else {
+        assert.ok(Math.abs(moved - forward) < 1e-6, `the protracted ${side} shoulder comes ${moved} m forward`);
+        // The shoulder sweeps round the clavicle's joint, so it comes out as well as forward, on either side outward.
+        const out = (applyPoint(posed.get(`clavicle.${side}`), head)[0] - head[0]) * (side === 'L' ? 1 : -1);
+        assert.ok(Math.abs(out - 0.044) < 0.0005, `the protracted ${side} shoulder comes ${out} m out, not 0.044`);
+      }
     }
   }
 });
