@@ -7,6 +7,7 @@ import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { applyPoint, boneTransforms, boundBox, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
+import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
 // The pose fixtures hold the wields' weapons and guns, so the tree holds everything a hand does.
@@ -80,6 +81,32 @@ test('a flexed wrist bends either hand toward its palm and an abducted one towar
       // At rest the palm faces the body and the thumb runs forward, +z, on either hand.
       const way = toward === 'palm' ? [hand.bind.mirror ? -1 : 1, 0, 0] : [0, 0, 1];
       assert.ok(dot(along, way) > 0.2, `the ${side} hand bends toward its ${toward}, along ${along}`);
+    }
+  }
+});
+
+test("a protracted clavicle brings either shoulder forward by the clavicle's reach, a retracted one back", () => {
+  const reach = JSON.parse(evaluateJsonnet("(import 'models/dolls/player/clavicle.libsonnet').reach", repo));
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  const [retracted, protracted] = bones.get('clavicle.L').limits.flex;
+  for (const [flex, forward] of [
+    [protracted, reach],
+    [retracted, undefined],
+  ]) {
+    const asked = (side) => ({
+      [`clavicle.${side}`]: bones.get(`clavicle.${side}`).sense.map((s, i) => s * [flex, 0, 0][i]),
+    });
+    const { frame, report } = compilePose(rig, {
+      rig: { id: rig.id, revision: rig.revision },
+      angles: { ...asked('L'), ...asked('R') },
+    });
+    assert.deepEqual(report.clamped, []);
+    const posed = boneTransforms(rig.bones, decodeFrame(frame));
+    for (const side of ['L', 'R']) {
+      const { head } = bones.get(`upperArm.${side}`);
+      const moved = applyPoint(posed.get(`clavicle.${side}`), head)[2] - head[2];
+      if (forward === undefined) assert.ok(moved < 0, `the retracted ${side} shoulder comes ${moved} m forward`);
+      else assert.ok(Math.abs(moved - forward) < 1e-6, `the protracted ${side} shoulder comes ${moved} m forward`);
     }
   }
 });
