@@ -543,10 +543,11 @@ export function wornPieces(id, models, dressing) {
 const surfacePart = (surface) => surface.split('#')[0];
 
 /**
- * The doll parts besides `part` that a piece drawn on it and declaring `covers` leaves bare: those a region holds whole
- * beside a piece of `part` the declaration hides none of, as a tank top covering the trunk leaves the clavicles bare
- * with the rest of the shoulders. The rest probe takes the piece to cover none of their skin (site/clearance.mjs,
- * `coverage`).
+ * The doll parts besides `part` that a piece drawn on it and declaring `covers` leaves bare: those a region held beside
+ * `part`, whether `part` is a piece of it or whole in it, holds whole when the declaration hides none of that region, as
+ * a tank top covering the trunk leaves the clavicles bare with the rest of the shoulders. A part the region holds only
+ * as a piece is not named, since the rest probe takes a piece to cover none of a named part's skin
+ * (site/clearance.mjs, `coverage`).
  * @param {DollDressing} dressing
  * @param {string} part
  * @param {readonly string[]} covers
@@ -554,8 +555,8 @@ const surfacePart = (surface) => surface.split('#')[0];
 const leftBare = (dressing, part, covers) => [
   ...new Set(
     Object.entries(dressing.regions).flatMap(([name, surfaces]) => {
-      const drawnOnPart = surfaces.some((surface) => surface !== part && surfacePart(surface) === part);
-      if (!drawnOnPart || covers.includes(part) || covers.includes(name)) return [];
+      const holdsPart = surfaces.some((surface) => surfacePart(surface) === part);
+      if (!holdsPart || covers.includes(part) || covers.includes(name)) return [];
       return surfaces.filter((surface) => surfacePart(surface) === surface && surface !== part);
     }),
   ),
@@ -843,17 +844,20 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     return [
       ...sites,
       ...plan.pieces.flatMap(({ model: piece, covers, soleLift, copies }) =>
-        copies.map(({ part, side, at, mirror, turn, site }) => ({
-          model: piece,
-          part,
-          side,
-          at,
-          ...(mirror ? { mirror } : {}),
-          ...(turn ? { turn } : {}),
-          ...(covers ? { covers, bodySite: site } : {}),
-          ...(covers && leftBare(dressing, part, covers).length > 0 ? { bare: leftBare(dressing, part, covers) } : {}),
-          ...(soleLift === undefined ? {} : { soleLift }),
-        })),
+        copies.map(({ part, side, at, mirror, turn, site }) => {
+          const bare = covers ? leftBare(dressing, part, covers) : [];
+          return {
+            model: piece,
+            part,
+            side,
+            at,
+            ...(mirror ? { mirror } : {}),
+            ...(turn ? { turn } : {}),
+            ...(covers ? { covers, bodySite: site } : {}),
+            ...(bare.length > 0 ? { bare } : {}),
+            ...(soleLift === undefined ? {} : { soleLift }),
+          };
+        }),
       ),
     ];
   }

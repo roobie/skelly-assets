@@ -159,6 +159,13 @@ test('a piece leaves bare the parts that hold the rest of a region it hides none
   assert.equal(sites(['chest'])[0].bare, undefined);
 });
 
+test('a piece leaves bare the rest of a region that holds its own part whole', () => {
+  const whole = { ...dressing, regions: { belly: ['chest#belly'], shoulders: ['chest', 'sleeve'] } };
+  const models = [model('coat', { slot: ['torso'] }), { ...model('coat_worn', { fit: ['worn'] }), covers: ['belly'] }];
+  const [piece] = wornSites(models[0], { dressing: whole, doll, models }).slice(doll.sites.length);
+  assert.deepEqual(piece.bare, ['sleeve']);
+});
+
 test("an item is dressed to check its pieces' covers whether or not the tree holds the item itself", () => {
   const models = [
     { ...model('coat_worn_cuff', { fit: ['worn'] }), covers: ['sleeve'] },
