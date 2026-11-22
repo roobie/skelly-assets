@@ -36,6 +36,8 @@ export const COINCIDENT = 1e-5;
 // would miss a strip along an edge that passes out of its piece between two corners. It is about a pixel of a review
 // sheet, so a poke too small to sample is too small to see there.
 export const PITCH = 0.005;
+// Two faces whose normals meet within a degree lie in one plane, as far as float storage and a few transforms can tell.
+export const PARALLEL = Math.cos(Math.PI / 180);
 
 // The ray that tells inside from outside leaves along a fixed direction with no axis-aligned component, so it misses the edges and vertices
 // of the axis-aligned meshes parts are built from.
@@ -507,7 +509,7 @@ export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
 const coveredPoints = (rest, surface) =>
   surface.flatMap(({ bone, samples }) =>
     samples.flatMap(({ point, normal, cover }) =>
-      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }],
+      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, cover, point, normal }],
     ),
   );
 
@@ -515,30 +517,28 @@ const coveredPoints = (rest, surface) =>
 function bareFindings(covered, posedPieces, posedBody, at) {
   const findings = { pokes: [], flush: [] };
   const figure = [...posedPieces, ...posedBody];
-  for (const { bone, piece, point, normal } of covered) {
+  for (const { bone, piece, cover, point, normal } of covered) {
     const posed = applyPoint(at(bone), point);
     const { depth } = depthOutside(posedPieces, posed);
     if (depth === -Infinity) continue;
     const outward = mulMV(at(bone).r, normal);
     if (!outsideAll(figure, add(posed, scale(outward, STEP)))) continue;
     if (depth > COINCIDENT) findings.pokes.push({ bone, piece, point: posed, depth });
-    else if (posedPieces.some((solid) => liesAlong(solid, posed, outward)))
-      findings.flush.push({ bone, piece, point: posed });
+    else if (liesAlong(posedPieces[cover], posed, outward)) findings.flush.push({ bone, piece, point: posed });
   }
   return findings;
 }
 
-// Faces whose normals meet within a degree lie in one plane, as far as float storage and a few transforms can tell.
-const PARALLEL = Math.cos(Math.PI / 180);
-
-// Whether a face of the solid within a coincident distance of `p` lies in the plane of the skin there, whose normal is
-// `normal`: only then do the two draw in a tie over an area. A face crossing the skin edge-on meets it along a line,
-// with the skin to one side inside the piece and to the other outside it, where its own samples poke if it is covered.
+// Whether a face of the covering piece's solid within a coincident distance of `p` lies in the plane of the skin there,
+// whose normal is `normal`, and faces the way the skin does: only then do the two draw in a tie over an area. A face of
+// another piece is no cover's, and a face turned away is the far side of a shell the skin lies inside. A face crossing
+// the skin edge-on meets it along a line, with the skin to one side inside the piece and to the other outside it, where
+// its own samples poke if it is covered.
 function liesAlong({ tree, local }, p, normal) {
   const q = local(p);
   const across = sub(local(add(p, normal)), q);
   return facesNear(tree, q).some(
-    ([a, b, c]) => Math.abs(dot(normalize(cross(sub(b, a), sub(c, a))), across)) >= PARALLEL,
+    ([a, b, c]) => dot(normalize(cross(sub(b, a), sub(c, a))), normalize(across)) >= PARALLEL,
   );
 }
 

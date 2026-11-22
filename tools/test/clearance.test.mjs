@@ -112,6 +112,19 @@ test("a forearm sleeve whose rim ends exactly on a row of the upper arm's sample
   assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [cuffed] })(still)), CLEAN);
 });
 
+test("a face turned away from the skin's side is not flush with it", () => {
+  // A sleeve whose faces on the arm's sides are wound inwards, so they lie in the skin's plane facing the arm.
+  const { positions, indices } = sleeveMesh(0.1);
+  const inwards = indices.flatMap((_, i) => {
+    if (i % 3) return [];
+    const [a, b, c] = indices.slice(i, i + 3);
+    const onSide = [a, b, c].every((v) => Math.abs(positions[v * 3]) === 0.05);
+    return onSide ? [a, c, b] : [a, b, c];
+  });
+  const turned = { piece: 'sleeve', bone: 'upper', mesh: { positions, indices: inwards } };
+  assert.equal(clearanceProbe(rig, { body, pieces: [turned] })(still).flush.length, 0);
+});
+
 test('an arm face shared with a shell inside the sleeve is hidden, not flush', () => {
   const lined = { piece: 'sleeve', bone: 'upper', mesh: union(sleeveMesh(0.12), sleeveMesh(0.1)) };
   assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [lined] })(still)), CLEAN);
