@@ -40,8 +40,24 @@ after(() => rmSync(root, { recursive: true, force: true }));
 mkdirSync(join(root, 'models'), { recursive: true });
 const dressing = {
   dolls: {
-    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: { body: { slot: 'torso', part: 'torso' } }, regions: {}, rig },
-    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: { body: { slot: 'torso', part: 'torso' } }, regions: {}, rig },
+    player: {
+      bust: 'bust',
+      limbs: [],
+      sides: ['right', 'left'],
+      mirrored: 'left',
+      slots: { body: { slot: 'torso', part: 'torso' } },
+      regions: {},
+      rig,
+    },
+    toy: {
+      bust: 'toybust',
+      limbs: [],
+      sides: ['right', 'left'],
+      mirrored: 'left',
+      slots: { body: { slot: 'torso', part: 'torso' } },
+      regions: {},
+      rig,
+    },
   },
   piece: 'body',
 };
@@ -119,7 +135,10 @@ test('an unjudged poke passes and is said on every run', () => {
 
 test('an entry that is stale, doubled or capped loose fails', () => {
   const problems = (allowances) => restPokeReport(probed.results, { ...none, ...allowances }).problems.join('\n');
-  assert.match(problems({ pokes: [...onBoth(0.021), { ...entry(0.01), bone: 'neck' }] }), /neck out of vest_worn is stale/);
+  assert.match(
+    problems({ pokes: [...onBoth(0.021), { ...entry(0.01), bone: 'neck' }] }),
+    /neck out of vest_worn is stale/,
+  );
   assert.match(problems({ pokes: onBoth(0.021), unjudged: [entry(0.021, { note: 'twice' })] }), /listed twice/);
   assert.match(problems({ pokes: onBoth(0.025) }), /capped at 25\.0 mm, far above the 20\.0 mm it measures/);
 });

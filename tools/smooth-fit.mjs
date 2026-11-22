@@ -10,14 +10,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { coverGaps, dollRig } from './dollRig.mjs';
-import {
-  coveringItems,
-  dollDressings,
-  modelMeshes,
-  readDoll,
-  readDressing,
-  wornSites,
-} from './dress.mjs';
+import { coveringItems, dollDressings, modelMeshes, readDoll, readDressing, wornSites } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { readSeats, seatFindings } from './head-fit.mjs';
 import { MANIFEST } from './manifest.mjs';

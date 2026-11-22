@@ -7,14 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { coverMargins, dollRig } from './dollRig.mjs';
-import {
-  coveringItems,
-  dollDressings,
-  modelMeshes,
-  readDoll,
-  readDressing,
-  wornSites,
-} from './dress.mjs';
+import { coveringItems, dollDressings, modelMeshes, readDoll, readDressing, wornSites } from './dress.mjs';
 import { MANIFEST } from './manifest.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
