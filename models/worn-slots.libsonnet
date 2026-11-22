@@ -8,6 +8,7 @@ local phalanges = { [hand.part(finger, k)]: { slot: 'hands', part: hand.part(fin
                   + { [hand.thumbPart(k)]: { slot: 'hands', part: hand.thumbPart(k) } for k in std.range(0, hand.thumbBones - 1) };
 {
   body: { slot: 'torso', part: 'torso' },
+  clavicle: { slot: 'torso', part: 'clavicle' },
   upper: { slot: 'arms', part: 'upper' },
   fore: { slot: 'arms', part: 'fore' },
   palm: { slot: 'hands', part: 'palm' },

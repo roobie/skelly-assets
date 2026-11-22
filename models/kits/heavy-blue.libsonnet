@@ -36,8 +36,11 @@ local chestSide = bust.chestWidth / 2;
 // The chest plate and its front slab are cut to the shoulders' slope under the trooper's deltoid caps, which this set
 // keeps.
 local shoulderRise = fit.trooperChestRise;
-local bodyAdd = [
+// The chest lies over the girdle, so its share past the neck's foot rides the clavicles.
+local girdle = fit.girdleShares('armor_heavy', [
   oct('chest', 'plate', ribTop - 0.04, chestTop + shoulderRise, bust.chestWidth + 0.1, chestDepth, 0.1) + { clip: fit.trapezius(shoulderRise) },
+]);
+local bodyAdd = girdle.trunk + [
   h.prism('slab', 'plate', 'z', [[-(chestSide + 0.01), ribTop - 0.03], [chestSide + 0.01, ribTop - 0.03], [chestSide + 0.04, chestTop - 0.02], [-(chestSide + 0.04), chestTop - 0.02]],
           chestDepth / 2 - 0.006, chestDepth / 2 + 0.03) + { clip: fit.trapezius(shoulderRise) },
   h.box('panel-frame', 'trim', [-0.065, ribTop + 0.025, chestDepth / 2 + 0.03], [0.065, ribTop + 0.105, chestDepth / 2 + 0.036]),
@@ -157,6 +160,7 @@ local shaftGuard(row) =
 
 local forArmour = {
   body: function(r) remake(r, starts(['chest', 'slab', 'chevron', 'rivet', 'belt', 'buckle']), bodyAdd),
+  clavicle: function(r) remake(r, starts(['chest']), girdle.clavicle),
   upper: function(r) remake(r, starts(['pauldron', 'comb', 'rerebrace']), upperAdd, 0.012),  // a coarser voxel grain (a multiple of 0.002) as the pauldron grew, so the triangle count holds
   fore: function(r) remake(r, starts(['couter', 'vambrace']), foreAdd),
   palm: function(r) remake(r, starts([]), palmAdd),

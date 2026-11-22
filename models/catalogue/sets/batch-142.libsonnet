@@ -145,7 +145,7 @@ local medal(id, mass) =
 
   // A stretch bracelet of 22 round wooden beads, 8 mm each, lying flat in a ring 68 mm across.
   h.compound('bead_bracelet', 0.0037, beadRing('bead', 'bead', 0.03, 0.004, 22), { bead: 'wood-walnut' }) + { title: 'Bead bracelet' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['wood'], slot: ['wrist'] } } },
 
   // A pair of beaded earrings lying flat side by side, each 32 mm long: a silver ear wire bent into a hook and three
   // wooden beads strung below it, the middle one larger.
@@ -199,7 +199,7 @@ local medal(id, mass) =
              + [local p = onCircle(R, 90); ball('bead-green', 'bead-a', 0.0045, p[0], p[1])]
              + [local p = onCircle(R, 270); ball('bead-orange', 'bead-b', 0.0045, p[0], p[1])],
              { 'thread-a': 'cloth-red', 'thread-b': 'cloth-yellow', 'thread-c': 'cloth-blue', block: 'wood-birch', 'bead-a': 'plastic-green', 'bead-b': 'plastic-orange' }) + { title: 'Friendship bracelet' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['fabric'], setting: ['modern'], slot: ['wrist'] } } },
 
   // A third-place medal 60 mm across, struck in brass with a raised rim and star, on a red neck ribbon with a cream
   // stripe folded short into a V above it.
@@ -315,5 +315,5 @@ local medal(id, mass) =
              + std.flattenArrays([cowrie('shell-%d' % i, R, 20 + 320 * i / 8, 0) for i in std.range(0, 8)])
              + [h.box('knot', 'cord', [-0.003, 0, -R - 0.004], [0.003, 0.004, -R + 0.002])],
              { cord: 'cord-cotton', shell: 'bone', slit: 'chitin-brown' }) + { title: 'Cowrie bracelet' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone', 'fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['bone', 'fabric'], slot: ['wrist'] } } },
 ]

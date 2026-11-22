@@ -7,6 +7,7 @@ import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf } from '../../site/fingers.mjs';
 import { applyPoint, boneTransforms, boundBox, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
+import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
 // The pose fixtures hold the wields' weapons and guns, so the tree holds everything a hand does.
@@ -38,18 +39,20 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const curled = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
-    const bone = bones.get(`index3.${side}`);
+    const bone = bones.get(`index_03.${side}`);
     return applyPoint(curled.get(bone.id), bone.tail);
   };
   for (const side of ['L', 'R']) {
     const hand = bones.get(`hand.${side}`),
-      knuckle = bones.get(`index.${side}`);
+      knuckle = bones.get(`index_01.${side}`);
+    const knuckleAt = applyPoint(curled.get(knuckle.id), knuckle.head);
+    const fromKnuckle = sub(tip(side), knuckleAt);
     const intoPalm = mulMV(curled.get(hand.id).r, [hand.bind.mirror ? -1 : 1, 0, 0]);
-    // The fingers hang from the palm's mid-thickness, so a full curl ends a few millimetres toward the palm face.
-    assert.ok(
-      dot(sub(tip(side), applyPoint(curled.get(knuckle.id), knuckle.head)), intoPalm) > 0.005,
-      `the ${side} fingertip comes back toward the palm`,
-    );
+    const towardWrist = normalize(sub(applyPoint(curled.get(hand.id), hand.head), knuckleAt));
+    // The knuckles stand at the palm's mid-thickness and the finger is longer than the palm is thick, so a full
+    // curl tucks the tip back under the knuckle row, only a few millimetres toward the palm's face.
+    assert.ok(dot(fromKnuckle, intoPalm) > 0.002, `the ${side} fingertip comes back to the palm's side`);
+    assert.ok(dot(fromKnuckle, towardWrist) > 0.02, `the ${side} fingertip folds back past the knuckle row`);
   }
   const [l, r] = [tip('L'), tip('R')];
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right fingertip mirrors the left across x');
@@ -82,6 +85,37 @@ test('a flexed wrist bends either hand toward its palm and an abducted one towar
   }
 });
 
+test("a protracted clavicle brings either shoulder forward by the clavicle's reach, a retracted one back", () => {
+  const reach = JSON.parse(evaluateJsonnet("(import 'models/dolls/player/clavicle.libsonnet').reach", repo));
+  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+  const [retracted, protracted] = bones.get('clavicle.L').limits.flex;
+  for (const [flex, forward] of [
+    [protracted, reach],
+    [retracted, undefined],
+  ]) {
+    const asked = (side) => ({
+      [`clavicle.${side}`]: bones.get(`clavicle.${side}`).sense.map((s, i) => s * [flex, 0, 0][i]),
+    });
+    const { frame, report } = compilePose(rig, {
+      rig: { id: rig.id, revision: rig.revision },
+      angles: { ...asked('L'), ...asked('R') },
+    });
+    assert.deepEqual(report.clamped, []);
+    const posed = boneTransforms(rig.bones, decodeFrame(frame));
+    for (const side of ['L', 'R']) {
+      const { head } = bones.get(`upperArm.${side}`);
+      const moved = applyPoint(posed.get(`clavicle.${side}`), head)[2] - head[2];
+      if (forward === undefined) assert.ok(moved < 0, `the retracted ${side} shoulder comes ${moved} m forward`);
+      else {
+        assert.ok(Math.abs(moved - forward) < 1e-6, `the protracted ${side} shoulder comes ${moved} m forward`);
+        // The shoulder sweeps round the clavicle's joint, so it comes out as well as forward, on either side outward.
+        const out = (applyPoint(posed.get(`clavicle.${side}`), head)[0] - head[0]) * (side === 'L' ? 1 : -1);
+        assert.ok(Math.abs(out - 0.044) < 0.0005, `the protracted ${side} shoulder comes ${out} m out, not 0.044`);
+      }
+    }
+  }
+});
+
 test('opposition rolls either thumb pad toward its own little finger, the mirrored copy a mirror of the reference', () => {
   const shorthand = { thumb: { oppose: 1, lift: 0.5 } };
   const { frame, report } = compilePose(rig, {
@@ -92,11 +126,11 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const posed = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
-    const bone = bones.get(`thumb3.${side}`);
+    const bone = bones.get(`thumb_03.${side}`);
     return applyPoint(posed.get(bone.id), bone.tail);
   };
   for (const side of ['L', 'R']) {
-    const root = bones.get(`thumb.${side}`);
+    const root = bones.get(`thumb_01.${side}`);
     // The pad faces the way the palm does at rest, and the little finger lies at -z of either hand.
     const pad = mulMV(posed.get(root.id).r, [root.bind.mirror ? -1 : 1, 0, 0]);
     assert.ok(pad[2] < -0.5, `the ${side} thumb pad turns toward the little finger, not ${pad}`);
@@ -105,7 +139,7 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test('the grip preset seats a haft in the wedge of palm and thumb, slanted so every finger wraps it from its root, the thumb closing over it, on either hand', () => {
+test("the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, the thumb's first segment bearing on it and its tip closing over it, on either hand", () => {
   // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
   // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
@@ -158,8 +192,8 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
     const angles = frameAngles(rig, frame);
     const flex = (id) => Math.abs(angles[id][0]);
     assert.ok(
-      flex(`little.${side}`) >= flex(`index.${side}`),
-      `the ${side} little finger's knuckle bends ${flex(`little.${side}`).toFixed(0)}°, less than the index's ${flex(`index.${side}`).toFixed(0)}°`,
+      flex(`pinky_01.${side}`) >= flex(`index_01.${side}`),
+      `the ${side} little finger's knuckle bends ${flex(`pinky_01.${side}`).toFixed(0)}°, less than the index's ${flex(`index_01.${side}`).toFixed(0)}°`,
     );
     // Away from the palm is the socket's `into`; a tip past the haft's middle that way has wrapped round it.
     const beyond = (tip) => dot(sub(applyPoint(transforms.get(tip.id), padOf(tip)), item.t), mulMV(item.r, [1, 0, 0]));
@@ -169,10 +203,10 @@ test('the grip preset seats a haft in the wedge of palm and thumb, slanted so ev
       assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
     assert.ok(
-      gap(`thumb.${side}`) < 0.003,
-      `the ${side} thumb's root bears on the haft, not ${(gap(`thumb.${side}`) * 1000).toFixed(1)} mm off it`,
+      gap(`thumb_01.${side}`) < 0.003,
+      `the ${side} thumb's first segment bears on the haft, not ${(gap(`thumb_01.${side}`) * 1000).toFixed(1)} mm off it`,
     );
-    const thumbTip = bones.get(`thumb3.${side}`);
+    const thumbTip = bones.get(`thumb_03.${side}`);
     assert.ok(
       beyond(thumbTip) > 0,
       `the ${side} thumb closes over the haft's far side, not ${(-beyond(thumbTip) * 1000).toFixed(1)} mm short of its middle`,

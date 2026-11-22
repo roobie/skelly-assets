@@ -37,7 +37,7 @@ const bone = (id, parent, head, tail, box, flexAxis, limits, extra = {}) => ({
   ...extra,
 });
 const box = (min, max) => ({ min, max });
-const phalanxId = (k) => (k === 0 ? 'index' : `index${k + 1}`);
+const phalanxId = (k) => `index_0${k + 1}`;
 const phalanx = (k, head, limits) =>
   bone(
     phalanxId(k),
@@ -49,7 +49,7 @@ const phalanx = (k, head, limits) =>
     limits,
     { digit: 'index', ...(k === 0 ? { spread: 1 } : {}) },
   );
-const thumbId = (k) => (k === 0 ? 'thumb' : `thumb${k + 1}`);
+const thumbId = (k) => `thumb_0${k + 1}`;
 const thumb = (k, head, limits) =>
   bone(
     thumbId(k),
@@ -125,7 +125,7 @@ const posedBy = (angles) => ({
   rotations: Object.fromEntries(Object.entries(angles).map(([id, a]) => [id, jointRotation(bones.get(id), a)])),
 });
 // The thumb's pad faces the way the palm does at rest.
-const thumbPad = (pose) => mulMV(boneTransforms(rig.bones, pose).get('thumb').r, [-1, 0, 0]);
+const thumbPad = (pose) => mulMV(boneTransforms(rig.bones, pose).get('thumb_01').r, [-1, 0, 0]);
 
 test('a curl shorthand turns every digit toward the palm by its share, the thumb across, rolled and lifted by its own', () => {
   const angles = handAngles(rig, 'hand', {
@@ -133,15 +133,15 @@ test('a curl shorthand turns every digit toward the palm by its share, the thumb
     spread: 1,
     thumb: { lift: 1, across: 0.5, oppose: 0.5, curl: 0.5 },
   });
-  assert.deepEqual(angles.index, [45, 0, 15]);
-  assert.deepEqual(angles.index2, [55, 0, 0]);
-  assert.deepEqual(angles.index3, [40, 0, 0]);
-  assert.deepEqual(angles.thumb, [60, 35, -30]);
-  assert.deepEqual(angles.thumb2, [30, 0, 0]);
-  assert.deepEqual(angles.thumb3, [40, 0, 0]);
+  assert.deepEqual(angles.index_01, [45, 0, 15]);
+  assert.deepEqual(angles.index_02, [55, 0, 0]);
+  assert.deepEqual(angles.index_03, [40, 0, 0]);
+  assert.deepEqual(angles.thumb_01, [60, 35, -30]);
+  assert.deepEqual(angles.thumb_02, [30, 0, 0]);
+  assert.deepEqual(angles.thumb_03, [40, 0, 0]);
   const pose = posedBy(angles);
   assert.ok(
-    tipOf(pose, 'index3')[0] < tipOf(rest, 'index3')[0] - 0.02,
+    tipOf(pose, 'index_03')[0] < tipOf(rest, 'index_03')[0] - 0.02,
     'the curled fingertip comes back toward the palm face',
   );
 });
@@ -149,18 +149,18 @@ test('a curl shorthand turns every digit toward the palm by its share, the thumb
 test('opposition rolls the thumb pad toward the fingers, and a lift carries the thumb toward the palm face', () => {
   const rolled = posedBy(handAngles(rig, 'hand', { thumb: { oppose: 1 } }));
   assert.ok(thumbPad(rolled)[2] < -0.9, `the rolled pad faces the little finger's side, not ${thumbPad(rolled)}`);
-  near(tipOf(rolled, 'thumb3'), tipOf(rest, 'thumb3'), 1e-9);
+  near(tipOf(rolled, 'thumb_03'), tipOf(rest, 'thumb_03'), 1e-9);
   const lifted = posedBy(handAngles(rig, 'hand', { thumb: { lift: 1 } }));
-  const tip = sub(tipOf(lifted, 'thumb3'), bones.get('thumb').head);
+  const tip = sub(tipOf(lifted, 'thumb_03'), bones.get('thumb_01').head);
   assert.ok(tip[0] < -0.8 * length(tip), 'the lifted thumb stands out of the palm plane on the palm side');
 });
 
 test('a preset names a shorthand, and a shorthand over it changes only what it says', () => {
   assert.deepEqual(handAngles(rig, 'hand', 'fist'), handAngles(rig, 'hand', rig.presets.fist));
   const eased = handAngles(rig, 'hand', { preset: 'fist', thumb: { curl: 0 } });
-  assert.deepEqual(eased.thumb, handAngles(rig, 'hand', 'fist').thumb);
-  assert.deepEqual(eased.thumb3, [0, 0, 0]);
-  assert.deepEqual(eased.index, handAngles(rig, 'hand', 'fist').index);
+  assert.deepEqual(eased.thumb_01, handAngles(rig, 'hand', 'fist').thumb_01);
+  assert.deepEqual(eased.thumb_03, [0, 0, 0]);
+  assert.deepEqual(eased.index_01, handAngles(rig, 'hand', 'fist').index_01);
   assert.match(handIssues(rig, 'hand', 'wave').join(), /no preset wave/);
 });
 
@@ -184,17 +184,17 @@ test('a hand closes round a haft on its grip socket, every phalanx resting on it
   const { pose, closed } = closeHand(rig, rest, 'hand', solid);
   assert.ok(closed.index.touched, 'the finger touches the haft');
   const transforms = boneTransforms(rig.bones, pose);
-  for (const id of ['index', 'index2', 'index3']) {
+  for (const id of ['index_01', 'index_02', 'index_03']) {
     // The pad is the phalanx's palm-side face, -x at rest.
     const { min, max } = bones.get(id).bind.box;
     const pad = applyPoint(transforms.get(id), [min[0], (min[1] + max[1]) / 2, 0]);
     const gap = signedDepth(solid, pad, 0.05);
     assert.ok(gap > -0.0015 && gap < 0.005, `${id}'s pad rests on the haft, not ${gap * 1000} mm off it`);
   }
-  assert.ok(tipOf(pose, 'index3')[0] < centre[0], "the fingertip wraps past the haft's middle");
-  const thumb = bones.get('thumb');
+  assert.ok(tipOf(pose, 'index_03')[0] < centre[0], "the fingertip wraps past the haft's middle");
+  const thumb = bones.get('thumb_01');
   assert.ok(
-    !closed.thumb.touched && closed.thumb.angles.thumb[0] === thumb.limits.flex[0],
+    !closed.thumb.touched && closed.thumb.angles.thumb_01[0] === thumb.limits.flex[0],
     'a digit that meets nothing closes fully',
   );
 });
@@ -204,15 +204,15 @@ test('a thumb lifted wide comes down on the far side of a haft, not through it',
   const { solid, centre } = seatedHaft(0.024, 0.06);
   const lifted = posedBy(handAngles(rig, 'hand', { thumb: { lift: 1 } }));
   const { pose, closed } = closeHand(rig, lifted, 'hand', solid);
-  const [lift] = closed.thumb.angles.thumb;
-  const { flex } = bones.get('thumb').limits;
+  const [lift] = closed.thumb.angles.thumb_01;
+  const { flex } = bones.get('thumb_01').limits;
   assert.ok(
     closed.thumb.touched && lift > flex[0] && lift < flex[1],
     `the thumb stops on the haft, not at a limit (${lift})`,
   );
-  for (const id of ['thumb', 'thumb2', 'thumb3'])
+  for (const id of ['thumb_01', 'thumb_02', 'thumb_03'])
     assert.ok(signedDepth(solid, tipOf(pose, id), 0.05) > -0.0015, `${id} sinks into the haft`);
-  assert.ok(tipOf(pose, 'thumb3')[0] < centre[0], "the thumb tip rests beyond the haft's middle");
+  assert.ok(tipOf(pose, 'thumb_03')[0] < centre[0], "the thumb tip rests beyond the haft's middle");
 });
 
 test('a held pinch sets the thumb and index pads on either face of a thin tab, closing leaving them there', () => {
@@ -235,8 +235,8 @@ test('a held pinch sets the thumb and index pads on either face of a thin tab, c
   const transforms = boneTransforms(rig.bones, decodeFrame(frame));
   const pad = (id) => applyPoint(transforms.get(id), padOf(bones.get(id)));
   for (const [digit, tip] of [
-    ['index', 'index3'],
-    ['thumb', 'thumb3'],
+    ['index', 'index_03'],
+    ['thumb', 'thumb_03'],
   ]) {
     assert.ok(
       pinched[digit].residual < 0.0005,
@@ -244,10 +244,10 @@ test('a held pinch sets the thumb and index pads on either face of a thin tab, c
     );
     assert.ok(Math.abs(signedDepth(solid, pad(tip), 0.05)) < 0.0005, `the ${digit} pad rests on the tab`);
   }
-  const across = sub(pad('thumb3'), pad('index3'));
+  const across = sub(pad('thumb_03'), pad('index_03'));
   assert.ok(
-    dot(sub([-0.02, 0.89, 0.01], pad('index3')), across) > 0 &&
-      dot(sub(pad('thumb3'), [-0.02, 0.89, 0.01]), across) > 0,
+    dot(sub([-0.02, 0.89, 0.01], pad('index_03')), across) > 0 &&
+      dot(sub(pad('thumb_03'), [-0.02, 0.89, 0.01]), across) > 0,
     'the tab lies between the pads',
   );
 });

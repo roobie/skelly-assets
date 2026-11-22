@@ -31,7 +31,7 @@ local swing = { shares: { windup: 18, strike: 12, follow: 25, recovery: 45 }, se
   walks: { idle: { arms: 'swing' } },
   strikes: {
     forehand: swing {
-      windup: guard { body+: { spine: [4, -30, 0] }, weapon: held([-0.15, 0.01, 0.14], -60, -110, 100, [-1, -0.3, 0]) },
+      windup: guard { body+: { spine: [4, -30, 0] }, weapon: held([-0.15, 0.01, 0.14], -60, -110, 100, [-1, -0.6, 0]) },
       hit: guard { body+: { spine: [10, 8, 0] }, weapon: held([0.1, -0.06, 0.42], -45, 0, 60) },
       follow: guard { body+: { spine: [12, 35, 0] }, weapon: held([0.4, -0.1, 0.25], 0, 100, -40, [-0.37, -0.93, 0]) },
     },
@@ -50,7 +50,7 @@ local swing = { shares: { windup: 18, strike: 12, follow: 25, recovery: 45 }, se
     thrust: {
       shares: { windup: 16, strike: 12, follow: 22, recovery: 50 },
       seconds: 0.7,
-      windup: guard { body+: { spine: [4, -15, 0] }, weapon: held([-0.02, -0.25, 0.03], -7.5, 5, -137.5, [0.4, -0.8, -0.45]) },
+      windup: guard { body+: { spine: [4, -15, 0] }, weapon: held([-0.02, -0.25, 0.06], -7.5, 5, -137.5, [0.4, -0.8, -0.45]) },
       hit: guard { body+: { spine: [12, 15, 0] }, weapon: held([0.1, -0.1, 0.48], -30, -5, 60) },
       follow: guard { body+: { spine: [12, 12, 0] }, weapon: held([0.1, -0.12, 0.42], -30, -2.5, 60) },
     },

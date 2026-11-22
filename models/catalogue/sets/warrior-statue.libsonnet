@@ -17,6 +17,8 @@ local arm = import 'models/measures/arm.libsonnet';
 local leg = import 'models/measures/leg.libsonnet';
 local hand = import 'models/measures/hand.libsonnet';
 local plate = import 'models/kits/plate.libsonnet';
+// The statue has no clavicles, so its harness is carved whole rather than from the worn rows that share it with them.
+local harness = import 'models/kits/plate-harness.libsonnet';
 local armetSeat = import 'models/armet-seat.libsonnet';
 
 // How much larger than life the figure is cut.
@@ -44,10 +46,10 @@ local pose = {
   head: { turn: 14, lift: 6 },
   // The sword arm hangs `forward` and `abduct` out; the hand lies flat on the pommel, fingers forward and turned
   // `inward`, the wrist bent back `wrist` so the forearm slopes down to it.
-  sword: { abduct: 27, forward: 12, inward: 10, wrist: 35 },
+  sword: { abduct: 36, forward: 12, inward: 10, wrist: 35 },
   // The shield arm hangs `abduct` out, the palm flat to the shield's back; the shield turns `turn` to face out and
   // forward and leans its top `lean` in.
-  shield: { abduct: 24, turn: 50, lean: 4 },
+  shield: { abduct: 31, turn: 50, lean: 4 },
   // Each phalanx's curl, knuckle first, and the thumb's bones likewise: the sword hand's fingers droop over the
   // pommel, the shield hand's lie flat.
   swordFingers: [12, 10, 8],
@@ -79,14 +81,12 @@ local at(f, p) = add(f.origin, rot.apply(f.turn, times(p, k)));
 
 // The doll's measures cut k times larger: every length scales, shares, powers and counts do not.
 local isShare(field) = std.endsWith(field, 'Share') || std.endsWith(field, 'Shares') || std.endsWith(field, 'Power') || std.endsWith(field, 'Count') || field == 'armpit';
-local scaledMeasures(m) = {
-  [f]: local v = m[f];
-    if std.type(v) == 'number' && !isShare(f) then v * k
-    else if f == 'knuckleBack' || f == 'ballJoint' then times(v, k)
-    else if f == 'origins' then { [joint]: times(v[joint], k) for joint in std.objectFields(v) }
-    else v
-  for f in std.objectFields(m)
-};
+local scaled(v) =
+  if std.type(v) == 'number' then v * k
+  else if std.type(v) == 'array' then std.map(scaled, v)
+  else if std.type(v) == 'object' then { [f]: scaled(v[f]) for f in std.objectFields(v) }
+  else v;
+local scaledMeasures(m) = { [f]: if isShare(f) then m[f] else scaled(m[f]) for f in std.objectFields(m) };
 local ring = band.hairRing;
 local bustMeasures = girdle(scaledMeasures(bust)).bustParams { hairRing: { bottom: ring.bottom * k, top: ring.top * k, rows: [times(row, k) for row in ring.rows] } };
 local armMeasures = scaledMeasures(arm);
@@ -144,8 +144,8 @@ local frames =
   local armFrames(name, side, curl) =
     local turns = armTurns[name];
     local pauldron = frame(turns.upper, at(harness, shoulder(side)));
-    local vambrace = frame(turns.fore, at(pauldron, [0, -arm.upperLength, 0]));
-    local palm = frame(turns.palm, at(vambrace, [0, -arm.foreLength, 0]));
+    local vambrace = frame(turns.fore, at(pauldron, arm.upperBone));
+    local palm = frame(turns.palm, at(vambrace, arm.foreBone));
     // A digit's bones down from its root, each curled about its own joint.
     local digit(part, root, length, curls) =
       std.foldl(function(acc, b)
@@ -335,7 +335,7 @@ local legParts(name) = [
     exportMass: 'parts',
     parts: [
       carved('plinth', plinthKg, plinthPieces) + { finish: { plinth: darkStone, moulding: stone } },
-      carved('harness', figureKg * 0.5, platePieces('armor_plate_worn_body')),
+      carved('harness', figureKg * 0.5, h.scaled(harness.pieces + harness.over, k)),
       segment('pelvis', 'bust', bustMeasures, { segment: 'pelvis' }, 0.14),
       carved('armet', figureKg * 0.03, platePieces('helmet_plate_armet')),
       carved('sword', 60, sword),

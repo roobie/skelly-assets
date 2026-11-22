@@ -56,8 +56,6 @@ local deltoid = girdle.deltoid;
 local trapezius = girdle.trapezius;
 local slopeY = girdle.slopeY;
 local deltoidY = girdle.deltoidY;
-// Where the arm's inner face hangs, beside the chest, under the deltoid it is centred on.
-local armInner = deltoid.x - arm.upperWidth / 2;
 // How far down the thigh's frame the hanging hand's fingertips reach.
 local fingertips = deltoid.y - leg.hip[1] - (arm.upperLength + arm.foreLength + arm.palmLength + arm.fingerLength);
 // A sleeve's head covers the deltoid, so its depth follows the deltoid's rather than the arm's, eased so the cloth
@@ -102,6 +100,9 @@ local hood(slot, lining, chestD, depth) =
   ];
 
 local shellGrain = 0.004;
+// The doll's skin is voxelised past its measures by up to half the doll's grain, and a shell may stop short of its own
+// by half its grain, so a shell meant to enclose the skin stands at least this far past the measures.
+local voxelReach = (bust.voxelGrain + shellGrain) / 2;
 local row(id, pieces, finish) = h.compound(id, 0.1, pieces, finish) + { voxelGrain: shellGrain };
 
 // A worn shell's row. `covers` names the doll parts or regions the shell encloses at rest, which a consumer stops
@@ -145,6 +146,36 @@ local spineShells(id, pieces, finish, spine, bare, title) =
     if band.pieces != []
   ];
 
+// The player's arms hang from clavicles that lift the shoulder girdle off the trunk (models/dolls/player/doll.libsonnet),
+// so a body shell's pieces over the girdle are shared out as the body is: above the clavicles' cut and past the neck's
+// foot they ride the right clavicle, moved into its frame, and the left one's share is dropped, since the clavicle is
+// drawn mirrored there; the rest rides the trunk. A round piece the cut crosses, such as a deltoid's cap, goes whole to
+// the side holding its middle. Only pieces that follow the girdle are shared, since a detail on one side would be
+// mirrored onto the other. Each share reaches `voxelReach` past a cut into the other's side, as the skin each encloses
+// does, so neither leaves a seam of it showing.
+local clavicleJoint = [-bust.joints.clavicle[0], bust.joints.clavicle[1], bust.joints.clavicle[2]];
+local girdleShares(id, pieces) =
+  // The side `keep` of the plane `axis = at`, reaching `reach` past it; a turned piece still goes whole by the plane
+  // itself, so every share draws it once.
+  local cut(from, axis, at, keep, reach=voxelReach) =
+    [p for p in h.cut(from, axis, at, keep, whole=true) if p.kind == 'turned']
+    + h.cut([p for p in from if p.kind != 'turned'], axis, at - keep * reach, keep);
+  local below = cut(pieces, 'y', bust.clavicleCut, -1), above = cut(pieces, 'y', bust.clavicleCut, 1);
+  local right = cut(above, 'x', -girdle.neckFoot, -1), left = cut(above, 'x', girdle.neckFoot, 1);
+  // The trunk's own share above the cut starts where the share below it ends.
+  local middle = cut(cut(cut(pieces, 'y', bust.clavicleCut, 1, -voxelReach), 'x', -girdle.neckFoot, 1), 'x', girdle.neckFoot, -1);
+  local lost = unshared(pieces, [below, right, middle, left]);
+  assert lost == [] : '%s: the clavicles\' cut left %s in none or in several of its shares' % [id, lost];
+  // A piece cut both below the clavicles and between them stays one shell's twice, so the part between is told apart.
+  { trunk: below + [p { id: p.id + '-yoke' } for p in middle], clavicle: h.moved(right, [-c for c in clavicleJoint]) };
+// A body shell of `pieces` and the pieces `over` that lie over the girdle, with its clavicles' share of those. Given
+// `shoulders`, the two enclose their parts; otherwise the body encloses only the trunk and the clavicles' share nothing.
+local bodyShells(id, pieces, over, finish, shoulders, title) =
+  local shares = girdleShares(id, over);
+  [shell(id + '_worn_body', pieces + shares.trunk, finish, if shoulders then ['torso'] else ['trunk'], title=named(title, 'body'))]
+  + (if shares.clavicle == [] then []
+     else [shell(id + '_worn_clavicle', shares.clavicle, finish, if shoulders then ['clavicle'] else [], title=named(title, 'shoulder'))]);
+
 // How far the trooper's cuirass stands off the shoulders, and how far its pauldron's top stands above the shoulder
 // joint it is worn about. The cuirass's deltoid caps stay `pauldronClear` under that top, more than one of the rows'
 // voxels, so at rest no cap shows through a pauldron.
@@ -181,6 +212,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
   slopeY: slopeY,
   shoulderY: shoulderY,
   deltoidCap: deltoidCap,
+  // The trunk's and the clavicles' shares of a body shell's pieces over the girdle, for a set drawing its own.
+  girdleShares: girdleShares,
   // How far out from the centre line a garment's collar reaches, so a strap over the shoulders can run clear of it.
   collarHalf: collarWidth / 2,
   // A strap across [x0, x1] and `zs` lying over the slope, between it set out by `rises[0]` and by `rises[1]`.
@@ -239,6 +272,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     // neckline.
     local armpit = l.ribs.y[1] + bust.armpit * bust.chestHeight + g;
     local sideX = bust.chestWidth / 2 * bust.chestLowShare + g;
+    local armInner = armRest.innerAt(armpit);
     assert !straps || sideX <= armInner : 'a sleeveless body\'s side at %g lies under the hanging arm, whose inner face is at %g' % [sideX, armInner];
     local chest = if straps then l.chest { width: 2 * sideX } else l.chest;
     local panel(name, side) =
@@ -274,18 +308,21 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
         $.slopeBand('strap-top-' + name, sl.trim, xs, [-strapFace, strapFace], [g, g + strapT]),
         $.slopeHung('strap-back-' + name, sl.trim, xs, [-strapFace, -strapFace + strapT], neckline - 0.01, g + strapT),
       ];
-    local body = [
-      level('low', l.waist, hem, l.waist.y[1]),
-      level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
-    ] + (if straps then [
-      level('chest', chest, l.chest.foot, armpit),
-      panel('front', 1),
-      panel('back', -1),
-    ] + strap('l', -1) + strap('r', 1) else [
+    // A sleeveless body's panels and straps stay on the trunk, whose declaration leaves the shoulders bare beneath
+    // them; a share of them on the clavicles could declare nothing, so would be taken to cover the skin it lies on.
+    local over = if straps then [] else [
       level('chest', chest, l.chest.foot, bodyTop) + { clip: trapezius(l.chest.rise) },
       deltoidCap('shoulder-left', sl.body, 1, g),
       deltoidCap('shoulder-right', sl.body, -1, g),
-    ]) + (if collar == 'none' then [] else [
+    ];
+    local body = (if straps then [
+      level('chest', chest, l.chest.foot, armpit),
+      panel('front', 1),
+      panel('back', -1),
+    ] + strap('l', -1) + strap('r', 1) else []) + [
+      level('low', l.waist, hem, l.waist.y[1]),
+      level('ribs', l.ribs, l.ribs.foot, l.ribs.y[1]),
+    ] + (if collar == 'none' then [] else [
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.05, collarWidth, collarWidth, 0.02, cz=-0.01),
     ]) + (if collar == 'lapel' then [
       h.prism('lapel-' + side, sl.trim, 'z', [[side * 0.03, chestTop], [side * 0.13, chestTop - 0.02], [side * 0.04, chestTop - 0.15]],
@@ -306,8 +343,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       oct('sleeve', sl.body, -arm.foreLength + 0.01, arm.seamOverlap, arm.foreWidth + 2 * gs + 0.008, arm.upperDepth + 2 * gs + 0.004, 0.02 + s.round),
       oct('cuff', sl.trim, -arm.foreLength - 0.004, -arm.foreLength + 0.03, arm.foreWidth + 2 * gs + 0.012, arm.upperDepth + 2 * gs + 0.008, 0.02 + s.round),
     ];
-    fitted((if s.spine == null then [shell(id + '_worn_body', body, finish, if straps then ['trunk'] else ['torso'], title=named(title, 'body'))]
-            else spineShells(id, body, finish, s.spine, straps, title))
+    fitted((if s.spine == null then bodyShells(id, body, over, finish, !straps, title)
+            else spineShells(id, body + over, finish, s.spine, straps, title))
            + (if s.sleeves == 'none' then [] else [
                 shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper sleeve')),
                 shell(id + '_worn_fore', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
@@ -356,12 +393,14 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     local body = [
       oct('waist', sl.cloth, bust.pelvisHeight - 0.01, waistTop, bust.waistWidth + 2 * g, bust.waistDepth + 2 * g, cut),
       oct('ribs', sl.cloth, waistTop - 0.01, ribTop, bust.ribWidth + 2 * g, bust.ribDepth + 2 * g, cut),
-      oct('chest', sl.cloth, ribTop - 0.01, chestTop + g, chestW, chestD, bust.chestChamfer / 2) + { clip: trapezius(g) },
-      deltoidCap('shoulder-left', sl.cloth, 1, g),
-      deltoidCap('shoulder-right', sl.cloth, -1, g),
       oct('collar', sl.trim, chestTop - 0.01, chestTop + 0.04, collarWidth, collarWidth, 0.02, cz=-0.01),
     ] + hood(sl.hood, sl.lining, chestD, 0.07) + std.flattenArrays([star(i, s.stars[i]) for i in std.range(0, std.length(s.stars) - 1)])
       + (if s.moon == null then [] else moon(s.moon));
+    local over = [
+      oct('chest', sl.cloth, ribTop - 0.01, chestTop + g, chestW, chestD, bust.chestChamfer / 2) + { clip: trapezius(g) },
+      deltoidCap('shoulder-left', sl.cloth, 1, g),
+      deltoidCap('shoulder-right', sl.cloth, -1, g),
+    ];
     // On the model arm, a right arm, the body side is +x, so a sleeve flares towards -x.
     local uw = arm.upperWidth + 2 * g + 0.01, ud = sleeveHeadDepth + 2 * g;
     local upper = [
@@ -407,8 +446,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ]);
     // The thigh's bell is narrow by the hip, where the pelvis shell covers the leg, and the shin's ends at the hem, so
     // neither encloses its part.
-    fitted([
-      shell(id + '_worn_body', body, finish, ['torso'], title=named(title, 'body')),
+    fitted(bodyShells(id, body, over, finish, true, title) + [
       shell(id + '_worn_pelvis', pelvis, finish, ['pelvis'], title=named(title, 'hips')),
       shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper sleeve')),
       shell(id + '_worn_fore', fore, finish, ['fore'], title=named(title, 'forearm sleeve')),
@@ -440,9 +478,6 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
           bust.waistWidth + 2 * g + 0.012 + 0.012 * i, bust.ribDepth + 2 * g + 0.006 + 0.008 * i, cut)
       for i in [0, 1, 2]
     ] + [
-      oct('chest', 'plate', ribTop - 0.03, chestTop + trooperShoulderRise, chestW, chestD, 0.05) + { clip: trapezius(trooperShoulderRise) },
-      deltoidCap('shoulder-left', 'plate', 1, trooperShoulderRise),
-      deltoidCap('shoulder-right', 'plate', -1, trooperShoulderRise),
       h.prism('slab', 'plate', 'z', [[-0.16, ribTop - 0.02], [0.16, ribTop - 0.02], [0.19, chestTop - 0.03], [-0.19, chestTop - 0.03]],
               front - 0.004, slabFront),
     ] + [
@@ -489,6 +524,11 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for i in [0, 1]
       for k in [0, 1]
     ];
+    local over = [
+      oct('chest', 'plate', ribTop - 0.03, chestTop + trooperShoulderRise, chestW, chestD, 0.05) + { clip: trapezius(trooperShoulderRise) },
+      deltoidCap('shoulder-left', 'plate', 1, trooperShoulderRise),
+      deltoidCap('shoulder-right', 'plate', -1, trooperShoulderRise),
+    ];
     local uw = arm.upperWidth + 2 * g, ud = arm.upperDepth + 2 * g;
     local upper = [
       // The pauldron stands well proud of the shoulder: a flat top, a stepped plate, a comb and a broad rim.
@@ -518,11 +558,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ];
     // The vambrace stops short of the wrist. The body encloses the trunk but not the deltoid caps: the pauldrons over
     // them ride the upper arm, a different part copy, so the shoulders stay drawn.
-    fitted([
-      shell(id + '_worn_body', body, finish, ['trunk'], title=named(title, 'body')),
+    fitted(bodyShells(id, body, over, finish, false, title) + [
       shell(id + '_worn_upper', upper, finish, [], title=named(title, 'upper arm')),
       shell(id + '_worn_fore', fore, finish, [], title=named(title, 'forearm')),
-    ]) + { ground: h.lifted(body, -(beltY - 0.13)) },
+    ]) + { ground: h.lifted(body + over, -(beltY - 0.13)) },
 
   // Heavy trooper leg armour: thick cuisses with a front plate, a square knee guard over a domed cop, and greaves with
   // a front ridge. `ground` stands one thigh and shin on the floor. Slots as `trooper`.
@@ -627,7 +666,8 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
   hands(id, finish, spec, title=null)::
     local s = { layer: 'under', cuff: 0.05, flare: 0.006, hem: 0.006, fingers: true, backRidges: 0,
                 slots: { hand: 'hand', cuff: 'cuff', hem: 'hem', ridge: 'stitch' } } + spec;
-    local g = layers[s.layer], sl = s.slots;
+    // A glove hugs the hand, so a layer thinner than the voxel reach would let the skin through it.
+    local g = std.max(layers[s.layer], voxelReach), sl = s.slots;
     local palmX = arm.palmThickness / 2 + g, palmZ = arm.palmWidth / 2 + g;
     local wristX = arm.wristWidth / 2 + g, wristZ = arm.wristWidth / 2 + arm.wristDepthExtra + g;
     local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g, fingerZ = hand.width / 2 + g;
@@ -636,9 +676,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     // rather than standing square past the little finger's root, where a curled finger would come out through it.
     local last = std.length(hand.fingers) - 1;
     local knuckleY(i) = hand.knuckle(i)[1] - g;
-    local edgeY(from, to, z) = knuckleY(from) + (knuckleY(to) - knuckleY(from)) * (z - hand.centre(from)) / (hand.centre(to) - hand.centre(from));
+    local knuckleZ(i) = hand.knuckle(i)[2];
+    local edgeY(from, to, z) = knuckleY(from) + (knuckleY(to) - knuckleY(from)) * (z - knuckleZ(from)) / (knuckleZ(to) - knuckleZ(from));
     local outline = [[arm.handOverlap, palmZ], [edgeY(0, 1, palmZ), palmZ]]
-                    + [[knuckleY(i), hand.centre(i)] for i in std.range(1, last - 1)]
+                    + [[knuckleY(i), knuckleZ(i)] for i in std.range(1, last - 1)]
                     + [[edgeY(last, last - 1, -palmZ), -palmZ], [arm.handOverlap, -palmZ]];
     local palm = [
       h.prism('palm', sl.hand, 'x', outline, -palmX, palmX),
@@ -663,9 +704,10 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for k in phalanges
     ];
     // A thumb piece in its bone's frame, down the bone's length; the root piece ends just past the root, the rest reach
-    // into the bone above, each past the skin's end for the same reason as a phalanx's.
+    // into the bone above, each past the skin's end for the same reason as a phalanx's. Across the palm's edge it
+    // spans the thumb's flesh, from its joint, inset in the palm, out to the thumb's projection past the edge.
     local thumbPieces = [
-      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbProjection + 0.004 + g])] }
+      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbInset + arm.thumbProjection + g])] }
       for k in std.range(0, hand.thumbBones - 1)
     ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.
@@ -731,13 +773,11 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     ]));
     local shafted = top > ankle;
     local footFinish = { lining: 'paint-charcoal' } + finish;
-    // The doll's foot and toes are voxelised past their cut at the ball by up to half the doll's grain, and each shell
-    // piece may stop short of its own cut by half its grain, so the foot and toe pieces each reach both halves past the
-    // ball to enclose the skin of their part, overlapping one another there as the doll's parts do. A turned piece is
-    // not sliced but handed whole to the side of the ball holding its middle, so it lands in only one of them.
-    local reach = (bust.voxelGrain + shellGrain) / 2;
+    // The foot and toe pieces each reach the voxel reach past the ball to enclose the skin of their part, overlapping
+    // one another there as the doll's parts do. A turned piece is not sliced but handed whole to the side of the ball
+    // holding its middle, so it lands in only one of them.
     local cutAtBall(keep) = std.flattenArrays([
-      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * reach), keep, whole=true)
+      h.cut([p], 'z', s.ball.joint[2] - (if p.kind == 'turned' then 0 else keep * voxelReach), keep, whole=true)
       for p in foot
     ]);
     local footPieces = cutAtBall(-1), toePieces = cutAtBall(1);

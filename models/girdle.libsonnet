@@ -30,8 +30,17 @@ function(m) {
   deltoidY(x, rise)::
     local a = $.deltoid.radius + rise, u = (std.abs(x) - $.deltoid.x) / a;
     if std.abs(u) >= 1 then null else $.deltoid.y + ($.deltoid.halfHeight + rise) * std.sqrt(1 - u * u),
-  // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from.
+  // The bust family's params: the measures, with the girdle's shape in place of those only it is drawn from, which are
+  // hidden. What the measures hide stays hidden, so the family is not given it, and a caller giving one shows it with
+  // `:::`, as the avatar does a clavicle's cut.
   bustParams::
-    local drawnFrom = ['shoulderJointOut', 'shoulderJointBelow', 'shoulderJointForward', 'deltoidRadius', 'deltoidCrown', 'trapeziusDrop'];
-    std.foldl(std.objectRemoveKey, drawnFrom, m) + { girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid } },
+    m {
+      shoulderJointOut:: super.shoulderJointOut,
+      shoulderJointBelow:: super.shoulderJointBelow,
+      shoulderJointForward:: super.shoulderJointForward,
+      deltoidRadius:: super.deltoidRadius,
+      deltoidCrown:: super.deltoidCrown,
+      trapeziusDrop:: super.trapeziusDrop,
+      girdle: { trapezius: $.trapezius(0), deltoid: $.deltoid },
+    },
 }

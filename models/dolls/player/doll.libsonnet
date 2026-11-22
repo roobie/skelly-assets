@@ -13,11 +13,14 @@ local armRest = import 'models/arm-rest.libsonnet';
   // side turns as its mirror image, so one turn serves both. The axis is one of the doll's, [±1, 0, 0] or alike, and
   // the degrees any. The player's arm is swung out clear of the trunk (models/arm-rest.libsonnet), the right's swing
   // turning it toward -x. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its
-  // origin in the doll frame; the player's doll frame is its bust's.
+  // origin in the doll frame; the player's doll frame is its bust's. The clavicle is a limb too, though it hangs
+  // nothing: the arm's rig bone hangs from its bone while the arm's model hangs from the bust, at the shoulder the
+  // clavicle carries, so either stands the arm on the same joint at rest.
   bust: 'player_bust',
   limbs: [
     { name: 'arm', model: 'player_arm', anchor: 'shoulder', turn: { axis: [0, 0, 1], degrees: -armRest.degrees } },
     { name: 'leg', model: 'player_leg', anchor: 'hip' },
+    { name: 'clavicle', model: 'player_clavicle', anchor: 'clavicle' },
   ],
   sides: ['right', 'left'],
   mirrored: 'left',
@@ -29,9 +32,10 @@ local armRest = import 'models/arm-rest.libsonnet';
   // piece the doll's export keeps of a part cut into regions. A region that holds a part whole is named on it by the
   // part, since a consumer hides by the names a part's primitives carry.
   regions: {
-    // Below the armpit, and the girdle above it that a sleeveless garment leaves bare.
+    // Below the armpit, and the girdle above it that a sleeveless garment leaves bare, the clavicles' share of it
+    // with it.
     trunk: ['torso#trunk'],
-    shoulders: ['torso#shoulders'],
+    shoulders: ['torso#shoulders', 'clavicle'],
     // The ankle's cap, which rises above a boot's vamp into the shaft, and the sole below it behind the ball: heel and
     // instep. The toes beyond are the ball part, which a shoe's toe piece covers.
     ankle: ['foot#ankle'],
@@ -54,6 +58,8 @@ local armRest = import 'models/arm-rest.libsonnet';
     { slot: 'back', part: 'torso', against: [0, 0, -1], sink: 0 },
     { slot: 'waist', part: 'pelvis', against: [0, 0, 1], sink: 0.5 },
     { slot: 'arms', part: 'upper', against: [-1, 0, 0], sink: 0.5 },
+    // On the back of the wrist: outside the forearm, straddling its end by the wearable's own height.
+    { slot: 'wrist', part: 'fore', against: [-1, -1, 0], sink: 0.5 },
     { slot: 'hands', part: 'palm', against: [0, 0, 0], sink: 0 },
     { slot: 'feet', part: 'foot', both: true, against: [0, -1, 0], sink: 1 },
   ],

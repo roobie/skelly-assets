@@ -89,7 +89,7 @@ local jewel = { metal: 'metal-gold', gem: 'gem-purple' };
     stone('stone-%d' % i, 'gem', 0.0025, 0.003, 0.031 * std.sin(i * 36 * deg), 0.006, 0.031 * std.cos(i * 36 * deg))
     for i in std.range(0, 9)
   ], jewel) + { title: 'Gem bracelet' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'glass'], slot: ['wrist'] } } },
 
   // A pair of small hoop earrings lying flat side by side, each a 16 mm hoop with a 7 mm stone hanging from it.
   h.compound('gem_earrings', 0.004, std.flattenArrays([

@@ -90,7 +90,7 @@ local cordNecklace(id, mass, body) =
                box('clasp-plate', 'centre', [-0.008, 0.007, -0.11], [0.008, 0.008, -0.102]),
              ],
              { case: 'metal-gold', bezel: 'metal-silver', dial: 'metal-silver', hand: 'metal-gold', link: 'metal-gold', centre: 'metal-silver' }) + { title: 'Dress watch' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal'], slot: ['wrist'] } } },
 
   // A plain cotton cord laid in a ring 130 mm across, knotted at the back, wound at the front round the groove of
   // a spent 25 mm cannon case 80 mm long lying mouth outward.
@@ -236,5 +236,5 @@ local cordNecklace(id, mass, body) =
              ]
              + [h.disc('hole-%d' % i, 'hole', 0.0012, 0.0035, 0.0042, 0, 0.06 + 0.007 * i) for i in std.range(0, 6)],
              { case: 'plastic-matte-black', plate: 'steel-bright', display: 'lcd-green', digit: 'plastic-black', button: 'steel-bright', strap: 'rubber-black', buckle: 'steel-bright', hole: 'plastic-charcoal' }) + { title: 'Wristwatch' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['plastic', 'metal'], setting: ['modern'], slot: ['wrist'] } } },
 ]

@@ -1,8 +1,10 @@
 {
-  "rig": { "id": "doll", "revision": 10 },
+  "rig": { "id": "doll", "revision": 12 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
+    "clavicle.L": [0, 0, 0],
+    "clavicle.R": [0, 0, 0],
     "pelvis": [0, -10, 0],
     "shin.L": [12, 0, 0],
     "shin.R": [14, 0, 0],
@@ -26,8 +28,8 @@
       "model": "baseball_bat",
       "at": [-0.1356, 1.621, -0.1445],
       "turn": [-0.4263, 0.6822, 0.5009, 0.3194],
-      "pole": [-0.91, -0.27, 0.31],
-      "socket": { "at": [0, 0, -0.21], "into": [1, 0, 0], "axis": [0, 0, 1] },
+      "pole": [-0.91, -0.6, 0.2],
+      "socket": { "at": [0, 0, -0.2], "into": [1, 0, 0], "axis": [0, 0, 1] },
       "grip": 0.5
     }
   }

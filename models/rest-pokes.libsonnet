@@ -12,15 +12,7 @@ local unjudged(doll, garment, bone, piece, depth, note) = { doll: doll, garment:
 local bothSides(entry, doll, garment, bone, piece, depth, text) = [entry(doll, garment, bone + side, piece, depth, text) for side in ['.L', '.R']];
 local player = 'player';
 
-local cuff = 'the bare forearm swells past the cuff\'s mouth where it enters it at the wrist, a seam on skin that shows above the cuff anyway';
-
 {
-  pokes: std.flattenArrays([
-    bothSides(poke, player, 'gauntlet_plate', 'forearm', 'gauntlet_plate_worn_palm', 0.002, cuff),
-    bothSides(poke, player, 'gloves_heavy', 'forearm', 'gloves_heavy_worn_palm', 0.002, cuff),
-    bothSides(poke, player, 'gloves_power', 'forearm', 'gloves_power_worn_palm', 0.002, cuff),
-    bothSides(poke, player, 'gloves_trooper', 'forearm', 'gloves_trooper_worn_palm', 0.002, cuff),
-    bothSides(poke, player, 'leather_gloves', 'forearm', 'leather_gloves_worn_palm', 0.002, cuff),
-  ]),
+  pokes: [],
   unjudged: [],
 }

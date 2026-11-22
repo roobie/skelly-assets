@@ -36,7 +36,7 @@
 // children folded into it, so the player's clips play on the doll: the doll's one torso part is mobgen's spine and chest.
 //
 // A finger bone names its `digit` and, at the knuckle, its `spread`, the share of a spread of the hand it takes along
-// positive abduction, which carries a finger toward the thumb (1 for the index, -1 for the little finger), so a pose
+// positive abduction, which carries a finger toward the thumb (1 for the index, -1 for the pinky), so a pose
 // file's hand shorthand (site/fingers.mjs) can curl and spread a hand without naming bones. A finger flexes about the
 // knuckle row, the axis chosen so positive flex curls it toward the palm.
 //
@@ -57,6 +57,7 @@
 local joints = import 'models/dolls/joints.libsonnet';
 local bust = import 'models/measures/bust.libsonnet';
 local armRest = import 'models/arm-rest.libsonnet';
+local clavicle = import 'models/dolls/player/clavicle.libsonnet';
 local unturned = [0, 0, 0, 1];
 local trunk = { nodeRotation: unturned };
 local arm = { nodeRotation: unturned, sided: true, parent: 'spine', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
@@ -84,7 +85,7 @@ local thumbBones = {
 };
 {
   id: 'doll',
-  revision: 10,
+  revision: 12,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -99,23 +100,29 @@ local thumbBones = {
                   limits: joints.neck },
     head: trunk { part: 'head', parent: 'neck', pivot: { anchor: 'head' }, along: [0, 1, 0], flexAxis: [1, 0, 0],
                   limits: joints.head },
+    // The clavicle carries the shoulder forward about the vertical through its joint by the breastbone, so a long gun's
+    // stock comes into the shoulder without the chest turning to it (models/dolls/player/clavicle.libsonnet). Its part
+    // is drawn as the right girdle, running out along -x.
+    clavicle: arm { part: 'clavicle', parent: 'spine', pivot: 'origin', along: [-1, 0, 0], flexAxis: [0, -1, 0],
+                    limits: clavicle.limits },
     // The arm rests swung out from the trunk (models/arm-rest.libsonnet), and abduction is measured from that rest, so
     // its range is the arm's from hanging straight, less the swing.
-    upperArm: arm { part: 'upper', parent: 'spine', pivot: 'origin',
+    upperArm: arm { part: 'upper', parent: 'clavicle', pivot: 'origin',
                     limits: { flex: [-50, 170], twist: [-70, 90], abduct: [-30 - armRest.degrees, 170 - armRest.degrees] } },
     forearm: arm { part: 'fore', parent: 'upperArm', pivot: 'origin', pronates: true, limits: joints.forearm },
     // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do;
     // about the arm's flex axis a turn would move the hand in the palm's plane.
     // `grip`: where a handle held in a power grip crosses the palm's middle, as a share of its length from the wrist
-    // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle deep in the
-    // palm, in the wedge between the palm and the lifted thumb's root, so the palm's heel and the thumb's root both
-    // bear on it and the fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook
-    // it and the palm stands beside it like a paddle. `gripSlant`: how far in degrees the handle turns from square
+    // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle across the
+    // palm short of the knuckle crease, where the fingers wrap right round it into a fist and the thumb's first segment
+    // comes down onto it (the grip preset's thumb, models/poses/hands.libsonnet); further toward the wrist, where the
+    // thumb's root sits, the fingers cannot reach round, and at the crease they only hook it and the palm stands beside
+    // it like a paddle. `gripSlant`: how far in degrees the handle turns from square
     // across the palm, its thumb end toward the fingers, so it runs from the index finger's root to the heel of the
     // palm under the little finger. Each finger then reaches the same way round it; held square, as a bar is, the
     // little finger, whose knuckle sits furthest back, stands off a handle the others wrap. Much past a quarter turn
     // the index finger's root comes onto the handle and opens the fist from the other end.
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, grip: 0.65, gripSlant: 20,
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, grip: 0.72, gripSlant: 20,
                 limits: joints.wrist },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0], limits: joints.thigh },
     shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0], limits: joints.knee },

@@ -1,8 +1,10 @@
 {
-  "rig": { "id": "doll", "revision": 10 },
+  "rig": { "id": "doll", "revision": 12 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
+    "clavicle.L": [0, 0, 0],
+    "clavicle.R": [0, 0, 0],
     "pelvis": [0, -10, 0],
     "shin.L": [12, 0, 0],
     "shin.R": [14, 0, 0],
@@ -27,7 +29,7 @@
       "at": [-0.1403, 1.1505, 0.2531],
       "turn": [-0.1516, -0.0995, 0.6274, 0.7573],
       "pole": [-0.6, -1, 0],
-      "socket": { "at": [0, 0, -0.21], "into": [1, 0, 0], "axis": [0, 0, 1] },
+      "socket": { "at": [0, 0, -0.2], "into": [1, 0, 0], "axis": [0, 0, 1] },
       "grip": 0.5
     }
   }

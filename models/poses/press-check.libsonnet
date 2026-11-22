@@ -36,7 +36,7 @@ local support = { hold: crease { socket: 'support', beneath: true, pole: [0, -1,
 local handle(offset) = { from: 'charging_handle', offset: offset, on: 'charging-handle' };
 local pinch = {
   hold: crease {
-    socket: { at: handle([0.051, -0.02, 0.03]), into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
+    socket: { at: handle([0.051, -0.02, 0.045]), into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
     pole: [0.483, -0.866, -0.129],
     pinch: { thumb: handle([0.009, 0, -0.005]), index: handle([0.0195, 0, 0.003]) },
   },
@@ -61,7 +61,7 @@ local cover(offset) = port(offset) { on: 'port-cover' };
 // The hand that shuts the cover: the index reaching, the other fingers curled out of its way.
 local coverHand = {
   hold: crease { pole: [0.5, -0.87, 0] },
-  hands: { curl: { middle: 0.8, ring: 0.9, little: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
+  hands: { curl: { middle: 0.8, ring: 0.9, pinky: 0.9 }, thumb: { across: 0.4, oppose: 0.6, lift: 0.3 } },
 };
 local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': pull } };
 {
@@ -90,7 +90,7 @@ local retracted = { moved: coverOpen { 'charging-handle': pull, 'bolt-carrier': 
       into: 0.12,
       moved: coverOpen,
       left: {
-        hold: crease { socket: { at: port([0.078, 0.009, -0.021]), into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
+        hold: crease { socket: { at: port([0.078, 0.029, -0.021]), into: [-1, 0, 0], axis: [0, 1, 0] }, pole: [0.2, -1, -0.4], close: false },
         hands: { curl: 0.1, thumb: { across: 0.2, oppose: 0.4, lift: 0.2 } },
       },
     },

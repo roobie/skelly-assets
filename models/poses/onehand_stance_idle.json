@@ -1,8 +1,10 @@
 {
-  "rig": { "id": "doll", "revision": 10 },
+  "rig": { "id": "doll", "revision": 12 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
+    "clavicle.L": [0, 0, 0],
+    "clavicle.R": [0, 0, 0],
     "pelvis": [0, 0, 0],
     "shin.L": [0, 0, 0],
     "shin.R": [0, 0, 0],

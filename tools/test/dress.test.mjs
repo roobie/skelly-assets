@@ -7,14 +7,17 @@ import { modelSources } from '../check-sources.mjs';
 import {
   coveringItems,
   dollDressing,
+  dollDressings,
   dollOf,
   isWearable,
   modelBox,
   modelParts,
   PLAYER,
+  placeOf,
   readDollParts,
   readDressing,
   wornOnParts,
+  wornPiece,
   wornPieces,
   wornRefusal,
   wornSites,
@@ -45,6 +48,7 @@ const dressing = {
     { slot: 'feet', part: 'sleeve', both: true, against: [0, -1, 0], sink: 1 },
   ],
   slots: { body: { slot: 'torso', part: 'chest' }, cuff: { slot: 'arms', part: 'sleeve' } },
+  regions: { belly: ['chest#belly'], yoke: ['chest#yoke', 'sleeve'] },
 };
 const figure = {
   bust: {
@@ -94,6 +98,40 @@ test("a worn piece is drawn in every copy of its segment's part, the left one mi
   close(pieces[2].at, [0, 0, 0]);
 });
 
+test("a piece whose part the doll has as a part of the bust on each side is drawn in each side's, the mirrored side's mirrored", () => {
+  const strapped = {
+    ...dressing,
+    slots: { ...dressing.slots, yoke: { slot: 'torso', part: { right: 'yoke_r', left: 'yoke_l' } } },
+  };
+  const strappedDoll = dollOf(strapped, {
+    ...figure,
+    bust: {
+      ...figure.bust,
+      parts: [
+        ...figure.bust.parts,
+        { part: 'yoke_r', at: [-0.1, 0.5, 0], box: box([-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]) },
+        { part: 'yoke_l', at: [0.1, 0.5, 0], box: box([0.05, 0.45, -0.05], [0.2, 0.55, 0.05]) },
+      ],
+    },
+  });
+  const models = [model('coat', { slot: ['torso'] }), model('coat_worn_yoke', { fit: ['worn'] })];
+  const pieces = wornSites(models[0], { dressing: strapped, doll: strappedDoll, models }).slice(
+    strappedDoll.sites.length,
+  );
+  assert.deepEqual(
+    pieces.map(({ part, side, mirror }) => [part, side, Boolean(mirror)]),
+    [
+      ['yoke_r', 'centre', false],
+      ['yoke_l', 'centre', true],
+    ],
+  );
+  close(pieces[1].at, [0.1, 0.5, 0]);
+  assert.match(
+    wornRefusal(models[0], { dressing: strapped, doll, models }) ?? '',
+    /the doll has no part yoke_r or yoke_l/,
+  );
+});
+
 test('a piece that covers some of its part names, in every copy, the doll site that draws that copy', () => {
   const models = [
     model('coat', { slot: ['torso'] }),
@@ -109,6 +147,23 @@ test('a piece that covers some of its part names, in every copy, the doll site t
       [undefined, undefined],
     ],
   );
+});
+
+test('a piece leaves bare the parts that hold the rest of a region it hides none of', () => {
+  const sites = (covers) => {
+    const models = [model('coat', { slot: ['torso'] }), { ...model('coat_worn', { fit: ['worn'] }), covers }];
+    return wornSites(models[0], { dressing, doll, models }).slice(doll.sites.length);
+  };
+  assert.deepEqual(sites(['belly'])[0].bare, ['sleeve']);
+  assert.equal(sites(['belly', 'yoke'])[0].bare, undefined);
+  assert.equal(sites(['chest'])[0].bare, undefined);
+});
+
+test('a piece leaves bare the rest of a region that holds its own part whole', () => {
+  const whole = { ...dressing, regions: { belly: ['chest#belly'], shoulders: ['chest', 'sleeve'] } };
+  const models = [model('coat', { slot: ['torso'] }), { ...model('coat_worn', { fit: ['worn'] }), covers: ['belly'] }];
+  const [piece] = wornSites(models[0], { dressing: whole, doll, models }).slice(doll.sites.length);
+  assert.deepEqual(piece.bare, ['sleeve']);
 });
 
 test("an item is dressed to check its pieces' covers whether or not the tree holds the item itself", () => {
@@ -187,14 +242,14 @@ test("every worn piece, over other clothing too, and every wearable with no piec
   assert.deepEqual(new Set(dollParts.sided), new Set(bones.filter(({ sided }) => sided).map(({ part }) => part)));
   const sources = await modelSources(repo);
   const tags = (entry, facet) => entry.taxonomy?.tags?.[facet] ?? [];
-  const pieces = sources.filter((entry) => tags(entry, 'fit').includes('worn') && /_worn(_[^_]+)?$/.test(entry.id));
-  const garments = new Set(pieces.map(({ id }) => id.replace(/_worn(_[^_]+)?$/, '')));
+  const pieces = sources.filter((entry) => tags(entry, 'fit').includes('worn') && wornPiece(entry.id) !== undefined);
+  const garments = new Set(pieces.map(({ id }) => wornPiece(id)?.garment));
   const placed = sources.filter(
     (entry) => tags(entry, 'fit').length === 0 && tags(entry, 'slot').length > 0 && !garments.has(entry.id),
   );
   const pieceParts = new Map(
     pieces.map(({ id }) => {
-      const segment = /_worn_([^_]+)$/.exec(id)?.[1];
+      const segment = wornPiece(id)?.segment;
       return [id, { part: segment === undefined ? dressing.piece : wornSlots[segment].part }];
     }),
   );
@@ -396,4 +451,13 @@ test('every body slot the vocabulary names has a place on the doll, and every se
       .map(([segment]) => segment),
     [],
   );
+});
+
+test('on every doll a watch rests on the back of the wrist, the hand end of the part its forearm pieces are drawn in', () => {
+  const watch = model('watch', { slot: ['wrist'] });
+  for (const dressing of dollDressings(readDressing(repo))) {
+    const place = placeOf(watch, dressing);
+    assert.equal(place.part, dressing.slots.fore.part, `${dressing.id}: the watch is placed off the forearm`);
+    assert.ok(place.against?.[1] < 0, `${dressing.id}: the watch does not rest at the forearm's hand end`);
+  }
 });

@@ -36,6 +36,8 @@ export const COINCIDENT = 1e-5;
 // would miss a strip along an edge that passes out of its piece between two corners. It is about a pixel of a review
 // sheet, so a poke too small to sample is too small to see there.
 export const PITCH = 0.005;
+// Two faces whose normals meet within a degree lie in one plane, as far as float storage and a few transforms can tell.
+export const PARALLEL = Math.cos(Math.PI / 180);
 
 // The ray that tells inside from outside leaves along a fixed direction with no axis-aligned component, so it misses the edges and vertices
 // of the axis-aligned meshes parts are built from.
@@ -365,7 +367,9 @@ function runThrough(node, p, dir) {
  * piece cover what it only sits beside, as a belt bag beside the waist it hangs on, or what lies beneath the part's far
  * side, as a sole beneath the shin guard's rim at the ankle. A piece that declares what it `covers` of the part copy it
  * rides passes beneath only that: a tank top that covers the trunk leaves the shoulders bare, though its armholes and
- * straps lie beneath the deltoids and the pectorals.
+ * straps lie beneath the deltoids and the pectorals. Nor does it pass beneath a part across its joints that it names
+ * `bare`, one holding the rest of a region it leaves bare, as the clavicles beside that tank top's straps
+ * (tools/dress.mjs, `leftBare`).
  * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
  */
 export function coverage(rig, rest) {
@@ -384,8 +388,9 @@ export function coverage(rig, rest) {
       ),
     ]),
   );
-  const declaresBare = ({ bone, covers }, id, region) =>
-    bone === id && covers !== undefined && !hides(covers, parts.get(id), region);
+  const declaresBare = ({ bone, covers, bare }, id, region) =>
+    (bone === id && covers !== undefined && !hides(covers, parts.get(id), region)) ||
+    (bare?.includes(parts.get(id)) ?? false);
   const beneath = (id, indices, { point, normal, region }) => {
     if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
@@ -440,7 +445,8 @@ export function coveredSurface(rig, rest, { whole = false } = {}) {
  * A probe of the doll at rest, over its covered surface: given the bone transforms of a pose, its findings as { pokes, flush, sinks, seams }, each
  * a list of points in the rig frame. A poke is { bone, piece, point, depth }: the body part, the piece meant to cover
  * it and how far outside every piece it lies. A flush point, { bone, piece, point }, is a covered point on a piece's
- * outer surface, a coincident face that draws in a tie with the piece's and so shows through it in stripes. A covered
+ * outer surface, a coincident face lying in the skin's plane that draws in a tie with the piece's and so shows through
+ * it in stripes; a piece face that only crosses the skin edge-on, as a cuff's rim does, is not flush. A covered
  * point that does not show, because a step off its face lands inside the figure, is neither. A sink is { piece, into, point,
  * depth }: how far the piece passes into the body part `into`; a seam is { piece, into, point }.
  */
@@ -506,7 +512,7 @@ export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
 const coveredPoints = (rest, surface) =>
   surface.flatMap(({ bone, samples }) =>
     samples.flatMap(({ point, normal, cover }) =>
-      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, point, normal }],
+      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, cover, point, normal }],
     ),
   );
 
@@ -514,16 +520,37 @@ const coveredPoints = (rest, surface) =>
 function bareFindings(covered, posedPieces, posedBody, at) {
   const findings = { pokes: [], flush: [] };
   const figure = [...posedPieces, ...posedBody];
-  for (const { bone, piece, point, normal } of covered) {
+  for (const { bone, piece, cover, point, normal } of covered) {
     const posed = applyPoint(at(bone), point);
     const { depth } = depthOutside(posedPieces, posed);
     if (depth === -Infinity) continue;
-    if (!outsideAll(figure, add(posed, scale(mulMV(at(bone).r, normal), STEP)))) continue;
+    const outward = mulMV(at(bone).r, normal);
+    if (!outsideAll(figure, add(posed, scale(outward, STEP)))) continue;
     if (depth > COINCIDENT) findings.pokes.push({ bone, piece, point: posed, depth });
-    else findings.flush.push({ bone, piece, point: posed });
+    else if (liesAlong(posedPieces[cover], posed, outward)) findings.flush.push({ bone, piece, point: posed });
   }
   return findings;
 }
+
+// Whether a face of the covering piece's solid within a coincident distance of `p` lies in the plane of the skin there,
+// whose normal is `normal`, and faces the way the skin does: only then do the two draw in a tie over an area. A face of
+// another piece is no cover's, and a face turned away is the far side of a shell the skin lies inside. A face crossing
+// the skin edge-on meets it along a line, with the skin to one side inside the piece and to the other outside it, where
+// its own samples poke if it is covered.
+function liesAlong({ tree, local }, p, normal) {
+  const q = local(p);
+  const across = sub(local(add(p, normal)), q);
+  return facesNear(tree, q).some(
+    ([a, b, c]) => dot(normalize(cross(sub(b, a), sub(c, a))), normalize(across)) >= PARALLEL,
+  );
+}
+
+// The triangles under `node` within a coincident distance of `p`.
+const facesNear = (node, p) => {
+  if (boxDistance(node.bounds, p) > COINCIDENT) return [];
+  if (node.faces) return node.faces.filter((face) => triangleDistance(p, face) <= COINCIDENT);
+  return node.children.flatMap((child) => facesNear(child, p));
+};
 
 /**
  * A closed mesh as a gear check reads it: `depth(p)`, how far `p` lies outside it, negative inside, and `reach(p, dir)`,

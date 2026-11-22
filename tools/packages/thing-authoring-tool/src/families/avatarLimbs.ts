@@ -60,13 +60,9 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       segment: picklist(ARM_SEGMENTS),
       finger: optional(string()),
       phalanx: optional(scalar),
-      /** The fingers from the thumb's side, their lengths as shares of `fingerLength`, and the gap between them. */
+      /** The fingers from the thumb's side, and the gap between them. */
       fingers: names,
-      fingerShares: numbers,
       fingerGap: positive,
-      /** Each finger's phalanges as shares of its length, knuckle first; the thumb's bones as shares of its length. */
-      phalanxShares: numbers,
-      thumbShares: numbers,
       upperLength: positive,
       upperWidth: positive,
       upperDepth: positive,
@@ -76,8 +72,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       palmLength: positive,
       palmWidth: positive,
       palmThickness: positive,
-      fingerLength: positive,
-      thumbLength: positive,
       /** How far each arm segment reaches into the one above it, so no gap opens between them. */
       seamOverlap: positive,
       /** How far the palm reaches into the wrist and the fingers into the palm. */
@@ -103,8 +97,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       thumbVolar: positive,
       /** How far each finger's knuckle sits back from the palm's length toward the wrist, the index first. */
       knuckleBack: numbers,
-      /** How far the knuckles sit toward the palm's face; the fingers' sockets place them, the palm only ends there. */
-      knuckleVolar: positive,
       /** The shoulder's, elbow's and wrist's joints in the arm's frame; without them they lie on its centre line. */
       origins: optional(json(strictObject({ upper: point3, fore: point3, palm: point3 }))),
       /**
@@ -112,12 +104,9 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
        * does not describe; the palm ends along it.
        */
       knuckles: optional(json(array(point3))),
-      /**
-       * Each finger's phalanges' lengths, the index first and each from the knuckle, and the thumb's bones', for a hand
-       * whose digits the measures' shares do not describe, as a skeleton's do not.
-       */
-      phalanxLengths: optional(json(array(array(length)))),
-      thumbLengths: optional(json(array(length))),
+      /** Each finger's phalanges' lengths, the index first and each from the knuckle, and the thumb's bones'. */
+      phalanxLengths: json(array(array(length))),
+      thumbLengths: json(array(length)),
       /**
        * A digit's far joint, or its tip, from its own joint in the arm's frame, for a digit that leans off hanging
        * straight down, as a thumb reaching forward from the palm's edge does.
@@ -140,29 +129,26 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const fingerCentre = (i: number) => halfPalm * d.fingerFrontShare - i * (fingerWidth + d.fingerGap) - fingerWidth / 2;
   const fingerAt = d.fingers.indexOf(d.finger ?? '');
   const phalanx = d.phalanx ?? 0;
-  if (d.segment === 'finger' && (fingerAt < 0 || !(phalanx >= 0 && phalanx < d.phalanxShares.length))) {
+  const phalanges = d.phalanxLengths[0]?.length ?? 0;
+  if (
+    d.phalanxLengths.length !== d.fingers.length ||
+    d.phalanxLengths.some((lengths) => lengths.length !== phalanges)
+  ) {
+    throw new Error(`The hand's phalanxLengths need the same number of phalanges for each of ${d.fingers.join(' ')}`);
+  }
+  if (d.segment === 'finger' && (fingerAt < 0 || !(phalanx >= 0 && phalanx < phalanges))) {
     throw new Error(
-      `finger segment needs a finger of ${d.fingers.join(' ')} and a phalanx below ${d.phalanxShares.length}, not ${d.finger} ${d.phalanx}`,
+      `finger segment needs a finger of ${d.fingers.join(' ')} and a phalanx below ${phalanges}, not ${d.finger} ${d.phalanx}`,
     );
   }
-  if (d.segment === 'thumb' && !(phalanx >= 0 && phalanx < d.thumbShares.length)) {
-    throw new Error(`thumb segment needs a phalanx below ${d.thumbShares.length}, not ${d.phalanx}`);
+  if (d.segment === 'thumb' && !(phalanx >= 0 && phalanx < d.thumbLengths.length)) {
+    throw new Error(`thumb segment needs a phalanx below ${d.thumbLengths.length}, not ${d.phalanx}`);
   }
-  if (
-    d.phalanxLengths &&
-    (d.phalanxLengths.length !== d.fingers.length ||
-      d.phalanxLengths.some((lengths) => lengths.length !== d.phalanxShares.length))
-  ) {
-    throw new Error(`The hand's phalanxLengths need ${d.phalanxShares.length} for each of ${d.fingers.join(' ')}`);
-  }
-  if (d.thumbLengths && d.thumbLengths.length !== d.thumbShares.length) {
-    throw new Error(`The hand's thumbLengths need one for each of the thumb's ${d.thumbShares.length} bones`);
-  }
-  const phalanxLength = (k: number) =>
-    d.phalanxLengths?.[fingerAt]?.[k] ?? d.fingerLength * (d.fingerShares[fingerAt] ?? 1) * (d.phalanxShares[k] ?? 0);
-  const phalanxTop = knuckles - d.phalanxShares.slice(0, phalanx).reduce((sum, _, k) => sum + phalanxLength(k), 0);
-  const thumbLength = (k: number) => d.thumbLengths?.[k] ?? d.thumbLength * (d.thumbShares[k] ?? 0);
-  const thumbTop = thumbRoot - d.thumbShares.slice(0, phalanx).reduce((sum, _, k) => sum + thumbLength(k), 0);
+  const ownLengths = d.phalanxLengths[fingerAt] ?? [];
+  const phalanxLength = (k: number) => ownLengths[k] ?? 0;
+  const phalanxTop = knuckles - ownLengths.slice(0, phalanx).reduce((sum, length) => sum + length, 0);
+  const thumbLength = (k: number) => d.thumbLengths[k] ?? 0;
+  const thumbTop = thumbRoot - d.thumbLengths.slice(0, phalanx).reduce((sum, length) => sum + length, 0);
   const measured = { upper: 0, fore: elbow, palm: wrist };
   if (d.origins) {
     requireJointHeights(d.origins, measured, 'arm');
@@ -319,7 +305,7 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       }
       case 'finger': {
         // One phalanx, reaching into the one above it so the joint stays closed when it curls; the tip a shade slimmer.
-        const slim = phalanx === d.phalanxShares.length - 1 ? 0.85 : 1;
+        const slim = phalanx === phalanges - 1 ? 0.85 : 1;
         const thick = halfThick * d.fingerThicknessShare * slim;
         const half = (fingerWidth / 2) * slim;
         return digit(d.finger!, [-thick, thick], ys(phalanxTop - phalanxLength(phalanx), phalanxTop + d.handOverlap), [

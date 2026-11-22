@@ -40,8 +40,8 @@ after(() => rmSync(root, { recursive: true, force: true }));
 mkdirSync(join(root, 'models'), { recursive: true });
 const dressing = {
   dolls: {
-    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, rig },
-    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, rig },
+    player: { bust: 'bust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, regions: {}, rig },
+    toy: { bust: 'toybust', limbs: [], sides: ['right', 'left'], mirrored: 'left', slots: {}, regions: {}, rig },
   },
   piece: 'torso',
 };

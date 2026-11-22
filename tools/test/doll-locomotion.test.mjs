@@ -84,7 +84,7 @@ test("each doll's rig is written at its record's path, the player's with the sit
       id: 'player',
       pack: 'skelly.body',
       rig: 'motions/doll.rig.json',
-      models: { bust: 'player_bust', arm: 'player_arm', leg: 'player_leg' },
+      models: { bust: 'player_bust', arm: 'player_arm', leg: 'player_leg', clavicle: 'player_clavicle' },
     },
     {
       id: 'ual',
@@ -97,7 +97,7 @@ test("each doll's rig is written at its record's path, the player's with the sit
   assert.equal(written.id, rig.id);
   assert.deepEqual(
     written.doll.map(({ model }) => model),
-    ['player_bust', 'player_arm', 'player_arm', 'player_leg', 'player_leg'],
+    ['player_bust', 'player_arm', 'player_arm', 'player_leg', 'player_leg', 'player_clavicle', 'player_clavicle'],
   );
 });
 

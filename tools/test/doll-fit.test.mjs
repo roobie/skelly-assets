@@ -36,7 +36,7 @@ test('a jacket of boxes standing off the torso and arms is clean at rest', () =>
     return { positions: corners.flat(), indices };
   };
   const pieces = rest.body
-    .filter(({ bone }) => /^(spine|upperArm|forearm)/.test(bone))
+    .filter(({ bone }) => /^(spine|clavicle|upperArm|forearm)/.test(bone))
     .map(({ bone, mesh }) => ({ piece: `box ${bone}`, bone, mesh: boxAround(mesh, bone) }));
   const jacket = { body: rest.body, pieces };
   const surface = coveredSurface(rig, jacket);

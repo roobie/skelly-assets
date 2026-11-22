@@ -1,13 +1,17 @@
 // The player bust's measures, hips to crown. Worn shells fit around these, so the bust and its gear share one source.
 // The trunk's joints, levels and girths are the UAL doll's (models/dolls/ual/joints.libsonnet), so one garment fits
-// both dolls; the pelvis, the lower chest and the deltoid are the player's own, as its drawing needs. Each joint is
+// both dolls; the pelvis and the lower chest are the player's own, as its drawing needs. Each joint is
 // above the hips' foot, the bust's frame.
 local ual = (import 'models/dolls/ual/joints.libsonnet').trunk;
 local spine = ual.spine, neck = ual.neck, head = ual.head, shoulder = ual.shoulder;
 local the(measures, names) = { [name]: measures[name] for name in names };
 {
-  // The pivots the rig turns the trunk, the neck and the head about. Hidden, as the bust family draws no joint.
-  joints:: { spine: spine, neck: neck, head: head },
+  // The pivots the rig turns the trunk, the neck, the head and the left clavicle about; the right clavicle mirrors the
+  // left across x. Hidden, as the bust family draws no joint.
+  joints:: { spine: spine, neck: neck, head: head, clavicle: ual.clavicle },
+  // The height the clavicles lift the shoulder girdles from. Hidden, as only the torso and the clavicle are cut there;
+  // other busts drawn from these measures keep their girdle whole.
+  clavicleCut:: ual.clavicleCut,
   pelvisWidth: 0.33, pelvisDepth: 0.2, pelvisHeight: spine[1],
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   // The chest's top is the neck's joint.
@@ -20,15 +24,16 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   chestLowShare: 0.86,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
+  // The upper arm hangs just ahead of a chest shell's back corners, so they are cut no deeper than this: a deeper cut
+  // brings them forward under the arm's back.
+  // Hidden, as no body part takes it.
+  chestBackCut:: 0.05,
   // The shoulder joint, which the arm pivots on: how far out past the chest's side, how far below its top and how far
   // ahead of the trunk's centre line. The rig and the baked poses were judged on this joint, so moving it asks for them
   // to be judged again.
   shoulderJointOut: shoulder[0] - self.chestWidth / 2,
   shoulderJointBelow: neck[1] - shoulder[1],
   shoulderJointForward: shoulder[2],
-  // The deltoid is round in plan, `deltoidRadius` about the shoulder joint, and its crown stands `deltoidCrown` above
-  // the slope's end, so the slope runs on over a rounded cap. Its plan follows the upper arm it caps.
-  deltoidRadius: 0.051,
   // The neck runs from its joint to the chin, and on into the head to the head's joint.
   neckOverlap: head[1] - neck[1] - self.neckHeight,
   headWidth: 0.165, headHeight: 0.268, headDepth: 0.214, jawHeight: 0.09, hairCover: 0.07,
@@ -54,5 +59,5 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   voxelGrain:: 0.006,
 } + the(ual, [
   'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
-  'trapeziusDrop', 'deltoidCrown', 'neckWidth', 'neckHeight',
+  'trapeziusDrop', 'deltoidCrown', 'deltoidRadius', 'neckWidth', 'neckHeight',
 ])

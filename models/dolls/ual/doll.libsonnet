@@ -1,23 +1,14 @@
 // The UAL doll, one of the dolls of models/dressing.libsonnet: the player's body plan measured off the UAL mannequin's
 // skeleton (models/dolls/ual/measures.libsonnet), so a game playing UAL's clips moves its parts. The fields are the
 // player's (models/dolls/player/doll.libsonnet), which says what each means.
-local measures = import 'models/dolls/ual/measures.libsonnet';
 local skeleton = import 'models/dolls/ual/skeleton.libsonnet';
-local playerHand = import 'models/measures/hand.libsonnet';
-local hand = measures.hand;
 local playerSlots = import 'models/worn-slots.libsonnet';
-// A worn piece's segment names the player's part; here it is drawn in the UAL part that stands for it. The finger
-// phalanges keep their order, the knuckle's first, as the two hands keep their fingers'.
+// A worn piece's segment names the player's part; here it is drawn in the UAL part that stands for it. The digits'
+// parts are named alike on both dolls, so a phalanx segment is drawn in the part of its own name. The clavicles are
+// parts of the bust here, one each side, where the player's are a limb's.
 local part = {
-  body: 'spine_03', upper: 'upperarm', fore: 'lowerarm', palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf',
-  foot: 'foot', toe: 'ball', shaft: 'calf',
-} + {
-  [playerHand.part(playerHand.fingers[i], k)]: hand.part(hand.fingers[i], k)
-  for i in std.range(0, std.length(hand.fingers) - 1)
-  for k in std.range(0, hand.phalanges - 1)
-} + {
-  [playerHand.thumbPart(k)]: hand.thumbPart(k)
-  for k in std.range(0, hand.thumbBones - 1)
+  body: 'spine_03', clavicle: { right: 'clavicle_r', left: 'clavicle_l' }, upper: 'upperarm', fore: 'lowerarm',
+  palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf', foot: 'foot', toe: 'ball', shaft: 'calf',
 };
 {
   pack: 'skelly.body',
@@ -41,7 +32,7 @@ local part = {
     ankle: ['foot#ankle'],
     sole: ['foot#sole', 'ball'],
   },
-  slots: { [segment]: playerSlots[segment] { part: part[segment] } for segment in std.objectFields(playerSlots) },
+  slots: { [segment]: playerSlots[segment] { part: std.get(part, segment, super.part) } for segment in std.objectFields(playerSlots) },
   places: [
     { slot: 'torso', part: 'spine_03', against: [0, 0, 1], sink: 0.5 },
     { slot: 'legs', part: 'thigh', both: true, against: [0, 0, 1], sink: 0.5 },
@@ -51,6 +42,7 @@ local part = {
     { slot: 'back', part: 'spine_03', against: [0, 0, -1], sink: 0 },
     { slot: 'waist', part: 'pelvis', against: [0, 0, 1], sink: 0.5 },
     { slot: 'arms', part: 'upperarm', against: [-1, 0, 0], sink: 0.5 },
+    { slot: 'wrist', part: 'lowerarm', against: [-1, -1, 0], sink: 0.5 },
     { slot: 'hands', part: 'hand', against: [0, 0, 0], sink: 0 },
     { slot: 'feet', part: 'foot', both: true, against: [0, -1, 0], sink: 1 },
   ],

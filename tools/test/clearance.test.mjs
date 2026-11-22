@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { clearanceProbe, coverage, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import {
+  COINCIDENT,
+  clearanceProbe,
+  coverage,
+  posedSolid,
+  sampledSurface,
+  signedDepth,
+} from '../../site/clearance.mjs';
 import { applyPoint, IDENTITY_M, length, rotAxis, rotZ } from '../../site/kinematics.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
@@ -92,6 +99,32 @@ test("a sleeve whose faces lie on its arm's is flush, not poked through", () => 
   assert.ok(flush.length > 0 && flush.every(({ bone }) => bone === 'upper'));
 });
 
+test("a forearm sleeve whose rim ends exactly on a row of the upper arm's samples crosses them edge-on, not flush", () => {
+  // The rim meets the upper arm's sides along a line, which draws no tie: the side below it is inside the sleeve, the
+  // side above it is bare and uncovered.
+  const onSide = sampledSurface(body[0].mesh).find(({ normal, point }) => normal[0] === 1 && point[1] < -0.25);
+  const top = onSide.point[1];
+  const cuffed = { piece: 'sleeve', bone: 'fore', mesh: boxMesh([0.12, top + 0.61, 0.12], [0, (top - 0.61) / 2, 0]) };
+  assert.ok(
+    signedDepth(posedSolid(cuffed.mesh, still.get('fore')), onSide.point) <= COINCIDENT,
+    'the rim crosses the sample',
+  );
+  assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [cuffed] })(still)), CLEAN);
+});
+
+test("a face turned away from the skin's side is not flush with it", () => {
+  // A sleeve whose faces on the arm's sides are wound inwards, so they lie in the skin's plane facing the arm.
+  const { positions, indices } = sleeveMesh(0.1);
+  const inwards = indices.flatMap((_, i) => {
+    if (i % 3) return [];
+    const [a, b, c] = indices.slice(i, i + 3);
+    const onSide = [a, b, c].every((v) => Math.abs(positions[v * 3]) === 0.05);
+    return onSide ? [a, c, b] : [a, b, c];
+  });
+  const turned = { piece: 'sleeve', bone: 'upper', mesh: { positions, indices: inwards } };
+  assert.equal(clearanceProbe(rig, { body, pieces: [turned] })(still).flush.length, 0);
+});
+
 test('an arm face shared with a shell inside the sleeve is hidden, not flush', () => {
   const lined = { piece: 'sleeve', bone: 'upper', mesh: union(sleeveMesh(0.12), sleeveMesh(0.1)) };
   assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [lined] })(still)), CLEAN);
@@ -121,6 +154,15 @@ test("a ray in the plane of a shell's foot leaves its part through the last face
     pieces: [{ piece: 'bag', bone: 'spine', mesh: boxMesh([0.0625, 0.0625, 0.0625], [-0.25, 0, 0]) }],
   };
   assert.equal(coverage(spine, rest)('spine', { point: [0.125, 0, 0], normal: [1, 0, 0] }), -1);
+});
+
+test('a piece passes beneath none of a part across its joint that it names bare', () => {
+  // The sleeve runs past the elbow over the wider forearm, whose sides would poke out of it, but leaves the forearm bare.
+  const named = { body: body.map((part) => ({ ...part, part: part.bone })), pieces: [sleeve(0.12, 0.4)] };
+  const wide = [named.body[0], { ...named.body[1], mesh: boxMesh([0.14, 0.3, 0.14], [0, -0.45, 0]) }];
+  const bare = { ...named.pieces[0], bare: ['fore'] };
+  assert.ok(clearanceProbe(rig, { body: wide, pieces: named.pieces })(still).pokes.length > 0);
+  assert.deepEqual(counted(clearanceProbe(rig, { body: wide, pieces: [bare] })(still)), CLEAN);
 });
 
 test("a piece hung against a part's side covers none of the rest of the part", () => {

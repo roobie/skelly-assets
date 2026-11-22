@@ -177,7 +177,13 @@ export async function buildFigure(data, wear) {
     const mesh = worldMesh(part);
     if (mesh.indices.length > 0) rest.body.push({ bone: bone.id, part: bone.bind.part, mesh });
     for (const { site, group } of pieces)
-      rest.pieces.push({ piece: site.model, bone: bone.id, covers: site.covers, mesh: worldMesh(group) });
+      rest.pieces.push({
+        piece: site.model,
+        bone: bone.id,
+        covers: site.covers,
+        ...(site.bare ? { bare: site.bare } : {}),
+        mesh: worldMesh(group),
+      });
   }
   const bones = new Map(bound.map((entry) => [entry.bone.id, entry]));
   let clearance;

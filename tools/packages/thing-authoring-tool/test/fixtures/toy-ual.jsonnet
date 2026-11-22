@@ -1,6 +1,6 @@
 // A toy doll shaped like a skeleton that is not the player's, as the UAL mannequin's is: the player's measures with the
 // trunk bent at three spine joints and the clavicles, joints off the limbs' centre lines, a foot bending at its ball,
-// a knuckle row of its own and its own part names. The families' parameters for such a body are checked on it.
+// and a knuckle row of its own. The families' parameters for such a body are checked on it.
 local h = import 'packages/thing-authoring-tool/compound.libsonnet';
 local fit = import 'packages/thing-authoring-tool/worn-fit.libsonnet';
 local arm = import 'models/measures/arm.libsonnet';
@@ -9,8 +9,7 @@ local bust = import 'models/measures/bust.libsonnet';
 local girdle = (import 'models/girdle.libsonnet')(bust);
 local band = import 'models/head-band.libsonnet';
 local hand = (import 'models/measures/hand.libsonnet') + {
-  part(finger, k):: '%s_%02d' % [finger, k + 1],
-  // A knuckle row straighter than the player's, a few millimetres further from the wrist.
+  // A knuckle row a few millimetres further from the wrist than the player's.
   knuckles:: [[k[0], k[1] - 0.004, k[2]] for k in super.knuckles],
 };
 local skin = { skin: 'body-skin-player', underwear: 'cloth-pants-player' };
@@ -31,7 +30,7 @@ local bustOrigins = {
 local bustPart(segment) = h.part(segment, 'bust', 1, girdle.bustParams {
   segment: segment,
   hairRing: band.hairRing,
-  clavicleCut: clavicleCut,
+  clavicleCut::: clavicleCut,
   origins: bustOrigins,
 }, skin);
 
