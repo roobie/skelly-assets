@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 10 },
+  "rig": { "id": "doll", "revision": 11 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
@@ -27,7 +27,7 @@
       "at": [0.4787, 1.34, -0.2513],
       "turn": [-0.0168, 0.9685, 0.036, 0.2457],
       "pole": [-0.3, -1, 0],
-      "socket": { "at": [0, 0, -0.21], "into": [1, 0, 0], "axis": [0, 0, 1] },
+      "socket": { "at": [0, 0, -0.2], "into": [1, 0, 0], "axis": [0, 0, 1] },
       "grip": 0.5
     }
   }

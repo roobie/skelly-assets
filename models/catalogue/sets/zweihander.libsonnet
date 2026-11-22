@@ -34,7 +34,7 @@ local lug = {
 local cross = { thickness: 0.024, span: 0.45, blockHalfWidth: 0.028, blockHalfThickness: 0.014 };
 local ring = { radius: 0.04, bar: 0.007, steps: 8 };
 
-local gripLength = 0.39;
+local gripLength = 0.44;
 local collarLength = 0.008;
 local swellLength = 0.012;
 local pommelLength = 0.065;

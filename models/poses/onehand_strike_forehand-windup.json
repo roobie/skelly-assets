@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 10 },
+  "rig": { "id": "doll", "revision": 11 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
@@ -20,7 +20,7 @@
       "model": "baseball_bat",
       "at": [-0.4887, 1.6847, -0.0838],
       "turn": [-0.7136, -0.3402, -0.0027, 0.6124],
-      "pole": [-1, -0.3, 0],
+      "pole": [-1, -0.6, 0],
       "socket": { "at": [0, 0, -0.3], "into": [1, 0, 0], "axis": [0, 0, 1] },
       "grip": 0.5
     }

@@ -115,7 +115,7 @@ local thumbBones = {
     // palm under the little finger. Each finger then reaches the same way round it; held square, as a bar is, the
     // little finger, whose knuckle sits furthest back, stands off a handle the others wrap. Much past a quarter turn
     // the index finger's root comes onto the handle and opens the fist from the other end.
-    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, grip: 0.65, gripSlant: 20,
+    hand: arm { part: 'palm', parent: 'forearm', pivot: 'origin', flexAxis: [0, 0, -1], reach: { pole: joints.poles.hand }, grip: 0.72, gripSlant: 20,
                 limits: joints.wrist },
     thigh: leg { part: 'thigh', parent: 'pelvis', pivot: 'origin', flexAxis: [-1, 0, 0], limits: joints.thigh },
     shin: leg { part: 'shin', parent: 'thigh', pivot: 'origin', flexAxis: [1, 0, 0], limits: joints.knee },
