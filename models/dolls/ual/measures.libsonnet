@@ -31,7 +31,7 @@ local bust = {
   pelvisWidth: 0.32, pelvisDepth: 0.22,
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   chestHeight: level('neck_01') - chestFoot,
-  armpit: (trunk.chestJoint - chestFoot) / self.chestHeight,
+  armpit: (trunk.chestJoint[1] - chestFoot) / self.chestHeight,
   chestLowShare: 0.95,
   clavicleCut: trunk.clavicleCut,
   // The shoulder joint is upperarm's head: out past the chest's side, below its top and behind the centre line.
