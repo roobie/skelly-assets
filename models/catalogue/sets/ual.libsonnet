@@ -101,7 +101,9 @@ local legSocket(of, child) = jointSocket(child, sub(legOrigin(child), legOrigin(
     exportMass: 'parts',
     taxonomy: taxonomy,
     voxelGrain: grain,
-    // The pelvis is the root, so the bust's frame is the pelvis bone's, at its head.
+    // The pelvis is the root, at its bone's head in the bust's frame, which is the player's: the pieces fitted to the
+    // player's bust are drawn on that frame's lattice, so UAL's flesh lies on it too.
+    rootAt: bustOrigins.pelvis,
     parts: [
       bustPart('pelvis', 7, { underwear: underwear }),
       bustPart('spine_01', 8, skinned),
