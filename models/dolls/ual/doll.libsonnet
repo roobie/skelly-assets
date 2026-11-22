@@ -4,10 +4,11 @@
 local skeleton = import 'models/dolls/ual/skeleton.libsonnet';
 local playerSlots = import 'models/worn-slots.libsonnet';
 // A worn piece's segment names the player's part; here it is drawn in the UAL part that stands for it. The digits'
-// parts are named alike on both dolls, so a phalanx segment is drawn in the part of its own name.
+// parts are named alike on both dolls, so a phalanx segment is drawn in the part of its own name. The clavicles are
+// parts of the bust here, one each side, where the player's are a limb's.
 local part = {
-  body: 'spine_03', upper: 'upperarm', fore: 'lowerarm', palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf',
-  foot: 'foot', toe: 'ball', shaft: 'calf',
+  body: 'spine_03', clavicle: { right: 'clavicle_r', left: 'clavicle_l' }, upper: 'upperarm', fore: 'lowerarm',
+  palm: 'hand', pelvis: 'pelvis', thigh: 'thigh', shin: 'calf', foot: 'foot', toe: 'ball', shaft: 'calf',
 };
 {
   pack: 'skelly.body',

@@ -98,6 +98,40 @@ test("a worn piece is drawn in every copy of its segment's part, the left one mi
   close(pieces[2].at, [0, 0, 0]);
 });
 
+test("a piece whose part the doll has as a part of the bust on each side is drawn in each side's, the mirrored side's mirrored", () => {
+  const strapped = {
+    ...dressing,
+    slots: { ...dressing.slots, yoke: { slot: 'torso', part: { right: 'yoke_r', left: 'yoke_l' } } },
+  };
+  const strappedDoll = dollOf(strapped, {
+    ...figure,
+    bust: {
+      ...figure.bust,
+      parts: [
+        ...figure.bust.parts,
+        { part: 'yoke_r', at: [-0.1, 0.5, 0], box: box([-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]) },
+        { part: 'yoke_l', at: [0.1, 0.5, 0], box: box([0.05, 0.45, -0.05], [0.2, 0.55, 0.05]) },
+      ],
+    },
+  });
+  const models = [model('coat', { slot: ['torso'] }), model('coat_worn_yoke', { fit: ['worn'] })];
+  const pieces = wornSites(models[0], { dressing: strapped, doll: strappedDoll, models }).slice(
+    strappedDoll.sites.length,
+  );
+  assert.deepEqual(
+    pieces.map(({ part, side, mirror }) => [part, side, Boolean(mirror)]),
+    [
+      ['yoke_r', 'centre', false],
+      ['yoke_l', 'centre', true],
+    ],
+  );
+  close(pieces[1].at, [0.1, 0.5, 0]);
+  assert.match(
+    wornRefusal(models[0], { dressing: strapped, doll, models }) ?? '',
+    /the doll has no part yoke_r or yoke_l/,
+  );
+});
+
 test('a piece that covers some of its part names, in every copy, the doll site that draws that copy', () => {
   const models = [
     model('coat', { slot: ['torso'] }),
