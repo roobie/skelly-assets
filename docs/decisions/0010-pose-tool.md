@@ -70,9 +70,11 @@ is held between two pads, a contact closing finds no such pair, and the author k
 on. The pose report gives each pinching digit's miss rather than the limits it met, since CCD presses against limits on
 its way to a point it still reaches.
 
-A power grip seats a handle deep in the palm (the hand bone's `grip` share), in the wedge between the palm and the
-lifted thumb's root, so the palm's heel and the thumb's root both bear on it and the fingers wrap right round it into
-a fist; seated at the knuckle crease, the fingers only hook it and the palm stands beside it like a paddle. The
+A power grip seats a handle across the palm short of the knuckle crease (the hand bone's `grip` share), where the
+fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook it and the palm stands
+beside it like a paddle. The thumb's root sits nearer the wrist than the handle, so the grip preset brings the thumb
+down already curled: its first segment lands on the handle and its tip folds over onto the fingers, where a straight
+thumb would land its tip on the fingers first and stand its segment off the handle. The
 knuckle row slants back toward the little finger, as the metacarpal heads arc, so the fist steps down from index to
 little; a palm split in two would arch the same way only with another bone and part for every hand, glove and mob to
 carry. The handle crosses the palm slanted

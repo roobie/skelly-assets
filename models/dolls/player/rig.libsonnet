@@ -107,10 +107,11 @@ local thumbBones = {
     // The palm faces the body with the thumb forward, so the wrist flexes about the knuckle row, as the fingers do;
     // about the arm's flex axis a turn would move the hand in the palm's plane.
     // `grip`: where a handle held in a power grip crosses the palm's middle, as a share of its length from the wrist
-    // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle deep in the
-    // palm, in the wedge between the palm and the lifted thumb's root, so the palm's heel and the thumb's root both
-    // bear on it and the fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook
-    // it and the palm stands beside it like a paddle. `gripSlant`: how far in degrees the handle turns from square
+    // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle across the
+    // palm short of the knuckle crease, where the fingers wrap right round it into a fist and the thumb's first segment
+    // comes down onto it (the grip preset's thumb, models/poses/hands.libsonnet); further toward the wrist, where the
+    // thumb's root sits, the fingers cannot reach round, and at the crease they only hook it and the palm stands beside
+    // it like a paddle. `gripSlant`: how far in degrees the handle turns from square
     // across the palm, its thumb end toward the fingers, so it runs from the index finger's root to the heel of the
     // palm under the little finger. Each finger then reaches the same way round it; held square, as a bar is, the
     // little finger, whose knuckle sits furthest back, stands off a handle the others wrap. Much past a quarter turn
