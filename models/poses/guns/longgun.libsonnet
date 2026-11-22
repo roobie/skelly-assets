@@ -9,17 +9,25 @@
 // `walks` names the stances the doll walks in, as the melee classes' do (models/poses/wields/wields.libsonnet): a gun
 // is `held`, both hands on it, since a gun swung in one hand points anywhere.
 local body = import '../wields/body.libsonnet';
+local clavicle = import 'models/dolls/player/clavicle.libsonnet';
 local pocket = import 'pocket.libsonnet';
 // Bladed, the left shoulder forward and leaning in, as the press check stands: the further a gun's fore-end lies ahead,
 // the further the chest turns to bring the left hand within its reach. `twist` turns the chest and `lean` tips it
-// forward (degrees).
-local bladed(twist, lean) = body { spine: [lean, -twist, 0], 'thigh.R': [5, 0, -3], 'thigh.L': [5, 0, 3] };
-// How a stance stands unless the family's `stands` says otherwise: the chest's `twist` and `lean`, the butt's `pocket`
-// (pocket.libsonnet's inside, below, behind), the bore's `pitch` and the elbows' `poles`. A stance giving no pitch
-// holds the bore level.
+// forward (degrees); `shoulder` brings the right shoulder forward on its clavicle (metres), which the right side's
+// mirrored joint takes as a negative flex.
+local bladed(twist, lean, shoulder) = body {
+  spine: [lean, -twist, 0],
+  'clavicle.R': [-clavicle.protraction(shoulder), 0, 0],
+  'thigh.R': [5, 0, -3],
+  'thigh.L': [5, 0, 3],
+};
+// How a stance stands unless the family's `stands` says otherwise: the chest's `twist` and `lean`, the right
+// `shoulder`'s travel forward, the butt's `pocket` (pocket.libsonnet's inside, below, behind, read off the chest
+// whatever the shoulder's travel), the bore's `pitch` and the elbows' `poles`. A stance giving no pitch holds the bore
+// level.
 local defaults = {
-  idle: { twist: 55, lean: 4, pocket: [0.024, 0.07, 0], pitch: 22, poles: { 'hand.R': [-1, -0.3, 0], 'hand.L': [-0.3, -1, 0] } },
-  guard: { twist: 50, lean: 10, pocket: [-0.0035, 0.03, 0.025], poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
+  idle: { twist: 55, lean: 4, shoulder: 0, pocket: [0.024, 0.07, 0], pitch: 22, poles: { 'hand.R': [-1, -0.3, 0], 'hand.L': [-0.3, -1, 0] } },
+  guard: { twist: 50, lean: 10, shoulder: 0, pocket: [-0.0035, 0.03, 0.025], poles: { 'hand.R': [-1, -0.45, 0.3], 'hand.L': [-0.2, -1, 0.2] } },
 };
 // The bore turned back past the twist lies across the lean by the twist's share of it, so it is raised back by that
 // share alone to stand level.
@@ -45,7 +53,7 @@ function(model, sockets, stands={}, swayLimitDeg=null)
       // chest's ahead, so the gun points at the ground ahead rather than at anyone and comes up to guard by a lift of
       // the arms.
       idle: {
-        body: bladed(stand.idle.twist, stand.idle.lean),
+        body: bladed(stand.idle.twist, stand.idle.lean, stand.idle.shoulder),
         weapon: weapon(stand.idle, stand.idle.twist + 5),
       },
       // Shouldered, ready to fire, leaning into the gun: the chest tipped forward over the hips, the butt in the pocket
@@ -54,7 +62,7 @@ function(model, sockets, stands={}, swayLimitDeg=null)
       // (its pitch raised back past the chest's lean), the left elbow under the fore-end, and the head jutted forward,
       // bowed and tilted onto the stock, the eyes down the sight.
       guard: {
-        body: bladed(stand.guard.twist, stand.guard.lean),
+        body: bladed(stand.guard.twist, stand.guard.lean, stand.guard.shoulder),
         weapon: weapon(stand.guard, stand.guard.twist),
         sight: { tilt: 30, jut: 15, lean: 10 },
       },

@@ -3,6 +3,8 @@
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {
+    "clavicle.L": [0, 0, 0],
+    "clavicle.R": [0, 0, 0],
     "pelvis": [0, -15, 0],
     "shin.L": [12, 0, 0],
     "shin.R": [14, 0, 0],
