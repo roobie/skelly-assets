@@ -22,7 +22,17 @@ const near = (actual, expected, what, within = MM) =>
 const span = (a, b) => Math.hypot(...a.map((v, i) => v - b[i]));
 
 test("the player's arm and hand are as thick and as long as UAL's", () => {
-  for (const girth of ['upperWidth', 'upperDepth', 'foreWidth', 'wristWidth', 'palmLength', 'palmWidth', 'palmThickness', 'fingerLength', 'thumbLength'])
+  for (const girth of [
+    'upperWidth',
+    'upperDepth',
+    'foreWidth',
+    'wristWidth',
+    'palmLength',
+    'palmWidth',
+    'palmThickness',
+    'fingerLength',
+    'thumbLength',
+  ])
     near(player[girth], ual[girth], girth);
 });
 
@@ -35,7 +45,12 @@ test("the player's built elbow and wrist stand as far from the joint before them
   ]) {
     const child = boneOf(`${bone}.L`);
     const ualJoint = skeleton[`${joint}_l`];
-    near(span(child.head, boneOf(child.parent).head), span(ualJoint.head, skeleton[ualJoint.parent].head), `${bone}.L`, JOINT);
+    near(
+      span(child.head, boneOf(child.parent).head),
+      span(ualJoint.head, skeleton[ualJoint.parent].head),
+      `${bone}.L`,
+      JOINT,
+    );
   }
 });
 
@@ -48,7 +63,9 @@ test("the player's built knuckles stand where UAL's do, and each digit bone runs
     near(along(`${joint}.L`), fromWrist(joint), `${joint}.L from the wrist`, JOINT),
   );
   player.fingers.forEach((finger, i) =>
-    [1, 2].forEach((k) => near(along(`${finger}_0${k + 1}.L`), player.phalanxLengths[i][k - 1], `${finger}_0${k}.L`, JOINT)),
+    [1, 2].forEach((k) =>
+      near(along(`${finger}_0${k + 1}.L`), player.phalanxLengths[i][k - 1], `${finger}_0${k}.L`, JOINT),
+    ),
   );
   [1, 2].forEach((k) => near(along(`thumb_0${k + 1}.L`), player.thumbLengths[k - 1], `thumb_0${k}.L`, JOINT));
 });
