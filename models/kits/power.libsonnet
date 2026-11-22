@@ -43,11 +43,8 @@ local chestSide = bust.chestWidth / 2;
 // The chest and its breast plate are cut to the shoulders' slope under the trooper's deltoid caps, which this set
 // keeps.
 local shoulderRise = fit.trooperChestRise;
-// The upper arm hangs just ahead of the chest's back corners, so they are cut no deeper than this: a deeper cut brings
-// them forward under the arm's back.
-local chestCut = 0.05;
 local bodyAdd = [
-  oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, bust.chestWidth + 0.03, chestD, chestCut) + { clip: fit.trapezius(shoulderRise) },
+  oct('chest', 'plate', ribTop - 0.03, chestTop + shoulderRise, bust.chestWidth + 0.03, chestD, bust.chestBackCut) + { clip: fit.trapezius(shoulderRise) },
   // Angular breast plate: a wedge that juts forward at the bottom of the chest.
   h.prism('breast', 'plate', 'x', [[ribTop - 0.03, front - 0.01], [ribTop - 0.03, front + 0.04], [chestTop - 0.045, front + 0.012], [chestTop - 0.02, front - 0.01]], -(chestSide - 0.01), chestSide - 0.01)
   + { clip: fit.trapezius(shoulderRise) },

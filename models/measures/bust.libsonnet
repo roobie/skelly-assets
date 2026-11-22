@@ -20,6 +20,10 @@ local the(measures, names) = { [name]: measures[name] for name in names };
   chestLowShare: 0.86,
   // The hips', waist's and ribs' plan corners are cut at `torsoChamfer`, the chest's at `chestChamfer`.
   torsoChamfer: 0.05, chestChamfer: 0.06,
+  // The upper arm hangs just ahead of a chest shell's back corners, so they are cut no deeper than this: a deeper cut
+  // brings them forward under the arm's back.
+  // Hidden, as no body part takes it.
+  chestBackCut:: 0.05,
   // The shoulder joint, which the arm pivots on: how far out past the chest's side, how far below its top and how far
   // ahead of the trunk's centre line. The rig and the baked poses were judged on this joint, so moving it asks for them
   // to be judged again.
