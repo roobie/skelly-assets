@@ -129,5 +129,5 @@ local wristComputer = [
   // mm long.
   h.compound('crystal_wrist_computer', 0.07, wristComputer,
              { housing: 'jade-green', face: 'crystal-glow-blue', button: 'metal-gold', strap: 'plastic-charcoal', clasp: 'metal-gold' }) + { title: 'Crystal wrist computer' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['sci-fi'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'electrical', tags: { material: ['plastic', 'metal'], setting: ['sci-fi'], slot: ['wrist'] } } },
 ]

@@ -205,7 +205,7 @@ local flower(prefix, slot, x, z, y0=0.002) =
              ])
              + [box('clasp', 'link', [-0.009, 0, -0.112], [0.009, 0.007, -0.098])],
              { case: 'metal-gold', dial: 'enamel-white', crystal: 'glass-clear', hand: 'plastic-black', link: 'metal-gold' }) + { title: 'Gold watch' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'glass'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'glass'], setting: ['modern'], slot: ['wrist'] } } },
 
   // A fine chain necklace laid out in a loop 140 mm across, with a 26 mm round pendant at the front: a medallion
   // bearing a raised ring and an eight-rayed star of a faith nobody remembers.

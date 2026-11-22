@@ -115,7 +115,7 @@ local cartridgeStrap(len, sw, t, n, cr, loopW) =
     h.turned('loop-%d' % k, 'loop', 'z', [[0, ri], [0, ro], [0.04, ro], [0.04, ri], [0, ri]], [x, 0.003 + ro - 0.001, -0.02])
     for k in std.range(0, 4)
   ], { band: 'cloth-canvas', loop: 'cloth-canvas', hook: 'hook-loop-grey' }) + { title: 'Wrist cartridge band' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'containers', tags: { material: ['fabric'], slot: ['wrist'] } } },
 
   // A cotton bandolier laid flat: four magazine pockets 80 mm wide, 190 mm long and 28 mm thick sewn in a row, each
   // under a flap with a press stud, and its sling strap 30 mm wide laid out in a loop from both ends to a buckle.

@@ -179,7 +179,7 @@ local cartridgeNecklace(id, mass, body) =
              + [box('clasp', 'link', [-0.011, 0.002, -0.11], [0.011, 0.008, -0.1])]
              + [h.disc('lug-%d' % i, 'case', 0.003, 0.002, 0.008, p[0], p[1]) for i in std.range(0, 3) for p in [[[-0.007, -0.019], [0.007, -0.019], [-0.007, 0.019], [0.007, 0.019]][i]]],
              { case: 'steel-bright', bezel: 'plastic-matte-black', mark: 'enamel-white', dial: 'lacquer-black', hand: 'enamel-white', link: 'steel-bright', centre: 'steel-grey' }) + { title: 'Diving watch' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'plastic'], setting: ['modern'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', tags: { material: ['metal', 'plastic'], setting: ['modern'], slot: ['wrist'] } } },
 
   // Plug: a single tortoiseshell-plastic ear spool 20 mm across and 12 mm long, flared at both ends round a black-lined 8 mm bore,
   // standing on one face.

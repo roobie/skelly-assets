@@ -41,6 +41,7 @@ local part = {
     { slot: 'back', part: 'spine_03', against: [0, 0, -1], sink: 0 },
     { slot: 'waist', part: 'pelvis', against: [0, 0, 1], sink: 0.5 },
     { slot: 'arms', part: 'upperarm', against: [-1, 0, 0], sink: 0.5 },
+    { slot: 'wrist', part: 'lowerarm', against: [-1, -1, 0], sink: 0.5 },
     { slot: 'hands', part: 'hand', against: [0, 0, 0], sink: 0 },
     { slot: 'feet', part: 'foot', both: true, against: [0, -1, 0], sink: 1 },
   ],

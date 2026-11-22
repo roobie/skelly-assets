@@ -54,6 +54,8 @@ local armRest = import 'models/arm-rest.libsonnet';
     { slot: 'back', part: 'torso', against: [0, 0, -1], sink: 0 },
     { slot: 'waist', part: 'pelvis', against: [0, 0, 1], sink: 0.5 },
     { slot: 'arms', part: 'upper', against: [-1, 0, 0], sink: 0.5 },
+    // On the back of the wrist: outside the forearm, straddling its end by the wearable's own height.
+    { slot: 'wrist', part: 'fore', against: [-1, -1, 0], sink: 0.5 },
     { slot: 'hands', part: 'palm', against: [0, 0, 0], sink: 0 },
     { slot: 'feet', part: 'foot', both: true, against: [0, -1, 0], sink: 1 },
   ],

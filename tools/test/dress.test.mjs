@@ -7,14 +7,17 @@ import { modelSources } from '../check-sources.mjs';
 import {
   coveringItems,
   dollDressing,
+  dollDressings,
   dollOf,
   isWearable,
   modelBox,
   modelParts,
   PLAYER,
+  placeOf,
   readDollParts,
   readDressing,
   wornOnParts,
+  wornPiece,
   wornPieces,
   wornRefusal,
   wornSites,
@@ -187,14 +190,14 @@ test("every worn piece, over other clothing too, and every wearable with no piec
   assert.deepEqual(new Set(dollParts.sided), new Set(bones.filter(({ sided }) => sided).map(({ part }) => part)));
   const sources = await modelSources(repo);
   const tags = (entry, facet) => entry.taxonomy?.tags?.[facet] ?? [];
-  const pieces = sources.filter((entry) => tags(entry, 'fit').includes('worn') && /_worn(_[^_]+)?$/.test(entry.id));
-  const garments = new Set(pieces.map(({ id }) => id.replace(/_worn(_[^_]+)?$/, '')));
+  const pieces = sources.filter((entry) => tags(entry, 'fit').includes('worn') && wornPiece(entry.id) !== undefined);
+  const garments = new Set(pieces.map(({ id }) => wornPiece(id)?.garment));
   const placed = sources.filter(
     (entry) => tags(entry, 'fit').length === 0 && tags(entry, 'slot').length > 0 && !garments.has(entry.id),
   );
   const pieceParts = new Map(
     pieces.map(({ id }) => {
-      const segment = /_worn_([^_]+)$/.exec(id)?.[1];
+      const segment = wornPiece(id)?.segment;
       return [id, { part: segment === undefined ? dressing.piece : wornSlots[segment].part }];
     }),
   );
@@ -396,4 +399,13 @@ test('every body slot the vocabulary names has a place on the doll, and every se
       .map(([segment]) => segment),
     [],
   );
+});
+
+test('on every doll a watch rests on the back of the wrist, the hand end of the part its forearm pieces are drawn in', () => {
+  const watch = model('watch', { slot: ['wrist'] });
+  for (const dressing of dollDressings(readDressing(repo))) {
+    const place = placeOf(watch, dressing);
+    assert.equal(place.part, dressing.slots.fore.part, `${dressing.id}: the watch is placed off the forearm`);
+    assert.ok(place.against?.[1] < 0, `${dressing.id}: the watch does not rest at the forearm's hand end`);
+  }
 });

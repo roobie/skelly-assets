@@ -110,7 +110,7 @@ local tiaraStone(id, a, y, r) = h.turned(id, 'stone', 'z', [[0, 0], [0, r], [0.0
     cabochon('stone-%d' % i, 'stone', 0.0035, 0.002, 0.032 * std.sin(rad(60 * i)), 0.004, 0.032 * std.cos(rad(60 * i)))
     for i in std.range(0, 5)
   ], { metal: 'metal-gold', stone: 'gem-onyx' }) + { title: 'Onyx and gold bracelet' }
-  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['arms'] } } },
+  + { voxelGrain: 0.002 } + { taxonomy: { category: 'clothing', keywords: ['jewellery'], tags: { material: ['metal', 'stone'], slot: ['wrist'] } } },
 
   // A pair of gold cufflinks lying face up, each 16 mm across and 13 mm tall: a round gold face inset with black onyx
   // on a short post over a swivel bar.
