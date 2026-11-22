@@ -117,5 +117,13 @@ local palmWidth = 0.1;
     length: head('thigh_l')[1],
     thighLength: -knee[1],
     shoeHeight: head('foot_l')[1],
+    // The girths are flesh, set by hand against the mannequin: a boot is fitted round the shoe's width, so a doll whose
+    // foot stood wider would come out through every boot.
+    thighWidth: 0.15, thighDepth: 0.19,
+    shinWidth: 0.11, shinDepth: 0.12,
+    shoeWidth: 0.1,
+    // The toes' tips and the heel's back, from the ankle's joint along z: flesh, set by hand against the mannequin's
+    // shoe, since its skeleton ends the toes at ball_leaf, short of their tips, and has no heel.
+    toeReach: 0.2408, heelReach: 0.0612,
   },
 }

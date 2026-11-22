@@ -57,12 +57,6 @@ local arm = joints.arm {
 
 local leg = joints.leg {
   thighTop: playerLeg.hipsOverlap - level('thigh_l'),
-  thighWidth: 0.155, thighDepth: 0.19,
-  shinWidth: 0.11, shinDepth: 0.135,
-  shoeWidth: 0.11,
-  // The toes' tips and the heel's back, from the ankle's joint along z: flesh, set by hand against the mannequin's
-  // shoe, since its skeleton ends the toes at ball_leaf, short of their tips, and has no heel.
-  toeReach: 0.2408, heelReach: 0.0612,
 } + the(playerLeg, [
   'thighChamfer', 'shinChamfer', 'shoeChamfer', 'kneeOverlap', 'ankleOverlap', 'upperSideInset', 'upperLengthInset',
   'upperBackShift',
