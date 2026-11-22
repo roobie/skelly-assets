@@ -1,0 +1,16 @@
+---
+type: breaking
+---
+The player's arms hang from clavicles, so a pose can bring a shoulder forward rather than turn the whole chest to put it behind a gun. Each clavicle is a bone of its own, `clavicle.L` and `clavicle.R`, between the spine and the upper arm, turning at UAL's clavicle head, 0.0188 m either side of the middle, 0.6179 m up the bust and 0.0714 m ahead of it. Its flex brings the shoulder forward about the vertical through that joint, up to 28.72°, which carries the shoulder joint 0.10 m forward and 0.044 m out; the range is set by that travel, so a pose gives the shoulder's travel in metres and the angle follows. It draws back 10°, 0.028 m, and lifts or drops 5°, 0.019 m at the shoulder: no pose asks for more yet, and the girdle it turns opens a seam below its cut when lifted and runs into the chest when drawn back. It does not twist. The right side's flex is mirrored, so bringing the right shoulder forward is a negative flex. The rig's revision is 12, and a pose that names no clavicle rests it at zero. The player's clips (`player.1`) animate no clavicle, so under them it rests at zero too.
+
+The bust's girdle is cut off the torso 0.5612 m up, beyond the neck's sides 0.06 m either side of the middle, and each side is drawn in a new model, `player_clavicle`, with the deltoid, so the shoulder's flesh comes forward with the arm. The `shoulders` region names the clavicle with the torso's shoulders.
+
+Body shells that reach over the shoulders share their girdle with a clavicle piece, `<garment>_worn_clavicle`, drawn in the `clavicle` segment of the `torso` slot, so a coat's shoulder follows the arm forward: the heavy, plate, power and trooper armour, the hoodie, the jacket, the leather jacket and the wizard robe. The plate cuirass's harness is its own file, so the warrior statue still carves it whole. A tank top's straps stay on the trunk, so a shoulder brought forward comes out from under them. A piece that declares what it covers is taken by the rest probe to leave bare the other parts of a region it covers none of, as a tank top covering the trunk leaves the clavicles bare with the shoulders. The UAL doll wears a garment's clavicle pieces on the clavicles of its own bust.
+
+Every wield key frame names both clavicles, so any two keys blend bone for bone. The pump shotgun's low ready brings the right shoulder fully forward, turns the chest 66° rather than 78°, seats the butt 0.01 m further out and 0.01 m higher in the pocket, and flares the right elbow about 0.15 m further out, so the stock no longer sinks into the upper arm.
+
+Upgrade:
+- Re-target pose files to the doll rig's revision 12, and add `clavicle.L` and `clavicle.R` to any pose that should bring a shoulder forward; a pose without them rests them at zero.
+- Re-import the wield and press check clips and their pose files: their key frames name the clavicles, and the pump shotgun's low ready is re-posed.
+- Dress the new `<garment>_worn_clavicle` pieces with their garments, in the `clavicle` segment's part, or the shoulder is left bare.
+- Re-seat anything drawn over the shoulders of the player's bust or the body shells above: the girdle is now drawn in the clavicles, not the torso.
