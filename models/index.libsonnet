@@ -231,6 +231,7 @@ std.flattenArrays([
   import 'models/catalogue/sets/medieval-timber.libsonnet',
   import 'models/catalogue/sets/notebook.libsonnet',
   import 'models/catalogue/sets/packages.libsonnet',
+  import 'models/catalogue/sets/plant-spares.libsonnet',
   import 'models/catalogue/sets/stash-chest.libsonnet',
   import 'models/catalogue/sets/supplies.libsonnet',
   import 'models/catalogue/sets/ual.libsonnet',

@@ -231,6 +231,7 @@
   'medieval-timber': import 'models/catalogue/sets/medieval-timber.libsonnet',
   'notebook': import 'models/catalogue/sets/notebook.libsonnet',
   'packages': import 'models/catalogue/sets/packages.libsonnet',
+  'plant-spares': import 'models/catalogue/sets/plant-spares.libsonnet',
   'stash-chest': import 'models/catalogue/sets/stash-chest.libsonnet',
   'supplies': import 'models/catalogue/sets/supplies.libsonnet',
   'ual': import 'models/catalogue/sets/ual.libsonnet',

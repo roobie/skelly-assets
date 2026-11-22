@@ -232,6 +232,7 @@ local heads = import 'tools/jsonnet/heads.libsonnet';
   'models/catalogue/sets/medieval-timber.libsonnet': heads.of(import 'models/catalogue/sets/medieval-timber.libsonnet'),
   'models/catalogue/sets/notebook.libsonnet': heads.of(import 'models/catalogue/sets/notebook.libsonnet'),
   'models/catalogue/sets/packages.libsonnet': heads.of(import 'models/catalogue/sets/packages.libsonnet'),
+  'models/catalogue/sets/plant-spares.libsonnet': heads.of(import 'models/catalogue/sets/plant-spares.libsonnet'),
   'models/catalogue/sets/stash-chest.libsonnet': heads.of(import 'models/catalogue/sets/stash-chest.libsonnet'),
   'models/catalogue/sets/supplies.libsonnet': heads.of(import 'models/catalogue/sets/supplies.libsonnet'),
   'models/catalogue/sets/ual.libsonnet': heads.of(import 'models/catalogue/sets/ual.libsonnet'),

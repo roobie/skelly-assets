@@ -41,11 +41,13 @@ local wornIn = {
   'weapon-parts': 'skelly.wearables',
 };
 // Shields are armour, but a game hands them out with the melee weapons they are carried with. Fuzes arm explosives,
-// not guns. A grenade or a trap is a weapon but no melee weapon, so each keeps the shelf of its own kind.
+// not guns. A grenade or a trap is a weapon but no melee weapon, so each keeps the shelf of its own kind. A plant's
+// service spares share its power shelf, rather than making a consumer load the machinery catalogue.
 local placed = {
   'skelly.melee': ['kite_shield', 'tower_shield'],
   'skelly.explosives': ['delay_fuze', 'frag_grenade', 'impact_fuze'],
   'skelly.traps': ['bear_trap'],
+  'skelly.electric-power': ['exciter_brush_set', 'governor_linkage', 'field_fuse', 'bearing_oiler'],
 };
 local placedIn = { [id]: pack for pack in std.objectFields(placed) for id in placed[pack] };
 // A worn piece goes to the pack a game dresses a body from, whatever its garment's shelf, but for a sling's, which a
