@@ -132,6 +132,25 @@ test("a piece whose part the doll has as a part of the bust on each side is draw
   );
 });
 
+test("a slot's origin, the fitted part's in its own, is where its pieces are drawn, mirrored with the copy", () => {
+  const shifted = {
+    ...dressing,
+    slots: {
+      body: { ...dressing.slots.body, origin: [0, -0.1, 0.02] },
+      cuff: { ...dressing.slots.cuff, origin: [0.05, 0.1, 0] },
+    },
+  };
+  const models = [
+    model('coat', { slot: ['torso'] }),
+    model('coat_worn_body', { fit: ['worn'] }),
+    model('coat_worn_cuff', { fit: ['worn'] }),
+  ];
+  const [body, right, left] = wornSites(models[0], { dressing: shifted, doll, models }).slice(doll.sites.length);
+  close(body.at, [0, -0.1, 0.02]);
+  close(right.at, [-0.25, 0.3, 0]);
+  close(left.at, [0.25, 0.3, 0]);
+});
+
 test('a piece that covers some of its part names, in every copy, the doll site that draws that copy', () => {
   const models = [
     model('coat', { slot: ['torso'] }),
