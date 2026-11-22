@@ -19,7 +19,9 @@ the garment's, which draws in stripes, from one a hair beneath it, which never s
 
 **Classify, with no margin.** The probe (`site/clearance.mjs`, `clearanceProbe`) sorts every finding into a kind
 whose meaning does not depend on how far it is: a covered body point outside every piece pokes; one on a piece's
-outer face is flush, a coincident face that draws in a tie and shows as stripes; one hidden inside the figure, as
+outer face is flush, a coincident face that draws in a tie and shows as stripes, but only where that face lies in the
+skin's plane: a face crossing the skin edge-on, as a cuff's rim, meets it along a line that draws no tie, and the skin
+beyond it pokes on its own samples if it is bare; one hidden inside the figure, as
 where parts meet or a lining lies against the body, is not a finding. A piece point a pose drives into the body sinks,
 unless it was there at rest by design or lies inside another piece, a seam. Every kind is reported, so a reviewer
 weighs a flush ledge and a deep poke from one report instead of a margin deciding for them.

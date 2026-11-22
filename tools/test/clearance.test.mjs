@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { clearanceProbe, coverage, posedSolid, signedDepth } from '../../site/clearance.mjs';
+import {
+  COINCIDENT,
+  clearanceProbe,
+  coverage,
+  posedSolid,
+  sampledSurface,
+  signedDepth,
+} from '../../site/clearance.mjs';
 import { applyPoint, IDENTITY_M, length, rotAxis, rotZ } from '../../site/kinematics.mjs';
 import { CLEAN, counted } from './findings.mjs';
 
@@ -90,6 +97,19 @@ test("a sleeve whose faces lie on its arm's is flush, not poked through", () => 
   const { pokes, flush } = clearanceProbe(rig, { body, pieces: [sleeve(0.1)] })(still);
   assert.equal(pokes.length, 0);
   assert.ok(flush.length > 0 && flush.every(({ bone }) => bone === 'upper'));
+});
+
+test("a forearm sleeve whose rim ends exactly on a row of the upper arm's samples crosses them edge-on, not flush", () => {
+  // The rim meets the upper arm's sides along a line, which draws no tie: the side below it is inside the sleeve, the
+  // side above it is bare and uncovered.
+  const onSide = sampledSurface(body[0].mesh).find(({ normal, point }) => normal[0] === 1 && point[1] < -0.25);
+  const top = onSide.point[1];
+  const cuffed = { piece: 'sleeve', bone: 'fore', mesh: boxMesh([0.12, top + 0.61, 0.12], [0, (top - 0.61) / 2, 0]) };
+  assert.ok(
+    signedDepth(posedSolid(cuffed.mesh, still.get('fore')), onSide.point) <= COINCIDENT,
+    'the rim crosses the sample',
+  );
+  assert.deepEqual(counted(clearanceProbe(rig, { body, pieces: [cuffed] })(still)), CLEAN);
 });
 
 test('an arm face shared with a shell inside the sleeve is hidden, not flush', () => {
