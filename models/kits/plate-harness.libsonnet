@@ -19,6 +19,10 @@ local lowW = bust.pelvisWidth + 2 * g, lowD = bust.pelvisDepth + 2 * g;
 local skirtTop = waistTop - 0.04;
 // The breast stands this far off the shoulders, cut to their slope.
 local shoulderRise = 0.015;
+local deltoid = (import 'models/girdle.libsonnet')(bust).deltoid;
+local spaulderRise = 0.02;
+// The spaulder's rim, standing this far proud of the cap round its widest.
+local spaulderRim = { height: 0.012, proud: 0.006 };
 // A shoulder strap lies on the breast's top: sunk this far into it, so no gap shows, and standing this far proud of it.
 local strapSink = 0.003, strapProud = 0.005;
 // The buckles' rivets keep their place on the breast's edge, the outer one this far inside the chest's side.
@@ -52,10 +56,15 @@ local rivetX = bust.chestWidth / 2 - 0.01;
   ],
   over: [
     oct('breast', 'plate', ribTop - 0.04, chestTop + shoulderRise, chestW, chestD, bust.chestBackCut) + { clip: fit.trapezius(shoulderRise) },
-    // A cap over each deltoid, so the pauldron meets plate as the arm lifts it. It stands off the deltoid as the breast
-    // does off the shoulders, which also clears the top of the arm the deltoid caps, as that is not round.
-    fit.deltoidCap('shoulder-left', 'plate', 1, shoulderRise),
-    fit.deltoidCap('shoulder-right', 'plate', -1, shoulderRise),
+    // A spaulder over each deltoid, so the pauldron meets plate as the arm lifts it: a cap with a rolled rim round its
+    // widest, as the pauldron has. It stands off the deltoid further than the breast does off the shoulders, so it
+    // clears the top of the arm the deltoid caps however high a doll's rest lifts it, a T-pose's level arm too.
+    fit.deltoidCap('shoulder-left', 'plate', 1, spaulderRise),
+    fit.deltoidCap('shoulder-right', 'plate', -1, spaulderRise),
+  ] + [
+    h.disc('shoulder-%s-rim' % (if side == 1 then 'left' else 'right'), 'trim', deltoid.radius + spaulderRise + spaulderRim.proud,
+           deltoid.y - spaulderRim.height / 2, deltoid.y + spaulderRim.height / 2, x=side * deltoid.x, z=deltoid.z) + { sides: 16 }
+    for side in [1, -1]
   ] + [
     // Shoulder straps over the breast's top from front to back.
     fit.slopeBand('strap-%d' % k, 'strap', [[-0.13, 0.11][k], [-0.11, 0.13][k]], [-chestD / 2, chestD / 2],
