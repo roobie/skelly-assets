@@ -4,8 +4,8 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
-import { padOf } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, boundBox, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
+import { padOf, probeOf } from '../../site/fingers.mjs';
+import { applyPoint, boneTransforms, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
@@ -17,18 +17,9 @@ const fixtures = readdirSync(join(repo, 'models/poses'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
 const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
 
-// A part's nearest approach to a posed solid over its box's corners, edges and faces, negative when sunk in. A turned
-// part is sampled on its box as it hangs, carried by its rest turn, where that box bounds it exactly.
-const lattice = ({ min, max }) =>
-  [0, 1, 2, 3]
-    .flatMap((i) => [0, 1, 2, 3].flatMap((j) => [0, 1, 2, 3].map((k) => [i, j, k])))
-    .filter((steps) => steps.some((s) => s === 0 || s === 3))
-    .map((steps) => steps.map((s, a) => min[a] + (s / 3) * (max[a] - min[a])));
-const partGap = (transforms, id, solid) => {
-  const { box, rest } = boundBox(bones.get(id).bind);
-  const at = (p) => applyPoint(transforms.get(id), applyPoint(rest, p));
-  return Math.min(...lattice(box).map((p) => signedDepth(solid, at(p), 0.1)));
-};
+// A part's nearest approach to a posed solid, negative when sunk in, at the points the grip probes it.
+const partGap = (transforms, id, solid) =>
+  Math.min(...probeOf(bones.get(id)).points.map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
