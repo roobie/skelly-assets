@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 13 },
+  "rig": { "id": "doll", "revision": 14 },
   "angles": {
     "spine": [0, 80, 0],
     "neck": [0, -30, 0],

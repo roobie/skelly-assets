@@ -41,11 +41,12 @@
 // knuckle row, the axis chosen so positive flex curls it toward the palm.
 //
 // The thumb hangs beside the palm's front edge, leaning out from the palm and forward as UAL's does
-// (models/measures/hand.libsonnet), and its bones flex about the fingers' axis; what sets it apart is its root, the
-// only digit joint with all three freedoms, which read as one motion in the joint's order above: abduction swings the
-// thumb in the palm's plane, negative across the palm toward the little finger; twist rolls it about its own length,
-// positive turning its pad from facing the way the palm faces toward facing the fingers, which is opposition; flex
-// then lifts it out of the palm's plane toward the palm side about the hinge the roll has turned, so a lifted thumb
+// (models/measures/hand.libsonnet), and its bones flex about the fingers' axis tipped square to their lean, as an axis
+// off square would swing a bending segment round a cone rather than in its own plane; what sets it apart is its root,
+// the only digit joint with all three freedoms, which read as one motion in the joint's order above: abduction swings
+// the thumb in the palm's plane, negative across the palm toward the little finger; twist rolls it about its own
+// length, positive turning its pad from facing the way the palm faces toward facing the fingers, which is opposition;
+// flex then lifts it out of the palm's plane toward the palm side about the hinge the roll has turned, so a lifted thumb
 // leans the way its pad faces. Across, roll and lift together bring the pad against a fingertip or over a gripped
 // handle; the two joints beyond only bend toward the pad. `presets` names hand shorthands (site/fingers.mjs,
 // `handAngles`) a pose file can ask for by name.
@@ -76,18 +77,23 @@ local fingerBones = {
   for i in std.range(0, fingerCount - 1)
   for k in std.range(0, hand.phalanges - 1)
 };
+// The fingers' axis tipped square to a leaning bone `along`, still in the mirror plane.
+local squareTo(along) =
+  local n = std.sqrt(along[1] * along[1] + along[2] * along[2]);
+  [0, -along[2] / n, along[1] / n];
 local thumbBones = {
   [hand.thumbPart(k)]: digit('thumb') {
     part: hand.thumbPart(k),
     parent: if k == 0 then 'hand' else hand.thumbPart(k - 1),
     along: hand.thumbTail(k),
+    flexAxis: squareTo(hand.thumbTail(k)),
     limits: joints.thumb[std.min(k, 2)],
   }
   for k in std.range(0, hand.thumbBones - 1)
 };
 {
   id: 'doll',
-  revision: 13,
+  revision: 14,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
