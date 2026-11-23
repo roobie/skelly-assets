@@ -20,6 +20,7 @@ import {
   mulMV,
   normalize,
   quatToMat3,
+  rotBetween,
   scale,
   sub,
   transpose,
@@ -185,6 +186,30 @@ function checkSkeleton(bones, skeleton) {
   }
 }
 
+// The box a part copy fills exactly, `bound`, where its doll-frame box would bound more air than part: a copy its site
+// turns is boxed in its own axes before the turn, and a part whose bone leans off those axes, as a thumb does, along
+// the lean, the smallest turn from the axis nearest `inPart`, its bone's direction in the part. Contact is read off
+// the faces of this box, so a fist closes on the digit rather than on the corners of its upright box. The box lies in
+// the doll frame turned by `turn` about the bone's head, `about`.
+const exactBound = ({ turn, points }, inPart, about) => {
+  const nearest = [1, 2].reduce((a, b) => (Math.abs(inPart[b]) > Math.abs(inPart[a]) ? b : a), 0);
+  const axis = [0, 1, 2].map((i) => (i === nearest ? Math.sign(inPart[i]) : 0));
+  const leans = axis.some((c, i) => c !== inPart[i]);
+  if (!turn && !leans) return {};
+  const lean = rotBetween(axis, inPart);
+  const r = turn ? mulMM(quatToMat3(turn), lean) : lean;
+  const back = transpose(r);
+  const box = { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
+  for (const p of points) {
+    const own = add(mulMV(back, sub(p, about)), about);
+    for (const i of [0, 1, 2]) {
+      box.min[i] = Math.min(box.min[i], own[i]);
+      box.max[i] = Math.max(box.max[i], own[i]);
+    }
+  }
+  return { bound: { box, turn: mat3ToQuat(r), about } };
+};
+
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
 // `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
 // limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, any
@@ -213,7 +238,8 @@ export function dollRig(doll, dressing) {
       const mirrored = spec.sided && side !== content.reference;
       const turning = copy.turn && quatToMat3(copy.turn);
       const intoDoll = (axis) => (turning ? mulMV(turning, axis) : axis);
-      const along = normalize(intoDoll(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along));
+      const inPart = normalize(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along);
+      const along = intoDoll(inPart);
       const flexAxis = intoDoll(flexInPart);
       const sense = mirrored ? mirroredSense(flexInPart, name) : [1, 1, 1];
       const limits = Object.fromEntries(
@@ -236,7 +262,8 @@ export function dollRig(doll, dressing) {
           site: copy.site,
           box: copy.box,
           mirror: Boolean(copy.mirror),
-          ...(copy.turn ? { turn: copy.turn, hanging: copy.hanging } : {}),
+          ...(copy.turn ? { turn: copy.turn } : {}),
+          ...exactBound(copy, inPart, head),
         },
         at: copy.at,
         ...(spec.reach

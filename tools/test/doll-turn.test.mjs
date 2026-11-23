@@ -5,6 +5,7 @@ import {
   add,
   applyPoint,
   boneTransforms,
+  boundBox,
   IDENTITY_M,
   jointRotation,
   mat3ToQuat,
@@ -22,6 +23,13 @@ import { dollOf, wornSites } from '../dress.mjs';
 // at its site, -90 degrees on the right and the mirrored left one by derivation, not by a second authoring. The rig's
 // nodes are rest-turned off the model's axes, as the UAL mannequin's are.
 const box = (min, max) => ({ min, max });
+// A toy part drawn as a box, whose vertices are its corners.
+const boxPart = (part, at, min, max) => ({
+  part,
+  at,
+  box: box(min, max),
+  points: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
+});
 const close = (actual, expected, message = '') =>
   actual.forEach((x, i) => assert.ok(Math.abs(x - expected[i]) < 1e-4, `${message} ${actual} is not ${expected}`));
 const mirrorX = ([x, y, z]) => [-x, y, z];
@@ -41,13 +49,13 @@ const dressing = {
 };
 const figure = {
   bust: {
-    parts: [{ part: 'torso', at: [0, 0, 0], box: box([-0.1, 0, -0.1], [0.1, 0.5, 0.1]) }],
+    parts: [boxPart('torso', [0, 0, 0], [-0.1, 0, -0.1], [0.1, 0.5, 0.1])],
     anchors: { shoulder_right: [-0.1, 0.4, 0], shoulder_left: [0.1, 0.4, 0] },
   },
   arm: {
     parts: [
-      { part: 'upper', at: [0, 0, 0], box: box([-0.05, -0.4, -0.05], [0.05, 0, 0.05]) },
-      { part: 'fore', at: [0, -0.4, 0], box: box([-0.04, -0.8, -0.04], [0.04, -0.4, 0.04]) },
+      boxPart('upper', [0, 0, 0], [-0.05, -0.4, -0.05], [0.05, 0, 0.05]),
+      boxPart('fore', [0, -0.4, 0], [-0.04, -0.8, -0.04], [0.04, -0.4, 0.04]),
     ],
     anchors: { shoulder: [0, 0, 0] },
   },
@@ -457,6 +465,42 @@ test("a turn by any angle reads the turned part's faces off its box as it hangs,
   // A looser box, the turned one's bound, would carry the reach and the pad past the part's far face and off its side.
   close(of(swung, 'fore.R').tail, swing(of(hanging, 'fore.R').tail), 'fore reach');
   close(padOf(of(swung, 'fore.R')), swing(padOf(of(hanging, 'fore.R'))), 'pad');
+});
+
+test("a bone leaning off its part's axes is boxed along its lean, on a turned copy too", () => {
+  // A forearm leaning 0.3 across x for every 1 down, drawn as a slab 0.08 square and 0.4 long down its lean.
+  const lean = [0.3, -1, 0].map((c) => c / Math.hypot(0.3, 1));
+  const across = [1, 0.3, 0].map((c) => c / Math.hypot(1, 0.3));
+  const points = [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
+    [0, 1, 2].map(
+      (a) =>
+        [0, -0.4, 0][a] +
+        (i & 1) * 0.4 * lean[a] +
+        ((i >> 1) & 1 ? 0.04 : -0.04) * across[a] +
+        (a === 2 ? ((i >> 2) & 1 ? 0.04 : -0.04) : 0),
+    ),
+  );
+  const leaning = {
+    ...figure,
+    arm: { ...figure.arm, parts: [figure.arm.parts[0], { ...figure.arm.parts[1], points }] },
+  };
+  const leaned = dollRig(dollOf(dressing, leaning), {
+    ...dressing,
+    rig: { ...rigContent, bones: { ...rigContent.bones, fore: { ...rigContent.bones.fore, along: lean } } },
+  });
+  for (const id of ['fore.R', 'fore.L']) {
+    const fore = leaned.bones.find((b) => b.id === id);
+    const { box, rest } = boundBox(fore.bind);
+    close(sub(box.max, box.min), [0.08, 0.4, 0.08], `${id} box`);
+    // The box's rest carries it onto the slab: each of the slab's corners is a corner of the box.
+    const copy = dollOf(dressing, leaning)
+      .parts.get('fore')
+      .find(({ side }) => `fore${dressing.boneSuffix[side]}` === id);
+    for (const p of copy.points) {
+      const inBox = applyPoint({ r: transpose(rest.r), t: mulMV(transpose(rest.r), sub([0, 0, 0], rest.t)) }, p);
+      assert.ok([0, 1, 2].every((a) => [box.min[a], box.max[a]].some((face) => Math.abs(inBox[a] - face) < 1e-9)));
+    }
+  }
 });
 
 test('a turn that is no angle about a doll axis is refused', () => {

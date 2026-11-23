@@ -93,7 +93,7 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {number | undefined} [soleLift]
  */
 
-/** @typedef {{ part: string; at: Vec3; box: Box }} ModelPart */
+/** @typedef {{ part: string; at: Vec3; box: Box; points: readonly Vec3[] }} ModelPart */
 /** @typedef {{ parts: readonly ModelPart[]; anchors: Readonly<Record<string, Vec3>> }} FigureModel */
 /** @typedef {{ model: string; at: Vec3; mirror?: boolean; turn?: Quaternion }} DollSite */
 /**
@@ -103,6 +103,7 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {number} site
  * @property {Vec3} at
  * @property {Box} box where the copy lies at rest in the doll frame, a bound on it
+ * @property {readonly Vec3[]} points the part's vertices where the copy lies at rest in the doll frame
  * @property {boolean} [mirror]
  * @property {Quaternion} [turn]
  * @property {{ box: Box; about: Vec3 }} [hanging] on a turned copy, its box as it hangs before the turn swings it about
@@ -355,19 +356,30 @@ function meshNodes(buffer, gltf = glbJson(buffer)) {
 export const modelBox = (buffer) => union(meshNodes(buffer).map(({ box }) => box));
 
 /**
- * Each part of a model: its name, origin and box in the model frame. A doll part's frame is where a worn piece is
- * drawn, so a part turned off the model's axes is refused rather than drawn askew.
+ * Each part of a model: its name, origin, box and vertices in the model frame. A doll part's frame is where a worn
+ * piece is drawn, so a part turned off the model's axes is refused rather than drawn askew. The vertices bound the part
+ * in a frame off the model's axes, where its box would be a loose bound.
  * @param {Buffer} buffer
  */
 export function modelParts(buffer) {
+  const gltf = glbJson(buffer);
   /** @type {Map<string, ModelPart>} */
   const byName = new Map();
-  for (const { part, box } of meshNodes(buffer)) {
+  for (const { part, box, mesh, toModel } of meshNodes(buffer, gltf)) {
     if (!part) continue;
     if (part.turned)
       throw new Error(`part ${part.name} is turned in its model; a doll part must keep the model's axes`);
+    const points = mesh.primitives.flatMap(({ attributes }) => {
+      const positions = glbAccessor(buffer, gltf, attributes.POSITION);
+      return Array.from({ length: positions.length / 3 }, (_, i) => toModel(pointAt(positions, 3 * i)));
+    });
     const seen = byName.get(part.name);
-    byName.set(part.name, { part: part.name, at: part.at, box: seen ? union([seen.box, box]) : box });
+    byName.set(
+      part.name,
+      seen
+        ? { ...seen, box: union([seen.box, box]), points: [...seen.points, ...points] }
+        : { part: part.name, at: part.at, box, points },
+    );
   }
   return [...byName.values()];
 }
@@ -411,7 +423,7 @@ export function modelMeshes(buffer, keep = () => true) {
 
 /**
  * The doll's sites, for each of its part names the copies of that part in the doll frame as
- * { side, site, at, box, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
+ * { side, site, at, box, points, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
  * draws the copy, and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may
  * keep the frame its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is:
  * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the other's),
@@ -435,8 +447,15 @@ export function dollOf(dressing, figure) {
   const parts = new Map();
   /** @param {PartCopy} copy */
   const add = (copy) => parts.set(copy.part, [...(parts.get(copy.part) ?? []), copy]);
-  for (const { part, at, box } of figureOf(bust).parts) {
-    add({ part, side: 'centre', site: 0, at: sum(bustAt, at), box: moved(box, bustAt) });
+  for (const { part, at, box, points } of figureOf(bust).parts) {
+    add({
+      part,
+      side: 'centre',
+      site: 0,
+      at: sum(bustAt, at),
+      box: moved(box, bustAt),
+      points: points.map((p) => sum(bustAt, p)),
+    });
   }
   const anchors = Object.fromEntries(
     Object.entries(figureOf(bust).anchors).map(([name, at]) => [name, sum(bustAt, at)]),
@@ -461,7 +480,7 @@ export function dollOf(dressing, figure) {
           ...(mirror ? { mirror } : {}),
           ...(turn ? { turn } : {}),
         }) - 1;
-      for (const { part, at, box } of figureOf(model).parts) {
+      for (const { part, at, box, points } of figureOf(model).parts) {
         const local = moved(box, difference([0, 0, 0], own));
         const flipped = mirror ? mirrored(local) : local;
         add({
@@ -470,6 +489,7 @@ export function dollOf(dressing, figure) {
           site,
           at: sum(hung, place(difference(at, own))),
           box: moved(turn ? turned(flipped, turn) : flipped, hung),
+          points: points.map((p) => sum(hung, place(difference(p, own)))),
           ...(mirror ? { mirror } : {}),
           ...(turn ? { turn, hanging: { box: moved(flipped, hung), about: hung } } : {}),
         });
