@@ -15,6 +15,20 @@ const { rig, itemMesh } = dollTree({ held: true });
 const fixtures = readdirSync(join(repo, 'models/poses'))
   .filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
+const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+
+// A part's nearest approach to a posed solid over its box's corners, edges and faces, negative when sunk in. A turned
+// part is sampled on its box as it hangs, carried by its rest turn, where that box bounds it exactly.
+const lattice = ({ min, max }) =>
+  [0, 1, 2, 3]
+    .flatMap((i) => [0, 1, 2, 3].flatMap((j) => [0, 1, 2, 3].map((k) => [i, j, k])))
+    .filter((steps) => steps.some((s) => s === 0 || s === 3))
+    .map((steps) => steps.map((s, a) => min[a] + (s / 3) * (max[a] - min[a])));
+const partGap = (transforms, id, solid) => {
+  const { box, rest } = boundBox(bones.get(id).bind);
+  const at = (p) => applyPoint(transforms.get(id), applyPoint(rest, p));
+  return Math.min(...lattice(box).map((p) => signedDepth(solid, at(p), 0.1)));
+};
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
@@ -36,7 +50,6 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
     hands: { 'hand.L': { curl: 1 }, 'hand.R': { curl: 1 } },
   });
   assert.deepEqual(report.clamped, []);
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const curled = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
     const bone = bones.get(`index_03.${side}`);
@@ -59,7 +72,6 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
 });
 
 test('a flexed wrist bends either hand toward its palm and an abducted one toward its thumb', () => {
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const asked = (side, angles) => ({
     [`hand.${side}`]: bones.get(`hand.${side}`).sense.map((sense, i) => sense * angles[i]),
   });
@@ -87,7 +99,6 @@ test('a flexed wrist bends either hand toward its palm and an abducted one towar
 
 test("a protracted clavicle brings either shoulder forward by the clavicle's reach, a retracted one back", () => {
   const reach = JSON.parse(evaluateJsonnet("(import 'models/dolls/player/clavicle.libsonnet').reach", repo));
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const [retracted, protracted] = bones.get('clavicle.L').limits.flex;
   for (const [flex, forward] of [
     [protracted, reach],
@@ -123,7 +134,6 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
     hands: { 'hand.L': shorthand, 'hand.R': shorthand },
   });
   assert.deepEqual(report.clamped, []);
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const posed = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
     const bone = bones.get(`thumb_03.${side}`);
@@ -152,13 +162,6 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
   const sides = ring.flatMap((i) => [i, (i + 1) % 8, 8 + ((i + 1) % 8), i, 8 + ((i + 1) % 8), 8 + i]);
   const caps = [1, 2, 3, 4, 5, 6].flatMap((k) => [0, k, k + 1, 8, 8 + k, 9 + k]);
   const haft = { positions: [...rim(-1), ...rim(1)], indices: [...sides, ...caps] };
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
-  // A part's nearest approach to the haft over its box's corners, edges and faces, negative when sunk in.
-  const lattice = ({ min, max }) =>
-    [0, 1, 2, 3]
-      .flatMap((i) => [0, 1, 2, 3].flatMap((j) => [0, 1, 2, 3].map((k) => [i, j, k])))
-      .filter((steps) => steps.some((s) => s === 0 || s === 3))
-      .map((steps) => steps.map((s, a) => min[a] + (s / 3) * (max[a] - min[a])));
   for (const side of ['L', 'R']) {
     const forearm = bones.get(`forearm.${side}`);
     const file = {
@@ -173,12 +176,7 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
     const item = held[`hand.${side}`];
     const solid = posedSolid(haft, item);
     const transforms = boneTransforms(rig.bones, decodeFrame(frame));
-    // A turned part is sampled on its box as it hangs, carried by its rest turn, where that box bounds it exactly.
-    const gap = (id) => {
-      const { box, rest } = boundBox(bones.get(id).bind);
-      const at = (p) => applyPoint(transforms.get(id), applyPoint(rest, p));
-      return Math.min(...lattice(box).map((p) => signedDepth(solid, at(p), 0.1)));
-    };
+    const gap = (id) => partGap(transforms, id, solid);
     const digits = rig.bones.filter((bone) => bone.digit && bone.id.endsWith(`.${side}`));
     for (const bone of digits)
       assert.ok(gap(bone.id) > -0.0015, `${bone.id} sinks ${(-gap(bone.id) * 1000).toFixed(1)} mm into the haft`);
@@ -211,5 +209,23 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
       beyond(thumbTip) > 0,
       `the ${side} thumb closes over the haft's far side, not ${(-beyond(thumbTip) * 1000).toFixed(1)} mm short of its middle`,
     );
+  }
+});
+
+test("the idles' gripping hands wrap the thumb round the haft, every segment bearing on it", () => {
+  for (const name of ['onehand_stance_idle.json', 'twohand_stance_idle.json']) {
+    const { file } = fixtures.find((fixture) => fixture.name === name);
+    const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
+    const transforms = boneTransforms(rig.bones, decodeFrame(frame));
+    const gripping = Object.keys(file.hold).filter((hand) => file.hands[hand] === 'grip');
+    assert.ok(gripping.length > 0, `${name} grips nothing`);
+    for (const hand of gripping) {
+      const solid = posedSolid(itemMesh(file.hold[hand].model), held[hand]);
+      const side = hand.split('.')[1];
+      for (const segment of ['thumb_01', 'thumb_02', 'thumb_03']) {
+        const gap = partGap(transforms, `${segment}.${side}`, solid);
+        assert.ok(gap < 0.003, `${name}: ${hand}'s ${segment} stands ${(gap * 1000).toFixed(1)} mm off the haft`);
+      }
+    }
   }
 });

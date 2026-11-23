@@ -1,13 +1,10 @@
 // The hand shorthands a pose file asks for by name (`hands: { "hand.R": "fist" }`), as site/fingers.mjs reads them:
 // shares of each joint's range rather than degrees, so one preset reads on either hand and keeps its shape when a limit
-// moves. A grip's preset is where the digits start before contact closes them on the item (site/fingers.mjs,
-// `closeHand`), so it leaves the fingers open and sets the thumb's across and roll, which contact cannot find, with the
-// thumb lifted off the palm, as a hand opens before taking a handle, so contact brings it down over the item.
-// A grip's thumb, lifted fully, swings right across the palm, rolls a little into opposition and comes down already
-// two-thirds curled, so its first segment lands on the haft and its tip folds over the haft's far side onto the curled
-// fingers, and the hand closes into a fist round the haft. Come down straight, its tip would land on the fingers first
-// and hold the segment off the haft, since its root sits deep in the palm, nearer the wrist than the haft; a supporting
-// hand's swings in and rolls little, so it lies along a handguard.
+// moves. A grip's preset is where the digits start before closing on a held item (site/fingers.mjs, `closeHand`), so it
+// leaves the fingers open for contact to curl them round the item. The thumb is seated on the item over its root's
+// whole range, so a grip's thumb shows its across, roll and lift only with nothing held: swung right across the palm,
+// rolled a little into opposition and lifted, as a hand opens before taking a handle; its curl is where the seat starts
+// the segments beyond. A supporting hand's swings in and rolls little, so it lies along a handguard.
 {
   open: { curl: 0.05, spread: 0.5, thumb: { across: -0.4, oppose: 0.1 } },
   fist: { curl: 1, thumb: { across: 0.6, oppose: 0.7, lift: 0.6, curl: 0.8 } },
