@@ -18,8 +18,8 @@ local armSegment(id, massKg, finish, ports, segment={ segment: id }) = {
 };
 local hand = import 'models/measures/hand.libsonnet';
 local fingerCount = std.length(hand.fingers);
-// Each phalanx hangs from the one above it, the knuckle phalanx from the palm; the thumb's bones hang likewise from its
-// root on the palm's edge.
+// Each phalanx hangs from the one above it, the knuckle phalanx from the palm; the thumb's bones lean from its root on
+// the palm's edge, each from the last one's tail.
 local phalanx(i, k) = armSegment(
   hand.part(hand.fingers[i], k), 0.15 / (fingerCount * hand.phalanges), { skin: skin },
   [jointPin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [jointSocket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []),
@@ -31,8 +31,8 @@ local phalanxConnection(i, k) = {
 };
 local thumbBone(k) = armSegment(
   hand.thumbPart(k), 0.05 / hand.thumbBones, { skin: skin },
-  [jointPin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []),
-  { segment: 'thumb', phalanx: k },
+  [jointPin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), hand.thumbTail(k))] else []),
+  { segment: 'thumb', phalanx: k, tail: hand.thumbTail(k) },
 );
 local thumbConnection(k) = {
   from: (if k == 0 then 'palm' else hand.thumbPart(k - 1)) + '.' + hand.thumbPart(k),

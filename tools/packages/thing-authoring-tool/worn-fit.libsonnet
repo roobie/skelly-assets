@@ -704,10 +704,23 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for k in phalanges
     ];
     // A thumb piece in its bone's frame, down the bone's length; the root piece ends just past the root, the rest reach
-    // into the bone above, each past the skin's end for the same reason as a phalanx's. Across the palm's edge it
-    // spans the thumb's flesh, from its joint, inset in the palm, out to the thumb's projection past the edge.
+    // into the bone above, each past the skin's end for the same reason as a phalanx's. It is the root bone's flesh,
+    // centred on the bone, a layer out, and it leans along the bone in the upright steps the doll's thumb is drawn in
+    // (the arm family's `digit`), so each step stands over the skin's. Each step reaches a layer past its own ends too,
+    // since the skin of one step is voxelised past its end into the next, which stands across from it.
+    local thumbZ = (arm.thumbInset + arm.thumbProjection) / 2 + g;
+    local thumbSteps(k) =
+      local tail = hand.thumbTail(k), length = hand.thumbLength(k), top = if k == 0 then 0 else arm.handOverlap;
+      local n = std.max(1, std.ceil(std.sqrt(tail[0] * tail[0] + tail[2] * tail[2]) / arm.digitLeanStep));
+      [
+        local share = (i + 0.5) / n, x = tail[0] * share, z = tail[2] * share;
+        h.box(if i == 0 then 'thumb' else 'thumb-%d' % i, sl.hand,
+              [x - thumbX, -length * (i + 1) / n - g, z - thumbZ],
+              [x + thumbX, (if i == 0 then top else -length * i / n) + g, z + thumbZ])
+        for i in std.range(0, n - 1)
+      ];
     local thumbPieces = [
-      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbInset + arm.thumbProjection + g])] }
+      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: thumbSteps(k) }
       for k in std.range(0, hand.thumbBones - 1)
     ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.

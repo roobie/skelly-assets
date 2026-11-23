@@ -66,8 +66,8 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
       segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket(hand.thumbPart(0), hand.thumbRoot)]
         + [socket(hand.part(hand.fingers[i], 0), hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
     ] + [
-      segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
-              [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []))
+      segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k, tail: hand.thumbTail(k) }, 'thumb', 0.015 / hand.thumbBones, ['skin'],
+              [pin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [socket(hand.thumbPart(k + 1), hand.thumbTail(k))] else []))
       for k in std.range(0, hand.thumbBones - 1)
     ] + [
       segment(hand.part(hand.fingers[i], k) + '-' + s[0], 'avatarArm', arm { finger: hand.fingers[i], phalanx: k }, 'finger', 0.003, ['skin'],

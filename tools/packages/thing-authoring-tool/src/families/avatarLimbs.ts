@@ -112,6 +112,8 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
        * straight down, as a thumb reaching forward from the palm's edge does.
        */
       tail: optional(json(point3)),
+      /** The most a leaning digit's upright steps stand across from one to the next. */
+      digitLeanStep: positive,
     }),
     params,
   );
@@ -162,13 +164,19 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   }
   /**
    * A digit's flesh, its section `xs` by `zs` about its joint, from `[bottom, top]` in its frame. One upright block for
-   * a digit hanging straight; along a leaning one, upright steps, each moved across by no more than the flesh's half
-   * width from the last so that they overlap, since the voxel families draw no slanted solid.
+   * a digit hanging straight; along a leaning one, upright steps, each moved across by no more than `digitLeanStep`
+   * from the last and at most half the flesh's width so they overlap, since the voxel families draw no slanted solid. A glove's digit steps the same way
+   * (worn-fit.libsonnet, `hands`), so its pieces stand over these.
    */
   const digit = (id: string, xs: Vec2, [bottom, top]: Vec2, zs: Vec2): BoxSolid[] => {
     const [x, , z] = d.tail ?? [0, 0, 0];
     const halfWidth = Math.min(xs[1] - xs[0], zs[1] - zs[0]) / 2;
-    const steps = Math.max(1, Math.ceil(Math.hypot(x, z) / halfWidth));
+    if (d.digitLeanStep > halfWidth) {
+      throw new Error(
+        `The digit lean step ${d.digitLeanStep} m is more than half the ${d.segment}'s narrower width, ${halfWidth} m, so its steps would barely meet`,
+      );
+    }
+    const steps = Math.max(1, Math.ceil(Math.hypot(x, z) / d.digitLeanStep));
     const across = ([from, to]: Vec2, lean: number, share: number): Vec2 => [from + lean * share, to + lean * share];
     return Array.from({ length: steps }, (_, i) => {
       const middle = (i + 0.5) / steps;

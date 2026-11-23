@@ -40,8 +40,8 @@
 // file's hand shorthand (site/fingers.mjs) can curl and spread a hand without naming bones. A finger flexes about the
 // knuckle row, the axis chosen so positive flex curls it toward the palm.
 //
-// The thumb hangs beside the palm's front edge the way the fingers hang below it, so its bones share the fingers'
-// frame; what sets it apart is its root, the only digit joint with all three freedoms, which read as one motion in
+// The thumb hangs beside the palm's front edge, leaning out from the palm and forward as UAL's does
+// (models/measures/hand.libsonnet), and its bones flex about the fingers' axis; what sets it apart is its root, the only digit joint with all three freedoms, which read as one motion in
 // the joint's order above: abduction swings the thumb in the palm's plane, negative across the palm toward the little
 // finger; twist rolls it about its own length, positive turning its pad from facing the way the palm faces toward
 // facing the fingers, which is opposition; flex then lifts it out of the palm's plane toward the palm side about the
@@ -79,13 +79,14 @@ local thumbBones = {
   [hand.thumbPart(k)]: digit('thumb') {
     part: hand.thumbPart(k),
     parent: if k == 0 then 'hand' else hand.thumbPart(k - 1),
+    along: hand.thumbTail(k),
     limits: joints.thumb[std.min(k, 2)],
   }
   for k in std.range(0, hand.thumbBones - 1)
 };
 {
   id: 'doll',
-  revision: 12,
+  revision: 13,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
