@@ -264,6 +264,11 @@ function closeChain(rig, pose, chain, solids) {
   return { pose, touched };
 }
 
+// The steps, in degrees, the thumb is seated at: its root's angles over their whole range, then every angle of the
+// thumb in turn about the best few, each step finer than the last, as the thumb fits a handle in more than one hollow.
+const ROOT_STEP = 20;
+const REFINE = [8, 4, 2, 1, 0.5];
+const SEEDS = 3;
 // How far a thumb segment may press into what it grips, as a pad gives against a handle, before a seat counts it sunk;
 // and how much a seat counts a segment sunk past that against one standing as far off the item, so the thumb comes to
 // rest on the item and the fingers rather than in them.
@@ -272,45 +277,82 @@ const SINK = 100;
 // How far off the item the best seat may leave a thumb segment and still have the thumb lie along it; an item the
 // thumb cannot lie along, out of its reach or too small, it closes on as a finger does.
 const BEARS = 0.004;
-// The steps, in degrees, the thumb is seated at: its root's angles over their whole range, then every angle of the
-// thumb in turn about the best few, each step finer than the last, as the thumb fits a handle in more than one hollow.
-const ROOT_STEP = 20;
-const REFINE = [8, 4, 2, 1, 0.5];
-const SEEDS = 3;
 const AXES = ['flex', 'twist', 'abduct'];
 
+// How far `p` lies outside `solid`, negative inside, when that is less than `bound`, and otherwise `bound` or more: a
+// least depth over many points needs only what would lower it, and the search for the surface stops at `bound`.
+const depthBelow = (solid, p, bound) => {
+  if (bound <= 0) return signedDepth(solid, p, REACH);
+  const depth = signedDepth(solid, p, Math.min(bound, REACH));
+  return depth === -Infinity ? signedDepth(solid, p, REACH) : depth;
+};
+
+// A part's probe points in its bone's frame, as `nearest` probes it, and the sphere round them.
+const probeOf = (bone) => {
+  const { box, rest } = boundBox(bone.bind);
+  const points = boxPoints(box).map((p) => applyPoint(rest, p));
+  const middle = box.min.map((low, a) => (low + box.max[a]) / 2);
+  const centre = applyPoint(rest, middle);
+  return { points, centre, radius: Math.max(...points.map((p) => length(sub(p, centre)))) };
+};
+
 /**
- * Seats the thumb's `chain` on `solid`, beside the fingers' parts, `solids`. Closing joint by joint finds only where
- * the thumb meets the item in the plane its root's roll and sweep across the palm leave it, and its first segment lies
- * on a handle from well before the rest of it can, so the thumb is seated instead: the angles of its joints, the roll
- * and the sweep across among them, are searched within their limits for the thumb whose segments each come nearest
- * bearing on the item, sunk into neither it nor the fingers. Returns the pose and whether the thumb touched, or
- * nothing when no seat brings every segment within `BEARS` of the item.
+ * Seats the thumb's `chain` on `solid`, beside the closed `fingers` (each a bone and its posed solid). Closing joint
+ * by joint finds only where the thumb meets the item in the plane its root's roll and sweep across the palm leave it,
+ * and its first segment lies on a handle from well before the rest of it can, so the thumb is seated instead: the
+ * angles of its joints, the roll and the sweep across among them, are searched within their limits for the thumb whose
+ * segments each come nearest bearing on the item, sunk into neither it nor the fingers. Only the thumb moves, so the
+ * search carries the thumb alone from the hand and probes only the fingers near each segment. Returns the pose and
+ * whether the thumb touched, or nothing when no seat brings every segment within `BEARS` of the item.
  */
-function seatThumb(rig, pose, chain, solid, solids) {
+function seatThumb(rig, pose, chain, solid, fingers) {
+  const transforms = boneTransforms(rig.bones, pose);
+  const hand = transforms.get(chain[0].parent);
+  const probes = chain.map(probeOf);
+  const parts = fingers.map(({ bone, solid: part }) => {
+    const { centre, radius } = probeOf(bone);
+    return { solid: part, centre: applyPoint(transforms.get(bone.id), centre), radius };
+  });
   // Each joint angle with a range to search, a joint's others staying as the pose holds them.
-  const free = chain.flatMap((bone) =>
-    AXES.map((name, axis) => ({ bone, axis, range: bone.limits[name] })).filter(({ range }) => range[1] > range[0]),
+  const free = chain.flatMap((bone, k) =>
+    AXES.map((name, axis) => ({ k, axis, range: bone.limits[name] })).filter(({ range }) => range[1] > range[0]),
   );
-  const held = new Map(chain.map((bone) => [bone.id, jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M)]));
-  const posed = (x) => {
-    const angles = new Map([...held].map(([id, a]) => [id, [...a]]));
-    free.forEach(({ bone, axis }, i) => {
-      angles.get(bone.id)[axis] = x[i];
+  const held = chain.map((bone) => jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M));
+  const anglesAt = (x) => {
+    const angles = held.map((a) => [...a]);
+    free.forEach(({ k, axis }, i) => {
+      angles[k][axis] = x[i];
     });
-    return chain.reduce((p, bone) => withAngles(p, bone, clampJointAngles(bone, angles.get(bone.id))), pose);
+    return angles.map((a, k) => clampJointAngles(chain[k], a));
+  };
+  // Each segment's nearest approach to the item, and to the item or a finger, as `boneTransforms` carries it.
+  const bearings = (x) => {
+    let parent = hand;
+    return anglesAt(x).map((angles, k) => {
+      const bone = chain[k];
+      const r = jointRotation(bone, angles);
+      parent = { r: mulMM(parent.r, r), t: applyPoint(parent, sub(bone.head, mulMV(r, bone.head))) };
+      const { points, centre, radius } = probes[k];
+      const at = applyPoint(parent, centre);
+      const near = parts.filter((part) => length(sub(part.centre, at)) < part.radius + radius + CONTACT);
+      let gap = Infinity;
+      let least = Infinity;
+      for (const p of points) {
+        const q = applyPoint(parent, p);
+        gap = Math.min(gap, depthBelow(solid, q, gap));
+        for (const part of near) least = Math.min(least, depthBelow(part.solid, q, CONTACT));
+      }
+      return { gap, least: Math.min(gap, least) };
+    });
   };
   // Each segment's distance off the item past contact, and how far past a pad's give it sinks into the item or the
   // fingers, the latter counting the more.
-  const misfit = (x) => {
-    const transforms = boneTransforms(rig.bones, posed(x));
-    return chain.reduce((sum, bone) => {
-      const gap = nearestIn(transforms, [bone], [solid]);
+  const misfit = (x) =>
+    bearings(x).reduce((sum, { gap, least }) => {
       const off = Math.max(0, gap - CONTACT);
-      const sunk = Math.max(0, -Math.min(gap, nearestIn(transforms, [bone], solids)) - PRESS);
+      const sunk = Math.max(0, -least - PRESS);
       return sum + off * off + SINK * sunk * sunk;
     }, 0);
-  };
   const clamped = (x) => x.map((v, i) => Math.min(free[i].range[1], Math.max(free[i].range[0], v)));
   const refined = (start) => {
     let { x, cost } = start;
@@ -327,7 +369,7 @@ function seatThumb(rig, pose, chain, solid, solids) {
     }
     return { x, cost };
   };
-  const root = free.flatMap(({ bone }, i) => (bone === chain[0] ? [i] : []));
+  const root = free.flatMap(({ k }, i) => (k === 0 ? [i] : []));
   const grid = root.reduce(
     (points, i) => {
       const [from, to] = free[i].range;
@@ -336,7 +378,7 @@ function seatThumb(rig, pose, chain, solid, solids) {
         Array.from({ length: steps + 1 }, (_, s) => x.map((v, j) => (j === i ? from + ((to - from) * s) / steps : v))),
       );
     },
-    [clamped(free.map(({ bone, axis }) => held.get(bone.id)[axis]))],
+    [clamped(free.map(({ k, axis }) => held[k][axis]))],
   );
   const byCost = (a, b) => a.cost - b.cost;
   const [best] = grid
@@ -345,10 +387,13 @@ function seatThumb(rig, pose, chain, solid, solids) {
     .slice(0, SEEDS)
     .map(refined)
     .sort(byCost);
-  const seated = posed(best.x);
-  const transforms = boneTransforms(rig.bones, seated);
-  if (chain.some((bone) => nearestIn(transforms, [bone], [solid]) > BEARS)) return null;
-  return { pose: seated, touched: nearest(rig, seated, chain, [solid, ...solids]) <= CONTACT };
+  const seated = bearings(best.x);
+  if (seated.some(({ gap }) => gap > BEARS)) return null;
+  const angles = anglesAt(best.x);
+  return {
+    pose: chain.reduce((p, bone, k) => withAngles(p, bone, angles[k]), pose),
+    touched: seated.some(({ least }) => least <= CONTACT),
+  };
 }
 
 /**
@@ -367,10 +412,13 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
     let touched;
     if (digit === 'thumb') {
       const transforms = boneTransforms(rig.bones, pose);
-      const fingers = digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
-      const solids = fingers.map((bone) => boxSolid(bone.bind, transforms.get(bone.id)));
+      const fingers = digits
+        .filter(([other]) => other !== 'thumb')
+        .flatMap(([, bones]) => bones)
+        .map((bone) => ({ bone, solid: boxSolid(bone.bind, transforms.get(bone.id)) }));
       ({ pose, touched } =
-        seatThumb(rig, pose, chain, solid, solids) ?? closeChain(rig, pose, chain, [solid, ...solids]));
+        seatThumb(rig, pose, chain, solid, fingers) ??
+        closeChain(rig, pose, chain, [solid, ...fingers.map((finger) => finger.solid)]));
     } else ({ pose, touched } = closeChain(rig, pose, chain, [solid]));
     closed[digit] = {
       touched,
