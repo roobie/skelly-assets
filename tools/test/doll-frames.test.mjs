@@ -30,7 +30,10 @@ const pieceOrigins = (dressing) => {
         .filter(({ model }) => model === `frame_worn_${segment}`)
         .map(({ part, side, at, turn }) => {
           if (!turn) return at;
-          const { about } = doll.parts.get(part).find((copy) => copy.side === side).hanging;
+          // A turned limb hangs from its bust anchor, so the turn is undone about that anchor.
+          const { site } = doll.parts.get(part).find((copy) => copy.side === side);
+          const { anchor } = dressing.limbs.find(({ model }) => model === doll.sites[site].model);
+          const about = doll.anchors[`${anchor}_${side}`];
           return add(about, mulMV(transpose(quatToMat3(turn)), sub(at, about)));
         }),
     ]),

@@ -25,7 +25,7 @@ import {
   sub,
   transpose,
 } from '../site/kinematics.mjs';
-import { dollDressings, modelMeshes, readDoll, readDressing } from './dress.mjs';
+import { dollDressings, exactBound, modelMeshes, readDoll, readDressing } from './dress.mjs';
 import { r4, unitQuat } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
 
@@ -190,24 +190,14 @@ function checkSkeleton(bones, skeleton) {
 // turns is boxed in its own axes before the turn, and a part whose bone leans off those axes, as a thumb does, along
 // the lean, the smallest turn from the axis nearest `inPart`, its bone's direction in the part. Contact is read off
 // the faces of this box, so a fist closes on the digit rather than on the corners of its upright box. The box lies in
-// the doll frame turned by `turn` about the bone's head, `about`.
-const exactBound = ({ turn, points }, inPart, about) => {
+// the doll frame turned about the bone's head, `about`.
+const boundOf = ({ turn, points }, inPart, about) => {
   const nearest = [1, 2].reduce((a, b) => (Math.abs(inPart[b]) > Math.abs(inPart[a]) ? b : a), 0);
   const axis = [0, 1, 2].map((i) => (i === nearest ? Math.sign(inPart[i]) : 0));
   const leans = axis.some((c, i) => c !== inPart[i]);
   if (!turn && !leans) return {};
   const lean = rotBetween(axis, inPart);
-  const r = turn ? mulMM(quatToMat3(turn), lean) : lean;
-  const back = transpose(r);
-  const box = { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
-  for (const p of points) {
-    const own = add(mulMV(back, sub(p, about)), about);
-    for (const i of [0, 1, 2]) {
-      box.min[i] = Math.min(box.min[i], own[i]);
-      box.max[i] = Math.max(box.max[i], own[i]);
-    }
-  }
-  return { bound: { box, turn: mat3ToQuat(r), about } };
+  return { bound: exactBound(points, mat3ToQuat(turn ? mulMM(quatToMat3(turn), lean) : lean), about) };
 };
 
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
@@ -263,7 +253,7 @@ export function dollRig(doll, dressing) {
           box: copy.box,
           mirror: Boolean(copy.mirror),
           ...(copy.turn ? { turn: copy.turn } : {}),
-          ...exactBound(copy, inPart, head),
+          ...boundOf(copy, inPart, head),
         },
         at: copy.at,
         ...(spec.reach

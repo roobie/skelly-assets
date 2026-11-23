@@ -106,9 +106,6 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {readonly Vec3[]} points the part's vertices where the copy lies at rest in the doll frame
  * @property {boolean} [mirror]
  * @property {Quaternion} [turn]
- * @property {{ box: Box; about: Vec3 }} [hanging] on a turned copy, its box as it hangs before the turn swings it about
- * `about`, the anchor it hangs from: the box a reader of the part's faces needs, since `box` is a looser one at any
- * angle but a quarter turn
  */
 /** @typedef {ReturnType<typeof dollOf>} Doll */
 /** @typedef {{ anchors: Readonly<Record<string, string>>; sided: readonly string[] }} DollParts */
@@ -231,6 +228,21 @@ const product = ([ax, ay, az, aw], [bx, by, bz, bw]) => [
  * @param {Quaternion} turn
  */
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
+
+/**
+ * The box `points` fill exactly in a frame that `turn` carries into the doll frame about `about`, so a part turned off
+ * the doll's axes is met at its own faces rather than at the corners of its looser doll-frame box. A rig bone's
+ * `bind.bound` is this box of its part copy (tools/dollRig.mjs), and a model rested on a turned part meets the same.
+ * @param {readonly Vec3[]} points
+ * @param {Quaternion} turn
+ * @param {Vec3} about
+ * @returns {{ box: Box; turn: Quaternion; about: Vec3 }}
+ */
+export const exactBound = (points, turn, about) => {
+  /** @type {Quaternion} */
+  const back = [-turn[0], -turn[1], -turn[2], turn[3]];
+  return { box: boxOf(points.map((p) => sum(rotate(back, difference(p, about)), about))), turn, about };
+};
 
 /**
  * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it.
@@ -490,7 +502,7 @@ export function dollOf(dressing, figure) {
           box: moved(turn ? turned(flipped, turn) : flipped, hung),
           points: points.map((p) => sum(hung, place(difference(p, own)))),
           ...(mirror ? { mirror } : {}),
-          ...(turn ? { turn, hanging: { box: moved(flipped, hung), about: hung } } : {}),
+          ...(turn ? { turn } : {}),
         });
       }
     }
@@ -940,19 +952,19 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     return [...sites, { model: model.id, at: difference(anchored, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
   }
   const { rested, place } = plan;
-  // A turned copy is rested against as it hangs, and the model then swung with it, so the model meets the part's own
-  // faces along its own axes, as a worn piece does, rather than the looser box of the turned part.
+  // A turned copy is rested against in its exact bound, the frame its bone's `bind.bound` gives it, and the model then
+  // swung with it, so the model meets the part's own faces, as a worn piece does, rather than the looser box of the
+  // turned part.
   const [first] = rested;
-  const hanging =
-    rested.length === 1 && first?.hanging && first.turn ? { ...first.hanging, turn: first.turn } : undefined;
-  const region = hanging ? hanging.box : union(rested.map(({ box }) => box));
+  const bound = rested.length === 1 && first?.turn ? exactBound(first.points, first.turn, first.at) : undefined;
+  const region = bound ? bound.box : union(rested.map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).
   const hung = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
   const own = lying ? STAND : undefined;
-  const at = hanging ? sum(rotate(hanging.turn, difference(hung, hanging.about)), hanging.about) : hung;
-  const turn = hanging ? (own ? product(hanging.turn, own) : hanging.turn) : own;
+  const at = bound ? sum(rotate(bound.turn, difference(hung, bound.about)), bound.about) : hung;
+  const turn = bound ? (own ? product(bound.turn, own) : bound.turn) : own;
   return [
     ...sites,
     {
