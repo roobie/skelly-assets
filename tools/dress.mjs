@@ -422,13 +422,12 @@ export function modelMeshes(buffer, keep = () => true) {
 // ---- the doll ----
 
 /**
- * The doll's sites, for each of its part names the copies of that part in the doll frame as
- * { side, site, at, box, points, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
- * draws the copy, and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may
- * keep the frame its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is:
- * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the other's),
- * then moved so its own anchor lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the
- * doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
+ * The doll's sites, for each of its part names the copies of that part in the doll frame as { side, site, at, box,
+ * points, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that draws the copy,
+ * and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may keep the frame
+ * its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is: the model mirrored,
+ * turned by the limb's turn (the mirrored side's being the mirror image of the other's), then moved so its own anchor
+ * lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
  * @param {DollDressing} dressing
  * @param {Readonly<Record<string, FigureModel>>} figure
  */

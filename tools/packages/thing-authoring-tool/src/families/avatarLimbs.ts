@@ -165,8 +165,8 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   /**
    * A digit's flesh, its section `xs` by `zs` about its joint, from `[bottom, top]` in its frame. One upright block for
    * a digit hanging straight; along a leaning one, upright steps, each moved across by no more than `digitLeanStep`
-   * from the last and at most half the flesh's width so they overlap, since the voxel families draw no slanted solid. A glove's digit steps the same way
-   * (worn-fit.libsonnet, `hands`), so its pieces stand over these.
+   * from the last and at most half the flesh's width so they overlap, since the voxel families draw no slanted solid.
+   * A glove's digit steps the same way (worn-fit.libsonnet, `hands`), so its pieces stand over these.
    */
   const digit = (id: string, xs: Vec2, [bottom, top]: Vec2, zs: Vec2): BoxSolid[] => {
     const [x, , z] = d.tail ?? [0, 0, 0];

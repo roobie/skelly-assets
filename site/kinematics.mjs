@@ -173,8 +173,8 @@ export const applyPoint = ({ r, t }, p) => add(mulMV(r, p), t);
 export const composed = (a, b) => ({ r: mulMM(a.r, b.r), t: applyPoint(a, b.t) });
 
 // A bound part's box where it is exact, with the rest placing that carries it into the rig frame: a part boxed off the
-// rig's axes (tools/dollRig.mjs, `bind.bound`) is boxed before its turn swings it about a point, as its box turned would
-// be a looser one at any angle but a quarter turn.
+// rig's axes (tools/dollRig.mjs, `bind.bound`) is boxed before its turn swings it about a point, as its box turned
+// would be a looser one at any angle but a quarter turn.
 export const boundBox = ({ box, bound }) => {
   if (!bound) return { box, rest: { r: IDENTITY_M, t: [0, 0, 0] } };
   const r = quatToMat3(bound.turn);

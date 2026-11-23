@@ -62,8 +62,10 @@ local rivetX = bust.chestWidth / 2 - 0.01;
     fit.deltoidCap('shoulder-left', 'plate', 1, spaulderRise),
     fit.deltoidCap('shoulder-right', 'plate', -1, spaulderRise),
   ] + [
-    h.disc('shoulder-%s-rim' % (if side == 1 then 'left' else 'right'), 'trim', deltoid.radius + spaulderRise + spaulderRim.proud,
-           deltoid.y - spaulderRim.height / 2, deltoid.y + spaulderRim.height / 2, x=side * deltoid.x, z=deltoid.z) + { sides: 16 }
+    h.disc('shoulder-%s-rim' % (if side == 1 then 'left' else 'right'), 'trim',
+           deltoid.radius + spaulderRise + spaulderRim.proud,
+           deltoid.y - spaulderRim.height / 2, deltoid.y + spaulderRim.height / 2,
+           x=side * deltoid.x, z=deltoid.z) + { sides: 16 }
     for side in [1, -1]
   ] + [
     // Shoulder straps over the breast's top from front to back.
