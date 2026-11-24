@@ -1,5 +1,9 @@
+// @ts-check
 // A mob row's mobgen template, shared by the bake (tools/mobs.mjs) and by every reader of the bones a row builds
 // (tools/severedParts.mjs), so the bones a manifest lists are the bones the bake cuts.
+/** @import { MobRow } from './layout.mjs' */
+/** @import { MaterialDef } from './packages/mobgen/src/core/body.ts' */
+/** @import { Template } from './packages/mobgen/src/core/template.ts' */
 import { installJsonnetSources } from './sources.mjs';
 
 await installJsonnetSources();
@@ -17,12 +21,26 @@ await import('./packages/mobgen/src/mob/skeletonTemplate.ts');
 await import('./packages/mobgen/src/mob/leaper/plan.ts');
 await import('./packages/mobgen/src/mob/walker/plan.ts');
 
+/**
+ * @param {string} colour
+ * @param {number} index
+ */
+const channel = (colour, index) => parseInt(colour.slice(index, index + 2), 16) / 255;
+/**
+ * @param {string | MaterialDef['color']} colour
+ * @returns {MaterialDef['color']}
+ */
 const hex = (colour) =>
-  typeof colour === 'string' ? [1, 3, 5].map((index) => parseInt(colour.slice(index, index + 2), 16) / 255) : colour;
+  typeof colour === 'string' ? [channel(colour, 1), channel(colour, 3), channel(colour, 5)] : colour;
 
 // The row's template with its narrowed parameters, palette, parts and validity budgets, registered per row.
+/**
+ * @param {MobRow} row
+ * @returns {Template}
+ */
 export function templateFor(row) {
   const base = consumableTemplate(row.template);
+  /** @type {Record<string, MaterialDef>} */
   const materials = { ...base.materials };
   for (const [name, material] of Object.entries(row.materials ?? {}))
     materials[name] = { emissive: 0, ...material, color: hex(material.color) };
@@ -31,17 +49,23 @@ export function templateFor(row) {
   );
   const own = { ...base.budgets, ...row.budgets };
   const room = row.budget_headroom ?? 1;
+  /**
+   * @template {Template['budgets']['totalVoxels']} Range
+   * @param {Range} range
+   * @returns {Range}
+   */
   const widen = (range) => ({ ...range, max: Math.ceil(range.max * room) });
   const budgets = {
     ...own,
     totalVoxels: widen(own.totalVoxels),
     groups: Object.fromEntries(Object.entries(own.groups).map(([name, range]) => [name, widen(range)])),
   };
+  const attackClip = row.attack_clip ?? base.attackClip;
   const derived = {
     ...base,
     budgets,
     name: `mob:${row.id}`,
-    attackClip: row.attack_clip ?? base.attackClip,
+    ...(attackClip === undefined ? {} : { attackClip }),
     materials,
     materialHsl,
     params: { ...base.params, ...row.params },
