@@ -260,6 +260,13 @@ name the player's bones, so such a doll stands at rest or takes a pose file writ
 to the doll or the rig moves every fit at once. The sheets and the sweep reach the showcase through one served site
 and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.
 
+`node tools/joint-cover.mjs` reports what every fitted garment bares at the knee, the elbow and the neck as the UAL
+doll plays the mannequin's own walk, jog and sprint (`ualClip.mjs` poses the rig from the vendored GLB's clips). A
+rigid piece rides one bone, so two that meet over a joint part as it bends, which the rest check cannot see. The
+report is of skin seen from straight above, in pixels of a figure drawn 25 and 50 px tall, because that is rog1's
+camera and those are its sizes; it ranks the garments and gates nothing, since what reads at that size is judged by
+eye. It writes `look/joint-cover/report.md` and `report.json`.
+
 The doll is a named target, since a second body should be a record and not a second copy of the code; why there is a
 second doll, and one set of garments for both, is in `../docs/decisions/0023-ual-doll.md`. Each doll is a
 record in `../models/dolls/<id>/doll.libsonnet`, listed in `../models/dressing.libsonnet`; the build, the checks and

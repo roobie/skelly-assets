@@ -2,48 +2,25 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { add, applyPoint, IDENTITY_M, mulMM, mulMV, quatToMat3, sub, transpose } from '../../site/kinematics.mjs';
+import {
+  add,
+  applyPoint,
+  boneTransforms,
+  IDENTITY_M,
+  mulMV,
+  quatToMat3,
+  sub,
+  transpose,
+} from '../../site/kinematics.mjs';
 import { restMeshes, treeMeshes } from '../dollRig.mjs';
-import { glbAccessor, glbJson } from '../glb.mjs';
+import { glbJson } from '../glb.mjs';
 import { modelGrain } from '../shapeProbe.mjs';
-import { GLB } from '../ual-skeleton.mjs';
+import { boneMoves, ualClips } from '../ualClip.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
 
 const { doll, rig, built, manifest } = dollTree({ doll: 'ual' });
-const glb = readFileSync(join(repo, GLB));
-const gltf = glbJson(glb);
-
-// The mannequin's node tree as a game holds it at one key of a clip, or at rest with none: each node's own translation,
-// rotation and scale, the clip's where it animates them and the node's rest otherwise, composed from the scene down.
-const posedNodes = (clipName, key) => {
-  const clip = gltf.animations.find(({ name }) => name === clipName) ?? { channels: [], samplers: [] };
-  const local = gltf.nodes.map(({ translation = [0, 0, 0], rotation = [0, 0, 0, 1], scale = [1, 1, 1] }) => ({
-    translation,
-    rotation,
-    scale,
-  }));
-  const times = new Set();
-  for (const { sampler, target } of clip.channels) {
-    const { input, output } = clip.samplers[sampler];
-    const at = Math.min(key, gltf.accessors[input].count - 1);
-    times.add(glbAccessor(glb, gltf, input)[at]);
-    const width = target.path === 'rotation' ? 4 : 3;
-    local[target.node][target.path] = glbAccessor(glb, gltf, output).slice(at * width, (at + 1) * width);
-  }
-  // The clip is baked, every channel keyed at the same times, so one key is one instant of every node.
-  assert.ok(times.size <= 1, `${clipName} keys its channels apart`);
-  const world = new Map();
-  const walk = (index, up) => {
-    const { name, children = [] } = gltf.nodes[index];
-    const { translation, rotation, scale } = local[index];
-    const r = mulMM(quatToMat3(rotation), [scale[0], 0, 0, 0, scale[1], 0, 0, 0, scale[2]]);
-    const node = { r: mulMM(up.r, r), t: add(up.t, mulMV(up.r, translation)) };
-    world.set(name, node);
-    for (const child of children) walk(child, node);
-  };
-  for (const index of gltf.scenes[gltf.scene ?? 0].nodes) walk(index, { r: IDENTITY_M, t: [0, 0, 0] });
-  return world;
-};
+// The mannequin's node tree as a game holds it at one key of a clip, or at rest with none.
+const { nodes: posedNodes } = ualClips(repo);
 
 // A point of a bone's part, in the part's own model frame, where a game seats it: under the bone's node by the
 // bone's bind alone.
@@ -130,5 +107,25 @@ test("every digit's tip lands on the skeleton leaf beyond it, at rest and as the
       const miss = Math.hypot(...sub(seated(nodes, bone, tip), nodes.get(name).t));
       assert.ok(miss < grain, `${clip ?? 'rest'} key ${key}: ${bone.id} ends ${miss} m off ${name}`);
     }
+  }
+});
+
+// A bone's move from rest carries a point of the doll at rest where the bone's bind seats it under the posed node, and
+// at rest every bone stays where it is.
+test("each bone's move from rest carries its part where the posed node seats it", () => {
+  const still = boneMoves(rig, posedNodes(null, 0));
+  const unposed = boneTransforms(rig.bones, { root: [0, 0, 0], rotations: {} });
+  for (const bone of rig.bones) {
+    const miss = Math.hypot(
+      ...sub(applyPoint(still.get(bone.id), bone.tail), applyPoint(unposed.get(bone.id), bone.tail)),
+    );
+    assert.ok(miss < 1e-4, `${bone.id} moves ${miss} m at rest`);
+  }
+  const nodes = posedNodes('Sprint_Loop', 5);
+  const moves = boneMoves(rig, nodes);
+  for (const bone of rig.bones) {
+    const q = inPart(bone, bone.tail);
+    const miss = Math.hypot(...sub(applyPoint(moves.get(bone.id), bone.tail), seated(nodes, bone, q)));
+    assert.ok(miss < 2e-4, `${bone.id}'s tail lies ${miss} m off where its node seats it`);
   }
 });
