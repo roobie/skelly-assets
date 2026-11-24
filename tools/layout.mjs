@@ -13,10 +13,43 @@ import { inheritTaxonomy } from './taxonomy.mjs';
  * @typedef {{ defaults?: MobDefaults, mobs: MobSheetRow[] }} MobSheet
  */
 
+/** @import { Template } from './packages/mobgen/src/core/template.ts' */
+/** @import { LookAtProfile } from './packages/mobgen/src/mob/lookAtProfiles.ts' */
+
 /**
- * A mob row with the sheet's defaults applied and its files named.
- * @typedef {{ id: string, pack: string, glb: string, body: string, clips: string, genome: string } & Record<string, unknown>} MobRow
+ * A mob row with the sheet's defaults applied and its files named. What every row has, of itself or of the defaults,
+ * `readMobRows` checks; the rest is a row's own to give, and the bake reads it (tools/mobTemplates.mjs, tools/actorBake.mjs).
+ * @typedef {object} MobRowFields
+ * @property {string} id
+ * @property {string} pack
+ * @property {string} glb
+ * @property {string} body
+ * @property {string} clips
+ * @property {string} genome
+ * @property {string} template
+ * @property {number} seed
+ * @property {number} scale
+ * @property {number} lod_divisor
+ * @property {number} walk_speed
+ * @property {number} walkCycles
+ * @property {number} walk_frames
+ * @property {number} attack_frames
+ * @property {number} crawl_stride
+ * @property {string} idle
+ * @property {boolean} crawls
+ * @property {Record<string, unknown> | undefined} taxonomy
+ * @property {string} [title]
+ * @property {string} [type]
+ * @property {string} [model]
+ * @property {Template['params']} [params]
+ * @property {Readonly<Record<string, { color: string | Template['materials'][string]['color']; emissive?: number; charged?: boolean }>>} [materials]
+ * @property {NonNullable<Template['parts']>} [parts]
+ * @property {string} [attack_clip]
+ * @property {number} [budget_headroom]
+ * @property {Partial<Template['budgets']>} [budgets]
+ * @property {LookAtProfile} [lookAt]
  */
+/** @typedef {MobRowFields & Record<string, unknown>} MobRow */
 
 /**
  * A sound row with the files it is baked to under its pack.
@@ -103,9 +136,33 @@ export function readMobRows(root = repo) {
   return sheet.mobs.map((row) => {
     const id = row.id ?? `${row.type}.${row.seed}`;
     const stem = `actors/${id}`;
+    const merged = { ...sheet.defaults, ...row };
+    /** @param {string} what */
+    const refuse = (what) => new Error(`models/mobs.json: ${id} needs ${what}, its own or the defaults'`);
+    /** @param {string} field */
+    const number = (field) => {
+      const value = merged[field];
+      if (typeof value !== 'number') throw refuse(`a number ${field}`);
+      return value;
+    };
+    const { template, idle, crawls } = merged;
+    if (typeof template !== 'string') throw refuse('a template');
+    if (typeof idle !== 'string') throw refuse('an idle');
+    if (typeof crawls !== 'boolean') throw refuse('crawls, true or false');
+    // Each key keeps the place it has in the merged row, so the row reads as it is written.
     return {
-      ...sheet.defaults,
-      ...row,
+      ...merged,
+      template,
+      idle,
+      crawls,
+      seed: number('seed'),
+      scale: number('scale'),
+      lod_divisor: number('lod_divisor'),
+      walk_speed: number('walk_speed'),
+      walkCycles: number('walkCycles'),
+      walk_frames: number('walk_frames'),
+      attack_frames: number('attack_frames'),
+      crawl_stride: number('crawl_stride'),
       id,
       glb: row.glb ?? `assets/models/${stem}.glb`,
       body: row.body ?? `${stem}.body.json`,
