@@ -8,6 +8,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { fittedGarments } from './dress.mjs';
 import { GAITS, ZOOMS } from './jointCover.mjs';
 import { workerPool } from './workerPool.mjs';
@@ -64,7 +65,7 @@ const worst = (row) =>
       joints.filter((joint) => answers(row, joint)).map((joint) => byJoint[joint].px[CLOSEST]),
     ),
   );
-const ranked = rows.toSorted((a, b) => worst(b) - worst(a) || a.garment.localeCompare(b.garment));
+const ranked = rows.toSorted((a, b) => worst(b) - worst(a) || compareCodeUnits(a.garment, b.garment));
 
 const seen = ({ seenCm2, px, key }) => (seenCm2 === 0 ? '·' : `${seenCm2} cm², ${px[CLOSEST]} px (key ${key})`);
 const cell = (row, gait, joint) => (answers(row, joint) ? seen(row.gaits[gait][joint]) : '—');
