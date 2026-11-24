@@ -36,9 +36,9 @@ local support = { hold: crease { socket: 'support', beneath: true, pole: [0, -1,
 local handle(offset) = { from: 'charging_handle', offset: offset, on: 'charging-handle' };
 local pinch = {
   hold: crease {
-    socket: { at: handle([0.051, -0.02, 0.045]), into: [-0.75, -0.5, -0.433], axis: [-0.625, 0.75, 0.217] },
+    socket: { at: handle([0.074, -0.009, 0.047]), into: [-0.626, -0.452, -0.636], axis: [-0.688, 0.704, 0.178] },
     pole: [0.483, -0.866, -0.129],
-    pinch: { thumb: handle([0.009, 0, -0.005]), index: handle([0.0195, 0, 0.003]) },
+    pinch: { thumb: handle([0.004, -0.001, -0.005]), index: handle([0.0215, 0, 0.003]) },
   },
   hands: 'pinch',
 };

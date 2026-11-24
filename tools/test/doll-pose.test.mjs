@@ -4,8 +4,18 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
-import { padOf } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, boundBox, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
+import { padOf, probeOf } from '../../site/fingers.mjs';
+import {
+  applyPoint,
+  boneTransforms,
+  boundBox,
+  composed,
+  dot,
+  length,
+  mulMV,
+  normalize,
+  sub,
+} from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
@@ -15,6 +25,49 @@ const { rig, itemMesh } = dollTree({ held: true });
 const fixtures = readdirSync(join(repo, 'models/poses'))
   .filter((name) => name.endsWith('.json'))
   .map((name) => ({ name, file: JSON.parse(readFileSync(join(repo, 'models/poses', name), 'utf8')) }));
+const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
+
+// A part's nearest approach to a posed solid, negative when sunk in, at the points the grip probes it.
+const partGap = (transforms, id, solid) =>
+  Math.min(...probeOf(bones.get(id)).map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
+
+// A part as a posed solid, its exact box.
+const partSolid = (transforms, id) => {
+  const { box, rest } = boundBox(bones.get(id).bind);
+  const corner = (i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? box.max[a] : box.min[a]));
+  const quads = [
+    [0, 1, 3, 2],
+    [4, 6, 7, 5],
+    [0, 4, 5, 1],
+    [2, 3, 7, 6],
+    [0, 2, 6, 4],
+    [1, 5, 7, 3],
+  ];
+  return posedSolid(
+    {
+      positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap(corner),
+      indices: quads.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
+    },
+    composed(transforms.get(id), rest),
+  );
+};
+
+// A gripping thumb closes over the fist: its knuckle stays by the palm, within the fist's depth of the palm along
+// `into`, the way from the palm into the held item, and its last two bones lie on the fingers or the item, neither
+// standing off them nor sunk in them.
+const assertThumbOverFist = (transforms, side, item, into, name) => {
+  const head = (id) => applyPoint(transforms.get(id), bones.get(id).head);
+  const off = dot(sub(head(`thumb_02.${side}`), head(`hand.${side}`)), into);
+  assert.ok(off > 0 && off < 0.07, `${name}: the thumb's knuckle stands ${(off * 1000).toFixed(0)} mm off the palm`);
+  const fist = rig.bones
+    .filter((bone) => bone.digit && bone.digit !== 'thumb' && bone.id.endsWith(`.${side}`))
+    .map((bone) => partSolid(transforms, bone.id));
+  for (const id of [`thumb_02.${side}`, `thumb_03.${side}`]) {
+    const least = Math.min(...[item, ...fist].map((body) => partGap(transforms, id, body)));
+    assert.ok(least < 0.004, `${name}: ${id} stands ${(least * 1000).toFixed(1)} mm off the fist`);
+    assert.ok(least > -0.0015, `${name}: ${id} sinks ${(-least * 1000).toFixed(1)} mm into the fist`);
+  }
+};
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
@@ -36,7 +89,6 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
     hands: { 'hand.L': { curl: 1 }, 'hand.R': { curl: 1 } },
   });
   assert.deepEqual(report.clamped, []);
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const curled = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
     const bone = bones.get(`index_03.${side}`);
@@ -59,7 +111,6 @@ test('a curled hand closes toward its own palm on both sides, the mirrored copy 
 });
 
 test('a flexed wrist bends either hand toward its palm and an abducted one toward its thumb', () => {
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const asked = (side, angles) => ({
     [`hand.${side}`]: bones.get(`hand.${side}`).sense.map((sense, i) => sense * angles[i]),
   });
@@ -87,7 +138,6 @@ test('a flexed wrist bends either hand toward its palm and an abducted one towar
 
 test("a protracted clavicle brings either shoulder forward by the clavicle's reach, a retracted one back", () => {
   const reach = JSON.parse(evaluateJsonnet("(import 'models/dolls/player/clavicle.libsonnet').reach", repo));
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const [retracted, protracted] = bones.get('clavicle.L').limits.flex;
   for (const [flex, forward] of [
     [protracted, reach],
@@ -123,7 +173,6 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
     hands: { 'hand.L': shorthand, 'hand.R': shorthand },
   });
   assert.deepEqual(report.clamped, []);
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
   const posed = boneTransforms(rig.bones, decodeFrame(frame));
   const tip = (side) => {
     const bone = bones.get(`thumb_03.${side}`);
@@ -139,7 +188,7 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test("the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, the thumb's first segment bearing on it and its tip closing over it, on either hand", () => {
+test('the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, and the thumb closes over the fist, on either hand', () => {
   // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
   // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
@@ -152,13 +201,6 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
   const sides = ring.flatMap((i) => [i, (i + 1) % 8, 8 + ((i + 1) % 8), i, 8 + ((i + 1) % 8), 8 + i]);
   const caps = [1, 2, 3, 4, 5, 6].flatMap((k) => [0, k, k + 1, 8, 8 + k, 9 + k]);
   const haft = { positions: [...rim(-1), ...rim(1)], indices: [...sides, ...caps] };
-  const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
-  // A part's nearest approach to the haft over its box's corners, edges and faces, negative when sunk in.
-  const lattice = ({ min, max }) =>
-    [0, 1, 2, 3]
-      .flatMap((i) => [0, 1, 2, 3].flatMap((j) => [0, 1, 2, 3].map((k) => [i, j, k])))
-      .filter((steps) => steps.some((s) => s === 0 || s === 3))
-      .map((steps) => steps.map((s, a) => min[a] + (s / 3) * (max[a] - min[a])));
   for (const side of ['L', 'R']) {
     const forearm = bones.get(`forearm.${side}`);
     const file = {
@@ -173,12 +215,7 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
     const item = held[`hand.${side}`];
     const solid = posedSolid(haft, item);
     const transforms = boneTransforms(rig.bones, decodeFrame(frame));
-    // A turned part is sampled on its box as it hangs, carried by its rest turn, where that box bounds it exactly.
-    const gap = (id) => {
-      const { box, rest } = boundBox(bones.get(id).bind);
-      const at = (p) => applyPoint(transforms.get(id), applyPoint(rest, p));
-      return Math.min(...lattice(box).map((p) => signedDepth(solid, at(p), 0.1)));
-    };
+    const gap = (id) => partGap(transforms, id, solid);
     const digits = rig.bones.filter((bone) => bone.digit && bone.id.endsWith(`.${side}`));
     for (const bone of digits)
       assert.ok(gap(bone.id) > -0.0015, `${bone.id} sinks ${(-gap(bone.id) * 1000).toFixed(1)} mm into the haft`);
@@ -202,14 +239,27 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
     for (const tip of tips)
       assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
-    assert.ok(
-      gap(`thumb_01.${side}`) < 0.003,
-      `the ${side} thumb's first segment bears on the haft, not ${(gap(`thumb_01.${side}`) * 1000).toFixed(1)} mm off it`,
-    );
+    assertThumbOverFist(transforms, side, solid, mulMV(item.r, [1, 0, 0]), side);
     const thumbTip = bones.get(`thumb_03.${side}`);
     assert.ok(
       beyond(thumbTip) > 0,
       `the ${side} thumb closes over the haft's far side, not ${(-beyond(thumbTip) * 1000).toFixed(1)} mm short of its middle`,
     );
+  }
+});
+
+test("the idles' gripping hands close the thumb over the fist", () => {
+  for (const name of ['onehand_stance_idle.json', 'twohand_stance_idle.json']) {
+    const { file } = fixtures.find((fixture) => fixture.name === name);
+    const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
+    const transforms = boneTransforms(rig.bones, decodeFrame(frame));
+    const gripping = Object.keys(file.hold).filter((hand) => file.hands[hand] === 'grip');
+    assert.ok(gripping.length > 0, `${name} grips nothing`);
+    for (const hand of gripping) {
+      const solid = posedSolid(itemMesh(file.hold[hand].model), held[hand]);
+      const side = hand.split('.')[1];
+      const into = normalize(mulMV(held[hand].r, file.hold[hand].socket.into));
+      assertThumbOverFist(transforms, side, solid, into, `${name} ${hand}`);
+    }
   }
 });

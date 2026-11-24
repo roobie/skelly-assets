@@ -193,8 +193,9 @@ export function handIssues(rig, handId, hand) {
 /**
  * The joint angles a hand shorthand (or the preset it names, under its own keys) asks of the digits of `handId`: a
  * finger's `curl` flexes each of its joints by that share of its range, `spread` abducts the knuckles by their share
- * of the spread, and the thumb's root goes `across` the palm, rolls into opposition by `oppose` and `lift`s toward the
- * palm, while `curl` bends the joints beyond it (models/dolls/player/rig.libsonnet, the thumb). Returns
+ * of the spread, and the thumb's root swings `across` the palm by its flex, rolls into opposition by `oppose` and
+ * `lift`s off the palm's plane by its abduction, while `curl` bends the joints beyond it
+ * (models/dolls/player/rig.libsonnet, the thumb). Returns
  * `{ <bone>: [flex, twist, abduct] }`.
  * @param {HandRig} rig
  * @param {string} handId
@@ -211,10 +212,9 @@ export function handAngles(rig, handId, asked) {
     if (digit === 'thumb') {
       const { across = 0, oppose = 0, lift = 0, curl = 0 } = hand.thumb;
       chain.forEach((bone, k) => {
-        // Across the palm is the root's negative abduction.
         angles[bone.id] =
           k === 0
-            ? [shareOf(bone, 'flex', lift), shareOf(bone, 'twist', oppose), shareOf(bone, 'abduct', -across)]
+            ? [shareOf(bone, 'flex', across), shareOf(bone, 'twist', oppose), shareOf(bone, 'abduct', lift)]
             : [shareOf(bone, 'flex', curl), 0, 0];
       });
       continue;
@@ -253,6 +253,17 @@ const boxPoints = ({ min, max }) => {
   return points;
 };
 
+/**
+ * The points `bone`'s part is probed at in the bone's frame, its rest box's lattice carried by its rest turn, where
+ * that box bounds it exactly. Whatever checks a part's contact probes it here, so no check can find a part sunk or
+ * clear between the points another probes.
+ * @param {Pick<HandBone, 'bind'>} bone
+ */
+export const probeOf = (bone) => {
+  const { box, rest } = boundBox(bone.bind);
+  return boxPoints(box).map((p) => applyPoint(rest, p));
+};
+
 // How close a part may come to a held item before it is in contact, how far away a point is still measured, how many
 // steps a joint's swing is checked at and how many halvings then find where it meets the item.
 const CONTACT = 0.001;
@@ -271,9 +282,8 @@ const nearest = (rig, pose, bones, solids) => {
   const transforms = boneTransforms(rig.bones, pose);
   let least = Infinity;
   for (const bone of bones) {
-    const { box, rest } = boundBox(bone.bind);
-    const t = composed(transformOf(transforms, bone.id), rest);
-    for (const p of boxPoints(box))
+    const t = transformOf(transforms, bone.id);
+    for (const p of probeOf(bone))
       for (const solid of solids) least = Math.min(least, signedDepth(solid, applyPoint(t, p), REACH));
   }
   return least;
@@ -342,14 +352,57 @@ const withAngles = (pose, bone, angles) => ({
 });
 
 /**
+ * Flexes each joint of a digit's `chain` in turn from the knuckle out until the part it moves, or any beyond it,
+ * touches `solids`, or until its limit; the next joint then goes on from there. A joint whose parts the pose sinks in
+ * opens instead until they rest on the surface, or, when its range cannot lift them clear, opens fully and leaves the
+ * next joint out to free them. Returns the pose and whether the digit touched.
+ * @param {HandRig} rig
+ * @param {Pose} pose
+ * @param {readonly HandBone[]} chain
+ * @param {readonly Solid[]} solids
+ */
+function closeChain(rig, pose, chain, solids) {
+  /**
+   * @param {Pose} p
+   * @param {readonly HandBone[]} moved
+   */
+  const apart = (p, moved) => nearest(rig, p, moved, solids) > CONTACT;
+  let touched = false;
+  chain.forEach((bone, k) => {
+    const moved = chain.slice(k);
+    const [flex, twist, abduct] = jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M);
+    /** @param {number} f */
+    const at = (f) => withAngles(pose, bone, clampJointAngles(bone, [f, twist, abduct]));
+    // The ends of the joint's range in the senses that open and close it.
+    const [least, most] = bone.limits.flex;
+    const [opened, end] = bone.sense[0] > 0 ? [least, most] : [most, least];
+    const gap = nearest(rig, at(flex), moved, solids);
+    if (gap < -CONTACT) {
+      // Posed sunk into the item: backed out the way the joint opens until it rests on the surface, or as far as it
+      // goes, leaving the joints beyond it to free their parts.
+      const out = sweepTo(flex, opened, (f) => apart(at(f), moved));
+      pose = at(out ? out.met : opened);
+      if (out) touched = true;
+      return;
+    }
+    if (gap <= CONTACT) {
+      touched = true;
+      return;
+    }
+    const met = sweepTo(flex, end, (f) => !apart(at(f), moved));
+    pose = at(met ? met.short : end);
+    if (met) touched = true;
+  });
+  return { pose, touched };
+}
+
+/**
  * Closes the digits of `handId` on `solid` (a posed solid, `clearance.mjs`, `posedSolid`), each joint in turn from the
- * knuckle out: a joint flexes from where the pose holds it until the part it moves, or any beyond it, touches the item,
- * or until its limit; the next joint then goes on from there, so a finger wraps a handle and a fingertip stops on a
- * surface. A joint whose parts the pose sinks into the item opens instead until they rest on it, or, when its range
- * cannot lift them clear, opens fully and leaves the next joint out to free them. The fingers close first and the thumb
- * last, on the item and on the closed fingers, so it comes to rest over them rather than through them. Digits that
- * touch nothing close fully; the digits named in `keep` stay as the pose has them. Returns the pose and, per digit
- * closed, how far it closed and whether it touched.
+ * knuckle out (`closeChain`), so a finger wraps a handle and a fingertip stops on a surface. The fingers close first
+ * and the thumb last, on the item and on the closed fingers, so it comes to rest over them rather than through them:
+ * its root swings across from where the pose lifts it, and its further joints bend down onto whatever lies under them.
+ * Digits that touch nothing close fully; the digits named in `keep` stay as the pose has them. Returns the pose and,
+ * per digit closed, how far it closed and whether it touched.
  * @param {HandRig} rig
  * @param {Pose} pose
  * @param {string} handId
@@ -362,46 +415,14 @@ export function closeHand(rig, pose, handId, solid, { keep = [] } = {}) {
   const digits = [...digitsOf(rig, handId)].sort(([a], [b]) => Number(a === 'thumb') - Number(b === 'thumb'));
   for (const [digit, chain] of digits) {
     if (keep.includes(digit)) continue;
-    const fingers =
-      digit !== 'thumb' ? [] : digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
-    const transforms = boneTransforms(rig.bones, pose);
-    const solids = [solid, ...fingers.map((bone) => boxSolid(bone.bind, transformOf(transforms, bone.id)))];
-    /**
-     * @param {Pose} p
-     * @param {readonly HandBone[]} moved
-     */
-    const apart = (p, moved) => nearest(rig, p, moved, solids) > CONTACT;
-    let touched = false;
-    chain.forEach((bone, k) => {
-      // A thumb its root has laid on the item or the fingers keeps its phalanges as posed, pressing its pad where it
-      // landed; bending them on would only lift the pad off.
-      if (digit === 'thumb' && touched) return;
-      const moved = chain.slice(k);
-      const [flex, twist, abduct] = jointAngles(bone, pose.rotations[bone.id] ?? IDENTITY_M);
-      /** @param {number} f */
-      const at = (f) => withAngles(pose, bone, clampJointAngles(bone, [f, twist, abduct]));
-      // The ends of the joint's range in the senses that close and open it: a phalanx curls toward the palm, while the
-      // thumb's root, which a grip opens wide (lifted off the palm), comes back down onto the item from beyond it.
-      const lowers = digit === 'thumb' && k === 0;
-      const [least, most] = bone.limits.flex;
-      const [opened, end] = bone.sense[0] > 0 !== lowers ? [least, most] : [most, least];
-      const gap = nearest(rig, at(flex), moved, solids);
-      if (gap < -CONTACT) {
-        // Posed sunk into the item: backed out the way the joint opens until it rests on the surface, or as far as it
-        // goes, leaving the joints beyond it to free their parts.
-        const out = sweepTo(flex, opened, (f) => apart(at(f), moved));
-        pose = at(out ? out.met : opened);
-        if (out) touched = true;
-        return;
-      }
-      if (gap <= CONTACT) {
-        touched = true;
-        return;
-      }
-      const met = sweepTo(flex, end, (f) => !apart(at(f), moved));
-      pose = at(met ? met.short : end);
-      if (met) touched = true;
-    });
+    /** @type {boolean} */
+    let touched;
+    if (digit === 'thumb') {
+      const transforms = boneTransforms(rig.bones, pose);
+      const fingers = digits.filter(([other]) => other !== 'thumb').flatMap(([, bones]) => bones);
+      const solids = fingers.map((bone) => boxSolid(bone.bind, transformOf(transforms, bone.id)));
+      ({ pose, touched } = closeChain(rig, pose, chain, [solid, ...solids]));
+    } else ({ pose, touched } = closeChain(rig, pose, chain, [solid]));
     closed[digit] = {
       touched,
       angles: Object.fromEntries(

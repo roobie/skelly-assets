@@ -72,9 +72,12 @@ its way to a point it still reaches.
 
 A power grip seats a handle across the palm short of the knuckle crease (the hand bone's `grip` share), where the
 fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook it and the palm stands
-beside it like a paddle. The thumb's root sits nearer the wrist than the handle, so the grip preset brings the thumb
-down already curled: its first segment lands on the handle and its tip folds over onto the fingers, where a straight
-thumb would land its tip on the fingers first and stand its segment off the handle. The
+beside it like a paddle. The thumb closes last and as a finger does, joint by joint until contact, on the item and on
+the closed fingers, so it comes to rest over the fist. That works because its joints bend it in the plane of the palm,
+across toward the fingers, as a thumb's do: with its hinge the fingers' own, bending toward the palm's face, a lifted
+thumb curled away from the fist and stood in the air, and a search over all its joint angles for a seat on the item
+could only lay it along the handle beside the fist, its knuckle standing off the palm. The grip preset lifts the thumb
+so that its knuckle stands before the fist, and contact does the rest. The
 knuckle row slants back toward the little finger, as the metacarpal heads arc, so the fist steps down from index to
 little; a palm split in two would arch the same way only with another bone and part for every hand, glove and mob to
 carry. The handle crosses the palm slanted

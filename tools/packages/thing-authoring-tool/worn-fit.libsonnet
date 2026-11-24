@@ -671,7 +671,7 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
     local palmX = arm.palmThickness / 2 + g, palmZ = arm.palmWidth / 2 + g;
     local wristX = arm.wristWidth / 2 + g, wristZ = arm.wristWidth / 2 + arm.wristDepthExtra + g;
     local fingerX = arm.palmThickness * arm.fingerThicknessShare / 2 + g, fingerZ = hand.width / 2 + g;
-    local thumbX = arm.palmThickness * arm.thumbThicknessShare / 2 + g;
+    local thumbX = arm.palmThickness * arm.thumbThicknessShare / 2;
     // The palm ends along the knuckle row, which slants back toward the little finger, so the glove's palm follows it
     // rather than standing square past the little finger's root, where a curled finger would come out through it.
     local last = std.length(hand.fingers) - 1;
@@ -704,10 +704,15 @@ local hems = { hip: 0.04, waist: bust.pelvisHeight, thigh: -0.1 };
       for k in phalanges
     ];
     // A thumb piece in its bone's frame, down the bone's length; the root piece ends just past the root, the rest reach
-    // into the bone above, each past the skin's end for the same reason as a phalanx's. Across the palm's edge it
-    // spans the thumb's flesh, from its joint, inset in the palm, out to the thumb's projection past the edge.
+    // into the bone above, each past the skin's end for the same reason as a phalanx's. It is its bone's flesh a layer
+    // out, the bones beyond the root a shade slimmer as the doll's are (the arm family's thumb), and it turns with the
+    // thumb, which each doll rests on its hand in its own way.
+    local thumbPiece(k) =
+      local slim = if k == 0 then 1 else arm.thumbSlimShare;
+      local x = thumbX * slim + g, z = arm.thumbWidth / 2 * slim + g;
+      [h.box('thumb', sl.hand, [-x, -hand.thumbLength(k) - g, -z], [x, (if k == 0 then 0 else arm.handOverlap) + g, z])];
     local thumbPieces = [
-      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: [h.box('thumb', sl.hand, [-thumbX, -hand.thumbLength(k) - g, -g], [thumbX, (if k == 0 then 0 else arm.handOverlap) + g, arm.thumbInset + arm.thumbProjection + g])] }
+      { id: id + '_worn_' + hand.thumbPart(k), label: 'thumb' + (if k == 0 then '' else ' ' + (k + 1)), pieces: thumbPiece(k) }
       for k in std.range(0, hand.thumbBones - 1)
     ];
     // The loose glove's fingers, one block across the knuckles, for the ground model.

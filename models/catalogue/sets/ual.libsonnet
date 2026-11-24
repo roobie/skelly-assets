@@ -71,7 +71,7 @@ local phalanx(i, k) = local finger = hand.fingers[i]; armPart(
 local thumbBone(k) = armPart(
   hand.thumbPart(k), 0.05 / hand.thumbBones,
   { segment: 'thumb', phalanx: k, tail: hand.thumbTail(k) },
-  [jointPin(hand.thumbPart(k))]
+  (if k == 0 then [] else [jointPin(hand.thumbPart(k))])
   + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), hand.thumbTail(k))] else []),
 );
 local digitConnection(parts) = [
@@ -101,7 +101,9 @@ local legSocket(of, child) = jointSocket(child, sub(legOrigin(child), legOrigin(
     exportMass: 'parts',
     taxonomy: taxonomy,
     voxelGrain: grain,
-    // The pelvis is the root, so the bust's frame is the pelvis bone's, at its head.
+    // The pelvis is the root, at its bone's head in the bust's frame, which is the player's: the pieces fitted to the
+    // player's bust are drawn on that frame's lattice, so UAL's flesh lies on it too.
+    rootAt: bustOrigins.pelvis,
     parts: [
       bustPart('pelvis', 7, { underwear: underwear }),
       bustPart('spine_01', 8, skinned),
@@ -143,20 +145,33 @@ local legSocket(of, child) = jointSocket(child, sub(legOrigin(child), legOrigin(
         jointPin('lowerarm'),
         jointSocket('hand', sub(armOrigins.palm, armOrigins.fore)),
       ]),
-      armPart('hand', 0.3, { segment: 'palm' }, [jointPin('hand'), jointSocket(hand.thumbPart(0), hand.thumbRoot)] + [
+      armPart('hand', 0.3, { segment: 'palm' }, [jointPin('hand')] + [
         jointSocket(hand.part(hand.fingers[i], 0), hand.knuckle(i))
         for i in std.range(0, fingerCount - 1)
       ]),
-    ] + [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)]
-      + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
+    ] + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     connections: [connection('upperarm', 'lowerarm'), connection('lowerarm', 'hand')]
-      + digitConnection([hand.thumbPart(k) for k in std.range(0, hand.thumbBones - 1)])
       + std.flattenArrays([
         digitConnection([hand.part(hand.fingers[i], k) for k in std.range(0, hand.phalanges - 1)])
         for i in std.range(0, fingerCount - 1)
       ]),
     anchors: {
       shoulder: { part: 'upperarm', at: [0, 0, 0] },
+      thumb_root: { part: 'hand', at: hand.thumbRoot },
+    },
+  },
+  {
+    id: 'ual_thumb',
+    title: 'UAL thumb',
+    exportMass: 'parts',
+    taxonomy: taxonomy,
+    voxelGrain: grain,
+    // The figure's right thumb hanging from its root, a part per bone; the doll rests it turned on the hand, along the
+    // line the skeleton's thumb bones run.
+    parts: [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)],
+    connections: digitConnection([hand.thumbPart(k) for k in std.range(0, hand.thumbBones - 1)])[1:],
+    anchors: {
+      thumb_root: { part: hand.thumbPart(0), at: [0, 0, 0] },
     },
   },
   {

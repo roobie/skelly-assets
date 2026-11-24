@@ -2,8 +2,10 @@
 // thumb bone is and what its part and bone are called, so the doll (models/catalogue/sets/avatar.libsonnet), its rig
 // (models/dolls/player/rig.libsonnet) and its gloves (packages/thing-authoring-tool/worn-fit.libsonnet) agree on one hand.
 // The knuckles, the thumb's root, the digit bones' lengths and their names are the UAL doll's
-// (models/dolls/ual/joints.libsonnet), so a glove's piece names and fits the same phalanx on both dolls; the player's
-// digits hang straight down from their roots, where UAL's run as its skeleton's do.
+// (models/dolls/ual/joints.libsonnet), so a glove's piece names and fits the same phalanx on both dolls. So is the
+// thumb's rest, leaning out from the palm and forward: the thumb is a limb of its own, drawn hanging straight and
+// rested turned on the hand, and a glove's thumb pieces are drawn in its bones' frames, so they turn with it. The
+// player's fingers hang straight down from their knuckles, where UAL's lean the few millimetres its skeleton's do.
 local arm = import 'arm.libsonnet';
 local ual = (import 'models/dolls/ual/joints.libsonnet').hand;
 local halfPalm = arm.palmWidth / 2;
@@ -25,6 +27,9 @@ local count = std.length(ual.fingers);
   thumbBones: ual.thumbBones,
   thumbPart(k):: ual.thumbPart(k),
   thumbLength(k):: ual.thumbLength(k),
+  // Each thumb bone's tail from its head, in the thumb's own frame, and where that frame's axes point in the arm's.
+  thumbTail(k):: ual.thumbTail(k),
+  thumbFrame:: ual.thumbFrame,
   // Where a game's fist closes on a held item's grip point, as a share of the palm's length from the wrist: the arm's
   // grip anchor, and the palm seat of the doll's melee hands, so a wield clip baked on the doll seats its weapon where
   // the game's figure holds it. The doll's own power grip (models/dolls/player/rig.libsonnet, the hand's `grip`) seats further from the wrist.

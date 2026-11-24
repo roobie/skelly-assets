@@ -18,5 +18,8 @@ ual {
   foreAxis:: plan(foreBone),
   seamOverlap: 0.01, handOverlap: 0.005, armChamfer: 0.03, wristChamfer: 0.02,
   foreDepthExtra: 0.004, wristDepthExtra: 0.006, wristShare: 0.45,
-  fingerThicknessShare: 0.8, thumbThicknessShare: 0.7, fingerFrontShare: 0.9, thumbProjection: 0.014,
+  fingerThicknessShare: 0.8, fingerFrontShare: 0.9,
+  // The thumb's root bone is as thick as this share of the palm and `thumbWidth` across, and the bones beyond it keep
+  // `thumbSlimShare` of that section, so the thumb is the hand's stoutest digit, as a thumb is.
+  thumbThicknessShare: 0.6, thumbWidth: 0.03, thumbSlimShare: 0.8,
 }

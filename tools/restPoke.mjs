@@ -1,5 +1,5 @@
-// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of the doll it is fitted to poking
-// through it at rest, and encloses what its pieces declare they cover. The cover check (tools/dollRig.mjs, `coverGaps`)
+// Proves that every fitted garment, a wearable drawn as worn pieces, leaves none of any doll poking through it at
+// rest, and encloses what its pieces declare they cover. The cover check (tools/dollRig.mjs, `coverGaps`)
 // counts a point a piece passes beneath as covered, so only the rest probe (site/clearance.mjs, `restClearance`) can
 // see the skin standing out of the piece meant to cover it. A poke is allowed by models/rest-pokes.libsonnet: `poke`
 // for one that is intended and says why, `unjudged` for one nobody has judged yet, which every run lists. Both name the
@@ -14,7 +14,6 @@ import { compareCodeUnits } from './codeUnitOrder.mjs';
 import { coverGaps, dollRig, restMeshes } from './dollRig.mjs';
 import {
   dollDressings,
-  dollGarments,
   dollModels,
   dollOf,
   fittedGarments,
@@ -117,7 +116,7 @@ const taskHash = (task, checker) =>
     .digest('hex')
     .slice(0, 32);
 
-// The pokes and cover gaps of every fitted garment among `models` ({ id, tags }) on the doll it is fitted to, by doll
+// The pokes and cover gaps of every fitted garment among `models` ({ id, tags }) on every doll, by doll
 // then garment (`probeGarment`): from the cache folder when a garment's inputs and the checker are as they were, else
 // probed on worker threads, one garment each, and kept. `modelOf(id)` gives a model's { glb, entry }, its GLB and model
 // entry, from a built tree or as generated. With `shard`, only that shard of the garments is probed, so CI can spread a
@@ -142,9 +141,8 @@ export async function restPokeResults(
   const mine = shard === undefined ? garments : shardUnits(garments, shard);
   if (mine.length === 0) return { results: {}, reused: 0, probed: 0 };
   const dressings = dollDressings(readDressing(root));
-  const garmentsOf = new Map(dressings.map((dressing) => [dressing.id, dollGarments(dressing, mine)]));
   const pieceIds = dressings.flatMap((dressing) =>
-    garmentsOf.get(dressing.id).flatMap((garment) => wornPieces(garment, models, dressing).map(({ model }) => model)),
+    mine.flatMap((garment) => wornPieces(garment, models, dressing).map(({ model }) => model)),
   );
   const dollIds = dressings.flatMap(dollModels);
   const files = new Map(
@@ -154,7 +152,7 @@ export async function restPokeResults(
     const doll = Object.fromEntries(
       dollModels(dressing).map((id) => [id, { glb: files.get(id).glb, anchors: files.get(id).entry.anchors }]),
     );
-    return garmentsOf.get(dressing.id).map((garment) => {
+    return mine.map((garment) => {
       const task = garmentTask(garment, { models, dressing, doll }, files);
       return { doll: dressing.id, garment, task, hash: taskHash(task, checker) };
     });

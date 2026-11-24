@@ -1,6 +1,7 @@
 // The player doll, one of the dolls of models/dressing.libsonnet: the doll a game's player is drawn as. What the
 // dressing rule needs of a doll is read from here (tools/dress.mjs, `dollDressing`).
 local armRest = import 'models/arm-rest.libsonnet';
+local hand = import 'models/measures/hand.libsonnet';
 {
   // Where the doll's rig is released: the pack of its parts, and the file that rig is written to.
   pack: 'skelly.body',
@@ -15,12 +16,15 @@ local armRest = import 'models/arm-rest.libsonnet';
   // turning it toward -x. A doll measured off a skeleton stands its bust where the skeleton has it with `bustAt`, its
   // origin in the doll frame; the player's doll frame is its bust's. The clavicle is a limb too, though it hangs
   // nothing: the arm's rig bone hangs from its bone while the arm's model hangs from the bust, at the shoulder the
-  // clavicle carries, so either stands the arm on the same joint at rest.
+  // clavicle carries, so either stands the arm on the same joint at rest. A limb with `on` hangs from that limb's
+  // anchor, not the bust's, and turns with it: the thumb hangs from the arm's thumb root, and its `turn` is a `frame`,
+  // where its model's own axes point in the arm's, as it leans askew of every axis of the arm.
   bust: 'player_bust',
   limbs: [
     { name: 'arm', model: 'player_arm', anchor: 'shoulder', turn: { axis: [0, 0, 1], degrees: -armRest.degrees } },
     { name: 'leg', model: 'player_leg', anchor: 'hip' },
     { name: 'clavicle', model: 'player_clavicle', anchor: 'clavicle' },
+    { name: 'thumb', model: 'player_thumb', anchor: 'thumb_root', on: 'arm', turn: { frame: hand.thumbFrame } },
   ],
   sides: ['right', 'left'],
   mirrored: 'left',

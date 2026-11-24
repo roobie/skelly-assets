@@ -10,6 +10,7 @@
 /** @import { GltfMesh, GltfNode } from './glb.mjs' */
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { mat3ToQuat } from '../site/kinematics.mjs';
 import { glbAccessor, glbItem, glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
@@ -30,8 +31,14 @@ import { facetTerms } from './taxonomy.mjs';
  * A limb hung on the doll: `turn`, if the doll rests it turned off the way its model hangs (down -y), is `degrees`
  * about `axis` of the doll frame, as the side that is not `mirrored` takes it; the other side's turn is this side's
  * mirror image (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both. The axis is one of
- * the doll's, which is all a T-pose or an arm swung clear of the hips asks for; the angle is any.
- * @typedef {{ name: string; model: string; anchor: string; turn?: { axis: Vec3; degrees: number } }} DollLimb
+ * the doll's, which is all a T-pose or an arm swung clear of the hips asks for; the angle is any. A limb that rests
+ * askew of every such axis, as a thumb does on its hand, gives `frame` instead: where its model's own x, y and z point.
+ *
+ * A limb hangs from the bust's anchor `<anchor>_<side>`, or with `on` from the anchor `anchor` of the limb of that
+ * name, listed before it, on the same side: a thumb from its hand's. Its turn is then in that limb's frame, taken
+ * after that limb's own, so it rests on the limb the same way however the doll rests the limb.
+ * @typedef {{ axis: Vec3; degrees: number } | { frame: { x: Vec3; y: Vec3; z: Vec3 } }} LimbTurn
+ * @typedef {{ name: string; model: string; anchor: string; on?: string; turn?: LimbTurn }} DollLimb
  */
 
 /**
@@ -56,7 +63,12 @@ import { facetTerms } from './taxonomy.mjs';
  * The doll part a segment's pieces are drawn in and, where that part's frame is not the one the pieces were fitted in,
  * `origin`: where the fitted part's origin lies in this part's frame, so a piece fitted to the player's torso, whose
  * origin is the bust's, is drawn at the bust's on a doll whose chest part turns about its own joint.
- * @typedef {{ part: SlotPart; origin?: Vec3 }} PieceSlot
+ *
+ * A piece's `covers` names the part it was fitted in as the player calls it, and the regions of the player's cut of it.
+ * `as` is that name of the slot's part, which the doll's own part answers to, and `unhidden` the names of the player's
+ * regions that the piece cannot hide on this doll, since the doll's region of that name lies on parts the piece is not
+ * drawn in.
+ * @typedef {{ part: SlotPart; origin?: Vec3; as?: string; unhidden?: readonly string[] }} PieceSlot
  */
 
 /**
@@ -88,7 +100,7 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {number | undefined} [soleLift]
  */
 
-/** @typedef {{ part: string; at: Vec3; box: Box }} ModelPart */
+/** @typedef {{ part: string; at: Vec3; box: Box; points: readonly Vec3[] }} ModelPart */
 /** @typedef {{ parts: readonly ModelPart[]; anchors: Readonly<Record<string, Vec3>> }} FigureModel */
 /** @typedef {{ model: string; at: Vec3; mirror?: boolean; turn?: Quaternion }} DollSite */
 /**
@@ -98,11 +110,9 @@ import { facetTerms } from './taxonomy.mjs';
  * @property {number} site
  * @property {Vec3} at
  * @property {Box} box where the copy lies at rest in the doll frame, a bound on it
+ * @property {readonly Vec3[]} points the part's vertices where the copy lies at rest in the doll frame
  * @property {boolean} [mirror]
  * @property {Quaternion} [turn]
- * @property {{ box: Box; about: Vec3 }} [hanging] on a turned copy, its box as it hangs before the turn swings it about
- * `about`, the anchor it hangs from: the box a reader of the part's faces needs, since `box` is a looser one at any
- * angle but a quarter turn
  */
 /** @typedef {ReturnType<typeof dollOf>} Doll */
 /** @typedef {{ anchors: Readonly<Record<string, string>>; sided: readonly string[] }} DollParts */
@@ -227,12 +237,44 @@ const product = ([ax, ay, az, aw], [bx, by, bz, bw]) => [
 const turned = (box, turn) => boxOf(corners(box).map((p) => rotate(turn, p)));
 
 /**
- * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it.
+ * The box `points` fill exactly in a frame that `turn` carries into the doll frame about `about`, so a part turned off
+ * the doll's axes is met at its own faces rather than at the corners of its looser doll-frame box. A rig bone's
+ * `bind.bound` is this box of its part copy (tools/dollRig.mjs), and a model rested on a turned part meets the same.
+ * @param {readonly Vec3[]} points
+ * @param {Quaternion} turn
+ * @param {Vec3} about
+ * @returns {{ box: Box; turn: Quaternion; about: Vec3 }}
+ */
+export const exactBound = (points, turn, about) => {
+  /** @type {Quaternion} */
+  const back = [-turn[0], -turn[1], -turn[2], turn[3]];
+  return { box: boxOf(points.map((p) => sum(rotate(back, difference(p, about)), about))), turn, about };
+};
+
+/**
+ * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it, or the turn that
+ * carries the model's axes onto a `frame`, which must be three unit axes square to each other and right-handed, since
+ * a frame that is not would shear or mirror the limb.
  * @param {string} model the limb's model, named in what is refused
- * @param {{ axis: Vec3; degrees: number }} turn
+ * @param {LimbTurn} turn
  * @returns {Quaternion}
  */
-const turnOf = (model, { axis, degrees }) => {
+const turnOf = (model, turn) => {
+  if ('frame' in turn) {
+    const { x, y, z } = turn.frame;
+    const axes = [x, y, z];
+    if (!axes.every((a) => Array.isArray(a) && a.length === 3 && a.every(Number.isFinite)))
+      throw new Error(`doll: ${model}'s turn frame needs x, y and z, each a direction [x, y, z]`);
+    /** @type {(a: Vec3, b: Vec3) => number} */
+    const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const handed = dot(x, [y[1] * z[2] - y[2] * z[1], y[2] * z[0] - y[0] * z[2], y[0] * z[1] - y[1] * z[0]]);
+    const square = axes.every((a, i) => axes.every((b, j) => Math.abs(dot(a, b) - (i === j ? 1 : 0)) < 1e-9));
+    if (!square || Math.abs(handed - 1) > 1e-9)
+      throw new Error(`doll: ${model}'s turn frame is not three unit axes square to each other and right-handed`);
+    // The frame's axes are the columns of the turn's matrix.
+    return /** @type {Quaternion} */ (mat3ToQuat([x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]]));
+  }
+  const { axis, degrees } = turn;
   const along = axis.filter((c) => c !== 0);
   if (axis.length !== 3 || !axis.every(Number.isFinite) || along.length !== 1 || Math.abs(along[0] ?? 0) !== 1)
     throw new Error(`doll: ${model}'s turn axis ${JSON.stringify(axis)} is not a doll axis, [±1, 0, 0] or alike`);
@@ -350,19 +392,30 @@ function meshNodes(buffer, gltf = glbJson(buffer)) {
 export const modelBox = (buffer) => union(meshNodes(buffer).map(({ box }) => box));
 
 /**
- * Each part of a model: its name, origin and box in the model frame. A doll part's frame is where a worn piece is
- * drawn, so a part turned off the model's axes is refused rather than drawn askew.
+ * Each part of a model: its name, origin, box and vertices in the model frame. A doll part's frame is where a worn
+ * piece is drawn, so a part turned off the model's axes is refused rather than drawn askew. The vertices bound the part
+ * in a frame off the model's axes, where its box would be a loose bound.
  * @param {Buffer} buffer
  */
 export function modelParts(buffer) {
+  const gltf = glbJson(buffer);
   /** @type {Map<string, ModelPart>} */
   const byName = new Map();
-  for (const { part, box } of meshNodes(buffer)) {
+  for (const { part, box, mesh, toModel } of meshNodes(buffer, gltf)) {
     if (!part) continue;
     if (part.turned)
       throw new Error(`part ${part.name} is turned in its model; a doll part must keep the model's axes`);
+    const points = mesh.primitives.flatMap(({ attributes }) => {
+      const positions = glbAccessor(buffer, gltf, attributes.POSITION);
+      return Array.from({ length: positions.length / 3 }, (_, i) => toModel(pointAt(positions, 3 * i)));
+    });
     const seen = byName.get(part.name);
-    byName.set(part.name, { part: part.name, at: part.at, box: seen ? union([seen.box, box]) : box });
+    byName.set(
+      part.name,
+      seen
+        ? { ...seen, box: union([seen.box, box]), points: [...seen.points, ...points] }
+        : { part: part.name, at: part.at, box, points },
+    );
   }
   return [...byName.values()];
 }
@@ -405,13 +458,12 @@ export function modelMeshes(buffer, keep = () => true) {
 // ---- the doll ----
 
 /**
- * The doll's sites, for each of its part names the copies of that part in the doll frame as
- * { side, site, at, box, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that
- * draws the copy, and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may
- * keep the frame its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is:
- * the model mirrored, turned by the limb's turn (the mirrored side's being the mirror image of the other's),
- * then moved so its own anchor lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the
- * doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
+ * The doll's sites, for each of its part names the copies of that part in the doll frame as { side, site, at, box,
+ * points, mirror, turn }, in the order of the dressing's sides, where `site` indexes the doll site that draws the copy,
+ * and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may keep the frame
+ * its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is: the model mirrored,
+ * turned by the limb's turn (the mirrored side's being the mirror image of the other's), then moved so its own anchor
+ * lies on the bust's, or on that of the limb it hangs `on`, whose turn it takes before its own. A copy's `at` is where its part's origin lands, its `box` the doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
  * @param {DollDressing} dressing
  * @param {Readonly<Record<string, FigureModel>>} figure
  */
@@ -430,20 +482,35 @@ export function dollOf(dressing, figure) {
   const parts = new Map();
   /** @param {PartCopy} copy */
   const add = (copy) => parts.set(copy.part, [...(parts.get(copy.part) ?? []), copy]);
-  for (const { part, at, box } of figureOf(bust).parts) {
-    add({ part, side: 'centre', site: 0, at: sum(bustAt, at), box: moved(box, bustAt) });
+  for (const { part, at, box, points } of figureOf(bust).parts) {
+    add({
+      part,
+      side: 'centre',
+      site: 0,
+      at: sum(bustAt, at),
+      box: moved(box, bustAt),
+      points: points.map((p) => sum(bustAt, p)),
+    });
   }
   const anchors = Object.fromEntries(
     Object.entries(figureOf(bust).anchors).map(([name, at]) => [name, sum(bustAt, at)]),
   );
-  for (const { model, anchor, turn: limbTurn } of limbs) {
+  // Each limb hung so far, by name and side: its turn, and its own anchors where the doll stands them.
+  /** @type {Map<string, Map<string, { turn?: Quaternion; anchors: Record<string, Vec3> }>>} */
+  const hangers = new Map();
+  for (const { name, model, anchor, on, turn: limbTurn } of limbs) {
     const own = figureOf(model).anchors[anchor];
     const unmirroredTurn = limbTurn && turnOf(model, limbTurn);
+    if (on !== undefined && !hangers.has(on))
+      throw new Error(`doll: ${model} hangs on the limb ${on}, which the doll has not hung before it`);
+    hangers.set(name, new Map());
     for (const side of sides) {
-      const hung = anchors[`${anchor}_${side}`];
+      const hanger = on === undefined ? undefined : hangers.get(on)?.get(side);
+      const hung = hanger ? hanger.anchors[anchor] : anchors[`${anchor}_${side}`];
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
-      const turn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
+      const ownTurn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
+      const turn = hanger?.turn && ownTurn ? product(hanger.turn, ownTurn) : (hanger?.turn ?? ownTurn);
       /** @type {(p: Vec3) => Vec3} a point of the limb's model frame, relative to where the site puts its origin */
       const place = (p) => {
         const flipped = mirror ? mirrorX(p) : p;
@@ -456,7 +523,13 @@ export function dollOf(dressing, figure) {
           ...(mirror ? { mirror } : {}),
           ...(turn ? { turn } : {}),
         }) - 1;
-      for (const { part, at, box } of figureOf(model).parts) {
+      hangers.get(name)?.set(side, {
+        ...(turn ? { turn } : {}),
+        anchors: Object.fromEntries(
+          Object.entries(figureOf(model).anchors).map(([id, at]) => [id, sum(hung, place(difference(at, own)))]),
+        ),
+      });
+      for (const { part, at, box, points } of figureOf(model).parts) {
         const local = moved(box, difference([0, 0, 0], own));
         const flipped = mirror ? mirrored(local) : local;
         add({
@@ -465,8 +538,9 @@ export function dollOf(dressing, figure) {
           site,
           at: sum(hung, place(difference(at, own))),
           box: moved(turn ? turned(flipped, turn) : flipped, hung),
+          points: points.map((p) => sum(hung, place(difference(p, own)))),
           ...(mirror ? { mirror } : {}),
-          ...(turn ? { turn, hanging: { box: moved(flipped, hung), about: hung } } : {}),
+          ...(turn ? { turn } : {}),
         });
       }
     }
@@ -504,23 +578,56 @@ export const wornGarment = (id) => wornPiece(id)?.garment;
 const pieceOf = (model) => (tagsOf(model, 'fit').includes('worn') ? wornPiece(model.id) : undefined);
 
 /**
- * The doll part whose frame a worn piece is drawn in, with the fitted part's origin in it if it has one: the dressing's
- * `piece` part without a segment, else the segment's slot.
+ * The doll part whose frame a worn piece is drawn in, with the fitted part's origin in it if it has one: the slot of the
+ * segment its id names, or of the dressing's `piece` without one.
  * @param {string} id
  * @param {{ segment: string | undefined }} piece
  * @param {DollDressing} dressing
  * @returns {PieceSlot}
  */
 function pieceSlot(id, { segment }, dressing) {
-  if (segment === undefined) return { part: dressing.piece };
-  const slot = dressing.slots[segment];
-  if (!slot) throw new Error(`${id}: worn segment ${segment} is not in the dressing's slots`);
-  return slot.origin ? { part: slot.part, origin: slot.origin } : { part: slot.part };
+  const named = segment ?? dressing.piece;
+  const slot = dressing.slots[named];
+  if (!slot) throw new Error(`${id}: worn segment ${named} is not in the dressing's slots`);
+  const { part, origin, as, unhidden } = slot;
+  return {
+    part,
+    ...(origin ? { origin } : {}),
+    ...(as === undefined ? {} : { as }),
+    ...(unhidden ? { unhidden } : {}),
+  };
 }
 
 /**
- * Why a slot's part is no single doll part, for a reader that names one: a manifest's `wornOn` and a piece's `covers`
- * name the player's parts, each of which a slot holds whole.
+ * The names a piece's `covers` gives on the doll, for the copy of `part` it is drawn in: the player's name for the
+ * piece's part is the doll's own part, a region the doll cannot hide from the piece is no name at all, and a region the
+ * doll holds as several whole parts, `part` among them, is the part, the only one of them the piece is drawn on.
+ * @param {PieceSlot} slot
+ * @param {string} part
+ * @param {readonly string[]} covers
+ * @param {DollDressing} dressing
+ */
+const coversOn = ({ as, unhidden }, part, covers, dressing) => [
+  ...new Set(
+    covers
+      .filter((name) => !unhidden?.includes(name))
+      .map((name) => (name === as || heldAmongParts(dressing, name, part) ? part : name)),
+  ),
+];
+
+/**
+ * Whether the doll's region `name` holds `part` whole beside other whole parts.
+ * @param {DollDressing} dressing
+ * @param {string} name
+ * @param {string} part
+ */
+function heldAmongParts(dressing, name, part) {
+  const wholes = (dressing.regions[name] ?? []).filter((surface) => surfacePart(surface) === surface);
+  return wholes.includes(part) && wholes.length > 1;
+}
+
+/**
+ * Why a slot's part is no single doll part, for a reader that names one, as a manifest's `wornOn` does.
  * @param {string} id
  * @param {SlotPart} part
  */
@@ -595,23 +702,31 @@ export function coversProblems(models, dressing) {
     if (!covers) return [];
     const worn = wornPiece(id);
     if (!worn) return [`${id} declares what it covers but is no worn piece`];
-    const slotPart = worn.segment === undefined ? dressing.piece : dressing.slots[worn.segment]?.part;
-    if (!slotPart) return [`${id}: worn segment ${worn.segment} is not in the dressing's slots`];
-    const problem = notOnePart(id, slotPart);
-    if (problem !== undefined) return [problem];
-    const part = /** @type {string} */ (slotPart);
-    const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
-      surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
-    );
-    const names = [part, ...regions.map(([region]) => region)];
-    return covers
-      .filter((name) => !names.includes(name))
-      .map((name) =>
-        dressing.regions[name]?.includes(part)
-          ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
-          : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
-      );
+    const slot = pieceSlot(id, worn, dressing);
+    const parts = typeof slot.part === 'string' ? [slot.part] : Object.values(slot.part);
+    return parts.flatMap((part) => coversProblemsOn(id, part, coversOn(slot, part, covers, dressing), dressing));
   });
+}
+
+/**
+ * What is wrong with the names a piece drawn in the doll part `part` covers there.
+ * @param {string} id
+ * @param {string} part
+ * @param {readonly string[]} covers
+ * @param {DollDressing} dressing
+ */
+function coversProblemsOn(id, part, covers, dressing) {
+  const regions = Object.entries(dressing.regions).filter(([, surfaces]) =>
+    surfaces.some((surface) => surface !== part && surfacePart(surface) === part),
+  );
+  const names = [part, ...regions.map(([region]) => region)];
+  return covers
+    .filter((name) => !names.includes(name))
+    .map((name) =>
+      dressing.regions[name]?.includes(part)
+        ? `${id} covers ${name}, which holds its part ${part} whole, so names no piece of it: name ${part}`
+        : `${id} covers ${name}, which is neither its part nor a region drawn on it: ${names.join(', ')}`,
+    );
 }
 
 /**
@@ -642,19 +757,6 @@ export const isWearable = (model, models) =>
  * @param {readonly DressModel[]} models
  */
 export const fittedGarments = (models) => [...new Set(models.flatMap((model) => pieceOf(model)?.garment ?? []))];
-
-/**
- * The garments among `garments` whose pieces were fitted to the doll of `dressing`. A garment's pieces are fitted to
- * one doll, which the checks run on that doll alone for: a piece's shape is only meant for the doll it was drawn
- * against. Every piece is the player's until they are told apart by the doll their id names (`_worn_<doll>`), and then
- * only `fittedDoll` changes.
- * @param {DollDressing} dressing
- * @param {readonly string[]} garments
- */
-export const dollGarments = (dressing, garments) => garments.filter((garment) => fittedDoll(garment) === dressing.id);
-
-/** The doll a garment's pieces were fitted to. @param {string} _garment */
-const fittedDoll = (_garment) => PLAYER;
 
 /**
  * The place a wearable with no pieces sits by: the first of the dressing's `places` that names one of its slots.
@@ -847,10 +949,11 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     // the parts across its joints it leaves bare.
     return [
       ...sites,
-      ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies }) =>
+      ...plan.pieces.flatMap(({ model: piece, origin, covers, soleLift, copies, ...slot }) =>
         copies.map((copy) => {
           const { part, side, mirror, turn, site } = copy;
-          const bare = covers ? leftBare(dressing, part, covers) : [];
+          const own = covers && coversOn(slot, part, covers, dressing);
+          const bare = own ? leftBare(dressing, part, own) : [];
           return {
             model: piece,
             part,
@@ -858,7 +961,7 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
             at: origin ? inCopy(copy, origin) : copy.at,
             ...(mirror ? { mirror } : {}),
             ...(turn ? { turn } : {}),
-            ...(covers ? { covers, bodySite: site } : {}),
+            ...(own ? { covers: own, bodySite: site } : {}),
             ...(bare.length > 0 ? { bare } : {}),
             ...(soleLift === undefined ? {} : { soleLift }),
           };
@@ -871,19 +974,19 @@ export function wornSites(model, { dressing, doll, models, boxOf: boxOfModel, an
     return [...sites, { model: model.id, at: difference(anchored, anchorsOf(model.id)[place.anchor] ?? [0, 0, 0]) }];
   }
   const { rested, place } = plan;
-  // A turned copy is rested against as it hangs, and the model then swung with it, so the model meets the part's own
-  // faces along its own axes, as a worn piece does, rather than the looser box of the turned part.
+  // A turned copy is rested against in its exact bound, the frame its bone's `bind.bound` gives it, and the model then
+  // swung with it, so the model meets the part's own faces, as a worn piece does, rather than the looser box of the
+  // turned part.
   const [first] = rested;
-  const hanging =
-    rested.length === 1 && first?.hanging && first.turn ? { ...first.hanging, turn: first.turn } : undefined;
-  const region = hanging ? hanging.box : union(rested.map(({ box }) => box));
+  const bound = rested.length === 1 && first?.turn ? exactBound(first.points, first.turn, first.at) : undefined;
+  const region = bound ? bound.box : union(rested.map(({ box }) => box));
   const lying = tagsOf(model, 'state').some((state) => dressing.lying.includes(state));
   const box = lying ? turned(boxOfModel(model.id), STAND) : boxOfModel(model.id);
   // Footwear's sole lies under the bare foot, so the figure stands on it (site/poseFile.mjs, `soleLift`).
   const hung = difference(rest(box, region, place), [0, model.soleLift ?? 0, 0]);
   const own = lying ? STAND : undefined;
-  const at = hanging ? sum(rotate(hanging.turn, difference(hung, hanging.about)), hanging.about) : hung;
-  const turn = hanging ? (own ? product(hanging.turn, own) : hanging.turn) : own;
+  const at = bound ? sum(rotate(bound.turn, difference(hung, bound.about)), bound.about) : hung;
+  const turn = bound ? (own ? product(bound.turn, own) : bound.turn) : own;
   return [
     ...sites,
     {

@@ -10,15 +10,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { coverGaps, dollRig } from './dollRig.mjs';
-import {
-  coveringItems,
-  dollDressings,
-  dollGarments,
-  modelMeshes,
-  readDoll,
-  readDressing,
-  wornSites,
-} from './dress.mjs';
+import { coveringItems, dollDressings, modelMeshes, readDoll, readDressing, wornSites } from './dress.mjs';
 import { glbJson } from './glb.mjs';
 import { readSeats, seatFindings } from './head-fit.mjs';
 import { MANIFEST } from './manifest.mjs';
@@ -103,7 +95,7 @@ function coverSmoothFindings(built, manifest, root) {
   const gaps = dollDressings(readDressing(root)).flatMap((dressing) => {
     const doll = readDoll(built, manifest, dressing);
     const rig = dollRig(doll, dressing);
-    return dollGarments(dressing, coveringItems(models)).flatMap((id) =>
+    return coveringItems(models).flatMap((id) =>
       guarded(id, () =>
         coverGaps(rig, wornSites({ id }, { dressing, doll, models, boxOf: unplaced, anchorsOf: unplaced }), meshesOf),
       ),

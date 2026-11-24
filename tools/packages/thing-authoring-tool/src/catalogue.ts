@@ -1,6 +1,15 @@
 import type { Assembly, Domain, PartDef, PartFamily } from '@skelly/construct/assembly/schema.ts';
 import { validate } from '@skelly/construct/assembly/validate.ts';
-import { applyDir, applyPoint, dot, rotation, scale, type Vec3 } from '@skelly/construct/foundation/math.ts';
+import {
+  applyDir,
+  applyPoint,
+  compose,
+  dot,
+  rotation,
+  scale,
+  translation,
+  type Vec3,
+} from '@skelly/construct/foundation/math.ts';
 import type { Solid } from '@skelly/construct/shapes/solid.ts';
 import { type Motion, type StageMove, shareStages } from '@skelly/motion/motion';
 import { BuildingSchema } from '@skelly/thing-core/building';
@@ -153,6 +162,12 @@ const ItemSchema = pipe(
      * another axis names it once, and the build turns the model onto +z. Defaults to the family's, else +z.
      */
     forward: optional(picklist(FORWARDS)),
+    /**
+     * Where the root part's origin stands in the model frame, in the item's units, when not at the frame's origin: a
+     * model whose root turns about a joint off the frame it is worn in keeps that frame, and with it the voxel lattice
+     * its pieces are drawn on.
+     */
+    rootAt: optional(ModelPointSchema),
     skin: optional(SkinSchema),
     parts: pipe(
       array(PartSchema),
@@ -509,7 +524,8 @@ export const itemBuilding = (item: ToolItem, settings: CatalogueSettings) => {
 export const buildItem = (item: ToolItem, settings: CatalogueSettings, voxel?: VoxelGrains) => {
   const first = item.parts[0]!;
   const forward = item.forward ?? FAMILY_FORWARDS[first.family] ?? '+z';
-  const rootPlacement = rotation(FRONT_TURNS[forward]);
+  const turned = rotation(FRONT_TURNS[forward]);
+  const rootPlacement = item.rootAt === undefined ? turned : compose(translation(item.rootAt), turned);
   let assembly: Assembly;
   let domain: Domain;
   let masses: Readonly<Record<string, number>>;

@@ -7,6 +7,7 @@ import { modelSources } from '../check-sources.mjs';
 import { readDollParts } from '../dollParts.mjs';
 import {
   coveringItems,
+  coversProblems,
   dollDressing,
   dollDressings,
   dollOf,
@@ -22,10 +23,18 @@ import {
   wornRefusal,
   wornSites,
 } from '../dress.mjs';
+import { writeGlb } from '../glb.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 const box = (min, max) => ({ min, max });
+// A toy part drawn as a box, whose vertices are its corners.
+const boxPart = (part, at, min, max) => ({
+  part,
+  at,
+  box: box(min, max),
+  points: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? max[a] : min[a]))),
+});
 const close = (actual, expected) =>
   actual.forEach((x, i) => assert.ok(Math.abs(x - expected[i]) < 1e-9, `${actual} is not ${expected}`));
 
@@ -36,7 +45,7 @@ const dressing = {
   limbs: [{ name: 'arm', model: 'limb', anchor: 'shoulder' }],
   sides: ['right', 'left'],
   mirrored: 'left',
-  piece: 'chest',
+  piece: 'body',
   layers: ['over-jacket'],
   lying: ['folded'],
   places: [
@@ -52,11 +61,11 @@ const dressing = {
 };
 const figure = {
   bust: {
-    parts: [{ part: 'chest', at: [0, 0, 0], box: box([-0.2, 0, -0.1], [0.2, 0.6, 0.1]) }],
+    parts: [boxPart('chest', [0, 0, 0], [-0.2, 0, -0.1], [0.2, 0.6, 0.1])],
     anchors: { shoulder_right: [-0.3, 0.5, 0], shoulder_left: [0.3, 0.5, 0], brow: [0, 0.8, 0.05] },
   },
   limb: {
-    parts: [{ part: 'sleeve', at: [0, -0.2, 0], box: box([-0.05, -0.4, -0.05], [0.1, 0, 0.05]) }],
+    parts: [boxPart('sleeve', [0, -0.2, 0], [-0.05, -0.4, -0.05], [0.1, 0, 0.05])],
     anchors: { shoulder: [0, 0.1, 0] },
   },
 };
@@ -109,8 +118,8 @@ test("a piece whose part the doll has as a part of the bust on each side is draw
       ...figure.bust,
       parts: [
         ...figure.bust.parts,
-        { part: 'yoke_r', at: [-0.1, 0.5, 0], box: box([-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]) },
-        { part: 'yoke_l', at: [0.1, 0.5, 0], box: box([0.05, 0.45, -0.05], [0.2, 0.55, 0.05]) },
+        boxPart('yoke_r', [-0.1, 0.5, 0], [-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]),
+        boxPart('yoke_l', [0.1, 0.5, 0], [0.05, 0.45, -0.05], [0.2, 0.55, 0.05]),
       ],
     },
   });
@@ -269,7 +278,7 @@ test("every worn piece, over other clothing too, and every wearable with no piec
   const pieceParts = new Map(
     pieces.map(({ id }) => {
       const segment = wornPiece(id)?.segment;
-      return [id, { part: segment === undefined ? dressing.piece : wornSlots[segment].part }];
+      return [id, { part: wornSlots[segment ?? dressing.piece].part }];
     }),
   );
   const layered = sources.filter((entry) => tags(entry, 'fit').some((fit) => dressing.layers.includes(fit)));
@@ -413,21 +422,13 @@ test('a wearable is refused with its reason where the doll has no place to wear 
   );
 });
 
-// A GLB holding only its JSON chunk: the boxes come from the accessors' bounds, so no buffer is needed.
-const glb = (gltf) => {
-  const json = Buffer.from(JSON.stringify(gltf).padEnd(Math.ceil(JSON.stringify(gltf).length / 4) * 4, ' '));
-  const header = Buffer.alloc(20);
-  header.write('glTF', 0);
-  header.writeUInt32LE(2, 4);
-  header.writeUInt32LE(20 + json.length, 8);
-  header.writeUInt32LE(json.length, 12);
-  header.write('JSON', 16);
-  return Buffer.concat([header, json]);
-};
+// A GLB whose every mesh draws the unit cube's corners.
+const unitCorners = [0, 1, 2, 3, 4, 5, 6, 7].flatMap((i) => [0, 1, 2].map((a) => (i >> a) & 1));
+const glb = (gltf) => writeGlb({ asset: { version: '2.0' }, ...gltf }, [new Float32Array(unitCorners)]);
 const unitMesh = { primitives: [{ attributes: { POSITION: 0 } }] };
-const unitBounds = [{ min: [0, 0, 0], max: [1, 1, 1] }];
+const unitBounds = [{ bufferView: 0, componentType: 5126, count: 8, type: 'VEC3', min: [0, 0, 0], max: [1, 1, 1] }];
 
-test("a model's parts and box are read in the model frame, through each node's transform", () => {
+test("a model's parts, box and vertices are read in the model frame, through each node's transform", () => {
   const buffer = glb({
     scenes: [{ nodes: [0] }],
     nodes: [
@@ -445,6 +446,15 @@ test("a model's parts and box are read in the model frame, through each node's t
   close(arm.box.min, [1, 1, 0]);
   close(arm.box.max, [3, 2, 1]);
   close(modelBox(buffer).max, [3, 2, 1]);
+  assert.equal(arm.points.length, 16);
+  close(
+    [0, 1, 2].map((a) => Math.min(...arm.points.map((p) => p[a]))),
+    [1, 1, 0],
+  );
+  close(
+    [0, 1, 2].map((a) => Math.max(...arm.points.map((p) => p[a]))),
+    [3, 2, 1],
+  );
 });
 
 test("a doll part turned off its model's axes is refused, as a piece in its frame would be drawn askew", () => {
@@ -479,4 +489,41 @@ test('on every doll a watch rests on the back of the wrist, the hand end of the 
     assert.equal(place.part, dressing.slots.fore.part, `${dressing.id}: the watch is placed off the forearm`);
     assert.ok(place.against?.[1] < 0, `${dressing.id}: the watch does not rest at the forearm's hand end`);
   }
+});
+
+test("a piece's covers reach the sites in the doll's own names, in each copy of a part and for a region held as several parts", () => {
+  const split = {
+    ...dressing,
+    slots: {
+      body: { slot: 'torso', part: 'spine', as: 'torso' },
+      clavicle: { slot: 'torso', part: { right: 'clavicle_r', left: 'clavicle_l' }, as: 'clavicle' },
+    },
+    regions: { shoulders: ['spine', 'clavicle_r', 'clavicle_l'] },
+  };
+  const splitDoll = dollOf(split, {
+    ...figure,
+    bust: {
+      ...figure.bust,
+      parts: [
+        boxPart('spine', [0, 0.5, 0], [-0.1, 0.4, -0.05], [0.1, 0.6, 0.05]),
+        boxPart('clavicle_r', [-0.1, 0.5, 0], [-0.2, 0.45, -0.05], [-0.05, 0.55, 0.05]),
+        boxPart('clavicle_l', [0.1, 0.5, 0], [0.05, 0.45, -0.05], [0.2, 0.55, 0.05]),
+      ],
+    },
+  });
+  const models = [
+    model('vest', { slot: ['torso'] }),
+    { ...model('vest_worn_body', { fit: ['worn'] }), covers: ['torso', 'shoulders'] },
+    { ...model('vest_worn_clavicle', { fit: ['worn'] }), covers: ['clavicle'] },
+  ];
+  const pieces = wornSites(models[0], { dressing: split, doll: splitDoll, models }).slice(splitDoll.sites.length);
+  assert.deepEqual(
+    pieces.map(({ part, mirror, covers }) => [part, Boolean(mirror), covers]),
+    [
+      ['spine', false, ['spine']],
+      ['clavicle_r', false, ['clavicle_r']],
+      ['clavicle_l', true, ['clavicle_l']],
+    ],
+  );
+  assert.deepEqual(coversProblems(models, split), []);
 });

@@ -6,9 +6,8 @@
     player: import 'models/dolls/player/doll.libsonnet',
     ual: import 'models/dolls/ual/doll.libsonnet',
   },
-  // The doll part a worn piece with no segment in its id, `<item>_worn`, is drawn in. A segment's part is in the doll's
-  // `slots`.
-  piece: 'torso',
+  // The segment a worn piece with none in its id, `<item>_worn`, is drawn as. A segment's part is in the doll's `slots`.
+  piece: 'body',
   // The fits of pieces fitted over other clothing, `<item>_worn_<layer>`, which the doll leaves out. Each is drawn in
   // the frame of its `<item>_worn` twin, since it is that piece shaped one layer out.
   layers: ['over-jacket'],
