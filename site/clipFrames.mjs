@@ -1,19 +1,39 @@
+// @ts-check
 // Clip frames, as a clip stores them: sampling a clip and decoding a frame into matrices. Loaded as is by the browser
 // and by Node, because the browser cannot reach tools/actorCompose.mjs (mobgen TypeScript, Jsonnet source). That
 // module re-exports it. Nothing here imports three.js, so the decode path stays free of the renderer.
+/** @import { Vec3 } from '../tools/packages/construct/src/foundation/math.ts' */
+/** @import { Pose, Quat } from './kinematics.mjs' */
 import { quatToMat3 } from './kinematics.mjs';
 
-/** A finite clip carries exactly one span key, named for the clock its caller samples it on; never guess. */
+/** @typedef {{ root: Vec3; rotations: Readonly<Record<string, Quat>> }} Frame A pose as a clip stores it. */
+/** @typedef {(w: number) => number} Easing */
+/**
+ * @typedef {object} Clip
+ * @property {readonly Frame[]} frames
+ * @property {boolean} [loop]
+ * @property {readonly number[]} [keyPhases]
+ * @property {string | readonly string[]} [easing]
+ * @property {number} [durationSimSeconds]
+ * @property {number} [durationRealSeconds]
+ */
+
+/**
+ * A finite clip carries exactly one span key, named for the clock its caller samples it on; never guess.
+ * @param {Pick<Clip, 'durationSimSeconds' | 'durationRealSeconds'>} clip
+ */
 export function clipSpanSeconds(clip) {
-  if ((clip.durationSimSeconds === undefined) === (clip.durationRealSeconds === undefined)) {
+  const span = clip.durationSimSeconds ?? clip.durationRealSeconds;
+  if (span === undefined || (clip.durationSimSeconds !== undefined && clip.durationRealSeconds !== undefined)) {
     throw new RangeError('finite clip must carry exactly one of durationSimSeconds or durationRealSeconds');
   }
-  return clip.durationSimSeconds ?? clip.durationRealSeconds;
+  return span;
 }
 
 // How a clip moves between two key frames, by the weight of the later one. Minimum jerk is how a practised hand moves
 // from one place to the next: from rest to rest, fastest midway. A blow does not stop where it lands: it speeds up into
 // the hit from rest (`ease-in`) and slows to rest after it (`ease-out`), each leaving or meeting the other at speed.
+/** @type {Readonly<Record<string, Easing>>} */
 export const EASINGS = {
   'minimum-jerk': (w) => w * w * w * (10 - 15 * w + 6 * w * w),
   'ease-in': (w) => w * w,
@@ -21,8 +41,13 @@ export const EASINGS = {
 };
 
 // The easing of the move from key frame `i`: one named for every move, or a list naming each move's own.
+/**
+ * @param {Clip['easing']} easing
+ * @param {number} i
+ * @returns {Easing}
+ */
 export function easingOf(easing, i) {
-  const name = Array.isArray(easing) ? easing[i] : easing;
+  const name = typeof easing === 'string' ? easing : easing?.[i];
   if (name === undefined) return (w) => w;
   const ease = EASINGS[name];
   if (!ease) throw new RangeError(`clip easing ${name} is none of ${Object.keys(EASINGS).join(', ')}`);
@@ -35,13 +60,21 @@ export function easingOf(easing, i) {
  * states each one's place, `keyPhases` (0 for the first, rising, and 1 for the last of a finite clip); a loop's last
  * frame moves on to its first over the rest of the span. `easing` names how it moves between them, evenly if unnamed,
  * or lists a name for each move in turn.
+ * @param {Clip} clip
+ * @param {number} cursor
  */
 export function clipKeys(clip, cursor) {
   const count = clip.frames.length;
   if (!count) throw new RangeError('clip has no frames');
   if (count === 1) return { i: 0, j: 0, w: 0 };
   const phases = clip.keyPhases ?? clip.frames.map((_, k) => k / (clip.loop ? count : count - 1));
-  if (phases.length !== count || phases[0] !== 0 || phases.some((at, k) => k > 0 && !(at > phases[k - 1]))) {
+  /** @param {number} k */
+  const phaseOf = (k) => {
+    const at = phases[k];
+    if (at === undefined) throw new RangeError(`clip has no key phase ${k}`);
+    return at;
+  };
+  if (phases.length !== count || phases[0] !== 0 || phases.some((at, k) => k > 0 && !(at > phaseOf(k - 1)))) {
     throw new RangeError(`clip key phases [${phases}] are not ${count} rising places from 0`);
   }
   if (!clip.loop && phases[count - 1] !== 1) throw new RangeError("a finite clip's last key phase is 1");
@@ -49,13 +82,17 @@ export function clipKeys(clip, cursor) {
   const i = phases.findLastIndex((at) => at <= phase);
   if (!clip.loop && i === count - 1) return { i, j: i, w: 0 };
   const j = (i + 1) % count;
-  const end = j === 0 ? 1 : phases[j];
-  return { i, j, w: easingOf(clip.easing, i)((phase - phases[i]) / (end - phases[i])) };
+  const end = j === 0 ? 1 : phaseOf(j);
+  return { i, j, w: easingOf(clip.easing, i)((phase - phaseOf(i)) / (end - phaseOf(i))) };
 }
 
 /**
  * The unit quaternion `weight` of the way from `a` to `b` along the shorter arc, as [x, y, z, w]. Nearly parallel
  * quaternions are lerped and normalised, because the spherical weights divide by a sine that vanishes there.
+ * @param {Quat} a
+ * @param {Quat} b
+ * @param {number} weight
+ * @returns {Quat}
  */
 export function slerp(a, b, weight) {
   let [bx, by, bz, bw] = b;
@@ -82,21 +119,37 @@ export function slerp(a, b, weight) {
   return [a[0] * wa + bx * wb, a[1] * wa + by * wb, a[2] * wa + bz * wb, a[3] * wa + bw * wb];
 }
 
-/** Returns a stored frame unchanged at exact frame cursors, including finite endpoints; rotations blend with `slerpRotation`. */
+/**
+ * Returns a stored frame unchanged at exact frame cursors, including finite endpoints; rotations blend with `slerpRotation`.
+ * @param {Clip} clip
+ * @param {number} cursor
+ * @param {typeof slerp} [slerpRotation]
+ * @returns {Frame}
+ */
 export function sampleClip(clip, cursor, slerpRotation = slerp) {
   const { i, j, w } = clipKeys(clip, cursor);
   const a = clip.frames[i];
-  if (w === 0) return a;
   const b = clip.frames[j];
+  if (a === undefined || b === undefined) throw new RangeError(`clip has no frames ${i} and ${j}`);
+  if (w === 0) return a;
   const ids = new Set([...Object.keys(a.rotations), ...Object.keys(b.rotations)]);
   return {
-    root: a.root.map((x, axis) => x + (b.root[axis] - x) * w),
+    root: [
+      a.root[0] + (b.root[0] - a.root[0]) * w,
+      a.root[1] + (b.root[1] - a.root[1]) * w,
+      a.root[2] + (b.root[2] - a.root[2]) * w,
+    ],
     rotations: Object.fromEntries(
       [...ids].map((id) => [id, slerpRotation(a.rotations[id] ?? [0, 0, 0, 1], b.rotations[id] ?? [0, 0, 0, 1], w)]),
     ),
   };
 }
 
+/**
+ * A stored frame as the pose kinematics composes: each rotation a matrix.
+ * @param {Frame} frame
+ * @returns {Pose}
+ */
 export const decodeFrame = (frame) => ({
   root: [...frame.root],
   rotations: Object.fromEntries(Object.entries(frame.rotations).map(([id, q]) => [id, quatToMat3(q)])),
