@@ -1,6 +1,11 @@
-import { realizedRegionBones } from './actorFigure.mjs';
+// @ts-check
+/** @import { Figure } from './actorFigure.mjs' */
+/** @import { MobRow } from './layout.mjs' */
+/** @import { Template } from './packages/mobgen/src/core/template.ts' */
+import { fusedFigure, realizedRegionBones } from './actorFigure.mjs';
 import { planOf } from './packages/mobgen/src/core/generate.ts';
 import { hullCentersByBone } from './packages/mobgen/src/core/voxelBounds.ts';
+import { acidTemplate } from './packages/mobgen/src/mob/acidTemplate.ts';
 import { attackClipFor } from './packages/mobgen/src/mob/attack.ts';
 import { GROUND_CONTACT_BONES } from './packages/mobgen/src/mob/crawl.ts';
 import { burstBones } from './packages/mobgen/src/mob/dismember.ts';
@@ -8,6 +13,10 @@ import { footRestExtents } from './packages/mobgen/src/mob/gait.ts';
 import { flinchClipFor, HIT_FLINCH } from './packages/mobgen/src/mob/reactions.ts';
 
 // All owned cells serve mass/reach; hull candidates serve only ground fitting.
+/**
+ * @param {Pick<Figure, 'realized' | 'voxelCentersByBone'>} figure
+ * @param {Pick<Template, 'bodyMassKg' | 'massFractions'>} template
+ */
 export const bodyGeometry = (figure, template) => {
   const hulls = hullCentersByBone(figure.realized);
   return {
@@ -27,23 +36,46 @@ export const bodyGeometry = (figure, template) => {
   };
 };
 
-/** Figure metadata in the generator's rest-world frame, turned on export (tools/actorFrame.mjs); scale is carried, not applied. */
+/** @param {Template} template */
+const humanoidAnimation = (template) => {
+  const attack = attackClipFor(template);
+  return {
+    attackPeakAtSimSeconds: attack.hitTime,
+    attackDurationSimSeconds: attack.duration,
+    hitDurationSimSeconds: template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
+  };
+};
+
+// A fused mass has no clips; it flinches by its whole body, as far as the flinch's peak turns a chest.
+const fusedFlinch = () => {
+  const peak = HIT_FLINCH.keys[1];
+  const chest = peak?.rotations.chest;
+  if (!peak || !chest) throw new Error('the hit flinch needs a peak key that turns the chest');
+  return { peakAtSimSeconds: peak.t, durationSimSeconds: HIT_FLINCH.duration, pitch: chest[0], roll: chest[2] };
+};
+
+/**
+ * Figure metadata in the generator's rest-world frame, turned on export (tools/actorFrame.mjs); scale is carried, not applied.
+ * @param {Figure} figure
+ * @param {Template} template
+ * @param {{ type: string; model: string; seed: number; scale: number; lookAt: MobRow['lookAt'] }} row
+ */
 export function actorBody(figure, template, { type, model, seed, scale, lookAt }) {
   if (!(Number.isFinite(scale) && scale > 0)) throw new RangeError('actor scale must be positive and finite');
   const { bones, anchors } = figure.realized.body;
   let minY = Infinity;
   let maxY = -Infinity;
   for (const mesh of figure.realized.meshes.values()) {
-    for (let i = 1; i < mesh.positions.length; i += 3) {
-      minY = Math.min(minY, mesh.positions[i]);
-      maxY = Math.max(maxY, mesh.positions[i]);
-    }
+    mesh.positions.forEach((y, index) => {
+      if (index % 3 !== 1) return;
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    });
   }
   const fused = template.bodyPlan === 'fused-mass';
   const humanoid = template.bodyPlan === 'humanoid';
   const acid = template.bodyPlan === 'acid';
-  const attack = humanoid ? attackClipFor(template) : undefined;
-  const peak = HIT_FLINCH.keys[1];
+  const mass = fused ? fusedFigure(figure) : undefined;
   const boneIds = new Set(bones.map((bone) => bone.id));
   const regions = figure.regions ?? realizedRegionBones(planOf(template.bodyPlan).regionBones, boneIds);
   return {
@@ -61,13 +93,13 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
     extents: Object.fromEntries(footRestExtents(bones, figure.realized.voxels)),
     ...(humanoid ? { groundContactBones: GROUND_CONTACT_BONES.filter((id) => boneIds.has(id)) } : {}),
     ...(lookAt === undefined ? {} : { lookAt }),
-    ...(fused
+    ...(mass
       ? {
-          manifest: figure.manifest,
-          bounds: figure.bounds,
-          originOffset: figure.originOffset,
-          coreInteriorPoint: figure.coreInteriorPoint,
-          restStrikeOrigin: figure.restStrikeOrigin,
+          manifest: mass.manifest,
+          bounds: mass.bounds,
+          originOffset: mass.originOffset,
+          coreInteriorPoint: mass.coreInteriorPoint,
+          restStrikeOrigin: mass.restStrikeOrigin,
           cells: {
             size: figure.realized.voxels.size,
             origin: figure.realized.voxels.origin,
@@ -77,28 +109,16 @@ export function actorBody(figure, template, { type, model, seed, scale, lookAt }
         }
       : {}),
     animation: fused
-      ? {
-          flinch: {
-            peakAtSimSeconds: peak.t,
-            durationSimSeconds: HIT_FLINCH.duration,
-            pitch: peak.rotations.chest[0],
-            roll: peak.rotations.chest[2],
-          },
-        }
+      ? { flinch: fusedFlinch() }
       : acid
         ? {
-            attackPeakAtSimSeconds: template.animation.attackPeak,
-            attackDurationSimSeconds: template.animation.attackDuration,
-            hitDurationSimSeconds: template.animation.hitDuration,
-            deathDurationRealSeconds: template.animation.deathDuration,
+            attackPeakAtSimSeconds: acidTemplate.animation.attackPeak,
+            attackDurationSimSeconds: acidTemplate.animation.attackDuration,
+            hitDurationSimSeconds: acidTemplate.animation.hitDuration,
+            deathDurationRealSeconds: acidTemplate.animation.deathDuration,
           }
         : humanoid
-          ? {
-              attackPeakAtSimSeconds: attack.hitTime,
-              attackDurationSimSeconds: attack.duration,
-              hitDurationSimSeconds:
-                template.legCut === undefined ? flinchClipFor(template).duration : HIT_FLINCH.duration,
-            }
+          ? humanoidAnimation(template)
           : {},
   };
 }

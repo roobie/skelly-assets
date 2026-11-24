@@ -22,6 +22,18 @@ export const realizedRegionBones = (regionBones, boneIds) =>
       );
 
 /** Adapt an already-realized row in the generator's rest-world frame, which the export turns (tools/actorFrame.mjs). */
+/** @typedef {ReturnType<typeof figureFor>} Figure a generated mob measured for its files */
+/** @typedef {Extract<Figure, { manifest: unknown }>} FusedFigure a fused mass's figure, with the cells and bounds it alone has */
+
+/**
+ * @param {Figure} figure
+ * @returns {FusedFigure}
+ */
+export const fusedFigure = (figure) => {
+  if (!('manifest' in figure)) throw new Error('a fused mass needs a figure measured from a fused-mass template');
+  return figure;
+};
+
 /**
  * @param {{ readonly realized: Realized; readonly genome: Genome }} generated
  * @param {Template} template
