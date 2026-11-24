@@ -191,9 +191,12 @@ every export whose code and inputs are unchanged, so its cost follows what chang
 catalogue; see `packages/thing-export/src/cache.ts`, `entryStore`. Keys are the
 content an export reads, not a dependency graph, so a kit or library edit rebuilds exactly the models whose compiled
 rows it changes, and nothing has to be kept in step with the imports. A key that leaves out something an export reads
-would serve stale bytes, so a tool caches only rows that name their inputs, data its code imports whatever the row
+would serve stale bytes, so a tool caches only rows that name their inputs, data its code reads whatever the row
 counts whole beside the code (`recipeTools.mjs`, `recipeTools`, and `mobs.mjs`, `mobStore`), and an over-wide key
-costs only a miss. A complete build prunes the entries it did not use, so the cache holds what the next build can
+costs only a miss. The code in a key is the import closure of the module that does the work, never a list kept by
+hand, which misses the import nobody added to it; see `importClosure.mjs`, `importClosure`. The checks that cache
+their results are keyed the same way, so a module that reads built models as bytes keeps the tool that built them out
+of its imports, or every edit to that tool would cost the check again; see `dollParts.mjs`. A complete build prunes the entries it did not use, so the cache holds what the next build can
 reuse rather than an entry for every edit ever built. Worktrees and users on one host can share a cache, since a
 fresh worktree would otherwise regenerate the whole catalogue: `SKELLY_EXPORT_CACHE` names its folder, and a folder
 that is setgid and group-writable is treated as shared. One build there cannot name the entries the other builds

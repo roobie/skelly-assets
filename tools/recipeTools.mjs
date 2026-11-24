@@ -3,14 +3,16 @@
 // loader: `tasks` checks a tool's rows together and gives each the portable data its export needs, and `exportOf`
 // turns one task into its export on a worker thread.
 // Gun rows name their sources relative to the repository root, which GAT's loader resolves them against. A tool whose
-// rows declare their inputs names the code its exports run and the data that code imports, so tools/build.mjs can
-// cache them; see thing-export's cache.ts, codeFingerprint.
+// rows declare their inputs names the module that loads its exports, whose import closure is the code they run
+// (tools/importClosure.mjs), and the data that code reads from disk, so tools/build.mjs can cache them; see
+// thing-export's cache.ts, codeFingerprint.
 // Import after tools/sources.mjs, installJsonnetSources: the loaders read the compiled Jsonnet twins.
 /** @import { ExportCache } from './packages/thing-export/src/cache.ts' */
 /** @import { GeneratedModel } from './packages/thing-export/src/files.ts' */
 /** @import { RecipeExport, RecipeRow } from './packages/thing-export/src/recipe.ts' */
 /** @import { thingTasks } from './packages/thing-authoring-tool/src/exports.ts' */
 import { join } from 'node:path';
+import { closureCode } from './importClosure.mjs';
 import { SIDECAR_DIRECTORIES } from './layout.mjs';
 
 const here = import.meta.dirname;
@@ -25,8 +27,8 @@ const here = import.meta.dirname;
  * @property {(task: unknown) => RecipeExport} exportOf
  * @property {string} directory
  * @property {boolean} index
- * @property {readonly string[]} [code]
- * @property {readonly string[]} [data]
+ * @property {readonly string[]} [code] The modules its exports run, from this folder; the cache keys by their closure.
+ * @property {readonly string[]} [data] The files and folders that code reads whatever the row, from this folder.
  */
 
 /**
@@ -61,14 +63,8 @@ const loadRecipeTools = async () => {
       exportOf: (row) => onlyExport(gun.loadExportRecipe([row])),
       directory: SIDECAR_DIRECTORIES.gun,
       index: false,
-      code: [
-        'package-lock.json',
-        'packages/construct/src',
-        'packages/thing-core/src',
-        'packages/thing-export/src',
-        'packages/gun-authoring-tool/src',
-      ],
-      // The gun code imports its tables, cartridges and the materials as JSON, whatever the row.
+      code: ['packages/gun-authoring-tool/src/cli/exportRecipe.ts'],
+      // The gun code reads its tables, cartridges and the materials whatever the row, and not only by importing them.
       data: ['../models/guns/tables', '../models/guns/cartridges', '../models/finishes.json'],
     },
     thing: {
@@ -85,16 +81,15 @@ const loadRecipeTools = async () => {
       },
       directory: SIDECAR_DIRECTORIES.thing,
       index: true,
-      code: [
-        'package-lock.json',
-        'packages/construct/src',
-        'packages/thing-core/src',
-        'packages/thing-export/src',
-        'packages/thing-authoring-tool/src',
-      ],
+      code: ['packages/thing-authoring-tool/src/exports.ts'],
     },
   };
 };
+
+// What generates a row beside its tool's loader: the writer that turns an export into a model's files, whose closure
+// holds the cache itself, and this module alone, since its own closure is every tool's.
+const GENERATOR = 'packages/thing-export/src/files.ts';
+const THIS_MODULE = 'recipeTools.mjs';
 
 // One cache per tool in the build's cache folder, so each tool's entries are keyed by its own code.
 /** @type {Map<string, ExportCache>} */
@@ -110,7 +105,8 @@ const cacheOf = async (folder, name, code, data) => {
   const dir = join(folder, name);
   let cache = caches.get(dir);
   if (cache === undefined) {
-    cache = exportCache(folder, name, codeFingerprint(here, code, data));
+    const modules = [GENERATOR, ...code].map((path) => join(here, path));
+    cache = exportCache(folder, name, codeFingerprint(here, [THIS_MODULE, ...closureCode(here, modules)], data));
     caches.set(dir, cache);
   }
   return cache;

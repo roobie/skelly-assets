@@ -6,6 +6,8 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { closureCode, importClosure } from '../importClosure.mjs';
+import { recipeTools } from '../recipeTools.mjs';
+import { installJsonnetSources } from '../sources.mjs';
 
 const tools = resolve(import.meta.dirname, '..');
 
@@ -36,6 +38,12 @@ const inFolder = (files, use) => {
  */
 const closureIn = (files, entry = 'entry.mjs') =>
   inFolder(files, (folder) => importClosure([join(folder, entry)]).map((file) => relative(folder, file)));
+
+/**
+ * The closure of a tools module, as paths from tools/.
+ * @param {string} module
+ */
+const closureOf = (module) => importClosure([join(tools, module)]).map((file) => relative(tools, file));
 
 test('a closure holds its entry and what it imports, through any number of imports and around a cycle', () => {
   assert.deepEqual(
@@ -121,4 +129,40 @@ test('an import that cannot be traced is refused, naming its module', () => {
     () => closureIn({ 'entry.mjs': "import { gone } from './gone.mjs';\n" }),
     /entry\.mjs: imports \.\/gone\.mjs, which is no file/,
   );
+});
+
+// What each cache's hand-kept list of code once left out, which its entries were then not keyed by.
+test('a recipe tool is keyed by the workspace packages its exports import by name', async () => {
+  await installJsonnetSources();
+  const { gun, thing } = await recipeTools();
+  for (const tool of [gun, thing]) {
+    const closure = importClosure((tool.code ?? []).map((module) => join(tools, module))).map((file) =>
+      relative(tools, file),
+    );
+    assert.ok(closure.includes('packages/motion/src/motion.ts'));
+    assert.ok(closure.includes('packages/surfaces/src/schema.ts'));
+    assert.ok(!closure.some((file) => file.includes('/viewer/')), 'a viewer is no part of an export');
+  }
+  const gunCode = importClosure((gun.code ?? []).map((module) => join(tools, module)));
+  assert.ok(gunCode.includes(join(tools, 'codeUnitOrder.mjs')));
+});
+
+test('the swing check is keyed by the motion math and the model frame its sweeps pose by', () => {
+  const closure = closureOf('swingClearance.mjs');
+  assert.ok(closure.includes('packages/motion/src/motion.ts'));
+  assert.ok(closure.includes('../site/modelFrame.mjs'));
+  assert.ok(closure.includes('swingSweep.mjs'));
+});
+
+test('the overlap check is keyed by the vector math its solids are built on', () => {
+  assert.ok(closureOf('siteOverlap.mjs').includes('packages/construct/src/foundation/math.ts'));
+});
+
+// A probe or a bake reads a model as its built bytes, so the code that built the model must not key it: a change to
+// that code which leaves the bytes alone costs no probe; see docs/decisions/0019-garment-rest-check.md.
+test('a check that reads built models is keyed by no authoring tool', () => {
+  for (const module of ['restPoke.mjs', 'wields.mjs', 'swingClearance.mjs', 'siteOverlap.mjs']) {
+    const authoring = closureOf(module).filter((file) => /^packages\/[a-z-]+-authoring-tool\//.test(file));
+    assert.deepEqual(authoring, [], module);
+  }
 });
