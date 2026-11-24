@@ -10,6 +10,7 @@
 /** @import { GltfMesh, GltfNode } from './glb.mjs' */
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { mat3ToQuat } from '../site/kinematics.mjs';
 import { glbAccessor, glbItem, glbJson } from './glb.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
@@ -30,8 +31,14 @@ import { facetTerms } from './taxonomy.mjs';
  * A limb hung on the doll: `turn`, if the doll rests it turned off the way its model hangs (down -y), is `degrees`
  * about `axis` of the doll frame, as the side that is not `mirrored` takes it; the other side's turn is this side's
  * mirror image (`mirroredTurn`), so a doll that rests its arms in a T-pose states one turn for both. The axis is one of
- * the doll's, which is all a T-pose or an arm swung clear of the hips asks for; the angle is any.
- * @typedef {{ name: string; model: string; anchor: string; turn?: { axis: Vec3; degrees: number } }} DollLimb
+ * the doll's, which is all a T-pose or an arm swung clear of the hips asks for; the angle is any. A limb that rests
+ * askew of every such axis, as a thumb does on its hand, gives `frame` instead: where its model's own x, y and z point.
+ *
+ * A limb hangs from the bust's anchor `<anchor>_<side>`, or with `on` from the anchor `anchor` of the limb of that
+ * name, listed before it, on the same side: a thumb from its hand's. Its turn is then in that limb's frame, taken
+ * after that limb's own, so it rests on the limb the same way however the doll rests the limb.
+ * @typedef {{ axis: Vec3; degrees: number } | { frame: { x: Vec3; y: Vec3; z: Vec3 } }} LimbTurn
+ * @typedef {{ name: string; model: string; anchor: string; on?: string; turn?: LimbTurn }} DollLimb
  */
 
 /**
@@ -245,12 +252,29 @@ export const exactBound = (points, turn, about) => {
 };
 
 /**
- * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it.
+ * The quaternion of a limb's turn: some degrees about one of the doll's axes, either way along it, or the turn that
+ * carries the model's axes onto a `frame`, which must be three unit axes square to each other and right-handed, since
+ * a frame that is not would shear or mirror the limb.
  * @param {string} model the limb's model, named in what is refused
- * @param {{ axis: Vec3; degrees: number }} turn
+ * @param {LimbTurn} turn
  * @returns {Quaternion}
  */
-const turnOf = (model, { axis, degrees }) => {
+const turnOf = (model, turn) => {
+  if ('frame' in turn) {
+    const { x, y, z } = turn.frame;
+    const axes = [x, y, z];
+    if (!axes.every((a) => Array.isArray(a) && a.length === 3 && a.every(Number.isFinite)))
+      throw new Error(`doll: ${model}'s turn frame needs x, y and z, each a direction [x, y, z]`);
+    /** @type {(a: Vec3, b: Vec3) => number} */
+    const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const handed = dot(x, [y[1] * z[2] - y[2] * z[1], y[2] * z[0] - y[0] * z[2], y[0] * z[1] - y[1] * z[0]]);
+    const square = axes.every((a, i) => axes.every((b, j) => Math.abs(dot(a, b) - (i === j ? 1 : 0)) < 1e-9));
+    if (!square || Math.abs(handed - 1) > 1e-9)
+      throw new Error(`doll: ${model}'s turn frame is not three unit axes square to each other and right-handed`);
+    // The frame's axes are the columns of the turn's matrix.
+    return /** @type {Quaternion} */ (mat3ToQuat([x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]]));
+  }
+  const { axis, degrees } = turn;
   const along = axis.filter((c) => c !== 0);
   if (axis.length !== 3 || !axis.every(Number.isFinite) || along.length !== 1 || Math.abs(along[0] ?? 0) !== 1)
     throw new Error(`doll: ${model}'s turn axis ${JSON.stringify(axis)} is not a doll axis, [±1, 0, 0] or alike`);
@@ -439,7 +463,7 @@ export function modelMeshes(buffer, keep = () => true) {
  * and the bust's anchors, which are in the doll frame too. The bust stands at `bustAt`, so a doll may keep the frame
  * its skeleton is measured in, with the floor at y = 0. A limb's copies are placed as its site is: the model mirrored,
  * turned by the limb's turn (the mirrored side's being the mirror image of the other's), then moved so its own anchor
- * lies on the bust's. A copy's `at` is where its part's origin lands, its `box` the doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
+ * lies on the bust's, or on that of the limb it hangs `on`, whose turn it takes before its own. A copy's `at` is where its part's origin lands, its `box` the doll-frame box of the part. `figure` holds each doll model's `parts` (modelParts) and `anchors` (its things sidecar).
  * @param {DollDressing} dressing
  * @param {Readonly<Record<string, FigureModel>>} figure
  */
@@ -471,14 +495,22 @@ export function dollOf(dressing, figure) {
   const anchors = Object.fromEntries(
     Object.entries(figureOf(bust).anchors).map(([name, at]) => [name, sum(bustAt, at)]),
   );
-  for (const { model, anchor, turn: limbTurn } of limbs) {
+  // Each limb hung so far, by name and side: its turn, and its own anchors where the doll stands them.
+  /** @type {Map<string, Map<string, { turn?: Quaternion; anchors: Record<string, Vec3> }>>} */
+  const hangers = new Map();
+  for (const { name, model, anchor, on, turn: limbTurn } of limbs) {
     const own = figureOf(model).anchors[anchor];
     const unmirroredTurn = limbTurn && turnOf(model, limbTurn);
+    if (on !== undefined && !hangers.has(on))
+      throw new Error(`doll: ${model} hangs on the limb ${on}, which the doll has not hung before it`);
+    hangers.set(name, new Map());
     for (const side of sides) {
-      const hung = anchors[`${anchor}_${side}`];
+      const hanger = on === undefined ? undefined : hangers.get(on)?.get(side);
+      const hung = hanger ? hanger.anchors[anchor] : anchors[`${anchor}_${side}`];
       if (!hung || !own) throw new Error(`doll: no ${anchor} anchor to hang ${model} by on the ${side}`);
       const mirror = side === mirroredSide;
-      const turn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
+      const ownTurn = mirror && unmirroredTurn ? mirroredTurn(unmirroredTurn) : unmirroredTurn;
+      const turn = hanger?.turn && ownTurn ? product(hanger.turn, ownTurn) : (hanger?.turn ?? ownTurn);
       /** @type {(p: Vec3) => Vec3} a point of the limb's model frame, relative to where the site puts its origin */
       const place = (p) => {
         const flipped = mirror ? mirrorX(p) : p;
@@ -491,6 +523,12 @@ export function dollOf(dressing, figure) {
           ...(mirror ? { mirror } : {}),
           ...(turn ? { turn } : {}),
         }) - 1;
+      hangers.get(name)?.set(side, {
+        ...(turn ? { turn } : {}),
+        anchors: Object.fromEntries(
+          Object.entries(figureOf(model).anchors).map(([id, at]) => [id, sum(hung, place(difference(at, own)))]),
+        ),
+      });
       for (const { part, at, box, points } of figureOf(model).parts) {
         const local = moved(box, difference([0, 0, 0], own));
         const flipped = mirror ? mirrored(local) : local;

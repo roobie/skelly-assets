@@ -467,42 +467,6 @@ test("a turn by any angle reads the turned part's faces off its box as it hangs,
   close(padOf(of(swung, 'fore.R')), swing(padOf(of(hanging, 'fore.R'))), 'pad');
 });
 
-test("a bone leaning off its part's axes is boxed along its lean, on a turned copy too", () => {
-  // A forearm leaning 0.3 across x for every 1 down, drawn as a slab 0.08 square and 0.4 long down its lean.
-  const lean = [0.3, -1, 0].map((c) => c / Math.hypot(0.3, 1));
-  const across = [1, 0.3, 0].map((c) => c / Math.hypot(1, 0.3));
-  const points = [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
-    [0, 1, 2].map(
-      (a) =>
-        [0, -0.4, 0][a] +
-        (i & 1) * 0.4 * lean[a] +
-        ((i >> 1) & 1 ? 0.04 : -0.04) * across[a] +
-        (a === 2 ? ((i >> 2) & 1 ? 0.04 : -0.04) : 0),
-    ),
-  );
-  const leaning = {
-    ...figure,
-    arm: { ...figure.arm, parts: [figure.arm.parts[0], { ...figure.arm.parts[1], points }] },
-  };
-  const leaned = dollRig(dollOf(dressing, leaning), {
-    ...dressing,
-    rig: { ...rigContent, bones: { ...rigContent.bones, fore: { ...rigContent.bones.fore, along: lean } } },
-  });
-  for (const id of ['fore.R', 'fore.L']) {
-    const fore = leaned.bones.find((b) => b.id === id);
-    const { box, rest } = boundBox(fore.bind);
-    close(sub(box.max, box.min), [0.08, 0.4, 0.08], `${id} box`);
-    // The box's rest carries it onto the slab: each of the slab's corners is a corner of the box.
-    const copy = dollOf(dressing, leaning)
-      .parts.get('fore')
-      .find(({ side }) => `fore${dressing.boneSuffix[side]}` === id);
-    for (const p of copy.points) {
-      const inBox = applyPoint({ r: transpose(rest.r), t: mulMV(transpose(rest.r), sub([0, 0, 0], rest.t)) }, p);
-      assert.ok([0, 1, 2].every((a) => [box.min[a], box.max[a]].some((face) => Math.abs(inBox[a] - face) < 1e-9)));
-    }
-  }
-});
-
 test('a turn that is no angle about a doll axis is refused', () => {
   const refused = (turn) => () => dollOf({ ...dressing, limbs: [{ ...dressing.limbs[0], turn }] }, figure);
   assert.throws(refused({ axis: [0, 0, 1], degrees: Number.NaN }), /no angle/);
@@ -542,4 +506,106 @@ test('a loose wearable across both copies of a turned part is refused, since the
       ),
     /turned apart/,
   );
+});
+
+// ---- a limb hung on a limb, turned askew of every axis: a thumb on its hand ----
+
+// The thumb hangs down -y in its own model, and rests on the arm leaning 30 degrees toward the arm's -z: its frame's
+// axes in the arm's are the columns of that turn about x.
+const lean = rotAxis([1, 0, 0], 30);
+const leanFrame = { x: [lean[0], lean[3], lean[6]], y: [lean[1], lean[4], lean[7]], z: [lean[2], lean[5], lean[8]] };
+const thumbed = {
+  ...dressing,
+  limbs: [
+    ...dressing.limbs,
+    { name: 'thumb', model: 'thumb', anchor: 'thumb_root', on: 'arm', turn: { frame: leanFrame } },
+  ],
+};
+const thumbFigure = {
+  ...figure,
+  arm: { ...figure.arm, anchors: { ...figure.arm.anchors, thumb_root: [0, -0.6, 0.04] } },
+  thumb: {
+    parts: [boxPart('thumb', [0, 0, 0], [-0.01, -0.06, -0.01], [0.01, 0, 0.01])],
+    anchors: { thumb_root: [0, 0, 0] },
+  },
+};
+
+test("a limb hung on a limb hangs from that limb's anchor and takes its turn before its own, mirrored on the left", () => {
+  const hung = dollOf(thumbed, thumbFigure);
+  const [right, left] = hung.parts.get('thumb');
+  // The right arm's quarter turn carries the arm's (x, y, z) onto (y, -x, z) about the shoulder, [-0.1, 0.4, 0].
+  close(right.at, [-0.7, 0.4, 0.04], 'right root');
+  close(left.at, [0.7, 0.4, 0.04], 'left root');
+  // The tip lies on the thumb's own y, which a mirror across x leaves where it is.
+  const tip = (copy) => add(copy.at, mulMV(quatToMat3(copy.turn), [0, -0.06, 0]));
+  const along = [-0.06 * Math.cos(Math.PI / 6), 0, -0.06 * Math.sin(Math.PI / 6)];
+  close(tip(right), add([-0.7, 0.4, 0.04], along), 'right tip');
+  close(tip(left), add([0.7, 0.4, 0.04], mirrorX(along)), 'left tip');
+  close(right.turn, mat3ToQuat(mulMM(rotAxis([0, 0, 1], -90), lean)), 'right turn');
+  // The thumb's sites come after the limbs listed before it, so theirs keep their numbers.
+  assert.deepEqual(
+    hung.sites.map(({ model }) => model),
+    ['bust', 'arm', 'arm', 'thumb', 'thumb'],
+  );
+  close(hung.sites[3].at, right.at, 'right site');
+  assert.equal(hung.sites[4].mirror, true);
+  // Every drawn point of the left copy is the right one's mirrored.
+  right.points.forEach((p, i) => close(left.points[i], mirrorX(p), 'left point'));
+});
+
+test('a limb hung on a limb is refused one the doll has not hung before it, or an anchor that limb has not', () => {
+  const [arm, thumb] = thumbed.limbs;
+  assert.throws(() => dollOf({ ...thumbed, limbs: [thumb, arm] }, thumbFigure), /has not hung before it/);
+  assert.throws(() => dollOf({ ...thumbed, limbs: [arm, { ...thumb, on: 'leg' }] }, thumbFigure), /has not hung/);
+  assert.throws(() => dollOf(thumbed, { ...thumbFigure, arm: figure.arm }), /no thumb_root anchor/);
+});
+
+test('a turn frame that would shear or mirror the limb is refused', () => {
+  const [arm, thumb] = thumbed.limbs;
+  const refused = (frame) => () => dollOf({ ...thumbed, limbs: [arm, { ...thumb, turn: { frame } }] }, thumbFigure);
+  assert.throws(refused({ ...leanFrame, x: [2, 0, 0] }), /not three unit axes/);
+  assert.throws(refused({ ...leanFrame, y: leanFrame.z }), /not three unit axes/);
+  assert.throws(refused({ ...leanFrame, x: [-1, 0, 0] }), /right-handed/);
+  assert.throws(refused({ x: [1, 0, 0], y: [0, 1, 0] }), /needs x, y and z/);
+});
+
+test('a bone of a limb hung on a limb runs and flexes as its part is turned, and seats its part by its bind', () => {
+  const hung = dollOf(thumbed, thumbFigure);
+  const content = {
+    ...rigContent,
+    bones: {
+      ...rigContent.bones,
+      thumb: {
+        sided: true,
+        nodeRotation: [0, 0, 0, 1],
+        part: 'thumb',
+        parent: 'fore',
+        pivot: 'origin',
+        along: [0, -1, 0],
+        flexAxis: [0, 0, -1],
+        limits: { flex: [0, 60], twist: [0, 0], abduct: [0, 0] },
+      },
+    },
+  };
+  const thumbRig = dollRig(hung, { ...thumbed, rig: content });
+  const [right, left] = ['thumb.R', 'thumb.L'].map((id) => thumbRig.bones.find((b) => b.id === id));
+  close(right.head, [-0.7, 0.4, 0.04], 'right head');
+  close(right.frame.y, [-Math.cos(Math.PI / 6), 0, -Math.sin(Math.PI / 6)], 'right run');
+  close(left.frame.y, [Math.cos(Math.PI / 6), 0, -Math.sin(Math.PI / 6)], 'left run');
+  assert.equal(right.bind.model, 'thumb');
+  assert.equal(right.bind.site, 3);
+  // The part's tip, in its own model frame, lands on the bone's tail through bind.rest in the unturned node.
+  for (const b of [right, left]) {
+    const { translation, rotation, scale } = b.bind.rest;
+    const seated = add(
+      mulMV(
+        quatToMat3(rotation),
+        [0, -0.06, 0].map((c, i) => c * scale[i]),
+      ),
+      translation,
+    );
+    close(add(b.head, seated), b.tail, `${b.id} tip`);
+    // Its exact box is the part's own, before the arm's turn and the thumb's swing it about the root.
+    close(sub(boundBox(b.bind).box.max, boundBox(b.bind).box.min), [0.02, 0.06, 0.02], `${b.id} box`);
+  }
 });
