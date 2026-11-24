@@ -260,7 +260,8 @@ name the player's bones, so such a doll stands at rest or takes a pose file writ
 to the doll or the rig moves every fit at once. The sheets and the sweep reach the showcase through one served site
 and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.
 
-The doll is a named target, since a second body should be a record and not a second copy of the code. Each doll is a
+The doll is a named target, since a second body should be a record and not a second copy of the code; why there is a
+second doll, and one set of garments for both, is in `../docs/decisions/0023-ual-doll.md`. Each doll is a
 record in `../models/dolls/<id>/doll.libsonnet`, listed in `../models/dressing.libsonnet`; the build, the checks and
 `dollRig.mjs`'s `exportDollRigs` take the dressing as one doll wears it (`dress.mjs`, `dollDressing`) and run for every
 doll, and the manifest's `dolls` names each one's rig file. A garment's pieces are fitted to the player and checked on
