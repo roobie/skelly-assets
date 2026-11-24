@@ -1,6 +1,12 @@
+// @ts-check
+/** @import { SeveredPlan } from './severedParts.mjs' */
+/** @import { Realized } from './packages/mobgen/src/core/generate.ts' */
+/** @import { Vec3 } from './packages/mobgen/src/core/math.ts' */
+/** @import { Template } from './packages/mobgen/src/core/template.ts' */
 import { pointBounds, SHADE_FACTORS } from './actorBake.mjs';
 import { turnPoint, turnPointArray } from './actorFrame.mjs';
 import { writeGlb } from './glb.mjs';
+import { AXES, perAxis } from './packages/construct/src/foundation/math.ts';
 import { templatePartMassProperties } from './packages/mobgen/src/core/templateMass.ts';
 import { materialOf, shadeOf } from './packages/mobgen/src/core/voxelize.ts';
 import { CUT_FACE } from './packages/mobgen/src/mob/crowd.ts';
@@ -9,8 +15,32 @@ import { severedBoneSet } from './packages/mobgen/src/mob/dismember.ts';
 // The key the sheet's materials draw a part's cut face by, the face the body it came from leaves open.
 export const CUT_MATERIAL = 'cut';
 
-const shaded = (colour, byte) => colour.map((x) => Math.min(1, x * SHADE_FACTORS[shadeOf(byte)]));
-const toCut = (colour) => colour.map((x, a) => x + (CUT_FACE.color[a] - x) * CUT_FACE.mix);
+/**
+ * @template Item
+ * @param {ArrayLike<Item>} list
+ * @param {number} index
+ * @param {string} what
+ */
+const itemAt = (list, index, what) => {
+  const item = list[index];
+  if (item === undefined) throw new Error(`severed part mesh: no ${what} at ${index}`);
+  return item;
+};
+
+/**
+ * @param {Vec3} colour
+ * @param {number} byte
+ * @returns {Vec3}
+ */
+const shaded = (colour, byte) => {
+  const shade = itemAt(SHADE_FACTORS, shadeOf(byte), 'shade');
+  return perAxis((a) => Math.min(1, colour[a] * shade));
+};
+/**
+ * @param {Vec3} colour
+ * @returns {Vec3}
+ */
+const toCut = (colour) => perAxis((a) => colour[a] + (CUT_FACE.color[a] - colour[a]) * CUT_FACE.mix);
 
 /**
  * One part's GLB: the faces of the part's bone meshes that face out of it, one primitive per catalogue material the
@@ -19,13 +49,23 @@ const toCut = (colour) => colour.map((x, a) => x + (CUT_FACE.color[a] - x) * CUT
  * or on a bone already cut away below, is a cut: another bone the part merely touches, such as a hanging hand against a
  * thigh, leaves skin there. The colours stay in the vertices, as the actor's do, and the origin is the part's centre of
  * mass.
+ * @param {string} id
+ * @param {Pick<Realized, 'meshes' | 'voxels' | 'body'>} realized
+ * @param {ReadonlySet<number>} subtree
+ * @param {ReadonlySet<number>} stumps
+ * @param {Vec3} centre
+ * @param {Readonly<Record<string, string>>} materials
  */
 function partGlb(id, realized, subtree, stumps, centre, materials) {
+  /** @param {string} name */
   const drawnAs = (name) => {
-    if (!Object.hasOwn(materials, name))
+    const drawn = Object.hasOwn(materials, name) ? materials[name] : undefined;
+    if (drawn === undefined)
       throw new Error(`models/mobs.json severed: materials does not draw ${name}, a material of ${id}`);
-    return materials[name];
+    return drawn;
   };
+  /** @typedef {{ positions: number[]; normals: number[]; colours: number[]; indices: number[]; seen: Map<string, number> }} Group */
+  /** @type {Map<string, Group>} */
   const groups = new Map();
   for (const owner of subtree) {
     const mesh = realized.meshes.get(owner);
@@ -33,34 +73,44 @@ function partGlb(id, realized, subtree, stumps, centre, materials) {
     const positions = turnPointArray(mesh.positions);
     const normals = turnPointArray(mesh.normals);
     for (let t = 0; t < mesh.indices.length; t += 3) {
-      const corners = [mesh.indices[t], mesh.indices[t + 1], mesh.indices[t + 2]];
-      const neighbour = mesh.neighbourBone[corners[0]];
+      const first = itemAt(mesh.indices, t, 'index');
+      const corners = [first, itemAt(mesh.indices, t + 1, 'index'), itemAt(mesh.indices, t + 2, 'index')];
+      const neighbour = itemAt(mesh.neighbourBone, first, 'neighbour bone');
       if (subtree.has(neighbour)) continue;
       const cut = stumps.has(neighbour);
-      const name = drawnAs(cut ? CUT_MATERIAL : materialOf(realized.voxels, mesh.colors[corners[0]]));
-      if (!groups.has(name))
-        groups.set(name, { positions: [], normals: [], colours: [], indices: [], seen: new Map() });
-      const group = groups.get(name);
+      const name = drawnAs(cut ? CUT_MATERIAL : materialOf(realized.voxels, itemAt(mesh.colors, first, 'colour')));
+      let group = groups.get(name);
+      if (!group) {
+        group = { positions: [], normals: [], colours: [], indices: [], seen: new Map() };
+        groups.set(name, group);
+      }
       for (const corner of corners) {
-        if (!group.seen.has(`${owner}:${corner}`)) {
-          group.seen.set(`${owner}:${corner}`, group.colours.length / 3);
-          for (let a = 0; a < 3; a++) {
-            group.positions.push(positions[corner * 3 + a] - centre[a]);
-            group.normals.push(normals[corner * 3 + a]);
+        let vertex = group.seen.get(`${owner}:${corner}`);
+        if (vertex === undefined) {
+          vertex = group.colours.length / 3;
+          group.seen.set(`${owner}:${corner}`, vertex);
+          for (const a of AXES) {
+            group.positions.push(itemAt(positions, corner * 3 + a, 'position') - centre[a]);
+            group.normals.push(itemAt(normals, corner * 3 + a, 'normal'));
           }
-          const byte = mesh.colors[corner];
-          const colour = shaded(realized.body.materials[materialOf(realized.voxels, byte)].color, byte);
+          const byte = itemAt(mesh.colors, corner, 'colour');
+          const material = materialOf(realized.voxels, byte);
+          const drawn = realized.body.materials[material];
+          if (!drawn) throw new Error(`severed part mesh: the body has no material ${material}`);
+          const colour = shaded(drawn.color, byte);
           group.colours.push(...(cut ? toCut(colour) : colour));
         }
-        group.indices.push(group.seen.get(`${owner}:${corner}`));
+        group.indices.push(vertex);
       }
     }
   }
-  const names = [...groups.keys()].sort();
+  const drawn = [...groups].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  const names = drawn.map(([name]) => name);
+  /** @type {ArrayBufferView[]} */
   const arrays = [];
+  /** @type {object[]} */
   const accessors = [];
-  const primitives = names.map((name, material) => {
-    const group = groups.get(name);
+  const primitives = drawn.map(([, group], material) => {
     const first = arrays.length;
     const position = new Float32Array(group.positions);
     arrays.push(
@@ -106,12 +156,19 @@ function partGlb(id, realized, subtree, stumps, centre, materials) {
  * part under its id. A part is the cut bone with every bone below it, as a cut takes them (mobgen's dismember.ts,
  * severedBoneSet), less the bones already cut away, and weighs its template's share of the body mass for that bone
  * less the shares already gone (mobgen's templateMass.ts, templatePartMassProperties).
+ * @param {Pick<SeveredPlan, 'parts' | 'materials'>} plan
+ * @param {Template} template
+ * @param {Pick<Realized, 'meshes' | 'voxels' | 'body'>} realized
+ * @returns {{ cuts: string } & Record<string, string | Uint8Array>}
  */
 export function bakeSeveredParts(plan, template, realized) {
   const { bones } = realized.body;
   const all = bones.map((_, index) => index);
-  const indicesOf = (cut) => all.filter((index) => cut.has(bones[index].id));
+  /** @param {ReadonlySet<string>} cut */
+  const indicesOf = (cut) => bones.flatMap((bone, index) => (cut.has(bone.id) ? [index] : []));
+  /** @type {Record<string, Uint8Array>} */
   const files = {};
+  /** @type {Record<string, object[]>} */
   const cuts = {};
   for (const part of plan.parts) {
     const whole = indicesOf(severedBoneSet(bones, [part.bone]));
@@ -127,14 +184,17 @@ export function bakeSeveredParts(plan, template, realized) {
       part: part.bone,
       without: gone,
     });
-    const { parent } = bones.find((bone) => bone.id === part.bone);
+    const cutBone = bones.find((bone) => bone.id === part.bone);
+    if (!cutBone) throw new Error(`severed part ${part.id} is cut at ${part.bone}, a bone its body lacks`);
+    const { parent } = cutBone;
     const stumps = new Set([
       bones.findIndex((bone) => bone.id === parent),
       ...part.without.map((below) => bones.findIndex((bone) => bone.id === below)),
     ]);
     files[part.id] = partGlb(part.id, realized, new Set(subtree), stumps, turnPoint(mass.center), plan.materials);
-    cuts[part.bone] ??= [];
-    cuts[part.bone].push({
+    const cutsHere = cuts[part.bone] ?? [];
+    cuts[part.bone] = cutsHere;
+    cutsHere.push({
       without: part.without,
       model: { id: part.id, file: part.path, parts: { [part.bone]: { massKg: mass.mass, centreOfMass: [0, 0, 0] } } },
     });

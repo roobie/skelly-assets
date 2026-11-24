@@ -1,3 +1,16 @@
+// @ts-check
+/** @import { Clips } from './actorFrame.mjs' */
+/** @import { Figure } from './actorFigure.mjs' */
+/** @import { MobRow } from './layout.mjs' */
+/** @import { Vec3 } from './packages/mobgen/src/core/math.ts' */
+/** @import { Pose } from './packages/mobgen/src/core/pose.ts' */
+/** @import { Realized } from './packages/mobgen/src/core/generate.ts' */
+/** @import { Template } from './packages/mobgen/src/core/template.ts' */
+/** @import { AttackClip } from './packages/mobgen/src/mob/attack.ts' */
+/** @import { HumanoidParams } from './packages/mobgen/src/mob/humanoid.ts' */
+/** @import { ClipDef, ClipFrame } from './packages/mobgen/src/mob/keyframes.ts' */
+/** @import { FrameOptions } from './packages/mobgen/src/mob/leaper/motion.ts' */
+import { fusedFigure } from './actorFigure.mjs';
 import { clamp, mat3ToQuat, smoothstep } from './packages/mobgen/src/core/math.ts';
 import { consumableTemplate } from './packages/mobgen/src/core/template.ts';
 import { acidDeathPose, acidIdlePose, acidStrideLength } from './packages/mobgen/src/mob/acidPoses.ts';
@@ -51,16 +64,49 @@ import {
 import { flinchClipFor, HIT_FLINCH } from './packages/mobgen/src/mob/reactions.ts';
 import { WALKER_DAMAGE, walkerClip, walkerFrame } from './packages/mobgen/src/mob/walker/motion.ts';
 
-/** Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs). */
+/** @typedef {Pick<MobRow, 'walk_frames' | 'attack_frames'>} FrameCounts */
+/** @typedef {FrameCounts & Pick<MobRow, 'walkCycles' | 'crawls' | 'crawl_stride' | 'walk_speed'>} HumanoidRow */
+/**
+ * How a pose clip is sampled and what it states of itself: its frame count, whether it loops, the span its cursor runs
+ * (see `poseClip`), and the moments and speeds a consumer reads beside its frames. `duration` and `period` are refused,
+ * since neither names its clock.
+ * @typedef {object} PoseClipSpan
+ * @property {number} frames
+ * @property {boolean} loop
+ * @property {unknown} [duration]
+ * @property {number} [durationSimSeconds]
+ * @property {number} [durationRealSeconds]
+ * @property {unknown} [period]
+ * @property {number} [periodSimSeconds]
+ * @property {number} [strideMetres]
+ * @property {number} [samplePeriod]
+ * @property {number} [cycles]
+ * @property {number} [hitAtSimSeconds]
+ * @property {number} [peakAtSimSeconds]
+ * @property {number} [takeoffAtSimSeconds]
+ * @property {number} [landAtSimSeconds]
+ * @property {number} [idleBlendSpeed]
+ */
+
+/** @param {Figure['genome']} genome a humanoid's, whose params are its template's, which the gait names */
+const humanoidParams = (genome) => /** @type {HumanoidParams} */ (genome.params);
+
+/**
+ * Absolute local rotations in the generator frame, without precision reduction; the export turns them (tools/actorFrame.mjs).
+ * @param {Pose} pose
+ */
 export const poseFrame = (pose) => ({
-  root: [...pose.root],
+  root: /** @type {Vec3} */ ([...pose.root]),
   rotations: Object.fromEntries(Object.entries(pose.rotations).map(([id, rotation]) => [id, mat3ToQuat(rotation)])),
 });
 
 /** Loop cursors are normalized; finite cursors are seconds. One frame is a static pose. The caller names the
  * finite span's clock, so a new clip cannot get one by accident. A walk loop states the distance of one stride
  * (`strideMetres`), because travel advances it and no clock does; an idle loop states `periodSimSeconds`, because
- * the live idle runs on the saved Sim wander clock. */
+ * the live idle runs on the saved Sim wander clock.
+ * @param {(cursor: number) => Pose} at
+ * @param {PoseClipSpan} span
+ */
 export function poseClip(
   at,
   {
@@ -88,19 +134,26 @@ export function poseClip(
   if (!(Number.isFinite(span) && span > 0)) throw new RangeError('clip span must be positive and finite');
   if (strideMetres !== undefined && !(Number.isFinite(strideMetres) && strideMetres > 0))
     throw new RangeError('strideMetres must be positive and finite');
-  const clip = { kind: 'pose', loop, ...metadata };
-  if (durationSimSeconds !== undefined) clip.durationSimSeconds = durationSimSeconds;
-  if (durationRealSeconds !== undefined) clip.durationRealSeconds = durationRealSeconds;
-  if (periodSimSeconds !== undefined) clip.periodSimSeconds = periodSimSeconds;
-  if (strideMetres !== undefined) clip.strideMetres = strideMetres;
-  if (cycles !== undefined) clip.cycles = cycles;
-  clip.frames = Array.from({ length: frames }, (_, i) =>
-    poseFrame(at(frames === 1 ? 0 : (span * i) / (loop ? frames : frames - 1))),
-  );
-  return clip;
+  return {
+    kind: /** @type {const} */ ('pose'),
+    loop,
+    ...metadata,
+    ...(durationSimSeconds === undefined ? {} : { durationSimSeconds }),
+    ...(durationRealSeconds === undefined ? {} : { durationRealSeconds }),
+    ...(periodSimSeconds === undefined ? {} : { periodSimSeconds }),
+    ...(strideMetres === undefined ? {} : { strideMetres }),
+    ...(cycles === undefined ? {} : { cycles }),
+    frames: Array.from({ length: frames }, (_, i) =>
+      poseFrame(at(frames === 1 ? 0 : (span * i) / (loop ? frames : frames - 1))),
+    ),
+  };
 }
 
-/** Acid curves are serialized before live-base joint limits or speed weighting are applied. */
+/**
+ * Acid curves are serialized before live-base joint limits or speed weighting are applied.
+ * @param {Pick<Figure, 'realized'>} figure
+ * @param {FrameCounts} row
+ */
 export function acidClips(figure, row) {
   const tuning = acidTemplate.animation;
   if (
@@ -112,12 +165,27 @@ export function acidClips(figure, row) {
     )
   )
     throw new RangeError('acid frame counts must be at least two');
+  /**
+   * @param {Readonly<Record<string, readonly number[]>>} values
+   * @param {number} weight
+   */
   const weighted = (values, weight) =>
     Object.fromEntries(Object.entries(values).map(([id, angles]) => [id, angles.map((a) => a * weight)]));
+  /**
+   * @param {number} t
+   * @param {number} peak
+   * @param {number} duration
+   */
   const pulse = (t, peak, duration) =>
     t <= 0 || t >= duration ? 0 : smoothstep(t < peak ? t / peak : (duration - t) / (duration - peak));
+  /**
+   * @param {'attack' | 'spitDraw' | 'hit'} name
+   * @param {'time' | 'progress'} cursor
+   * @param {(u: number) => number} weight
+   * @param {Readonly<Record<string, number>>} [metadata]
+   */
   const action = (name, cursor, weight, metadata = {}) => ({
-    kind: 'jointDelta',
+    kind: /** @type {const} */ ('jointDelta'),
     cursor,
     speedWeight: false,
     sideScalesZ: name === 'hit',
@@ -129,6 +197,7 @@ export function acidClips(figure, row) {
   });
   // Canonical baked fall: absolute, endpoint-inclusive, from idle frame zero; the last frame is the settled fold.
   const rest = acidIdlePose(figure.realized, 0);
+  /** @param {1 | -1} direction */
   const death = (direction) =>
     poseClip((time) => acidDeathPose(figure.realized, rest, time, direction), {
       loop: false,
@@ -144,7 +213,7 @@ export function acidClips(figure, row) {
       }),
       death: { forward: death(1), backward: death(-1) },
       walk: {
-        kind: 'jointDelta',
+        kind: /** @type {const} */ ('jointDelta'),
         loop: true,
         cursor: 'gaitPhase',
         speedWeight: true,
@@ -153,6 +222,7 @@ export function acidClips(figure, row) {
         cycles: 1,
         strideMetres: acidStrideLength(figure.realized),
         frames: Array.from({ length: row.walk_frames }, (_, i) => {
+          /** @type {Record<string, Vec3>} */
           const angles = {};
           for (const [index, side] of ['L', 'R'].entries()) {
             const wave = Math.sin((2 * Math.PI * i) / row.walk_frames + index * Math.PI);
@@ -179,10 +249,14 @@ export function acidClips(figure, row) {
   };
 }
 
+/**
+ * @param {Figure} figure
+ */
 export function fusedClips(figure) {
+  const { originOffset: offset, scale } = fusedFigure(figure);
   return {
     standing: {
-      idle: poseClip(() => ({ root: figure.originOffset.map((v) => v / figure.scale), rotations: {} }), {
+      idle: poseClip(() => ({ root: [offset[0] / scale, offset[1] / scale, offset[2] / scale], rotations: {} }), {
         loop: false,
         frames: 1,
       }),
@@ -191,34 +265,48 @@ export function fusedClips(figure) {
 }
 
 /** Non-humanoid plans bake mobgen's own absolute poses. A plan with its own reactions adds a flinch and one death
- * per side its body can fall on. */
+ * per side its body can fall on.
+ * @param {Pick<Figure, 'realized' | 'genome'>} figure
+ * @param {Pick<Template, 'bodyPlan'>} template
+ * @param {FrameCounts & Pick<MobRow, 'walk_speed'>} row
+ */
 export function creatureClips(figure, template, row) {
   const { realized, genome } = figure;
   const frames = { walk: row.walk_frames, attack: row.attack_frames };
   if (!(Number.isInteger(frames.walk) && frames.walk >= 2 && Number.isInteger(frames.attack) && frames.attack >= 2)) {
     throw new RangeError('creature frame counts must be at least two');
   }
+  /** @type {() => Pose} */
   let idle;
+  /** @type {(cursor: number) => Pose} */
   let walk;
+  /** @type {(time: number) => Pose} */
   let attack;
+  /** @type {{ readonly duration: number; readonly hitTime: number }} */
   let action;
+  /** @type {number} */
   let cycleMetres;
+  /** @type {Record<string, Clips>} */
   let reactions = {};
   if (template.bodyPlan === 'quadruped') {
-    const stance = { limp: genome.params.limp, headTilt: genome.params.headTilt, jawOpen: genome.params.jawOpen };
+    // A dog's genome draws the three its stance reads, as a critter's does.
+    const stance = critterStance(genome.params);
+    const stride = quadrupedStrideLength(realized, stance);
     idle = () => dogIdlePose(realized, stance);
-    cycleMetres = quadrupedStrideLength(realized, stance);
-    walk = (cursor) => quadrupedGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    cycleMetres = stride;
+    walk = (cursor) => quadrupedGaitPose(realized, cursor * stride, row.walk_speed, stance);
     action = DOG_POUNCE;
     attack = (time) => dogAttackPose(realized, idle(), time);
   } else if (template.bodyPlan === 'critter') {
     const stance = critterStance(genome.params);
     const rest = critterIdlePose(realized, stance);
     idle = () => rest;
-    cycleMetres = critterStrideLength(realized, stance);
-    walk = (cursor) => critterGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    const stride = critterStrideLength(realized, stance);
+    cycleMetres = stride;
+    walk = (cursor) => critterGaitPose(realized, cursor * stride, row.walk_speed, stance);
     action = CRITTER_POUNCE;
     attack = (time) => critterAttackPose(realized, rest, time);
+    /** @param {'L' | 'R'} side */
     const death = (side) =>
       poseClip((time) => critterDeathPose(realized, rest, time, side), {
         loop: false,
@@ -235,21 +323,24 @@ export function creatureClips(figure, template, row) {
       death: { left: death('L'), right: death('R') },
     };
   } else if (template.bodyPlan === 'insect') {
-    const stance = { mandibleOpen: genome.params.mandibleOpen };
+    const { mandibleOpen } = genome.params;
+    const stance = mandibleOpen === undefined ? {} : { mandibleOpen };
+    const stride = insectStrideLength(realized);
     idle = () => insectIdlePose(realized, 0.9);
-    cycleMetres = insectStrideLength(realized);
-    walk = (cursor) => insectGaitPose(realized, cursor * cycleMetres, row.walk_speed, stance);
+    cycleMetres = stride;
+    walk = (cursor) => insectGaitPose(realized, cursor * stride, row.walk_speed, stance);
     action = INSECT_LUNGE;
     attack = (time) => insectAttackPose(realized, insectIdlePose(realized, 0), time);
   } else if (template.bodyPlan === 'floater') {
-    const params = genome.params;
+    // A genome's params are its template's, which a floater's poses name.
+    const params = /** @type {Parameters<typeof floaterIdlePose>[1]} */ (genome.params);
     idle = () => floaterIdlePose(realized, params);
     cycleMetres = params.driftCycle;
     walk = (cursor) => floaterDriftPose(realized, params, cursor);
     action = FLOATER_CAST;
     attack = (time) => floaterCastPose(realized, params, time);
   } else if (template.bodyPlan === 'dragon') {
-    const params = genome.params;
+    const params = /** @type {Parameters<typeof dragonIdlePose>[1]} */ (genome.params);
     idle = () => dragonIdlePose(realized, params);
     cycleMetres = dragonStrideLength(realized, params);
     walk = (cursor) => dragonStompPose(realized, params, cursor);
@@ -275,6 +366,11 @@ export function creatureClips(figure, template, row) {
  * A keyed-rig mob's clips are tracks on its own rig, each grounded on the supports its body keeps. Loops play in
  * place and state their stride, like every walk; finite clips keep their travel, since a pounce's distance is
  * the attack. Returns the baker of one named clip, with the cut points already severed.
+ * @param {Pick<Figure, 'realized'>} figure
+ * @param {FrameCounts} row
+ * @param {string} mob
+ * @param {(name: string) => ClipDef} clipOf
+ * @param {(realized: Realized, name: string, u: number, cut: FrameOptions) => ClipFrame} frameOf
  */
 function trackClipBaker(figure, row, mob, clipOf, frameOf) {
   if (
@@ -287,14 +383,23 @@ function trackClipBaker(figure, row, mob, clipOf, frameOf) {
   ) {
     throw new RangeError(`${mob} frame counts must be at least two`);
   }
+  /**
+   * @param {string} name
+   * @param {FrameOptions} [cut]
+   */
   return (name, cut = {}) => {
     const clip = clipOf(name);
+    /** @param {number} u */
     const at = (u) => frameOf(figure.realized, name, u, cut);
+    /**
+     * @param {number} u
+     * @returns {Pose}
+     */
     const inPlace = (u) => {
       const { pose } = at(u);
       return { ...pose, root: [pose.root[0], pose.root[1], 0] };
     };
-    const travel = clip.travel?.at(-1)[1];
+    const travel = clip.travel?.at(-1)?.[1];
     const baked = clip.loop
       ? poseClip(inPlace, {
           loop: true,
@@ -314,14 +419,20 @@ function trackClipBaker(figure, row, mob, clipOf, frameOf) {
             : { takeoffAtSimSeconds: clip.air.from * clip.seconds, landAtSimSeconds: clip.air.to * clip.seconds }),
         });
     // A charged telegraph is per frame, so it stays aligned with the pose it brightens.
+    /** @param {number} i */
     const cursor = (i) => (clip.loop ? i / baked.frames.length : i / (baked.frames.length - 1));
-    if (clip.charge) baked.frames = baked.frames.map((frame, i) => ({ ...frame, charge: at(cursor(i)).charge }));
-    return baked;
+    return clip.charge
+      ? { ...baked, frames: baked.frames.map((frame, i) => ({ ...frame, charge: at(cursor(i)).charge })) }
+      : baked;
   };
 }
 
 /** The leaper's clips. Bodies that lost hind springs get their own sets, as a legless humanoid gets a crawling
- * one; `limping.walk` is keyed by the side that lost its spring. */
+ * one; `limping.walk` is keyed by the side that lost its spring.
+ * @param {Pick<Figure, 'realized'>} figure
+ * @param {unknown} _template
+ * @param {FrameCounts} row
+ */
 export function leaperClips(figure, _template, row) {
   const bake = trackClipBaker(figure, row, 'leaper', leaperClip, leaperFrame);
   return {
@@ -342,7 +453,11 @@ export function leaperClips(figure, _template, row) {
 
 /** The walker's clips: a boss that stomps and fires, and flinches only when a heavy round hits it, so its flinch
  * names those rounds. A leg lost from the heel down leaves a stump it limps on, so `limping.walk` is keyed by the side
- * that lost its foot; a leg lost whole leaves it nothing to walk on, so it has no dragging set. */
+ * that lost its foot; a leg lost whole leaves it nothing to walk on, so it has no dragging set.
+ * @param {Pick<Figure, 'realized'>} figure
+ * @param {unknown} _template
+ * @param {FrameCounts} row
+ */
 export function walkerClips(figure, _template, row) {
   const bake = trackClipBaker(figure, row, 'walker', walkerClip, walkerFrame);
   return {
@@ -360,6 +475,8 @@ export function walkerClips(figure, _template, row) {
  * Both locomotion sets use the same figure, including injured crawling on a standing rig. A row's `crawls` flag
  * selects whether it bakes a crawling set at all: built data holds only what the game uses. Its crawl walk
  * states the row's authored `crawl_stride` as `strideMetres`, like the standing walk states its own distance.
+ * @param {Pick<Figure, 'realized' | 'genome' | 'seed'>} figure
+ * @param {HumanoidRow & { legCut?: number | undefined }} row
  */
 export function humanoidPoseClips(figure, row) {
   if (!(Number.isInteger(row.walkCycles) && row.walkCycles > 0))
@@ -369,7 +486,7 @@ export function humanoidPoseClips(figure, row) {
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
-    params: figure.genome.params,
+    params: humanoidParams(figure.genome),
     seed: figure.seed,
     cache: createGaitCache(),
     planPeriodSteps: 2 * row.walkCycles,
@@ -402,7 +519,7 @@ export function humanoidPoseClips(figure, row) {
     ) / row.walkCycles;
   const standing = {
     idle: Object.fromEntries(
-      ['slack', 'aggravated'].map((stance) => [
+      /** @type {const} */ (['slack', 'aggravated']).map((stance) => [
         stance,
         {
           base: poseFrame(idleBasePose(actor, stance)),
@@ -428,21 +545,31 @@ export function humanoidPoseClips(figure, row) {
   return crawling ? { standing, crawling } : { standing };
 }
 
-/** Endpoint-inclusive action frames are independent of their eventual live base. */
+/**
+ * Endpoint-inclusive action frames are independent of their eventual live base.
+ * @param {Pick<Figure, 'realized' | 'genome' | 'seed'>} figure
+ * @param {Pick<Template, 'name' | 'attackClip' | 'flinchClip' | 'legCut'>} template
+ * @param {HumanoidRow} row
+ */
 export function humanoidClips(figure, template, row) {
   const sets = humanoidPoseClips(figure, { ...row, legCut: template.legCut });
   const actor = {
     bones: figure.realized.body.bones,
     extents: footRestExtents(figure.realized.body.bones, figure.realized.voxels),
-    params: figure.genome.params,
+    params: humanoidParams(figure.genome),
     seed: figure.seed,
   };
   if (!(Number.isInteger(row.attack_frames) && row.attack_frames >= 2))
     throw new RangeError('attack_frames must be at least two');
+  /**
+   * @param {AttackClip} clip
+   * @param {boolean} flinch
+   * @param {boolean} crawling
+   */
   const overlay = (clip, flinch, crawling) => ({
-    kind: 'overlay',
+    kind: /** @type {const} */ ('overlay'),
     durationSimSeconds: clip.duration,
-    ...(flinch ? { peakAtSimSeconds: clip.keys[1].t } : { hitAtSimSeconds: clip.hitTime }),
+    ...(flinch ? { peakAtSimSeconds: peakOf(clip).t } : { hitAtSimSeconds: clip.hitTime }),
     sideScalesZ: flinch,
     walkBlendBones: [...ARM_BONES],
     frames: Array.from({ length: row.attack_frames }, (_, i) => {
@@ -450,26 +577,37 @@ export function humanoidClips(figure, template, row) {
       if (!crawling) return attackOverlayFrame(actor, clip, time);
       // A crawling rig may have no lower legs; its live action never computes a standing pelvis drop.
       const frame = attackRotations(actor, clip, time, { root: [0, 0, 0], rotations: {}, angles: {} });
+      if (!frame.clipAngles) throw new Error(`clip ${clip.name} states no angles at ${time}`);
       return { angles: frame.clipAngles, walkBlendWeight: frame.armWalkWeight, dropMetres: 0 };
     }),
   });
-  if (sets.standing) {
-    sets.standing.attack = overlay(attackClipFor(template), false, false);
-    sets.standing.flinch = overlay(flinchClipFor(template), true, false);
-  }
-  if (!sets.crawling) return sets;
-  sets.crawling.attack = overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true);
-  sets.crawling.flinch = {
-    kind: 'overlay',
-    durationSimSeconds: HIT_FLINCH.duration,
-    peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
-    sideScalesZ: true,
-    walkBlendBones: [],
-    frames: Array.from({ length: row.attack_frames }, (_, i) => ({
-      angles: crawlHitAngles((HIT_FLINCH.duration * i) / (row.attack_frames - 1)),
-      walkBlendWeight: 1,
-      dropMetres: 0,
-    })),
+  const standing = sets.standing && {
+    ...sets.standing,
+    attack: overlay(attackClipFor(template), false, false),
+    flinch: overlay(flinchClipFor(template), true, false),
   };
-  return sets;
+  const crawling = sets.crawling && {
+    ...sets.crawling,
+    attack: overlay(attackClipFor(consumableTemplate('legless-humanoid')), false, true),
+    flinch: {
+      kind: /** @type {const} */ ('overlay'),
+      durationSimSeconds: HIT_FLINCH.duration,
+      peakAtSimSeconds: HIT_FLINCH.duration * CRAWL_HIT_PEAK_FRACTION,
+      sideScalesZ: true,
+      walkBlendBones: [],
+      frames: Array.from({ length: row.attack_frames }, (_, i) => ({
+        angles: crawlHitAngles((HIT_FLINCH.duration * i) / (row.attack_frames - 1)),
+        walkBlendWeight: 1,
+        dropMetres: 0,
+      })),
+    },
+  };
+  return { ...(standing ? { standing } : {}), ...(crawling ? { crawling } : {}) };
 }
+
+/** @param {AttackClip} clip a flinch, which peaks at its second key */
+const peakOf = (clip) => {
+  const peak = clip.keys[1];
+  if (!peak) throw new Error(`flinch clip ${clip.name} needs a second key, its peak`);
+  return peak;
+};

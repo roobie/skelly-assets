@@ -1,8 +1,13 @@
+// @ts-check
 // Usage: node tools/mobs.mjs [--out dir] [--cache dir | --no-cache] [mobId ...], or node tools/mobs.mjs --shard i/n
 // [--cache dir] to only fill the cache with one shard of the mob rows. With no ids it builds every models/mobs.json row.
 // Every row is baked as an actor pose: GLB, body, clips and genome files live at their logical paths under the row's pack. A
 // type's severed-part source row also bakes its parts (tools/severedParts.mjs), and a run over every row writes their
 // pack's index of them. The cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
+/** @import { MobRow } from './layout.mjs' */
+/** @import { SeveredPlan } from './severedParts.mjs' */
+/** @import { Genome, Template } from './packages/mobgen/src/core/template.ts' */
+/** @import { EntryStore } from './packages/thing-export/src/cache.ts' */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -25,9 +30,15 @@ const { bakeSeveredParts } = await import('./severedPartBake.mjs');
 
 // A consumer reads the genome as a draw from the row's ranges, the row's own where it narrows one and its template's
 // otherwise, so a genome outside them would misstate the figure.
+/**
+ * @param {MobRow} row
+ * @param {Template} template
+ * @param {Genome} genome
+ */
 const refuseStrayParams = (row, template, genome) => {
   const strays = strayParams(template, genome);
   if (strays.length === 0) return;
+  /** @param {unknown} spec */
   const range = (spec) => (spec === undefined ? 'no declared range' : `range ${JSON.stringify(spec)}`);
   throw new Error(
     `${row.id} draws ${strays.map(({ name, value, spec }) => `${name} = ${value} outside ${range(spec)}`).join('; ')}`,
@@ -35,6 +46,10 @@ const refuseStrayParams = (row, template, genome) => {
 };
 
 // The row's files by role; a row that is its type's severed-part source (tools/severedParts.mjs) also bakes the parts.
+/**
+ * @param {MobRow} row
+ * @param {SeveredPlan} [severed]
+ */
 const bakeMob = (row, severed) => {
   const template = templateFor(row);
   const found = generateValid(template, row.seed, { maxAttempts: 1 });
@@ -60,21 +75,37 @@ const bakeMob = (row, severed) => {
 // A mob's files are fixed by its resolved row and the code that bakes it: mobgen with the data it imports, and the
 // actor modules here. Every module of this folder counts, since naming them one by one would miss a new one, and an
 // edit to another costs only a rebake of the mobs.
-const MOB_FILES = ['body', 'clips', 'genome', 'glb'];
+const MOB_FILES = /** @type {const} */ (['body', 'clips', 'genome', 'glb']);
+/** @param {string} id */
 const partRole = (id) => `severed.${id}`;
 // A severed-part source row's parts by bone, which go into their pack's index rather than a file of their own.
 const CUTS_ROLE = 'severed';
 // Each role with the path its file is written to.
+/**
+ * @param {MobRow} row
+ * @param {SeveredPlan} [severed]
+ * @returns {[role: string, file: string][]}
+ */
 const mobFiles = (row, severed) => [
-  ...MOB_FILES.map((role) => [role, outputPath(row.pack, row[role])]),
+  ...MOB_FILES.map(/** @returns {[string, string]} */ (role) => [role, outputPath(row.pack, row[role])]),
   ...(severed === undefined
     ? []
-    : severed.parts.map((part) => [partRole(part.id), outputPath(severed.pack, part.path)])),
+    : severed.parts.map(
+        /** @returns {[string, string]} */ (part) => [partRole(part.id), outputPath(severed.pack, part.path)],
+      )),
 ];
+/**
+ * @param {MobRow} row
+ * @param {SeveredPlan} [severed]
+ */
 const mobRoles = (row, severed) => [
   ...mobFiles(row, severed).map(([role]) => role),
   ...(severed === undefined ? [] : [CUTS_ROLE]),
 ];
+/**
+ * @param {MobRow} row
+ * @param {SeveredPlan} [severed]
+ */
 const mobInputs = (row, severed) => ({
   row,
   severed: severed && {
@@ -85,6 +116,7 @@ const mobInputs = (row, severed) => ({
 });
 // A mob's entry is keyed by the code this module runs to bake it (tools/importClosure.mjs) and by the generator's and
 // the templates' data, which that code reads whatever the row.
+/** @param {string} cache */
 export const mobStore = (cache) =>
   entryStore(
     cache,
@@ -92,9 +124,19 @@ export const mobStore = (cache) =>
     codeFingerprint(here, closureCode(here, [import.meta.filename]), ['packages/mobgen/src', '../models/mobs']),
   );
 
+/**
+ * @param {EntryStore} store
+ * @param {MobRow} row
+ * @param {SeveredPlan} [severed]
+ */
 const storedMob = (store, row, severed) =>
   store.entry(mobRoles(row, severed), mobInputs(row, severed), () => bakeMob(row, severed));
 
+/**
+ * @param {string} out
+ * @param {string} file
+ * @param {string | Uint8Array} bytes
+ */
 const writeOut = (out, file, bytes) => {
   const path = join(out, file);
   mkdirSync(dirname(path), { recursive: true });
@@ -103,22 +145,50 @@ const writeOut = (out, file, bytes) => {
 
 // Bakes the row, or takes its files from the store, and writes each where its row field, or its severed-part plan,
 // places it; returns the store entry when there is one, and by bone the parts the row is cut into.
+/**
+ * @param {MobRow} row
+ * @param {string} out
+ * @param {EntryStore} [store]
+ * @param {SeveredPlan} [severed]
+ */
 export function exportMob(row, out, store, severed) {
-  const { files, ...entry } = store ? storedMob(store, row, severed) : { files: bakeMob(row, severed) };
-  for (const [role, file] of mobFiles(row, severed)) writeOut(out, file, files[role]);
-  return { entry: store ? entry : undefined, cuts: severed && JSON.parse(files[CUTS_ROLE]) };
+  const stored = store && storedMob(store, row, severed);
+  /** @type {Readonly<Record<string, string | Uint8Array>>} */
+  const files = stored ? stored.files : bakeMob(row, severed);
+  /** @param {string} role */
+  const fileOf = (role) => {
+    const file = files[role];
+    if (file === undefined) throw new Error(`${row.id} was baked without its ${role} file`);
+    return file;
+  };
+  for (const [role, file] of mobFiles(row, severed)) writeOut(out, file, fileOf(role));
+  return {
+    entry: stored && { key: stored.key, reused: stored.reused },
+    cuts: severed && JSON.parse(String(fileOf(CUTS_ROLE))),
+  };
 }
 
 // The severed parts index of every plan's pack, from each plan's parts by bone, by mob type.
+/**
+ * @param {Iterable<Pick<SeveredPlan, 'mob' | 'pack'>>} plans
+ * @param {ReadonlyMap<string, unknown>} cutsByMob
+ * @returns {[file: string, json: string][]}
+ */
 export function severedIndexFiles(plans, cutsByMob) {
+  /** @type {Map<string, Record<string, unknown>>} */
   const packs = new Map();
   for (const { mob, pack } of [...plans].sort((a, b) => (a.mob < b.mob ? -1 : 1))) {
-    if (!packs.has(pack)) packs.set(pack, {});
-    packs.get(pack)[mob] = cutsByMob.get(mob);
+    const index = packs.get(pack) ?? {};
+    packs.set(pack, index);
+    index[mob] = cutsByMob.get(mob);
   }
   return [...packs].map(([pack, index]) => [outputPath(pack, SEVERED_INDEX), JSON.stringify(index)]);
 }
 
+/**
+ * @param {number} reused
+ * @param {number} total
+ */
 const reportCache = (reused, total) => console.log(`mob cache: ${reused} mob(s) reused, ${total - reused} baked`);
 
 async function main() {
@@ -129,7 +199,7 @@ async function main() {
   const rows = readMobRows(repo);
   const plans = new Map((await readSeveredParts(repo)).map((plan) => [plan.source.id, plan]));
   const cache = cacheFolder(values);
-  const store = cache && mobStore(cache);
+  const store = cache === undefined ? undefined : mobStore(cache);
   if (values.shard !== undefined) {
     if (store === undefined || positionals.length > 0) throw new Error('--shard fills a cache and takes no ids');
     const shard = shardUnits(rows, parseShard(values.shard));
@@ -137,7 +207,8 @@ async function main() {
     return 0;
   }
   const wanted = positionals.length > 0 ? positionals : rows.map((row) => row.id);
-  const unknown = wanted.filter((id) => !rows.some((row) => row.id === id));
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const unknown = wanted.filter((id) => !byId.has(id));
   if (unknown.length > 0) {
     console.log(`not in models/mobs.json: ${unknown.join(' ')}`);
     return 1;
@@ -145,23 +216,22 @@ async function main() {
   const out = resolve(values.out);
   mkdirSync(out, { recursive: true });
   let failed = false;
+  /** @type {Set<string>} */
   const used = new Set();
   let reused = 0;
+  /** @type {Map<string, unknown>} */
   const cutsByMob = new Map();
   for (const id of wanted) {
     try {
+      const row = byId.get(id);
+      if (!row) throw new Error('not in models/mobs.json');
       const plan = plans.get(id);
-      const { entry, cuts } = exportMob(
-        rows.find((row) => row.id === id),
-        out,
-        store,
-        plan,
-      );
-      if (cuts) cutsByMob.set(plan.mob, cuts);
+      const { entry, cuts } = exportMob(row, out, store, plan);
+      if (plan && cuts) cutsByMob.set(plan.mob, cuts);
       if (entry) used.add(entry.key);
       if (entry?.reused) reused += 1;
     } catch (error) {
-      console.log(`EXPORT FAILED ${id}: ${error.message}`);
+      console.log(`EXPORT FAILED ${id}: ${error instanceof Error ? error.message : String(error)}`);
       failed = true;
     }
   }
