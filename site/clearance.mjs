@@ -1,3 +1,4 @@
+// @ts-check
 // Where a posed garment stops enclosing the body it covers, shared by the pose page, the pose sheet and the clearance
 // sweep. Nothing is forgiven by a margin: every finding is classified instead, so a fit that is merely flush or a
 // seam where two pieces meet is told apart from a body part showing through. Why is in docs/decisions/0011-clearance-classified.md.
@@ -13,8 +14,11 @@
 // it was already in there at rest, where pieces meet the next part by design, or it lies in another piece, a `seam`
 // where the garment overlaps itself. The skin check (skin.mjs) draws the same covered surface, so what the probe finds and what a camera sees
 // are told of one surface.
+/** @import { AxisIndex, Transform, Vec3 } from '../tools/packages/construct/src/foundation/math.ts' */
+/** @import { Box, Rig } from './kinematics.mjs' */
 import { hides } from './hiding.mjs';
 import {
+  AXES,
   add,
   applyPoint,
   cross,
@@ -44,19 +48,84 @@ export const PARALLEL = Math.cos(Math.PI / 180);
 const RAY = normalize([0.123, 0.987, 0.345]);
 const EPSILON = 1e-12;
 
-const triangleCorners = ({ positions, indices }, t) =>
-  [0, 1, 2].map((k) => {
-    const i = indices[t * 3 + k] * 3;
-    return [positions[i], positions[i + 1], positions[i + 2]];
-  });
-const triangles = (mesh) => Array.from({ length: mesh.indices.length / 3 }, (_, t) => triangleCorners(mesh, t));
-const centroid = ([a, b, c]) => [0, 1, 2].map((k) => (a[k] + b[k] + c[k]) / 3);
+/**
+ * A closed triangle mesh; `pieces` names each triangle's region, where the export marks one.
+ * @typedef {object} Mesh
+ * @property {ArrayLike<number>} positions
+ * @property {ArrayLike<number>} indices
+ * @property {readonly (string | undefined)[]} [pieces]
+ */
+/** @typedef {readonly [Vec3, Vec3, Vec3]} Triangle */
+/** @typedef {{ corners: Triangle; point: Vec3; normal: Vec3; region: string | undefined }} Sample */
+/** @typedef {{ bounds: Box; faces: readonly Triangle[]; children?: undefined } | { bounds: Box; faces?: undefined; children: readonly [Tree, Tree] }} Tree */
+/** @typedef {{ tree: Tree; local: (p: Vec3) => Vec3 }} Solid */
+/**
+ * The doll at rest, as tools/dollRig.mjs, `restMeshes` gives it.
+ * @typedef {object} Rest
+ * @property {readonly { bone: string; part?: string | undefined; mesh: Mesh }[]} body A part that names no doll part is hidden by region alone.
+ * @property {readonly RestPiece[]} pieces
+ */
+/** @typedef {{ piece: string; bone: string; mesh: Mesh; covers?: readonly string[] | undefined; bare?: readonly string[] | undefined }} RestPiece */
+/** @typedef {Sample & { cover: number; whole?: boolean }} CoveredSample */
+/** @typedef {{ bone: string; samples: CoveredSample[] }[]} Surface */
+/** @typedef {{ bone: string; piece: string; cover: number; point: Vec3; normal: Vec3 }} CoveredPoint */
+/** @typedef {{ bone: string; piece: string; point: Vec3; depth: number }} Poke */
+/** @typedef {{ bone: string; piece: string; point: Vec3 }} Flush */
+/** @typedef {{ piece: string; into: string; point: Vec3; depth: number }} Sink */
+/** @typedef {{ piece: string; into: string; point: Vec3 }} Seam */
+/** @typedef {{ pokes: Poke[]; flush: Flush[]; sinks: Sink[]; seams: Seam[] }} Findings */
 
+/** The axis after each, round the three. */
+const NEXT = /** @type {const} */ ([1, 2, 0]);
+
+/**
+ * The item at `index` of a list that holds one there.
+ * @template T
+ * @param {ArrayLike<T>} list
+ * @param {number} index
+ */
+const itemAt = (list, index) => {
+  const item = list[index];
+  if (item === undefined) throw new RangeError(`clearance: no item ${index} of ${list.length}`);
+  return item;
+};
+
+/**
+ * @param {Mesh} mesh
+ * @param {number} corner
+ * @returns {Vec3}
+ */
+const cornerPoint = ({ positions, indices }, corner) => {
+  const i = itemAt(indices, corner) * 3;
+  return [itemAt(positions, i), itemAt(positions, i + 1), itemAt(positions, i + 2)];
+};
+/**
+ * @param {Mesh} mesh
+ * @returns {Triangle[]}
+ */
+const triangles = (mesh) =>
+  Array.from({ length: mesh.indices.length / 3 }, (_, t) => [
+    cornerPoint(mesh, t * 3),
+    cornerPoint(mesh, t * 3 + 1),
+    cornerPoint(mesh, t * 3 + 2),
+  ]);
+/**
+ * @param {Triangle} triangle
+ * @returns {Vec3}
+ */
+const centroid = ([a, b, c]) => [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3];
+
+/**
+ * @param {Iterable<Vec3>} points
+ * @returns {Box}
+ */
 function boundsOf(points) {
-  const min = [Infinity, Infinity, Infinity],
-    max = [-Infinity, -Infinity, -Infinity];
+  /** @type {[number, number, number]} */
+  const min = [Infinity, Infinity, Infinity];
+  /** @type {[number, number, number]} */
+  const max = [-Infinity, -Infinity, -Infinity];
   for (const p of points)
-    for (let a = 0; a < 3; a++) {
+    for (const a of AXES) {
       min[a] = Math.min(min[a], p[a]);
       max[a] = Math.max(max[a], p[a]);
     }
@@ -64,13 +133,21 @@ function boundsOf(points) {
 }
 
 // Whether the boxes overlap, the first widened by `margin`.
-const boxesMeet = (a, b, margin) =>
-  [0, 1, 2].every((k) => a.min[k] - margin <= b.max[k] && b.min[k] <= a.max[k] + margin);
+/**
+ * @param {Box} a
+ * @param {Box} b
+ * @param {number} margin
+ */
+const boxesMeet = (a, b, margin) => AXES.every((k) => a.min[k] - margin <= b.max[k] && b.min[k] <= a.max[k] + margin);
 
 // How far `p` lies outside the box, zero inside it.
+/**
+ * @param {Box} box
+ * @param {Vec3} p
+ */
 function boxDistance({ min, max }, p) {
   let sum = 0;
-  for (let a = 0; a < 3; a++) {
+  for (const a of AXES) {
     const off = Math.max(min[a] - p[a], 0, p[a] - max[a]);
     sum += off * off;
   }
@@ -81,18 +158,27 @@ function boxDistance({ min, max }, p) {
  * Each triangle of the mesh halved across its longest side until no side is longer than `pitch`, as corner triples:
  * the surface the probe samples and the skin check draws. Halving the longest side keeps a long thin triangle to a
  * row of small ones rather than a grid.
+ * @param {Mesh} mesh
+ * @param {number} [pitch]
  */
 export function subdivided(mesh, pitch = PITCH) {
+  /** @type {Triangle[]} */
   const out = [];
+  /** @param {Triangle} corners */
   const split = (corners) => {
-    const sides = [0, 1, 2].map((k) => length(sub(corners[(k + 1) % 3], corners[k])));
-    const k = sides.indexOf(Math.max(...sides));
-    if (sides[k] <= pitch) {
+    /** @param {AxisIndex} k */
+    const side = (k) => length(sub(corners[NEXT[k]], corners[k]));
+    const sides = /** @type {const} */ ([side(0), side(1), side(2)]);
+    const longest = Math.max(...sides);
+    const k = AXES.find((at) => sides[at] === longest);
+    if (k === undefined) throw new RangeError('clearance: a triangle with a side of no length');
+    if (longest <= pitch) {
       out.push(corners);
       return;
     }
-    const [a, b, c] = [corners[k], corners[(k + 1) % 3], corners[(k + 2) % 3]];
-    const middle = [0, 1, 2].map((axis) => (a[axis] + b[axis]) / 2);
+    const [a, b, c] = [corners[k], corners[NEXT[k]], corners[NEXT[NEXT[k]]]];
+    /** @type {Vec3} */
+    const middle = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
     split([a, middle, c]);
     split([middle, b, c]);
   };
@@ -105,6 +191,11 @@ export function subdivided(mesh, pitch = PITCH) {
 // inside one face, so a step off it along that normal leaves the face's plane, where a corner's step along one of its
 // faces could run along a plane another face lies in. A mirrored copy's faces are turned inside out, which its negative
 // volume shows.
+/**
+ * @param {Mesh} mesh
+ * @param {number} [pitch]
+ * @returns {Sample[]}
+ */
 export function sampledSurface(mesh, pitch = PITCH) {
   const faces = triangles(mesh);
   const outward = faces.reduce((sum, [a, b, c]) => sum + dot(a, cross(b, c)), 0) < 0 ? -1 : 1;
@@ -122,6 +213,11 @@ export function sampledSurface(mesh, pitch = PITCH) {
 
 // Möller–Trumbore: how far along the ray from `p` in direction `dir` it meets the triangle, and whether it leaves
 // through the face's outer side (+1) or enters it (-1); null when it misses or meets it behind the point.
+/**
+ * @param {Vec3} p
+ * @param {Vec3} dir
+ * @param {Triangle} triangle
+ */
 function rayHit(p, dir, [a, b, c]) {
   const e1 = sub(b, a),
     e2 = sub(c, a);
@@ -140,6 +236,10 @@ function rayHit(p, dir, [a, b, c]) {
 }
 
 // The distance from `p` to the nearest point of the triangle (Ericson, Real-Time Collision Detection, 5.1.5).
+/**
+ * @param {Vec3} p
+ * @param {Triangle} triangle
+ */
 function triangleDistance(p, [a, b, c]) {
   const ab = sub(b, a),
     ac = sub(c, a),
@@ -152,61 +252,42 @@ function triangleDistance(p, [a, b, c]) {
     d4 = dot(ac, bp);
   if (d3 >= 0 && d4 <= d3) return length(bp);
   const vc = d1 * d4 - d3 * d2;
-  if (vc <= 0 && d1 >= 0 && d3 <= 0)
-    return length(
-      sub(
-        ap,
-        ab.map((x) => x * (d1 / (d1 - d3))),
-      ),
-    );
+  if (vc <= 0 && d1 >= 0 && d3 <= 0) return length(sub(ap, scale(ab, d1 / (d1 - d3))));
   const cp = sub(p, c),
     d5 = dot(ab, cp),
     d6 = dot(ac, cp);
   if (d6 >= 0 && d5 <= d6) return length(cp);
   const vb = d5 * d2 - d1 * d6;
-  if (vb <= 0 && d2 >= 0 && d6 <= 0)
-    return length(
-      sub(
-        ap,
-        ac.map((x) => x * (d2 / (d2 - d6))),
-      ),
-    );
+  if (vb <= 0 && d2 >= 0 && d6 <= 0) return length(sub(ap, scale(ac, d2 / (d2 - d6))));
   const va = d3 * d6 - d5 * d4;
   if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) {
     const w = (d4 - d3) / (d4 - d3 + (d5 - d6));
-    return length(
-      sub(
-        bp,
-        sub(c, b).map((x) => x * w),
-      ),
-    );
+    return length(sub(bp, scale(sub(c, b), w)));
   }
   const denom = 1 / (va + vb + vc);
   const v = vb * denom,
     w = vc * denom;
-  return length(
-    sub(
-      ap,
-      [0, 1, 2].map((k) => ab[k] * v + ac[k] * w),
-    ),
-  );
+  return length(sub(ap, [ab[0] * v + ac[0] * w, ab[1] * v + ac[1] * w, ab[2] * v + ac[2] * w]));
 }
 
 // ---- solids: a tree of boxes over a mesh's triangles, so a point's queries visit only the triangles near it ----
 
 const LEAF = 8;
 
+/**
+ * @param {readonly Triangle[]} faces
+ * @returns {Tree}
+ */
 function boxTree(faces) {
   const bounds = boundsOf(faces.flat());
   if (faces.length <= LEAF) return { bounds, faces };
   const centres = faces.map(centroid);
   const spread = boundsOf(centres);
-  const axis = [0, 1, 2].reduce(
-    (best, a) => (spread.max[a] - spread.min[a] > spread.max[best] - spread.min[best] ? a : best),
-    0,
+  const axis = AXES.reduce((best, a) =>
+    spread.max[a] - spread.min[a] > spread.max[best] - spread.min[best] ? a : best,
   );
   const order = faces
-    .map((face, i) => ({ face, at: centres[i][axis] }))
+    .map((face, i) => ({ face, at: itemAt(centres, i)[axis] }))
     .sort((a, b) => a.at - b.at)
     .map(({ face }) => face);
   const half = order.length >> 1;
@@ -214,6 +295,12 @@ function boxTree(faces) {
 }
 
 // The distance from `p` to the nearest triangle under `node`, if nearer than `best`.
+/**
+ * @param {Tree} node
+ * @param {Vec3} p
+ * @param {number} best
+ * @returns {number}
+ */
 function nearest(node, p, best) {
   if (boxDistance(node.bounds, p) >= best) return best;
   if (node.faces) return node.faces.reduce((least, face) => Math.min(least, triangleDistance(p, face)), best);
@@ -223,10 +310,16 @@ function nearest(node, p, best) {
 }
 
 // Whether the ray from `p` in direction `dir` can meet the box nearer than `limit` (the slab test).
+/**
+ * @param {Box} box
+ * @param {Vec3} p
+ * @param {Vec3} dir
+ * @param {number} [limit]
+ */
 function rayMeets({ min, max }, p, dir, limit = Infinity) {
   let near = 0,
     far = limit;
-  for (let a = 0; a < 3; a++) {
+  for (const a of AXES) {
     const t1 = (min[a] - p[a]) / dir[a],
       t2 = (max[a] - p[a]) / dir[a];
     near = Math.max(near, Math.min(t1, t2));
@@ -238,6 +331,11 @@ function rayMeets({ min, max }, p, dir, limit = Infinity) {
 // How many more times the ray from `p` leaves the surface under `node` than it enters it: the number of shells around
 // the point, negative for a mirrored copy, whose faces are turned inside out. A part is built of shells that overlap
 // and touch, so a crossing's parity alone would call a point inside two of them outside.
+/**
+ * @param {Tree} node
+ * @param {Vec3} p
+ * @returns {number}
+ */
 const winding = (node, p) => {
   if (!rayMeets(node.bounds, p, RAY)) return 0;
   if (node.faces) return node.faces.reduce((count, face) => count + (rayHit(p, RAY, face)?.side ?? 0), 0);
@@ -246,6 +344,13 @@ const winding = (node, p) => {
 
 // How far the ray from `p` in direction `dir` runs before it first meets a triangle under `node` beyond a coincident
 // face, if nearer than `best`.
+/**
+ * @param {Tree} node
+ * @param {Vec3} p
+ * @param {Vec3} dir
+ * @param {number} best
+ * @returns {number}
+ */
 function firstHit(node, p, dir, best) {
   if (!rayMeets(node.bounds, p, dir, best)) return best;
   if (node.faces)
@@ -258,18 +363,34 @@ function firstHit(node, p, dir, best) {
 
 // A solid: a mesh's tree at rest, carried rigidly by a bone transform. A query takes its point back into the rest
 // frame, so a pose moves no triangle and builds no tree.
+/** @type {Transform} */
 const STILL = { r: IDENTITY_M, t: [0, 0, 0] };
+/** @param {Mesh} mesh */
 const solidOf = (mesh) => boxTree(triangles(mesh));
+/**
+ * @param {Tree} tree
+ * @param {Transform} transform
+ * @returns {Solid}
+ */
 const carried = (tree, { r, t }) => {
   const back = transpose(r);
   return { tree, local: (p) => mulMV(back, sub(p, t)) };
 };
 
 // A mesh carried by a transform; a grip closes on one (site/fingers.mjs).
+/**
+ * @param {Mesh} mesh
+ * @param {Transform} transform
+ */
 export const posedSolid = (mesh, transform) => carried(solidOf(mesh), transform);
 
 // How far the ray from `p` in direction `dir` runs before it meets the solid's surface beyond a coincident face, or
 // Infinity: from a point inside it, how far the point could move that way and stay enclosed.
+/**
+ * @param {Solid} solid
+ * @param {Vec3} p
+ * @param {Vec3} dir
+ */
 export function runAlong({ tree, local }, p, dir) {
   const q = local(p);
   return firstHit(tree, q, sub(local(add(p, dir)), q), Infinity);
@@ -279,6 +400,9 @@ export function runAlong({ tree, local }, p, dir) {
  * How far `p` lies outside the solid, negative inside. A point off the solid's box is outside it, so needs no ray. A
  * grip probes hundreds of points per joint step, so it can name a `reach` past which only the side matters: the
  * search gives up there, and the depth is ±Infinity.
+ * @param {Solid} solid
+ * @param {Vec3} p
+ * @param {number} [reach]
  */
 export function signedDepth({ tree, local }, p, reach = Infinity) {
   const q = local(p);
@@ -289,6 +413,10 @@ export function signedDepth({ tree, local }, p, reach = Infinity) {
 }
 
 // Whether `p` lies inside the solid deeper than a coincident face.
+/**
+ * @param {Solid} solid
+ * @param {Vec3} p
+ */
 function isInside({ tree, local }, p) {
   const q = local(p);
   return boxDistance(tree.bounds, q) === 0 && winding(tree, q) !== 0 && nearest(tree, q, COINCIDENT) >= COINCIDENT;
@@ -296,18 +424,23 @@ function isInside({ tree, local }, p) {
 
 // How far `p` lies outside every one of the solids, or -Infinity when it lies inside one deeper than a coincident face,
 // with the index of the solid that decides it. A solid whose box lies further off than the best so far cannot do better.
+/**
+ * @param {readonly Solid[]} solids
+ * @param {Vec3} p
+ */
 function depthOutside(solids, p) {
-  const local = solids.map((solid) => solid.local(p));
-  const off = local.map((q, i) => boxDistance(solids[i].tree.bounds, q));
-  const within = solids.findIndex(
-    (solid, i) =>
-      off[i] === 0 && winding(solid.tree, local[i]) !== 0 && nearest(solid.tree, local[i], COINCIDENT) >= COINCIDENT,
+  const placed = solids.map(({ tree, local }) => {
+    const q = local(p);
+    return { tree, q, off: boxDistance(tree.bounds, q) };
+  });
+  const within = placed.findIndex(
+    ({ tree, q, off }) => off === 0 && winding(tree, q) !== 0 && nearest(tree, q, COINCIDENT) >= COINCIDENT,
   );
   if (within >= 0) return { depth: -Infinity, index: within };
   let best = { depth: Infinity, index: -1 };
-  solids.forEach((solid, index) => {
-    if (off[index] >= best.depth) return;
-    const depth = nearest(solid.tree, local[index], best.depth);
+  placed.forEach(({ tree, q, off }, index) => {
+    if (off >= best.depth) return;
+    const depth = nearest(tree, q, best.depth);
     if (depth < best.depth) best = { depth, index };
   });
   return best;
@@ -319,6 +452,10 @@ function depthOutside(solids, p) {
 export const STEP = 2 * COINCIDENT;
 
 // Whether `p` lies outside every one of the solids.
+/**
+ * @param {readonly Solid[]} solids
+ * @param {Vec3} p
+ */
 const outsideAll = (solids, p) =>
   solids.every(({ tree, local }) => {
     const q = local(p);
@@ -329,11 +466,12 @@ const outsideAll = (solids, p) =>
 // its joints, where a cuff, a collar or a hem reaches over the joint. A part further off only meets the piece by
 // lying against it, as a hanging hand against a thigh guard, which is a clip of the garment into the body, not skin the
 // garment fails to cover.
+/** @param {Rig['bones']} bones */
 function reachOf(bones) {
   const reach = new Map(bones.map(({ id }) => [id, new Set([id])]));
   for (const { id, parent } of bones) {
     if (parent === undefined || parent === null) continue;
-    reach.get(id).add(parent);
+    reach.get(id)?.add(parent);
     reach.get(parent)?.add(id);
   }
   return reach;
@@ -343,6 +481,11 @@ function reachOf(bones) {
 // the shells it is built of overlap, to the first beyond which none encloses it. A ray lying in the plane of a shell's
 // side can count as inside that shell past the last face it meets, so where nothing lies further on, that face is where
 // it leaves.
+/**
+ * @param {Tree} node
+ * @param {Vec3} p
+ * @param {Vec3} dir
+ */
 function runThrough(node, p, dir) {
   let t = firstHit(node, p, dir, Infinity);
   while (t < Infinity && winding(node, add(p, scale(dir, t + COINCIDENT))) !== 0) {
@@ -371,6 +514,9 @@ function runThrough(node, p, dir) {
  * `bare`, one holding the rest of a region it leaves bare, as the clavicles beside that tank top's straps
  * (tools/dress.mjs, `leftBare`).
  * The body part's `part` and a sample's `region` name what a declaration hides (site/hiding.mjs, `hides`).
+ * @param {Rig} rig
+ * @param {Rest} rest
+ * @returns {(id: string, sample: Pick<Sample, 'point' | 'normal' | 'region'>) => number}
  */
 export function coverage(rig, rest) {
   const pieceSolids = rest.pieces.map(({ mesh }) => carried(solidOf(mesh), STILL));
@@ -384,21 +530,39 @@ export function coverage(rig, rest) {
     [...bodySolids].map(([id, { tree }]) => [
       id,
       rest.pieces.flatMap(({ bone }, index) =>
-        reach.get(bone)?.has(id) && boxesMeet(tree.bounds, pieceSolids[index].tree.bounds, COINCIDENT) ? [index] : [],
+        reach.get(bone)?.has(id) && boxesMeet(tree.bounds, itemAt(pieceSolids, index).tree.bounds, COINCIDENT)
+          ? [index]
+          : [],
       ),
     ]),
   );
-  const declaresBare = ({ bone, covers, bare }, id, region) =>
-    (bone === id && covers !== undefined && !hides(covers, parts.get(id), region)) ||
-    (bare?.includes(parts.get(id)) ?? false);
+  /**
+   * @param {RestPiece} piece
+   * @param {string} id
+   * @param {string | undefined} region
+   */
+  const declaresBare = ({ bone, covers, bare }, id, region) => {
+    const part = parts.get(id);
+    if (part === undefined)
+      return bone === id && covers !== undefined && (region === undefined || !covers.includes(region));
+    return (bone === id && covers !== undefined && !hides(covers, part, region)) || bare?.includes(part) === true;
+  };
+  /**
+   * @param {string} id
+   * @param {readonly number[]} indices
+   * @param {Pick<Sample, 'point' | 'normal' | 'region'>} sample
+   */
   const beneath = (id, indices, { point, normal, region }) => {
-    if (Math.abs(dot(normal, axes.get(id))) >= Math.SQRT1_2) return -1;
+    const axis = axes.get(id);
+    const solid = bodySolids.get(id);
+    if (!axis || !solid) throw new Error(`clearance: no bone or no body part ${id}`);
+    if (Math.abs(dot(normal, axis)) >= Math.SQRT1_2) return -1;
     const dir = scale(normal, -1);
-    const part = bodySolids.get(id).tree;
+    const part = solid.tree;
     let hit = { t: runThrough(part, point, dir) / 2, index: -1 };
     for (const index of indices) {
-      if (declaresBare(rest.pieces[index], id, region)) continue;
-      const t = firstHit(pieceSolids[index].tree, point, dir, hit.t);
+      if (declaresBare(itemAt(rest.pieces, index), id, region)) continue;
+      const t = firstHit(itemAt(pieceSolids, index).tree, point, dir, hit.t);
       if (t < hit.t) hit = { t, index };
     }
     if (hit.index < 0) return -1;
@@ -410,10 +574,10 @@ export function coverage(rig, rest) {
     const indices = meant.get(id) ?? [];
     if (indices.length === 0) return -1;
     const { depth, index } = depthOutside(
-      indices.map((i) => pieceSolids[i]),
+      indices.map((i) => itemAt(pieceSolids, i)),
       sample.point,
     );
-    return depth <= COINCIDENT ? indices[index] : beneath(id, indices, sample);
+    return depth <= COINCIDENT ? itemAt(indices, index) : beneath(id, indices, sample);
   };
 }
 
@@ -423,9 +587,18 @@ export function coverage(rig, rest) {
  * samples. With `whole`, each sample also says whether its corners are covered too, which costs a query per corner of each
  * covered sample: the skin check draws the triangles of the whole ones, since a triangle a hem or a cuff crosses would
  * draw its uncovered part as showing, so only a caller that draws or counts them asks.
+ * @param {Rig} rig
+ * @param {Rest} rest
+ * @param {{ whole?: boolean }} [options]
+ * @returns {Surface}
  */
 export function coveredSurface(rig, rest, { whole = false } = {}) {
   const cover = coverage(rig, rest);
+  /**
+   * @param {string} bone
+   * @param {Sample} sample
+   * @returns {CoveredSample}
+   */
   const sampled = (bone, sample) => {
     const index = cover(bone, sample);
     if (!whole) return { ...sample, cover: index };
@@ -449,6 +622,10 @@ export function coveredSurface(rig, rest, { whole = false } = {}) {
  * it in stripes; a piece face that only crosses the skin edge-on, as a cuff's rim does, is not flush. A covered
  * point that does not show, because a step off its face lands inside the figure, is neither. A sink is { piece, into, point,
  * depth }: how far the piece passes into the body part `into`; a seam is { piece, into, point }.
+ * @param {Rig} rig
+ * @param {Rest} rest
+ * @param {Surface} [surface]
+ * @returns {(transforms: ReadonlyMap<string, Transform>) => Findings}
  */
 export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
   const covered = coveredPoints(rest, surface);
@@ -465,13 +642,15 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
     })),
   }));
   return (transforms) => {
+    /** @param {string} id */
     const at = (id) => {
       const transform = transforms.get(id);
       if (!transform) throw new Error(`clearance: no transform for bone ${id}`);
       return transform;
     };
-    const posedPieces = rest.pieces.map(({ bone }, i) => carried(pieceTrees[i], at(bone)));
-    const posedBody = rest.body.map(({ bone }, i) => carried(bodyTrees[i], at(bone)));
+    const posedPieces = rest.pieces.map(({ bone }, i) => carried(itemAt(pieceTrees, i), at(bone)));
+    const posedBody = rest.body.map(({ bone }, i) => carried(itemAt(bodyTrees, i), at(bone)));
+    /** @type {Findings} */
     const findings = { ...bareFindings(covered, posedPieces, posedBody, at), sinks: [], seams: [] };
     pieces.forEach(({ piece, bone, points }, own) => {
       const others = posedPieces.filter((_, i) => i !== own);
@@ -479,14 +658,15 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
         const posed = applyPoint(at(bone), point);
         const into = posedBody.findIndex((solid, i) => !sunk.has(i) && isInside(solid, posed));
         if (into < 0) continue;
+        const bodyBone = itemAt(rest.body, into).bone;
         if (depthOutside(others, posed).depth <= COINCIDENT)
-          findings.seams.push({ piece, into: rest.body[into].bone, point: posed });
+          findings.seams.push({ piece, into: bodyBone, point: posed });
         else
           findings.sinks.push({
             piece,
-            into: rest.body[into].bone,
+            into: bodyBone,
             point: posed,
-            depth: -signedDepth(posedBody[into], posed),
+            depth: -signedDepth(itemAt(posedBody, into), posed),
           });
       }
     });
@@ -498,8 +678,13 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
  * The probe's findings with the doll at rest, as `clearanceProbe(...)` gives them for the identity pose, without the
  * work that pose cannot need: a piece point is sunk into exactly the body parts it already was at rest, so there are
  * no sinks or seams to look for and the pieces are never sampled.
+ * @param {Rig} rig
+ * @param {Rest} rest
+ * @param {Surface} [surface]
+ * @returns {Findings}
  */
 export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
+  /** @param {readonly { mesh: Mesh }[]} parts */
   const solids = (parts) => parts.map(({ mesh }) => carried(solidOf(mesh), STILL));
   return {
     ...bareFindings(coveredPoints(rest, surface), solids(rest.pieces), solids(rest.body), () => STILL),
@@ -509,15 +694,27 @@ export function restClearance(rig, rest, surface = coveredSurface(rig, rest)) {
 }
 
 // The covered samples of a surface, each with the piece meant to cover it.
+/**
+ * @param {Rest} rest
+ * @param {Surface} surface
+ * @returns {CoveredPoint[]}
+ */
 const coveredPoints = (rest, surface) =>
   surface.flatMap(({ bone, samples }) =>
     samples.flatMap(({ point, normal, cover }) =>
-      cover < 0 ? [] : [{ bone, piece: rest.pieces[cover].piece, cover, point, normal }],
+      cover < 0 ? [] : [{ bone, piece: itemAt(rest.pieces, cover).piece, cover, point, normal }],
     ),
   );
 
 // The pokes and flush points of covered samples against the posed pieces and body.
+/**
+ * @param {readonly CoveredPoint[]} covered
+ * @param {readonly Solid[]} posedPieces
+ * @param {readonly Solid[]} posedBody
+ * @param {(bone: string) => Transform} at
+ */
 function bareFindings(covered, posedPieces, posedBody, at) {
+  /** @type {Pick<Findings, 'pokes' | 'flush'>} */
   const findings = { pokes: [], flush: [] };
   const figure = [...posedPieces, ...posedBody];
   for (const { bone, piece, cover, point, normal } of covered) {
@@ -527,7 +724,7 @@ function bareFindings(covered, posedPieces, posedBody, at) {
     const outward = mulMV(at(bone).r, normal);
     if (!outsideAll(figure, add(posed, scale(outward, STEP)))) continue;
     if (depth > COINCIDENT) findings.pokes.push({ bone, piece, point: posed, depth });
-    else if (liesAlong(posedPieces[cover], posed, outward)) findings.flush.push({ bone, piece, point: posed });
+    else if (liesAlong(itemAt(posedPieces, cover), posed, outward)) findings.flush.push({ bone, piece, point: posed });
   }
   return findings;
 }
@@ -537,6 +734,11 @@ function bareFindings(covered, posedPieces, posedBody, at) {
 // another piece is no cover's, and a face turned away is the far side of a shell the skin lies inside. A face crossing
 // the skin edge-on meets it along a line, with the skin to one side inside the piece and to the other outside it, where
 // its own samples poke if it is covered.
+/**
+ * @param {Solid} solid
+ * @param {Vec3} p
+ * @param {Vec3} normal
+ */
 function liesAlong({ tree, local }, p, normal) {
   const q = local(p);
   const across = sub(local(add(p, normal)), q);
@@ -546,6 +748,11 @@ function liesAlong({ tree, local }, p, normal) {
 }
 
 // The triangles under `node` within a coincident distance of `p`.
+/**
+ * @param {Tree} node
+ * @param {Vec3} p
+ * @returns {readonly Triangle[]}
+ */
 const facesNear = (node, p) => {
   if (boxDistance(node.bounds, p) > COINCIDENT) return [];
   if (node.faces) return node.faces.filter((face) => triangleDistance(p, face) <= COINCIDENT);
@@ -556,8 +763,17 @@ const facesNear = (node, p) => {
  * A closed mesh as a gear check reads it: `depth(p)`, how far `p` lies outside it, negative inside, and `reach(p, dir)`,
  * how far the ray from `p` along the unit vector `dir` runs before it meets the mesh beyond a coincident face, Infinity
  * when it misses. They answer a gear piece's question, how far a point stands off the surface beneath it.
+ * @param {Mesh} mesh
  */
 export function meshProbe(mesh) {
   const solid = carried(solidOf(mesh), STILL);
-  return { depth: (p) => signedDepth(solid, p), reach: (p, dir) => firstHit(solid.tree, p, dir, Infinity) };
+  return {
+    /** @param {Vec3} p */
+    depth: (p) => signedDepth(solid, p),
+    /**
+     * @param {Vec3} p
+     * @param {Vec3} dir
+     */
+    reach: (p, dir) => firstHit(solid.tree, p, dir, Infinity),
+  };
 }

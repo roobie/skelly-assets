@@ -35,7 +35,7 @@
 
 const DEG = Math.PI / 180;
 /** @type {readonly (0 | 1 | 2)[]} */
-const AXES = [0, 1, 2];
+export const AXES = [0, 1, 2];
 
 // ---- vectors ----
 
@@ -374,10 +374,11 @@ export function boneTransforms(bones, pose) {
 const boneById = (rig) => new Map(rig.bones.map((bone) => [bone.id, bone]));
 /**
  * The bone `id` of a rig's bones, and the transform of one, each refused by name when there is none.
- * @param {ReadonlyMap<string, Bone>} bones
+ * @template {Bone} B
+ * @param {ReadonlyMap<string, B>} bones
  * @param {string} id
  */
-const boneOf = (bones, id) => {
+export const boneOf = (bones, id) => {
   const bone = bones.get(id);
   if (!bone) throw new Error(`the rig has no bone ${id}`);
   return bone;
@@ -386,7 +387,7 @@ const boneOf = (bones, id) => {
  * @param {ReadonlyMap<string, Transform>} transforms
  * @param {string} id
  */
-const transformOf = (transforms, id) => {
+export const transformOf = (transforms, id) => {
   const transform = transforms.get(id);
   if (!transform) throw new Error(`no transform of bone ${id}`);
   return transform;
