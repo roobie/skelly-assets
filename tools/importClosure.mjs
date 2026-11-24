@@ -12,7 +12,8 @@ import { createRequire, isBuiltin } from 'node:module';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const here = import.meta.dirname;
+// Files are named by their real paths, so one reached through a link is one file.
+const here = realpathSync(import.meta.dirname);
 
 // A module's types are erased before it runs, so `import type` and a JSDoc `@import` are not followed: what they name
 // cannot change what the module makes.
@@ -61,14 +62,19 @@ const resolveImport = (importer, specifier) => {
     return realpathSync(path);
   }
   if (isBuiltin(specifier)) return undefined;
-  let path;
+  const require = createRequire(importer);
   try {
-    path = realpathSync(createRequire(importer).resolve(specifier));
-  } catch {
-    // No package of the lockfile: a browser page's import map names it.
-    return undefined;
+    const path = realpathSync(require.resolve(specifier));
+    return path.split(sep).includes('node_modules') ? undefined : path;
+  } catch (cause) {
+    // A package node_modules does not hold is a browser page's, named by its import map. One it holds as a link to a
+    // local folder is a workspace package, whose module is code to key by, so failing to find it is refused.
+    const [scope = '', name = ''] = specifier.split('/');
+    const packageName = scope.startsWith('@') ? join(scope, name) : scope;
+    const folder = (require.resolve.paths(specifier) ?? []).map((path) => join(path, packageName)).find(existsSync);
+    if (folder === undefined || realpathSync(folder).split(sep).includes('node_modules')) return undefined;
+    throw new Error(`${importer}: imports ${specifier} of a workspace package, which does not resolve`, { cause });
   }
-  return path.split(sep).includes('node_modules') ? undefined : path;
 };
 
 /** @type {Map<string, string[]>} */

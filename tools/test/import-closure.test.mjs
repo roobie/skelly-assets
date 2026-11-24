@@ -1,6 +1,6 @@
 // @ts-check
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -107,6 +107,33 @@ test('a closure leaves out the runtime and the modules of node_modules, which th
     ['entry.mjs'],
   );
   assert.ok(closureCode(tools, [join(tools, 'codeUnitOrder.mjs')]).includes('package-lock.json'));
+});
+
+test('a closure follows a workspace package by name, and refuses one whose module does not resolve', () => {
+  const workspace = {
+    'entry.mjs': "import { shared } from '@fixture/shared/module';\n",
+    'packages/shared/package.json': JSON.stringify({
+      name: '@fixture/shared',
+      exports: { './module': './src/module.ts' },
+    }),
+    'packages/shared/src/module.ts': "import { inner } from './inner.ts';\n",
+    'packages/shared/src/inner.ts': '',
+  };
+  /** @param {string} folder */
+  const linked = (folder) => {
+    mkdirSync(join(folder, 'node_modules/@fixture'), { recursive: true });
+    symlinkSync(join(folder, 'packages/shared'), join(folder, 'node_modules/@fixture/shared'));
+    return importClosure([join(folder, 'entry.mjs')]).map((file) => relative(folder, file));
+  };
+  assert.deepEqual(inFolder(workspace, linked), [
+    'entry.mjs',
+    'packages/shared/src/inner.ts',
+    'packages/shared/src/module.ts',
+  ]);
+  assert.throws(
+    () => inFolder({ ...workspace, 'entry.mjs': "import { shared } from '@fixture/shared/unexported';\n" }, linked),
+    /entry\.mjs: imports @fixture\/shared\/unexported of a workspace package, which does not resolve/,
+  );
 });
 
 test('a closure takes a module by path or by URL', () => {
