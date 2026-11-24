@@ -70,6 +70,12 @@ const EPSILON = 1e-12;
 /** @typedef {{ bone: string; samples: CoveredSample[] }[]} Surface */
 /** @typedef {{ bone: string; piece: string; cover: number; point: Vec3; normal: Vec3 }} CoveredPoint */
 /** @typedef {{ bone: string; piece: string; point: Vec3; depth: number }} Poke */
+/**
+ * Skin that shows as the doll is posed, whether or not a piece is meant to cover it: `rest` is the point at rest and
+ * `point` where the pose carries it, `piece` is the piece meant to cover it, if any, and `seen` whether it shows to a viewer looking along `-toward`, the skin facing them with nothing of the
+ * figure between.
+ * @typedef {{ bone: string; piece: string | undefined; rest: Vec3; point: Vec3; normal: Vec3; area: number; seen: boolean }} Shown
+ */
 /** @typedef {{ bone: string; piece: string; point: Vec3 }} Flush */
 /** @typedef {{ piece: string; into: string; point: Vec3; depth: number }} Sink */
 /** @typedef {{ piece: string; into: string; point: Vec3 }} Seam */
@@ -671,6 +677,51 @@ export function clearanceProbe(rig, rest, surface = coveredSurface(rig, rest)) {
       }
     });
     return findings;
+  };
+}
+
+/**
+ * The skin that shows as the doll is posed, given the bone transforms of a pose: every sample `watched` keeps, by its
+ * bone and its point at rest, that no piece encloses and that lies on the figure's outside, as `Shown`. It is what a
+ * report of the skin a moving doll bares reads, at a joint whose pieces part as it bends or on a part no piece is
+ * meant to cover; `toward` is the way to the viewer it is judged for.
+ * @param {Rest} rest
+ * @param {Surface} surface the body's surface with what covers it (`coveredSurface`)
+ * @param {{ watched: (bone: string, point: Vec3) => boolean; toward: Vec3 }} options
+ * @returns {(transforms: ReadonlyMap<string, Transform>) => Shown[]}
+ */
+export function shownSkin(rest, surface, { watched, toward }) {
+  const bodyTrees = rest.body.map(({ mesh }) => solidOf(mesh));
+  const pieceTrees = rest.pieces.map(({ mesh }) => solidOf(mesh));
+  const samples = surface.flatMap(({ bone, samples: own }) =>
+    own
+      .filter(({ point }) => watched(bone, point))
+      .map(({ point, normal, cover, corners: [a, b, c] }) => ({
+        bone,
+        piece: cover < 0 ? undefined : itemAt(rest.pieces, cover).piece,
+        point,
+        normal,
+        area: length(cross(sub(b, a), sub(c, a))) / 2,
+      })),
+  );
+  return (transforms) => {
+    /** @param {string} id */
+    const at = (id) => {
+      const transform = transforms.get(id);
+      if (!transform) throw new Error(`clearance: no transform for bone ${id}`);
+      return transform;
+    };
+    const posedPieces = rest.pieces.map(({ bone }, i) => carried(itemAt(pieceTrees, i), at(bone)));
+    const figure = [...posedPieces, ...rest.body.map(({ bone }, i) => carried(itemAt(bodyTrees, i), at(bone)))];
+    return samples.flatMap(({ bone, piece, point, normal, area }) => {
+      const posed = applyPoint(at(bone), point);
+      if (depthOutside(posedPieces, posed).depth <= COINCIDENT) return [];
+      const outward = mulMV(at(bone).r, normal);
+      const off = add(posed, scale(outward, STEP));
+      if (!outsideAll(figure, off)) return [];
+      const seen = dot(outward, toward) > 0 && figure.every((solid) => runAlong(solid, off, toward) === Infinity);
+      return [{ bone, piece, rest: point, point: posed, normal: outward, area, seen }];
+    });
   };
 }
 
