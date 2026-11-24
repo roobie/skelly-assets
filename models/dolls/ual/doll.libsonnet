@@ -48,6 +48,8 @@ local unhidden = { body: ['trunk'] };
                + (if std.objectHas(unhidden, segment) then { unhidden: unhidden[segment] } else {})
     for segment in std.objectFields(playerSlots)
   },
+  // A place's `as` is the player's name for its part where a slot does not already give it, which a placed wearable's
+  // `wornOn` names.
   places: [
     { slot: 'torso', part: 'spine_03', against: [0, 0, 1], sink: 0.5 },
     { slot: 'legs', part: 'thigh', both: true, against: [0, 0, 1], sink: 0.5 },

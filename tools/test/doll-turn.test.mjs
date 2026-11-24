@@ -43,6 +43,7 @@ const dressing = {
   boneSuffix: { right: '.R', left: '.L' },
   piece: 'body',
   slots: { cuff: { slot: 'arms', part: 'upper' } },
+  regions: {},
   places: [],
   layers: [],
   lying: [],

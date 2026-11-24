@@ -39,6 +39,8 @@ const toy = (extra) => ({
   mirrored: 'left',
   boneSuffix: { right: '.R', left: '.L' },
   slots: {},
+  regions: {},
+  places: [],
   rig,
   ...extra,
 });

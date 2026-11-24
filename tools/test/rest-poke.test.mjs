@@ -47,6 +47,7 @@ const dressing = {
       mirrored: 'left',
       slots: { body: { slot: 'torso', part: 'torso' } },
       regions: {},
+      places: [],
       rig,
     },
     toy: {
@@ -56,6 +57,7 @@ const dressing = {
       mirrored: 'left',
       slots: { body: { slot: 'torso', part: 'torso' } },
       regions: {},
+      places: [],
       rig,
     },
   },

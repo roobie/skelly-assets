@@ -54,7 +54,8 @@ const drawn = ({ at, mirror, turn }, point) => {
 
 for (const { id } of dollDressings(dressings)) {
   const tree = dollTree({ doll: id, wears: WEARS });
-  // The rig as its file holds it, and the entries as the manifest holds them: `wornOn` is the player's, whatever the doll.
+  // The rig as its file holds it, and the entries as the manifest holds them: `wornOn` is the player's, whatever the
+  // doll.
   const rig = JSON.parse(JSON.stringify(tree.rig));
   const wornOn = wornOnParts(tree.models, player, { anchors: {}, sided: [] });
   const entries = WEARS.flatMap(shellsOf).map((piece) => {

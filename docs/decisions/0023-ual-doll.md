@@ -59,7 +59,15 @@ What still differs between the dolls is how the same body is cut into parts, and
 words. A worn piece's segment names the player's part, and the doll's `slots` name the part of its own that the piece
 is drawn in, with where the player's part frame lies in it when the two turn about different joints, as the chest and
 the pelvis do. A piece's `covers` resolve to the doll's own regions by name, so hiding stays by name on both dolls and
-no map of one doll's regions onto the other's is kept. The rest check (`docs/decisions/0019-garment-rest-check.md`) and
+no map of one doll's regions onto the other's is kept.
+
+A game reads none of that record. A worn model's manifest entry keeps the player's names for its part and for what it
+covers, since one entry cannot name every doll's, and each doll's rig carries the answer on its bones (`bind.wears`):
+the name the bone's part is worn under, where a piece drawn on it rests in the bone's node, and what each name a
+piece may cover hides of the bone's part. The rig was chosen over a slot map in the manifest because a game already
+reads the rig to bind each part to its bone, so seating and hiding a piece is one lookup on a bone it holds, and a map
+would have been a second table to join to the first, in every game. The player's rig carries the same fields, so a
+game reads either doll one way. The rest check (`docs/decisions/0019-garment-rest-check.md`) and
 the cover check run every garment on both dolls, so a garment cannot come to fit one and not the other unnoticed.
 
 ## Consequences
