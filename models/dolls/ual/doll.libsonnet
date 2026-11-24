@@ -29,6 +29,7 @@ local unhidden = { body: ['trunk'] };
   limbs: [
     { name: 'arm', model: 'ual_arm', anchor: 'shoulder', turn: { axis: [0, 0, 1], degrees: -90 } },
     { name: 'leg', model: 'ual_leg', anchor: 'hip' },
+    { name: 'thumb', model: 'ual_thumb', anchor: 'thumb_root', on: 'arm', turn: { frame: joints.hand.thumbFrame } },
   ],
   sides: ['right', 'left'],
   mirrored: 'left',

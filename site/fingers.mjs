@@ -279,10 +279,8 @@ function closeChain(rig, pose, chain, solids) {
 const ROOT_STEP = 20;
 const REFINE = [8, 4, 2, 1, 0.5];
 const SEEDS = 3;
-// How far a thumb segment may press into what it grips, as a pad gives against a handle, before a seat counts it sunk;
-// and how much a seat counts a segment sunk past that against one standing as far off the item, so the thumb comes to
-// rest on the item and the fingers rather than in them.
-const PRESS = 0.0015;
+// How much a seat counts a segment sunk past contact against one standing as far off the item, so the thumb comes to
+// rest on the item and the fingers rather than in them. A thumb may sink no further than a finger, `CONTACT`.
 const SINK = 100;
 const AXES = ['flex', 'twist', 'abduct'];
 
@@ -301,9 +299,9 @@ const depthBelow = (solid, p, bound) => {
  * angles of its joints, the roll and the sweep across among them, are searched within their limits for the thumb whose
  * segments each come nearest bearing on the item, sunk into neither it nor the fingers. Only the thumb moves, so the
  * search carries the thumb alone from the hand and probes only the fingers near each segment. Returns the pose and
- * whether the thumb touched, or nothing when the best seat leaves the thumb's first segment, which the rest of the
- * thumb lies along the item from, off it: an item out of the thumb's reach or too small to lie along, which the thumb
- * closes on as a finger does.
+ * whether the thumb touched, or nothing when the best seat lays no segment short of the tip on the item: a thumb that
+ * lies along an item bears on it before its tip, whereas one that only reaches it with its tip touches the near face,
+ * and that item the thumb closes on as a finger does.
  */
 function seatThumb(rig, pose, chain, solid, fingers) {
   const transforms = boneTransforms(rig.bones, pose);
@@ -345,12 +343,12 @@ function seatThumb(rig, pose, chain, solid, fingers) {
       return { gap, least: Math.min(gap, least) };
     });
   };
-  // Each segment's distance off the item past contact, and how far past a pad's give it sinks into the item or the
-  // fingers, the latter counting the more.
+  // Each segment's distance off the item past contact, and how far past contact it sinks into the item or the fingers,
+  // the latter counting the more.
   const misfit = (x) =>
     bearings(x).reduce((sum, { gap, least }) => {
       const off = Math.max(0, gap - CONTACT);
-      const sunk = Math.max(0, -least - PRESS);
+      const sunk = Math.max(0, -least - CONTACT);
       return sum + off * off + SINK * sunk * sunk;
     }, 0);
   const clamped = (x) => x.map((v, i) => Math.min(free[i].range[1], Math.max(free[i].range[0], v)));
@@ -388,7 +386,7 @@ function seatThumb(rig, pose, chain, solid, fingers) {
     .map(refined)
     .sort(byCost);
   const seated = bearings(best.x);
-  if (seated[0].gap > CONTACT) return null;
+  if (!seated.slice(0, -1).some(({ gap }) => gap <= CONTACT)) return null;
   const angles = anglesAt(best.x);
   return { pose: chain.reduce((p, bone, k) => withAngles(p, bone, angles[k]), pose), touched: true };
 }

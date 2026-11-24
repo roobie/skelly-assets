@@ -1,5 +1,5 @@
 {
-  "rig": { "id": "doll", "revision": 14 },
+  "rig": { "id": "doll", "revision": 15 },
   "ground": true,
   "level": ["foot.R", "foot.L"],
   "angles": {

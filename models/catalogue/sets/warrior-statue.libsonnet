@@ -113,6 +113,10 @@ local legTurn(side) = rot.mul(rot.x(-side * pose.stride - rake), rot.z(side * po
 local footTurn(side) = rot.y(side * pose.toeOut);
 local legDrop = -rot.apply(legTurn(1), leg.origins.foot)[1];
 
+// The thumb's own frame in the palm's, its axes the columns: the doll draws the thumb hanging straight and rests it
+// turned on the hand (models/measures/hand.libsonnet).
+local thumbRest = local f = hand.thumbFrame; [[f.x[i], f.y[i], f.z[i]] for i in [0, 1, 2]];
+
 // Each side's arm turns: upper arm, forearm and palm.
 local armTurns = {
   right: {
@@ -146,17 +150,18 @@ local frames =
     local pauldron = frame(turns.upper, at(harness, shoulder(side)));
     local vambrace = frame(turns.fore, at(pauldron, arm.upperBone));
     local palm = frame(turns.palm, at(vambrace, arm.foreBone));
-    // A digit's bones down from its root, each at the last one's tail and curled about its own joint.
-    local digit(part, root, tail, curls) =
+    // A digit's bones down from its root, each at the last one's tail and curled about its own joint; `rest` is how
+    // the digit's own frame lies in the palm's, which only the thumb's is turned in.
+    local digit(part, root, tail, curls, rest=rot.id) =
       std.foldl(function(acc, b)
-        local f = if b == 0 then frame(rot.mul(palm.turn, rot.z(curls[0])), at(palm, root))
+        local f = if b == 0 then frame(rot.mul(rot.mul(palm.turn, rest), rot.z(curls[0])), at(palm, root))
           else local above = acc[part(b - 1) + '-' + name]; frame(rot.mul(above.turn, rot.z(curls[b])), at(above, tail(b - 1)));
         acc { [part(b) + '-' + name]: f }, std.range(0, std.length(curls) - 1), {});
     {
       ['pauldron-' + name]: pauldron,
       ['vambrace-' + name]: vambrace,
       ['palm-' + name]: palm,
-    } + digit(hand.thumbPart, hand.thumbRoot, hand.thumbTail, pose.thumb)
+    } + digit(hand.thumbPart, hand.thumbRoot, hand.thumbTail, pose.thumb, thumbRest)
     + std.foldl(function(acc, i) acc + digit(function(b) hand.part(hand.fingers[i], b), hand.knuckle(i), function(b) [0, -hand.length(i, b), 0], curl),
                 std.range(0, std.length(hand.fingers) - 1), {});
   local left = armFrames('left', 1, pose.shieldFingers), right = armFrames('right', -1, pose.swordFingers);

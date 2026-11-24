@@ -20,8 +20,8 @@ local clavicle(suffix, out) = trunk('clavicle_' + suffix, 'clavicle_' + suffix, 
 }) { along: [out, 0, 0], flexAxis: [0, 0, out] };
 local arm(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: 'origin', along: [0, -1, 0], flexAxis: [-1, 0, 0] };
 local leg(name, parent) = sidedNode(name) { part: name, parent: parent, pivot: 'origin', along: [0, -1, 0] };
-// A digit bone runs as the skeleton's does, toward its next joint, which for the thumb is well off the hanging arm's
-// axes.
+// A digit bone runs as the skeleton's does, toward its next joint; a thumb bone's run is in the thumb's own frame,
+// which the doll rests turned along the skeleton's thumb.
 local digit(name, parent, digitName) = arm(name, parent) { flexAxis: [0, 0, -1], digit: digitName };
 // The spine is three joints here, each taking a third of the whole spine's range.
 local spineThird = { [axis]: [end / 3 for end in joints.spine[axis]] for axis in std.objectFields(joints.spine) };
@@ -48,7 +48,7 @@ local thumbBones = {
 };
 {
   id: 'ual',
-  revision: 1,
+  revision: 2,
   root: 'pelvis',
   reference: 'left',
   skeleton: skeleton.bones,

@@ -266,7 +266,10 @@ on. What is still the player's alone, named so in the code (`PLAYER`) and not le
 and locomotion, the press check, the head-band fit and the showcase's whole worn view, because their content was worked
 out on the player's body, and a garment's `wornOn`, which names the player's slots, not each doll's. A limb a doll rests
 turned, such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models
-stay authored hanging as `docs/decisions/0008-dressing.md` has them; a hand or a loose wearable is read off a turned
+stay authored hanging as `docs/decisions/0008-dressing.md` has them. A limb may hang on another limb's anchor, and
+then takes that limb's turn before its own: the thumb is such a limb on the arm, hung from its hand's thumb root and
+turned by the frame its bones run in, since it leaves the hand askew of every axis and a part is drawn square to its
+model's. A hand or a loose wearable is read off a turned
 part as it hangs and swung with the turn, since the turned part's box is a looser one at any angle but a quarter turn.
 A loose wearable across both copies of a turned part is refused, as the copies turn apart and one model cannot follow both. A doll whose
 bones are not the player's gives its joints' places and its extra cuts to the body families as content

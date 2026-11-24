@@ -20,7 +20,6 @@ import {
   mulMV,
   normalize,
   quatToMat3,
-  rotBetween,
   scale,
   sub,
   transpose,
@@ -187,18 +186,10 @@ function checkSkeleton(bones, skeleton) {
 }
 
 // The box a part copy fills exactly, `bound`, where its doll-frame box would bound more air than part: a copy its site
-// turns is boxed in its own axes before the turn, and a part whose bone leans off those axes, as a thumb does, along
-// the lean, the smallest turn from the axis nearest `inPart`, its bone's direction in the part. Contact is read off
-// the faces of this box, so a fist closes on the digit rather than on the corners of its upright box. The box lies in
-// the doll frame turned about the bone's head, `about`.
-const boundOf = ({ turn, points }, inPart, about) => {
-  const nearest = [1, 2].reduce((a, b) => (Math.abs(inPart[b]) > Math.abs(inPart[a]) ? b : a), 0);
-  const axis = [0, 1, 2].map((i) => (i === nearest ? Math.sign(inPart[i]) : 0));
-  const leans = axis.some((c, i) => c !== inPart[i]);
-  if (!turn && !leans) return {};
-  const lean = rotBetween(axis, inPart);
-  return { bound: exactBound(points, mat3ToQuat(turn ? mulMM(quatToMat3(turn), lean) : lean), about) };
-};
+// turns is boxed in its own axes before the turn. Contact is read off the faces of this box, so a fist closes on the
+// digit rather than on the corners of its turned box. The box lies in the doll frame turned about the bone's head,
+// `about`.
+const boundOf = ({ turn, points }, about) => (turn ? { bound: exactBound(points, turn, about) } : {});
 
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
 // `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
@@ -253,7 +244,7 @@ export function dollRig(doll, dressing) {
           box: copy.box,
           mirror: Boolean(copy.mirror),
           ...(copy.turn ? { turn: copy.turn } : {}),
-          ...boundOf(copy, inPart, head),
+          ...boundOf(copy, head),
         },
         at: copy.at,
         ...(spec.reach

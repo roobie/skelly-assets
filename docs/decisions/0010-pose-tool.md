@@ -76,9 +76,10 @@ beside it like a paddle. The thumb's root sits nearer the wrist than the handle,
 from well before the rest of it can, and closing it joint by joint finds the handle only in the plane the root's roll
 and sweep leave it: the first segment stops on the handle and the rest stand off it. So the closing step seats the
 thumb instead, searching all its joint angles within their limits for the thumb whose segments each bear on the item
-without sinking into it or the fingers; the grip preset only says where that search starts. A thumb whose first
-segment cannot reach the item closes as a finger does, since a seat measured against an item it cannot lie along
-would lay it along the near face instead of wrapping it. The
+without sinking into it or the fingers, no further than a finger may; the grip preset only says where that search
+starts. The seat stands when a segment short of the tip bears on the item, as a thumb lying along a handle does, its
+first segment standing off a thin one while the rest wrap; a thumb that reaches the item only with its tip would be
+laid against the near face, so it closes as a finger does. The
 knuckle row slants back toward the little finger, as the metacarpal heads arc, so the fist steps down from index to
 little; a palm split in two would arch the same way only with another bone and part for every hand, glove and mob to
 carry. The handle crosses the palm slanted

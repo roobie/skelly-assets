@@ -84,20 +84,36 @@ test("each doll's rig is written at its record's path, the player's with the sit
       id: 'player',
       pack: 'skelly.body',
       rig: 'motions/doll.rig.json',
-      models: { bust: 'player_bust', arm: 'player_arm', leg: 'player_leg', clavicle: 'player_clavicle' },
+      models: {
+        bust: 'player_bust',
+        arm: 'player_arm',
+        leg: 'player_leg',
+        clavicle: 'player_clavicle',
+        thumb: 'player_thumb',
+      },
     },
     {
       id: 'ual',
       pack: 'skelly.body',
       rig: 'dolls/ual.rig.json',
-      models: { bust: 'ual_bust', arm: 'ual_arm', leg: 'ual_leg' },
+      models: { bust: 'ual_bust', arm: 'ual_arm', leg: 'ual_leg', thumb: 'ual_thumb' },
     },
   ]);
   const written = JSON.parse(readFileSync(join(built, files[0]), 'utf8'));
   assert.equal(written.id, rig.id);
   assert.deepEqual(
     written.doll.map(({ model }) => model),
-    ['player_bust', 'player_arm', 'player_arm', 'player_leg', 'player_leg', 'player_clavicle', 'player_clavicle'],
+    [
+      'player_bust',
+      'player_arm',
+      'player_arm',
+      'player_leg',
+      'player_leg',
+      'player_clavicle',
+      'player_clavicle',
+      'player_thumb',
+      'player_thumb',
+    ],
   );
 });
 

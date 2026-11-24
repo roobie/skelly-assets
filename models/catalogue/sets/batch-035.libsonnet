@@ -37,6 +37,9 @@ local armRest = import 'models/arm-rest.libsonnet';
 local hipX = leg.hip[0];
 local hipY = leg.hip[1];
 local plate = 0.012;
+// The way the thumb hangs from its root on the palm: the doll draws it hanging straight in its own frame and rests it
+// turned on the hand (models/measures/hand.libsonnet), so its socket faces down that frame's own y.
+local thumbDown = [-c for c in hand.thumbFrame.y];
 local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
   local sides = [['left', 1], ['right', -1]];
   // Held, the forearm runs forward and in from the elbow, thumb up; hanging, it falls straight.
@@ -63,7 +66,7 @@ local mannequin(id, doll=null, dollMassKg=0, standMassKg=2) =
     ] + std.flattenArrays([[
       segment('upper-' + s[0], 'avatarArm', arm, 'upper', 0.45, ['skin'], [pin('shoulder'), socket('elbow', arm.upperBone) + forearm(s[1])]),
       segment('fore-' + s[0], 'avatarArm', arm, 'fore', 0.35, ['skin'], [pin('elbow'), socket('wrist', arm.foreBone)]),
-      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket(hand.thumbPart(0), hand.thumbRoot)]
+      segment('palm-' + s[0], 'avatarArm', arm, 'palm', 0.15, ['skin'], [pin('wrist'), socket(hand.thumbPart(0), hand.thumbRoot, thumbDown, hand.thumbFrame.z)]
         + [socket(hand.part(hand.fingers[i], 0), hand.knuckle(i)) for i in std.range(0, std.length(hand.fingers) - 1)]),
     ] + [
       segment(hand.thumbPart(k) + '-' + s[0], 'avatarArm', arm { phalanx: k, tail: hand.thumbTail(k) }, 'thumb', 0.015 / hand.thumbBones, ['skin'],

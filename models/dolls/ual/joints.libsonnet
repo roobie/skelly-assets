@@ -29,7 +29,18 @@ local bone(finger, k) = if k == phalanges then finger + '_04_leaf' else '%s_%02d
 local thumbBone(k) = if k == thumbBones then 'thumb_04_leaf' else 'thumb_%02d' % (k + 1);
 // Each digit bone from its joint to the next, the knuckles and the thumb's root from the wrist, in the arm's frame.
 local tails = [[armDelta(bone(f, k), bone(f, k + 1)) for k in std.range(0, phalanges - 1)] for f in fingers];
-local thumbTails = [armDelta(thumbBone(k), thumbBone(k + 1)) for k in std.range(0, thumbBones - 1)];
+// The thumb is a limb of its own, drawn hanging down -y from its root as the arm hangs from the shoulder, and rested
+// turned on the hand. Its bones run in one line on the mannequin, so one turn rests all of them: the thumb's frame in
+// the arm's has its -y along that line, from the root to the tip, and its z, the axis its joints bend about as the
+// fingers' do about theirs, the fingers' axis tipped square to the line and still in the arm's mirror plane.
+local unit(v) = local n = std.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); [c / n for c in v];
+local cross(a, b) = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+local thumbLine = unit(armDelta(thumbBone(0), thumbBone(thumbBones)));
+local thumbHinge = unit([0, -thumbLine[2], thumbLine[1]]);
+local thumbFrame = { x: cross(thumbLine, thumbHinge), y: [-c for c in thumbLine], z: [-c for c in thumbHinge] };
+local inThumb(v) = [dot(v, thumbFrame.x), dot(v, thumbFrame.y), dot(v, thumbFrame.z)];
+local thumbTails = [inThumb(armDelta(thumbBone(k), thumbBone(k + 1))) for k in std.range(0, thumbBones - 1)];
 local knuckles = [armDelta('hand', bone(f, 0)) for f in fingers];
 local thumbRoot = armDelta('hand', thumbBone(0));
 local phalanxLengths = [[-t[1] for t in finger] for finger in tails];
@@ -87,13 +98,10 @@ local palmWidth = 0.1;
     phalanxLengths: phalanxLengths,
     thumbLengths: thumbLengths,
     fingerLength:: fingerLengths[1],
-    // The thumb's root as the palm draws its ball, from the skeleton's thumb_01 head.
-    thumbRootShare: -thumbRoot[1] / palmLength,
-    thumbVolar: thumbRoot[0],
-    thumbInset: palmWidth / 2 - thumbRoot[2],
   },
   // The hand's digits as a doll's parts and rig bones are named and laid out, in the arm's frame: each digit's root on
-  // the palm and each bone's tail, from its joint to the next, as the skeleton runs it.
+  // the palm and each bone's tail, from its joint to the next, as the skeleton runs it; a thumb bone's tail is in the
+  // thumb's frame.
   hand: {
     fingers: fingers,
     phalanges: phalanges,
@@ -101,6 +109,8 @@ local palmWidth = 0.1;
     knuckles: knuckles,
     knuckle(i):: knuckles[i],
     thumbRoot: thumbRoot,
+    // Where the thumb's own axes point in the arm's frame, which is the turn the thumb rests by on the hand.
+    thumbFrame: thumbFrame,
     tail(i, k):: tails[i][k],
     length(i, k):: phalanxLengths[i][k],
     part(finger, k):: bone(finger, k),

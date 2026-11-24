@@ -163,7 +163,9 @@ they are.
 A joint is given whole, as the doll's skeleton has it, and its height must be the one the measures lay the flesh out
 from, or the part would turn about a point its flesh does not end at. A limb segment's flesh stands on the middle of
 its bone, so a bone that runs off the centre line carries its flesh with it; the flesh is drawn upright rather than
-leaning with the bone, because the voxel families draw no slanted solids. The round cap that lets a joint bend sits
+leaning with the bone, because the voxel families draw no slanted solids. That serves a bone a few millimetres off
+its line; a thumb, which leaves its hand at an angle, is a model of its own, drawn hanging straight and rested turned
+on the hand (`../../README.md`, the doll), as a stair of upright steps reads as no thumb. The round cap that lets a joint bend sits
 on the joint, and the part is handed over about its own joint, because that is the point its bone turns it about.
 A bust cut into spine and clavicle parts, or a foot cut at its ball, shares one drawn mass among the parts rather
 than drawing each anew, so the split body has the silhouette the whole one has; a spine's joints sit toward the back

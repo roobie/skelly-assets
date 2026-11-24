@@ -140,7 +140,7 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test("the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, the thumb's first segment bearing on it and its tip closing over it, on either hand", () => {
+test('the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, the thumb bearing on it beyond its first segment and its tip closing over it, on either hand', () => {
   // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
   // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
@@ -191,9 +191,11 @@ test("the grip preset seats a haft across the palm, slanted so every finger wrap
     for (const tip of tips)
       assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
+    // The thumb's root sits nearer the wrist than a thin haft, so its first segment stands off it and the rest wrap.
+    const bearing = Math.min(gap(`thumb_02.${side}`), gap(`thumb_03.${side}`));
     assert.ok(
-      gap(`thumb_01.${side}`) < 0.003,
-      `the ${side} thumb's first segment bears on the haft, not ${(gap(`thumb_01.${side}`) * 1000).toFixed(1)} mm off it`,
+      bearing < 0.0015,
+      `the ${side} thumb bears on the haft beyond its first segment, not ${(bearing * 1000).toFixed(1)} mm off it`,
     );
     const thumbTip = bones.get(`thumb_03.${side}`);
     assert.ok(

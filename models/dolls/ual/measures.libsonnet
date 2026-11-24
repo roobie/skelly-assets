@@ -52,7 +52,7 @@ local arm = joints.arm {
   foreDepthExtra: 0.001, wristDepthExtra: 0.0075, wristShare: 0.3,
 } + the(playerArm, [
   'seamOverlap', 'handOverlap', 'armChamfer', 'wristChamfer', 'fingerThicknessShare', 'thumbThicknessShare',
-  'fingerFrontShare', 'thumbProjection', 'digitLeanStep',
+  'fingerFrontShare', 'thumbWidth', 'thumbSlimShare',
 ]);
 
 local leg = joints.leg {

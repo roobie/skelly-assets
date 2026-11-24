@@ -26,7 +26,10 @@ sites and cannot place a wearable differently.
 
 The doll is assembled from the avatar's own models and anchors, read from the built tree, so a change to the body
 moves every worn view with it and no copy of its measures is kept. Each limb hangs by its own anchor from the bust's
-anchor of the same name, so a limb authored with its joint off its origin still meets the bust.
+anchor of the same name, so a limb authored with its joint off its origin still meets the bust. A limb can hang from
+another limb's anchor the same way, as the thumb does from its hand's: a thumb leaves the hand at an angle, the
+voxel families draw every solid square to its model's axes, and its lean drawn in the arm's model was a stair of
+steps that read as no thumb, so it is a model of its own, drawn straight and rested turned.
 
 A worn piece is drawn in the frame of the doll part its segment names, in every copy of that part, because that is
 the frame the piece is authored in for the game. Pieces fitted over other clothing are left out, since the doll wears
