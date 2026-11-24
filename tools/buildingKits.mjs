@@ -1,5 +1,8 @@
+// @ts-check
 // Kit documents are regenerated from Jsonnet independently of cached model exports. Validate the actual sidecars,
 // not source rows or an incidental scratch manifest, so metadata cannot silently disappear at an export boundary.
+/** @import { ManifestBuildingKit, ManifestModel } from './manifest.mjs' */
+/** @import { Building } from './packages/thing-core/src/building.ts' */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parse } from 'valibot';
@@ -8,11 +11,13 @@ import { outputPath } from './layout.mjs';
 import { BuildingKitSchema, BuildingSchema, validateBuildingKit } from './packages/thing-core/src/building.ts';
 
 const repo = resolve(import.meta.dirname, '..');
+/** @param {{ id: string; revision: number }} kit */
 const keyOf = ({ id, revision }) => `${id}@${revision}`;
 
 export function readBuildingKits(root = repo) {
   // Fixture roots and older source trees with no building kits need no registry.
   if (!existsSync(join(root, 'models/building-kits.jsonnet'))) return [];
+  /** @type {{ pack: string; kit: unknown }[]} */
   const values = JSON.parse(readFileSync(join(root, 'models/building-kits.json'), 'utf8'));
   if (!Array.isArray(values)) throw new Error('models/building-kits.jsonnet: expected an array');
   const seen = new Set();
@@ -27,10 +32,19 @@ export function readBuildingKits(root = repo) {
   });
 }
 
-/** Write only referenced kits, including for targeted builds; a smooth copy shares its base model's sidecar/kit. */
+/**
+ * Write only referenced kits, including for targeted builds; a smooth copy shares its base model's sidecar/kit.
+ * @param {object} options
+ * @param {readonly Pick<ManifestModel, 'id' | 'pack' | 'path' | 'building'>[]} options.models
+ * @param {string} options.out
+ * @param {string} [options.root]
+ * @param {boolean} [options.complete]
+ */
 export function exportBuildingKits({ models, out, root = repo, complete = true }) {
   const definitions = new Map(readBuildingKits(root).map((entry) => [keyOf(entry.kit), entry]));
+  /** @type {Map<string, ReturnType<typeof readBuildingKits>[number]>} */
   const used = new Map();
+  /** @type {Map<string, Building>} */
   const modules = new Map();
   for (const model of models) {
     if (!model.building) continue;
@@ -59,7 +73,9 @@ export function exportBuildingKits({ models, out, root = repo, complete = true }
     if (keyOf(target.kit) !== keyOf(building.kit) || !target.apertures?.some(({ id }) => id === opening.aperture))
       throw new Error(`${model}: incompatible insert target aperture`);
   }
+  /** @type {ManifestBuildingKit[]} */
   const buildingKits = [];
+  /** @type {string[]} */
   const files = [];
   for (const { pack, path, kit } of [...used.values()].sort((a, b) => compareCodeUnits(keyOf(a.kit), keyOf(b.kit)))) {
     const file = outputPath(pack, path);
