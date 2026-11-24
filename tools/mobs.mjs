@@ -3,12 +3,13 @@
 // Every row is baked as an actor pose: GLB, body, clips and genome files live at their logical paths under the row's pack. A
 // type's severed-part source row also bakes its parts (tools/severedParts.mjs), and a run over every row writes their
 // pack's index of them. The cache is tools/generation.mjs, DEFAULT_CACHE, unless --cache names another; mob entries are in its mob folder.
-import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { CACHE_OPTIONS, cacheFolder, parseShard, shardUnits } from './generation.mjs';
+import { closureCode } from './importClosure.mjs';
 import { outputPath, readMobRows } from './layout.mjs';
 import { readSeveredParts, SEVERED_INDEX } from './severedParts.mjs';
 
@@ -82,18 +83,14 @@ const mobInputs = (row, severed) => ({
     parts: severed.parts.map(({ bone, without, id, path }) => ({ bone, without, id, path })),
   },
 });
-export const mobStore = (cache) => {
-  const tools = readdirSync(here).filter((name) => name.endsWith('.mjs'));
-  return entryStore(
+// A mob's entry is keyed by the code this module runs to bake it (tools/importClosure.mjs) and by the generator's and
+// the templates' data, which that code reads whatever the row.
+export const mobStore = (cache) =>
+  entryStore(
     cache,
     'mob',
-    codeFingerprint(
-      here,
-      ['package-lock.json', 'packages/mobgen/src', ...tools],
-      ['packages/mobgen/src', '../models/mobs'],
-    ),
+    codeFingerprint(here, closureCode(here, [import.meta.filename]), ['packages/mobgen/src', '../models/mobs']),
   );
-};
 
 const storedMob = (store, row, severed) =>
   store.entry(mobRoles(row, severed), mobInputs(row, severed), () => bakeMob(row, severed));

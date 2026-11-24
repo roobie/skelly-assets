@@ -25,6 +25,7 @@ import {
   wornSites,
 } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
+import { closureCode } from './importClosure.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { thingEntryFile } from './layout.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
@@ -98,17 +99,9 @@ export function probeGarment({ garment, dressing, doll: figure, pieces }) {
 }
 
 const HERE = import.meta.dirname;
-// The code a probe runs. A cached probe is only as good as the code and the runtime that made it.
-const CHECKER_CODE = [
-  'restPoke.mjs',
-  'dress.mjs',
-  'dollRig.mjs',
-  'glb.mjs',
-  '../site/clearance.mjs',
-  '../site/hiding.mjs',
-  '../site/kinematics.mjs',
-];
-const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
+// The code a probe runs: this module's import closure. A cached probe is only as good as the code and the runtime that
+// made it.
+const checkerHash = () => codeFingerprint(HERE, closureCode(HERE, [import.meta.filename]));
 const CACHE_FOLDER = 'rest-poke';
 
 // A GLB stands in the key by its digest: the key is what made the result, and the bytes are only how it was carried.

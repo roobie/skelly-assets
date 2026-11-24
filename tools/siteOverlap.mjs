@@ -22,6 +22,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { shardUnits } from './generation.mjs';
+import { closureCode } from './importClosure.mjs';
 import { AXES, perAxis } from './packages/construct/src/foundation/math.ts';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
 import { solid } from './pieceSolid.mjs';
@@ -283,9 +284,9 @@ export function siteOverlaps(sites, grain) {
 }
 
 const HERE = import.meta.dirname;
-// The code a measure runs. A cached measure is only as good as the code and the runtime that made it.
-const MEASURE_CODE = ['siteOverlap.mjs', 'pieceSolid.mjs'];
-const measureHash = () => codeFingerprint(HERE, MEASURE_CODE);
+// The code a measure runs: this module's import closure. A cached measure is only as good as the code and the runtime
+// that made it.
+const measureHash = () => codeFingerprint(HERE, closureCode(HERE, [import.meta.filename]));
 const CACHE_FOLDER = 'overlap';
 
 /**
