@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { withWornOn } from '../build.mjs';
 import { modelSources } from '../check-sources.mjs';
+import { readDollParts } from '../dollParts.mjs';
 import {
   coveringItems,
   dollDressing,
@@ -14,7 +15,6 @@ import {
   modelParts,
   PLAYER,
   placeOf,
-  readDollParts,
   readDressing,
   wornOnParts,
   wornPiece,
