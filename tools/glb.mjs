@@ -10,6 +10,7 @@
  * @property {GltfMesh[]} meshes
  * @property {{ nodes: number[] }[]} scenes
  * @property {number} [scene]
+ * @property {unknown[]} [skins]
  */
 
 /**
@@ -34,7 +35,8 @@
  * @property {number} [mesh]
  * @property {string} [name]
  * @property {number[]} [children]
- * @property {{ part?: string; port?: ExportPortMetadata }} [extras]
+ * @property {{ part?: string; port?: ExportPortMetadata; mount?: unknown }} [extras] `mount` is the joint a part
+ * hangs on another by (packages/thing-export/src/mounts.ts, partMounts), which these tools only ask the presence of
  */
 
 /**
