@@ -1,13 +1,27 @@
+// @ts-check
 // The sounds page: every baked sound row of the built tree, one table per object with a row per surface it lands on,
 // and a player for each take, so the takes of one landing and the surfaces of one object are heard side by side.
+/**
+ * A sound row of sounds.json, as site/build.mjs writes it.
+ * @typedef {{ object: string; surface: string; takes: { url: string; seed: number }[] }} Sound
+ */
+
 const content = document.getElementById('content');
+if (content === null) throw new Error('the sounds page has no #content to fill');
+/** @param {string} id */
 const words = (id) => id.replaceAll('_', ' ');
+/**
+ * @param {string} tag
+ * @param {object} [props]
+ * @param {...(Node | string)} children
+ */
 const element = (tag, props = {}, ...children) => {
   const node = Object.assign(document.createElement(tag), props);
   node.append(...children);
   return node;
 };
 
+/** @type {{ sounds: Sound[] }} */
 const { sounds } = await fetch('sounds.json').then((r) => r.json());
 const objects = Map.groupBy(sounds, (sound) => sound.object);
 content.append(element('h1', { textContent: 'Sounds' }));
