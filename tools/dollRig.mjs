@@ -24,7 +24,7 @@ import {
   sub,
   transpose,
 } from '../site/kinematics.mjs';
-import { dollDressings, exactBound, modelMeshes, readDoll, readDressing } from './dress.mjs';
+import { dollDressings, exactBound, modelMeshes, readDoll, readDressing, wornCopies } from './dress.mjs';
 import { r4, unitQuat } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
 
@@ -206,6 +206,7 @@ export function dollRig(doll, dressing) {
     throw new Error(`rig: limits are written for the ${content.reference}, which the doll has no side of`);
   const sided = (id, side) => (content.bones[id]?.sided ? `${id}${boneSuffix[side]}` : id);
   const bones = [];
+  const worn = wornCopies(doll, dressing);
   for (const [name, spec] of Object.entries(content.bones)) {
     checkLimits(name, spec.limits);
     const flexInPart = spec.flexAxis ?? [1, 0, 0];
@@ -247,6 +248,12 @@ export function dollRig(doll, dressing) {
           ...boundOf(copy, head),
         },
         at: copy.at,
+        worn: worn.get(`${copy.part}/${copy.side}`) ?? {
+          part: spec.part,
+          at: copy.at,
+          mirror: Boolean(copy.mirror),
+          hides: {},
+        },
         ...(spec.reach
           ? { pole: mirrored ? [-spec.reach.pole[0], spec.reach.pole[1], spec.reach.pole[2]] : spec.reach.pole }
           : {}),
@@ -275,7 +282,7 @@ export function dollRig(doll, dressing) {
     clips: content.clips,
     eye: content.eye,
     presets: content.presets ?? {},
-    bones: ordered.map(({ along, flexAxis, pole, at, nodeRotation, ...bone }) => {
+    bones: ordered.map(({ along, flexAxis, pole, at, worn: wearing, nodeRotation, ...bone }) => {
       // A bone with one child ends at that child's joint; otherwise it runs along its rest direction to its part's far face.
       const own = children.get(bone.id);
       const exact = boundBox(bone.bind);
@@ -287,8 +294,15 @@ export function dollRig(doll, dressing) {
       if (reaching && !reaching.reach.chain.every(Boolean))
         throw new Error(`rig: ${bone.id} reaches by two-bone IK, so it needs a parent and a grandparent`);
       const frame = frameAbout(bone.head, tail, flexAxis);
-      const rest = restOffset({ at, mirror: bone.bind.mirror, turn: bone.bind.turn }, bone.head, nodeRotation);
-      return { ...bone, node: { rotation: nodeRotation }, bind: { ...bone.bind, rest }, tail, frame, ...reaching };
+      const { turn } = bone.bind;
+      const rest = restOffset({ at, mirror: bone.bind.mirror, turn }, bone.head, nodeRotation);
+      const wears = {
+        part: wearing.part,
+        rest: restOffset({ at: wearing.at, mirror: wearing.mirror, turn }, bone.head, nodeRotation),
+        hides: wearing.hides,
+      };
+      const bind = { ...bone.bind, rest, wears };
+      return { ...bone, node: { rotation: nodeRotation }, bind, tail, frame, ...reaching };
     }),
   };
 }

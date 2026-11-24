@@ -22,8 +22,8 @@ import { facetTerms } from './taxonomy.mjs';
 
 /**
  * A place a wearable with no pieces sits by: at a bust anchor, or rested against a doll part.
- * @typedef {{ slot: string; anchor: string; part?: never; both?: never }} AnchorPlace
- * @typedef {{ slot: string; anchor?: never; part: string; against: Vec3; sink: number; both?: boolean }} RestPlace
+ * @typedef {{ slot: string; anchor: string; part?: never; both?: never; as?: never }} AnchorPlace
+ * @typedef {{ slot: string; anchor?: never; part: string; against: Vec3; sink: number; both?: boolean; as?: string }} RestPlace
  * @typedef {AnchorPlace | RestPlace} Place
  */
 
@@ -668,6 +668,80 @@ export function wornPieces(id, models, dressing) {
 
 /** The doll part a region's surface lies on. @param {string} surface */
 const surfacePart = (surface) => surface.split('#')[0];
+
+/**
+ * For a piece drawn in the doll part `part` by `slot`, what each name its `covers` may give hides there: the part
+ * itself, whole, or a region drawn as a piece of it, by the name its primitives carry (site/hiding.mjs, `hides`). The
+ * names are the one the piece's model knows the part by and the doll's regions; a name that hides nothing on this
+ * part, or that the doll cannot hide from the piece, is left out.
+ * @param {PieceSlot} slot
+ * @param {string} part
+ * @param {DollDressing} dressing
+ * @returns {Record<string, string>}
+ */
+function hiddenBy(slot, part, dressing) {
+  const names = [slot.as ?? part, ...Object.keys(dressing.regions)];
+  return Object.fromEntries(
+    names.flatMap((name) => {
+      const [hidden] = coversOn(slot, part, [name], dressing);
+      return hidden === undefined || coversProblemsOn('', part, [hidden], dressing).length > 0 ? [] : [[name, hidden]];
+    }),
+  );
+}
+
+/**
+ * How a doll part copy is worn: `part`, the name a worn model's `wornOn` knows the part by, which is the player's;
+ * where a piece drawn on it has its origin in the doll frame at rest, `at`, and whether it is drawn mirrored there; and
+ * `hides`, what each name of a piece's `covers` hides of this part (`hiddenBy`).
+ * @typedef {{ part: string; at: Vec3; mirror: boolean; hides: Readonly<Record<string, string>> }} Worn
+ */
+
+/**
+ * How each part copy of the doll is worn, by `<part>/<side>`: the copies its slots draw pieces in, as `wornSites` draws
+ * them, and the parts a place rests a wearable against under another name than the doll's own. A copy not listed is
+ * worn under its own part's name at its own origin, and hides nothing.
+ * @param {Doll} doll
+ * @param {DollDressing} dressing
+ * @returns {Map<string, Worn>}
+ */
+export function wornCopies(doll, dressing) {
+  /** @type {Map<string, Worn>} */
+  const worn = new Map();
+  /** @param {string} key @param {Worn} entry */
+  const put = (key, entry) => {
+    const held = worn.get(key);
+    if (held && JSON.stringify(held) !== JSON.stringify(entry))
+      throw new Error(`doll ${dressing.id}: ${key} is worn as ${held.part} and as ${entry.part}, differently`);
+    worn.set(key, entry);
+  };
+  for (const [segment, slot] of Object.entries(dressing.slots)) {
+    const copies = slotCopies(slot.part, doll, dressing);
+    if (!copies) continue;
+    if (typeof slot.part !== 'string' && slot.as === undefined)
+      throw new Error(
+        `doll ${dressing.id}: slot ${segment} is drawn in a part on each side, so it needs its name, \`as\``,
+      );
+    for (const copy of copies)
+      put(`${copy.part}/${copy.side}`, {
+        part: slot.as ?? copy.part,
+        at: slot.origin ? inCopy(copy, slot.origin) : copy.at,
+        mirror: Boolean(copy.mirror),
+        hides: hiddenBy(slot, copy.part, dressing),
+      });
+  }
+  for (const place of dressing.places) {
+    if (place.as === undefined) continue;
+    for (const copy of doll.parts.get(place.part) ?? []) {
+      const key = `${copy.part}/${copy.side}`;
+      if (!worn.has(key)) put(key, { part: place.as, at: copy.at, mirror: Boolean(copy.mirror), hides: {} });
+      else if (worn.get(key)?.part !== place.as)
+        throw new Error(
+          `doll ${dressing.id}: ${key} is worn as ${worn.get(key)?.part} by a slot and ${place.as} by a place`,
+        );
+    }
+  }
+  return worn;
+}
 
 /**
  * The doll parts besides `part` that a piece drawn on it and declaring `covers` leaves bare: those a region held beside

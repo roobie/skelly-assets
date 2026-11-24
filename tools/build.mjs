@@ -599,7 +599,8 @@ async function main() {
     if (positionals.length === 0) {
       const mobs = mobManifest(readMobRows(repo), await readSeveredParts(repo));
       const sounds = soundManifest(readSoundRows(repo), SOUND_SAMPLE_RATE);
-      // A wearable's wornOn names one doll's part copies; fitting one garment to many dolls is not built yet.
+      // A wearable's wornOn names the player's parts, whatever the doll: each doll's rig says which of its bones answers
+      // to a name (tools/dollRig.mjs, `bind.wears`).
       const dressing = dollDressing(readDressing(repo), PLAYER);
       const models = withWornOn(
         withSources([...built.models, ...recipes.models, ...mobs.models], sources),

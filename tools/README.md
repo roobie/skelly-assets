@@ -268,7 +268,7 @@ doll, and the manifest's `dolls` names each one's rig file. A garment's pieces a
 every doll, so the checks run each garment on each doll, and the rest-poke allowances name the doll they were judged
 on. What is still the player's alone, named so in the code (`PLAYER`) and not left to a first doll, is the baked wields
 and locomotion, the press check, the head-band fit and the showcase's whole worn view, because their content was worked
-out on the player's body, and a garment's `wornOn`, which names the player's slots, not each doll's. A limb a doll rests
+out on the player's body, and the names in a garment's `wornOn` and `covers`, which are the player's parts and regions on every doll: each doll's rig says in its bones' `bind.wears` which bone answers to a name, where a piece rests on it and what the piece hides there. A limb a doll rests
 turned, such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models
 stay authored hanging as `docs/decisions/0008-dressing.md` has them. A limb may hang on another limb's anchor, and
 then takes that limb's turn before its own: the thumb is such a limb on the arm, hung from its hand's thumb root and

@@ -56,9 +56,11 @@ shows as such on the doll too.
 Every slot the vocabulary names needs a place on the doll, or the showcase build fails for the first wearable that
 names it; a test holds the content to that, see `tools/test/dress.test.mjs`. The doll part each worn piece and each
 wearable placed by its slot sits on is carried in its manifest entry, `wornOn`, from this same rule, so a game seats it
-on the bone of that part without a copy of the segment map or the places that could drift from it; the offsets the
-places rest a wearable by are left out, because they only show roughly where an item belongs and are no fit a game
-should copy. A wearable placed on a limb's part names the side of the copy it sits on, as the rig names it, rather
+on the bone of that part without a copy of the segment map or the places that could drift from it. The names are the
+player's on every doll, and a doll's rig says which of its bones answers to each
+(`docs/decisions/0023-ual-doll.md`). The offsets the places rest a wearable by are left out, because they only show
+roughly where an item belongs and are no fit a game should copy. A wearable placed on a limb's part names the side of
+the copy it sits on, as the rig names it, rather
 than leave a game to know which side the doll places it on. A piece fitted over other clothing, which the doll leaves out, still names a part for a game that layers
 it: its worn twin's, since it is that piece shaped one layer out. A worn-only set, with pieces but no loose
 model, is not a wearable here and stays shown as its pieces. A rigid head piece is placed by its slot rather than by
