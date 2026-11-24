@@ -54,26 +54,38 @@ try {
 // What reads from above: skin that fills half a pixel at the closest zoom tints the pixel it falls in.
 const CLOSEST = Math.max(...ZOOMS);
 const READS = 0.5;
-const worst = ({ gaits }) =>
-  Math.max(...Object.values(gaits).flatMap((joints) => Object.values(joints).map(({ px }) => px[CLOSEST])));
+const joints = ['knee', 'elbow', 'neck'];
+// The joints a garment answers for: the neck only under a garment with a piece beside it.
+const answers = ({ collared }, joint) => joint !== 'neck' || collared;
+const worst = (row) =>
+  Math.max(
+    0,
+    ...Object.values(row.gaits).flatMap((byJoint) =>
+      joints.filter((joint) => answers(row, joint)).map((joint) => byJoint[joint].px[CLOSEST]),
+    ),
+  );
 const ranked = rows.toSorted((a, b) => worst(b) - worst(a) || a.garment.localeCompare(b.garment));
 
-const joints = ['knee', 'elbow', 'neck'];
-const cell = ({ seenCm2, px, key }) => (seenCm2 === 0 ? '·' : `${seenCm2} cm², ${px[CLOSEST]} px (key ${key})`);
+const seen = ({ seenCm2, px, key }) => (seenCm2 === 0 ? '·' : `${seenCm2} cm², ${px[CLOSEST]} px (key ${key})`);
+const cell = (row, gait, joint) => (answers(row, joint) ? seen(row.gaits[gait][joint]) : '—');
+const columns = Object.keys(GAITS).flatMap((gait) => joints.map((joint) => ({ gait, joint })));
 const table = [
-  `| garment | ${Object.keys(GAITS)
-    .flatMap((gait) => joints.map((joint) => `${gait} ${joint}`))
-    .join(' | ')} |`,
-  `|---|${Object.keys(GAITS)
-    .flatMap(() => joints.map(() => '---'))
-    .join('|')}|`,
+  `| garment | ${columns.map(({ gait, joint }) => `${gait} ${joint}`).join(' | ')} |`,
+  `|---|${columns.map(() => '---').join('|')}|`,
   ...ranked.map(
-    (row) =>
-      `| ${row.garment} | ${Object.keys(GAITS)
-        .flatMap((gait) => joints.map((joint) => cell(row.gaits[gait][joint])))
-        .join(' | ')} |`,
+    (row) => `| ${row.garment} | ${columns.map(({ gait, joint }) => cell(row, gait, joint)).join(' | ')} |`,
   ),
 ];
+// The doll's own neck, as any garment that reaches nowhere near it leaves it.
+const bare = rows.find(({ collared }) => !collared);
+const bareNeck = bare
+  ? [
+      `The bare doll's neck: ${Object.keys(GAITS)
+        .map((gait) => `${gait} ${seen(bare.gaits[gait].neck)}`)
+        .join('; ')}.`,
+      '',
+    ]
+  : [];
 mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'report.json'), `${JSON.stringify({ step, zooms: ZOOMS, garments: ranked }, null, 1)}\n`);
 writeFileSync(
@@ -81,19 +93,20 @@ writeFileSync(
   [
     '# Joint cover on the UAL doll',
     '',
-    `Skin seen from straight above at each garment's worst key of each gait, of every ${step} keys one probed: its area`,
-    `in the picture and the pixels it fills with the figure ${CLOSEST} px tall. A dot is none.`,
+    `Skin seen from straight above at each garment's worst key of each gait, one key in ${step} probed: its area in`,
+    `the picture and the pixels it fills with the figure ${CLOSEST} px tall. A dot is none, and a dash a neck the garment`,
+    'has no piece beside.',
     '',
+    ...bareNeck,
     ...table,
     '',
   ].join('\n'),
 );
 for (const row of ranked.filter((entry) => worst(entry) >= READS)) {
-  const parts = Object.entries(row.gaits).flatMap(([gait, byJoint]) =>
-    Object.entries(byJoint).flatMap(([joint, { px }]) =>
-      px[CLOSEST] >= READS ? [`${gait} ${joint} ${px[CLOSEST]} px`] : [],
-    ),
-  );
+  const parts = columns.flatMap(({ gait, joint }) => {
+    const { px } = row.gaits[gait][joint];
+    return answers(row, joint) && px[CLOSEST] >= READS ? [`${gait} ${joint} ${px[CLOSEST]} px`] : [];
+  });
   console.log(`${row.garment}: ${parts.join(', ')}`);
 }
 console.log(`${ranked.length} garments -> ${out}`);

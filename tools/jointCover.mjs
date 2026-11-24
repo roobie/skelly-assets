@@ -61,7 +61,11 @@ export function jointProbe(rig, rest) {
   const heads = new Map(rig.bones.map(({ id, head }) => [id, head]));
   // A joint's skin lies on the bones that meet there, so how far a point of theirs lies from it never changes: the
   // skin of each joint is chosen at rest. A hinge's is what a piece is meant to cover; the neck's is all of it.
-  /** @param {{ joint: string; at: string; bones: readonly string[] }} joint @param {string} bone @param {number[]} point */
+  /**
+   * @param {{ joint: string; at: string; bones: readonly string[] }} joint
+   * @param {string} bone
+   * @param {number[]} point
+   */
   const holds = ({ joint, at, bones }, bone, point) =>
     bones.includes(bone) && (joint === 'neck' || length(sub(point, heads.get(at))) <= REACH);
   const probe = shownSkin(rest, coveredSurface(rig, rest), {
@@ -119,9 +123,17 @@ export function worstKeys(byGait) {
   );
 }
 
+/** @param {{ bones: readonly { id: string; parent: string | null }[] }} rig @param {string} id */
+const boneOf = (rig, id) => {
+  const bone = rig.bones.find((own) => own.id === id);
+  if (!bone) throw new Error(`the rig has no bone ${id}`);
+  return bone;
+};
+
 /**
  * One garment's row, the unit a worker runs: the garment of the built tree `built` worn on the UAL doll, probed at
- * rest and at every `step`th key of each gait.
+ * rest and at every `step`th key of each gait, with `collared`, whether a piece of it rides the neck or a bone next to
+ * it.
  * @param {{ built: string; garment: string; step: number }} task
  */
 export function garmentRow({ built, garment, step }) {
@@ -134,12 +146,23 @@ export function garmentRow({ built, garment, step }) {
     throw new Error(`${garment}: ${id} is placed loose, not by its worn pieces`);
   };
   const sites = wornSites({ id: garment }, { dressing, doll, models: manifest.models, boxOf: loose, anchorsOf: loose });
-  const probe = jointProbe(rig, restMeshes(rig, sites, treeMeshes(built, manifest)));
+  const rest = restMeshes(rig, sites, treeMeshes(built, manifest));
+  const probe = jointProbe(rig, rest);
+  // Nothing fitted is meant to cover the neck, so its skin is the garment's to answer for only when a piece of it
+  // rides the neck or a bone across its joints, where a collar would; under any other garment the neck is as bare as
+  // the doll's own, which the report gives once.
+  const collar = jointsOf(rig)
+    .filter(({ joint }) => joint === 'neck')
+    .flatMap(({ at }) =>
+      rig.bones.filter(({ id, parent }) => id === at || parent === at || id === boneOf(rig, at).parent),
+    )
+    .map(({ id }) => id);
+  const collared = rest.pieces.some(({ bone }) => collar.includes(bone));
   const clips = ualClips();
   const keysOf = (/** @type {string} */ clip) =>
     Array.from({ length: Math.ceil(clips.keys(clip) / step) }, (_, i) => probe(clips.nodes(clip, i * step)));
   const gaits = worstKeys(Object.fromEntries(Object.entries(GAITS).map(([gait, clip]) => [gait, keysOf(clip)])));
   // A key's place in its clip, not among the keys probed.
   for (const joints of Object.values(gaits)) for (const joint of Object.values(joints)) joint.key *= step;
-  return { garment, rest: worstKeys({ rest: [probe(clips.nodes(null, 0))] }).rest, gaits };
+  return { garment, collared, rest: worstKeys({ rest: [probe(clips.nodes(null, 0))] }).rest, gaits };
 }
