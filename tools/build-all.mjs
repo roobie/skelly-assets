@@ -1,3 +1,4 @@
+// @ts-check
 // Builds the complete produced tree, the roster and recipe exports with their manifest (build.mjs), every mob
 // (mobs.mjs) and every sound (sounds.mjs), into one output folder. The determinism check and CI build through this one entry so both hold the
 // same tree to the manifest.
@@ -14,10 +15,18 @@ const here = import.meta.dirname;
 const repo = resolve(here, '..');
 
 // `cache` is the folder both builders reuse unchanged models from, or undefined to generate every model.
+/**
+ * @param {string} out
+ * @param {{ cache: string | undefined }} options
+ */
 export function buildAll(out, { cache }) {
   const options = cache === undefined ? ['--no-cache'] : ['--cache', resolve(cache)];
   // Sounds bake in seconds, so they have no cache to choose.
-  for (const [builder, ...args] of [['build.mjs', ...options], ['mobs.mjs', ...options], ['sounds.mjs']]) {
+  for (const [builder, args] of /** @type {const} */ ([
+    ['build.mjs', options],
+    ['mobs.mjs', options],
+    ['sounds.mjs', []],
+  ])) {
     execFileSync(process.execPath, [join(here, builder), '--out', resolve(out), ...args], {
       cwd: repo,
       stdio: 'inherit',

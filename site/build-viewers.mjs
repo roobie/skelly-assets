@@ -1,3 +1,4 @@
+// @ts-check
 // Builds every viewer site/tools.json lists into its package's dist/, which site/build.mjs then serves.
 // Usage: node site/build-viewers.mjs.
 import { execFileSync } from 'node:child_process';

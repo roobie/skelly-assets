@@ -1,9 +1,12 @@
+// @ts-check
 // The assemblies the kits build, each laid out on its own as its kit fits it to a vehicle, so a review can draw and
 // explode one apart from any vehicle: an engine, a turret, a radiator or a fuel tank as its core with every fitting at
 // its own site (models/vehicles/assembly.libsonnet), a wheel with each kind of brake its class offers
 // (models/vehicles/wheel-kit.libsonnet), and an exhaust as its pipes and parts along its run
 // (models/vehicles/exhaust-kit.libsonnet). Each is named after the part it fits fused, a wheel's with its kind of brake
 // too, with ASSEMBLY_SUFFIX, so it never takes a model's id.
+/** @import { Vec3 } from './packages/construct/src/foundation/math.ts' */
+/** @import { Forward } from './packages/thing-core/src/frame.ts' */
 import { resolve } from 'node:path';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { toModelFrame } from './packages/thing-core/src/frame.ts';
@@ -11,11 +14,18 @@ import { toModelFrame } from './packages/thing-core/src/frame.ts';
 const repo = resolve(import.meta.dirname, '..');
 export const ASSEMBLY_SUFFIX = '_assembly';
 
+/**
+ * A part at its place in an assembly's frame, with whatever else its kit says of the site.
+ * @typedef {{ id: string; part: string; at: Vec3 } & Record<string, unknown>} AssemblySite
+ * @typedef {{ id: string; sites: AssemblySite[] }} Assembly
+ */
+
 // Each assembly's sites about the origin of its own frame, turned into the model frame as a vehicle's placements are
 // (tools/placements.mjs), as { id, sites: [{ id, part, at }] }. A wheel's far twin and its brake's are the near side
 // reflected, so only the near side is laid out. An exhaust has no core, so it is laid out about its front pipe, the
 // part that meets the engine.
 export function readAssemblies(root = repo) {
+  /** @type {{ forward: Forward; assemblies: Assembly[] }} */
   const { forward, assemblies } = JSON.parse(
     evaluateJsonnet(
       `
@@ -52,6 +62,7 @@ export function readAssemblies(root = repo) {
       root,
     ),
   );
+  /** @param {readonly AssemblySite[]} sites */
   const turned = (sites) => sites.map((placed) => ({ ...placed, at: toModelFrame(forward, placed.at) }));
   return assemblies.map(({ id, sites }) => ({ id, sites: turned(sites) }));
 }

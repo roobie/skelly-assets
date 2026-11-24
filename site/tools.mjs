@@ -1,3 +1,4 @@
+// @ts-check
 // The tool pages the showcase serves beside its index, read from site/tools.json: a page of the showcase itself, or a
 // viewer, a tool package whose vite build the site serves under the package's name.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -38,12 +39,27 @@ export const SITE_FILES = [
 // declaration types it from their packages, which resolve only under tools/, so the shader lives there.
 export const TOOLS_FILES = ['fabric.mjs'];
 
+/**
+ * A tool of site/tools.json: its link's label and the page or the viewer it opens.
+ * @typedef {{ label: string; page?: string; viewer?: string }} Tool
+ */
+
+/**
+ * @param {string} root
+ * @param {string} viewer
+ */
 export const viewerDir = (root, viewer) => join(root, PACKAGES, viewer);
+/**
+ * @param {string} root
+ * @param {string} viewer
+ */
 export const viewerDist = (root, viewer) => join(viewerDir(root, viewer), 'dist');
 
 // Every tool, each held to naming a page of the showcase or a tool package, so a misspelt entry fails rather than
 // never being linked.
+/** @param {string} root */
 export function readTools(root) {
+  /** @type {{ tools: Tool[] }} */
   const { tools } = JSON.parse(readFileSync(join(root, TOOLS), 'utf8'));
   for (const tool of tools) {
     const where = tool.page
@@ -59,12 +75,18 @@ export function readTools(root) {
 }
 
 // Relative, so the links hold under a Pages project path and on any local server.
+/** @param {Pick<Tool, 'page' | 'viewer'>} tool */
 export const toolHref = ({ page, viewer }) => page ?? `${viewer}/`;
 
+/** @param {readonly Tool[]} tools */
 export const toolLinks = (tools) =>
   tools.map((tool) => `<a href="${escapeHtml(toolHref(tool))}">${escapeHtml(tool.label)}</a>`).join('\n      ');
 
 // The tool pages a built site serves that no link names: a page beside the index, or a directory with its own index.
+/**
+ * @param {string} out
+ * @param {readonly Pick<Tool, 'page' | 'viewer'>[]} linked
+ */
 export function unlinkedTools(out, linked) {
   const hrefs = new Set(linked.map(toolHref));
   return readdirSync(out, { withFileTypes: true })
