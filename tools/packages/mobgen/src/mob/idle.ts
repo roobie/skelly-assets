@@ -236,9 +236,17 @@ const HEAD_AMPLITUDE_DEG = 4;
 const CLAW_RATE = (2 * Math.PI) / 1.2;
 const CLAW_AMPLITUDE_DEG = 10;
 
+/** One of an idle's oscillators: the bones it turns, each about one of its axes by its share of the amplitude. */
+export interface IdleOscillator {
+  readonly periodSimSeconds: number;
+  readonly amplitudeDeg: number;
+  readonly salt: number;
+  readonly bones: readonly { readonly bone: string; readonly axis: 'x' | 'y' | 'z'; readonly scale: number }[];
+}
+
 /** Bake-facing oscillator data, in right-multiplication order (sway before breath). The live idle runs on the
  * saved Sim wander clock, so each period names that clock. */
-export const idleMotion = (stance: IdleStance) => [
+export const idleMotion = (stance: IdleStance): readonly IdleOscillator[] => [
   {
     periodSimSeconds: (2 * Math.PI) / SWAY_RATE,
     amplitudeDeg: SWAY_AMPLITUDE_DEG,
@@ -273,7 +281,7 @@ export const idleMotion = (stance: IdleStance) => [
             { bone: 'forearm.L', axis: 'x', scale: 1 },
             { bone: 'forearm.R', axis: 'x', scale: -1 },
           ],
-        },
+        } satisfies IdleOscillator,
       ]
     : []),
 ];
