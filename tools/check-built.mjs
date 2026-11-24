@@ -1,3 +1,4 @@
+// @ts-check
 // Check fresh builds of the complete tree (tools/build-all.mjs). The first fresh tree must satisfy its manifest and the
 // declared packs (tools/manifest.mjs, treeDifferences), fit the head-gear straps to the head (tools/strap-fit.mjs) and
 // seat the rigid head shells clear of it and the solid helmets round it (tools/head-fit.mjs);
@@ -19,6 +20,7 @@ import { treeStrapFindings } from './strap-fit.mjs';
 const repo = resolve(import.meta.dirname, '..');
 
 // Every file under root, as sorted paths relative to it.
+/** @param {string} root */
 function treeFiles(root) {
   return readdirSync(root, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile())
@@ -27,11 +29,16 @@ function treeFiles(root) {
 }
 
 // How tree `other` departs from tree `first`: a file only one of them has, or one whose bytes differ.
+/**
+ * @param {string} first
+ * @param {string} other
+ */
 export function treeMismatches(first, other) {
   const firstFiles = treeFiles(first);
   const otherFiles = treeFiles(other);
   const inFirst = new Set(firstFiles);
   const inOther = new Set(otherFiles);
+  /** @param {string} file */
   const differs = (file) => !readFileSync(join(first, file)).equals(readFileSync(join(other, file)));
   return [
     ...firstFiles.filter((file) => !inOther.has(file)).map((file) => `missing from ${other}: ${file}`),
@@ -41,7 +48,11 @@ export function treeMismatches(first, other) {
 }
 
 // Every way the fresh trees fail the check, the first of them being the reference.
-function freshDifferences([reference, ...others]) {
+/**
+ * @param {string} reference
+ * @param {readonly string[]} others
+ */
+function freshDifferences(reference, others) {
   const manifest = JSON.parse(readFileSync(join(reference, MANIFEST), 'utf8'));
   const files = treeFiles(reference).map((file) => `built/${file}`);
   return [
@@ -61,7 +72,9 @@ function main() {
     const trees = temporary ? [temporary] : values.fresh.map((tree) => resolve(tree));
     for (const tree of trees)
       if (!existsSync(join(tree, MANIFEST))) throw new Error(`not a built tree, no ${MANIFEST}: ${tree}`);
-    const differences = freshDifferences(trees);
+    const [reference, ...others] = trees;
+    if (reference === undefined) throw new Error('no built tree to check');
+    const differences = freshDifferences(reference, others);
     if (differences.length) {
       console.error(differences.join('\n'));
       return 1;

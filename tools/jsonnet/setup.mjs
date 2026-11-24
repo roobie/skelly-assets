@@ -1,3 +1,4 @@
+// @ts-check
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import {
@@ -17,10 +18,24 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+/**
+ * runtime.json: the pinned go-jsonnet, each platform's archive digest and how a download is retried.
+ * @typedef {object} Pin
+ * @property {string} version
+ * @property {{ attempts: number; delaysMs: number[] }} download
+ * @property {Record<string, string>} sha256
+ */
+/** @type {Pin} */
 const PIN = JSON.parse(readFileSync(join(SCRIPT_DIR, 'runtime.json'), 'utf8'));
+/** @type {Partial<Record<NodeJS.Platform, string>>} */
 const PLATFORM_NAMES = { linux: 'linux', darwin: 'darwin', win32: 'windows' };
+/** @type {Partial<Record<NodeJS.Architecture, string>>} */
 const ARCH_NAMES = { x64: 'amd64', arm64: 'arm64' };
 
+/**
+ * @param {Uint8Array} archive
+ * @param {string | undefined} expectedHash
+ */
 function verifyArchiveHash(archive, expectedHash) {
   const actualHash = createHash('sha256').update(archive).digest('hex');
   if (actualHash !== expectedHash) {
@@ -43,6 +58,7 @@ function executablePath() {
   };
 }
 
+/** @param {string} binary */
 function existingBinaryIsPinnedVersion(binary) {
   if (!existsSync(binary)) {
     return false;
@@ -55,6 +71,11 @@ function existingBinaryIsPinnedVersion(binary) {
   }
 }
 
+/**
+ * @param {Uint8Array} archive
+ * @param {string | undefined} expectedHash
+ * @param {string} targetDirectory
+ */
 export function installJsonnetArchive(archive, expectedHash, targetDirectory) {
   verifyArchiveHash(archive, expectedHash);
 
@@ -92,6 +113,7 @@ export function installJsonnetArchive(archive, expectedHash, targetDirectory) {
   }
 }
 
+/** @param {number} milliseconds */
 function defaultSleep(milliseconds) {
   return new Promise((done) => setTimeout(done, milliseconds));
 }
@@ -100,6 +122,12 @@ function defaultSleep(milliseconds) {
  * Download `url`, retrying on 5xx responses and network errors. A 4xx response fails at once.
  * `delaysMs[i]` is the wait after failed attempt i; `attempts` is the total number of tries.
  * `fetchImpl` and `sleep` are injectable so tests need no network and no wall-clock waits.
+ * @param {string} url
+ * @param {object} [options]
+ * @param {number} options.attempts
+ * @param {readonly number[]} options.delaysMs
+ * @param {(url: string) => Promise<Pick<Response, 'ok' | 'status' | 'statusText' | 'arrayBuffer'>>} [options.fetchImpl]
+ * @param {(milliseconds: number) => Promise<unknown>} [options.sleep]
  */
 export async function downloadWithRetry(
   url,
