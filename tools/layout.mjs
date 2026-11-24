@@ -125,18 +125,25 @@ export function readRoster(root = repo) {
   });
 }
 
+/**
+ * models/mobs.json's rows as written, each with the sheet's defaults and with itself over them.
+ * @param {string} root
+ */
+const mergedMobRows = (root) => {
+  /** @type {MobSheet} */
+  const sheet = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
+  return sheet.mobs.map((row) => ({ row, defaults: sheet.defaults, merged: { ...sheet.defaults, ...row } }));
+};
+
 // models/mobs.json's rows with the sheet's defaults applied; a row's taxonomy inherits the defaults' by the taxonomy rule.
 /**
  * @param {string} [root]
  * @returns {MobRow[]}
  */
 export function readMobRows(root = repo) {
-  /** @type {MobSheet} */
-  const sheet = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
-  return sheet.mobs.map((row) => {
+  return mergedMobRows(root).map(({ row, defaults, merged }) => {
     const id = row.id ?? `${row.type}.${row.seed}`;
     const stem = `actors/${id}`;
-    const merged = { ...sheet.defaults, ...row };
     /** @param {string} what */
     const refuse = (what) => new Error(`models/mobs.json: ${id} needs ${what}, its own or the defaults'`);
     /** @param {string} field */
@@ -168,7 +175,7 @@ export function readMobRows(root = repo) {
       body: row.body ?? `${stem}.body.json`,
       clips: row.clips ?? `${stem}.clips.json`,
       genome: row.genome ?? `${stem}.genome.json`,
-      taxonomy: inheritTaxonomy(sheet.defaults?.taxonomy, row.taxonomy),
+      taxonomy: inheritTaxonomy(defaults?.taxonomy, row.taxonomy),
     };
   });
 }
@@ -239,7 +246,7 @@ export const smoothedPack = (packId) => (packId.endsWith(SMOOTH) ? packId.slice(
  */
 export function declaredPacks(root = repo) {
   const models = new Set([...recipePackIds(root), ...readRoster(root).map((row) => row.packId)]);
-  const declared = new Set([...models, ...readMobRows(root).map((row) => row.pack), ...soundPackIds(root)]);
+  const declared = new Set([...models, ...mergedMobRows(root).map(({ merged }) => merged.pack), ...soundPackIds(root)]);
   const named = [...declared].filter((pack) => smoothedPack(pack) !== undefined);
   if (named.length > 0) throw new Error(`a source declares a smooth pack's name: ${named.sort().join(' ')}`);
   return new Set([...declared, ...[...models].map(smoothPack)]);
