@@ -32,12 +32,14 @@ local tails = [[armDelta(bone(f, k), bone(f, k + 1)) for k in std.range(0, phala
 // The thumb is a limb of its own, drawn hanging down -y from its root as the arm hangs from the shoulder, and rested
 // turned on the hand. Its bones run in one line on the mannequin, so one turn rests all of them: the thumb's frame in
 // the arm's has its -y along that line, from the root to the tip, and its z, the axis its joints bend about as the
-// fingers' do about theirs, the fingers' axis tipped square to the line and still in the arm's mirror plane.
+// fingers' do about theirs, along the palm's normal squared to the line: a thumb bends in the plane of its palm, across
+// it toward the fingers, where a finger bends toward the palm's face. With the hinge the fingers', a lifted thumb
+// curled away from a fist rather than over it.
 local unit(v) = local n = std.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); [c / n for c in v];
 local cross(a, b) = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 local dot(a, b) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 local thumbLine = unit(armDelta(thumbBone(0), thumbBone(thumbBones)));
-local thumbHinge = unit([0, -thumbLine[2], thumbLine[1]]);
+local thumbHinge = local along = thumbLine[0]; unit([along * thumbLine[0] - 1, along * thumbLine[1], along * thumbLine[2]]);
 local thumbFrame = { x: cross(thumbLine, thumbHinge), y: [-c for c in thumbLine], z: [-c for c in thumbHinge] };
 local inThumb(v) = [dot(v, thumbFrame.x), dot(v, thumbFrame.y), dot(v, thumbFrame.z)];
 local thumbTails = [inThumb(armDelta(thumbBone(k), thumbBone(k + 1))) for k in std.range(0, thumbBones - 1)];

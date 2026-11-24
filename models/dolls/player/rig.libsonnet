@@ -42,15 +42,14 @@
 //
 // The thumb is a limb of its own, which the doll rests on the palm's front edge leaning out from the palm and forward
 // as UAL's does (models/measures/hand.libsonnet). In its own frame its bones hang as a finger's do and flex about the
-// same axis, which that rest tips square to their lean, as an axis off square would swing a bending segment round a
-// cone rather than in its own plane; what sets it apart is its root,
-// the only digit joint with all three freedoms, which read as one motion in the joint's order above: abduction swings
-// the thumb in the palm's plane, negative across the palm toward the little finger; twist rolls it about its own
-// length, positive turning its pad from facing the way the palm faces toward facing the fingers, which is opposition;
-// flex then lifts it out of the palm's plane toward the palm side about the hinge the roll has turned, so a lifted
-// thumb leans the way its pad faces. Across, roll and lift together bring the pad against a fingertip or over a gripped
-// handle; the two joints beyond only bend toward the pad. `presets` names hand shorthands (site/fingers.mjs,
-// `handAngles`) a pose file can ask for by name.
+// same axis, which that rest lays along the palm's normal, square to the thumb: its joints bend it in the plane of the
+// palm, across toward the fingers, its pad facing them. What sets it apart is its root, the only digit joint with all
+// three freedoms, which read as one motion in the joint's order above: flex swings the thumb across the palm, positive
+// toward the little finger; twist rolls it about its own length, positive turning its pad back toward the palm, which
+// is opposition; abduction lifts it off the palm's plane on the palm's side. Lifted, the thumb's knuckle stands before
+// the palm, and the two joints beyond, which only bend toward the pad, lay it over a closed fist or bring its pad
+// against a fingertip. `presets` names hand shorthands (site/fingers.mjs, `handAngles`) a pose file can ask for by
+// name.
 //
 // `nodeRotation` is the rest rotation of a bone's glTF node, a quaternion [x, y, z, w] of the node's axes in the model's,
 // or one per side for a sided bone. The player's joints are nodes at their heads turned by nothing, and a clip's

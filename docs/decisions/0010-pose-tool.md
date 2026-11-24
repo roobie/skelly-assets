@@ -72,14 +72,12 @@ its way to a point it still reaches.
 
 A power grip seats a handle across the palm short of the knuckle crease (the hand bone's `grip` share), where the
 fingers wrap right round it into a fist; seated at the knuckle crease, the fingers only hook it and the palm stands
-beside it like a paddle. The thumb's root sits nearer the wrist than the handle, so its first segment lies on a handle
-from well before the rest of it can, and closing it joint by joint finds the handle only in the plane the root's roll
-and sweep leave it: the first segment stops on the handle and the rest stand off it. So the closing step seats the
-thumb instead, searching all its joint angles within their limits for the thumb whose segments each bear on the item
-without sinking into it or the fingers, no further than a finger may; the grip preset only says where that search
-starts. The seat stands when a segment short of the tip bears on the item, as a thumb lying along a handle does, its
-first segment standing off a thin one while the rest wrap; a thumb that reaches the item only with its tip would be
-laid against the near face, so it closes as a finger does. The
+beside it like a paddle. The thumb closes last and as a finger does, joint by joint until contact, on the item and on
+the closed fingers, so it comes to rest over the fist. That works because its joints bend it in the plane of the palm,
+across toward the fingers, as a thumb's do: with its hinge the fingers' own, bending toward the palm's face, a lifted
+thumb curled away from the fist and stood in the air, and a search over all its joint angles for a seat on the item
+could only lay it along the handle beside the fist, its knuckle standing off the palm. The grip preset lifts the thumb
+so that its knuckle stands before the fist, and contact does the rest. The
 knuckle row slants back toward the little finger, as the metacarpal heads arc, so the fist steps down from index to
 little; a palm split in two would arch the same way only with another bone and part for every hand, glove and mob to
 carry. The handle crosses the palm slanted

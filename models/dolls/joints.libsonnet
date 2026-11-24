@@ -25,10 +25,11 @@
   // A finger's joints from the knuckle out: the knuckle hyperextends a little and spreads; the joints beyond it only
   // curl, the middle one furthest.
   phalanges: [{ flex: [-20, 90], abduct: [-15, 15] }, { flex: [0, 110], abduct: [0, 0] }, { flex: [0, 80], abduct: [0, 0] }],
-  // The thumb's joints from its root out: the root crosses the palm further than it spreads away, rolls into
-  // opposition and lifts toward the palm; the knuckle beyond bends a little back and most of a right angle forward;
-  // the last joint bends further.
-  thumb: [{ flex: [-10, 60], twist: [0, 70], abduct: [-60, 25] }, { flex: [-10, 60], twist: [0, 0], abduct: [0, 0] }, { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }],
+  // The thumb's joints from its root out. The root flexes across the palm further than it spreads away, rolls a little
+  // either way and lifts off the palm's plane, by its abduction, far enough to stand its knuckle before a closed fist;
+  // the knuckle beyond bends a little back and nearly a right angle forward, as it must to lay the thumb over the
+  // fingers, and the last joint as far.
+  thumb: [{ flex: [-25, 60], twist: [-30, 30], abduct: [-10, 60] }, { flex: [-10, 80], twist: [0, 0], abduct: [0, 0] }, { flex: [0, 80], twist: [0, 0], abduct: [0, 0] }],
   // Reach poles, in the doll's frame: the elbow down and out, as an arm reaching in front of the body carries it; the
   // knee forward.
   poles: { hand: [0.5, -1, -0.3], foot: [0, 0, 1] },

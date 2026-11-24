@@ -5,7 +5,17 @@ import { test } from 'node:test';
 import { posedSolid, signedDepth } from '../../site/clearance.mjs';
 import { decodeFrame } from '../../site/clipFrames.mjs';
 import { padOf, probeOf } from '../../site/fingers.mjs';
-import { applyPoint, boneTransforms, dot, length, mulMV, normalize, sub } from '../../site/kinematics.mjs';
+import {
+  applyPoint,
+  boneTransforms,
+  boundBox,
+  composed,
+  dot,
+  length,
+  mulMV,
+  normalize,
+  sub,
+} from '../../site/kinematics.mjs';
 import { compilePose, frameAngles } from '../../site/poseFile.mjs';
 import { evaluateJsonnet } from '../jsonnet/index.mjs';
 import { dollTree, repo } from './doll-tree.mjs';
@@ -19,7 +29,45 @@ const bones = new Map(rig.bones.map((bone) => [bone.id, bone]));
 
 // A part's nearest approach to a posed solid, negative when sunk in, at the points the grip probes it.
 const partGap = (transforms, id, solid) =>
-  Math.min(...probeOf(bones.get(id)).points.map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
+  Math.min(...probeOf(bones.get(id)).map((p) => signedDepth(solid, applyPoint(transforms.get(id), p), 0.1)));
+
+// A part as a posed solid, its exact box.
+const partSolid = (transforms, id) => {
+  const { box, rest } = boundBox(bones.get(id).bind);
+  const corner = (i) => [0, 1, 2].map((a) => ((i >> a) & 1 ? box.max[a] : box.min[a]));
+  const quads = [
+    [0, 1, 3, 2],
+    [4, 6, 7, 5],
+    [0, 4, 5, 1],
+    [2, 3, 7, 6],
+    [0, 2, 6, 4],
+    [1, 5, 7, 3],
+  ];
+  return posedSolid(
+    {
+      positions: [0, 1, 2, 3, 4, 5, 6, 7].flatMap(corner),
+      indices: quads.flatMap(([a, b, c, d]) => [a, b, c, a, c, d]),
+    },
+    composed(transforms.get(id), rest),
+  );
+};
+
+// A gripping thumb closes over the fist: its knuckle stays by the palm, within the fist's depth of the palm along
+// `into`, the way from the palm into the held item, and its last two bones lie on the fingers or the item, neither
+// standing off them nor sunk in them.
+const assertThumbOverFist = (transforms, side, item, into, name) => {
+  const head = (id) => applyPoint(transforms.get(id), bones.get(id).head);
+  const off = dot(sub(head(`thumb_02.${side}`), head(`hand.${side}`)), into);
+  assert.ok(off > 0 && off < 0.07, `${name}: the thumb's knuckle stands ${(off * 1000).toFixed(0)} mm off the palm`);
+  const fist = rig.bones
+    .filter((bone) => bone.digit && bone.digit !== 'thumb' && bone.id.endsWith(`.${side}`))
+    .map((bone) => partSolid(transforms, bone.id));
+  for (const id of [`thumb_02.${side}`, `thumb_03.${side}`]) {
+    const least = Math.min(...[item, ...fist].map((body) => partGap(transforms, id, body)));
+    assert.ok(least < 0.004, `${name}: ${id} stands ${(least * 1000).toFixed(1)} mm off the fist`);
+    assert.ok(least > -0.0015, `${name}: ${id} sinks ${(-least * 1000).toFixed(1)} mm into the fist`);
+  }
+};
 
 test('every pose fixture compiles on the doll within its limits', () => {
   assert.ok(fixtures.length > 0);
@@ -140,7 +188,7 @@ test('opposition rolls either thumb pad toward its own little finger, the mirror
   assert.ok(length(sub(r, [-l[0], l[1], l[2]])) < 1e-9, 'the right thumb tip mirrors the left across x');
 });
 
-test('the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, the thumb bearing on it beyond its first segment and its tip closing over it, on either hand', () => {
+test('the grip preset seats a haft across the palm, slanted so every finger wraps it from its root, and the thumb closes over the fist, on either hand', () => {
   // An octagonal haft across the palm, as a hand-worn handle is rounded, seated on the palm's grip socket and following
   // the hand; the forearm is bent so the hand stands clear of the body.
   const width = 0.03;
@@ -191,12 +239,7 @@ test('the grip preset seats a haft across the palm, slanted so every finger wrap
     for (const tip of tips)
       assert.ok(beyond(tip) > 0, `${tip.id} stops ${(-beyond(tip) * 1000).toFixed(1)} mm short of the haft's middle`);
     assert.ok(report.grips[`hand.${side}`].thumb.touched, `the ${side} thumb closes on the haft`);
-    // The thumb's root sits nearer the wrist than a thin haft, so its first segment stands off it and the rest wrap.
-    const bearing = Math.min(gap(`thumb_02.${side}`), gap(`thumb_03.${side}`));
-    assert.ok(
-      bearing < 0.0015,
-      `the ${side} thumb bears on the haft beyond its first segment, not ${(bearing * 1000).toFixed(1)} mm off it`,
-    );
+    assertThumbOverFist(transforms, side, solid, mulMV(item.r, [1, 0, 0]), side);
     const thumbTip = bones.get(`thumb_03.${side}`);
     assert.ok(
       beyond(thumbTip) > 0,
@@ -205,7 +248,7 @@ test('the grip preset seats a haft across the palm, slanted so every finger wrap
   }
 });
 
-test("the idles' gripping hands wrap the thumb round the haft, every segment bearing on it", () => {
+test("the idles' gripping hands close the thumb over the fist", () => {
   for (const name of ['onehand_stance_idle.json', 'twohand_stance_idle.json']) {
     const { file } = fixtures.find((fixture) => fixture.name === name);
     const { frame, held } = compilePose(rig, file, { meshOf: itemMesh });
@@ -215,10 +258,8 @@ test("the idles' gripping hands wrap the thumb round the haft, every segment bea
     for (const hand of gripping) {
       const solid = posedSolid(itemMesh(file.hold[hand].model), held[hand]);
       const side = hand.split('.')[1];
-      for (const segment of ['thumb_01', 'thumb_02', 'thumb_03']) {
-        const gap = partGap(transforms, `${segment}.${side}`, solid);
-        assert.ok(gap < 0.003, `${name}: ${hand}'s ${segment} stands ${(gap * 1000).toFixed(1)} mm off the haft`);
-      }
+      const into = normalize(mulMV(held[hand].r, file.hold[hand].socket.into));
+      assertThumbOverFist(transforms, side, solid, into, `${name} ${hand}`);
     }
   }
 });
