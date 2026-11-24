@@ -93,4 +93,5 @@ export const FIT_VIEWS = [
 export const OVERHEAD_SUN = from(-0.45, 0.45, 1);
 
 // The view sets a look can draw a tile from, by the name a review asks for.
+/** @type {Readonly<Record<string, View[]>>} */
 export const VIEW_SETS = { review: REVIEW_VIEWS, underside: UNDERSIDE_VIEWS, straight: STRAIGHT_VIEWS, fit: FIT_VIEWS };
