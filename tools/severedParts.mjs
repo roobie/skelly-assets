@@ -1,7 +1,10 @@
+// @ts-check
 // The severed parts the mob export bakes: per cut point of each mob type that models/mobs.json's `severed` names, one
 // model for each set of cut points below it a cut there may find already gone, cut from the first row of that type in
 // its pack. Parts follow the type rather than the row, so a type's variants share one set of items;
 // tools/severedPartBake.mjs bakes them with that row.
+/** @import { MobRow } from './layout.mjs' */
+/** @import { Bone } from './packages/mobgen/src/core/body.ts' */
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { readMobRows } from './layout.mjs';
@@ -13,6 +16,22 @@ const repo = resolve(import.meta.dirname, '..');
 // below already gone and its model sidecar, so a game finds the part each cut leaves with one lookup.
 export const SEVERED_INDEX = 'severed/index.json';
 
+/**
+ * models/mobs.json's `severed`: the pack and taxonomy its parts take, the types cut by the pack of their rows with the
+ * title each gives its parts, a title per cut point and per cut point already gone, and the catalogue material each
+ * mobgen material is drawn as.
+ * @typedef {object} SeveredSheet
+ * @property {string} pack
+ * @property {Record<string, unknown>} taxonomy
+ * @property {Readonly<Record<string, Readonly<Record<string, string>>>>} mobs
+ * @property {Readonly<Record<string, string>>} cuts
+ * @property {Readonly<Record<string, string>>} without
+ * @property {Readonly<Record<string, string>>} materials
+ */
+/** @typedef {{ bone: string; without: readonly string[]; id: string; title: string; path: string; taxonomy: Record<string, unknown> }} SeveredPart */
+/** @typedef {{ mob: string; source: MobRow; pack: string; materials: Readonly<Record<string, string>>; index: string; parts: SeveredPart[] }} SeveredPlan */
+
+/** @param {string} bone */
 const slug = (bone) =>
   bone
     .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
@@ -24,6 +43,11 @@ const slug = (bone) =>
  * material is drawn as, and per part the cut point it is cut at, the cut points below it already gone, its id, title,
  * GLB and taxonomy. `bonesOf(row)` gives the bones the row's body builds; `catalogue` is the set of catalogue material
  * ids.
+ * @param {SeveredSheet | undefined} severed
+ * @param {readonly MobRow[]} rows
+ * @param {(row: MobRow) => readonly Bone[]} bonesOf
+ * @param {ReadonlySet<string>} catalogue
+ * @returns {SeveredPlan[]}
  */
 export function severedPartPlan(severed, rows, bonesOf, catalogue) {
   if (severed === undefined) return [];
@@ -32,10 +56,17 @@ export function severedPartPlan(severed, rows, bonesOf, catalogue) {
     if (!catalogue.has(id))
       throw new Error(`models/mobs.json severed: materials draws ${name} as ${id}, which is no catalogue material`);
   }
+  /**
+   * @param {Readonly<Record<string, string>>} titles
+   * @param {string} field
+   * @param {string} bone
+   * @param {string} mob
+   */
   const titleOf = (titles, field, bone, mob) => {
-    if (!Object.hasOwn(titles, bone))
+    const title = Object.hasOwn(titles, bone) ? titles[bone] : undefined;
+    if (title === undefined)
       throw new Error(`models/mobs.json severed: ${field} has no title for ${bone}, a cut point of ${mob}`);
-    return titles[bone];
+    return title;
   };
   return Object.entries(mobs).flatMap(([sourcePack, types]) =>
     Object.entries(types).map(([mob, mobTitle]) => {
@@ -67,9 +98,11 @@ export function severedPartPlan(severed, rows, bonesOf, catalogue) {
 }
 
 // The plans of the repository's sheet, over the bones each source row builds.
+/** @param {string} [root] */
 export async function readSeveredParts(root = repo) {
   const { templateFor } = await import('./mobTemplates.mjs');
   const { build, generate } = await import('./packages/mobgen/src/core/generate.ts');
+  /** @type {{ severed?: SeveredSheet }} */
   const { severed } = JSON.parse(readFileSync(join(root, 'models/mobs.json'), 'utf8'));
   const catalogue = new Set(Object.keys(JSON.parse(readFileSync(join(root, 'models/finishes.json'), 'utf8'))));
   return severedPartPlan(

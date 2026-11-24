@@ -1,12 +1,28 @@
+// @ts-check
 // Point-list twin of mobgen/core/massProperties.ts and core/templateMass.ts.
 // Kept grid-free so the same arithmetic can consume serialized actor bodies.
+/** @import { Vec3 } from './packages/mobgen/src/core/math.ts' */
+import { AXES } from './packages/construct/src/foundation/math.ts';
+
+/**
+ * @param {number} value
+ * @param {string} name
+ */
 const positive = (value, name) => {
   if (!(value > 0 && Number.isFinite(value))) throw new RangeError(`${name} must be positive and finite`);
 };
+/** @param {readonly Vec3[]} points */
 const nonempty = (points) => {
   if (points.length === 0) throw new RangeError('selected bones contain no voxels');
 };
 
+/**
+ * @param {readonly Vec3[]} points
+ * @param {Vec3} center
+ * @param {number} voxelMass
+ * @param {number} size
+ * @returns {[Vec3, Vec3, Vec3]}
+ */
 const tensorAtCenter = (points, center, voxelMass, size) => {
   let xx = 0;
   let yy = 0;
@@ -33,6 +49,11 @@ const tensorAtCenter = (points, center, voxelMass, size) => {
   ];
 };
 
+/**
+ * @param {readonly Vec3[]} points
+ * @param {number} voxelSize
+ * @param {number} voxelMass
+ */
 export const voxelMassProperties = (points, voxelSize, voxelMass) => {
   positive(voxelSize, 'voxelSize');
   positive(voxelMass, 'voxelMass');
@@ -45,24 +66,35 @@ export const voxelMassProperties = (points, voxelSize, voxelMass) => {
     sy += p[1];
     sz += p[2];
   }
+  /** @type {Vec3} */
   const center = [sx / points.length, sy / points.length, sz / points.length];
   return { mass: points.length * voxelMass, center, inertia: tensorAtCenter(points, center, voxelMass, voxelSize) };
 };
 
+/**
+ * @param {readonly Vec3[]} points
+ * @param {number} voxelSize
+ * @param {Vec3} [reference]
+ */
 export const voxelBounds = (points, voxelSize, reference = [0, 0, 0]) => {
   positive(voxelSize, 'voxelSize');
   nonempty(points);
   const half = voxelSize / 2;
+  /** @type {[number, number, number]} */
   const min = [Infinity, Infinity, Infinity];
+  /** @type {[number, number, number]} */
   const max = [-Infinity, -Infinity, -Infinity];
   for (const point of points) {
-    for (let axis = 0; axis < 3; axis++) {
+    for (const axis of AXES) {
       min[axis] = Math.min(min[axis], point[axis] - half);
       max[axis] = Math.max(max[axis], point[axis] + half);
     }
   }
+  /** @type {Vec3} */
   const center = [(min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2];
+  /** @type {Vec3} */
   const halfExtents = [(max[0] - min[0]) / 2, (max[1] - min[1]) / 2, (max[2] - min[2]) / 2];
+  /** @type {Vec3[]} */
   const corners = [];
   for (const x of [-halfExtents[0], halfExtents[0]]) {
     for (const y of [-halfExtents[1], halfExtents[1]]) {
@@ -74,6 +106,15 @@ export const voxelBounds = (points, voxelSize, reference = [0, 0, 0]) => {
   return { center, halfExtents, corners };
 };
 
+/**
+ * @param {object} of
+ * @param {readonly Vec3[]} of.points
+ * @param {number} of.voxelSize
+ * @param {number} of.bodyVoxelCount
+ * @param {number} of.bodyMassKg
+ * @param {Readonly<Record<string, number>>} [of.massFractions]
+ * @param {string} of.part
+ */
 export const partMassProperties = ({ points, voxelSize, bodyVoxelCount, bodyMassKg, massFractions, part }) => {
   positive(bodyMassKg, 'bodyMassKg');
   const fraction = massFractions?.[part] ?? points.length / bodyVoxelCount;

@@ -13,14 +13,17 @@ export const burstBones = (bones: readonly Bone[]): readonly string[] =>
   bones.filter((bone) => bone.disposition === 'burst').map((bone) => bone.id);
 
 /** Per hit region, the parts a cut there may start at, parents first, from the plan's region bones. */
-export const regionSeverableParts = (
+export const regionSeverableParts = <Region extends string = BodyRegion>(
   bones: readonly Bone[],
-  regionBones: Readonly<Record<BodyRegion, readonly string[]>>,
-): Readonly<Record<BodyRegion, readonly string[]>> => {
+  regionBones: Readonly<Record<Region, readonly string[]>>,
+): Readonly<Record<Region, readonly string[]>> => {
   const severable = severableParts(bones);
   return Object.fromEntries(
-    Object.entries(regionBones).map(([region, members]) => [region, severable.filter((id) => members.includes(id))]),
-  ) as unknown as Record<BodyRegion, readonly string[]>;
+    Object.entries<readonly string[]>(regionBones).map(([region, members]) => [
+      region,
+      severable.filter((id) => members.includes(id)),
+    ]),
+  ) as unknown as Record<Region, readonly string[]>;
 };
 
 /**
