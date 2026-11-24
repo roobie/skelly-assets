@@ -32,7 +32,6 @@ local bust = {
   local chestFoot = self.pelvisHeight + self.waistHeight + self.ribHeight,
   chestHeight: level('neck_01') - chestFoot,
   armpit: (trunk.chestJoint[1] - chestFoot) / self.chestHeight,
-  chestLowShare: 0.95,
   clavicleCut: trunk.clavicleCut,
   // The shoulder joint is upperarm's head: out past the chest's side, below its top and behind the centre line.
   shoulderJointOut: head('upperarm_l')[0] - self.chestWidth / 2,
@@ -44,25 +43,20 @@ local bust = {
   'waistWidth', 'waistDepth', 'waistHeight', 'ribWidth', 'ribDepth', 'ribHeight', 'chestWidth', 'chestDepth',
   'trapeziusDrop', 'deltoidCrown', 'deltoidRadius', 'neckWidth', 'neckHeight',
 ]) + the(playerBust, [
-  'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare', 'hairCover',
-  'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack', 'hairLayerCount',
+  'chestLowShare', 'headWidth', 'headHeight', 'headDepth', 'jawHeight', 'torsoChamfer', 'chestChamfer', 'eyeShare',
+  'hairCover', 'hairThickness', 'facePower', 'hairSweep', 'hairRise', 'hairCrownShare', 'hairCrownBack',
+  'hairLayerCount',
 ]);
 
 local arm = joints.arm {
   foreDepthExtra: 0.001, wristDepthExtra: 0.0075, wristShare: 0.3,
 } + the(playerArm, [
   'seamOverlap', 'handOverlap', 'armChamfer', 'wristChamfer', 'fingerThicknessShare', 'thumbThicknessShare',
-  'fingerFrontShare', 'thumbProjection',
+  'fingerFrontShare', 'thumbWidth', 'thumbSlimShare',
 ]);
 
 local leg = joints.leg {
   thighTop: playerLeg.hipsOverlap - level('thigh_l'),
-  thighWidth: 0.155, thighDepth: 0.19,
-  shinWidth: 0.11, shinDepth: 0.135,
-  shoeWidth: 0.11,
-  // The toes' tips and the heel's back, from the ankle's joint along z: flesh, set by hand against the mannequin's
-  // shoe, since its skeleton ends the toes at ball_leaf, short of their tips, and has no heel.
-  toeReach: 0.2408, heelReach: 0.0612,
 } + the(playerLeg, [
   'thighChamfer', 'shinChamfer', 'shoeChamfer', 'kneeOverlap', 'ankleOverlap', 'upperSideInset', 'upperLengthInset',
   'upperBackShift',

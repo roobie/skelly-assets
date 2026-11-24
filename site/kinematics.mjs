@@ -29,8 +29,9 @@
 /** @typedef {{ root: Vec3; rotations: Readonly<Record<string, Mat3>> }} Pose */
 /** @typedef {{ bone: string; asked: Angles; held: Angles }[]} ClampReport The bones a solve held to their limits. */
 /**
- * How a part is bound to its bone: its box and, if the doll rests it turned, the turn and the box as it hangs.
- * @typedef {{ box: Box; turn?: Quat | undefined; hanging?: { box: Box; about: Vec3 } | undefined }} Bind
+ * How a part is bound to its bone: its box and, if the part is boxed off the rig's axes, its exact box, the turn that
+ * carries that box into the rig frame and the point the turn is about.
+ * @typedef {{ box: Box; bound?: { box: Box; turn: Quat; about: Vec3 } | undefined }} Bind
  */
 
 const DEG = Math.PI / 180;
@@ -332,18 +333,17 @@ export const applyPoint = ({ r, t }, p) => add(mulMV(r, p), t);
  */
 export const composed = (a, b) => ({ r: mulMM(a.r, b.r), t: applyPoint(a, b.t) });
 
-// A bound part's box where it is exact, with the rest placing that carries it into the rig frame: a part the doll rests
-// turned (tools/dollRig.mjs, `bind.hanging`) is boxed as it hangs before the turn swings it about the anchor it hangs
-// from, as its box turned would be a looser one at any angle but a quarter turn.
+// A bound part's box where it is exact, with the rest placing that carries it into the rig frame: a part boxed off the
+// rig's axes (tools/dollRig.mjs, `bind.bound`) is boxed before its turn swings it about a point, as its box turned
+// would be a looser one at any angle but a quarter turn.
 /**
  * @param {Bind} bind
  * @returns {{ box: Box; rest: Transform }}
  */
-export const boundBox = ({ box, turn, hanging }) => {
-  if (!turn) return { box, rest: { r: IDENTITY_M, t: [0, 0, 0] } };
-  if (!hanging) throw new Error('a part bound turned needs the box it hangs in');
-  const r = quatToMat3(turn);
-  return { box: hanging.box, rest: { r, t: sub(hanging.about, mulMV(r, hanging.about)) } };
+export const boundBox = ({ box, bound }) => {
+  if (!bound) return { box, rest: { r: IDENTITY_M, t: [0, 0, 0] } };
+  const r = quatToMat3(bound.turn);
+  return { box: bound.box, rest: { r, t: sub(bound.about, mulMV(r, bound.about)) } };
 };
 
 // World transform (rest -> posed) of every bone; `bones` are parents-first. A bone with no rotation keeps its rest

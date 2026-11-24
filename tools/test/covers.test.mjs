@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { coversProblems, dollDressings, dollGarments, readDressing, wornGarment } from '../dress.mjs';
+import { coversProblems, dollDressings, readDressing } from '../dress.mjs';
 import { installJsonnetSources } from '../sources.mjs';
 
 const repo = resolve(import.meta.dirname, '../..');
 
 test('a covers name is the part its piece is drawn on or a region drawn as a piece of that part', () => {
   const dressing = {
-    piece: 'chest',
-    slots: { cuff: { part: 'sleeve' }, collar: { part: 'neck' } },
+    piece: 'body',
+    slots: { body: { part: 'chest' }, cuff: { part: 'sleeve' }, collar: { part: 'neck' } },
     regions: { belly: ['chest#belly'], throat: ['neck', 'chest#yoke'] },
   };
   const problems = coversProblems(
@@ -20,20 +20,42 @@ test('a covers name is the part its piece is drawn on or a region drawn as a pie
       { id: 'vest_worn', covers: ['chest', 'sleeve'] },
       { id: 'mitt_worn_cuff', covers: ['belly'] },
       { id: 'hood_worn_collar', covers: ['belly'] },
-      { id: 'coat_worn_tail', covers: ['tail'] },
       { id: 'coat', covers: ['chest'] },
       { id: 'scarf_worn' },
     ],
     dressing,
   );
-  assert.equal(problems.length, 6);
+  assert.equal(problems.length, 5);
   // The throat holds the whole neck, so the neck's primitives mark no piece a consumer could hide by its name.
   assert.match(problems[0], /scarf_worn_collar covers throat, which holds its part neck whole.*name neck/);
   assert.match(problems[1], /vest_worn covers sleeve/);
   assert.match(problems[2], /mitt_worn_cuff covers belly/);
   assert.match(problems[3], /hood_worn_collar covers belly/);
-  assert.match(problems[4], /segment tail/);
-  assert.match(problems[5], /coat declares .* no worn piece/);
+  assert.match(problems[4], /coat declares .* no worn piece/);
+  assert.throws(() => coversProblems([{ id: 'coat_worn_tail', covers: ['tail'] }], dressing), /segment tail/);
+});
+
+test("a doll answers to the player's name for a piece's part with its own part, and cannot hide a region it does not hold", () => {
+  const dressing = {
+    piece: 'body',
+    slots: {
+      body: { part: 'spine_03', as: 'torso', unhidden: ['trunk'] },
+      clavicle: { part: { right: 'clavicle_r' }, as: 'clavicle' },
+    },
+    regions: { trunk: ['spine_01'], shoulders: ['spine_03', 'clavicle_r'] },
+  };
+  const problems = coversProblems(
+    [
+      { id: 'coat_worn_body', covers: ['torso', 'trunk'] },
+      { id: 'coat_worn_clavicle', covers: ['clavicle'] },
+      { id: 'vest_worn_body', covers: ['torso', 'shoulders'] },
+      { id: 'vest_worn_clavicle', covers: ['shoulders'] },
+      { id: 'cape_worn_body', covers: ['trunk'] },
+    ],
+    dressing,
+  );
+  // The doll holds the shoulders as several whole parts, so the name is the piece's part, not an error.
+  assert.equal(problems.length, 0);
 });
 
 // The authored items, which carry what each worn shell covers into its export.
@@ -46,8 +68,7 @@ test('every worn shell names in covers only its doll part or the regions drawn a
     'no item declares what it covers, so nothing was checked',
   );
   for (const dressing of dollDressings(readDressing(repo))) {
-    const own = items.filter(({ id }) => dollGarments(dressing, [wornGarment(id) ?? id]).length > 0);
-    assert.deepEqual(coversProblems(own, dressing), []);
+    assert.deepEqual(coversProblems(items, dressing), []);
   }
 });
 

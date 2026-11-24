@@ -1,7 +1,7 @@
 // The UAL doll, one of the dolls of models/dressing.libsonnet: the player's body plan measured off the UAL mannequin's
 // skeleton (models/dolls/ual/measures.libsonnet), so a game playing UAL's clips moves its parts. The fields are the
 // player's (models/dolls/player/doll.libsonnet), which says what each means.
-local skeleton = import 'models/dolls/ual/skeleton.libsonnet';
+local joints = import 'models/dolls/ual/joints.libsonnet';
 local playerSlots = import 'models/worn-slots.libsonnet';
 // A worn piece's segment names the player's part; here it is drawn in the UAL part that stands for it. The digits'
 // parts are named alike on both dolls, so a phalanx segment is drawn in the part of its own name. The clavicles are
@@ -12,19 +12,24 @@ local part = {
 };
 // The player's torso and pelvis turn about the bust's origin, where UAL's chest and pelvis turn about their own joints,
 // so a piece drawn in either is put back at the bust's origin as that part's frame holds it.
-local trunk = (import 'models/dolls/ual/joints.libsonnet').trunk;
+local trunk = joints.trunk;
 local negated(v) = [-x for x in v];
 local origin = { body: negated(trunk.chestJoint), pelvis: negated(trunk.pelvis) };
+// A piece's `covers` names its part as the player does (`as`, in the slot), which is the doll's own part here. The
+// player's trunk is the torso below the armpit; UAL's is the two spine parts below its chest part, which a piece drawn
+// in the chest hides none of.
+local unhidden = { body: ['trunk'] };
 {
   pack: 'skelly.body',
   rigPath: 'dolls/ual.rig.json',
-  // The skeleton's frame is the doll's, so the bust stands at its root part's joint, the pelvis bone's head.
+  // The skeleton's frame is the doll's, and the bust's frame stands at the hips' foot as the player's does.
   bust: 'ual_bust',
-  bustAt: skeleton.head('pelvis'),
+  bustAt: joints.bustBase,
   // The skeleton stands in a T-pose: the arm, built hanging, rests turned a quarter about z out to the side.
   limbs: [
     { name: 'arm', model: 'ual_arm', anchor: 'shoulder', turn: { axis: [0, 0, 1], degrees: -90 } },
     { name: 'leg', model: 'ual_leg', anchor: 'hip' },
+    { name: 'thumb', model: 'ual_thumb', anchor: 'thumb_root', on: 'arm', turn: { frame: joints.hand.thumbFrame } },
   ],
   sides: ['right', 'left'],
   mirrored: 'left',
@@ -38,8 +43,9 @@ local origin = { body: negated(trunk.chestJoint), pelvis: negated(trunk.pelvis) 
     sole: ['foot#sole', 'ball'],
   },
   slots: {
-    [segment]: playerSlots[segment] { part: std.get(part, segment, super.part) }
+    [segment]: playerSlots[segment] { part: std.get(part, segment, super.part), as: super.part }
                + (if std.objectHas(origin, segment) then { origin: origin[segment] } else {})
+               + (if std.objectHas(unhidden, segment) then { unhidden: unhidden[segment] } else {})
     for segment in std.objectFields(playerSlots)
   },
   places: [

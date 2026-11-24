@@ -18,8 +18,8 @@ local armSegment(id, massKg, finish, ports, segment={ segment: id }) = {
 };
 local hand = import 'models/measures/hand.libsonnet';
 local fingerCount = std.length(hand.fingers);
-// Each phalanx hangs from the one above it, the knuckle phalanx from the palm; the thumb's bones hang likewise from its
-// root on the palm's edge.
+// Each phalanx hangs from the one above it, the knuckle phalanx from the palm. The thumb is a limb of its own
+// (`player_thumb`), its bones hanging likewise from its root, each from the last one's tail.
 local phalanx(i, k) = armSegment(
   hand.part(hand.fingers[i], k), 0.15 / (fingerCount * hand.phalanges), { skin: skin },
   [jointPin(hand.part(hand.fingers[i], k))] + (if k + 1 < hand.phalanges then [jointSocket(hand.part(hand.fingers[i], k + 1), [0, -hand.length(i, k), 0])] else []),
@@ -31,11 +31,11 @@ local phalanxConnection(i, k) = {
 };
 local thumbBone(k) = armSegment(
   hand.thumbPart(k), 0.05 / hand.thumbBones, { skin: skin },
-  [jointPin(hand.thumbPart(k))] + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), [0, -hand.thumbLength(k), 0])] else []),
-  { segment: 'thumb', phalanx: k },
+  (if k == 0 then [] else [jointPin(hand.thumbPart(k))]) + (if k + 1 < hand.thumbBones then [jointSocket(hand.thumbPart(k + 1), hand.thumbTail(k))] else []),
+  { segment: 'thumb', phalanx: k, tail: hand.thumbTail(k) },
 );
 local thumbConnection(k) = {
-  from: (if k == 0 then 'palm' else hand.thumbPart(k - 1)) + '.' + hand.thumbPart(k),
+  from: hand.thumbPart(k - 1) + '.' + hand.thumbPart(k),
   to: hand.thumbPart(k) + '.' + hand.thumbPart(k),
 };
 local legSegment(id, massKg, finish, ports) = {
@@ -137,17 +137,14 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       armSegment('fore', 1.1, { skin: skin }, [jointPin('elbow'), jointSocket('wrist', arm.foreBone)]),
       armSegment('palm', 0.3, { skin: skin }, [
         jointPin('wrist'),
-        jointSocket(hand.thumbPart(0), hand.thumbRoot),
       ] + [jointSocket(hand.part(hand.fingers[i], 0), hand.knuckle(i)) for i in std.range(0, fingerCount - 1)]),
-    ] + [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)]
-      + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
+    ] + [phalanx(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     connections: [
       { from: 'upper.elbow', to: 'fore.elbow' },
       { from: 'fore.wrist', to: 'palm.wrist' },
-    ] + [thumbConnection(k) for k in std.range(0, hand.thumbBones - 1)]
-      + [phalanxConnection(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
+    ] + [phalanxConnection(i, k) for i in std.range(0, fingerCount - 1) for k in std.range(0, hand.phalanges - 1)],
     // The pivots code poses from: the shoulder the arm hangs from, sitting at the bust's shoulder anchor, each joint
-    // below it, and the grip a held item sits at in the palm.
+    // below it, the root the thumb hangs from and the grip a held item sits at in the palm.
     anchors: {
       shoulder: { part: 'upper', at: [0, 0, 0] },
       elbow: { part: 'upper', at: arm.upperBone },
@@ -156,6 +153,22 @@ local neckPin = jointPin('head') { normal: [0, -1, 0] };
       thumb_root: { part: 'palm', at: hand.thumbRoot },
       // The palm's y runs from the knuckles (0) to the wrist (1).
       grip: { part: 'palm', solid: 'palm', fraction: [0.5, 1 - hand.fistShare, 0.5] },
+    },
+  },
+  {
+    id: 'player_thumb',
+    title: 'Player thumb',
+    exportMass: 'parts',
+    taxonomy: { category: 'body-parts', tags: { material: ['flesh'] } },
+    voxelGrain: bust.voxelGrain,
+    // The right thumb hanging from its root as the arm hangs from the shoulder, a part per bone. The doll rests it
+    // turned on the hand (models/dolls/player/doll.libsonnet), since it runs askew of the arm's axes and a part is
+    // drawn square to its model's: in the arm's model its lean could only be a stair of steps.
+    parts: [thumbBone(k) for k in std.range(0, hand.thumbBones - 1)],
+    connections: [thumbConnection(k) for k in std.range(1, hand.thumbBones - 1)],
+    // The pivot code poses from: the thumb's root, sitting at the arm's thumb root anchor.
+    anchors: {
+      thumb_root: { part: hand.thumbPart(0), at: [0, 0, 0] },
     },
   },
   {

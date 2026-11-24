@@ -40,14 +40,16 @@
 // file's hand shorthand (site/fingers.mjs) can curl and spread a hand without naming bones. A finger flexes about the
 // knuckle row, the axis chosen so positive flex curls it toward the palm.
 //
-// The thumb hangs beside the palm's front edge the way the fingers hang below it, so its bones share the fingers'
-// frame; what sets it apart is its root, the only digit joint with all three freedoms, which read as one motion in
-// the joint's order above: abduction swings the thumb in the palm's plane, negative across the palm toward the little
-// finger; twist rolls it about its own length, positive turning its pad from facing the way the palm faces toward
-// facing the fingers, which is opposition; flex then lifts it out of the palm's plane toward the palm side about the
-// hinge the roll has turned, so a lifted thumb leans the way its pad faces. Across, roll and lift together bring the
-// pad against a fingertip or over a gripped handle; the two joints beyond only bend toward the pad. `presets` names
-// hand shorthands (site/fingers.mjs, `handAngles`) a pose file can ask for by name.
+// The thumb is a limb of its own, which the doll rests on the palm's front edge leaning out from the palm and forward
+// as UAL's does (models/measures/hand.libsonnet). In its own frame its bones hang as a finger's do and flex about the
+// same axis, which that rest lays along the palm's normal, square to the thumb: its joints bend it in the plane of the
+// palm, across toward the fingers, its pad facing them. What sets it apart is its root, the only digit joint with all
+// three freedoms, which read as one motion in the joint's order above: flex swings the thumb across the palm, positive
+// toward the little finger; twist rolls it about its own length, positive turning its pad back toward the palm, which
+// is opposition; abduction lifts it off the palm's plane on the palm's side. Lifted, the thumb's knuckle stands before
+// the palm, and the two joints beyond, which only bend toward the pad, lay it over a closed fist or bring its pad
+// against a fingertip. `presets` names hand shorthands (site/fingers.mjs, `handAngles`) a pose file can ask for by
+// name.
 //
 // `nodeRotation` is the rest rotation of a bone's glTF node, a quaternion [x, y, z, w] of the node's axes in the model's,
 // or one per side for a sided bone. The player's joints are nodes at their heads turned by nothing, and a clip's
@@ -79,13 +81,14 @@ local thumbBones = {
   [hand.thumbPart(k)]: digit('thumb') {
     part: hand.thumbPart(k),
     parent: if k == 0 then 'hand' else hand.thumbPart(k - 1),
+    along: hand.thumbTail(k),
     limits: joints.thumb[std.min(k, 2)],
   }
   for k in std.range(0, hand.thumbBones - 1)
 };
 {
   id: 'doll',
-  revision: 12,
+  revision: 15,
   root: 'pelvis',
   reference: 'left',
   clips: 'player.1',
@@ -114,10 +117,10 @@ local thumbBones = {
     // about the arm's flex axis a turn would move the hand in the palm's plane.
     // `grip`: where a handle held in a power grip crosses the palm's middle, as a share of its length from the wrist
     // (site/fingers.mjs, `palmSocket`); a hold may seat its item elsewhere. A power grip seats the handle across the
-    // palm short of the knuckle crease, where the fingers wrap right round it into a fist and the thumb's first segment
-    // comes down onto it (the grip preset's thumb, models/poses/hands.libsonnet); further toward the wrist, where the
-    // thumb's root sits, the fingers cannot reach round, and at the crease they only hook it and the palm stands beside
-    // it like a paddle. `gripSlant`: how far in degrees the handle turns from square
+    // palm short of the knuckle crease, where the fingers wrap right round it into a fist and the thumb wraps it from
+    // the other side (site/fingers.mjs, `closeHand`); further toward the wrist, where the thumb's root sits, the
+    // fingers cannot reach round, and at the crease they only hook it and the palm stands beside it like a paddle.
+    // `gripSlant`: how far in degrees the handle turns from square
     // across the palm, its thumb end toward the fingers, so it runs from the index finger's root to the heel of the
     // palm under the little finger. Each finger then reaches the same way round it; held square, as a bar is, the
     // little finger, whose knuckle sits furthest back, stands off a handle the others wrap. Much past a quarter turn

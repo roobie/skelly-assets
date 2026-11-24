@@ -24,7 +24,7 @@ import {
   sub,
   transpose,
 } from '../site/kinematics.mjs';
-import { dollDressings, modelMeshes, readDoll, readDressing } from './dress.mjs';
+import { dollDressings, exactBound, modelMeshes, readDoll, readDressing } from './dress.mjs';
 import { r4, unitQuat } from './keyFrames.mjs';
 import { outputPath } from './layout.mjs';
 
@@ -185,6 +185,12 @@ function checkSkeleton(bones, skeleton) {
   }
 }
 
+// The box a part copy fills exactly, `bound`, where its doll-frame box would bound more air than part: a copy its site
+// turns is boxed in its own axes before the turn. Contact is read off the faces of this box, so a fist closes on the
+// digit rather than on the corners of its turned box. The box lies in the doll frame turned about the bone's head,
+// `about`.
+const boundOf = ({ turn, points }, about) => (turn ? { bound: exactBound(points, turn, about) } : {});
+
 // Each bone of the content, once per side when sided, bound to its part copy in the doll. A bone's `along` and
 // `flexAxis` are written in its part's own frame, which the copy's mirror and site turn carry into the doll's, so a
 // limb rested off the way its model hangs has the same content on each side. `along` is a direction in the part, any
@@ -213,7 +219,8 @@ export function dollRig(doll, dressing) {
       const mirrored = spec.sided && side !== content.reference;
       const turning = copy.turn && quatToMat3(copy.turn);
       const intoDoll = (axis) => (turning ? mulMV(turning, axis) : axis);
-      const along = normalize(intoDoll(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along));
+      const inPart = normalize(copy.mirror ? [-spec.along[0], spec.along[1], spec.along[2]] : spec.along);
+      const along = intoDoll(inPart);
       const flexAxis = intoDoll(flexInPart);
       const sense = mirrored ? mirroredSense(flexInPart, name) : [1, 1, 1];
       const limits = Object.fromEntries(
@@ -236,7 +243,8 @@ export function dollRig(doll, dressing) {
           site: copy.site,
           box: copy.box,
           mirror: Boolean(copy.mirror),
-          ...(copy.turn ? { turn: copy.turn, hanging: copy.hanging } : {}),
+          ...(copy.turn ? { turn: copy.turn } : {}),
+          ...boundOf(copy, head),
         },
         at: copy.at,
         ...(spec.reach

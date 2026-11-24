@@ -19,7 +19,7 @@ was left out of the list silently.
 
 ## Decision
 
-The build probes every fitted garment on the doll at rest and fails on any body point that pokes out of the piece
+The build probes every fitted garment on every doll at rest and fails on any body point that pokes out of the piece
 meant to cover it, naming the garment, the doll's bone, the piece and how deep it pokes, and on any declaration its
 pieces do not enclose. See `tools/restPoke.mjs`.
 
@@ -30,6 +30,9 @@ pieces do not enclose. See `tools/restPoke.mjs`.
   names one place and its depth, and a poke anywhere else is still found.
 - The deepest poke of each bone and piece is what an entry caps, since that is the one figure a reader can check
   against the review sheets, and a garment that pokes deeper anywhere along the same pair has changed its fit.
+- A garment has one set of pieces for all dolls, so each doll is probed against each garment: a piece fitted to the
+  player that floats or gapes on another body is a fit bug, not a doll's own business. An allowance therefore names its
+  doll.
 - Only the build runs it, not `tools/check-sources.mjs`: it reads the built doll and pieces, which the sources alone
   do not give.
 

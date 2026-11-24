@@ -263,15 +263,18 @@ and one headless browser, `reviewSite.mjs`, so no tool serves it its own way.
 The doll is a named target, since a second body should be a record and not a second copy of the code. Each doll is a
 record in `../models/dolls/<id>/doll.libsonnet`, listed in `../models/dressing.libsonnet`; the build, the checks and
 `dollRig.mjs`'s `exportDollRigs` take the dressing as one doll wears it (`dress.mjs`, `dollDressing`) and run for every
-doll, and the manifest's `dolls` names each one's rig file. A garment's pieces are fitted to one doll
-(`dress.mjs`, `dollGarments`), and the rest-poke allowances name the doll they were judged on. What is still the
-player's alone, named so in the code (`PLAYER`) and not left to a first doll, is the baked wields and locomotion, the
-press check, the head-band fit and the showcase's whole worn view, because their content was worked out on the player's
-body, and a garment's `wornOn`, since fitting one garment to several dolls is not built. A limb a doll rests turned,
-such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models stay authored
-hanging as `docs/decisions/0008-dressing.md` has them; a hand or a loose wearable is read off a turned part as it hangs
-and swung with the turn, since the turned part's box is a looser one at any angle but a quarter turn. A loose wearable
-across both copies of a turned part is refused, as the copies turn apart and one model cannot follow both. A doll whose
+doll, and the manifest's `dolls` names each one's rig file. A garment's pieces are fitted to the player and checked on
+every doll, so the checks run each garment on each doll, and the rest-poke allowances name the doll they were judged
+on. What is still the player's alone, named so in the code (`PLAYER`) and not left to a first doll, is the baked wields
+and locomotion, the press check, the head-band fit and the showcase's whole worn view, because their content was worked
+out on the player's body, and a garment's `wornOn`, which names the player's slots, not each doll's. A limb a doll rests
+turned, such as a T-pose arm, is a `turn` on its site in the record and not a turn inside the model, so the models
+stay authored hanging as `docs/decisions/0008-dressing.md` has them. A limb may hang on another limb's anchor, and
+then takes that limb's turn before its own: the thumb is such a limb on the arm, hung from its hand's thumb root and
+turned by the frame its bones run in, since it leaves the hand askew of every axis and a part is drawn square to its
+model's. A hand or a loose wearable is read off a turned
+part as it hangs and swung with the turn, since the turned part's box is a looser one at any angle but a quarter turn.
+A loose wearable across both copies of a turned part is refused, as the copies turn apart and one model cannot follow both. A doll whose
 bones are not the player's gives its joints' places and its extra cuts to the body families as content
 (`packages/thing-authoring-tool/README.md`, Body families).
 A doll measured off a skeleton, such as UAL's, names that skeleton in its rig, and the rig is refused unless every

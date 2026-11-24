@@ -52,9 +52,9 @@ test("the player's built elbow and wrist stand as far from the joint before them
   }
 });
 
-// The player's digits hang straight down the arm from UAL's knuckles, so each bone runs as long as UAL's runs along
-// the arm.
-test("the player's built knuckles stand where UAL's do, and each digit bone runs as long along the arm as UAL's", () => {
+// The player's fingers hang straight down the arm from UAL's knuckles, so each bone runs as long as UAL's runs along
+// the arm; the thumb leans as UAL's does, so each of its bones runs as long as UAL's whole.
+test("the player's built knuckles stand where UAL's do, each finger bone runs as long along the arm as UAL's and each thumb bone as long as UAL's", () => {
   const along = (child) => span(boneOf(child).head, boneOf(boneOf(child).parent).head);
   const fromWrist = (joint) => span(skeleton[`${joint}_l`].head, skeleton.hand_l.head);
   [...player.fingers.map((finger) => `${finger}_01`), 'thumb_01'].forEach((joint) =>
@@ -65,5 +65,12 @@ test("the player's built knuckles stand where UAL's do, and each digit bone runs
       near(along(`${finger}_0${k + 1}.L`), player.phalanxLengths[i][k - 1], `${finger}_0${k}.L`, JOINT),
     ),
   );
-  [1, 2].forEach((k) => near(along(`thumb_0${k + 1}.L`), player.thumbLengths[k - 1], `thumb_0${k}.L`, JOINT));
+  [1, 2].forEach((k) =>
+    near(
+      along(`thumb_0${k + 1}.L`),
+      span(skeleton[`thumb_0${k + 1}_l`].head, skeleton[`thumb_0${k}_l`].head),
+      `thumb_0${k}.L`,
+      JOINT,
+    ),
+  );
 });

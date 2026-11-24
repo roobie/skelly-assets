@@ -273,6 +273,31 @@ it('exports a point anchor where its part frame puts it, off the grid and the dr
     }),
   ).toThrow();
 });
+it("stands the root at its authored point, its drawn voxels on the model frame's lattice", () => {
+  const input = fixture();
+  const rootAt: Vec3 = [0, 0.0013, 0];
+  const anchors = buildItem(
+    loadCatalogue({
+      ...input,
+      items: [
+        {
+          ...input.items[0],
+          rootAt,
+          anchors: {
+            root: { part: 'lower', at: [0, 0, 0] },
+            foot: { part: 'lower', solid: 'body', fraction: [0.5, 0, 0.5] },
+          },
+        },
+      ],
+    }).items[0]!,
+    loadCatalogue(input),
+    VOXEL,
+  ).handling.anchors!;
+  expect(anchors.root).toEqual(rootAt);
+  const layers = anchors.foot![1] / VOXEL.voxelGrain;
+  expect(layers).toBeCloseTo(Math.round(layers), 9);
+  expect(Math.abs(anchors.foot![1] - rootAt[1])).toBeLessThan(VOXEL.voxelGrain);
+});
 it('refuses baked collision on an inventory atom, whose export carries no parts', () => {
   const input = fixture();
   input.items[0]!.exportMass = 'inventory-atom';

@@ -4,13 +4,12 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
 import { exportDollRigs } from '../dollRig.mjs';
-import { dollDressing, dollDressings, dollGarments } from '../dress.mjs';
+import { dollDressing } from '../dress.mjs';
 import { thingEntryFile } from '../layout.mjs';
 import { partGlb } from './boxes.mjs';
 
 // Two toy dolls of a torso on a one-bone rig, in different packs, one with an arm hung from each side of its bust, to
-// show what the code does for a doll that is not the player: it writes each doll's rig, keyed by its own models, and
-// leaves the garments fitted to the player alone.
+// show what the code does for a doll that is not the player: it writes each doll's rig, keyed by its own models.
 const TORSO = [
   [-0.1, 0, -0.1],
   [0.1, 0.5, 0.1],
@@ -44,7 +43,7 @@ const toy = (extra) => ({
   ...extra,
 });
 const dressing = {
-  piece: 'torso',
+  piece: 'body',
   dolls: {
     player: toy({ pack: 'a.body', rigPath: 'a.rig.json', bust: 'a_bust', limbs: [] }),
     puppet: toy({
@@ -97,13 +96,7 @@ test("each doll's rig is written at its own path, with the models of its own par
   assert.equal(spine.bind.model, 'b_bust');
 });
 
-test('a garment fitted to the player is checked on the player alone', () => {
-  const [player, puppet] = dollDressings(dressing);
-  assert.deepEqual(dollGarments(player, ['vest', 'coat']), ['vest', 'coat']);
-  assert.deepEqual(dollGarments(puppet, ['vest', 'coat']), []);
-});
-
 test('a doll record may not restate a field the dressing shares', () => {
-  const clashing = { piece: 'torso', dolls: { player: { piece: 'chest' } } };
+  const clashing = { piece: 'body', dolls: { player: { piece: 'chest' } } };
   assert.throws(() => dollDressing(clashing, 'player'), /doll player: piece is also a shared field/);
 });

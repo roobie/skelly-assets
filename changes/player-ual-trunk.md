@@ -11,7 +11,7 @@ Upgrade:
 - Re-target pose files to the doll rig's revision 10, and re-judge any pose that places the arms: the shoulders have moved, and the arms rest turned.
 - Re-import the gun, two-hand wield and press check clips and their pose files: the stances, strikes and key frames have changed.
 - Re-seat anything drawn over the plate cuirass's breast or deltoid caps: the breast is narrower and the caps stand further out.
-- Seat each arm part from its bone's `bind.rest`, which now carries the arm's rest turn. A part's faces at rest are its `bind.hanging.box` as the part hangs, turned by `bind.turn` about `bind.hanging.about`. `bind.box` is only a loose bound on a turned part.
+- Seat each arm part from its bone's `bind.rest`, which now carries the arm's rest turn. A turned part's faces at rest are its `bind.bound.box`, turned by `bind.bound.turn` about `bind.bound.about`. `bind.box` is only a loose bound on a turned part.
 - Read the look point from the rig's `eye`, not from a copied constant.
 - Raise the player figure's head attachment frame (`attachmentFrames.head.at`) by 0.0063 m, so it stands 0.1058 m above the top of the neck.
 - Move anything worn at the shoulders, the spine or the neck to the new joints given above.

@@ -88,13 +88,9 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       thumbThicknessShare: positive,
       /** How far forward the fingers reach, as a share of the palm's half width. */
       fingerFrontShare: positive,
-      /** Where the thumb's root sits down the palm, as a share of the palm length. */
-      thumbRootShare: positive,
-      /** How far the thumb sinks into the palm's front edge, and how far past it the thumb stands out. */
-      thumbInset: positive,
-      thumbProjection: positive,
-      /** How far the thumb's root sits toward the palm's face; the palm segment does not draw it, the thumb's socket does. */
-      thumbVolar: positive,
+      /** The thumb's root bone's width across the hand, and the share of the root's section the bones beyond it keep. */
+      thumbWidth: positive,
+      thumbSlimShare: positive,
       /** How far each finger's knuckle sits back from the palm's length toward the wrist, the index first. */
       knuckleBack: numbers,
       /** The shoulder's, elbow's and wrist's joints in the arm's frame; without them they lie on its centre line. */
@@ -108,8 +104,8 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
       phalanxLengths: json(array(array(length))),
       thumbLengths: json(array(length)),
       /**
-       * A digit's far joint, or its tip, from its own joint in the arm's frame, for a digit that leans off hanging
-       * straight down, as a thumb reaching forward from the palm's edge does.
+       * A digit's far joint, or its tip, from its own joint in the digit's frame, for a digit whose bone runs a little
+       * off hanging straight down, as a skeleton's may.
        */
       tail: optional(json(point3)),
     }),
@@ -121,8 +117,6 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const halfPalm = d.palmWidth / 2;
   const halfThick = d.palmThickness / 2;
   const wristTop = wrist + d.foreLength * d.wristShare;
-  const thumbRoot = wrist - d.palmLength * d.thumbRootShare;
-  const thumbEdge = halfPalm - d.thumbInset;
   // The fingers across the palm, the index at the thumb's side, +z, each a shade shorter toward the little one.
   const span = halfPalm + halfPalm * d.fingerFrontShare;
   const fingerWidth = (span - (d.fingers.length - 1) * d.fingerGap) / d.fingers.length;
@@ -148,7 +142,8 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   const phalanxLength = (k: number) => ownLengths[k] ?? 0;
   const phalanxTop = knuckles - ownLengths.slice(0, phalanx).reduce((sum, length) => sum + length, 0);
   const thumbLength = (k: number) => d.thumbLengths[k] ?? 0;
-  const thumbTop = thumbRoot - d.thumbLengths.slice(0, phalanx).reduce((sum, length) => sum + length, 0);
+  // The thumb is drawn in its own frame, its root the origin, where a finger is drawn in the arm's.
+  const thumbTop = -d.thumbLengths.slice(0, phalanx).reduce((sum, length) => sum + length, 0);
   const measured = { upper: 0, fore: elbow, palm: wrist };
   if (d.origins) {
     requireJointHeights(d.origins, measured, 'arm');
@@ -163,7 +158,9 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
   /**
    * A digit's flesh, its section `xs` by `zs` about its joint, from `[bottom, top]` in its frame. One upright block for
    * a digit hanging straight; along a leaning one, upright steps, each moved across by no more than the flesh's half
-   * width from the last so that they overlap, since the voxel families draw no slanted solid.
+   * width from the last so that they overlap, since the voxel families draw no slanted solid. A digit that leans far,
+   * as a thumb does off its hand, is a limb of its own, drawn straight and rested turned, as a stair of steps reads as
+   * no thumb.
    */
   const digit = (id: string, xs: Vec2, [bottom, top]: Vec2, zs: Vec2): BoxSolid[] => {
     const [x, , z] = d.tail ?? [0, 0, 0];
@@ -314,24 +311,16 @@ export const avatarArm = (params: Readonly<Record<string, string>>): LimbSolid[]
         ]);
       }
       case 'thumb': {
-        // The metacarpal sinks into the palm's edge; the phalanges beyond it stand clear of the edge they hang beside,
-        // a shade slimmer, each reaching into the bone above it so the joint stays closed when it bends.
-        const slim = phalanx === 0 ? 1 : 0.8;
+        // Each bone is centred on its own line; the bones beyond the root are a shade slimmer, each reaching into the
+        // bone above it so the joint stays closed when it bends.
+        const slim = phalanx === 0 ? 1 : d.thumbSlimShare;
         const thick = halfThick * d.thumbThicknessShare * slim;
-        const zs: [number, number] =
-          phalanx === 0
-            ? [thumbEdge, halfPalm + d.thumbProjection]
-            : [halfPalm + 0.001, halfPalm + d.thumbProjection - 0.002];
-        // The measures' thumb joint lies on the palm's edge, the flesh in front of it; a skeleton's thumb bone, which
-        // a tail follows, runs through the flesh's middle.
-        const across: Vec2 = d.tail
-          ? [(zs[0] - zs[1]) / 2, (zs[1] - zs[0]) / 2]
-          : [zs[0] - thumbEdge, zs[1] - thumbEdge];
+        const half = (d.thumbWidth / 2) * slim;
         return digit(
           'thumb',
           [-thick, thick],
           ys(thumbTop - thumbLength(phalanx), thumbTop + (phalanx === 0 ? 0 : d.handOverlap)),
-          across,
+          [-half, half],
         );
       }
       default:
