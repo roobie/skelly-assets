@@ -11,6 +11,7 @@
 /** @import { RecipeExport, RecipeRow } from './packages/thing-export/src/recipe.ts' */
 /** @import { thingTasks } from './packages/thing-authoring-tool/src/exports.ts' */
 import { join } from 'node:path';
+import { SIDECAR_DIRECTORIES } from './layout.mjs';
 
 const here = import.meta.dirname;
 
@@ -32,9 +33,6 @@ const here = import.meta.dirname;
  * One row's generation as a worker runs it: the owning tool and the task its `tasks` gave the row.
  * @typedef {{ tool: RecipeToolName; task: unknown }} RecipeTask
  */
-
-/** The folder under a pack each tool writes its model sidecars to, by tool. */
-export const SIDECAR_DIRECTORIES = { gun: 'gungen', thing: 'things' };
 
 /**
  * The one export a single-row load gives.

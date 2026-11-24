@@ -34,10 +34,9 @@ import { dollDressing, dollFrom, dollModels, modelMeshes, PLAYER, readDressing }
 import { shardUnits } from './generation.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing, unitQuat } from './keyFrames.mjs';
-import { outputPath, sidecarFile } from './layout.mjs';
+import { outputPath, SIDECAR_DIRECTORIES, sidecarFile } from './layout.mjs';
 import { armSwing, askedClamps, framePhase, readLocomotion, walkAngles, walkLoop } from './locomotion.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
-import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
