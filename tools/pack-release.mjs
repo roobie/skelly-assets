@@ -1,3 +1,4 @@
+// @ts-check
 // Packs a built tree into release assets: one <packId>.tar.gz per pack directory, holding <packId>/..., plus the
 // manifest beside them, so a consumer pinning a release fetches only the packs it bundles. The manifest's renames also
 // ship alone as renames.json, so a consumer moving its pin maps its saved ids without reading the whole manifest, and
@@ -27,6 +28,10 @@ const TAR_NORMALIZE = [
   '--mode=u=rwX,go=rX',
 ];
 
+/**
+ * @param {string} tree
+ * @param {string} out
+ */
 export function packRelease(tree, out) {
   const entries = readdirSync(tree, { withFileTypes: true });
   const strays = entries.filter((entry) => !entry.isDirectory() && entry.name !== MANIFEST).map((entry) => entry.name);

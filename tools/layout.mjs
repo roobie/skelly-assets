@@ -4,7 +4,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, posix, resolve } from 'node:path';
 import { recipePackIds } from './recipes.mjs';
-import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 import { inheritTaxonomy } from './taxonomy.mjs';
 
 /**
@@ -58,6 +57,9 @@ export function outputPath(packId, file) {
   }
   return posix.join(packId, file);
 }
+
+/** The folder under a pack each recipe tool (tools/recipeTools.mjs) writes its model sidecars to, by tool. */
+export const SIDECAR_DIRECTORIES = { gun: 'gungen', thing: 'things' };
 
 // A model's sidecar at its logical path under its pack, in the folder its tool writes sidecars to; it holds what the
 // GLB does not, such as the anchors.

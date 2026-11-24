@@ -1,3 +1,4 @@
+// @ts-check
 // Holds every cue into skelly's source to the one form README.md, "Cues into skelly", sets. It checks the form
 // only: resolving a cue needs a skelly checkout, which this repository's checks do not have.
 import { execFileSync } from 'node:child_process';
@@ -15,10 +16,18 @@ const PINNED = /https:\/\/github\.com\/roobie\/skelly\/(?:blob|tree|commit)\//g;
 const PROSE = /\b(?:skelly|deadvox)'s `/gi;
 const LINE_NUMBER = /:\d+$|#L\d+/;
 
+/**
+ * @param {string} text
+ * @param {number} index
+ */
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
 
-/** Every cue in `text` that breaks the form, as `{ line, problem }`. */
+/**
+ * Every cue in `text` that breaks the form, as `{ line, problem }`.
+ * @param {string} text
+ */
 export function cueIssues(text) {
+  /** @type {{ line: number; problem: string }[]} */
   const issues = [];
   for (const match of text.matchAll(PROSE)) {
     issues.push({ line: lineOf(text, match.index), problem: `prose cue "${match[0]}…"; cue ${SKELLY_URL}, \`path\`` });
@@ -28,6 +37,7 @@ export function cueIssues(text) {
   }
   for (const match of text.matchAll(CUE)) {
     const path = match[1];
+    if (path === undefined) continue;
     if (LINE_NUMBER.test(path)) {
       issues.push({ line: lineOf(text, match.index), problem: `\`${path}\` names a line; cue a symbol instead` });
     } else if (path.startsWith('/') || path.split('/').includes('..')) {

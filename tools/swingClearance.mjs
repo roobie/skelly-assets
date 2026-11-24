@@ -26,6 +26,7 @@ import { availableParallelism } from 'node:os';
 import { resolve } from 'node:path';
 import { AUTHORED_LATERAL, evenClocks, motionAtSite, motionLayers, poseAt, stowPlanesOf } from '../site/motionPose.mjs';
 import { shardUnits } from './generation.mjs';
+import { closureCode } from './importClosure.mjs';
 import { column, dot, perAxis } from './packages/construct/src/foundation/math.ts';
 import { shareStages } from './packages/motion/src/motion.ts';
 import { FRONT_TURNS, toModelFrame } from './packages/thing-core/src/frame.ts';
@@ -311,17 +312,9 @@ export function sweepTasks({ grain, motions, vehicles }) {
 }
 
 const HERE = import.meta.dirname;
-// The code a sweep runs, whole folders for the shared packages since naming their modules one by one would miss a new
-// import. A cached sweep is only as good as the code and the runtime that made it.
-const CHECKER_CODE = [
-  'swingClearance.mjs',
-  'swingSweep.mjs',
-  'pieceSolid.mjs',
-  '../site/motionPose.mjs',
-  'packages/thing-core/src',
-  'packages/construct/src/foundation',
-];
-const checkerHash = () => codeFingerprint(HERE, CHECKER_CODE);
+// The code a sweep runs: this module's import closure, which holds the worker's own, since each sweep runs this module
+// on a thread. A cached sweep is only as good as the code and the runtime that made it.
+const checkerHash = () => codeFingerprint(HERE, closureCode(HERE, [import.meta.filename]));
 
 /**
  * @param {SweepTask} task

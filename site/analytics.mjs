@@ -1,3 +1,4 @@
+// @ts-check
 // The visit counter of the Pages deploy: Simple Analytics, which needs no configuration, and the site footer that
 // carries its badge and the rendered version. They are added to the assembled site rather than to each page's source or each viewer's build, so no page that is published can
 // miss the script.
@@ -9,6 +10,7 @@ export const ANALYTICS_SCRIPT = '<script async src="https://scripts.simpleanalyt
 // the page renders, since it is the one footer every document page shares.
 const FOOTER_TEMPLATE = readFileSync(new URL('./footer.html', import.meta.url), 'utf8').trimEnd();
 export const VERSION_MARK = '<!--build-version-->';
+/** @param {string} versionHtml */
 export const footerFor = (versionHtml) => FOOTER_TEMPLATE.replace(VERSION_MARK, versionHtml);
 export const FOOTER = footerFor('');
 
@@ -16,8 +18,13 @@ export const FOOTER = footerFor('');
 // footer in flow; a full-viewport tool page or a viewer leaves it off, since a footer there would cover controls that
 // are anchored to the bottom of the screen.
 export const FOOTER_ATTRIBUTE = 'data-site-footer';
+/** @param {string} html */
 export const optsIntoFooter = (html) => new RegExp(`<body\\b[^>]*\\s${FOOTER_ATTRIBUTE}[\\s>=/]`).test(html);
 
+/**
+ * @param {string} html
+ * @param {string} [versionHtml]
+ */
 export function withAnalytics(html, versionHtml = '') {
   if (html.includes(ANALYTICS_SCRIPT)) return html;
   if (!html.includes('</head>')) throw new Error('a page needs a closing </head> tag to carry the analytics script');
@@ -31,7 +38,9 @@ const FOOTER_ANCHOR = 'https://www.simpleanalytics.com?utm_source';
 
 // A built page lacks neither the script nor a footer it opted into, with the version slot filled, so a skipped page
 // fails the deploy build.
+/** @param {string} html */
 export function checkAnalytics(html) {
+  /** @type {string[]} */
   const lacks = [];
   if (!html.includes(ANALYTICS_SCRIPT)) lacks.push('the script');
   if (optsIntoFooter(html) && !(html.includes(FOOTER_ANCHOR) && !html.includes(VERSION_MARK)))
@@ -40,12 +49,17 @@ export function checkAnalytics(html) {
 }
 
 // Every HTML page under dir, however deep a viewer nests it.
+/** @param {string} dir */
 export function pagesUnder(dir) {
   return readdirSync(dir, { withFileTypes: true, recursive: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.html'))
     .map((entry) => join(entry.parentPath, entry.name));
 }
 
+/**
+ * @param {string} dir
+ * @param {string} [versionHtml]
+ */
 export function addAnalytics(dir, versionHtml = '') {
   for (const page of pagesUnder(dir)) {
     const html = withAnalytics(readFileSync(page, 'utf8'), versionHtml);

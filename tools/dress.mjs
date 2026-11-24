@@ -787,7 +787,7 @@ function layerTwinOf(model, dressing) {
 /**
  * Each model's `wornOn` by id, the doll part it sits on (tools/manifest.mjs, `buildManifest`): a worn piece's is the
  * part whose frame it is drawn in, and a piece fitted over other clothing has its worn twin's; a wearable with no
- * pieces has its place's part with the copy it sits on (placedOn), from `dollParts` (readDollParts). A wearable with
+ * pieces has its place's part with the copy it sits on (placedOn), from `dollParts` (tools/dollParts.mjs, readDollParts). A wearable with
  * pieces has none: its pieces are what sit on the doll.
  * @param {readonly DressModel[]} models
  * @param {DollDressing} dressing
@@ -830,22 +830,6 @@ function placedOn(model, dressing, { anchors, sided }) {
   if (!part) throw new Error(`${model.id}: the doll's bust has no anchor ${place.anchor} on a part`);
   const copy = place.both ? { both: true } : sided.includes(part) ? { side: dressing.sides[0] } : {};
   return { part, ...copy, ...(place.anchor === undefined ? {} : { anchor: place.anchor }) };
-}
-
-/**
- * What a manifest's `wornOn` needs of the doll's catalogue rows, since the built sidecars keep only points: the part
- * each bust anchor lies on, `anchors`, and the parts of the limbs, `sided`, which the doll has a copy of on each side.
- * Import only after installJsonnetSources, as the catalogue reads the compiled rows.
- * @param {DollDressing} dressing
- * @returns {Promise<DollParts>}
- */
-export async function readDollParts(dressing) {
-  const { readItems } = await import('./packages/thing-authoring-tool/src/cli/content.ts');
-  const [bust, ...limbs] = readItems(dollModels(dressing));
-  return {
-    anchors: Object.fromEntries(Object.entries(bust?.anchors ?? {}).map(([name, { part }]) => [name, part])),
-    sided: limbs.flatMap(({ parts }) => parts.map(({ id }) => id)),
-  };
 }
 
 // The quarter turn about x that stands a model lying on its back, head end at -z, up with its front at +z.

@@ -32,12 +32,12 @@ import { compilePose, frameAngles } from '../site/poseFile.mjs';
 import { dollRig } from './dollRig.mjs';
 import { dollDressing, dollFrom, dollModels, modelMeshes, PLAYER, readDressing } from './dress.mjs';
 import { shardUnits } from './generation.mjs';
+import { closureCode } from './importClosure.mjs';
 import { evaluateJsonnet } from './jsonnet/index.mjs';
 import { lookAt, posedAt, poseJson, r4, shoulderPoints, standing, unitQuat } from './keyFrames.mjs';
-import { outputPath, sidecarFile } from './layout.mjs';
+import { outputPath, SIDECAR_DIRECTORIES, sidecarFile } from './layout.mjs';
 import { armSwing, askedClamps, framePhase, readLocomotion, walkAngles, walkLoop } from './locomotion.mjs';
 import { codeFingerprint, resultFolder } from './packages/thing-export/src/cache.ts';
-import { SIDECAR_DIRECTORIES } from './recipeTools.mjs';
 
 const repo = resolve(import.meta.dirname, '..');
 const POSES = 'models/poses';
@@ -581,19 +581,9 @@ function walkClips(rig, gait, name, cls, { weapon, sockets }, stances, held, mes
 }
 
 const HERE = import.meta.dirname;
-// The code a bake runs. A cached bake is only as good as the code and the runtime that made it.
-const BAKE_CODE = [
-  'wields.mjs',
-  'keyFrames.mjs',
-  'locomotion.mjs',
-  '../site/poseFile.mjs',
-  '../site/fingers.mjs',
-  '../site/clearance.mjs',
-  '../site/hiding.mjs',
-  '../site/kinematics.mjs',
-  '../site/clipFrames.mjs',
-];
-const bakeHash = () => codeFingerprint(HERE, BAKE_CODE);
+// The code a bake runs: this module's import closure. A cached bake is only as good as the code and the runtime that
+// made it.
+const bakeHash = () => codeFingerprint(HERE, closureCode(HERE, [import.meta.filename]));
 const CACHE_FOLDER = 'wields';
 
 // What `classClips` reads, so its key changes with nothing else the wields or the gait say. The weapon's solid is its
